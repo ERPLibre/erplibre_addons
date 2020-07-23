@@ -47,7 +47,7 @@ ERPLibre Base Website Sale
         'website_sale_stock_force_block',
         'website_sale_suggest_create_account',
         'website_sale_tax_toggle',
-        'website_sale_vat_required',
+        #'website_sale_vat_required',
         'website_sale_wishlist_keep',
         'website_snippet_carousel_product',
         'website_snippet_product_category',
