@@ -47,7 +47,7 @@ ERPLibre base
         'partner_quebec_tz',
 
         # addons/Smile-SA_odoo_addons
-        'Smile-SA_odoo_addons',
+        'smile_website_login_as',
 
     ],
     'data': [],

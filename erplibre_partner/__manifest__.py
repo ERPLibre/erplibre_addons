@@ -29,7 +29,7 @@ ERPLibre partner
         'partner_change_parent',
         'partner_change_parent_affiliate',
         'partner_contact_type_visible',
-        'partner_duplicate_mgmt',
+        # 'partner_duplicate_mgmt',   depend de unidecode
         'partner_duplicate_multi_phone',
         'partner_duplicate_multi_relation',
         'partner_edit_group',
