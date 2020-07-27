@@ -3,13 +3,13 @@
 {
     'name': 'ERPLibre base',
     'version': '0.1',
-    'author': "ERPLibre",
-    'website': 'https://erplibre.ca',
+    'author': "TechnoLibre",
+    'website': 'https://technolibre.ca',
     'license': 'AGPL-3',
-    'category': 'Human Resources',
-    'summary': 'INSTALL my base',
+    'category': 'Base',
+    'summary': 'INSTALL ERPLibre base',
     'description': """
-ERPLibreBase
+ERPLibre base
 ===============
 
 """,
@@ -28,6 +28,14 @@ ERPLibreBase
 
         # Muk
         'muk_web_theme',
+        'muk_utils',
+        'muk_branding',
+        'muk_hr_utils',
+        'muk_mail_branding',
+        'muk_web_branding',
+        'muk_web_theme_mail',
+        'muk_web_utils',
+        'muk_website_branding',
 
         # Server-tools
         'fetchmail_notify_error_to_sender',
@@ -37,6 +45,10 @@ ERPLibreBase
 
         # Partner
         'partner_quebec_tz',
+
+        # addons/Smile-SA_odoo_addons
+        'Smile-SA_odoo_addons',
+
     ],
     'data': [],
     'installable': True,
