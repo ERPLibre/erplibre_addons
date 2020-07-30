@@ -33,7 +33,7 @@ ERPLibre stock
         'stock_inventory_category_domain',
         'stock_inventory_internal_location',
         'stock_inventory_line_domain',
-        'stock_inventory_line_domain_barcode',
+        #'stock_inventory_line_domain_barcode',
         'stock_location_position_alphanum',
         'stock_picking_change_destination',
         'stock_serial_single_quant',
