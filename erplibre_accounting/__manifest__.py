@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'ERPLibre contract',
+    'name': 'ERPLibre accounting',
     'version': '0.1',
     'author': "TechnoLibre",
     'website': 'https://technolibre.ca',
@@ -9,7 +9,7 @@
     'category': 'stock',
     'summary': 'INSTALL ERPLibre accounting',
     'description': """
-ERPLibre contract
+ERPLibre accounting
 ==================
 
 """,
@@ -18,8 +18,8 @@ ERPLibre contract
         'erplibre_base',
 
         # addons/OCA_account-budgeting
-        'account_budget_oca',
-        'account_budget_template',
+        # 'account_budget_oca',
+        # 'account_budget_template',
 
         # OCA_account-closing
         # 'account_cutoff_accrual_base',
