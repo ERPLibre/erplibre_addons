@@ -249,6 +249,11 @@ ERPLibre accounting
         # 'sale_order_margin_percent',
         # 'sale_report_margin',
 
+        # TODO mettre nom du repo addons pour ces modules
+        'accounting_pdf_reports',
+        'om_account_accountant',
+        'om_account_asset',
+        'om_account_budget',
     ],
     'data': [],
     'installable': True,
