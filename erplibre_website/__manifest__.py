@@ -1,0 +1,86 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+{
+    'name': 'ERPLibre website',
+    'version': '0.1',
+    'author': "TechnoLibre",
+    'website': 'https://technolibre.ca',
+    'license': 'AGPL-3',
+    'category': 'website',
+    'summary': 'INSTALL ERPLibre website',
+    'description': """
+ERPLibre website
+=================
+
+""",
+    'depends': [
+        'portal',
+
+        # odoo/addons
+        'website',
+        'website_blog',
+        'website_crm',
+        'website_crm_partner_assign',
+        'website_crm_phone_validation',
+        'website_customer',
+        'website_event',
+        'website_event_questions',
+        'website_event_sale',
+        'website_event_track',
+        'website_form',
+        'website_form_project',
+        'website_forum',
+        'website_gengo',
+        'website_google_map',
+        'website_hr',
+        'website_hr_recruitment',
+        'website_links',
+        'website_livechat',
+        'website_mail',
+        'website_mail_channel',
+        'website_mass_mailing',
+        'website_membership',
+        'website_partner',
+        'website_payment',
+        'website_rating',
+        'website_slides',
+        'website_survey',
+        'website_theme_install',
+        'website_twitter',
+
+        # addons/OCA_website
+        'website_adv_image_optimization',
+        'website_anchor_smooth_scroll',
+        'website_blog_excerpt_img',
+        'website_breadcrumb',
+        'website_canonical_url',
+        'website_cookie_notice',
+        'website_crm_privacy_policy',
+        'website_crm_quick_answer',
+        'website_crm_recaptcha',
+        'website_form_builder',
+        'website_form_recaptcha',
+        'website_google_tag_manager',
+        'website_img_dimension',
+        'website_js_below_the_fold',
+        'website_lazy_load_image',
+        'website_legal_page',
+        'website_logo',
+        'website_media_size',
+        'website_megamenu',
+        # 'website_no_crawler',
+        'website_odoo_debranding',
+        'website_portal_address',
+        'website_portal_contact',
+        'website_snippet_anchor',
+        'website_snippet_big_button',
+        'website_snippet_country_dropdown',
+        'website_snippet_marginless_gallery',
+
+        # addons/Smile-SA_odoo_addons
+        'smile_website_login_as',
+
+    ],
+    'data': [],
+    'installable': True,
+}
