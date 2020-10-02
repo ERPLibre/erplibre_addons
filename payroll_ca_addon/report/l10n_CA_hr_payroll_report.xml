@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <report 
+            id="action_report_report_l10nCAfichepaye"
+            model="hr.payslip" 
+            string="Fiche de paye"
+            report_type="qweb-pdf"
+            name="payroll_ca_addon.report_l10n_CA_fiche_paye"
+            file="payroll_ca_addon.report_l10n_CA_fiche_paye"
+        />
+</odoo>
