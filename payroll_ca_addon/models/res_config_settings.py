@@ -12,3 +12,4 @@ class ResConfigSettings(models.TransientModel):
     cotisation_prevoyance = fields.Float(related='company_id.cotisation_prevoyance', string='Cotisation Patronale Prevoyance', readonly=False)
     org_ss = fields.Char(related='company_id.org_ss', string="Organisme de securite sociale", readonly=False)
     conv_coll = fields.Char(related='company_id.conv_coll', string="Convention collective", readonly=False)
+    module_l10n_CA_hr_payroll = fields.Boolean(string="Active l10_CA_hr_payroll")
