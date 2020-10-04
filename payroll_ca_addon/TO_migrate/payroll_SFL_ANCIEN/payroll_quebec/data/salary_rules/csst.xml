@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+            <!-- TODO Modifier pour CNESST 2020-->
 
         <record id="rule_qc_csst_ee_s" model="hr.salary.rule">
             <field name="name">CSST - Employee - Eligible Salaries</field>

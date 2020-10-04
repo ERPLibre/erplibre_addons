@@ -5,7 +5,7 @@
     'name': 'Canada Payroll',
     'category': 'Human Resources',
     'author': 'Alexandre Ferreira Benevides (TechnoLibre)',
-    'depends': ['hr_payroll', 'l10n_fr'],
+    'depends': ['hr_payroll', 'l10n_ca'],
     'description': """
 French Payroll Rules.
 =====================
