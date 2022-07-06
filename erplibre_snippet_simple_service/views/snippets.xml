@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Snippets -->
+    <template id="s_erplibre_snippet_simple_service" name="Erplibre Snippet Simple Service">
+        <section class="o_erplibre_snippet_simple_service">
+            <div class="container">
+                <h3 class="o_loading_erplibre_snippet_simple_service">LOADING...</h3>
+                <div class="row mt16 mb16">
+                    <b>closed:</b>
+                    <div class="text-center closed_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>current_user:</b>
+                    <div class="text-center current_user_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>date:</b>
+                    <div class="text-center date_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>date_delay:</b>
+                    <div class="text-center date_delay_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>external_participants:</b>
+                    <div class="text-center external_participants_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>hash:</b>
+                    <div class="text-center hash_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>name:</b>
+                    <div class="text-center name_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>participants:</b>
+                    <div class="text-center participants_value" />
+                </div>
+                <div class="row mt16 mb16">
+                    <b>url:</b>
+                    <div class="text-center url_value" />
+                </div>
+            </div>
+        </section>
+    </template>
+    <!-- Add snippets to menu -->
+    <template id="snippet_effect" inherit_id="website.snippets">
+        <xpath expr="//div[@id='snippet_effect']/div[hasclass('o_panel_body')]" position="inside">
+            <t
+                t-snippet="erplibre_snippet_simple_service.s_erplibre_snippet_simple_service"
+                t-thumbnail="/erplibre_snippet_simple_service/static/description/icon.png"
+            />
+        </xpath>
+    </template>
+    <!-- Add stylesheet and Javascript -->
+    <template id="assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="//link[last()]" position="after">
+            <link
+                rel="stylesheet"
+                type="text/scss"
+                href="/erplibre_snippet_simple_service/static/src/scss/erplibre_snippet_simple_service.scss"
+            />
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
+            <script
+                type="text/javascript"
+                src="/erplibre_snippet_simple_service/static/src/js/website.erplibre_snippet_simple_service.animation.js"
+            />
+        </xpath>
+    </template>
+</odoo>
