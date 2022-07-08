@@ -1,4 +1,4 @@
-odoo.define('erplibre_snippet_multiple_dialog.widgets', function (require) {
+odoo.define('erplibre_snippet_simple_service.widgets', function (require) {
     "use strict";
 
     var ajax = require("web.ajax");
@@ -12,17 +12,66 @@ odoo.define('erplibre_snippet_multiple_dialog.widgets', function (require) {
     var weContext = require("web_editor.context");
 
     let list_rooms = [];
-
+    let list_users = [];
 
     var result = $.Deferred(),
         _templates_loaded = ajax.loadXML(
-            "/erplibre_snippet_multiple_dialog/static/src/xml/widgets.xml",
+            "/erplibre_snippet_simple_service/static/src/xml/widgets.xml",
             core.qweb
         );
+    function available_channels() {
+        let _channels_def = $.Deferred()
 
+        rpc.query({
+            model: 'sinerkia_jitsi_meet.jitsi_meet',
+            method: 'search_read',
+            kwargs: {
+                fields: [
+                    "name",
+                    "roomName",
+                    "domaineName",
+                    "url",
+                    "id",
+                ],
+                context: weContext.get()
+            },
+        }).then(function (channels_list) {
+            console.log("rooms: " + JSON.stringify(channels_list));
+            list_rooms = channels_list;
+
+            _channels_def.resolve(channels_list);
+
+        });
+        return _channels_def;
+    }
+
+    function available_users(meet) {
+        let _users_def = $.Deferred()
+
+        rpc.query({
+            model: 'sinerkia_jitsi_meet.external_user',
+            method: 'search_read',
+            kwargs: {
+                domain: [
+                    ["meet", "=", parseInt(meet)],
+                ],
+                fields: [
+                    "name",
+                    "id"
+                ]
+            },
+        }).then(function (users_list) {
+            console.log("users: " + JSON.stringify(users_list));
+
+            list_users = users_list;
+            _users_def.resolve(users_list);
+
+        });
+        return _users_def;
+    }
 
     var ParamsForm = Dialog.extend({
-        template: "erplibre_snippet_multiple_dialog.ParamsForm",
+        template: "erplibre_snippet_simple_service.ParamsForm",
 
         /**
          * Store models info before creating widget
@@ -51,34 +100,19 @@ odoo.define('erplibre_snippet_multiple_dialog.widgets', function (require) {
             this.final_data = this.$("#model").val();
             console.log("save: " + this.final_data);
 
-            rpc.query({
-                model: 'sinerkia_jitsi_meet.external_user',
-                method: 'search_read',
-                kwargs: {
-                    domain: [
-                        ["meet", "=", parseInt(this.final_data)],
-                    ],
-                    fields: [
-                        "name",
-                        "id"
-                    ]
-                },
-            }).then(function (users_list) {
-                console.log("users: " + JSON.stringify(users_list));
 
+            available_users(this.final_data).done(function (){
                 var usersDialog = new UsersParamsForm(
-                    $(".multiple_dialog"), {}, users_list, ""
+                    $(".simple_service"), {}, list_users, ""
                 );
                 usersDialog.open();
-            });
-
-
+            })
 
             this._super.apply(this, arguments);
         },
     });
     var UsersParamsForm = Dialog.extend({
-        template: "erplibre_snippet_multiple_dialog.UsersParamsForm",
+        template: "erplibre_snippet_simple_service.UsersParamsForm",
 
         /**
          * Store models info before creating widget
@@ -97,6 +131,7 @@ odoo.define('erplibre_snippet_multiple_dialog.widgets', function (require) {
                 title: _t("Form Settings"),
                 size: "small",
             }, options);
+
             return this._super(parent, _options);
         },
 
@@ -107,7 +142,7 @@ odoo.define('erplibre_snippet_multiple_dialog.widgets', function (require) {
             this.final_data = this.$("#model").val();
             console.log("save: " + this.final_data);
 
-            document.getElementById("message").innerHTML = "user: " + this.final_data;
+            document.getElementById("message").innerHTML = "Jitsi url: " + this.final_data;
 
 
             this._super.apply(this, arguments);
@@ -121,38 +156,23 @@ odoo.define('erplibre_snippet_multiple_dialog.widgets', function (require) {
         });
     });
 
-    sAnimation.registry.multiple_dialog = sAnimation.Class.extend({
-        selector: '.multiple_dialog',
+    sAnimation.registry.simple_service = sAnimation.Class.extend({
+        selector: '.simple_service',
 
         /**
          * @override
          */
         start: function () {
-            let def = this._rpc({
-                model: 'sinerkia_jitsi_meet.jitsi_meet',
-                method: 'search_read',
-                kwargs: {
-                    fields: [
-                        "name",
-                        "roomName",
-                        "domaineName",
-                        "url",
-                        "id",
-                    ],
-                context: weContext.get()},
-            }).done(function (models_list) {
-                console.log("in rpc " + JSON.stringify(models_list));
-                list_rooms = models_list;
-                //_models_def.resolve(_.indexBy(models_list, "model"));
 
+            available_channels().done(function (){
                 var dialog = new ParamsForm(
-                    $(".multiple_dialog"), {}, list_rooms, ""
+                    $(".simple_service"), {}, list_rooms, ""
                 );
                 dialog.open();
-            });
+            })
 
 
-            return $.when(this._super.apply(this, arguments), def);
+            return $.when(this._super.apply(this, arguments));
 
         },
     });

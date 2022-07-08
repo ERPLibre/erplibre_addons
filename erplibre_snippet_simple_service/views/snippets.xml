@@ -1,47 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
-    <!-- Snippets -->
-    <template id="s_erplibre_snippet_simple_service" name="Erplibre Snippet Simple Service">
-        <section class="o_erplibre_snippet_simple_service">
-            <div class="container">
-                <h3 class="o_loading_erplibre_snippet_simple_service">LOADING...</h3>
-                <div class="row mt16 mb16">
-                    <b>closed:</b>
-                    <div class="text-center closed_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>current_user:</b>
-                    <div class="text-center current_user_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>date:</b>
-                    <div class="text-center date_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>date_delay:</b>
-                    <div class="text-center date_delay_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>external_participants:</b>
-                    <div class="text-center external_participants_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>hash:</b>
-                    <div class="text-center hash_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>name:</b>
-                    <div class="text-center name_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>participants:</b>
-                    <div class="text-center participants_value" />
-                </div>
-                <div class="row mt16 mb16">
-                    <b>url:</b>
-                    <div class="text-center url_value" />
-                </div>
+    <!-- Snippet Content-->
+    <template id="s_erplibre_snippet_simple_service" name="ERPLibre snippet simple service">
+        <section class="simple_service">
+            <div id="meet">
+                <p class="loading" id="message">Loading ...</p>
             </div>
         </section>
     </template>
@@ -70,4 +34,12 @@
             />
         </xpath>
     </template>
+
+    <template id="assets_editor" inherit_id="website.assets_editor">
+        <xpath expr=".">
+            <script type="text/javascript"
+                    src="/erplibre_snippet_simple_service/static/src/js/widgets.js"/>
+        </xpath>
+    </template>
+
 </odoo>
