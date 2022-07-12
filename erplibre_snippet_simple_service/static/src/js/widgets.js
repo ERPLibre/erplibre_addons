@@ -156,6 +156,24 @@ odoo.define('erplibre_snippet_simple_service.widgets', function (require) {
         });
     });
 
+    var Form = options.Class.extend({
+        init: function () {
+            this._super.apply(this, arguments);
+        },
+
+        /**
+         * Ask for a model or remove snippet.
+         */
+        onBuilt: function () {
+            available_channels().done(function () {
+                var dialog = new ParamsForm(
+                    $(".simple_service"), {}, list_rooms, ""
+                );
+                dialog.open();
+            })
+        },
+    });
+
     sAnimation.registry.simple_service = sAnimation.Class.extend({
         selector: '.simple_service',
 
@@ -164,12 +182,12 @@ odoo.define('erplibre_snippet_simple_service.widgets', function (require) {
          */
         start: function () {
 
-            available_channels().done(function (){
-                var dialog = new ParamsForm(
-                    $(".simple_service"), {}, list_rooms, ""
-                );
-                dialog.open();
-            })
+            // available_channels().done(function (){
+            //     var dialog = new ParamsForm(
+            //         $(".simple_service"), {}, list_rooms, ""
+            //     );
+            //     dialog.open();
+            // })
 
 
             return $.when(this._super.apply(this, arguments));
@@ -177,5 +195,5 @@ odoo.define('erplibre_snippet_simple_service.widgets', function (require) {
         },
     });
 
-
+    options.registry.erplibre_snippet_simple_service = Form;
 });

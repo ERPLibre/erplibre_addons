@@ -42,4 +42,13 @@
         </xpath>
     </template>
 
+    <!-- Add snippets options -->
+    <template id="snippet_options" inherit_id="website.snippet_options">
+        <xpath expr=".">
+            <!-- The form itself -->
+            <div data-js="erplibre_snippet_simple_service" data-selector=".simple_service"/>
+
+        </xpath>
+    </template>
+
 </odoo>

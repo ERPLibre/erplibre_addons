@@ -65,13 +65,15 @@ odoo.define('erplibre_snippet_simple_dialog.widgets', function (require) {
         });
     });
 
-    sAnimation.registry.simple_dialog = sAnimation.Class.extend({
-        selector: '.simple_dialog',
+    var Form = options.Class.extend({
+        init: function () {
+            this._super.apply(this, arguments);
+        },
 
         /**
-         * @override
+         * Ask for a model or remove snippet.
          */
-        start: function () {
+        onBuilt: function () {
             let def = this._rpc({
                 model: 'sinerkia_jitsi_meet.jitsi_meet',
                 method: 'search_read',
@@ -94,14 +96,9 @@ odoo.define('erplibre_snippet_simple_dialog.widgets', function (require) {
                 );
                 dialog.open();
             });
-
-
-
-            return $.when(this._super.apply(this, arguments), def);
-
         },
     });
 
-    //options.registry.erplibre_snippet_simple_dialog = Form;
+    options.registry.erplibre_snippet_simple_dialog = Form;
 
 });
