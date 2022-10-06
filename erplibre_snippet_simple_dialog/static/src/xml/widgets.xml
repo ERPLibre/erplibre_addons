@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2017 Tecnativa - Jairo Llopis
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl). -->
+
+<template>
+    <t t-name="erplibre_snippet_simple_dialog.ParamsForm">
+        <form>
+            <div class="form-group">
+                <label for="model">Choose this form's action</label>
+                <select id="model" class="form-control">
+                    <t t-foreach="widget.rooms" t-as="room">
+                        <option
+                            t-att-value="room.url"
+                            t-att-selected="room === widget.chosen ? 'selected' : null"
+                        >
+                            <t t-esc="room.url"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+        </form>
+    </t>
+</template>
