@@ -1,17 +1,17 @@
-odoo.define("demo_website_snippet.animation", function (require) {
+odoo.define("demo_website_snippet_defi.animation", function (require) {
     "use strict";
 
     let sAnimation = require("website.content.snippets.animation");
 
-    sAnimation.registry.demo_website_snippet = sAnimation.Class.extend({
-        selector: ".o_demo_website_snippet",
+    sAnimation.registry.demo_website_snippet_defi = sAnimation.Class.extend({
+        selector: ".o_demo_website_snippet_defi",
 
         start: function () {
             let self = this;
-            this._eventList = this.$(".demo_website_snippet_value");
+            this._eventList = this.$(".demo_website_snippet_defi_value");
             this._originalContent = this._eventList.text();
             let def = this._rpc({
-                route: "/demo_website_snippet/helloworld",
+                route: "/demo_website_snippet_defi/helloworld",
             }).then(function (data) {
                 if (data.error) {
                     return;

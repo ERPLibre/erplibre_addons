@@ -2,10 +2,10 @@
 <!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
     <!-- Snippets -->
-    <template id="s_demo_website_snippet" name="Demo Website Snippet">
-        <section class="o_demo_website_snippet">
+    <template id="s_demo_website_snippet_defi" name="Demo Website Snippet">
+        <section class="o_demo_website_snippet_defi">
             <div class="container">
-                <div class="text-center demo_website_snippet_value">Hello</div>
+                <div class="text-center demo_website_snippet_defi_value">Hello</div>
                 <input type="text" id="fds"></input><button>coucou</button>
             </div>
         </section>
@@ -14,8 +14,8 @@
     <template id="snippet_effect" inherit_id="website.snippets">
         <xpath expr="//div[@id='snippet_effect']/div[hasclass('o_panel_body')]" position="inside">
             <t
-                t-snippet="demo_website_snippet.s_demo_website_snippet"
-                t-thumbnail="/demo_website_snippet/static/description/icon.png"
+                t-snippet="demo_website_snippet_defi.s_demo_website_snippet_defi"
+                t-thumbnail="/demo_website_snippet_defi/static/description/icon.png"
             />
         </xpath>
     </template>
@@ -25,13 +25,13 @@
             <link
                 rel="stylesheet"
                 type="text/scss"
-                href="/demo_website_snippet/static/src/scss/demo_website_snippet.scss"
+                href="/demo_website_snippet_defi/static/src/scss/demo_website_snippet_defi.scss"
             />
         </xpath>
         <xpath expr="//script[last()]" position="after">
             <script
                 type="text/javascript"
-                src="/demo_website_snippet/static/src/js/website.demo_website_snippet.animation.js"
+                src="/demo_website_snippet_defi/static/src/js/website.demo_website_snippet_defi.animation.js"
             />
         </xpath>
     </template>
