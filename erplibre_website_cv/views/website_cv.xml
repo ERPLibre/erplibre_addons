@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="website_cv_view_form" model="ir.ui.view">
+        <field name="name">website_cv_form</field>
+        <field name="model">website.cv</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="website_cv_view_tree" model="ir.ui.view">
+        <field name="name">website_cv_tree</field>
+        <field name="model">website.cv</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="website_cv_website_cv_action_window"
+        name="Website CV"
+        res_model="website.cv"
+        view_mode="tree,form"
+    />
+</odoo>
