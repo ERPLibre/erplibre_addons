@@ -5,46 +5,239 @@
     <template id="s_erplibre_website_cv" name="Website CV">
         <section class="o_erplibre_website_cv">
             <body id="page-top">
-                <!-- Navigation-->
+                <!-- Navigation -->
                 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
                     <a class="navbar-brand js-scroll-trigger" href="#page-top">
                         <span class="d-block d-lg-none">Mathieu Benoit</span>
-                        <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="/erplibre_website_cv/static/description/profile.png" alt="Profil png" /></span>
+                        <span class="d-none d-lg-block">
+                            <img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                                src="/erplibre_website_cv/static/description/profile.png"
+                                alt="Profil png" />
+                        </span>
                     </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
                     <div class="collapse navbar-collapse" id="navbarResponsive">
                         <ul class="navbar-nav">
-                            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">About</a></li>
-                            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#experience">Experience</a></li>
-                            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#education">Education</a></li>
-                            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#skills">Skills</a></li>
-                            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#interests">Interests</a></li>
-                            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#awards">Awards</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#apropos">À propos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#experience">Expérience</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#projets">Projets</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#formations">Formations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#habiletes">Habiletés</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#interets">Intérêts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#trophes">Trophés</a>
+                            </li>
                         </ul>
                     </div>
                 </nav>
                 <div class="container-fluid p-0">
-                    <!-- About-->
-                    <section class="resume-section" id="about">
+                    <!-- À propos -->
+                    <section class="resume-section" id="apropos">
                         <div class="resume-section-content">
-                            <h1 class="mb-0">
-                                Mathieu
-                                <span class="text-primary">Benoit</span>
+                            <h1 class="mb-0"> Mathieu <span class="text-primary">Benoit</span>
                             </h1>
-                            <div class="subheading mb-5">
-                                2500 Chemin de Polytechnique · Montréal, QC H3T 1J4 · (317) 585-8468 ·
-                                <a href="mailto:name@email.com">info@mathieubenoit.ca</a>
+                            <div class="subheading mb-5"> 2500 Chemin de Polytechnique · Montréal,
+                                QC H3T 1J4 · (317) 585-8468 · <a href="mailto:name@email.com">
+                                info@mathieubenoit.ca</a>
                             </div>
-                            <p class="lead mb-5">En tant que défenseur passionné du mouvement du logiciel libre, Mathieu a fondé TechnoLibre en suivant ses principes. Fort de ses connaissances et de son expérience étendues, Mathieu a piloté la feuille de route technique et l'architecture logicielle de notre produit phare, ERPLibre.</p>
+                            <p class="lead mb-5">En tant que défenseur passionné du mouvement du
+                                logiciel libre, Mathieu a fondé TechnoLibre en suivant ses
+                                principes. Fort de ses connaissances et de son expérience étendues,
+                                Mathieu a piloté la feuille de route technique et l'architecture
+                                logicielle de notre produit phare, ERPLibre.</p>
                             <div class="social-icons">
-                                <a class="social-icon" href="https://github.com/mathben"><img class="social-icon" src="/erplibre_website_cv/static/description/github_logo.png"/><i class="fab fa-github"></i></a>
+                                <a class="social-icon" href="https://github.com/mathben">
+                                    <img
+                                        src="/erplibre_website_cv/static/description/logo_github.png"
+                                        alt="Logo GitHub"
+                                        style="width: 100%; height: 100%; object-fit: contain;" />
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Expérience -->
+                    <section class="resume-section" id="experience">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Expérience</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Démarrage d'entreprise en technologie libre</h3>
+                                    <div class="subheading mb-3">TechnoLibre</div>
+                                    <p>· Mise en place d'une gestion de projet avec traçabilité de
+                                        l'environnement de développement ERPLibre. </p>
+                                    <p>· Développer un générateur de code pour simplifier et
+                                        accélérer le développement de modules dans ERPLibre. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2020</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Démarrage organisme à but non lucratif</h3>
+                                    <div class="subheading mb-3">SantéLibre</div>
+                                    <p>· Développer une plateforme de connexion entre les
+                                        entreprises
+                                        pour des demandes de production sur imprimante 3D. </p>
+                                    <p>· Participer au hackathon Code Life Ventilator Challenge</p>
+                                    <p>· Gérer les projets RetD pour les urgences de la pandémie au
+                                        Québec.</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2020</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Démarrage d'entreprise en informatique libre</h3>
+                                    <div class="subheading mb-3">MathBenTech - Mathben Informatique</div>
+                                    <p>· Développer et commercialiser le produit ERPLibre basé sur
+                                        le ERP Odoo. </p>
+                                    <p>· Développer une procédure d'analyse fonctionnelle pour les
+                                        besoins clients. </p>
+                                    <p>· Développer des processus d'affaires sur les logiciels
+                                        libres pour le marché québécois. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2018</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Projets -->
+                    <section class="resume-section" id="projets">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Projets</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Membre fondateur et recherche de projets de
+                                        transition écologique</h3>
+                                    <div class="subheading mb-3">Laval en transition</div>
+                                    <p>· Déploiement d'un intranet pour améliorer la gestion de
+                                        projet avec Odoo. </p>
+                                    <p>· Développer le site web. </p>
+                                    <p>· Déploiement d'un service de communications par équipe et
+                                        par projet avec RocketChat. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2019</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Projet de rétro-ingénierie - Analyseur de code
+                                        C++</h3>
+                                    <div class="subheading mb-3">Polytechnique, Montréal</div>
+                                    <p>· Développer un analyseur de structure de code C++ avec Clang
+                                        et Python. </p>
+                                    <p>· Parallélisation en multi-process de l'analyse du code. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2016</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Administrateur de CoopÉTS</h3>
+                                    <div class="subheading mb-3">CoopÉTS, Montréal</div>
+                                    <p>· Prendre des décisions au sein du comité administratif. </p>
+                                    <p>· Veiller au bon fonctionnement de la coopérative. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2016</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Formations -->
+                    <section class="resume-section" id="formations">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Formations</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Maîtrise recherche en génie industriel</h3>
+                                    <div class="subheading mb-3">Polytechnique, Université de
+                                        Montréal, Montréal</div>
+                                    <p>Continuité du DESS de 2016 pour passer en recherche
+                                        industrielle. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2021</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Certificat </h3>
+                                    <div class="subheading mb-3">Centre de formation professionnelle
+                                        Paul-Émile-Dufresne, Laval</div>
+                                    <p>· Plan d'affaires et modèle d'affaires </p>
+                                    <p>· Planification financière </p>
+                                    <p>· Commercialisation </p>
+                                    <p>· Marketing </p>
+                                    <p>· Planification des ressources d'entreprise </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2019</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">DESS en Génie informatique</h3>
+                                    <div class="subheading mb-3">Polytechnique, Université de
+                                        Montréal, Montréal</div>
+                                    <p>Programmation en : </p>
+                                    <p>· Calcul parallèle </p>
+                                    <p>· Qualité logicielle </p>
+                                    <p>· Rétro-ingénierie </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2015</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Habiletés -->
+                    <section class="resume-section" id="habiletes">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Habiletés</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">Maîtrise recherche en génie industriel</h3>
+                                    <div class="subheading mb-3">Polytechnique, Université de
+                                        Montréal, Montréal</div>
+                                    <p>Continuité du DESS de 2016 pour passer en recherche
+                                        industrielle. </p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary">2021</span>
+                                </div>
                             </div>
                         </div>
                     </section>
                     <hr class="m-0" />
                 </div>
             </body>
-        <!--
+            <!--
             <div class="container">
                 <div class="text-center erplibre_website_cv_value">Informations</div>
                 <form
