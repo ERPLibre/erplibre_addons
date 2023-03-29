@@ -4,6 +4,10 @@
     <!-- Snippets -->
     <template id="s_erplibre_website_cv" name="Website CV">
         <section class="o_erplibre_website_cv">
+            <head>
+                <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet" type="text/css" />
+                <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+            </head>
             <body id="page-top">
                 <!-- Navigation -->
                 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
@@ -222,16 +226,66 @@
                             <h2 class="mb-5">Habiletés</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0">Maîtrise recherche en génie industriel</h3>
-                                    <div class="subheading mb-3">Polytechnique, Université de
-                                        Montréal, Montréal</div>
-                                    <p>Continuité du DESS de 2016 pour passer en recherche
-                                        industrielle. </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2021</span>
+                                    <div class="subheading mb-3">Programming languages and tools <p></p>
+                                        <div
+                                            class="icons">
+                                            <a class="icon">
+                                                <img
+                                                    src="/erplibre_website_cv/static/description/logo_c++.png"
+                                                    alt="Logo C++"
+                                                    style="width: 100%; height: 100%; object-fit: contain;" />
+                                            </a>
+                                            <a class="icon">
+                                                <img
+                                                    src="/erplibre_website_cv/static/description/logo_javascript.png"
+                                                    alt="Logo JavaScript"
+                                                    style="width: 100%; height: 100%; object-fit: contain;" />
+                                            </a>
+                                            <a class="icon">
+                                                <img
+                                                    src="/erplibre_website_cv/static/description/logo_python.png"
+                                                    alt="Logo Python"
+                                                    style="width: 100%; height: 100%; object-fit: contain;" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="subheading mb-3">Plateformes</div>
+                                    <p></p>
+                                    <p>✔ Arch Linux </p>
+                                    <p>✔ Ubuntu </p>
+                                    <p>✔ Fedora </p>
+                                    <div class="subheading mb-3">Langages</div>
+                                    <p></p>
+                                    <p>✔ C++ </p>
+                                    <p>✔ JavaScript </p>
+                                    <p>✔ C++ </p>
                                 </div>
                             </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Intérêts -->
+                    <section class="resume-section" id="interets">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Intérêts</h2>
+                            <p>· Leadership - Toujours se dépasser </p>
+                            <p>· Méticuleux - Importance des détails et d'un travail bien fait </p>
+                            <p>· Soucieux de l'environnement et du travail d'équipe </p>
+                            <p>· Passionné de la philosophie Unix et du logiciel libre </p>
+                            <p>· Pratique quotidiennement du Kung-Fu et adhère à la philosophie
+                                Taoïste </p>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Trophés et Certifications -->
+                    <section class="resume-section" id="trophes">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Trophés et Certifications</h2>
+                            <p>🏆 Bourse d'honneur en innovation technologique du MEI - 2018 </p>
+                            <p>🏆 3e position Robosub équipe SONIA - 2014 </p>
+                            <p>🏆 3e position Robosub équipe SONIA - 2012 </p>
+                            <p>🏆 1er position Robosub équipe SONIA - 2011 </p>
+                            <p>🏆 Meilleure amélioration scolaire de son année - 2005 </p>
                         </div>
                     </section>
                     <hr class="m-0" />

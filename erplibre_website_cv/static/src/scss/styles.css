@@ -11390,7 +11390,6 @@ p.lead {
   justify-content: center;
   height: 3.5rem;
   width: 3.5rem;
-  background-color: #495057;
   color: #fff;
   border-radius: 100%;
   font-size: 1.5rem;
@@ -11401,6 +11400,17 @@ p.lead {
 }
 .social-icons .social-icon:hover {
   background-color: #bd5d38;
+}
+
+.icons .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: 100%;
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 .dev-icons {
