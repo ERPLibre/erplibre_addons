@@ -4,9 +4,12 @@
     <!-- Snippets -->
     <template id="s_erplibre_website_cv" name="Website CV">
         <section class="o_erplibre_website_cv">
+            <!-- Link Fonts-->
             <head>
-                <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet" type="text/css" />
-                <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+                <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700"
+                    rel="stylesheet" type="text/css" />
+                <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i"
+                    rel="stylesheet" type="text/css" />
             </head>
             <body id="page-top">
                 <!-- Navigation -->
@@ -16,7 +19,7 @@
                         <span class="d-none d-lg-block">
                             <img class="img-fluid img-profile rounded-circle mx-auto mb-2"
                                 src="/erplibre_website_cv/static/description/profile.png"
-                                alt="Profil png" />
+                                alt="Profil photo" />
                         </span>
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -72,6 +75,12 @@
                                         alt="Logo GitHub"
                                         style="width: 100%; height: 100%; object-fit: contain;" />
                                 </a>
+                                <a class="social-icon" href="">
+                                    <img
+                                        src="/erplibre_website_cv/static/description/logo_linkedin.png"
+                                        alt="Logo Linkedin"
+                                        style="width: 100%; height: 100%; object-fit: contain;" />
+                                </a>
                             </div>
                         </div>
                     </section>
@@ -84,9 +93,9 @@
                                 <div class="flex-grow-1">
                                     <h3 class="mb-0">Démarrage d'entreprise en technologie libre</h3>
                                     <div class="subheading mb-3">TechnoLibre</div>
-                                    <p>· Mise en place d'une gestion de projet avec traçabilité de
-                                        l'environnement de développement ERPLibre. </p>
-                                    <p>· Développer un générateur de code pour simplifier et
+                                    <p>• Mise en place d'une gestion de projet avec traçabilité de
+                                        l'environnement de développement ERPLibre. <br /> •
+                                        Développer un générateur de code pour simplifier et
                                         accélérer le développement de modules dans ERPLibre. </p>
                                 </div>
                                 <div class="flex-shrink-0">
@@ -97,12 +106,11 @@
                                 <div class="flex-grow-1">
                                     <h3 class="mb-0">Démarrage organisme à but non lucratif</h3>
                                     <div class="subheading mb-3">SantéLibre</div>
-                                    <p>· Développer une plateforme de connexion entre les
-                                        entreprises
-                                        pour des demandes de production sur imprimante 3D. </p>
-                                    <p>· Participer au hackathon Code Life Ventilator Challenge</p>
-                                    <p>· Gérer les projets RetD pour les urgences de la pandémie au
-                                        Québec.</p>
+                                    <p>• Développer une plateforme de connexion entre les
+                                        entreprises pour des demandes de production sur imprimante
+                                        3D. <br /> • Participer au hackathon Code Life Ventilator
+                                        Challenge <br /> • Gérer les projets RetD pour les urgences
+                                        de la pandémie au Québec.</p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2020</span>
@@ -112,12 +120,11 @@
                                 <div class="flex-grow-1">
                                     <h3 class="mb-0">Démarrage d'entreprise en informatique libre</h3>
                                     <div class="subheading mb-3">MathBenTech - Mathben Informatique</div>
-                                    <p>· Développer et commercialiser le produit ERPLibre basé sur
-                                        le ERP Odoo. </p>
-                                    <p>· Développer une procédure d'analyse fonctionnelle pour les
-                                        besoins clients. </p>
-                                    <p>· Développer des processus d'affaires sur les logiciels
-                                        libres pour le marché québécois. </p>
+                                    <p>• Développer et commercialiser le produit ERPLibre basé sur
+                                        le ERP Odoo. <br /> • Développer une procédure d'analyse
+                                        fonctionnelle pour les besoins clients. <br /> • Développer
+                                        des processus d'affaires sur les logiciels libres pour le
+                                        marché québécois. </p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2018</span>
@@ -135,11 +142,10 @@
                                     <h3 class="mb-0">Membre fondateur et recherche de projets de
                                         transition écologique</h3>
                                     <div class="subheading mb-3">Laval en transition</div>
-                                    <p>· Déploiement d'un intranet pour améliorer la gestion de
-                                        projet avec Odoo. </p>
-                                    <p>· Développer le site web. </p>
-                                    <p>· Déploiement d'un service de communications par équipe et
-                                        par projet avec RocketChat. </p>
+                                    <p>• Déploiement d'un intranet pour améliorer la gestion de
+                                        projet avec Odoo. <br /> • Développer le site web. <br /> •
+                                        Déploiement d'un service de communications par équipe et par
+                                        projet avec RocketChat. </p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2019</span>
@@ -150,9 +156,9 @@
                                     <h3 class="mb-0">Projet de rétro-ingénierie - Analyseur de code
                                         C++</h3>
                                     <div class="subheading mb-3">Polytechnique, Montréal</div>
-                                    <p>· Développer un analyseur de structure de code C++ avec Clang
-                                        et Python. </p>
-                                    <p>· Parallélisation en multi-process de l'analyse du code. </p>
+                                    <p>• Développer un analyseur de structure de code C++ avec Clang
+                                        et Python. <br /> • Parallélisation en multi-process de
+                                        l'analyse du code. </p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2016</span>
@@ -162,8 +168,8 @@
                                 <div class="flex-grow-1">
                                     <h3 class="mb-0">Administrateur de CoopÉTS</h3>
                                     <div class="subheading mb-3">CoopÉTS, Montréal</div>
-                                    <p>· Prendre des décisions au sein du comité administratif. </p>
-                                    <p>· Veiller au bon fonctionnement de la coopérative. </p>
+                                    <p>• Prendre des décisions au sein du comité administratif. <br />
+                                        • Veiller au bon fonctionnement de la coopérative. </p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2016</span>
@@ -193,11 +199,9 @@
                                     <h3 class="mb-0">Certificat </h3>
                                     <div class="subheading mb-3">Centre de formation professionnelle
                                         Paul-Émile-Dufresne, Laval</div>
-                                    <p>· Plan d'affaires et modèle d'affaires </p>
-                                    <p>· Planification financière </p>
-                                    <p>· Commercialisation </p>
-                                    <p>· Marketing </p>
-                                    <p>· Planification des ressources d'entreprise </p>
+                                    <p>• Plan d'affaires et modèle d'affaires <br /> • Planification
+                                        financière <br /> • Commercialisation <br /> • Marketing <br />
+                                        • Planification des ressources d'entreprise </p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2019</span>
@@ -209,9 +213,8 @@
                                     <div class="subheading mb-3">Polytechnique, Université de
                                         Montréal, Montréal</div>
                                     <p>Programmation en : </p>
-                                    <p>· Calcul parallèle </p>
-                                    <p>· Qualité logicielle </p>
-                                    <p>· Rétro-ingénierie </p>
+                                    <p>• Calcul parallèle <br /> • Qualité logicielle <br /> •
+                                        Rétro-ingénierie </p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <span class="text-primary">2015</span>
@@ -251,14 +254,10 @@
                                     </div>
                                     <div class="subheading mb-3">Plateformes</div>
                                     <p></p>
-                                    <p>✔ Arch Linux </p>
-                                    <p>✔ Ubuntu </p>
-                                    <p>✔ Fedora </p>
+                                    <p>✔ Arch Linux <br /> ✔ Ubuntu <br /> ✔ Fedora </p>
                                     <div class="subheading mb-3">Langages</div>
                                     <p></p>
-                                    <p>✔ C++ </p>
-                                    <p>✔ JavaScript </p>
-                                    <p>✔ C++ </p>
+                                    <p>✔ C++ <br /> ✔ JavaScript <br /> ✔ C++ </p>
                                 </div>
                             </div>
                         </div>
@@ -268,12 +267,11 @@
                     <section class="resume-section" id="interets">
                         <div class="resume-section-content">
                             <h2 class="mb-5">Intérêts</h2>
-                            <p>· Leadership - Toujours se dépasser </p>
-                            <p>· Méticuleux - Importance des détails et d'un travail bien fait </p>
-                            <p>· Soucieux de l'environnement et du travail d'équipe </p>
-                            <p>· Passionné de la philosophie Unix et du logiciel libre </p>
-                            <p>· Pratique quotidiennement du Kung-Fu et adhère à la philosophie
-                                Taoïste </p>
+                            <p>• Leadership - Toujours se dépasser <br /> • Méticuleux - Importance
+                                des détails et d'un travail bien fait <br /> • Soucieux de
+                                l'environnement et du travail d'équipe <br /> • Passionné de la
+                                philosophie Unix et du logiciel libre <br /> • Pratique
+                                quotidiennement du Kung-Fu et adhère à la philosophie Taoïste </p>
                         </div>
                     </section>
                     <hr class="m-0" />
@@ -281,11 +279,10 @@
                     <section class="resume-section" id="trophes">
                         <div class="resume-section-content">
                             <h2 class="mb-5">Trophés et Certifications</h2>
-                            <p>🏆 Bourse d'honneur en innovation technologique du MEI - 2018 </p>
-                            <p>🏆 3e position Robosub équipe SONIA - 2014 </p>
-                            <p>🏆 3e position Robosub équipe SONIA - 2012 </p>
-                            <p>🏆 1er position Robosub équipe SONIA - 2011 </p>
-                            <p>🏆 Meilleure amélioration scolaire de son année - 2005 </p>
+                            <p>🏆 Bourse d'honneur en innovation technologique du MEI - 2018 <br />🏆
+                                3e position Robosub équipe SONIA - 2014 <br />🏆 3e position Robosub
+                                équipe SONIA - 2012 <br />🏆 1er position Robosub équipe SONIA -
+                                2011 <br />🏆 Meilleure amélioration scolaire de son année - 2005 </p>
                         </div>
                     </section>
                     <hr class="m-0" />
