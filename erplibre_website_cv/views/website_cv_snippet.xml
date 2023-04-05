@@ -57,17 +57,17 @@
                     <!-- À propos -->
                     <section class="resume-section" id="apropos">
                         <div class="resume-section-content">
-                            <h1 class="mb-0"> Mathieu <span class="text-primary">Benoit</span>
-                            </h1>
+                            <h1 class="mb-0"> Mathieu <span class="text-primary">Benoit</span></h1>
                             <div class="subheading mb-5"> 2500 Chemin de Polytechnique · Montréal,
                                 QC H3T 1J4 · (317) 585-8468 · <a href="mailto:name@email.com">
-                                info@mathieubenoit.ca</a>
-                            </div>
-                            <p class="lead mb-5">En tant que défenseur passionné du mouvement du
-                                logiciel libre, Mathieu a fondé TechnoLibre en suivant ses
-                                principes. Fort de ses connaissances et de son expérience étendues,
-                                Mathieu a piloté la feuille de route technique et l'architecture
-                                logicielle de notre produit phare, ERPLibre.</p>
+                                info@mathieubenoit.ca</a></div>
+                            <p class="lead mb-5">
+                                En tant que défenseur passionné du mouvement du logiciel libre,
+                                Mathieu a fondé TechnoLibre en suivant ses principes. Fort de ses
+                                connaissances et de son expérience étendues, Mathieu a piloté la
+                                feuille de route technique et l'architecture logicielle de notre
+                                produit phare, ERPLibre.
+                            </p>
                             <div class="social-icons">
                                 <a class="social-icon" href="https://github.com/mathben">
                                     <img
