@@ -1,7 +1,17 @@
-from odoo import _, api, fields, models
+from odoo import _, models, fields, models, api, exceptions
 
-class WebsiteCV(models.Model):
-    _name = "website.cv"
-    _description = "website_cv"
+class Contact(models.Model):
+    _name = 'website.cv'
+    _description = 'Website_CV'
 
-    name = fields.Char()
+    name = fields.Char(string='informations_name', required=True)
+    address = fields.Char(string='informations_address', required=True)
+    phone = fields.Char(string='informations_phone', required=True)
+    email = fields.Char(string='informations_email', required=True)
+    description = fields.Char(string='informations_description')
+
+    @api.constrains('email')
+    def _check_email(self):
+        for record in self:
+            if record.email and '@' not in record.email:
+                raise exceptions.ValidationError("Invalid email format!")

@@ -5,7 +5,7 @@ import json
 import werkzeug
 
 
-class WebsiteCVController(http.Controller):
+class WebsiteCVControllàer(http.Controller):
     @http.route(
         ["/erplibre_website_cv/website_cv"],
         type="json",
@@ -14,30 +14,32 @@ class WebsiteCVController(http.Controller):
         methods=["POST", "GET"],
         csrf=False,
     )
-    # Ajout des fruits du demo_internal
-    def website_cv(self):
-        result_ids = request.env["website.cv"].search([])
-        lst_fruit = []
-        data = {"fruit": lst_fruit}
-        for result_id in result_ids:
-            lst_fruit.append(result_id.name)
-        return data
+    def get_informations(self):
+        informations_response = http.request.env["website.cv"].search([])
+        informations = list()
+        for information in informations_response:
+            informations.append({
+                "id": information["id"],
+                "name": information["name"]
+            })
+        return informations
 
     @http.route(
-        "/erplibre_website_cv/add",
-        type="http",
-        auth="user",
+        "/erplibre_website_cv/website_update",
+        type="json",
+        auth="public",
         website=True,
         methods=["POST"],
         csrf=False,
     )
-    def submit_website_cv_portal(self, **kw):
-        vals = {}
+    def update_aliment(self, **kwargs):
+        informations_id, informations_name = kwargs.get(
+            "informations_id"), kwargs.get("informations_name")
 
-        if kw.get("ypos"):
-            ypos_value = kw.get("ypos")
-            vals["name"] = str(ypos_value)
+        if not informations_id:
+            return False
 
-        new_website_cv_portal = (
-            request.env["website.cv"].sudo().create(vals)
-        )
+        matching_informations = http.request.env["website.cv"].search(
+            [("id", "=", informations_id)], limit=1)
+        matching_informations.write({"name": informations_name})
+        return True

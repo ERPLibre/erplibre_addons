@@ -6,7 +6,7 @@
     "license": "AGPL-3",
     "website": "https://technolibre.ca",
     "application": True,
-    "depends": ["website"],
+    "depends": ["website", "base"],
     "data": [
         "security/ir.model.access.csv",
         "views/website_cv_snippet.xml",
@@ -14,4 +14,5 @@
         "views/website_cv_menu.xml",
     ],
     "installable": True,
+    'application': True,
 }
