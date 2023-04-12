@@ -6,87 +6,56 @@ odoo.define("erplibre_website_cv.animation", require => {
 
     sAnimation.registry.erplibre_website_cv = sAnimation.Class.extend({
         selector: ".o_erplibre_website_cv",
-
+    
         start: function () {
             let self = this;
+    
+            this._desctextList = this.el.getElementsByClassName("desc-text");
+            for (const element of this._desctextList) {
+                element.setAttribute("contenteditable", "true");
+                element.addEventListener("input", function (event) {
+                    // Get the updated value from the contenteditable element
+                    let updatedValue = event.target.innerHTML;
+    
+                    // Send an HTTP request to update_aliment method in the controller
+                    // with the updated value and the field name as parameters
+                    $.ajax({
+                        url: '/erplibre_website_cv/website_update',
+                        type: 'POST',
+                        data: {
+                            'informations_id': event.target.id,  // Assuming id attribute contains the record id
+                            'informations_name': updatedValue,
+                        },
+                        success: function (result) {
+                            // Handle success response
+                            if (result) {
+                                console.log('Record updated successfully!');
+                            } else {
+                                console.error('Failed to update record.');
+                            }
+                        },
+                        error: function () {
+                            console.error('Failed to update record.');
+                        }
+                    });
+                });
+            }   
+            /*
+            // Assuming the "Edit" button has a CSS class of "edit-button" and the target elements have a CSS class of "desc-text"
+            var editButton = document.querySelector('.edit-page-menu');
 
-            this._informationsList = this.el.getElementsByClassName("informations-list")[0];
-            this._form = this.el.getElementsByClassName("informations-form")[0];
-            this._input = this.el.getElementsByClassName("informations__input")[0];
-            this._originalContent = this._informationsList.innerHTML;
+            // Add event listener to the "Edit" button
+            editButton.addEventListener('click', function (event) {
+                // Get all elements with class "desc-text"
+                var descTextList = document.getElementsByClassName('desc-text');
 
-            this._input.value = "";
-
-            const def = this.getInformations(self);
-
-            this.updateInformations(self);
-            this.addInformations(self);
-
-            return $.when(this._super.apply(this, arguments), def);
-        },
-
-        getInformations: function (self) {
-            let def = self._rpc({
-                route: "/erplibre_website_cv/website_cv"
-            }).then(function (data) {
-                if (data.error) {
-                    return;
-                }
-
-                if (_.isEmpty(data)) {
-                    self._$loadedContent = data;
-                    self._informationsList.innerHTML = "";
-                    self._informationsList.parentElement.style.display = "none";
-                    return;
-                }
-
-                self._$loadedContent = data;
-                self._informationsList.innerHTML = "";
-                self._informationsList.parentElement.removeAttribute("style");
-
-                for (const information of data) {
-                    const informationListItem = document.createElement("li");
-                    informationListItem.className = "aliment";
-                    informationListItem.id = aliment.id;
-
-                    const informationText = document.createElement("span");
-                    informationText.className = "information__text";
-                    informationText.setAttribute("contenteditable", "true");
-                    informationText.textContent = information.name;
-
-                    const informationDelete = document.createElement("div");
-                    informationDelete.className = "information__delete";
-
-                    informationListItem.append(informationText);
-                    informationListItem.append(informationDelete);
-                    self._informationsList.append(informationListItem);
+                // Loop through the "desc-text" elements and set "contenteditable" attribute to true
+                for (var i = 0; i < descTextList.length; i++) {
+                    descTextList[i].setAttribute('contenteditable', 'false');
                 }
             });
-
-            return def;
+            */
         },
-        addInformations: function (self) {
-            self._form.addEventListener("submit", event => {
-                event.preventDefault();
-
-                ajax.jsonRpc(
-                    "/erplibre_website_cv/website_add",
-                    "call",
-                    { "informations_name": self._input.value }
-                ).done(data => {
-                    if (data.error) {
-                        return;
-                    }
-
-                    if (_.isEmpty(data)) {
-                        return;
-                    }
-
-                    self._input.value = "";
-                    self.getInformations(self)
-                })
-            });
-        }, 
         updateInformations: function (self) {
             self.el.addEventListener("keyup", event => {
                 event.preventDefault();
