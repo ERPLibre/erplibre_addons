@@ -5,7 +5,7 @@ import json
 import werkzeug
 
 
-class WebsiteCVControllàer(http.Controller):
+class WebsiteCVController(http.Controller):
     @http.route(
         ["/erplibre_website_cv/website_cv"],
         type="json",

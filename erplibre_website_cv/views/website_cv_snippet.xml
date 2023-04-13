@@ -57,14 +57,15 @@
                     <!-- À propos -->
                     <section class="resume-section" id="apropos">
                         <div class="resume-section-content">
-                            <h1 class="mb-0 desc-text" id="name"> Mathieu <span class="text-primary desc-text">
-                                Benoit</span></h1>
-                            <div
-                                class="subheading mb-5 desc-text" id="address"> 2500 Chemin de Polytechnique ·
-                                Montréal, QC H3T 1J4 · <span id="phone">(317) 585-8468</span> · <a
-                                    href="mailto:name@email.com" id="email">
-                                    info@mathieubenoit.ca</a></div>
-                            <p class="lead mb-5 desc-text" id="description">
+                            <h1 class="mb-0 desc-text" id="name"> Mathieu <span
+                                    class="text-primary">
+                                    Benoit</span></h1>
+                            <div class="subheading mb-5 desc-text" id="address"> 2500 Chemin de
+                                Polytechnique · Montréal, QC H3T 1J4 · <span id="phone">(317)
+                                585-8468</span> · <a href="mailto:name@email.com" id="email">
+                                info@mathieubenoit.ca</a>
+                            </div>
+                            <p class="lead mb-5 desc-text" id="description-a-propos">
                                 En tant que défenseur passionné du mouvement du logiciel
                                 libre, Mathieu a fondé TechnoLibre en suivant ses principes.
                                 Fort de ses connaissances et de son expérience étendues, Mathieu
@@ -95,43 +96,18 @@
                             <h2 class="mb-5">Expérience</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0">Démarrage d'entreprise en technologie libre</h3>
-                                    <div class="subheading mb-3">TechnoLibre</div>
-                                    <p>• Mise en place d'une gestion de projet avec traçabilité de
-                                        l'environnement de développement ERPLibre. <br /> •
-                                        Développer un générateur de code pour simplifier et
-                                        accélérer le développement de modules dans ERPLibre. </p>
+                                    <h3 class="mb-0 desc-text" id="name-experience">Démarrage
+                                        d'entreprise en technologie libre</h3>
+                                    <div class="subheading mb-3 desc-text"
+                                        id="entreprise-experience">TechnoLibre</div>
+                                    <p class="desc-text" id="description-experience">• Mise en place
+                                        d'une gestion de projet avec traçabilité de l'environnement
+                                        de développement ERPLibre. <br /> • Développer un générateur
+                                        de code pour simplifier et accélérer le développement de
+                                        modules dans ERPLibre. </p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="text-primary">2020</span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
-                                <div class="flex-grow-1">
-                                    <h3 class="mb-0">Démarrage organisme à but non lucratif</h3>
-                                    <div class="subheading mb-3">SantéLibre</div>
-                                    <p>• Développer une plateforme de connexion entre les
-                                        entreprises pour des demandes de production sur imprimante
-                                        3D. <br /> • Participer au hackathon Code Life Ventilator
-                                        Challenge <br /> • Gérer les projets RetD pour les urgences
-                                        de la pandémie au Québec.</p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2020</span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
-                                <div class="flex-grow-1">
-                                    <h3 class="mb-0">Démarrage d'entreprise en informatique libre</h3>
-                                    <div class="subheading mb-3">MathBenTech - Mathben Informatique</div>
-                                    <p>• Développer et commercialiser le produit ERPLibre basé sur
-                                        le ERP Odoo. <br /> • Développer une procédure d'analyse
-                                        fonctionnelle pour les besoins clients. <br /> • Développer
-                                        des processus d'affaires sur les logiciels libres pour le
-                                        marché québécois. </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2018</span>
+                                    <span class="text-primary desc-text" id="date-experience">2020</span>
                                 </div>
                             </div>
                         </div>
@@ -143,40 +119,18 @@
                             <h2 class="mb-5">Projets</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0">Membre fondateur et recherche de projets de
+                                    <h3 class="mb-0 desc-text" id="name-projets">Membre fondateur et
+                                        recherche de projets de
                                         transition écologique</h3>
-                                    <div class="subheading mb-3">Laval en transition</div>
-                                    <p>• Déploiement d'un intranet pour améliorer la gestion de
-                                        projet avec Odoo. <br /> • Développer le site web. <br /> •
-                                        Déploiement d'un service de communications par équipe et par
-                                        projet avec RocketChat. </p>
+                                    <div class="subheading mb-3 desc-text" id="entreprise-projets">Laval
+                                        en transition</div>
+                                    <p class="desc-text" id="description-projets">• Déploiement d'un
+                                        intranet pour améliorer la gestion de projet avec Odoo. <br />
+                                        • Développer le site web. <br /> • Déploiement d'un service
+                                        de communications par équipe et par projet avec RocketChat. </p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="text-primary">2019</span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
-                                <div class="flex-grow-1">
-                                    <h3 class="mb-0">Projet de rétro-ingénierie - Analyseur de code
-                                        C++</h3>
-                                    <div class="subheading mb-3">Polytechnique, Montréal</div>
-                                    <p>• Développer un analyseur de structure de code C++ avec Clang
-                                        et Python. <br /> • Parallélisation en multi-process de
-                                        l'analyse du code. </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2016</span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
-                                <div class="flex-grow-1">
-                                    <h3 class="mb-0">Administrateur de CoopÉTS</h3>
-                                    <div class="subheading mb-3">CoopÉTS, Montréal</div>
-                                    <p>• Prendre des décisions au sein du comité administratif. <br />
-                                        • Veiller au bon fonctionnement de la coopérative. </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2016</span>
+                                    <span class="text-primary desc-text" id="date-projets">2019</span>
                                 </div>
                             </div>
                         </div>
@@ -188,40 +142,17 @@
                             <h2 class="mb-5">Formations</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0">Maîtrise recherche en génie industriel</h3>
-                                    <div class="subheading mb-3">Polytechnique, Université de
+                                    <h3 class="mb-0 desc-text" id="name-formations">Maîtrise
+                                        recherche en génie industriel</h3>
+                                    <div class="subheading mb-3 desc-text"
+                                        id="entreprise-formations">Polytechnique, Université de
                                         Montréal, Montréal</div>
-                                    <p>Continuité du DESS de 2016 pour passer en recherche
+                                    <p class="desc-text" id="description-formations">Continuité du
+                                        DESS de 2016 pour passer en recherche
                                         industrielle. </p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="text-primary">2021</span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
-                                <div class="flex-grow-1">
-                                    <h3 class="mb-0">Certificat </h3>
-                                    <div class="subheading mb-3">Centre de formation professionnelle
-                                        Paul-Émile-Dufresne, Laval</div>
-                                    <p>• Plan d'affaires et modèle d'affaires <br /> • Planification
-                                        financière <br /> • Commercialisation <br /> • Marketing <br />
-                                        • Planification des ressources d'entreprise </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2019</span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
-                                <div class="flex-grow-1">
-                                    <h3 class="mb-0">DESS en Génie informatique</h3>
-                                    <div class="subheading mb-3">Polytechnique, Université de
-                                        Montréal, Montréal</div>
-                                    <p>Programmation en : </p>
-                                    <p>• Calcul parallèle <br /> • Qualité logicielle <br /> •
-                                        Rétro-ingénierie </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary">2015</span>
+                                    <span class="text-primary desc-text" id="date-formations">2021</span>
                                 </div>
                             </div>
                         </div>
@@ -258,10 +189,12 @@
                                     </div>
                                     <div class="subheading mb-3">Plateformes</div>
                                     <p></p>
-                                    <p>✔ Arch Linux <br /> ✔ Ubuntu <br /> ✔ Fedora </p>
+                                    <p class="desc-text" id="name-plateformes">✔ Arch Linux <br /> ✔
+                                        Ubuntu <br /> ✔ Fedora </p>
                                     <div class="subheading mb-3">Langages</div>
                                     <p></p>
-                                    <p>✔ C++ <br /> ✔ JavaScript <br /> ✔ C++ </p>
+                                    <p class="desc-text" id="name-langages">✔ C++ <br /> ✔
+                                        JavaScript <br /> ✔ C++ </p>
                                 </div>
                             </div>
                         </div>
@@ -271,11 +204,12 @@
                     <section class="resume-section" id="interets">
                         <div class="resume-section-content">
                             <h2 class="mb-5">Intérêts</h2>
-                            <p>• Leadership - Toujours se dépasser <br /> • Méticuleux - Importance
-                                des détails et d'un travail bien fait <br /> • Soucieux de
-                                l'environnement et du travail d'équipe <br /> • Passionné de la
-                                philosophie Unix et du logiciel libre <br /> • Pratique
-                                quotidiennement du Kung-Fu et adhère à la philosophie Taoïste </p>
+                            <p class="desc-text" id="name-interets">• Leadership - Toujours se
+                                dépasser <br /> • Méticuleux - Importance des détails et d'un
+                                travail bien fait <br /> • Soucieux de l'environnement et du travail
+                                d'équipe <br /> • Passionné de la philosophie Unix et du logiciel
+                                libre <br /> • Pratique quotidiennement du Kung-Fu et adhère à la
+                                philosophie Taoïste </p>
                         </div>
                     </section>
                     <hr class="m-0" />
@@ -283,10 +217,11 @@
                     <section class="resume-section" id="trophes">
                         <div class="resume-section-content">
                             <h2 class="mb-5">Trophés et Certifications</h2>
-                            <p>🏆 Bourse d'honneur en innovation technologique du MEI - 2018 <br />🏆
-                                3e position Robosub équipe SONIA - 2014 <br />🏆 3e position Robosub
-                                équipe SONIA - 2012 <br />🏆 1er position Robosub équipe SONIA -
-                                2011 <br />🏆 Meilleure amélioration scolaire de son année - 2005 </p>
+                            <p class="desc-text" id="name-trophes">🏆 Bourse d'honneur en innovation
+                                technologique du MEI - 2018 <br />🏆 3e position Robosub équipe
+                                SONIA - 2014 <br />🏆 3e position Robosub équipe SONIA - 2012 <br />🏆
+                                1er position Robosub équipe SONIA - 2011 <br />🏆 Meilleure
+                                amélioration scolaire de son année - 2005 </p>
                         </div>
                     </section>
                     <hr class="m-0" />

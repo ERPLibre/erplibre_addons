@@ -6,40 +6,15 @@ odoo.define("erplibre_website_cv.animation", require => {
 
     sAnimation.registry.erplibre_website_cv = sAnimation.Class.extend({
         selector: ".o_erplibre_website_cv",
-    
+
         start: function () {
             let self = this;
-    
+
             this._desctextList = this.el.getElementsByClassName("desc-text");
             for (const element of this._desctextList) {
                 element.setAttribute("contenteditable", "true");
-                element.addEventListener("input", function (event) {
-                    // Get the updated value from the contenteditable element
-                    let updatedValue = event.target.innerHTML;
-    
-                    // Send an HTTP request to update_aliment method in the controller
-                    // with the updated value and the field name as parameters
-                    $.ajax({
-                        url: '/erplibre_website_cv/website_update',
-                        type: 'POST',
-                        data: {
-                            'informations_id': event.target.id,  // Assuming id attribute contains the record id
-                            'informations_name': updatedValue,
-                        },
-                        success: function (result) {
-                            // Handle success response
-                            if (result) {
-                                console.log('Record updated successfully!');
-                            } else {
-                                console.error('Failed to update record.');
-                            }
-                        },
-                        error: function () {
-                            console.error('Failed to update record.');
-                        }
-                    });
-                });
-            }   
+            }
+
             /*
             // Assuming the "Edit" button has a CSS class of "edit-button" and the target elements have a CSS class of "desc-text"
             var editButton = document.querySelector('.edit-page-menu');
