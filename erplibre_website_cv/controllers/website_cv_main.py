@@ -1,9 +1,7 @@
-from odoo import http, models, fields, api
-from odoo.http import request
+from odoo import http, models, fields, api, exceptions
 
 import json
 import werkzeug
-
 
 class WebsiteCVController(http.Controller):
     @http.route(
@@ -14,32 +12,25 @@ class WebsiteCVController(http.Controller):
         methods=["POST", "GET"],
         csrf=False,
     )
-    def get_informations(self):
-        informations_response = http.request.env["website.cv"].search([])
-        informations = list()
-        for information in informations_response:
-            informations.append({
-                "id": information["id"],
-                "name": information["name"]
+    def website_cv_form(self, **post):
+        Contact = http.request.env['website.cv']
+        if http.request.httprequest.method == 'POST':
+            # Get form data from POST request
+            name = post.get('name')
+            address = post.get('address')
+            phone = post.get('phone')
+            email = post.get('email')
+            description = post.get('description')
+
+            # Create a new contact record
+            contact = Contact.create({
+                'name': name,
+                'address': address,
+                'phone': phone,
+                'email': email,
+                'description': description,
             })
-        return informations
 
-    @http.route(
-        "/erplibre_website_cv/website_update",
-        type="json",
-        auth="public",
-        website=True,
-        methods=["POST"],
-        csrf=False,
-    )
-    def update_aliment(self, **kwargs):
-        informations_id, informations_name = kwargs.get(
-            "informations_id"), kwargs.get("informations_name")
-
-        if not informations_id:
-            return False
-
-        matching_informations = http.request.env["website.cv"].search(
-            [("id", "=", informations_id)], limit=1)
-        matching_informations.write({"name": informations_name})
-        return True
+            # Redirect to a success page or return a JSON response
+            # with the contact record data if needed
+            return json.dumps({'result': 'success', 'contact_id': contact.id})
