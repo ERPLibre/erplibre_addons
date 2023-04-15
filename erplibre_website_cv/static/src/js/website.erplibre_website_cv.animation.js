@@ -1,3 +1,5 @@
+let john = null
+
 odoo.define("erplibre_website_cv.animation", require => {
     "use strict";
 
@@ -10,27 +12,52 @@ odoo.define("erplibre_website_cv.animation", require => {
         start: function () {
             let self = this;
 
+            john = this.el
+            this.resumeSectionContent = this.el.getElementsByClassName("resume-section-content-propos")[0];
+            console.log(this.resumeSectionContent);
+            this._originalContent = this.resumeSectionContent.innerHTML;
+
+            const def = this.getWebsiteCV(self);
+
             this._desctextList = this.el.getElementsByClassName("desc-text");
             for (const element of this._desctextList) {
                 element.setAttribute("contenteditable", "true");
             }
 
-            /*
-            // Assuming the "Edit" button has a CSS class of "edit-button" and the target elements have a CSS class of "desc-text"
-            var editButton = document.querySelector('.edit-page-menu');
+            return $.when(this._super.apply(this, arguments), def);
+        },
+        getWebsiteCV: function (self) {
+            let def = self._rpc({
+                route: "/erplibre_website_cv/website_cv"
+            }).then(function (data) {
+                if (data.error) {
+                    return;
+                }
 
-            // Add event listener to the "Edit" button
-            editButton.addEventListener('click', function (event) {
-                // Get all elements with class "desc-text"
-                var descTextList = document.getElementsByClassName('desc-text');
+                if (_.isEmpty(data)) {
+                    self._$loadedContent = data;
+                    return;
+                }
 
-                // Loop through the "desc-text" elements and set "contenteditable" attribute to true
-                for (var i = 0; i < descTextList.length; i++) {
-                    descTextList[i].setAttribute('contenteditable', 'false');
+                self._$loadedContent = data;
+
+                for (const contact of data) {
+                    console.log(contact)
+                    const emailElement = self.el.getElementsByClassName("email_p")[0];
+                    if (emailElement) {
+                        emailElement.setAttribute("href", "mailto:" + contact.email);
+                        emailElement.textContent = contact.email;
+                    }
+                    self.el.getElementsByClassName("name_p")[0].textContent = contact.name
+                    self.el.getElementsByClassName("phone_p")[0].textContent = contact.phone
+                    self.el.getElementsByClassName("address_p")[0].textContent = contact.address
+                    self.el.getElementsByClassName("description_p")[0].textContent = contact.description
                 }
             });
-            */
+
+            return def;
         },
+
         updateInformations: function (self) {
             self.el.addEventListener("keyup", event => {
                 event.preventDefault();
@@ -49,7 +76,7 @@ odoo.define("erplibre_website_cv.animation", require => {
                 const informationsName = event.target.textContent;
 
                 ajax.jsonRpc(
-                    "/erplibre_website_cv/website_update",
+                    "/erplibre_website_cv/website_cv",
                     "call",
                     {
                         "informations_id": alimentId,
@@ -63,7 +90,7 @@ odoo.define("erplibre_website_cv.animation", require => {
         destroy: function () {
             this._super.apply(this, arguments);
             if (this._$loadedContent) {
-                this._informationsList.innerHTML = this._originalContent;
+                this.resumeSectionContent.innerHTML = this._originalContent;
             }
         }
     });

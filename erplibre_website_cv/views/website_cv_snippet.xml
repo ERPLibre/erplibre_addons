@@ -56,27 +56,18 @@
                 <div class="container-fluid p-0">
                     <!-- À propos -->
                     <section class="resume-section" id="apropos">
-                        <div class="resume-section-content">
-                            <h1 class="mb-0 desc-text" id="name">
-                                <t t-esc="website.name" />
-                                <span class="text-primary">
-                                    Benoit
-                                </span>
-                            </h1>
-                            <div class="subheading mb-5 desc-text" id="address">
-                                <t t-esc="website.address" />
-                                <span id="phone">
-                                    <t t-esc="website.phone" />
-                                </span>
-                                <a t-attf-href="mailto:{{website.email}}" id="email">
-                                    {{contact.email}}
+                        <div class="resume-section-content-propos">
+                            <h1 class="mb-0 desc-text name_p" id="name"></h1>
+                            <div class="subheading mb-5 desc-text address_p" id="address">
+                                <span class="phone_p" id="phone"></span> · <a
+                                    class="email_p" href="mailto:name@email.com"
+                                    id="email">
                                 </a>
-
                             </div>
-                            <p class="lead mb-5 desc-text" id="description-a-propos">
-                                <t t-esc="website.description" />
+                            <p class="lead mb-5 desc-text description_p" id="description-a-propos">
                             </p>
-                            <div class="social-icons">
+                            <div
+                                class="social-icons">
                                 <a class="social-icon" href="https://github.com/mathben">
                                     <img
                                         src="/erplibre_website_cv/static/description/logo_github.png"
@@ -94,8 +85,8 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Expérience -->
-                    <section class="resume-section" id="experience">
-                        <div class="resume-section-content">
+                    <section class="resume-section-experience" id="experience">
+                        <div class="resume-section-content-experience">
                             <h2 class="mb-5">Expérience</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">

@@ -3,9 +3,32 @@ from odoo import http, models, fields, api, exceptions
 import json
 import werkzeug
 
+
 class WebsiteCVController(http.Controller):
     @http.route(
         ["/erplibre_website_cv/website_cv"],
+        type="json",
+        auth="public",
+        website=True,
+        methods=["POST", "GET"],
+        csrf=False,
+    )
+    def website_cv_get(self):
+        contact_reponse = http.request.env['website.cv'].search([], limit=1)
+        contacts = list()
+        for contact in contact_reponse:
+            contacts.append({
+                "id": contact["id"],
+                "name": contact["name"],
+                "address": contact["address"],
+                "phone": contact["phone"],
+                "email": contact["email"],
+                "description": contact["description"]
+            })
+        return contacts
+    
+    @http.route(
+        ["/erplibre_website_cv/create_website_cv"],
         type="json",
         auth="public",
         website=True,
