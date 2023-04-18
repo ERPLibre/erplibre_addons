@@ -23,37 +23,21 @@ class WebsiteCVController(http.Controller):
                 "address": contact["address"],
                 "phone": contact["phone"],
                 "email": contact["email"],
-                "description": contact["description"]
+                "description": contact["description"],
+
+                "name_experience": contact["name_experience"],
+                "entreprise_name_experience": contact["entreprise_name_experience"],
+                "description_experience": contact["description_experience"],
+                "date_experience": contact["date_experience"],
+
+                "name_projets": contact["name_projets"],
+                "entreprise_name_projets": contact["entreprise_name_projets"],
+                "description_projets": contact["description_projets"],
+                "date_projets": contact["date_projets"],
+
+                "name_formations": contact["name_formations"],
+                "entreprise_name_formations": contact["entreprise_name_formations"],
+                "description_formations": contact["description_formations"],
+                "date_formations": contact["date_formations"]
             })
         return contacts
-    
-    @http.route(
-        ["/erplibre_website_cv/create_website_cv"],
-        type="json",
-        auth="public",
-        website=True,
-        methods=["POST", "GET"],
-        csrf=False,
-    )
-    def website_cv_form(self, **post):
-        Contact = http.request.env['website.cv']
-        if http.request.httprequest.method == 'POST':
-            # Get form data from POST request
-            name = post.get('name')
-            address = post.get('address')
-            phone = post.get('phone')
-            email = post.get('email')
-            description = post.get('description')
-
-            # Create a new contact record
-            contact = Contact.create({
-                'name': name,
-                'address': address,
-                'phone': phone,
-                'email': email,
-                'description': description,
-            })
-
-            # Redirect to a success page or return a JSON response
-            # with the contact record data if needed
-            return json.dumps({'result': 'success', 'contact_id': contact.id})

@@ -1,5 +1,3 @@
-let john = null
-
 odoo.define("erplibre_website_cv.animation", require => {
     "use strict";
 
@@ -12,9 +10,9 @@ odoo.define("erplibre_website_cv.animation", require => {
         start: function () {
             let self = this;
 
-            john = this.el
-            this.resumeSectionContent = this.el.getElementsByClassName("resume-section-content-propos")[0];
-            console.log(this.resumeSectionContent);
+            //this.resumeSectionContent = this.el.getElementsByClassName("resume-section-content-apropos")[0];
+            this.resumeSectionContent = this.el.querySelector(".resume-section-content-apropos, .resume-section-content-experience, .resume-section-content-projets, .resume-section-content-formations");
+
             this._originalContent = this.resumeSectionContent.innerHTML;
 
             const def = this.getWebsiteCV(self);
@@ -43,15 +41,30 @@ odoo.define("erplibre_website_cv.animation", require => {
 
                 for (const contact of data) {
                     console.log(contact)
-                    const emailElement = self.el.getElementsByClassName("email_p")[0];
+                    const emailElement = self.el.getElementsByClassName("email_apropos")[0];
                     if (emailElement) {
                         emailElement.setAttribute("href", "mailto:" + contact.email);
                         emailElement.textContent = contact.email;
                     }
-                    self.el.getElementsByClassName("name_p")[0].textContent = contact.name
-                    self.el.getElementsByClassName("phone_p")[0].textContent = contact.phone
-                    self.el.getElementsByClassName("address_p")[0].textContent = contact.address
-                    self.el.getElementsByClassName("description_p")[0].textContent = contact.description
+                    self.el.getElementsByClassName("name_apropos")[0].textContent = contact.name
+                    self.el.getElementsByClassName("phone_apropos")[0].textContent = contact.phone
+                    self.el.getElementsByClassName("address_apropos")[0].textContent = contact.address
+                    self.el.getElementsByClassName("description_apropos")[0].textContent = contact.description
+
+                    self.el.getElementsByClassName("name_experience")[0].textContent = contact.name_experience
+                    self.el.getElementsByClassName("entreprise_name_experience")[0].textContent = contact.entreprise_name_experience
+                    self.el.getElementsByClassName("description_experience")[0].textContent = contact.description_experience
+                    self.el.getElementsByClassName("date_experience")[0].textContent = contact.date_experience
+                    
+                    self.el.getElementsByClassName("name_projets")[0].textContent = contact.name_projets
+                    self.el.getElementsByClassName("entreprise_name_projets")[0].textContent = contact.entreprise_name_projets
+                    self.el.getElementsByClassName("description_projets")[0].textContent = contact.description_projets
+                    self.el.getElementsByClassName("date_projets")[0].textContent = contact.date_projets
+                    
+                    self.el.getElementsByClassName("name_formations")[0].textContent = contact.name_formations
+                    self.el.getElementsByClassName("entreprise_name_formations")[0].textContent = contact.entreprise_name_formations
+                    self.el.getElementsByClassName("description_formations")[0].textContent = contact.description_formations
+                    self.el.getElementsByClassName("date_formations")[0].textContent = contact.date_formations
                 }
             });
 

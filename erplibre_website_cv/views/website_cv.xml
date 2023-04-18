@@ -19,13 +19,39 @@
             <form string="Informations">
                 <sheet>
                     <group>
+                        <h2 style="text-decoration: underline;">À propos</h2>
                         <field name="name" />
                         <field name="address" />
                         <field name="phone" />
                         <field name="email" />
                         <field name="description" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Expérience</h2>
+                        <field name="name_experience" />
+                        <field name="entreprise_name_experience" />
+                        <field name="description_experience" />
+                        <field name="date_experience" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Projets</h2>
+                        <field name="name_projets" />
+                        <field name="entreprise_name_projets" />
+                        <field name="description_projets" />
+                        <field name="date_projets" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Formations</h2>
+                        <field name="name_formations" />
+                        <field name="entreprise_name_formations" />
+                        <field name="description_formations" />
+                        <field name="date_formations" />
                     </group>
                 </sheet>
+
             </form>
         </field>
     </record>

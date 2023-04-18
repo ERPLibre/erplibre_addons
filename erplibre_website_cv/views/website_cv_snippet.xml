@@ -55,17 +55,20 @@
                 </nav>
                 <div class="container-fluid p-0">
                     <!-- À propos -->
-                    <section class="resume-section" id="apropos">
-                        <div class="resume-section-content-propos">
-                            <h1 class="mb-0 desc-text name_p" id="name"></h1>
-                            <div class="subheading mb-5 desc-text address_p" id="address">
-                                <span class="phone_p" id="phone"></span> · <a
-                                    class="email_p" href="mailto:name@email.com"
-                                    id="email">
-                                </a>
+                    <section class="resume-section">
+                        <div class="resume-section-content-apropos">
+                            <h1 class="mb-0 desc-text name_apropos"></h1>
+                            <div class="subheading mb-5">
+                                <table>
+                                    <tr>
+                                        <span class="desc-text address_apropos"></span>
+                                    </tr>
+                                    <tr> · <span class="desc-text phone_apropos"></span></tr>
+                                    <tr> · <a class="desc-text email_apropos"
+                                            href="mailto:name@email.com"></a></tr>
+                                </table>
                             </div>
-                            <p class="lead mb-5 desc-text description_p" id="description-a-propos">
-                            </p>
+                            <p class="lead mb-5 desc-text description_apropos"></p>
                             <div
                                 class="social-icons">
                                 <a class="social-icon" href="https://github.com/mathben">
@@ -85,68 +88,67 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Expérience -->
-                    <section class="resume-section-experience" id="experience">
+                    <section class="resume-section">
                         <div class="resume-section-content-experience">
                             <h2 class="mb-5">Expérience</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text" id="name-experience">Démarrage
+                                    <h3 class="mb-0 desc-text name_experience">Démarrage
                                         d'entreprise en technologie libre</h3>
-                                    <div class="subheading mb-3 desc-text"
-                                        id="entreprise-experience">TechnoLibre</div>
-                                    <p class="desc-text" id="description-experience">• Mise en place
+                                    <div class="subheading mb-3 desctext entreprise_name_experience">
+                                        TechnoLibre
+                                    </div>
+                                    <p class="desc-text description_experience">• Mise en place
                                         d'une gestion de projet avec traçabilité de l'environnement
                                         de développement ERPLibre. <br /> • Développer un générateur
                                         de code pour simplifier et accélérer le développement de
                                         modules dans ERPLibre. </p>
                                 </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary desc-text" id="date-experience">2020</span>
+                                <div class="flex-shrink-0 align-self-start">
+                                    <span class="text-primary desc-text date_experience">2020</span>
                                 </div>
                             </div>
                         </div>
                     </section>
                     <hr class="m-0" />
                     <!-- Projets -->
-                    <section class="resume-section" id="projets">
-                        <div class="resume-section-content">
+                    <section class="resume-section">
+                        <div class="resume-section-content-projets">
                             <h2 class="mb-5">Projets</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text" id="name-projets">Membre fondateur et
-                                        recherche de projets de
-                                        transition écologique</h3>
-                                    <div class="subheading mb-3 desc-text" id="entreprise-projets">Laval
+                                    <h3 class="mb-0 desc-text name_projets">Membre fondateur et
+                                        recherche de projets de transition écologique</h3>
+                                    <div class="subheading mb-3 desc-text entreprise_name_projets">Laval
                                         en transition</div>
-                                    <p class="desc-text" id="description-projets">• Déploiement d'un
+                                    <p class="desc-text description_projets">• Déploiement d'un
                                         intranet pour améliorer la gestion de projet avec Odoo. <br />
                                         • Développer le site web. <br /> • Déploiement d'un service
                                         de communications par équipe et par projet avec RocketChat. </p>
                                 </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary desc-text" id="date-projets">2019</span>
+                                <div class="flex-shrink-0 align-self-start">
+                                    <span class="text-primary desc-text date_projets">2019</span>
                                 </div>
                             </div>
                         </div>
                     </section>
                     <hr class="m-0" />
                     <!-- Formations -->
-                    <section class="resume-section" id="formations">
-                        <div class="resume-section-content">
+                    <section class="resume-section">
+                        <div class="resume-section-content-formations">
                             <h2 class="mb-5">Formations</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text" id="name-formations">Maîtrise
-                                        recherche en génie industriel</h3>
-                                    <div class="subheading mb-3 desc-text"
-                                        id="entreprise-formations">Polytechnique, Université de
-                                        Montréal, Montréal</div>
-                                    <p class="desc-text" id="description-formations">Continuité du
-                                        DESS de 2016 pour passer en recherche
-                                        industrielle. </p>
+                                    <h3 class="mb-0 desc-text name_formations">Maîtrise recherche en
+                                        génie industriel</h3>
+                                    <div
+                                        class="subheading mb-3 desc-text entreprise_name_formations">Polytechnique,
+                                        Université de Montréal, Montréal</div>
+                                    <p class="desc-text description_formations">Continuité du DESS
+                                        de 2016 pour passer en recherche industrielle.</p>
                                 </div>
-                                <div class="flex-shrink-0">
-                                    <span class="text-primary desc-text" id="date-formations">2021</span>
+                                <div class="flex-shri nk-0 align-self-start">
+                                    <span class="text-primary desc-text date_formations">2021</span>
                                 </div>
                             </div>
                         </div>
