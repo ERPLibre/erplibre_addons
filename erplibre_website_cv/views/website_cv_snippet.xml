@@ -93,19 +93,12 @@
                             <h2 class="mb-5">Expérience</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text name_experience">Démarrage
-                                        d'entreprise en technologie libre</h3>
-                                    <div class="subheading mb-3 desctext entreprise_name_experience">
-                                        TechnoLibre
-                                    </div>
-                                    <p class="desc-text description_experience">• Mise en place
-                                        d'une gestion de projet avec traçabilité de l'environnement
-                                        de développement ERPLibre. <br /> • Développer un générateur
-                                        de code pour simplifier et accélérer le développement de
-                                        modules dans ERPLibre. </p>
+                                    <h3 class="mb-0 desc-text name_experience"></h3>
+                                    <div class="subheading mb-3 desc-text entreprise_name_experience"></div>
+                                    <p class="desc-text description_experience"></p>
                                 </div>
-                                <div class="flex-shrink-0 align-self-start">
-                                    <span class="text-primary desc-text date_experience">2020</span>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary desc-text date_experience date_span"></span>
                                 </div>
                             </div>
                         </div>
@@ -117,17 +110,12 @@
                             <h2 class="mb-5">Projets</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text name_projets">Membre fondateur et
-                                        recherche de projets de transition écologique</h3>
-                                    <div class="subheading mb-3 desc-text entreprise_name_projets">Laval
-                                        en transition</div>
-                                    <p class="desc-text description_projets">• Déploiement d'un
-                                        intranet pour améliorer la gestion de projet avec Odoo. <br />
-                                        • Développer le site web. <br /> • Déploiement d'un service
-                                        de communications par équipe et par projet avec RocketChat. </p>
+                                    <h3 class="mb-0 desc-text name_projets"></h3>
+                                    <div class="subheading mb-3 desc-text entreprise_name_projets"></div>
+                                    <p class="desc-text description_projets"></p>
                                 </div>
-                                <div class="flex-shrink-0 align-self-start">
-                                    <span class="text-primary desc-text date_projets">2019</span>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary desc-text date_projets date_span"></span>
                                 </div>
                             </div>
                         </div>
@@ -139,16 +127,12 @@
                             <h2 class="mb-5">Formations</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text name_formations">Maîtrise recherche en
-                                        génie industriel</h3>
-                                    <div
-                                        class="subheading mb-3 desc-text entreprise_name_formations">Polytechnique,
-                                        Université de Montréal, Montréal</div>
-                                    <p class="desc-text description_formations">Continuité du DESS
-                                        de 2016 pour passer en recherche industrielle.</p>
+                                    <h3 class="mb-0 desc-text name_formations"></h3>
+                                    <div class="subheading mb-3 desc-text entreprise_name_formations"></div>
+                                    <p class="desc-text description_formations"></p>
                                 </div>
-                                <div class="flex-shri nk-0 align-self-start">
-                                    <span class="text-primary desc-text date_formations">2021</span>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary desc-text date_formations date_span"></span>
                                 </div>
                             </div>
                         </div>
