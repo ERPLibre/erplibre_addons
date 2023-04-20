@@ -10,9 +10,7 @@ odoo.define("erplibre_website_cv.animation", require => {
         start: function () {
             let self = this;
 
-            //this.resumeSectionContent = this.el.getElementsByClassName("resume-section-content-apropos")[0];
             this.resumeSectionContent = this.el.querySelector(".resume-section-content-apropos, .resume-section-content-experience, .resume-section-content-projets, .resume-section-content-formations");
-
             this._originalContent = this.resumeSectionContent.innerHTML;
 
             const def = this.getWebsiteCV(self);
@@ -21,10 +19,11 @@ odoo.define("erplibre_website_cv.animation", require => {
             for (const element of this._desctextList) {
                 element.setAttribute("contenteditable", "true");
                 element.addEventListener("input", function (event) {
-                    const contactId = event.target.dataset.contactId;
+                    const contactId = self.el.dataset.contactId;
                     if (!contactId) {
                         throw new Error("Contact ID not provided.");
                     }
+                    console.log(event.target.dataset);
                     const fieldName = event.target.dataset.fieldName;
                     const fieldValue = event.target.textContent.trim();
 
@@ -45,6 +44,8 @@ odoo.define("erplibre_website_cv.animation", require => {
                     self._$loadedContent = data;
                     return;
                 }
+
+                self.el.dataset.contactId = data[0].id;
 
                 self._$loadedContent = data;
 
@@ -80,11 +81,13 @@ odoo.define("erplibre_website_cv.animation", require => {
             return def;
         },
         updateCV: function (contactId, fieldName, fieldValue) {
-            // Send updated information to the server
-            ajax.jsonRpc("/erplibre_website_cv/update_cv", "call", {
+            const params = {
                 id: contactId,
-                [fieldName]: fieldValue
-            }).then(function (data) {
+                [fieldName]: fieldValue,
+                toUpdateList: {fieldName: fieldName, fieldValue: fieldValue}
+            }
+            console.log(params)
+            ajax.jsonRpc("/erplibre_website_cv/update_cv", "call", params).then(function (data) {
                 if (data.success) {
                     console.log("Contact updated successfully.");
                 } else {

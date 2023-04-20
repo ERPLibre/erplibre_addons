@@ -57,18 +57,21 @@
                     <!-- À propos -->
                     <section class="resume-section">
                         <div class="resume-section-content-apropos">
-                            <h1 class="mb-0 desc-text name_apropos"></h1>
+                            <h1 class="mb-0 desc-text name_apropos" data-field-name="name"></h1>
                             <div class="subheading mb-5">
                                 <table>
                                     <tr>
-                                        <span class="desc-text address_apropos"></span>
+                                        <span class="desc-text address_apropos"
+                                            data-field-name="address"></span>
                                     </tr>
-                                    <tr> · <span class="desc-text phone_apropos"></span></tr>
+                                    <tr> · <span class="desc-text phone_apropos"
+                                            data-field-name="phone"></span></tr>
                                     <tr> · <a class="desc-text email_apropos"
-                                            href="mailto:name@email.com"></a></tr>
+                                            href="mailto:name@email.com" data-field-name="email"></a></tr>
                                 </table>
                             </div>
-                            <p class="lead mb-5 desc-text description_apropos"></p>
+                            <p class="lead mb-5 desc-text description_apropos"
+                                data-field-name="description"></p>
                             <div
                                 class="social-icons">
                                 <a class="social-icon" href="https://github.com/mathben">
@@ -89,16 +92,21 @@
                     <hr class="m-0" />
                     <!-- Expérience -->
                     <section class="resume-section">
-                        <div class="resume-section-content-experience">
+                        <div class="resume-section-content-experience resume-width">
                             <h2 class="mb-5">Expérience</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text name_experience"></h3>
-                                    <div class="subheading mb-3 desc-text entreprise_name_experience"></div>
-                                    <p class="desc-text description_experience"></p>
+                                    <h3 class="mb-0 desc-text name_experience"
+                                        data-field-name="name_experience"></h3>
+                                    <div
+                                        class="subheading mb-3 desc-text entreprise_name_experience"
+                                        data-field-name="entreprise_name_experience"></div>
+                                    <p class="desc-text description_experience"
+                                        data-field-name="description_experience"></p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="text-primary desc-text date_experience date_span"></span>
+                                    <span class="text-primary desc-text date_experience date_span"
+                                        data-field-name="date_experience"></span>
                                 </div>
                             </div>
                         </div>
@@ -106,16 +114,20 @@
                     <hr class="m-0" />
                     <!-- Projets -->
                     <section class="resume-section">
-                        <div class="resume-section-content-projets">
+                        <div class="resume-section-content-projets resume-width">
                             <h2 class="mb-5">Projets</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text name_projets"></h3>
-                                    <div class="subheading mb-3 desc-text entreprise_name_projets"></div>
-                                    <p class="desc-text description_projets"></p>
+                                    <h3 class="mb-0 desc-text name_projets"
+                                        data-field-name="name_projets"></h3>
+                                    <div class="subheading mb-3 desc-text entreprise_name_projets"
+                                        data-field-name="entreprise_name_projets"></div>
+                                    <p class="desc-text description_projets"
+                                        data-field-name="description_projets"></p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="text-primary desc-text date_projets date_span"></span>
+                                    <span class="text-primary desc-text date_projets date_span"
+                                        data-field-name="date_projets"></span>
                                 </div>
                             </div>
                         </div>
@@ -123,16 +135,21 @@
                     <hr class="m-0" />
                     <!-- Formations -->
                     <section class="resume-section">
-                        <div class="resume-section-content-formations">
+                        <div class="resume-section-content-formations resume-width">
                             <h2 class="mb-5">Formations</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                                 <div class="flex-grow-1">
-                                    <h3 class="mb-0 desc-text name_formations"></h3>
-                                    <div class="subheading mb-3 desc-text entreprise_name_formations"></div>
-                                    <p class="desc-text description_formations"></p>
+                                    <h3 class="mb-0 desc-text name_formations"
+                                        data-field-name="name_formations"></h3>
+                                    <div
+                                        class="subheading mb-3 desc-text entreprise_name_formations"
+                                        data-field-name="entreprise_name_formations"></div>
+                                    <p class="desc-text description_formations"
+                                        data-field-name="description_formations"></p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="text-primary desc-text date_formations date_span"></span>
+                                    <span class="text-primary desc-text date_formations date_span"
+                                        data-field-name="date_formations"></span>
                                 </div>
                             </div>
                         </div>

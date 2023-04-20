@@ -60,26 +60,8 @@ class WebsiteCVController(http.Controller):
             raise exceptions.ValidationError("Contact not found.")
 
         fields_to_update = {
-            "name": post.get("name"),
-            "address": post.get("address"),
-            "phone": post.get("phone"),
-            "email": post.get("email"),
-            "description": post.get("description"),
-
-            "name_experience": post.get("name_experience"),
-            "entreprise_name_experience": post.get("entreprise_name_experience"),
-            "description_experience": post.get("description_experience"),
-            "date_experience": post.get("date_experience"),
-
-            "name_projets": post.get("name_projets"),
-            "entreprise_name_projets": post.get("entreprise_name_projets"),
-            "description_projets": post.get("description_projets"),
-            "date_projets": post.get("date_projets"),
-
-            "name_formations": post.get("name_formations"),
-            "entreprise_name_formations": post.get("entreprise_name_formations"),
-            "description_formations": post.get("description_formations"),
-            "date_formations": post.get("date_formations")
+            post.get("toUpdateList")["fieldName"]: post.get(
+                "toUpdateList")["fieldValue"]
         }
 
         contact.write(fields_to_update)
