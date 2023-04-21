@@ -10,7 +10,7 @@ odoo.define("erplibre_website_cv.animation", require => {
         start: function () {
             let self = this;
 
-            this.resumeSectionContent = this.el.querySelector(".resume-section-content-apropos, .resume-section-content-experience, .resume-section-content-projets, .resume-section-content-formations");
+            this.resumeSectionContent = this.el.querySelector(".resume-section-content-apropos, .resume-section-content-experience, .resume-section-content-projets, .resume-section-content-formations, .resume-section-content-interets, .resume-section-content-trophes");
             this._originalContent = this.resumeSectionContent.innerHTML;
 
             const def = this.getWebsiteCV(self);
@@ -28,6 +28,16 @@ odoo.define("erplibre_website_cv.animation", require => {
                     const fieldValue = event.target.textContent.trim();
 
                     self.updateCV(contactId, fieldName, fieldValue);
+                });
+
+                element.addEventListener("click", function (event) {
+                    console.log(getComputedStyle(event.target).borderColor);
+                    event.target.style.backgroundColor = "#d3d3d3"; 
+                    event.target.style.borderColor = "#d3d3d3 !important"; 
+                });
+                element.addEventListener("blur", function (event) {
+                    event.target.style.backgroundColor = ""; 
+                    event.target.style.borderColor = ""; 
                 });
             }
             return $.when(this._super.apply(this, arguments), def);
@@ -75,6 +85,12 @@ odoo.define("erplibre_website_cv.animation", require => {
                     self.el.getElementsByClassName("entreprise_name_formations")[0].textContent = contact.entreprise_name_formations
                     self.el.getElementsByClassName("description_formations")[0].textContent = contact.description_formations
                     self.el.getElementsByClassName("date_formations")[0].textContent = contact.date_formations
+
+                    self.el.getElementsByClassName("name_interets")[0].textContent = contact.name_interets
+                    self.el.getElementsByClassName("description_interets")[0].textContent = contact.description_interets
+
+                    self.el.getElementsByClassName("name_trophes")[0].textContent = contact.name_trophes
+                    self.el.getElementsByClassName("date_trophes")[0].textContent = contact.date_trophes
                 }
             });
 
@@ -84,7 +100,7 @@ odoo.define("erplibre_website_cv.animation", require => {
             const params = {
                 id: contactId,
                 [fieldName]: fieldValue,
-                toUpdateList: {fieldName: fieldName, fieldValue: fieldValue}
+                toUpdateList: { fieldName: fieldName, fieldValue: fieldValue }
             }
             console.log(params)
             ajax.jsonRpc("/erplibre_website_cv/update_cv", "call", params).then(function (data) {

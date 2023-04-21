@@ -29,6 +29,12 @@ class Contact(models.Model):
     description_formations = fields.Char(string='Description', required=True)
     date_formations = fields.Char(string='Date', required=True)
 
+    name_interets = fields.Char(string='Nom interets', required=True)
+    description_interets = fields.Char(string='Description', required=True)
+
+    name_trophes = fields.Char(string='Nom trophes', required=True)
+    date_trophes = fields.Char(string='Date', required=True)
+
     @api.constrains('email')
     def _check_email(self):
         for record in self:

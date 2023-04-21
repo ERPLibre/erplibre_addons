@@ -38,7 +38,13 @@ class WebsiteCVController(http.Controller):
                 "name_formations": contact["name_formations"],
                 "entreprise_name_formations": contact["entreprise_name_formations"],
                 "description_formations": contact["description_formations"],
-                "date_formations": contact["date_formations"]
+                "date_formations": contact["date_formations"],
+
+                "name_interets": contact["name_interets"],
+                "description_interets": contact["description_interets"],
+
+                "name_trophes": contact["name_trophes"],
+                "date_trophes": contact["date_trophes"]
             })
         return contacts
 

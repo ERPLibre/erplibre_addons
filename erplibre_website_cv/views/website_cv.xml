@@ -49,6 +49,18 @@
                         <field name="entreprise_name_formations" />
                         <field name="description_formations" />
                         <field name="date_formations" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Interêts</h2>
+                        <field name="name_interets" />
+                        <field name="description_interets" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Trophés et Certifications</h2>
+                        <field name="name_trophes" />
+                        <field name="date_trophes" />
                     </group>
                 </sheet>
 
