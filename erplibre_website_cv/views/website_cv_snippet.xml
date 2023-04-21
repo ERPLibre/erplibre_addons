@@ -55,7 +55,7 @@
                 </nav>
                 <div class="container-fluid p-0">
                     <!-- À propos -->
-                    <section class="resume-section">
+                    <section class="resume-section" id="apropos">
                         <div class="resume-section-content-apropos">
                             <h1 class="mb-0 desc-text name_apropos" data-field-name="name"></h1>
                             <div class="subheading mb-5">
@@ -91,7 +91,7 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Expérience -->
-                    <section class="resume-section">
+                    <section class="resume-section" id="experience">
                         <div class="resume-section-content-experience resume-width">
                             <h2 class="mb-5">Expérience</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
@@ -113,7 +113,7 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Projets -->
-                    <section class="resume-section">
+                    <section class="resume-section" id="projets">
                         <div class="resume-section-content-projets resume-width">
                             <h2 class="mb-5">Projets</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
@@ -134,7 +134,7 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Formations -->
-                    <section class="resume-section">
+                    <section class="resume-section" id="formations">
                         <div class="resume-section-content-formations resume-width">
                             <h2 class="mb-5">Formations</h2>
                             <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
@@ -198,7 +198,7 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Intérêts -->
-                    <section class="resume-section">
+                    <section class="resume-section" id="interets">
                         <div class="resume-section-content-interets resume-width">
                             <h2 class="mb-5">Intérêts</h2>
                             <table>
@@ -224,7 +224,7 @@
                     </section>
                     <hr class="m-0" />
                     <!-- Trophés et Certifications -->
-                    <section class="resume-section">
+                    <section class="resume-section" id="trophes">
                         <div class="resume-section-content-trophes resume-width">
                             <h2 class="mb-5">Trophés et Certifications</h2>
                             <table>
