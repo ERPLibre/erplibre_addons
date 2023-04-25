@@ -32,14 +32,32 @@ odoo.define("erplibre_website_cv.animation", require => {
 
                 element.addEventListener("click", function (event) {
                     console.log(getComputedStyle(event.target).borderColor);
-                    event.target.style.backgroundColor = "#d3d3d3"; 
-                    event.target.style.borderColor = "#d3d3d3 !important"; 
+                    event.target.style.backgroundColor = "#d3d3d3";
+                    event.target.style.borderColor = "#d3d3d3 !important";
                 });
                 element.addEventListener("blur", function (event) {
-                    event.target.style.backgroundColor = ""; 
-                    event.target.style.borderColor = ""; 
+                    event.target.style.backgroundColor = "";
+                    event.target.style.borderColor = "";
                 });
             }
+
+            // Enable scrollspy on the body
+            $('body').scrollspy({ target: '#navbarResponsive', offset: 100 });
+
+            // Smooth scrolling on click of nav links
+            $('a.js-scroll-trigger[href*="#"]:not([href="#"])').click(function () {
+                if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+                    var target = $(this.hash);
+                    target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+                    if (target.length) {
+                        $('html, body').animate({
+                            scrollTop: target.offset().top - 70
+                        }, 1000, 'easeInOutExpo');
+                        return false;
+                    }
+                }
+            });
+
             return $.when(this._super.apply(this, arguments), def);
         },
         getWebsiteCV: function (self) {

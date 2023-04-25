@@ -11,9 +11,9 @@
                 <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i"
                     rel="stylesheet" type="text/css" />
             </head>
-            <body id="page-top">
+            <body id="page-top" data-spy="scroll">
                 <!-- Navigation -->
-                <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav" data-target="#navbarResponsive" data-offset="100">
                     <a class="navbar-brand js-scroll-trigger" href="#page-top">
                         <span class="d-block d-lg-none">Mathieu Benoit</span>
                         <span class="d-none d-lg-block">
@@ -53,7 +53,7 @@
                         </ul>
                     </div>
                 </nav>
-                <div class="container-fluid p-0">
+                <div class="container-fluid p-0 scrollspy-example"  data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0">
                     <!-- À propos -->
                     <section class="resume-section" id="apropos">
                         <div class="resume-section-content-apropos">
