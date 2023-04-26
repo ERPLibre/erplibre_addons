@@ -14,33 +14,60 @@ odoo.define("erplibre_website_cv.animation", require => {
             this._originalContent = this.resumeSectionContent.innerHTML;
 
             const def = this.getWebsiteCV(self);
+            this.scrollSpy(self);
 
-            this._desctextList = this.el.getElementsByClassName("desc-text");
-            for (const element of this._desctextList) {
-                element.setAttribute("contenteditable", "true");
-                element.addEventListener("input", function (event) {
-                    const contactId = self.el.dataset.contactId;
-                    if (!contactId) {
-                        throw new Error("Contact ID not provided.");
+            console.log('editableMode value:', this.editableMode);
+
+            this._desctextList = this.el.querySelectorAll(".desc-text");
+            console.log('_desctextList:', this._desctextList);
+
+            if (this.editableMode) {
+                console.log('editableMode value:', this.editableMode);
+
+                for (const element of this._desctextList) {
+                    element.setAttribute("contenteditable", "true");
+                    element.setAttribute("tabindex", "0");
+
+                    if (element === this._desctextList[0]) {
+                        element.setAttribute("autofocus", "true");
                     }
-                    console.log(event.target.dataset);
-                    const fieldName = event.target.dataset.fieldName;
-                    const fieldValue = event.target.textContent.trim();
 
-                    self.updateCV(contactId, fieldName, fieldValue);
-                });
+                    element.addEventListener("input", function (event) {
+                        const contactId = self.el.dataset.contactId;
+                        if (!contactId) {
+                            throw new Error("Contact ID not provided.");
+                        }
 
-                element.addEventListener("click", function (event) {
-                    console.log(getComputedStyle(event.target).borderColor);
-                    event.target.style.backgroundColor = "#d3d3d3";
-                    event.target.style.borderColor = "#d3d3d3 !important";
-                });
-                element.addEventListener("blur", function (event) {
-                    event.target.style.backgroundColor = "";
-                    event.target.style.borderColor = "";
-                });
+                        console.log(event.target.dataset);
+                        const fieldName = event.target.dataset.fieldName;
+                        const fieldValue = event.target.textContent.trim();
+
+                        self.updateCV(contactId, fieldName, fieldValue);
+                    });
+
+                    element.addEventListener("mousedown", function (event) {
+                        if (event.target.getAttribute("contenteditable") === "true") {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    });
+
+                    element.addEventListener("click", function (event) {
+                        console.log(getComputedStyle(event.target).borderColor);
+                        event.target.style.backgroundColor = "#d3d3d3";
+                        event.target.style.borderColor = "#d3d3d3 !important";
+                    });
+
+                    element.addEventListener("blur", function (event) {
+                        event.target.style.backgroundColor = "";
+                        event.target.style.borderColor = "";
+                        event.target.removeAttribute("contenteditable");
+                    });
+                }
             }
-
+            return $.when(this._super.apply(this, arguments), def);
+        },
+        scrollSpy: function (self) {
             // Enable scrollspy on the body
             $('body').scrollspy({ target: '#navbarResponsive', offset: 100 });
 
@@ -57,8 +84,6 @@ odoo.define("erplibre_website_cv.animation", require => {
                     }
                 }
             });
-
-            return $.when(this._super.apply(this, arguments), def);
         },
         getWebsiteCV: function (self) {
             let def = self._rpc({
