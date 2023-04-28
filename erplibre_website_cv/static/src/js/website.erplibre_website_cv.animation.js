@@ -9,6 +9,7 @@ odoo.define("erplibre_website_cv.animation", require => {
 
         start: function () {
             let self = this;
+            const hauteurMenu = 70;
 
             this.resumeSectionContent = this.el.querySelector(".resume-section-content-apropos, .resume-section-content-experience, .resume-section-content-projets, .resume-section-content-formations, .resume-section-content-interets, .resume-section-content-trophes");
             this._originalContent = this.resumeSectionContent.innerHTML;
@@ -78,7 +79,7 @@ odoo.define("erplibre_website_cv.animation", require => {
                     target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
                     if (target.length) {
                         $('html, body').animate({
-                            scrollTop: target.offset().top - 70
+                            scrollTop: target.offset().top - hauteurMenu
                         }, 1000, 'easeInOutExpo');
                         return false;
                     }

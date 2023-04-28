@@ -14,5 +14,5 @@
         "views/website_cv_menu.xml",
     ],
     "installable": True,
-    'application': True,
+    "application": True,
 }
