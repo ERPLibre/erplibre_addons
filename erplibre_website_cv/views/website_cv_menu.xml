@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--Root menu-->
+
+    <menuitem
+        id="website_cv_icon"
+        name="Website CV"
+        sequence="20"
+        web_icon="erplibre_website_cv,static/description/icon.png"
+    />
+
+    <!--Sub menu-->
+
+    <menuitem id="website_cv_menu" name="Website CV Menu" sequence="1" parent="website_cv_icon" />
+
+    <!--Child menu-->
+
+    <menuitem
+        id="website_cv"
+        name="Website CV"
+        action="website_cv_website_cv_action_window"
+        sequence="2"
+        parent="website_cv_menu"
+    />
+</odoo>

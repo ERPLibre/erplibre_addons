@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Snippets -->
+    <template id="s_erplibre_website_cv" name="Website CV">
+        <section class="o_erplibre_website_cv">
+            <!-- Link Fonts-->
+            <head>
+                <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700"
+                    rel="stylesheet" type="text/css" />
+                <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i"
+                    rel="stylesheet" type="text/css" />
+            </head>
+            <body id="page-top" data-spy="scroll">
+                <!-- Navigation -->
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav" data-target="#navbarResponsive" data-offset="100">
+                    <a class="navbar-brand js-scroll-trigger" href="#page-top">
+                        <span class="d-block d-lg-none"></span>
+                        <span class="d-none d-lg-block">
+                            <img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                                src="/erplibre_website_cv/static/description/profile.png"
+                                alt="Profil photo" />
+                        </span>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#apropos">À propos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#experience">Expérience</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#projets">Projets</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#formations">Formations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#habiletes">Habiletés</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#interets">Intérêts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link js-scroll-trigger" href="#trophes">Trophés</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid p-0 scrollspy-example"  data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0">
+                    <!-- À propos -->
+                    <section class="resume-section" id="apropos">
+                        <div class="resume-section-content-apropos">
+                            <h1 class="mb-0 desc-text name_apropos" data-field-name="name"></h1>
+                            <div class="subheading mb-5">
+                                <table>
+                                    <tr>
+                                        <span class="desc-text address_apropos"
+                                            data-field-name="address"></span>
+                                    </tr>
+                                    <tr> · <span class="desc-text phone_apropos"
+                                            data-field-name="phone"></span></tr>
+                                    <tr> · <a class="desc-text email_apropos"
+                                            href="mailto:name@email.com" data-field-name="email"></a></tr>
+                                </table>
+                            </div>
+                            <p class="lead mb-5 desc-text description_apropos"
+                                data-field-name="description"></p>
+                            <div
+                                class="social-icons">
+                                <a class="social-icon" href="https://github.com/mathben">
+                                    <img
+                                        src="/erplibre_website_cv/static/description/logo_github.png"
+                                        alt="Logo GitHub"
+                                        style="width: 100%; height: 100%; object-fit: contain;" />
+                                </a>
+                                <a class="social-icon" href="">
+                                    <img
+                                        src="/erplibre_website_cv/static/description/logo_linkedin.png"
+                                        alt="Logo Linkedin"
+                                        style="width: 100%; height: 100%; object-fit: contain;" />
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Expérience -->
+                    <section class="resume-section" id="experience">
+                        <div class="resume-section-content-experience resume-width">
+                            <h2 class="mb-5">Expérience</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0 desc-text name_experience"
+                                        data-field-name="name_experience"></h3>
+                                    <div
+                                        class="subheading mb-3 desc-text entreprise_name_experience"
+                                        data-field-name="entreprise_name_experience"></div>
+                                    <p class="desc-text description_experience"
+                                        data-field-name="description_experience"></p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary desc-text date_experience date_span"
+                                        data-field-name="date_experience"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Projets -->
+                    <section class="resume-section" id="projets">
+                        <div class="resume-section-content-projets resume-width">
+                            <h2 class="mb-5">Projets</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0 desc-text name_projets"
+                                        data-field-name="name_projets"></h3>
+                                    <div class="subheading mb-3 desc-text entreprise_name_projets"
+                                        data-field-name="entreprise_name_projets"></div>
+                                    <p class="desc-text description_projets"
+                                        data-field-name="description_projets"></p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary desc-text date_projets date_span"
+                                        data-field-name="date_projets"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Formations -->
+                    <section class="resume-section" id="formations">
+                        <div class="resume-section-content-formations resume-width">
+                            <h2 class="mb-5">Formations</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0 desc-text name_formations"
+                                        data-field-name="name_formations"></h3>
+                                    <div
+                                        class="subheading mb-3 desc-text entreprise_name_formations"
+                                        data-field-name="entreprise_name_formations"></div>
+                                    <p class="desc-text description_formations"
+                                        data-field-name="description_formations"></p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="text-primary desc-text date_formations date_span"
+                                        data-field-name="date_formations"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Habiletés -->
+                    <section class="resume-section" id="habiletes">
+                        <div class="resume-section-content">
+                            <h2 class="mb-5">Habiletés</h2>
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                                <div class="flex-grow-1">
+                                    <div class="subheading mb-3">Programming languages and tools <p></p>
+                                        <div
+                                            class="icons">
+                                            <a class="icon">
+                                                <img
+                                                    src="/erplibre_website_cv/static/description/logo_c++.png"
+                                                    alt="Logo C++"
+                                                    style="width: 100%; height: 100%; object-fit: contain;" />
+                                            </a>
+                                            <a class="icon">
+                                                <img
+                                                    src="/erplibre_website_cv/static/description/logo_javascript.png"
+                                                    alt="Logo JavaScript"
+                                                    style="width: 100%; height: 100%; object-fit: contain;" />
+                                            </a>
+                                            <a class="icon">
+                                                <img
+                                                    src="/erplibre_website_cv/static/description/logo_python.png"
+                                                    alt="Logo Python"
+                                                    style="width: 100%; height: 100%; object-fit: contain;" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="subheading mb-3">Plateformes</div>
+                                    <p></p>
+                                    <p class="desc-text" id="name-plateformes">✔ Arch Linux <br /> ✔
+                                        Ubuntu <br /> ✔ Fedora </p>
+                                    <div class="subheading mb-3">Langages</div>
+                                    <p></p>
+                                    <p class="desc-text" id="name-langages">✔ C++ <br /> ✔
+                                        JavaScript <br /> ✔ C++ </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Intérêts -->
+                    <section class="resume-section" id="interets">
+                        <div class="resume-section-content-interets resume-width">
+                            <h2 class="mb-5">Intérêts</h2>
+                            <table>
+                                <tr>
+                                    <th>
+                                        <span class="icon_interets font-weight-normal">·</span>
+                                    </th>
+                                    <th>
+                                        <span class="desc-text name_interets font-weight-normal"
+                                            data-field-name="name_interets"></span>
+                                    </th>
+                                    <th>
+                                        <span class="dash-interets font-weight-normal">-</span>
+                                    </th>
+                                    <th>
+                                        <span
+                                            class="desc-text description_interets font-weight-normal"
+                                            data-field-name="description_interets"></span>
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                    <!-- Trophés et Certifications -->
+                    <section class="resume-section" id="trophes">
+                        <div class="resume-section-content-trophes resume-width">
+                            <h2 class="mb-5">Trophés et Certifications</h2>
+                            <table>
+                                <tr>
+                                    <th>
+                                        <span class="icon_trophes font-weight-normal">🏆</span>
+                                    </th>
+                                    <th>
+                                        <span class="desc-text name_trophes font-weight-normal"
+                                            data-field-name="name_trophes"> </span>
+                                    </th>
+                                    <th>
+                                        <span class="dash-trophes font-weight-normal">-</span>
+                                    </th>
+                                    <th>
+                                        <span class="desc-text date_trophes font-weight-normal"
+                                            data-field-name="date_trophes"></span>
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+                    </section>
+                    <hr class="m-0" />
+                </div>
+            </body>
+        </section>
+    </template>
+
+    <!-- Add snippets to menu -->
+    <template id="snippet_effect" inherit_id="website.snippets">
+        <xpath expr="//div[@id='snippet_effect']/div[hasclass('o_panel_body')]" position="inside">
+            <t
+                t-snippet="erplibre_website_cv.s_erplibre_website_cv"
+                t-thumbnail="/erplibre_website_cv/static/description/icon.png"
+            />
+        </xpath>
+    </template>
+
+    <!-- Add stylesheet and Javascript -->
+    <template id="assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="//link[last()]" position="after">
+            <link
+                rel="stylesheet"
+                type="text/scss"
+                href="/erplibre_website_cv/static/src/scss/erplibre_website_cv.scss"
+            />
+        </xpath>
+        <xpath expr="//link[last()]" position="after">
+            <link
+                rel="stylesheet"
+                type="text/css"
+                href="/erplibre_website_cv/static/src/scss/styles.css"
+            />
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
+            <script
+                type="text/javascript"
+                src="/erplibre_website_cv/static/src/js/website.erplibre_website_cv.animation.js"
+            />
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,82 @@
+/*
+    SCSS
+*/
+
+.informations {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+
+    &__text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    &-list {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &+& {
+        margin-top: .5rem;
+    }
+}
+
+.informations__delete {
+    align-items: center;
+    background-color: #c00;
+    border-radius: 0.125rem;
+    cursor: pointer;
+    display: flex;
+    height: 1rem;
+    justify-content: center;
+    min-width: 1rem;
+
+    &::after {
+        content: "x";
+        color: #F3F3F3;
+        font-family: monospace;
+        font-weight: bold;
+        pointer-events: none;
+    }
+}
+
+.informations-list__container {
+    width: 100%;
+    max-width: 15rem;
+}
+
+.snippet-section {
+    padding: 0 1rem;
+
+    &__results {
+        align-items: center;
+        background-color: #FAFAFA;
+        border-radius: .5rem;
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin: 1rem 1rem 0;
+        padding: 2rem;
+    }
+}
+
+.date_span {
+    margin-top: auto;
+}
+
+.resume-width {
+    width: 100%;
+}
+
+.font-weight-normal {
+    font-weight: normal;
+}
+
+.navbar-nav .nav-link.active {
+    text-decoration: underline;
+}
