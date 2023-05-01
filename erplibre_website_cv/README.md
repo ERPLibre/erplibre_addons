@@ -15,8 +15,10 @@ Notre plateforme de création de CV dispose d'un back-end convivial qui permet d
 
 ## Fonctionnalité manquante
 
+ * [ ] Extraire le style (thème).
+ * [ ] Enlever le bar du côté. 
  * [ ] Le modèle manque de many2many pour permettre la prise en compte de données multiples telles que l'expérience multiple.
- * [ ] La fonctionnalité permettant de modifier la photo de l'utilisateur
+ * [ ] La fonctionnalité permettant de modifier la photo de l'utilisateur.
  * [ ] La possibilité d'ajouter des langages de programmation en insérant une photo.
- * [ ] Création de plusieurs utilisateurs 
+ * [ ] Création de plusieurs utilisateurs.
 
