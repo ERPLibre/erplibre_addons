@@ -33,6 +33,7 @@
         "views/devops_log_makefile_target.xml",
         "views/devops_plan_type.xml",
         "views/devops_plan_type_lvl1.xml",
+        "views/devops_plan_type_lvl2.xml",
         "views/devops_system.xml",
         "views/devops_test.xml",
         "views/res_config_settings.xml",

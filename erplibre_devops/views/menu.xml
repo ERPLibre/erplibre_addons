@@ -161,6 +161,8 @@
 
     <menuitem id="menu_plan_type_lvl1" name="Type lvl1" sequence="2" parent="menu_plan" action="devops_plan_type_lvl1_plan_type_lvl1_action_window" />
 
+    <menuitem id="menu_plan_type_lvl2" name="Type lvl2" sequence="3" parent="menu_plan" action="devops_plan_type_lvl2_plan_type_lvl2_action_window" />
+
     <menuitem id="menu_release" name="Release" sequence="7" parent="menu_erplibre_devops" />
 
     <menuitem

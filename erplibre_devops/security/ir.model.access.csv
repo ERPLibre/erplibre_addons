@@ -17,6 +17,7 @@ devops_log_makefile_target_access_user_types_/_internal_user,devops_log_makefile
 devops_log_warning_access_user_types_/_internal_user,devops_log_warning Access User types / Internal User,model_devops_log_warning,base.group_user,1,1,1,1
 devops_plan_type_access_user_types_/_internal_user,devops_plan_type Access User types / Internal User,model_devops_plan_type,base.group_user,1,1,1,1
 devops_plan_type_lvl1_access_user_types_/_internal_user,devops_plan_type_lvl1 Access User types / Internal User,model_devops_plan_type_lvl1,base.group_user,1,1,1,1
+devops_plan_type_lvl2_access_user_types_/_internal_user,devops_plan_type_lvl2 Access User types / Internal User,model_devops_plan_type_lvl2,base.group_user,1,1,1,1
 devops_system_access_user_types_/_internal_user,devops_system Access User types / Internal User,model_devops_system,base.group_user,1,1,1,1
 devops_test_access_user_types_/_internal_user,devops_test Access User types / Internal User,model_devops_test,base.group_user,1,1,1,1
 devops_workspace_access_user_types_/_internal_user,devops_workspace Access User types / Internal User,model_devops_workspace,base.group_user,1,1,1,1
