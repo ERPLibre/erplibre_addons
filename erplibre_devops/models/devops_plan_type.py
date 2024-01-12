@@ -6,3 +6,15 @@ class DevopsPlanType(models.Model):
     _description = "devops_plan_type"
 
     name = fields.Char()
+
+    lvl1_id = fields.Many2one(
+        comodel_name="devops.plan.type.lvl1", string="Lvl 1"
+    )
+
+    lvl2_id = fields.Many2one(
+        comodel_name="devops.plan.type.lvl2", string="Lvl 2"
+    )
+
+    lvl3_id = fields.Many2one(
+        comodel_name="devops.plan.type.lvl3", string="Lvl 3"
+    )

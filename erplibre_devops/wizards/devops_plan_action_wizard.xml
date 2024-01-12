@@ -19,9 +19,9 @@
                 <field name="root_workspace_id_is_me" invisible="True" />
                 <field name="root_workspace_id" invisible="True" />
                 <field name="has_next" invisible="True" />
-<!--                <group name="Category">-->
-<!--                    <field name="plan_type_id" />-->
-<!--                </group>-->
+                <group name="Category">
+                    <field name="plan_type_id" />
+                </group>
                 <!--                <h1>-->
                 <!--                    <field name="name"-->
                 <!--                           attrs="{'readonly': [('state', '!=', 'start')]}"-->

@@ -20,6 +20,7 @@ from . import (
     devops_plan_type,
     devops_plan_type_lvl1,
     devops_plan_type_lvl2,
+    devops_plan_type_lvl3,
     devops_system,
     devops_test,
     devops_workspace,
