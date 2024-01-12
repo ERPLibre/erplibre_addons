@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_plan_type_test_erplibre_locally" model="devops.plan.type">
+            <field name="name">Test erplibre locally new project</field>
+            <field name="state_name">g_a_local</field>
+            <field name="lvl1_id" ref="devops_plan_type_lvl1_new_project"/>
+        </record>
+    </data>
+</odoo>

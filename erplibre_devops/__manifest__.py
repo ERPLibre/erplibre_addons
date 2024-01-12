@@ -42,6 +42,8 @@
         "views/devops_workspace_docker.xml",
         "views/devops_workspace_terminal.xml",
         "data/ir_cron.xml",
+        "data/devops_plan_type_lvl1.xml",
+        "data/devops_plan_type.xml",
         "data/devops_cg_new_project_stage.xml",
         "data/devops_ide_breakpoint.xml",
         "data/devops_system.xml",

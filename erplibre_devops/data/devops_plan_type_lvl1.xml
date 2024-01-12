@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_plan_type_lvl1_new_project" model="devops.plan.type.lvl1">
+            <field name="name">New project</field>
+        </record>
+    </data>
+</odoo>

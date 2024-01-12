@@ -18,3 +18,5 @@ class DevopsPlanType(models.Model):
     lvl3_id = fields.Many2one(
         comodel_name="devops.plan.type.lvl3", string="Lvl 3"
     )
+
+    state_name = fields.Char(required=True, help="With this state name, will show wizard state associate to this plan type.")

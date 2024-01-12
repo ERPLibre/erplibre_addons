@@ -53,6 +53,8 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     state = fields.Selection(default="init")
 
+    automated_state = fields.Boolean(compute="_compute_automated_state")
+
     has_next = fields.Boolean(compute="_compute_has_next")
 
     force_generate = fields.Boolean(
@@ -101,6 +103,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         required=True,
         default=lambda s: s.env.user.id,
     )
+
+    @api.depends(
+        "plan_type_id",
+    )
+    def _compute_automated_state(self):
+        for rec in self:
+            if rec.plan_type_id:
+                rec.state = rec.plan_type_id.state_name
 
     def _compute_has_next(self):
         for record in self:
