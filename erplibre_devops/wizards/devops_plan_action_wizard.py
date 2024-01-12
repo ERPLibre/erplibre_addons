@@ -35,6 +35,8 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     root_workspace_id_is_me = fields.Boolean(related="root_workspace_id.is_me")
 
+    plan_type_id = fields.Many2one(comodel_name="devops.plan.type")
+
     generated_new_project_id = fields.Many2one(
         comodel_name="devops.cg.new_project",
         string="Generated project",
