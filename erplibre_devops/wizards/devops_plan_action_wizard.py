@@ -283,6 +283,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 wp_id.stop_execution_if_env_not_clean = False
             wp_id.cg_self_add_config_cg = True
             wp_id.code_mode_context_generator = "autopoiesis"
+            wp_id.mode_view = "same_view"
             # Project
             cg_id = self.env["devops.code_generator"].create(
                 {
