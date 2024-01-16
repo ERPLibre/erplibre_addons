@@ -40,6 +40,11 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="Generated project",
     )
 
+    plan_cg_id = fields.Many2one(
+        comodel_name="devops.plan.cg",
+        string="Generated plan CG",
+    )
+
     working_module_id = fields.Many2one(
         comodel_name="ir.module.module",
         string="Working module",
@@ -279,11 +284,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Plan a_f_devops_regen"
         ) as wp_id:
-            if self.force_generate:
-                wp_id.stop_execution_if_env_not_clean = False
-            wp_id.cg_self_add_config_cg = True
-            wp_id.code_mode_context_generator = "autopoiesis"
-            wp_id.mode_view = "same_view"
+            # TODO this is a bug, no need that in reality, but action_code_generator_generate_all loop into it
             # Project
             cg_id = self.env["devops.cg"].create(
                 {
@@ -300,15 +301,23 @@ class DevopsPlanActionWizard(models.TransientModel):
                     "devops_workspace_ids": [(6, 0, wp_id.ids)],
                 }
             )
-            # Overwrite information
-            # TODO this is a bug, no need that in reality, but action_code_generator_generate_all loop into it
-            wp_id.devops_cg_ids = [(6, 0, cg_id.ids)]
-            wp_id.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
-            wp_id.devops_cg_model_ids = [(6, 0, [])]
-            wp_id.devops_cg_field_ids = [(6, 0, [])]
+            plan_cg_value = {
+                "workspace_id": wp_id.id,
+                "cg_self_add_config_cg": True,
+                "path_working_erplibre": wp_id.folder,
+                "code_mode_context_generator": "autopoiesis",
+                "mode_view": "same_view",
+                "devops_cg_ids": [(6, 0, cg_id.ids)],
+                "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
+                "devops_cg_model_ids": [(6, 0, [])],
+                "devops_cg_field_ids": [(6, 0, [])],
+                "stop_execution_if_env_not_clean": not self.force_generate,
+            }
+            plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
             # Generate
-            wp_id.action_code_generator_generate_all()
-            self.generated_new_project_id = wp_id.last_new_project_cg.id
+            plan_cg_id.action_code_generator_generate_all()
+            self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
+            self.plan_cg_id = plan_cg_id.id
             # finally
             self.state = "final"
 
@@ -364,20 +373,26 @@ class DevopsPlanActionWizard(models.TransientModel):
         #         "devops_workspace_ids": [(6, 0, wp_id.ids)],
         #     }
         # )
-        # Overwrite information
-        wp_id.path_code_generator_to_generate = relative_path_module
-        wp_id.devops_cg_ids = [(6, 0, cg_id.ids)]
-        wp_id.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
-        wp_id.devops_cg_model_ids = [(6, 0, self.model_ids.ids)]
-        wp_id.devops_cg_field_ids = [(6, 0, lst_field_id)]
+        plan_cg_value = {
+            "workspace_id": wp_id.id,
+            "mode_view": "new_view",
+            "path_working_erplibre": wp_id.folder,
+            "path_code_generator_to_generate": relative_path_module,
+            "devops_cg_ids": [(6, 0, cg_id.ids)],
+            "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
+            "devops_cg_model_ids": [(6, 0, self.model_ids.ids)],
+            "devops_cg_field_ids": [(6, 0, lst_field_id)],
+            "stop_execution_if_env_not_clean": not self.force_generate,
+        }
         # Update configuration self-gen
-        wp_id.mode_view = "new_view"
         if is_autopoiesis:
-            wp_id.cg_self_add_config_cg = True
-            wp_id.code_mode_context_generator = "autopoiesis"
+            plan_cg_value["cg_self_add_config_cg"] = True
+            plan_cg_value["code_mode_context_generator"] = "autopoiesis"
         # Generate
-        wp_id.action_code_generator_generate_all()
-        self.generated_new_project_id = wp_id.last_new_project_cg.id
+        plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
+        plan_cg_id.action_code_generator_generate_all()
+        self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
+        self.plan_cg_id = plan_cg_id.id
         # Git add
         lst_default_file = [
             f"{module_name}/__manifest__.py",
@@ -403,3 +418,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         )
         # finally
         self.state = "final"
+
+    @api.multi
+    def action_git_commit(self):
+        for rec in self:
+            if rec.plan_cg_id:
+                rec.plan_cg_id.action_git_commit()

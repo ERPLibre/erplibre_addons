@@ -19,6 +19,8 @@
 
     <menuitem id="menu_devops" name="DevOps" sequence="1" parent="menu_erplibre_devops" />
 
+    <menuitem id="menu_plan" name="Plan" sequence="3" parent="menu_erplibre_devops" />
+
     <menuitem id="menu_test" name="Test" sequence="6" parent="menu_erplibre_devops" />
 
     <menuitem id="menu_code_cg" name="CG" sequence="1" parent="menu_code" />
@@ -155,7 +157,13 @@
 
     <menuitem id="menu_operate" name="Operate" sequence="9" parent="menu_erplibre_devops" />
 
-    <menuitem id="menu_plan" name="Plan" sequence="3" parent="menu_erplibre_devops" />
+    <menuitem
+        id="menu_plan_cg"
+        name="Code generator"
+        action="devops_plan_cg_plan_cg_action_window"
+        sequence="1"
+        parent="menu_plan"
+    />
 
     <menuitem id="menu_release" name="Release" sequence="7" parent="menu_erplibre_devops" />
 

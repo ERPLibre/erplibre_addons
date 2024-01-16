@@ -189,6 +189,7 @@
                 <div name="final" attrs="{'invisible': [('state', '!=', 'final')]}">
                     <p>The planification is now configured, close this dialog below.</p>
                     <group>
+                        <field name="plan_cg_id" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
                         <field
                             name="generated_new_project_id"
                             attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
@@ -196,6 +197,13 @@
                         <field
                             name="create_workspace_id"
                             attrs="{'invisible': [('create_workspace_id', '=', False)]}"
+                        />
+                        <button
+                            name="action_git_commit"
+                            string="Git commit"
+                            type="object"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('plan_cg_id', '=', False)]}"
                         />
                     </group>
                 </div>

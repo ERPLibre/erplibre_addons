@@ -202,13 +202,26 @@ volumes:
                 addons_path = None
                 # TODO this is not good, need a script from manifest to rebuild this path
                 if rec.docker_config_gen_cg:
+                    if rec.workspace_id.path_code_generator_to_generate:
+                        str_path_gen = ",".join(
+                            [
+                                os.path.join(
+                                    rec.workspace_id.path_working_erplibre, a
+                                )
+                                for a in rec.workspace_id.path_code_generator_to_generate.strip().split(
+                                    ";"
+                                )
+                            ]
+                        )
+                    else:
+                        str_path_gen = ""
                     addons_path = (
                         "addons_path ="
                         f" {rec.workspace_id.path_working_erplibre}/odoo/addons,"
-                        f"{rec.workspace_id.path_working_erplibre}/{rec.workspace_id.path_code_generator_to_generate},"
+                        f"{str_path_gen},"
                         f"{rec.workspace_id.path_working_erplibre}/addons/OCA_web,"
-                        f"{rec.workspace_id.path_working_erplibre}/addons{rec.workspace_id.path_working_erplibre}_erplibre_addons,"
-                        f"{rec.workspace_id.path_working_erplibre}/addons{rec.workspace_id.path_working_erplibre}_erplibre_theme_addons,"
+                        f"{rec.workspace_id.path_working_erplibre}/addons/ERPLibre_erplibre_addons,"
+                        f"{rec.workspace_id.path_working_erplibre}/addons/ERPLibre_erplibre_theme_addons,"
                         f"{rec.workspace_id.path_working_erplibre}/addons/MathBenTech_development,"
                         f"{rec.workspace_id.path_working_erplibre}/addons/MathBenTech_erplibre-family-management,"
                         f"{rec.workspace_id.path_working_erplibre}/addons/MathBenTech_odoo-business-spending-management-quebec-canada,"

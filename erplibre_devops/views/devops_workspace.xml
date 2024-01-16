@@ -94,21 +94,6 @@
                         attrs="{'invisible': [('is_conflict_mode_exec', '=', True)]}"
                     />
                     <button
-                        name="action_execute_last_stage_new_project"
-                        string="Re-execute last"
-                        type="object"
-                        class="btn-warning"
-                        attrs="{'invisible': ['|', ('is_conflict_mode_exec', '=', True), ('has_re_execute_new_project', '=', False)]}"
-                    />
-                    <button
-                        name="action_execute_last_stage_new_project"
-                        string="Re-execute Uc0"
-                        type="object"
-                        class="btn-warning"
-                        context="{'default_stage_Uc0': True}"
-                        attrs="{'invisible': ['|', ('is_conflict_mode_exec', '=', True), ('has_re_execute_new_project', '=', False)]}"
-                    />
-                    <button
                         name="action_clear_error_exec"
                         string="Clear error exec"
                         type="object"
@@ -141,6 +126,16 @@
                         attrs="{'invisible': [('devops_exec_count', '==', 0)]}"
                     >
                         <field name="devops_exec_count" string="Executions" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_plan_cg_plan_cg_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-building-o"
+                        context="{'search_default_workspace_id': active_id}"
+                        attrs="{'invisible': [('plan_cg_count', '==', 0)]}"
+                    >
+                        <field name="plan_cg_count" string="Plans CG" widget="statinfo" />
                     </button>
                     <button
                         name="%(erplibre_devops.devops_exec_error_action_window)d"
@@ -200,7 +195,6 @@
                         <field name="is_installed" invisible="True" />
                         <field name="is_running" invisible="True" />
                         <field name="is_me" invisible="True" />
-                        <field name="has_re_execute_new_project" invisible="True" />
                     </group>
                     <group string="Execution">
                         <field name="is_debug_log" />
@@ -246,7 +240,6 @@
                     </group>
                     <group string="Action">
                         <button name="action_open_terminal" string="Terminal" type="object" class="oe_highlight" />
-                        <button name="action_clear_cache" string="Clear cache" type="object" class="oe_highlight" />
                         <button
                             name="action_open_directory"
                             string="Open directory"
@@ -266,285 +259,16 @@
                         </group>
                     </page>
                     <page name="code_generator" string="Code">
-                        <div class="bg-warning">
-                            <h3>Warning:</h3>
-                            Create new project with code generator
-                        </div>
-                        <group string="Action CG">
-                            <group>
-                                <button
-                                    name="action_install_and_generate_all_generated_module"
-                                    string="All"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_install_and_generate_all_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field
-                                        name="time_exec_action_install_and_generate_all_generated_module"
-                                        nolabel="1"
-                                    />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_code_generator_generate_all"
-                                    string="Generate all"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_code_generator_generate_all', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_code_generator_generate_all" nolabel="1" />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_install_all_generated_module"
-                                    string="Install all"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_install_all_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_install_all_generated_module" nolabel="1" />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_refresh_meta_cg_generated_module"
-                                    string="Refresh CG"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_refresh_meta_cg_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_refresh_meta_cg_generated_module" nolabel="1" />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_install_all_uca_generated_module"
-                                    string="Install UCA"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_install_all_uca_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_install_all_uca_generated_module" nolabel="1" />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_install_all_ucb_generated_module"
-                                    string="Install UCB"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_install_all_ucb_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_install_all_ucb_generated_module" nolabel="1" />
-                                </div>
-                            </group>
-                        </group>
-                        <group string="Action addons">
-                            <group>
-                                <button
-                                    name="action_clear_all_generated_module"
-                                    string="Clear all"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_clear_all_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_clear_all_generated_module" nolabel="1" />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_git_commit_all_generated_module"
-                                    string="Git commit"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <div
-                                    attrs="{'invisible': [('time_exec_action_git_commit_all_generated_module', '=', False)]}"
-                                >
-                                    Exec in
-                                    <field name="time_exec_action_git_commit_all_generated_module" nolabel="1" />
-                                </div>
-                            </group>
-                            <group>
-                                <button
-                                    name="action_open_terminal_tig"
-                                    string="Terminal tig"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                            </group>
-                            <group>
-                                <button
-                                    name="action_open_terminal_addons"
-                                    string="Terminal addons"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                            </group>
-                        </group>
-                        <field name="need_debugger_cg_erplibre_devops" invisible="True" />
-                        <group string="CG new project">
-                            <group>
-                                <button
-                                    name="action_open_terminal_path_erplibre_devops"
-                                    string="Terminal path erplibre_devops"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <button
-                                    name="action_format_erplibre_devops"
-                                    string="Format module erplibre_devops"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <button
-                                    name="action_update_erplibre_devops"
-                                    string="Update module erplibre_devops"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <button
-                                    name="workspace_CG_remove_module"
-                                    string="Clear modules"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <button
-                                    name="workspace_CG_git_commit"
-                                    string="Git commit"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <button
-                                    name="action_cg_setup_pycharm_debug"
-                                    string="Setup Pycharm debug"
-                                    type="object"
-                                    class="oe_highlight"
-                                    attrs="{'invisible': [('need_debugger_cg_erplibre_devops', '=', False)]}"
-                                />
-                            </group>
-                        </group>
                         <group>
-                            <group string="Action other">
-                                <button
-                                    name="action_cg_generate_demo"
-                                    string="Generate demo"
-                                    type="object"
-                                    class="oe_highlight"
-                                />
-                                <field name="is_clear_before_cg_demo" />
-                                <field name="cg_demo_type_data" />
-                            </group>
-                            <group string="Execution">
-                                <field name="last_new_project_cg" />
-                                <field name="stop_execution_if_env_not_clean" />
-                                <field name="cg_self_add_config_cg" />
-                            </group>
-                            <group name="group_cg_uca" string="CG config UcA">
-                                <field name="config_uca_enable_export_data" />
-                            </group>
-                            <group string="Log">
-                                <field
-                                    name="devops_cg_erplibre_devops_error_log"
-                                    attrs="{'invisible': [('devops_cg_erplibre_devops_error_log', '=', False)]}"
-                                />
-                                <field name="devops_cg_erplibre_devops_log" />
-                            </group>
-                            <group name="group_cg_config" string="CG config view">
-                                <field name="mode_view" />
-                                <field name="mode_view_snippet" />
-                                <field name="mode_view_snippet_enable_template_website_snippet_view" />
-                                <field name="mode_view_snippet_template_generate_website_snippet_generic_mdl" />
-                                <field name="mode_view_snippet_template_generate_website_snippet_ctrl_featur" />
-                                <field name="mode_view_snippet_template_generate_website_enable_javascript" />
-                                <field name="mode_view_snippet_template_generate_website_snippet_type" />
-                            </group>
-                            <group string="Configuration">
-                                <field name="code_mode_context_generator" />
-                                <field name="path_code_generator_to_generate" />
-                                <field name="path_working_erplibre" />
-                            </group>
+                            <field name="plan_cg_ids" />
                         </group>
-                        <group string="Generator">
-                            <field name="id" invisible="True" />
-                            <field
-                                name="devops_cg_ids"
-                                widget="many2many"
-                                options="{'always_reload': True}"
-                                context="{'default_devops_workspace_ids': [id]}"
-                            />
-                            <field
-                                name="devops_cg_module_ids"
-                                widget="many2many"
-                                options="{'always_reload': True}"
-                                context="{'default_devops_workspace_ids': [id]}"
-                            />
-                            <field
-                                name="devops_cg_model_ids"
-                                widget="many2many"
-                                options="{'always_reload': True}"
-                                context="{'default_devops_workspace_ids': [id]}"
-                            />
-                            <field
-                                name="devops_cg_field_ids"
-                                widget="many2many"
-                                options="{'always_reload': True}"
-                                context="{'default_devops_workspace_ids': [id]}"
-                            />
-                        </group>
-                    </page>
-                    <page name="code_generator_info_diff" string="Diff">
-                        <field name="devops_cg_diff" />
-                    </page>
-                    <page name="code_generator_info_status" string="Status">
-                        <field name="devops_cg_status" />
-                    </page>
-                    <page name="code_generator_info_stat" string="Stat">
-                        <field name="devops_cg_stat" />
                     </page>
                     <page name="makefile" string="Makefile">
                         <field name="log_makefile_target_ids" />
                     </page>
-                    <page name="code_generator_info_tree" string="Tree">
-                        <group>
-                            <button
-                                name="action_check_tree_addons"
-                                string="Update tree"
-                                type="object"
-                                class="oe_highlight"
-                            />
-                        </group>
-                        <field name="devops_cg_tree_addons" />
-                    </page>
                     <page name="log" string="Log">
                         <group>
                             <field name="log_workspace" />
-                        </group>
-                        <group>
-                            <field name="devops_cg_log_addons" />
                         </group>
                     </page>
                     <page name="install" string="Install">

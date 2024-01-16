@@ -17,6 +17,7 @@ from . import (
     devops_log_error,
     devops_log_makefile_target,
     devops_log_warning,
+    devops_plan_cg,
     devops_system,
     devops_test,
     devops_workspace,

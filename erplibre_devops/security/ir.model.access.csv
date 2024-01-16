@@ -1,10 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+devops_cg_access_user_types_/_internal_user,devops_cg Access User types / Internal User,model_devops_cg,base.group_user,1,1,1,1
+devops_cg_field_access_user_types_/_internal_user,devops_cg_field Access User types / Internal User,model_devops_cg_field,base.group_user,1,1,1,1
+devops_cg_model_access_user_types_/_internal_user,devops_cg_model Access User types / Internal User,model_devops_cg_model,base.group_user,1,1,1,1
+devops_cg_module_access_user_types_/_internal_user,devops_cg_module Access User types / Internal User,model_devops_cg_module,base.group_user,1,1,1,1
 devops_cg_new_project_access_user_types_/_internal_user,devops_cg_new_project Access User types / Internal User,model_devops_cg_new_project,base.group_user,1,1,1,1
 devops_cg_new_project_stage_access_user_types_/_internal_user,devops_cg_new_project_stage Access User types / Internal User,model_devops_cg_new_project_stage,base.group_user,1,1,1,1
-devops_cg_access_user_types_/_internal_user,devops_cg Access User types / Internal User,model_devops_cg,base.group_user,1,1,1,1
-devops_cg_module_access_user_types_/_internal_user,devops_cg_module Access User types / Internal User,model_devops_cg_module,base.group_user,1,1,1,1
-devops_cg_model_access_user_types_/_internal_user,devops_cg_model Access User types / Internal User,model_devops_cg_model,base.group_user,1,1,1,1
-devops_cg_field_access_user_types_/_internal_user,devops_cg_field Access User types / Internal User,model_devops_cg_field,base.group_user,1,1,1,1
 devops_db_image_access_user_types_/_internal_user,devops_db_image Access User types / Internal User,model_devops_db_image,base.group_user,1,1,1,1
 devops_exec_access_user_types_/_internal_user,devops_exec Access User types / Internal User,model_devops_exec,base.group_user,1,1,1,1
 devops_exec_bundle_access_user_types_/_internal_user,devops_exec_bundle Access User types / Internal User,model_devops_exec_bundle,base.group_user,1,1,1,1
@@ -15,6 +15,7 @@ devops_ide_pycharm_configuration_access_user_types_/_internal_user,devops_ide_py
 devops_log_error_access_user_types_/_internal_user,devops_log_error Access User types / Internal User,model_devops_log_error,base.group_user,1,1,1,1
 devops_log_makefile_target_access_user_types_/_internal_user,devops_log_makefile_target Access User types / Internal User,model_devops_log_makefile_target,base.group_user,1,1,1,1
 devops_log_warning_access_user_types_/_internal_user,devops_log_warning Access User types / Internal User,model_devops_log_warning,base.group_user,1,1,1,1
+devops_plan_cg_access_user_types_/_internal_user,devops_plan_cg Access User types / Internal User,model_devops_plan_cg,base.group_user,1,1,1,1
 devops_system_access_user_types_/_internal_user,devops_system Access User types / Internal User,model_devops_system,base.group_user,1,1,1,1
 devops_test_access_user_types_/_internal_user,devops_test Access User types / Internal User,model_devops_test,base.group_user,1,1,1,1
 devops_workspace_access_user_types_/_internal_user,devops_workspace Access User types / Internal User,model_devops_workspace,base.group_user,1,1,1,1

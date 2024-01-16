@@ -79,6 +79,7 @@ class DevopsCgField(models.Model):
         ]
     )
 
+    # TODO remove this association
     devops_workspace_ids = fields.Many2many(
         comodel_name="devops.workspace",
         string="DevOps Workspace",
