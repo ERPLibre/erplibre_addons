@@ -44,16 +44,14 @@ def post_init_hook(cr, e):
         # TODO HUMAN: enable your functionality to generate
         value["enable_template_code_generator_demo"] = False
         value["template_model_name"] = (
-            "devops.cg.new_project; devops.cg.new_project.stage;"
-            " devops.code_generator; devops.code_generator.module;"
-            " devops.code_generator.module.model;"
-            " devops.code_generator.module.model.field; devops.db.image;"
-            " devops.exec; devops.exec.bundle; devops.exec.error;"
-            " devops.ide.breakpoint; devops.ide.pycharm;"
+            "devops.cg; devops.cg.field; devops.cg.model; devops.cg.module;"
+            " devops.cg.new_project; devops.cg.new_project.stage;"
+            " devops.db.image; devops.exec; devops.exec.bundle;"
+            " devops.exec.error; devops.ide.breakpoint; devops.ide.pycharm;"
             " devops.ide.pycharm.configuration; devops.log.error;"
             " devops.log.makefile.target; devops.log.warning;"
-            " devops.plan.action.wizard; devops.system; devops.test;"
-            " devops.workspace; devops.workspace.docker;"
+            " devops.plan.action.wizard; devops.plan.cg; devops.system;"
+            " devops.test; devops.workspace; devops.workspace.docker;"
             " devops.workspace.terminal"
         )
         value["template_inherit_model_name"] = ""

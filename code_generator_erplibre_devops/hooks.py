@@ -62,6 +62,374 @@ def post_init_hook(cr, e):
         lst_depend_module = ["mail", "multi_step_wizard"]
         code_generator_id.add_module_dependency(lst_depend_module)
 
+        # Add/Update Devops Cg
+        model_model = "devops.cg"
+        model_name = "devops_cg"
+        dct_model = {
+            "description": "devops_cg",
+            "nomenclator": True,
+        }
+        dct_field = {
+            "default_workspace_master": {
+                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_sequence": 4,
+                "comment_before": (
+                    "TODO create boolean cache with default workspace to work"
+                    " for the other"
+                ),
+                "field_description": "DevOps Workspace default",
+                "relation": "devops.workspace",
+                "ttype": "many2one",
+            },
+            "devops_workspace_ids": {
+                "code_generator_form_simple_view_sequence": 11,
+                "code_generator_sequence": 3,
+                "code_generator_tree_view_sequence": 13,
+                "comment_before": (
+                    "TODO if share result, do a command to copy file all and"
+                    " recreate it like a mirror on other workspace"
+                ),
+                "field_description": "DevOps Workspace",
+                "force_widget": "many2many_tags",
+                "relation": "devops.workspace",
+                "ttype": "many2many",
+            },
+            "force_clean_before_generate": {
+                "code_generator_form_simple_view_sequence": 14,
+                "code_generator_sequence": 6,
+                "code_generator_tree_view_sequence": 12,
+                "field_description": "Force Clean Before Generate",
+                "help": "Will remove all modules to generate news.",
+                "ttype": "boolean",
+            },
+            "name": {
+                "code_generator_form_simple_view_sequence": 10,
+                "code_generator_sequence": 2,
+                "code_generator_tree_view_sequence": 10,
+                "field_description": "Name",
+                "ttype": "char",
+            },
+        }
+        model_devops_cg = code_generator_id.add_update_model(
+            model_model,
+            model_name,
+            dct_field=dct_field,
+            dct_model=dct_model,
+        )
+
+        # Generate code
+        if True:
+            # Generate code header
+            value = {
+                "code": """import json
+
+from odoo import _, api, exceptions, fields, models""",
+                "name": "header",
+                "m2o_module": code_generator_id.id,
+                "m2o_model": model_devops_cg.id,
+            }
+            env["code.generator.model.code.import"].create(value)
+
+            # Generate code model
+            lst_value = [
+                {
+                    "code": """r = super().create(vals_list)
+w_ids = self.env.context.get("default_devops_workspace_ids")
+if w_ids:
+    for cg_id in r:
+        if not cg_id.default_workspace_master:
+            cg_id.default_workspace_master = w_ids[0]
+
+        if not cg_id.devops_workspace_ids:
+            cg_id.devops_workspace_ids = [6, 0, w_ids]
+        for module_id in cg_id.module_ids:
+            if not module_id.devops_workspace_ids:
+                module_id.devops_workspace_ids = [
+                    (
+                        6,
+                        0,
+                        w_ids,
+                    )
+                ]
+            for model_id in module_id.model_ids:
+                if not model_id.devops_workspace_ids:
+                    model_id.devops_workspace_ids = [
+                        (
+                            6,
+                            0,
+                            w_ids,
+                        )
+                    ]
+                for field_id in model_id.field_ids:
+                    if not field_id.devops_workspace_ids:
+                        field_id.devops_workspace_ids = [
+                            (
+                                6,
+                                0,
+                                w_ids,
+                            )
+                        ]
+return r""",
+                    "name": "create",
+                    "decorator": "@api.model_create_multi",
+                    "param": "self, vals_list",
+                    "sequence": 0,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_cg.id,
+                },
+            ]
+            env["code.generator.model.code"].create(lst_value)
+
+        # Add/Update Devops Cg Field
+        model_model = "devops.cg.field"
+        model_name = "devops_cg_field"
+        dct_model = {
+            "description": "devops_cg_field",
+            "nomenclator": True,
+        }
+        dct_field = {
+            "devops_workspace_ids": {
+                "code_generator_form_simple_view_sequence": 18,
+                "code_generator_sequence": 12,
+                "code_generator_tree_view_sequence": 19,
+                "comment_before": "TODO remove this association",
+                "field_description": "DevOps Workspace",
+                "force_widget": "many2many_tags",
+                "relation": "devops.workspace",
+                "ttype": "many2many",
+            },
+            "field_relation": {
+                "code_generator_form_simple_view_sequence": 14,
+                "code_generator_sequence": 9,
+                "code_generator_tree_view_sequence": 16,
+                "field_description": "Inverse field",
+                "force_domain": "[('model_id', '=', relation)]",
+                "help": (
+                    "inverse_name - Need for one2many to associate with"
+                    " many2one."
+                ),
+                "relation": "devops.cg.field",
+                "ttype": "many2one",
+            },
+            "field_relation_manual": {
+                "code_generator_form_simple_view_sequence": 15,
+                "code_generator_sequence": 10,
+                "code_generator_tree_view_sequence": 17,
+                "field_description": "Inverse field manual",
+                "help": (
+                    "inverse_name - Need for one2many to associate with"
+                    " many2one, manual entry."
+                ),
+                "ttype": "char",
+            },
+            "has_error": {
+                "code_generator_compute": "_compute_has_error",
+                "code_generator_sequence": 4,
+                "code_generator_tree_view_sequence": 10,
+                "field_description": "Has Error",
+                "store": True,
+                "ttype": "boolean",
+            },
+            "help": {
+                "code_generator_form_simple_view_sequence": 16,
+                "code_generator_sequence": 3,
+                "code_generator_tree_view_sequence": 18,
+                "field_description": "Help",
+                "ttype": "char",
+            },
+            "model_id": {
+                "code_generator_form_simple_view_sequence": 17,
+                "code_generator_sequence": 5,
+                "code_generator_tree_view_sequence": 12,
+                "field_description": "Model",
+                "on_delete": "cascade",
+                "relation": "devops.cg.model",
+                "ttype": "many2one",
+            },
+            "name": {
+                "code_generator_form_simple_view_sequence": 10,
+                "code_generator_sequence": 2,
+                "code_generator_tree_view_sequence": 11,
+                "field_description": "Name",
+                "ttype": "char",
+            },
+            "relation": {
+                "code_generator_form_simple_view_sequence": 12,
+                "code_generator_sequence": 7,
+                "code_generator_tree_view_sequence": 14,
+                "field_description": "Comodel",
+                "help": (
+                    "comodel - Create relation for many2one, many2many,"
+                    " one2many"
+                ),
+                "relation": "devops.cg.model",
+                "ttype": "many2one",
+            },
+            "relation_manual": {
+                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_sequence": 8,
+                "code_generator_tree_view_sequence": 15,
+                "field_description": "Comodel manual",
+                "help": (
+                    "comodel - Create relation for many2one, many2many,"
+                    " one2many. Manual entry by pass relation field."
+                ),
+                "ttype": "char",
+            },
+            "type": {
+                "code_generator_form_simple_view_sequence": 11,
+                "code_generator_sequence": 6,
+                "code_generator_tree_view_sequence": 13,
+                "default": "char",
+                "field_description": "Type",
+                "required": True,
+                "selection": (
+                    "[('char', 'char'), ('boolean', 'boolean'), ('integer',"
+                    " 'integer'), ('float', 'float'), ('text', 'text'),"
+                    " ('html', 'html'), ('datetime', 'datetime'), ('date',"
+                    " 'date'), ('many2one', 'many2one'), ('many2many',"
+                    " 'many2many'), ('one2many', 'one2many')]"
+                ),
+                "ttype": "selection",
+            },
+            "widget": {
+                "code_generator_sequence": 11,
+                "field_description": "Widget",
+                "selection": (
+                    "[('image', 'image'), ('many2many_tags',"
+                    " 'many2many_tags'), ('priority', 'priority'),"
+                    " ('selection', 'selection'), ('mail_followers',"
+                    " 'mail_followers'), ('mail_activity', 'mail_activity'),"
+                    " ('mail_thread', 'mail_thread')]"
+                ),
+                "ttype": "selection",
+            },
+        }
+        model_devops_cg_field = code_generator_id.add_update_model(
+            model_model,
+            model_name,
+            dct_field=dct_field,
+            dct_model=dct_model,
+        )
+
+        # Generate code
+        if True:
+            # Generate code model
+            lst_value = [
+                {
+                    "code": """for rec in self:
+    # Disable all error
+    rec.has_error = False
+    if rec.type in ("many2many", "many2one", "one2many"):
+        has_relation = rec.relation or rec.relation_manual
+        has_field_relation = True
+        if rec.type == "one2many":
+            has_field_relation = (
+                rec.field_relation or rec.field_relation_manual
+            )
+        rec.has_error = not has_relation or not has_field_relation""",
+                    "name": "_compute_has_error",
+                    "decorator": (
+                        '@api.depends("type", "relation", "relation_manual",'
+                        ' "field_relation", "field_relation_manual")'
+                    ),
+                    "param": "self",
+                    "sequence": 0,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_cg_field.id,
+                },
+            ]
+            env["code.generator.model.code"].create(lst_value)
+
+        # Add/Update Devops Cg Model
+        model_model = "devops.cg.model"
+        model_name = "devops_cg_model"
+        dct_model = {
+            "description": "devops_cg_model",
+            "nomenclator": True,
+        }
+        dct_field = {
+            "description": {
+                "code_generator_form_simple_view_sequence": 11,
+                "code_generator_sequence": 3,
+                "code_generator_tree_view_sequence": 12,
+                "field_description": "Description",
+                "ttype": "char",
+            },
+            "devops_workspace_ids": {
+                "code_generator_form_simple_view_sequence": 14,
+                "code_generator_sequence": 6,
+                "code_generator_tree_view_sequence": 14,
+                "field_description": "DevOps Workspace",
+                "force_widget": "many2many_tags",
+                "relation": "devops.workspace",
+                "ttype": "many2many",
+            },
+            "module_id": {
+                "code_generator_form_simple_view_sequence": 12,
+                "code_generator_sequence": 5,
+                "code_generator_tree_view_sequence": 11,
+                "field_description": "Module",
+                "on_delete": "cascade",
+                "relation": "devops.cg.module",
+                "ttype": "many2one",
+            },
+            "name": {
+                "code_generator_form_simple_view_sequence": 10,
+                "code_generator_sequence": 2,
+                "code_generator_tree_view_sequence": 10,
+                "field_description": "Name",
+                "ttype": "char",
+            },
+        }
+        model_devops_cg_model = code_generator_id.add_update_model(
+            model_model,
+            model_name,
+            dct_field=dct_field,
+            dct_model=dct_model,
+        )
+
+        # Add/Update Devops Cg Module
+        model_model = "devops.cg.module"
+        model_name = "devops_cg_module"
+        dct_model = {
+            "description": "devops_cg_module",
+            "nomenclator": True,
+        }
+        dct_field = {
+            "code_generator": {
+                "code_generator_form_simple_view_sequence": 11,
+                "code_generator_sequence": 3,
+                "code_generator_tree_view_sequence": 11,
+                "field_description": "Project",
+                "on_delete": "cascade",
+                "relation": "devops.cg",
+                "ttype": "many2one",
+            },
+            "devops_workspace_ids": {
+                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_sequence": 5,
+                "code_generator_tree_view_sequence": 13,
+                "field_description": "DevOps Workspace",
+                "force_widget": "many2many_tags",
+                "relation": "devops.workspace",
+                "ttype": "many2many",
+            },
+            "name": {
+                "code_generator_form_simple_view_sequence": 10,
+                "code_generator_sequence": 2,
+                "code_generator_tree_view_sequence": 10,
+                "field_description": "Name",
+                "ttype": "char",
+            },
+        }
+        model_devops_cg_module = code_generator_id.add_update_model(
+            model_model,
+            model_name,
+            dct_field=dct_field,
+            dct_model=dct_model,
+        )
+
         # Add/Update Devops Cg New Project
         model_model = "devops.cg.new_project"
         model_name = "devops_cg_new_project"
@@ -2393,386 +2761,6 @@ _logger = logging.getLogger(__name__)""",
             }
             env["code.generator.model.code.import"].create(value)
 
-        # Add/Update Devops Code Generator
-        model_model = "devops.code_generator"
-        model_name = "devops_code_generator"
-        dct_model = {
-            "description": "devops_code_generator",
-            "nomenclator": True,
-        }
-        dct_field = {
-            "default_workspace_master": {
-                "code_generator_form_simple_view_sequence": 13,
-                "code_generator_sequence": 4,
-                "comment_before": (
-                    "TODO create boolean cache with default workspace to work"
-                    " for the other"
-                ),
-                "field_description": "DevOps Workspace default",
-                "relation": "devops.workspace",
-                "ttype": "many2one",
-            },
-            "devops_workspace_ids": {
-                "code_generator_form_simple_view_sequence": 11,
-                "code_generator_sequence": 3,
-                "code_generator_tree_view_sequence": 13,
-                "comment_before": (
-                    "TODO if share result, do a command to copy file all and"
-                    " recreate it like a mirror on other workspace"
-                ),
-                "field_description": "DevOps Workspace",
-                "force_widget": "many2many_tags",
-                "relation": "devops.workspace",
-                "required": True,
-                "ttype": "many2many",
-            },
-            "force_clean_before_generate": {
-                "code_generator_form_simple_view_sequence": 14,
-                "code_generator_sequence": 6,
-                "code_generator_tree_view_sequence": 12,
-                "field_description": "Force Clean Before Generate",
-                "help": "Will remove all modules to generate news.",
-                "ttype": "boolean",
-            },
-            "name": {
-                "code_generator_form_simple_view_sequence": 10,
-                "code_generator_sequence": 2,
-                "code_generator_tree_view_sequence": 10,
-                "field_description": "Name",
-                "ttype": "char",
-            },
-        }
-        model_devops_code_generator = code_generator_id.add_update_model(
-            model_model,
-            model_name,
-            dct_field=dct_field,
-            dct_model=dct_model,
-        )
-
-        # Generate code
-        if True:
-            # Generate code header
-            value = {
-                "code": """import json
-
-from odoo import _, api, exceptions, fields, models""",
-                "name": "header",
-                "m2o_module": code_generator_id.id,
-                "m2o_model": model_devops_code_generator.id,
-            }
-            env["code.generator.model.code.import"].create(value)
-
-            # Generate code model
-            lst_value = [
-                {
-                    "code": """r = super().create(vals_list)
-w_ids = self.env.context.get("default_devops_workspace_ids")
-if w_ids:
-    for cg_id in r:
-        if not cg_id.default_workspace_master:
-            cg_id.default_workspace_master = w_ids[0]
-
-        if not cg_id.devops_workspace_ids:
-            cg_id.devops_workspace_ids = [6, 0, w_ids]
-        for module_id in cg_id.module_ids:
-            if not module_id.devops_workspace_ids:
-                module_id.devops_workspace_ids = [
-                    (
-                        6,
-                        0,
-                        w_ids,
-                    )
-                ]
-            for model_id in module_id.model_ids:
-                if not model_id.devops_workspace_ids:
-                    model_id.devops_workspace_ids = [
-                        (
-                            6,
-                            0,
-                            w_ids,
-                        )
-                    ]
-                for field_id in model_id.field_ids:
-                    if not field_id.devops_workspace_ids:
-                        field_id.devops_workspace_ids = [
-                            (
-                                6,
-                                0,
-                                w_ids,
-                            )
-                        ]
-return r""",
-                    "name": "create",
-                    "decorator": "@api.model_create_multi",
-                    "param": "self, vals_list",
-                    "sequence": 0,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_code_generator.id,
-                },
-            ]
-            env["code.generator.model.code"].create(lst_value)
-
-        # Add/Update Devops Code Generator Module
-        model_model = "devops.code_generator.module"
-        model_name = "devops_code_generator_module"
-        dct_model = {
-            "description": "devops_code_generator_module",
-            "nomenclator": True,
-        }
-        dct_field = {
-            "code_generator": {
-                "code_generator_form_simple_view_sequence": 11,
-                "code_generator_sequence": 3,
-                "code_generator_tree_view_sequence": 11,
-                "field_description": "Project",
-                "on_delete": "cascade",
-                "relation": "devops.code_generator",
-                "required": True,
-                "ttype": "many2one",
-            },
-            "devops_workspace_ids": {
-                "code_generator_form_simple_view_sequence": 13,
-                "code_generator_sequence": 5,
-                "code_generator_tree_view_sequence": 13,
-                "field_description": "DevOps Workspace",
-                "force_widget": "many2many_tags",
-                "relation": "devops.workspace",
-                "required": True,
-                "ttype": "many2many",
-            },
-            "name": {
-                "code_generator_form_simple_view_sequence": 10,
-                "code_generator_sequence": 2,
-                "code_generator_tree_view_sequence": 10,
-                "field_description": "Name",
-                "ttype": "char",
-            },
-        }
-        model_devops_code_generator_module = (
-            code_generator_id.add_update_model(
-                model_model,
-                model_name,
-                dct_field=dct_field,
-                dct_model=dct_model,
-            )
-        )
-
-        # Add/Update Devops Code Generator Module Model
-        model_model = "devops.code_generator.module.model"
-        model_name = "devops_code_generator_module_model"
-        dct_model = {
-            "description": "devops_code_generator_module_model",
-            "nomenclator": True,
-        }
-        dct_field = {
-            "description": {
-                "code_generator_form_simple_view_sequence": 11,
-                "code_generator_sequence": 3,
-                "code_generator_tree_view_sequence": 12,
-                "field_description": "Description",
-                "ttype": "char",
-            },
-            "devops_workspace_ids": {
-                "code_generator_form_simple_view_sequence": 14,
-                "code_generator_sequence": 6,
-                "code_generator_tree_view_sequence": 14,
-                "field_description": "DevOps Workspace",
-                "force_widget": "many2many_tags",
-                "relation": "devops.workspace",
-                "required": True,
-                "ttype": "many2many",
-            },
-            "module_id": {
-                "code_generator_form_simple_view_sequence": 12,
-                "code_generator_sequence": 5,
-                "code_generator_tree_view_sequence": 11,
-                "field_description": "Module",
-                "on_delete": "cascade",
-                "relation": "devops.code_generator.module",
-                "required": True,
-                "ttype": "many2one",
-            },
-            "name": {
-                "code_generator_form_simple_view_sequence": 10,
-                "code_generator_sequence": 2,
-                "code_generator_tree_view_sequence": 10,
-                "field_description": "Name",
-                "ttype": "char",
-            },
-        }
-        model_devops_code_generator_module_model = (
-            code_generator_id.add_update_model(
-                model_model,
-                model_name,
-                dct_field=dct_field,
-                dct_model=dct_model,
-            )
-        )
-
-        # Add/Update Devops Code Generator Module Model Field
-        model_model = "devops.code_generator.module.model.field"
-        model_name = "devops_code_generator_module_model_field"
-        dct_model = {
-            "description": "devops_code_generator_module_model_field",
-            "nomenclator": True,
-        }
-        dct_field = {
-            "devops_workspace_ids": {
-                "code_generator_form_simple_view_sequence": 18,
-                "code_generator_sequence": 12,
-                "code_generator_tree_view_sequence": 19,
-                "field_description": "DevOps Workspace",
-                "force_widget": "many2many_tags",
-                "relation": "devops.workspace",
-                "required": True,
-                "ttype": "many2many",
-            },
-            "field_relation": {
-                "code_generator_form_simple_view_sequence": 14,
-                "code_generator_sequence": 9,
-                "code_generator_tree_view_sequence": 16,
-                "field_description": "Inverse field",
-                "force_domain": "[('model_id', '=', relation)]",
-                "help": (
-                    "inverse_name - Need for one2many to associate with"
-                    " many2one."
-                ),
-                "relation": "devops.code_generator.module.model.field",
-                "ttype": "many2one",
-            },
-            "field_relation_manual": {
-                "code_generator_form_simple_view_sequence": 15,
-                "code_generator_sequence": 10,
-                "code_generator_tree_view_sequence": 17,
-                "field_description": "Inverse field manual",
-                "help": (
-                    "inverse_name - Need for one2many to associate with"
-                    " many2one, manual entry."
-                ),
-                "ttype": "char",
-            },
-            "has_error": {
-                "code_generator_compute": "_compute_has_error",
-                "code_generator_sequence": 4,
-                "code_generator_tree_view_sequence": 10,
-                "field_description": "Has Error",
-                "store": True,
-                "ttype": "boolean",
-            },
-            "help": {
-                "code_generator_form_simple_view_sequence": 16,
-                "code_generator_sequence": 3,
-                "code_generator_tree_view_sequence": 18,
-                "field_description": "Help",
-                "ttype": "char",
-            },
-            "model_id": {
-                "code_generator_form_simple_view_sequence": 17,
-                "code_generator_sequence": 5,
-                "code_generator_tree_view_sequence": 12,
-                "field_description": "Model",
-                "on_delete": "cascade",
-                "relation": "devops.code_generator.module.model",
-                "required": True,
-                "ttype": "many2one",
-            },
-            "name": {
-                "code_generator_form_simple_view_sequence": 10,
-                "code_generator_sequence": 2,
-                "code_generator_tree_view_sequence": 11,
-                "field_description": "Name",
-                "ttype": "char",
-            },
-            "relation": {
-                "code_generator_form_simple_view_sequence": 12,
-                "code_generator_sequence": 7,
-                "code_generator_tree_view_sequence": 14,
-                "field_description": "Comodel",
-                "help": (
-                    "comodel - Create relation for many2one, many2many,"
-                    " one2many"
-                ),
-                "relation": "devops.code_generator.module.model",
-                "ttype": "many2one",
-            },
-            "relation_manual": {
-                "code_generator_form_simple_view_sequence": 13,
-                "code_generator_sequence": 8,
-                "code_generator_tree_view_sequence": 15,
-                "field_description": "Comodel manual",
-                "help": (
-                    "comodel - Create relation for many2one, many2many,"
-                    " one2many. Manual entry by pass relation field."
-                ),
-                "ttype": "char",
-            },
-            "type": {
-                "code_generator_form_simple_view_sequence": 11,
-                "code_generator_sequence": 6,
-                "code_generator_tree_view_sequence": 13,
-                "default": "char",
-                "field_description": "Type",
-                "required": True,
-                "selection": (
-                    "[('char', 'char'), ('boolean', 'boolean'), ('integer',"
-                    " 'integer'), ('float', 'float'), ('text', 'text'),"
-                    " ('html', 'html'), ('datetime', 'datetime'), ('date',"
-                    " 'date'), ('many2one', 'many2one'), ('many2many',"
-                    " 'many2many'), ('one2many', 'one2many')]"
-                ),
-                "ttype": "selection",
-            },
-            "widget": {
-                "code_generator_sequence": 11,
-                "field_description": "Widget",
-                "selection": (
-                    "[('image', 'image'), ('many2many_tags',"
-                    " 'many2many_tags'), ('priority', 'priority'),"
-                    " ('selection', 'selection'), ('mail_followers',"
-                    " 'mail_followers'), ('mail_activity', 'mail_activity'),"
-                    " ('mail_thread', 'mail_thread')]"
-                ),
-                "ttype": "selection",
-            },
-        }
-        model_devops_code_generator_module_model_field = (
-            code_generator_id.add_update_model(
-                model_model,
-                model_name,
-                dct_field=dct_field,
-                dct_model=dct_model,
-            )
-        )
-
-        # Generate code
-        if True:
-            # Generate code model
-            lst_value = [
-                {
-                    "code": """for rec in self:
-    # Disable all error
-    rec.has_error = False
-    if rec.type in ("many2many", "many2one", "one2many"):
-        has_relation = rec.relation or rec.relation_manual
-        has_field_relation = True
-        if rec.type == "one2many":
-            has_field_relation = (
-                rec.field_relation or rec.field_relation_manual
-            )
-        rec.has_error = not has_relation or not has_field_relation""",
-                    "name": "_compute_has_error",
-                    "decorator": (
-                        '@api.depends("type", "relation", "relation_manual",'
-                        ' "field_relation", "field_relation_manual")'
-                    ),
-                    "param": "self",
-                    "sequence": 0,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                },
-            ]
-            env["code.generator.model.code"].create(lst_value)
-
         # Add/Update Devops Db Image
         model_model = "devops.db.image"
         model_name = "devops_db_image"
@@ -3082,7 +3070,7 @@ _logger = logging.getLogger(__name__)""",
         "Failed to load registry",
     ]
     keyword_error_to_remove = [
-        "devops.code_generator.module.model.field.has_error",
+        "devops.cg.field.has_error",
         "devops.exec.error.name",
         "devops.workspace.devops_exec_error_count",
         "views/devops_exec_error.xml",
@@ -4658,7 +4646,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 2258,
+            "no_line": 1145,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4668,7 +4656,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 1720,
+            "no_line": 609,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4678,7 +4666,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 2007,
+            "no_line": 896,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4688,7 +4676,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 2089,
+            "no_line": 978,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4698,7 +4686,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 2093,
+            "no_line": 982,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4708,7 +4696,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 2448,
+            "no_line": 1318,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4718,7 +4706,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 2448,
+            "no_line": 1318,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -5837,7 +5825,7 @@ help=\"Select the model you want to inherit or import data.\",
                 "ttype": "boolean",
             },
             "force_generate": {
-                "code_generator_sequence": 13,
+                "code_generator_sequence": 14,
                 "field_description": "Force Generate",
                 "help": (
                     "Ignore secure file edited, can overwrite this file and"
@@ -5853,7 +5841,7 @@ help=\"Select the model you want to inherit or import data.\",
             },
             "has_next": {
                 "code_generator_compute": "_compute_has_next",
-                "code_generator_sequence": 12,
+                "code_generator_sequence": 13,
                 "field_description": "Has Next",
                 "ttype": "boolean",
             },
@@ -5864,20 +5852,22 @@ help=\"Select the model you want to inherit or import data.\",
                 "relation": "devops.db.image",
                 "ttype": "many2one",
             },
-            "model_description": {
+            "model_ids": {
                 "code_generator_sequence": 15,
-                "field_description": "Model description",
-                "ttype": "char",
-            },
-            "model_name": {
-                "code_generator_sequence": 14,
                 "field_description": "Model",
-                "ttype": "char",
+                "relation": "devops.cg.model",
+                "ttype": "many2many",
             },
             "name": {
                 "code_generator_sequence": 4,
                 "field_description": "Name",
                 "ttype": "char",
+            },
+            "plan_cg_id": {
+                "code_generator_sequence": 9,
+                "field_description": "Generated plan CG",
+                "relation": "devops.plan.cg",
+                "ttype": "many2one",
             },
             "root_workspace_id": {
                 "code_generator_sequence": 5,
@@ -5898,7 +5888,7 @@ help=\"Select the model you want to inherit or import data.\",
                 "ttype": "boolean",
             },
             "state": {
-                "code_generator_sequence": 11,
+                "code_generator_sequence": 12,
                 "default": "init",
                 "field_description": "State",
                 "required": True,
@@ -5927,13 +5917,13 @@ help=\"Select the model you want to inherit or import data.\",
                 "ttype": "many2one",
             },
             "working_module_id": {
-                "code_generator_sequence": 9,
+                "code_generator_sequence": 10,
                 "field_description": "Working module",
                 "relation": "ir.module.module",
                 "ttype": "many2one",
             },
             "working_module_name": {
-                "code_generator_sequence": 10,
+                "code_generator_sequence": 11,
                 "field_description": "Working Module Name",
                 "help": "working_module_id or working_module_name",
                 "ttype": "char",
@@ -6284,7 +6274,6 @@ return self._reopen_self()
     "Plan a_a_model"
 ) as wp_id:
     module_name = "erplibre_devops"
-    self.model_description = "Example feature to add to devops"
     self.generate_new_model(
         wp_id, module_name, "Autopoiesis", is_autopoiesis=True
     )""",
@@ -6298,12 +6287,9 @@ return self._reopen_self()
                     "code": '''with self.root_workspace_id.devops_create_exec_bundle(
     "Plan a_f_devops_regen"
 ) as wp_id:
-    if self.force_generate:
-        wp_id.stop_execution_if_env_not_clean = False
-    wp_id.cg_self_add_config_cg = True
-    wp_id.code_mode_context_generator = "autopoiesis"
+    # TODO this is a bug, no need that in reality, but action_code_generator_generate_all loop into it
     # Project
-    cg_id = self.env["devops.code_generator"].create(
+    cg_id = self.env["devops.cg"].create(
         {
             "name": "Autopoiesis regenerate",
             "devops_workspace_ids": [(6, 0, wp_id.ids)],
@@ -6311,21 +6297,30 @@ return self._reopen_self()
         }
     )
     # Module
-    cg_module_id = self.env["devops.code_generator.module"].create(
+    cg_module_id = self.env["devops.cg.module"].create(
         {
             "name": "erplibre_devops",
             "code_generator": cg_id.id,
             "devops_workspace_ids": [(6, 0, wp_id.ids)],
         }
     )
-    # Overwrite information
-    wp_id.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-    wp_id.devops_code_generator_module_ids = [(6, 0, cg_module_id.ids)]
-    wp_id.devops_code_generator_model_ids = [(6, 0, [])]
-    wp_id.devops_code_generator_field_ids = [(6, 0, [])]
+    plan_cg_value = {
+        "workspace_id": wp_id.id,
+        "cg_self_add_config_cg": True,
+        "path_working_erplibre": wp_id.folder,
+        "code_mode_context_generator": "autopoiesis",
+        "mode_view": "same_view",
+        "devops_cg_ids": [(6, 0, cg_id.ids)],
+        "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
+        "devops_cg_model_ids": [(6, 0, [])],
+        "devops_cg_field_ids": [(6, 0, [])],
+        "stop_execution_if_env_not_clean": not self.force_generate,
+    }
+    plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
     # Generate
-    wp_id.action_code_generator_generate_all()
-    self.generated_new_project_id = wp_id.last_new_project_cg.id
+    plan_cg_id.action_code_generator_generate_all()
+    self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
+    self.plan_cg_id = plan_cg_id.id
     # finally
     self.state = "final"''',
                     "name": "state_exit_a_f_devops_regen",
@@ -6352,7 +6347,7 @@ if dir_name.startswith(wp_id.folder):
 else:
     relative_path_module = dir_name
 # Project
-cg_id = self.env["devops.code_generator"].create(
+cg_id = self.env["devops.cg"].create(
     {
         "name": project_name,
         "devops_workspace_ids": [(6, 0, wp_id.ids)],
@@ -6360,7 +6355,7 @@ cg_id = self.env["devops.code_generator"].create(
     }
 )
 # Module
-cg_module_id = self.env["devops.code_generator.module"].create(
+cg_module_id = self.env["devops.cg.module"].create(
     {
         "name": module_name,
         "code_generator": cg_id.id,
@@ -6368,17 +6363,13 @@ cg_module_id = self.env["devops.code_generator.module"].create(
     }
 )
 # Model
-cg_model_id = self.env["devops.code_generator.module.model"].create(
-    {
-        "name": self.model_name,
-        "description": self.model_description,
-        "module_id": cg_module_id.id,
-        "devops_workspace_ids": [(6, 0, wp_id.ids)],
-    }
-)
+for cg_model_id in self.model_ids:
+    cg_model_id.module_id = cg_module_id.id
+    cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
+lst_field_id = [b.id for a in self.model_ids for b in a.field_ids]
 # Field
 # cg_field_id = self.env[
-#     "devops.code_generator.module.model.field"
+#     "devops.cg.field"
 # ].create(
 #     {
 #         "name": "size",
@@ -6388,30 +6379,42 @@ cg_model_id = self.env["devops.code_generator.module.model"].create(
 #         "devops_workspace_ids": [(6, 0, wp_id.ids)],
 #     }
 # )
-# Overwrite information
-wp_id.path_code_generator_to_generate = relative_path_module
-wp_id.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-wp_id.devops_code_generator_module_ids = [(6, 0, cg_module_id.ids)]
-wp_id.devops_code_generator_model_ids = [(6, 0, [cg_model_id.id])]
-wp_id.devops_code_generator_field_ids = [(6, 0, [])]
+plan_cg_value = {
+    "workspace_id": wp_id.id,
+    "mode_view": "new_view",
+    "path_working_erplibre": wp_id.folder,
+    "path_code_generator_to_generate": relative_path_module,
+    "devops_cg_ids": [(6, 0, cg_id.ids)],
+    "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
+    "devops_cg_model_ids": [(6, 0, self.model_ids.ids)],
+    "devops_cg_field_ids": [(6, 0, lst_field_id)],
+    "stop_execution_if_env_not_clean": not self.force_generate,
+}
 # Update configuration self-gen
-wp_id.mode_view = "new_view"
 if is_autopoiesis:
-    wp_id.cg_self_add_config_cg = True
-    wp_id.code_mode_context_generator = "autopoiesis"
+    plan_cg_value["cg_self_add_config_cg"] = True
+    plan_cg_value["code_mode_context_generator"] = "autopoiesis"
 # Generate
-wp_id.action_code_generator_generate_all()
-self.generated_new_project_id = wp_id.last_new_project_cg.id
+plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
+plan_cg_id.action_code_generator_generate_all()
+self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
+self.plan_cg_id = plan_cg_id.id
 # Git add
-model_file_name = self.model_name.replace(".", "_")
 lst_default_file = [
     f"{module_name}/__manifest__.py",
-    f"{module_name}/models/__init__.py",
-    f"{module_name}/models/{model_file_name}.py",
     f"{module_name}/security/ir.model.access.csv",
     f"{module_name}/views/menu.xml",
-    f"{module_name}/views/{model_file_name}.xml",
 ]
+if self.model_ids:
+    lst_default_file.append(f"{module_name}/models/__init__.py")
+    for cg_model_id in self.model_ids:
+        model_file_name = cg_model_id.name.replace(".", "_")
+        lst_default_file.append(
+            f"{module_name}/models/{model_file_name}.py"
+        )
+        lst_default_file.append(
+            f"{module_name}/views/{model_file_name}.xml"
+        )
 cmd_git_add = ";".join([f"git add '{a}'" for a in lst_default_file])
 wp_id.execute(
     cmd=cmd_git_add,
@@ -6429,6 +6432,1270 @@ self.state = "final"''',
                     "sequence": 31,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_plan_action_wizard.id,
+                },
+            ]
+            env["code.generator.model.code"].create(lst_value)
+
+        # Add/Update Devops Plan Cg
+        model_model = "devops.plan.cg"
+        model_name = "devops_plan_cg"
+        dct_model = {
+            "description": "Planification to use Code Generator",
+            "nomenclator": True,
+        }
+        dct_field = {
+            "active": {
+                "code_generator_form_simple_view_sequence": 10,
+                "code_generator_sequence": 3,
+                "default": True,
+                "field_description": "Active",
+                "force_widget": "boolean_button",
+                "ttype": "boolean",
+            },
+            "cg_demo_type_data": {
+                "code_generator_form_simple_view_sequence": 14,
+                "code_generator_sequence": 25,
+                "default": "simple",
+                "field_description": "Cg Demo Type Data",
+                "help": (
+                    "Generate a set of data depend of the type to generate."
+                ),
+                "required": True,
+                "selection": (
+                    "[('simple', 'Simple'), ('ore', 'ORE'), ('devops_example',"
+                    " 'devops example')]"
+                ),
+                "ttype": "selection",
+            },
+            "cg_self_add_config_cg": {
+                "code_generator_form_simple_view_sequence": 17,
+                "code_generator_sequence": 23,
+                "field_description": "Cg Self Add Config Cg",
+                "help": "Will use both feature of cg for self generate.",
+                "ttype": "boolean",
+            },
+            "code_mode_context_generator": {
+                "code_generator_form_simple_view_sequence": 28,
+                "code_generator_sequence": 5,
+                "default": "default",
+                "field_description": "Code Mode Context Generator",
+                "help": "Change context variable easy change.",
+                "selection": (
+                    "[('default', 'Default'), ('autopoiesis', 'Autopoiesis'),"
+                    " ('custom', 'Custom')]"
+                ),
+                "ttype": "selection",
+            },
+            "config_uca_enable_export_data": {
+                "code_generator_form_simple_view_sequence": 18,
+                "code_generator_sequence": 13,
+                "default": True,
+                "field_description": "Config Uca Enable Export Data",
+                "help": (
+                    "Will enable option nonmenclator in CG to export data"
+                    " associate to models."
+                ),
+                "ttype": "boolean",
+            },
+            "devops_cg_erplibre_devops_error_log": {
+                "code_generator_form_simple_view_sequence": 19,
+                "code_generator_sequence": 7,
+                "field_description": "Error CG erplibre_devops new_project",
+                "help": (
+                    "Will show code generator error for new project"
+                    " erplibre_devops, last execution"
+                ),
+                "readonly": True,
+                "ttype": "text",
+            },
+            "devops_cg_erplibre_devops_log": {
+                "code_generator_form_simple_view_sequence": 20,
+                "code_generator_sequence": 8,
+                "field_description": "Log CG erplibre_devops new_project",
+                "help": (
+                    "Will show code generator log for new project"
+                    " erplibre_devops, last execution"
+                ),
+                "readonly": True,
+                "ttype": "text",
+            },
+            "devops_cg_field_ids": {
+                "code_generator_form_simple_view_sequence": 35,
+                "code_generator_sequence": 12,
+                "field_description": "Field",
+                "force_widget": "many2many",
+                "relation": "devops.cg.field",
+                "ttype": "many2many",
+            },
+            "devops_cg_ids": {
+                "code_generator_form_simple_view_sequence": 32,
+                "code_generator_sequence": 9,
+                "field_description": "Project",
+                "force_widget": "many2many",
+                "relation": "devops.cg",
+                "ttype": "many2many",
+            },
+            "devops_cg_model_ids": {
+                "code_generator_form_simple_view_sequence": 34,
+                "code_generator_sequence": 11,
+                "field_description": "Model",
+                "force_widget": "many2many",
+                "relation": "devops.cg.model",
+                "ttype": "many2many",
+            },
+            "devops_cg_module_ids": {
+                "code_generator_form_simple_view_sequence": 33,
+                "code_generator_sequence": 10,
+                "field_description": "Module",
+                "force_widget": "many2many",
+                "relation": "devops.cg.module",
+                "ttype": "many2many",
+            },
+            "has_re_execute_new_project": {
+                "code_generator_compute": (
+                    "_compute_has_re_execute_new_project"
+                ),
+                "code_generator_form_simple_view_sequence": 11,
+                "code_generator_sequence": 14,
+                "field_description": "Has Re Execute New Project",
+                "store": True,
+                "ttype": "boolean",
+            },
+            "is_clear_before_cg_demo": {
+                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_sequence": 28,
+                "default": True,
+                "field_description": "Is Clear Before Cg Demo",
+                "help": (
+                    "When generate data demo for code generator, delete all"
+                    " data before."
+                ),
+                "ttype": "boolean",
+            },
+            "last_new_project_cg": {
+                "code_generator_form_simple_view_sequence": 15,
+                "code_generator_sequence": 26,
+                "field_description": "Last new project cg",
+                "relation": "devops.cg.new_project",
+                "ttype": "many2one",
+            },
+            "mode_view": {
+                "code_generator_form_simple_view_sequence": 21,
+                "code_generator_sequence": 15,
+                "default": "same_view",
+                "field_description": "Mode View",
+                "help": (
+                    "Mode view, enable rebuild same view or create new view."
+                ),
+                "selection": (
+                    "[('no_view', 'No view'), ('same_view', 'Autopoiesis'),"
+                    " ('new_view', 'New')]"
+                ),
+                "ttype": "selection",
+            },
+            "mode_view_snippet": {
+                "code_generator_form_simple_view_sequence": 22,
+                "code_generator_sequence": 16,
+                "default": "no_snippet",
+                "field_description": "Mode View Snippet",
+                "help": "Will active feature to generate snippet",
+                "selection": (
+                    "[('no_snippet', 'No snippet'), ('enable_snippet', 'Enable"
+                    " snippet')]"
+                ),
+                "ttype": "selection",
+            },
+            "mode_view_snippet_enable_template_website_snippet_view": {
+                "code_generator_form_simple_view_sequence": 23,
+                "code_generator_sequence": 17,
+                "default": True,
+                "field_description": (
+                    "Mode View Snippet Enable Template Website Snippet View"
+                ),
+                "help": "Feature for mode_view_snippet",
+                "ttype": "boolean",
+            },
+            "mode_view_snippet_template_generate_website_enable_javascript": {
+                "code_generator_form_simple_view_sequence": 26,
+                "code_generator_sequence": 20,
+                "default": True,
+                "field_description": (
+                    "Mode View Snippet Template Generate Website Enable"
+                    " Javascript"
+                ),
+                "help": "Feature for mode_view_snippet",
+                "ttype": "boolean",
+            },
+            "mode_view_snippet_template_generate_website_snippet_ctrl_featur": {
+                "code_generator_form_simple_view_sequence": 25,
+                "code_generator_sequence": 19,
+                "default": "model_show_item_individual",
+                "field_description": (
+                    "Mode View Snippet Template Generate Website Snippet Ctrl"
+                    " Featur"
+                ),
+                "help": "Feature for mode_view_snippet",
+                "selection": (
+                    "[('helloworld', 'helloworld'),"
+                    " ('model_show_item_individual', 'Model show item"
+                    " individual'), ('model_show_item_list', 'Model show item"
+                    " list')]"
+                ),
+                "ttype": "selection",
+            },
+            "mode_view_snippet_template_generate_website_snippet_generic_mdl": {
+                "code_generator_form_simple_view_sequence": 24,
+                "code_generator_sequence": 18,
+                "field_description": (
+                    "Mode View Snippet Template Generate Website Snippet"
+                    " Generic Mdl"
+                ),
+                "help": "Feature for mode_view_snippet",
+                "ttype": "char",
+            },
+            "mode_view_snippet_template_generate_website_snippet_type": {
+                "code_generator_form_simple_view_sequence": 27,
+                "code_generator_sequence": 21,
+                "default": "effect",
+                "field_description": (
+                    "Mode View Snippet Template Generate Website Snippet Type"
+                ),
+                "help": "Feature for mode_view_snippet",
+                "selection": (
+                    "[('content', 'Content'), ('effect', 'Effect'),"
+                    " ('feature', 'Feature'), ('structure', 'Structure')]"
+                ),
+                "ttype": "selection",
+            },
+            "name": {
+                "code_generator_compute": "_compute_name",
+                "code_generator_sequence": 2,
+                "code_generator_tree_view_sequence": 10,
+                "field_description": "Name",
+                "store": True,
+                "ttype": "char",
+            },
+            "need_debugger_cg_erplibre_devops": {
+                "code_generator_form_simple_view_sequence": 12,
+                "code_generator_sequence": 24,
+                "field_description": "Need Debugger Cg Erplibre Devops",
+                "help": (
+                    "CG erplibre_devops got error, detect can use the debugger"
+                ),
+                "ttype": "boolean",
+            },
+            "path_code_generator_to_generate": {
+                "code_generator_form_simple_view_sequence": 29,
+                "code_generator_sequence": 27,
+                "default": "addons/addons",
+                "field_description": "Path Code Generator To Generate",
+                "ttype": "char",
+            },
+            "path_working_erplibre": {
+                "code_generator_form_simple_view_sequence": 30,
+                "code_generator_sequence": 22,
+                "default": "/ERPLibre",
+                "field_description": "Path Working Erplibre",
+                "ttype": "char",
+            },
+            "stop_execution_if_env_not_clean": {
+                "code_generator_form_simple_view_sequence": 16,
+                "code_generator_sequence": 6,
+                "default": True,
+                "field_description": "Stop Execution If Env Not Clean",
+                "ttype": "boolean",
+            },
+            "workspace_id": {
+                "code_generator_sequence": 4,
+                "field_description": "Workspace",
+                "relation": "devops.workspace",
+                "required": True,
+                "ttype": "many2one",
+            },
+        }
+        model_devops_plan_cg = code_generator_id.add_update_model(
+            model_model,
+            model_name,
+            dct_field=dct_field,
+            dct_model=dct_model,
+        )
+
+        # Generate code
+        if True:
+            # Generate code header
+            value = {
+                "code": """import json
+import os
+
+from odoo import _, api, exceptions, fields, models""",
+                "name": "header",
+                "m2o_module": code_generator_id.id,
+                "m2o_model": model_devops_plan_cg.id,
+            }
+            env["code.generator.model.code.import"].create(value)
+
+            # Generate code model
+            lst_value = [
+                {
+                    "code": """cg_before_ids_i = self.devops_cg_ids.ids
+
+status = super().write(values)
+if "devops_cg_ids" in values.keys():
+    # Update all the list of code generator, associate to this plan
+    for rec in self:
+        cg_missing_ids_i = list(
+            set(cg_before_ids_i).difference(set(rec.devops_cg_ids.ids))
+        )
+        cg_missing_ids = self.env["devops.cg"].browse(cg_missing_ids_i)
+        for cg_id in cg_missing_ids:
+            for module_id in cg_id.module_ids:
+                if rec in module_id.devops_workspace_ids:
+                    module_id.devops_workspace_ids = [(3, rec.id)]
+                for model_id in module_id.model_ids:
+                    if rec in model_id.devops_workspace_ids:
+                        model_id.devops_workspace_ids = [(3, rec.id)]
+                    for field_id in model_id.field_ids:
+                        if rec in field_id.devops_workspace_ids:
+                            field_id.devops_workspace_ids = [
+                                (3, rec.id)
+                            ]
+        cg_adding_ids_i = list(
+            set(rec.devops_cg_ids.ids).difference(set(cg_before_ids_i))
+        )
+        cg_adding_ids = self.env["devops.cg"].browse(cg_adding_ids_i)
+        for cg_id in cg_adding_ids:
+            for module_id in cg_id.module_ids:
+                if rec not in module_id.devops_workspace_ids:
+                    module_id.devops_workspace_ids = [(4, rec.id)]
+                for model_id in module_id.model_ids:
+                    if rec not in model_id.devops_workspace_ids:
+                        model_id.devops_workspace_ids = [(4, rec.id)]
+                    for field_id in model_id.field_ids:
+                        if rec not in field_id.devops_workspace_ids:
+                            field_id.devops_workspace_ids = [
+                                (4, rec.id)
+                            ]
+return status""",
+                    "name": "write",
+                    "decorator": "@api.multi",
+                    "param": "self, values",
+                    "sequence": 0,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    rec.name = rec.workspace_id.name""",
+                    "name": "_compute_name",
+                    "decorator": '@api.depends("workspace_id")',
+                    "param": "self",
+                    "sequence": 1,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Install generated module"
+    ) as rec_ws:
+        module_list = ",".join(
+            [m.name for cg in rec.devops_cg_ids for m in cg.module_ids]
+        )
+        rec_ws.install_module(module_list)
+        rec_ws.action_check()""",
+                    "name": "action_install_all_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 2,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Install all UcA"
+    ) as rec_ws:
+        module_list = ",".join(
+            [
+                f"code_generator_template_{m.name},{m.name}"
+                for cg in rec.devops_cg_ids
+                for m in cg.module_ids
+            ]
+        )
+        rec_ws.execute(
+            cmd=f"./script/database/db_restore.py --database cg_uca",
+            folder=rec.path_working_erplibre,
+            to_instance=True,
+        )
+        rec_ws.execute(
+            cmd=(
+                "./script/addons/install_addons_dev.sh"
+                f" cg_uca {module_list}"
+            ),
+            folder=rec.path_working_erplibre,
+            to_instance=True,
+        )
+        rec_ws.action_check()""",
+                    "name": "action_install_all_uca_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 3,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Install all UcB"
+    ) as rec_ws:
+        module_list = ",".join(
+            [
+                f"code_generator_{m.name}"
+                for cg in rec.devops_cg_ids
+                for m in cg.module_ids
+            ]
+        )
+        rec_ws.execute(
+            cmd=f"./script/database/db_restore.py --database cg_ucb",
+            folder=rec.path_working_erplibre,
+            to_instance=True,
+        )
+        rec_ws.execute(
+            cmd=(
+                "./script/addons/install_addons_dev.sh"
+                f" cg_ucb {module_list}"
+            ),
+            folder=rec.path_working_erplibre,
+            to_instance=True,
+        )
+        rec_ws.action_check()""",
+                    "name": "action_install_all_ucb_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 4,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Install and generate all"
+    ) as rec_ws:
+        rec.action_code_generator_generate_all()
+        rec.action_git_commit_all_generated_module()
+        rec.action_refresh_meta_cg_generated_module()
+        rec.action_install_all_generated_module()""",
+                    "name": "action_install_and_generate_all_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 5,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "CG generate module"
+    ) as rec_ws:
+        # TODO no where this variable are set at true, need hook
+        rec.devops_cg_erplibre_devops_error_log = False
+        rec.need_debugger_cg_erplibre_devops = False
+        # TODO add try catch, add breakpoint, rerun loop. Careful when lose context
+        # Start with local storage
+        # Increase speed
+        # TODO keep old configuration of config.conf and not overwrite all
+        # rec_ws.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_code_generator", to_instance=True)
+        if rec.devops_cg_ids and rec_ws.mode_exec in ["docker"]:
+            rec_ws.workspace_docker_id.docker_config_gen_cg = True
+            rec_ws.action_reboot()
+            rec_ws.workspace_docker_id.docker_config_gen_cg = False
+        for rec_cg in rec.devops_cg_ids:
+            for module_id in rec_cg.module_ids:
+                devops_exec_bundle_parent_root_id = (
+                    self.env["devops.exec.bundle"]
+                    .browse(rec_ws._context.get("devops_exec_bundle"))
+                    .get_parent_root()
+                )
+                if rec_cg.force_clean_before_generate:
+                    rec.workspace_code_remove_module(module_id)
+                model_conf = None
+                if rec.code_mode_context_generator == "autopoiesis":
+                    # TODO this seems outdated, fix by wizard
+                    # TODO found path by this __file__
+                    directory = "./addons/ERPLibre_erplibre_addons"
+                    module = "erplibre_devops"
+                    project_type = "self"
+                    if rec.cg_self_add_config_cg:
+                        model_conf = rec.get_cg_model_config(module_id)
+                else:
+                    model_conf = rec.get_cg_model_config(module_id)
+                    directory = os.path.join(
+                        rec.path_working_erplibre,
+                        rec.path_code_generator_to_generate,
+                    )
+                    module = module_id.name
+                    project_type = "cg"
+                dct_new_project = {
+                    "module": module,
+                    "directory": directory,
+                    "keep_bd_alive": True,
+                    "devops_workspace": rec_ws.id,
+                    "project_type": project_type,
+                    "devops_exec_bundle_id": devops_exec_bundle_parent_root_id.id,
+                    "stop_execution_if_env_not_clean": rec.stop_execution_if_env_not_clean,
+                    "mode_view": rec.mode_view,
+                    "mode_view_snippet": rec.mode_view_snippet,
+                    "mode_view_snippet_enable_template_website_snippet_view": rec.mode_view_snippet_enable_template_website_snippet_view,
+                    "mode_view_snippet_template_generate_website_snippet_generic_mdl": rec.mode_view_snippet_template_generate_website_snippet_generic_mdl,
+                    "mode_view_snippet_template_generate_website_snippet_ctrl_featur": rec.mode_view_snippet_template_generate_website_snippet_ctrl_featur,
+                    "mode_view_snippet_template_generate_website_enable_javascript": rec.mode_view_snippet_template_generate_website_enable_javascript,
+                    "mode_view_snippet_template_generate_website_snippet_type": rec.mode_view_snippet_template_generate_website_snippet_type,
+                    "config_uca_enable_export_data": rec.config_uca_enable_export_data,
+                }
+                # extra_arg = ""
+                if model_conf:
+                    dct_new_project["config"] = model_conf
+                    # extra_arg = f" --config '{model_conf}'"
+
+                new_project_id = self.env[
+                    "devops.cg.new_project"
+                ].create(dct_new_project)
+                if rec.last_new_project_cg:
+                    new_project_id.last_new_project = (
+                        rec.last_new_project_cg.id
+                    )
+                rec.last_new_project_cg = new_project_id.id
+                new_project_id.with_context(
+                    rec_ws._context
+                ).action_new_project()
+                # cmd = (
+                #     f"cd {rec.path_working_erplibre};./script/code_generator/new_project.py"
+                #     f" --keep_bd_alive -m {module_name} -d"
+                #     f" {rec.path_code_generator_to_generate}{extra_arg}"
+                # )
+                # result = rec_ws.execute(cmd=cmd, to_instance=True)
+                # rec.devops_cg_log_addons = result
+                # OR
+                # result = rec_ws.execute(
+                #     cmd=f"cd {rec.folder};./script/code_generator/new_project.py"
+                #     f" -d {addons_path} -m {module_name}",
+                # )
+        if rec.devops_cg_ids and rec_ws.mode_exec in ["docker"]:
+            rec_ws.action_reboot()
+        # rec_ws.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_all", to_instance=True)""",
+                    "name": "action_code_generator_generate_all",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 6,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Workspace code remove module"
+    ) as rec_ws:
+        path_to_remove = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        rec.workspace_remove_module(module_id.name, path_to_remove)""",
+                    "name": "workspace_code_remove_module",
+                    "decorator": "@api.multi",
+                    "param": "self, module_id",
+                    "sequence": 7,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Workspace CG git commit"
+    ) as rec_ws:
+        # TODO use local variable instead hardcode it
+        folder_path = os.path.join(
+            rec.folder, "addons", "ERPLibre_erplibre_addons"
+        )
+        rec_ws.execute(
+            cmd="git cola",
+            folder=folder_path,
+            force_open_terminal=True,
+            force_exit=True,
+        )""",
+                    "name": "workspace_CG_git_commit",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 8,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "CG commit all"
+    ) as rec_ws:
+        folder = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        # for cg in rec.devops_cg_ids:
+        # Validate git directory exist
+        exec_id = rec_ws.execute(
+            cmd=f"ls {folder}/.git",
+            to_instance=True,
+        )
+        result = exec_id.log_all
+        if "No such file or directory" in result:
+            # Suppose git not exist
+            # This is not good if .git directory is in parent directory
+            rec_ws.execute(
+                cmd=(
+                    "git"
+                    " init;echo '*.pyc' > .gitignore;git add"
+                    " .gitignore;git commit -m 'first commit'"
+                ),
+                folder=folder,
+                to_instance=True,
+            )
+            rec_ws.execute(
+                cmd="git init",
+                folder=folder,
+                to_instance=True,
+            )
+
+        exec_id = rec_ws.execute(
+            cmd=f"git status -s",
+            folder=folder,
+            to_instance=True,
+        )
+        result = exec_id.log_all
+        if result:
+            # TODO show result to log
+            # Force add file and commit
+            rec_ws.execute(
+                cmd=f"git add .",
+                folder=folder,
+                to_instance=True,
+            )
+            rec_ws.execute(
+                cmd=f"git commit -m 'Commit by RobotLibre'",
+                folder=folder,
+                to_instance=True,
+            )""",
+                    "name": "action_git_commit_all_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 9,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Refresh meta CG"
+    ) as rec_ws:
+        folder = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        diff = ""
+        status = ""
+        stat = ""
+        exec_id = rec_ws.execute(
+            cmd=f"ls {folder}/.git",
+            to_instance=True,
+        )
+        result = exec_id.log_all
+        if result:
+            # Create diff
+            exec_id = rec_ws.execute(
+                cmd=f"git diff",
+                folder=folder,
+                to_instance=True,
+            )
+            diff += exec_id.log_all
+            # Create status
+            exec_id = rec_ws.execute(
+                cmd=f"git status",
+                folder=folder,
+                to_instance=True,
+            )
+            status += exec_id.log_all
+            for cg in rec.devops_cg_ids:
+                # Create statistic
+                for module_id in cg.module_ids:
+                    exec_id = rec_ws.execute(
+                        cmd=(
+                            "./script/statistic/code_count.sh"
+                            f" ./{rec.path_code_generator_to_generate}/{module_id.name};"
+                        ),
+                        folder=rec.path_working_erplibre,
+                        to_instance=True,
+                    )
+                    result = exec_id.log_all
+                    if result:
+                        stat += f"./{rec.path_code_generator_to_generate}/{module_id.name}"
+                        stat += result
+
+                    exec_id = rec_ws.execute(
+                        cmd=(
+                            "./script/statistic/code_count.sh"
+                            f" ./{rec.path_code_generator_to_generate}/code_generator_template_{module_id.name};"
+                        ),
+                        folder=rec.path_working_erplibre,
+                        to_instance=True,
+                    )
+                    result = exec_id.log_all
+                    if result:
+                        stat += f"./{rec.path_code_generator_to_generate}/code_generator_template_{module_id.name}"
+                        stat += result
+
+                    exec_id = rec_ws.execute(
+                        cmd=(
+                            "./script/statistic/code_count.sh"
+                            f" ./{rec.path_code_generator_to_generate}/code_generator_{module_id.name};"
+                        ),
+                        folder=rec.path_working_erplibre,
+                        to_instance=True,
+                    )
+                    result = exec_id.log_all
+                    if result:
+                        stat += f"./{rec.path_code_generator_to_generate}/code_generator_{module_id.name}"
+                        stat += result
+
+                    # Autofix attached field to workspace
+                    if rec not in module_id.devops_workspace_ids:
+                        module_id.devops_workspace_ids = [(4, rec.id)]
+                    for model_id in module_id.model_ids:
+                        if rec not in model_id.devops_workspace_ids:
+                            model_id.devops_workspace_ids = [
+                                (4, rec.id)
+                            ]
+                        for field_id in model_id.field_ids:
+                            if (
+                                rec
+                                not in field_id.devops_workspace_ids
+                            ):
+                                field_id.devops_workspace_ids = [
+                                    (4, rec.id)
+                                ]
+
+        rec.devops_cg_diff = diff
+        rec.devops_cg_status = status
+        rec.devops_cg_stat = stat""",
+                    "name": "action_refresh_meta_cg_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 10,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Workspace remove module"
+    ) as rec_ws:
+        if remove_module:
+            rec_ws.execute(
+                cmd=f"rm -rf ./{module_name};",
+                folder=path_to_remove,
+                to_instance=True,
+            )
+        rec_ws.execute(
+            cmd=f"rm -rf ./code_generator_template_{module_name};",
+            folder=path_to_remove,
+            to_instance=True,
+        )
+        rec_ws.execute(
+            cmd=f"rm -rf ./code_generator_{module_name};",
+            folder=path_to_remove,
+            to_instance=True,
+        )""",
+                    "name": "workspace_remove_module",
+                    "decorator": "@api.multi",
+                    "param": (
+                        "self, module_name, path_to_remove, remove_module=True"
+                    ),
+                    "sequence": 11,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Workspace CG remove module"
+    ) as rec_ws:
+        # TODO is it necessary to hardcode it? Why not merge with code section?
+        path_to_remove = os.path.join(
+            rec.path_working_erplibre,
+            "addons",
+            "ERPLibre_erplibre_addons",
+        )
+        rec.workspace_remove_module(
+            "erplibre_devops", path_to_remove, remove_module=False
+        )""",
+                    "name": "workspace_CG_remove_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 12,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Clear all generated module"
+    ) as rec_ws:
+        for cg in rec.devops_cg_ids:
+            for module_id in cg.module_ids:
+                rec.workspace_code_remove_module(module_id)
+        rec_ws.action_check()""",
+                    "name": "action_clear_all_generated_module",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 13,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Generate data demo"
+    ) as rec_ws:
+        if rec.cg_demo_type_data == "simple":
+            # Project
+            cg_id = self.env["devops.cg"].create(
+                {
+                    "name": "Parc de voiture",
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                    "force_clean_before_generate": True,
+                }
+            )
+            # Module
+            cg_module_id = self.env["devops.cg.module"].create(
+                {
+                    "name": "parc",
+                    "code_generator": cg_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            # Model
+            cg_model_voiture_id = self.env["devops.cg.model"].create(
+                {
+                    "name": "parc.voiture",
+                    "description": "Ensemble de voiture dans le parc",
+                    "module_id": cg_module_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            # Field
+            cg_field_voiture_couleur_id = self.env[
+                "devops.cg.field"
+            ].create(
+                {
+                    "name": "couleur",
+                    "help": "Couleur de la voiture.",
+                    "type": "char",
+                    "model_id": cg_model_voiture_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            if rec.is_clear_before_cg_demo:
+                rec.devops_cg_ids = [(6, 0, cg_id.ids)]
+                rec.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+                rec.devops_cg_model_ids = [
+                    (
+                        6,
+                        0,
+                        [
+                            cg_model_voiture_id.id,
+                        ],
+                    )
+                ]
+                rec.devops_cg_field_ids = [
+                    (
+                        6,
+                        0,
+                        [
+                            cg_field_voiture_couleur_id.id,
+                        ],
+                    )
+                ]
+            else:
+                rec.devops_cg_ids = [(4, cg_id.id)]
+                rec.devops_cg_module_ids = [(4, cg_module_id.id)]
+                rec.devops_cg_model_ids = [
+                    (4, cg_model_voiture_id.id),
+                ]
+                rec.devops_cg_field_ids = [
+                    (4, cg_field_voiture_couleur_id.id),
+                ]
+        elif rec.cg_demo_type_data == "devops_example":
+            # Project
+            cg_id = self.env["devops.cg"].create(
+                {
+                    "name": "Projet exemple",
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                    "force_clean_before_generate": False,
+                }
+            )
+            # Module
+            cg_module_id = self.env["devops.cg.module"].create(
+                {
+                    "name": "erplibre_devops",
+                    "code_generator": cg_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            # Model
+            cg_model_example_id = self.env["devops.cg.model"].create(
+                {
+                    "name": "devops.example",
+                    "description": "Example feature to add to devops",
+                    "module_id": cg_module_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            # Field
+            cg_field_size_id = self.env["devops.cg.field"].create(
+                {
+                    "name": "size",
+                    "help": "Size of this example.",
+                    "type": "integer",
+                    "model_id": cg_model_example_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            if rec.is_clear_before_cg_demo:
+                rec.devops_cg_ids = [(6, 0, cg_id.ids)]
+                rec.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+                rec.devops_cg_model_ids = [
+                    (
+                        6,
+                        0,
+                        [
+                            cg_model_example_id.id,
+                        ],
+                    )
+                ]
+                rec.devops_cg_field_ids = [
+                    (
+                        6,
+                        0,
+                        [
+                            cg_field_size_id.id,
+                        ],
+                    )
+                ]
+            else:
+                rec.devops_cg_ids = [(4, cg_id.id)]
+                rec.devops_cg_module_ids = [(4, cg_module_id.id)]
+                rec.devops_cg_model_ids = [
+                    (4, cg_model_example_id.id),
+                ]
+                rec.devops_cg_field_ids = [
+                    (4, cg_field_size_id.id),
+                ]
+        elif rec.cg_demo_type_data == "ore":
+            # Project
+            cg_id = self.env["devops.cg"].create(
+                {
+                    "name": "Offrir Recevoir Échanger",
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                    "force_clean_before_generate": True,
+                }
+            )
+            # Module
+            cg_module_id = self.env["devops.cg.module"].create(
+                {
+                    "name": "ore",
+                    "code_generator": cg_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            # Model
+            cg_model_offre_id = self.env["devops.cg.model"].create(
+                {
+                    "name": "ore.offre.service",
+                    "description": (
+                        "Permet de créer une offre de service"
+                        " publiable dans la communauté."
+                    ),
+                    "module_id": cg_module_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            cg_model_demande_id = self.env["devops.cg.model"].create(
+                {
+                    "name": "ore.demande.service",
+                    "description": (
+                        "Permet de créer une demande de service"
+                        " publiable dans la communauté."
+                    ),
+                    "module_id": cg_module_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            # Field
+            cg_field_offre_date_afficher_id = self.env[
+                "devops.cg.field"
+            ].create(
+                {
+                    "name": "date_service_afficher",
+                    "help": (
+                        "Date à laquelle l'offre de service sera"
+                        " affiché."
+                    ),
+                    "type": "date",
+                    "model_id": cg_model_offre_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            cg_field_offre_temps_estime_id = self.env[
+                "devops.cg.field"
+            ].create(
+                {
+                    "name": "temp_estime",
+                    "help": (
+                        "Temps estimé pour effectuer le service à"
+                        " offrir."
+                    ),
+                    "type": "float",
+                    "model_id": cg_model_offre_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            cg_field_demande_date_afficher_id = self.env[
+                "devops.cg.field"
+            ].create(
+                {
+                    "name": "date_service_afficher",
+                    "help": (
+                        "Date à laquelle la demande de service sera"
+                        " affiché."
+                    ),
+                    "type": "date",
+                    "model_id": cg_model_demande_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            cg_field_demande_condition_id = self.env[
+                "devops.cg.field"
+            ].create(
+                {
+                    "name": "condition",
+                    "help": "Condition sur la demande de service.",
+                    "type": "text",
+                    "model_id": cg_model_demande_id.id,
+                    "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                }
+            )
+            if rec.is_clear_before_cg_demo:
+                rec.devops_cg_ids = [(6, 0, cg_id.ids)]
+                rec.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+                rec.devops_cg_model_ids = [
+                    (
+                        6,
+                        0,
+                        [
+                            cg_model_offre_id.id,
+                            cg_model_demande_id.id,
+                        ],
+                    )
+                ]
+                rec.devops_cg_field_ids = [
+                    (
+                        6,
+                        0,
+                        [
+                            cg_field_offre_date_afficher_id.id,
+                            cg_field_offre_temps_estime_id.id,
+                            cg_field_demande_date_afficher_id.id,
+                            cg_field_demande_condition_id.id,
+                        ],
+                    )
+                ]
+            else:
+                rec.devops_cg_ids = [(4, cg_id.id)]
+                rec.devops_cg_module_ids = [(4, cg_module_id.id)]
+                rec.devops_cg_model_ids = [
+                    (4, cg_model_offre_id.id),
+                    (4, cg_model_demande_id.id),
+                ]
+                rec.devops_cg_field_ids = [
+                    (4, cg_field_offre_date_afficher_id.id),
+                    (4, cg_field_offre_temps_estime_id.id),
+                    (4, cg_field_demande_date_afficher_id.id),
+                    (4, cg_field_demande_condition_id.id),
+                ]""",
+                    "name": "action_cg_generate_demo",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 14,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """# Support only 1, but can run in parallel multiple if no dependencies between
+lst_model = []
+dct_model_conf = {"model": lst_model}
+for model_id in module_id.model_ids:
+    lst_field = []
+    lst_model.append({"name": model_id.name, "fields": lst_field})
+    for field_id in model_id.field_ids:
+        dct_value_field = {
+            "name": field_id.name,
+            "help": field_id.help,
+            "type": field_id.type,
+        }
+        if field_id.type in [
+            "many2one",
+            "many2many",
+            "one2many",
+        ]:
+            dct_value_field["relation"] = (
+                field_id.relation.name
+                if field_id.relation
+                else field_id.relation_manual
+            )
+            if not dct_value_field["relation"]:
+                msg_err = (
+                    f"Model '{model_id.name}', field"
+                    f" '{field_id.name}' need a"
+                    " relation because type is"
+                    f" '{field_id.type}'"
+                )
+                raise exceptions.Warning(msg_err)
+        if field_id.type in [
+            "one2many",
+        ]:
+            dct_value_field["relation_field"] = (
+                field_id.field_relation.name
+                if field_id.field_relation
+                else field_id.field_relation_manual
+            )
+            if not dct_value_field["relation_field"]:
+                msg_err = (
+                    f"Model '{model_id.name}', field"
+                    f" '{field_id.name}' need a"
+                    " relation field because type is"
+                    f" '{field_id.type}'"
+                )
+                raise exceptions.Warning(msg_err)
+        if field_id.widget:
+            dct_value_field = field_id.widget
+        lst_field.append(dct_value_field)
+model_conf = (
+    json.dumps(dct_model_conf)
+    # .replace('"', '\\"')
+    # .replace("'", "")
+)
+return model_conf""",
+                    "name": "get_cg_model_config",
+                    "decorator": "@api.model",
+                    "param": "self, module_id",
+                    "sequence": 15,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Re-execute last new project"
+    ) as rec_ws:
+        if rec_ws._context.get("default_stage_Uc0"):
+            rec.last_new_project_cg.stage_id = self.env.ref(
+                "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
+            ).id
+        # TODO create a copy of new project and not modify older version
+        # TODO next sentence is not useful if made a copy
+        rec.last_new_project_cg.devops_exec_bundle_id = (
+            rec_ws._context.get("devops_exec_bundle")
+        )
+        rec.last_new_project_cg.action_new_project()""",
+                    "name": "action_execute_last_stage_new_project",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 16,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Open Terminal and tig"
+    ) as rec_ws:
+        if rec_ws.mode_exec in ["docker"]:
+            exec_id = rec_ws.execute(cmd="which tig", to_instance=True)
+            result = exec_id.log_all
+            if not result:
+                # TODO support OS and not only docker
+                rec_ws.workspace_docker_id.action_docker_install_dev_soft()
+        dir_to_check = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+            ".git",
+        )
+        exec_id = rec_ws.execute(cmd=f"ls {dir_to_check}")
+        status_ls = exec_id.log_all
+        if "No such file or directory" in status_ls:
+            raise exceptions.Warning(
+                "Cannot open command 'tig', cannot find directory"
+                f" '{dir_to_check}'."
+            )
+        folder = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        cmd = f"tig"
+        rec_ws.execute(
+            cmd=cmd,
+            force_open_terminal=True,
+            folder=folder,
+        )""",
+                    "name": "action_open_terminal_tig",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 17,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Open Terminal addons"
+    ) as rec_ws:
+        folder = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        cmd = f"ls -l"
+        rec_ws.execute(
+            cmd=cmd,
+            folder=folder,
+            force_open_terminal=True,
+        )""",
+                    "name": "action_open_terminal_addons",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 18,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
+    rec.has_re_execute_new_project = bool(
+        rec.last_new_project_cg and rec.last_new_project_cg.has_error
+    )""",
+                    "name": "_compute_has_re_execute_new_project",
+                    "decorator": (
+                        '@api.multi;@api.depends("last_new_project_cg",'
+                        ' "last_new_project_cg.has_error")'
+                    ),
+                    "param": "self",
+                    "sequence": 19,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
                 },
             ]
             env["code.generator.model.code"].create(lst_value)
@@ -7159,54 +8426,9 @@ for rec in self:
                 "force_widget": "boolean_button",
                 "ttype": "boolean",
             },
-            "cg_demo_type_data": {
-                "code_generator_form_simple_view_sequence": 54,
-                "code_generator_sequence": 65,
-                "default": "simple",
-                "field_description": "Cg Demo Type Data",
-                "help": (
-                    "Generate a set of data depend of the type to generate."
-                ),
-                "required": True,
-                "selection": (
-                    "[('simple', 'Simple'), ('ore', 'ORE'), ('devops_example',"
-                    " 'devops example')]"
-                ),
-                "ttype": "selection",
-            },
-            "cg_self_add_config_cg": {
-                "code_generator_form_simple_view_sequence": 57,
-                "code_generator_sequence": 79,
-                "field_description": "Cg Self Add Config Cg",
-                "help": "Will use both feature of cg for self generate.",
-                "ttype": "boolean",
-            },
-            "code_mode_context_generator": {
-                "code_generator_form_simple_view_sequence": 68,
-                "code_generator_sequence": 52,
-                "default": "default",
-                "field_description": "Code Mode Context Generator",
-                "help": "Change context variable easy change.",
-                "selection": (
-                    "[('default', 'Default'), ('autopoiesis', 'Autopoiesis'),"
-                    " ('custom', 'Custom')]"
-                ),
-                "ttype": "selection",
-            },
-            "config_uca_enable_export_data": {
-                "code_generator_form_simple_view_sequence": 58,
-                "code_generator_sequence": 53,
-                "default": True,
-                "field_description": "Config Uca Enable Export Data",
-                "help": (
-                    "Will enable option nonmenclator in CG to export data"
-                    " associate to models."
-                ),
-                "ttype": "boolean",
-            },
             "db_is_restored": {
                 "code_generator_form_simple_view_sequence": 42,
-                "code_generator_sequence": 34,
+                "code_generator_sequence": 33,
                 "field_description": "Db Is Restored",
                 "help": "When false, it's because actually restoring a DB.",
                 "readonly": True,
@@ -7214,96 +8436,42 @@ for rec in self:
             },
             "db_name": {
                 "code_generator_form_simple_view_sequence": 39,
-                "code_generator_sequence": 32,
+                "code_generator_sequence": 31,
                 "default": "test",
                 "field_description": "DB instance name",
                 "ttype": "char",
             },
-            "devops_cg_erplibre_devops_error_log": {
-                "code_generator_form_simple_view_sequence": 59,
-                "code_generator_sequence": 48,
-                "field_description": "Error CG erplibre_devops new_project",
-                "help": (
-                    "Will show code generator error for new project"
-                    " erplibre_devops, last execution"
-                ),
-                "readonly": True,
-                "ttype": "text",
-            },
-            "devops_cg_erplibre_devops_log": {
-                "code_generator_form_simple_view_sequence": 60,
-                "code_generator_sequence": 47,
-                "field_description": "Log CG erplibre_devops new_project",
-                "help": (
-                    "Will show code generator log for new project"
-                    " erplibre_devops, last execution"
-                ),
-                "readonly": True,
-                "ttype": "text",
-            },
-            "devops_code_generator_diff": {
-                "code_generator_form_simple_view_sequence": 76,
-                "code_generator_sequence": 43,
+            "devops_cg_diff": {
+                "code_generator_form_simple_view_sequence": 45,
+                "code_generator_sequence": 38,
                 "field_description": "Diff addons",
                 "help": "Will show diff git",
                 "ttype": "text",
             },
-            "devops_code_generator_field_ids": {
-                "code_generator_form_simple_view_sequence": 75,
+            "devops_cg_log_addons": {
+                "code_generator_form_simple_view_sequence": 51,
                 "code_generator_sequence": 41,
-                "field_description": "Field",
-                "force_widget": "many2many",
-                "relation": "devops.code_generator.module.model.field",
-                "ttype": "many2many",
-            },
-            "devops_code_generator_ids": {
-                "code_generator_form_simple_view_sequence": 72,
-                "code_generator_sequence": 38,
-                "field_description": "Project",
-                "force_widget": "many2many",
-                "relation": "devops.code_generator",
-                "ttype": "many2many",
-            },
-            "devops_code_generator_log_addons": {
-                "code_generator_form_simple_view_sequence": 82,
-                "code_generator_sequence": 46,
                 "field_description": "Log code generator",
                 "help": "Will show code generator log, last execution",
                 "ttype": "text",
             },
-            "devops_code_generator_model_ids": {
-                "code_generator_form_simple_view_sequence": 74,
+            "devops_cg_stat": {
+                "code_generator_form_simple_view_sequence": 47,
                 "code_generator_sequence": 40,
-                "field_description": "Model",
-                "force_widget": "many2many",
-                "relation": "devops.code_generator.module.model",
-                "ttype": "many2many",
-            },
-            "devops_code_generator_module_ids": {
-                "code_generator_form_simple_view_sequence": 73,
-                "code_generator_sequence": 39,
-                "field_description": "Module",
-                "force_widget": "many2many",
-                "relation": "devops.code_generator.module",
-                "ttype": "many2many",
-            },
-            "devops_code_generator_stat": {
-                "code_generator_form_simple_view_sequence": 78,
-                "code_generator_sequence": 45,
                 "field_description": "Stat addons",
                 "help": "Will show statistique code",
                 "ttype": "text",
             },
-            "devops_code_generator_status": {
-                "code_generator_form_simple_view_sequence": 77,
-                "code_generator_sequence": 44,
+            "devops_cg_status": {
+                "code_generator_form_simple_view_sequence": 46,
+                "code_generator_sequence": 39,
                 "field_description": "Status addons",
                 "help": "Will show status git",
                 "ttype": "text",
             },
-            "devops_code_generator_tree_addons": {
-                "code_generator_form_simple_view_sequence": 80,
-                "code_generator_sequence": 42,
+            "devops_cg_tree_addons": {
+                "code_generator_form_simple_view_sequence": 49,
+                "code_generator_sequence": 37,
                 "field_description": "Tree addons",
                 "help": (
                     "Will show generated files from code generator or humain"
@@ -7312,7 +8480,7 @@ for rec in self:
             },
             "devops_exec_bundle_count": {
                 "code_generator_compute": "_compute_devops_exec_bundle_count",
-                "code_generator_form_simple_view_sequence": 15,
+                "code_generator_form_simple_view_sequence": 16,
                 "code_generator_sequence": 11,
                 "field_description": "Executions bundle count",
                 "force_widget": "statinfo",
@@ -7321,7 +8489,7 @@ for rec in self:
             },
             "devops_exec_bundle_root_count": {
                 "code_generator_compute": "_compute_devops_exec_bundle_count",
-                "code_generator_form_simple_view_sequence": 16,
+                "code_generator_form_simple_view_sequence": 17,
                 "code_generator_sequence": 12,
                 "field_description": "Executions bundle root count",
                 "force_widget": "statinfo",
@@ -7339,7 +8507,7 @@ for rec in self:
             },
             "devops_exec_error_count": {
                 "code_generator_compute": "_compute_devops_exec_error_count",
-                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_form_simple_view_sequence": 14,
                 "code_generator_sequence": 10,
                 "field_description": "Executions error count",
                 "force_widget": "statinfo",
@@ -7359,7 +8527,7 @@ for rec in self:
             },
             "exec_reboot_process": {
                 "code_generator_form_simple_view_sequence": 31,
-                "code_generator_sequence": 35,
+                "code_generator_sequence": 34,
                 "field_description": "Exec Reboot Process",
                 "help": (
                     "Reboot means kill and reborn, but from operating system,"
@@ -7370,8 +8538,8 @@ for rec in self:
                 "ttype": "boolean",
             },
             "folder": {
-                "code_generator_form_simple_view_sequence": 18,
-                "code_generator_sequence": 27,
+                "code_generator_form_simple_view_sequence": 19,
+                "code_generator_sequence": 26,
                 "code_generator_tree_view_sequence": 11,
                 "default_lambda": "lambda self: self._default_folder()",
                 "field_description": "Folder",
@@ -7381,85 +8549,64 @@ for rec in self:
             },
             "git_branch": {
                 "code_generator_form_simple_view_sequence": 34,
-                "code_generator_sequence": 68,
+                "code_generator_sequence": 48,
                 "field_description": "Git branch",
                 "ttype": "char",
             },
             "git_url": {
                 "code_generator_form_simple_view_sequence": 35,
-                "code_generator_sequence": 69,
+                "code_generator_sequence": 49,
                 "default": "https://github.com/ERPLibre/ERPLibre",
                 "field_description": "Git URL",
                 "ttype": "char",
             },
             "has_error_restore_db": {
                 "code_generator_form_simple_view_sequence": 43,
-                "code_generator_sequence": 82,
+                "code_generator_sequence": 53,
                 "field_description": "Has Error Restore Db",
-                "ttype": "boolean",
-            },
-            "has_re_execute_new_project": {
-                "code_generator_compute": (
-                    "_compute_has_re_execute_new_project"
-                ),
-                "code_generator_form_simple_view_sequence": 28,
-                "code_generator_sequence": 63,
-                "field_description": "Has Re Execute New Project",
-                "store": True,
                 "ttype": "boolean",
             },
             "ide_pycharm": {
                 "code_generator_form_simple_view_sequence": 41,
-                "code_generator_sequence": 29,
+                "code_generator_sequence": 28,
                 "field_description": "Ide Pycharm",
                 "relation": "devops.ide.pycharm",
                 "ttype": "many2one",
             },
             "image_db_selection": {
                 "code_generator_form_simple_view_sequence": 38,
-                "code_generator_sequence": 85,
+                "code_generator_sequence": 57,
                 "default_lambda": "_default_image_db_selection",
                 "field_description": "Image Db Selection",
                 "relation": "devops.db.image",
                 "ttype": "many2one",
             },
-            "is_clear_before_cg_demo": {
-                "code_generator_form_simple_view_sequence": 53,
-                "code_generator_sequence": 64,
-                "default": True,
-                "field_description": "Is Clear Before Cg Demo",
-                "help": (
-                    "When generate data demo for code generator, delete all"
-                    " data before."
-                ),
-                "ttype": "boolean",
-            },
             "is_conflict_mode_exec": {
                 "code_generator_compute": "_compute_is_conflict_mode_exec",
-                "code_generator_form_simple_view_sequence": 24,
-                "code_generator_sequence": 62,
+                "code_generator_form_simple_view_sequence": 25,
+                "code_generator_sequence": 45,
                 "field_description": "Is Conflict Mode Exec",
                 "store": True,
                 "ttype": "boolean",
             },
             "is_debug_log": {
                 "code_generator_form_simple_view_sequence": 29,
-                "code_generator_sequence": 25,
+                "code_generator_sequence": 24,
                 "field_description": "Is Debug Log",
                 "help": "Will print cmd to debug.",
                 "ttype": "boolean",
             },
             "is_installed": {
-                "code_generator_form_simple_view_sequence": 25,
-                "code_generator_sequence": 23,
+                "code_generator_form_simple_view_sequence": 26,
+                "code_generator_sequence": 21,
                 "code_generator_tree_view_sequence": 20,
                 "field_description": "Is Installed",
                 "help": "Need to install environnement before execute it.",
                 "ttype": "boolean",
             },
             "is_me": {
-                "code_generator_form_simple_view_sequence": 27,
-                "code_generator_sequence": 33,
+                "code_generator_form_simple_view_sequence": 28,
+                "code_generator_sequence": 32,
                 "code_generator_tree_view_sequence": 19,
                 "field_description": "Self instance",
                 "help": "Add more automatisation about manage itself.",
@@ -7467,8 +8614,8 @@ for rec in self:
                 "ttype": "boolean",
             },
             "is_running": {
-                "code_generator_form_simple_view_sequence": 26,
-                "code_generator_sequence": 26,
+                "code_generator_form_simple_view_sequence": 27,
+                "code_generator_sequence": 25,
                 "comment_before": (
                     "TODO transform in in compute with"
                     " devops_workspace_docker.is_running"
@@ -7477,22 +8624,15 @@ for rec in self:
                 "readonly": True,
                 "ttype": "boolean",
             },
-            "last_new_project_cg": {
-                "code_generator_form_simple_view_sequence": 55,
-                "code_generator_sequence": 83,
-                "field_description": "Last new project cg",
-                "relation": "devops.cg.new_project",
-                "ttype": "many2one",
-            },
             "log_workspace": {
-                "code_generator_form_simple_view_sequence": 81,
+                "code_generator_form_simple_view_sequence": 50,
                 "code_generator_sequence": 17,
                 "field_description": "Log Workspace",
                 "ttype": "text",
             },
             "mode_environnement": {
-                "code_generator_form_simple_view_sequence": 21,
-                "code_generator_sequence": 61,
+                "code_generator_form_simple_view_sequence": 22,
+                "code_generator_sequence": 44,
                 "code_generator_tree_view_sequence": 16,
                 "default": "test",
                 "field_description": "Mode Environnement",
@@ -7508,8 +8648,8 @@ for rec in self:
                 "ttype": "selection",
             },
             "mode_exec": {
-                "code_generator_form_simple_view_sequence": 20,
-                "code_generator_sequence": 60,
+                "code_generator_form_simple_view_sequence": 21,
+                "code_generator_sequence": 43,
                 "code_generator_tree_view_sequence": 15,
                 "comment_before": "TODO add SystemD",
                 "default": "docker",
@@ -7521,8 +8661,8 @@ for rec in self:
                 "ttype": "selection",
             },
             "mode_source": {
-                "code_generator_form_simple_view_sequence": 19,
-                "code_generator_sequence": 50,
+                "code_generator_form_simple_view_sequence": 20,
+                "code_generator_sequence": 42,
                 "code_generator_tree_view_sequence": 14,
                 "default": "docker",
                 "field_description": "Mode Source",
@@ -7531,8 +8671,8 @@ for rec in self:
                 "ttype": "selection",
             },
             "mode_version_base": {
-                "code_generator_form_simple_view_sequence": 23,
-                "code_generator_sequence": 67,
+                "code_generator_form_simple_view_sequence": 24,
+                "code_generator_sequence": 47,
                 "code_generator_tree_view_sequence": 18,
                 "default": "12.0",
                 "field_description": "Mode Version Base",
@@ -7542,8 +8682,8 @@ for rec in self:
                 "ttype": "selection",
             },
             "mode_version_erplibre": {
-                "code_generator_form_simple_view_sequence": 22,
-                "code_generator_sequence": 66,
+                "code_generator_form_simple_view_sequence": 23,
+                "code_generator_sequence": 46,
                 "code_generator_tree_view_sequence": 17,
                 "default": "1.5.0",
                 "field_description": "Mode Version Erplibre",
@@ -7558,94 +8698,6 @@ for rec in self:
                 ),
                 "ttype": "selection",
             },
-            "mode_view": {
-                "code_generator_form_simple_view_sequence": 61,
-                "code_generator_sequence": 51,
-                "default": "same_view",
-                "field_description": "Mode View",
-                "help": (
-                    "Mode view, enable rebuild same view or create new view."
-                ),
-                "selection": (
-                    "[('no_view', 'No view'), ('same_view', 'Autopoiesis'),"
-                    " ('new_view', 'New')]"
-                ),
-                "ttype": "selection",
-            },
-            "mode_view_snippet": {
-                "code_generator_form_simple_view_sequence": 62,
-                "code_generator_sequence": 54,
-                "default": "no_snippet",
-                "field_description": "Mode View Snippet",
-                "help": "Will active feature to generate snippet",
-                "selection": (
-                    "[('no_snippet', 'No snippet'), ('enable_snippet', 'Enable"
-                    " snippet')]"
-                ),
-                "ttype": "selection",
-            },
-            "mode_view_snippet_enable_template_website_snippet_view": {
-                "code_generator_form_simple_view_sequence": 63,
-                "code_generator_sequence": 55,
-                "default": True,
-                "field_description": (
-                    "Mode View Snippet Enable Template Website Snippet View"
-                ),
-                "help": "Feature for mode_view_snippet",
-                "ttype": "boolean",
-            },
-            "mode_view_snippet_template_generate_website_enable_javascript": {
-                "code_generator_form_simple_view_sequence": 66,
-                "code_generator_sequence": 58,
-                "default": True,
-                "field_description": (
-                    "Mode View Snippet Template Generate Website Enable"
-                    " Javascript"
-                ),
-                "help": "Feature for mode_view_snippet",
-                "ttype": "boolean",
-            },
-            "mode_view_snippet_template_generate_website_snippet_ctrl_featur": {
-                "code_generator_form_simple_view_sequence": 65,
-                "code_generator_sequence": 57,
-                "default": "model_show_item_individual",
-                "field_description": (
-                    "Mode View Snippet Template Generate Website Snippet Ctrl"
-                    " Featur"
-                ),
-                "help": "Feature for mode_view_snippet",
-                "selection": (
-                    "[('helloworld', 'helloworld'),"
-                    " ('model_show_item_individual', 'Model show item"
-                    " individual'), ('model_show_item_list', 'Model show item"
-                    " list')]"
-                ),
-                "ttype": "selection",
-            },
-            "mode_view_snippet_template_generate_website_snippet_generic_mdl": {
-                "code_generator_form_simple_view_sequence": 64,
-                "code_generator_sequence": 56,
-                "field_description": (
-                    "Mode View Snippet Template Generate Website Snippet"
-                    " Generic Mdl"
-                ),
-                "help": "Feature for mode_view_snippet",
-                "ttype": "char",
-            },
-            "mode_view_snippet_template_generate_website_snippet_type": {
-                "code_generator_form_simple_view_sequence": 67,
-                "code_generator_sequence": 59,
-                "default": "effect",
-                "field_description": (
-                    "Mode View Snippet Template Generate Website Snippet Type"
-                ),
-                "help": "Feature for mode_view_snippet",
-                "selection": (
-                    "[('content', 'Content'), ('effect', 'Effect'),"
-                    " ('feature', 'Feature'), ('structure', 'Structure')]"
-                ),
-                "ttype": "selection",
-            },
             "name": {
                 "code_generator_compute": "_compute_name",
                 "code_generator_form_simple_view_sequence": 10,
@@ -7657,24 +8709,15 @@ for rec in self:
                 "ttype": "char",
             },
             "namespace": {
-                "code_generator_sequence": 24,
+                "code_generator_sequence": 23,
                 "code_generator_tree_view_sequence": 12,
                 "field_description": "Namespace",
                 "help": "Specific name for this workspace",
                 "ttype": "char",
             },
-            "need_debugger_cg_erplibre_devops": {
-                "code_generator_form_simple_view_sequence": 52,
-                "code_generator_sequence": 18,
-                "field_description": "Need Debugger Cg Erplibre Devops",
-                "help": (
-                    "CG erplibre_devops got error, detect can use the debugger"
-                ),
-                "ttype": "boolean",
-            },
             "new_project_count": {
                 "code_generator_compute": "_compute_new_project_count",
-                "code_generator_form_simple_view_sequence": 14,
+                "code_generator_form_simple_view_sequence": 15,
                 "code_generator_sequence": 9,
                 "field_description": "New project count",
                 "force_widget": "statinfo",
@@ -7682,22 +8725,32 @@ for rec in self:
                 "ttype": "integer",
             },
             "path_code_generator_to_generate": {
-                "code_generator_form_simple_view_sequence": 69,
-                "code_generator_sequence": 20,
-                "default": "addons/addons",
+                "code_generator_compute": (
+                    "_compute_path_code_generator_to_generate"
+                ),
+                "code_generator_sequence": 22,
                 "field_description": "Path Code Generator To Generate",
+                "store": True,
                 "ttype": "char",
             },
             "path_working_erplibre": {
-                "code_generator_form_simple_view_sequence": 70,
-                "code_generator_sequence": 22,
+                "code_generator_sequence": 20,
                 "default": "/ERPLibre",
                 "field_description": "Path Working Erplibre",
                 "ttype": "char",
             },
+            "plan_cg_count": {
+                "code_generator_compute": "_compute_plan_cg_count",
+                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_sequence": 55,
+                "field_description": "Plan CG count",
+                "force_widget": "statinfo",
+                "store": True,
+                "ttype": "integer",
+            },
             "port_http": {
                 "code_generator_form_simple_view_sequence": 32,
-                "code_generator_sequence": 30,
+                "code_generator_sequence": 29,
                 "comment_before": "TODO backup button and restore button",
                 "default": 8069,
                 "field_description": "port http",
@@ -7706,7 +8759,7 @@ for rec in self:
             },
             "port_longpolling": {
                 "code_generator_form_simple_view_sequence": 33,
-                "code_generator_sequence": 31,
+                "code_generator_sequence": 30,
                 "default": 8071,
                 "field_description": "port longpolling",
                 "help": "The port of longpolling odoo.",
@@ -7720,21 +8773,14 @@ for rec in self:
             },
             "show_error_chatter": {
                 "code_generator_form_simple_view_sequence": 30,
-                "code_generator_sequence": 19,
+                "code_generator_sequence": 18,
                 "field_description": "Show Error Chatter",
                 "help": "Show error to chatter",
                 "ttype": "boolean",
             },
-            "stop_execution_if_env_not_clean": {
-                "code_generator_form_simple_view_sequence": 56,
-                "code_generator_sequence": 78,
-                "default": True,
-                "field_description": "Stop Execution If Env Not Clean",
-                "ttype": "boolean",
-            },
             "system_id": {
-                "code_generator_form_simple_view_sequence": 17,
-                "code_generator_sequence": 28,
+                "code_generator_form_simple_view_sequence": 18,
+                "code_generator_sequence": 27,
                 "code_generator_tree_view_sequence": 13,
                 "default_lambda": (
                     "lambda self:"
@@ -7747,121 +8793,16 @@ for rec in self:
                 "ttype": "many2one",
             },
             "test_ids": {
-                "code_generator_form_simple_view_sequence": 83,
-                "code_generator_sequence": 80,
+                "code_generator_form_simple_view_sequence": 52,
+                "code_generator_sequence": 51,
                 "field_description": "Tests",
                 "relation": "devops.test",
                 "ttype": "many2many",
             },
-            "time_exec_action_clear_all_generated_module": {
-                "code_generator_form_simple_view_sequence": 50,
-                "code_generator_sequence": 70,
-                "field_description": (
-                    "Time Exec Action Clear All Generated Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_clear_all_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_code_generator_generate_all": {
-                "code_generator_form_simple_view_sequence": 45,
-                "code_generator_sequence": 49,
-                "field_description": (
-                    "Time Exec Action Code Generator Generate All"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_code_generator_generate_all"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_git_commit_all_generated_module": {
-                "code_generator_form_simple_view_sequence": 51,
-                "code_generator_sequence": 76,
-                "field_description": (
-                    "Time Exec Action Git Commit All Generated Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_git_commit_all_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_install_all_generated_module": {
-                "code_generator_form_simple_view_sequence": 46,
-                "code_generator_sequence": 71,
-                "field_description": (
-                    "Time Exec Action Install All Generated Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_install_all_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_install_all_uca_generated_module": {
-                "code_generator_form_simple_view_sequence": 48,
-                "code_generator_sequence": 72,
-                "field_description": (
-                    "Time Exec Action Install All Uca Generated Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_install_all_uca_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_install_all_ucb_generated_module": {
-                "code_generator_form_simple_view_sequence": 49,
-                "code_generator_sequence": 73,
-                "field_description": (
-                    "Time Exec Action Install All Ucb Generated Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_install_all_ucb_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_install_and_generate_all_generated_module": {
-                "code_generator_form_simple_view_sequence": 44,
-                "code_generator_sequence": 74,
-                "field_description": (
-                    "Time Exec Action Install And Generate All Generated"
-                    " Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_install_and_generate_all_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
-            "time_exec_action_refresh_meta_cg_generated_module": {
-                "code_generator_form_simple_view_sequence": 47,
-                "code_generator_sequence": 75,
-                "field_description": (
-                    "Time Exec Action Refresh Meta Cg Generated Module"
-                ),
-                "help": (
-                    "Execution time of method"
-                    " action_refresh_meta_cg_generated_module"
-                ),
-                "readonly": True,
-                "ttype": "char",
-            },
             "url_instance": {
                 "code_generator_compute": "_compute_url_instance",
                 "code_generator_form_simple_view_sequence": 36,
-                "code_generator_sequence": 36,
+                "code_generator_sequence": 35,
                 "field_description": "Url Instance",
                 "force_widget": "url",
                 "store": True,
@@ -7870,7 +8811,7 @@ for rec in self:
             "url_instance_database_manager": {
                 "code_generator_compute": "_compute_url_instance",
                 "code_generator_form_simple_view_sequence": 37,
-                "code_generator_sequence": 37,
+                "code_generator_sequence": 36,
                 "field_description": "Url Instance Database Manager",
                 "force_widget": "url",
                 "store": True,
@@ -7878,13 +8819,13 @@ for rec in self:
             },
             "workspace_docker_id": {
                 "code_generator_form_simple_view_sequence": 40,
-                "code_generator_sequence": 77,
+                "code_generator_sequence": 50,
                 "field_description": "Workspace Docker",
                 "relation": "devops.workspace.docker",
                 "ttype": "many2one",
             },
             "workspace_terminal_id": {
-                "code_generator_sequence": 81,
+                "code_generator_sequence": 52,
                 "field_description": "Workspace Terminal",
                 "relation": "devops.workspace.terminal",
                 "ttype": "many2one",
@@ -7915,7 +8856,6 @@ import subprocess
 import time
 import traceback
 from contextlib import contextmanager
-from datetime import datetime, timedelta
 
 import requests
 
@@ -8011,14 +8951,12 @@ return r_ids""",
                 },
                 {
                     "code": """for rec in self:
-    rec.has_re_execute_new_project = bool(
-        rec.last_new_project_cg and rec.last_new_project_cg.has_error
-    )""",
-                    "name": "_compute_has_re_execute_new_project",
-                    "decorator": (
-                        '@api.multi;@api.depends("last_new_project_cg",'
-                        ' "last_new_project_cg.has_error")'
-                    ),
+    lst_path = ["addons/addons"] + [
+        a.path_code_generator_to_generate for a in rec.plan_cg_ids
+    ]
+    rec.path_code_generator_to_generate = ";".join(set(lst_path))""",
+                    "name": "_compute_path_code_generator_to_generate",
+                    "decorator": '@api.multi;@api.depends("plan_cg_ids.path_code_generator_to_generate")',
                     "param": "self",
                     "sequence": 5,
                     "m2o_module": code_generator_id.id,
@@ -8063,7 +9001,6 @@ return r_ids""",
                 },
                 {
                     "code": """for rec in self:
-    # TODO is it better use search_count or len(devops_exec_ids)?
     rec.devops_exec_count = self.env["devops.exec"].search_count(
         [("devops_workspace", "=", rec.id)]
     )""",
@@ -8079,7 +9016,21 @@ return r_ids""",
                 },
                 {
                     "code": """for rec in self:
-    # TODO is it better use search_count or len(devops_exec_ids)?
+    rec.plan_cg_count = self.env["devops.plan.cg"].search_count(
+        [("workspace_id", "=", rec.id)]
+    )""",
+                    "name": "_compute_plan_cg_count",
+                    "decorator": (
+                        '@api.multi;@api.depends("plan_cg_ids",'
+                        ' "plan_cg_ids.active")'
+                    ),
+                    "param": "self",
+                    "sequence": 9,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_workspace.id,
+                },
+                {
+                    "code": """for rec in self:
     rec.devops_exec_error_count = self.env[
         "devops.exec.error"
     ].search_count([("devops_workspace", "=", rec.id)])""",
@@ -8089,13 +9040,12 @@ return r_ids""",
                         ' "devops_exec_error_ids.active")'
                     ),
                     "param": "self",
-                    "sequence": 9,
+                    "sequence": 10,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
                 {
                     "code": """for rec in self:
-    # TODO is it better use search_count or len(devops_exec_ids)?
     rec.devops_exec_bundle_count = self.env[
         "devops.exec.bundle"
     ].search_count([("devops_workspace", "=", rec.id)])
@@ -8110,13 +9060,12 @@ return r_ids""",
                         ' "devops_exec_bundle_ids.active")'
                     ),
                     "param": "self",
-                    "sequence": 10,
+                    "sequence": 11,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
                 {
                     "code": """for rec in self:
-    # TODO is it better use search_count or len(devops_exec_ids)?
     rec.new_project_count = self.env[
         "devops.cg.new_project"
     ].search_count([("devops_workspace", "=", rec.id)])""",
@@ -8126,7 +9075,7 @@ return r_ids""",
                         ' "new_project_ids.active")'
                     ),
                     "param": "self",
-                    "sequence": 11,
+                    "sequence": 12,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8137,7 +9086,7 @@ return r_ids""",
                     "name": "action_cg_setup_pycharm_debug",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 12,
+                    "sequence": 13,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8149,7 +9098,7 @@ return r_ids""",
                     "name": "action_clear_error_exec",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 13,
+                    "sequence": 14,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8165,7 +9114,7 @@ return r_ids""",
                     "name": "action_open_terminal_path_erplibre_devops",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 14,
+                    "sequence": 15,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8183,7 +9132,7 @@ return r_ids""",
                     "name": "action_format_erplibre_devops",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 15,
+                    "sequence": 16,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8203,509 +9152,7 @@ return r_ids""",
                     "name": "action_update_erplibre_devops",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 16,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """# Support only 1, but can run in parallel multiple if no dependencies between
-lst_model = []
-dct_model_conf = {"model": lst_model}
-for model_id in module_id.model_ids:
-    lst_field = []
-    lst_model.append({"name": model_id.name, "fields": lst_field})
-    for field_id in model_id.field_ids:
-        dct_value_field = {
-            "name": field_id.name,
-            "help": field_id.help,
-            "type": field_id.type,
-        }
-        if field_id.type in [
-            "many2one",
-            "many2many",
-            "one2many",
-        ]:
-            dct_value_field["relation"] = (
-                field_id.relation.name
-                if field_id.relation
-                else field_id.relation_manual
-            )
-            if not dct_value_field["relation"]:
-                msg_err = (
-                    f"Model '{model_id.name}', field"
-                    f" '{field_id.name}' need a"
-                    " relation because type is"
-                    f" '{field_id.type}'"
-                )
-                raise exceptions.Warning(msg_err)
-        if field_id.type in [
-            "one2many",
-        ]:
-            dct_value_field["relation_field"] = (
-                field_id.field_relation.name
-                if field_id.field_relation
-                else field_id.field_relation_manual
-            )
-            if not dct_value_field["relation_field"]:
-                msg_err = (
-                    f"Model '{model_id.name}', field"
-                    f" '{field_id.name}' need a"
-                    " relation field because type is"
-                    f" '{field_id.type}'"
-                )
-                raise exceptions.Warning(msg_err)
-        if field_id.widget:
-            dct_value_field = field_id.widget
-        lst_field.append(dct_value_field)
-model_conf = (
-    json.dumps(dct_model_conf)
-    # .replace('"', '\\"')
-    # .replace("'", "")
-)
-return model_conf""",
-                    "name": "get_cg_model_config",
-                    "decorator": "@api.model",
-                    "param": "self, module_id",
                     "sequence": 17,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("CG generate module") as rec:
-        start = datetime.now()
-        # TODO no where this variable are set at true, need hook
-        rec.devops_cg_erplibre_devops_error_log = False
-        rec.need_debugger_cg_erplibre_devops = False
-        # TODO add try catch, add breakpoint, rerun loop. Careful when lose context
-        # Start with local storage
-        # Increase speed
-        # TODO keep old configuration of config.conf and not overwrite all
-        # rec.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_code_generator", to_instance=True)
-        if rec.devops_code_generator_ids and rec.mode_exec in [
-            "docker"
-        ]:
-            rec.workspace_docker_id.docker_config_gen_cg = True
-            rec.action_reboot()
-            rec.workspace_docker_id.docker_config_gen_cg = False
-        for rec_cg in rec.devops_code_generator_ids:
-            for module_id in rec_cg.module_ids:
-                devops_exec_bundle_parent_root_id = (
-                    self.env["devops.exec.bundle"]
-                    .browse(rec._context.get("devops_exec_bundle"))
-                    .get_parent_root()
-                )
-                if rec_cg.force_clean_before_generate:
-                    rec.workspace_code_remove_module(module_id)
-                model_conf = None
-                if rec.code_mode_context_generator == "autopoiesis":
-                    # TODO this seems outdated, fix by wizard
-                    # TODO found path by this __file__
-                    directory = "./addons/ERPLibre_erplibre_addons"
-                    module = "erplibre_devops"
-                    project_type = "self"
-                    if rec.cg_self_add_config_cg:
-                        model_conf = rec.get_cg_model_config(module_id)
-                else:
-                    model_conf = rec.get_cg_model_config(module_id)
-                    directory = os.path.join(
-                        rec.path_working_erplibre,
-                        rec.path_code_generator_to_generate,
-                    )
-                    module = module_id.name
-                    project_type = "cg"
-                dct_new_project = {
-                    "module": module,
-                    "directory": directory,
-                    "keep_bd_alive": True,
-                    "devops_workspace": rec.id,
-                    "project_type": project_type,
-                    "devops_exec_bundle_id": devops_exec_bundle_parent_root_id.id,
-                    "stop_execution_if_env_not_clean": rec.stop_execution_if_env_not_clean,
-                    "mode_view": rec.mode_view,
-                    "mode_view_snippet": rec.mode_view_snippet,
-                    "mode_view_snippet_enable_template_website_snippet_view": rec.mode_view_snippet_enable_template_website_snippet_view,
-                    "mode_view_snippet_template_generate_website_snippet_generic_mdl": rec.mode_view_snippet_template_generate_website_snippet_generic_mdl,
-                    "mode_view_snippet_template_generate_website_snippet_ctrl_featur": rec.mode_view_snippet_template_generate_website_snippet_ctrl_featur,
-                    "mode_view_snippet_template_generate_website_enable_javascript": rec.mode_view_snippet_template_generate_website_enable_javascript,
-                    "mode_view_snippet_template_generate_website_snippet_type": rec.mode_view_snippet_template_generate_website_snippet_type,
-                    "config_uca_enable_export_data": rec.config_uca_enable_export_data,
-                }
-                # extra_arg = ""
-                if model_conf:
-                    dct_new_project["config"] = model_conf
-                    # extra_arg = f" --config '{model_conf}'"
-
-                new_project_id = self.env[
-                    "devops.cg.new_project"
-                ].create(dct_new_project)
-                if rec.last_new_project_cg:
-                    new_project_id.last_new_project = (
-                        rec.last_new_project_cg.id
-                    )
-                rec.last_new_project_cg = new_project_id.id
-                new_project_id.with_context(
-                    rec._context
-                ).action_new_project()
-                # cmd = (
-                #     f"cd {rec.path_working_erplibre};./script/code_generator/new_project.py"
-                #     f" --keep_bd_alive -m {module_name} -d"
-                #     f" {rec.path_code_generator_to_generate}{extra_arg}"
-                # )
-                # result = rec.execute(cmd=cmd, to_instance=True)
-                # rec.devops_code_generator_log_addons = result
-                # OR
-                # result = rec.execute(
-                #     cmd=f"cd {rec.folder};./script/code_generator/new_project.py"
-                #     f" -d {addons_path} -m {module_name}",
-                # )
-        if rec.devops_code_generator_ids and rec.mode_exec in [
-            "docker"
-        ]:
-            rec.action_reboot()
-        # rec.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_all", to_instance=True)
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_code_generator_generate_all = (
-            f"{td:.03f}s"
-        )""",
-                    "name": "action_code_generator_generate_all",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 18,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Clear all generated module"
-    ) as rec:
-        start = datetime.now()
-        for cg in rec.devops_code_generator_ids:
-            for module_id in cg.module_ids:
-                rec.workspace_code_remove_module(module_id)
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_clear_all_generated_module = f"{td:.03f}s"
-        rec.action_check()""",
-                    "name": "action_clear_all_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 19,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Workspace code remove module"
-    ) as rec:
-        path_to_remove = os.path.join(
-            rec.path_working_erplibre,
-            rec.path_code_generator_to_generate,
-        )
-        rec.workspace_remove_module(module_id.name, path_to_remove)""",
-                    "name": "workspace_code_remove_module",
-                    "decorator": "@api.multi",
-                    "param": "self, module_id",
-                    "sequence": 20,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Workspace CG remove module"
-    ) as rec:
-        # TODO is it necessary to hardcode it? Why not merge with code section?
-        path_to_remove = os.path.join(
-            rec.path_working_erplibre,
-            "addons",
-            "ERPLibre_erplibre_addons",
-        )
-        rec.workspace_remove_module(
-            "erplibre_devops", path_to_remove, remove_module=False
-        )""",
-                    "name": "workspace_CG_remove_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 21,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Workspace CG git commit"
-    ) as rec:
-        folder_path = os.path.join(
-            rec.folder, "addons", "ERPLibre_erplibre_addons"
-        )
-        rec.execute(
-            cmd="git cola",
-            folder=folder_path,
-            force_open_terminal=True,
-            force_exit=True,
-        )""",
-                    "name": "workspace_CG_git_commit",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 22,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Workspace remove module"
-    ) as rec:
-        if remove_module:
-            rec.execute(
-                cmd=f"rm -rf ./{module_name};",
-                folder=path_to_remove,
-                to_instance=True,
-            )
-        rec.execute(
-            cmd=f"rm -rf ./code_generator_template_{module_name};",
-            folder=path_to_remove,
-            to_instance=True,
-        )
-        rec.execute(
-            cmd=f"rm -rf ./code_generator_{module_name};",
-            folder=path_to_remove,
-            to_instance=True,
-        )""",
-                    "name": "workspace_remove_module",
-                    "decorator": "@api.multi",
-                    "param": (
-                        "self, module_name, path_to_remove, remove_module=True"
-                    ),
-                    "sequence": 23,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("CG commit all") as rec:
-        folder = os.path.join(
-            rec.path_working_erplibre,
-            rec.path_code_generator_to_generate,
-        )
-        start = datetime.now()
-        # for cg in rec.devops_code_generator_ids:
-        # Validate git directory exist
-        exec_id = rec.execute(
-            cmd=f"ls {folder}/.git",
-            to_instance=True,
-        )
-        result = exec_id.log_all
-        if "No such file or directory" in result:
-            # Suppose git not exist
-            # This is not good if .git directory is in parent directory
-            rec.execute(
-                cmd=(
-                    "git"
-                    " init;echo '*.pyc' > .gitignore;git add"
-                    " .gitignore;git commit -m 'first commit'"
-                ),
-                folder=folder,
-                to_instance=True,
-            )
-            rec.execute(
-                cmd="git init",
-                folder=folder,
-                to_instance=True,
-            )
-
-        exec_id = rec.execute(
-            cmd=f"git status -s",
-            folder=folder,
-            to_instance=True,
-        )
-        result = exec_id.log_all
-        if result:
-            # TODO show result to log
-            # Force add file and commit
-            rec.execute(
-                cmd=f"git add .",
-                folder=folder,
-                to_instance=True,
-            )
-            rec.execute(
-                cmd=f"git commit -m 'Commit by RobotLibre'",
-                folder=folder,
-                to_instance=True,
-            )
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_git_commit_all_generated_module = (
-            f"{td:.03f}s"
-        )""",
-                    "name": "action_git_commit_all_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 24,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("Refresh meta CG") as rec:
-        folder = os.path.join(
-            rec.path_working_erplibre,
-            rec.path_code_generator_to_generate,
-        )
-        start = datetime.now()
-        diff = ""
-        status = ""
-        stat = ""
-        exec_id = rec.execute(
-            cmd=f"ls {folder}/.git",
-            to_instance=True,
-        )
-        result = exec_id.log_all
-        if result:
-            # Create diff
-            exec_id = rec.execute(
-                cmd=f"git diff",
-                folder=folder,
-                to_instance=True,
-            )
-            diff += exec_id.log_all
-            # Create status
-            exec_id = rec.execute(
-                cmd=f"git status",
-                folder=folder,
-                to_instance=True,
-            )
-            status += exec_id.log_all
-            for cg in rec.devops_code_generator_ids:
-                # Create statistic
-                for module_id in cg.module_ids:
-                    exec_id = rec.execute(
-                        cmd=(
-                            "./script/statistic/code_count.sh"
-                            f" ./{rec.path_code_generator_to_generate}/{module_id.name};"
-                        ),
-                        folder=rec.path_working_erplibre,
-                        to_instance=True,
-                    )
-                    result = exec_id.log_all
-                    if result:
-                        stat += f"./{rec.path_code_generator_to_generate}/{module_id.name}"
-                        stat += result
-
-                    exec_id = rec.execute(
-                        cmd=(
-                            "./script/statistic/code_count.sh"
-                            f" ./{rec.path_code_generator_to_generate}/code_generator_template_{module_id.name};"
-                        ),
-                        folder=rec.path_working_erplibre,
-                        to_instance=True,
-                    )
-                    result = exec_id.log_all
-                    if result:
-                        stat += f"./{rec.path_code_generator_to_generate}/code_generator_template_{module_id.name}"
-                        stat += result
-
-                    exec_id = rec.execute(
-                        cmd=(
-                            "./script/statistic/code_count.sh"
-                            f" ./{rec.path_code_generator_to_generate}/code_generator_{module_id.name};"
-                        ),
-                        folder=rec.path_working_erplibre,
-                        to_instance=True,
-                    )
-                    result = exec_id.log_all
-                    if result:
-                        stat += f"./{rec.path_code_generator_to_generate}/code_generator_{module_id.name}"
-                        stat += result
-
-                    # Autofix attached field to workspace
-                    if rec not in module_id.devops_workspace_ids:
-                        module_id.devops_workspace_ids = [(4, rec.id)]
-                    for model_id in module_id.model_ids:
-                        if rec not in model_id.devops_workspace_ids:
-                            model_id.devops_workspace_ids = [
-                                (4, rec.id)
-                            ]
-                        for field_id in model_id.field_ids:
-                            if (
-                                rec
-                                not in field_id.devops_workspace_ids
-                            ):
-                                field_id.devops_workspace_ids = [
-                                    (4, rec.id)
-                                ]
-
-        rec.devops_code_generator_diff = diff
-        rec.devops_code_generator_status = status
-        rec.devops_code_generator_stat = stat
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_refresh_meta_cg_generated_module = (
-            f"{td:.03f}s"
-        )""",
-                    "name": "action_refresh_meta_cg_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 25,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """cg_before_ids_i = self.devops_code_generator_ids.ids
-
-status = super().write(values)
-if "devops_code_generator_ids" in values.keys():
-    # Update all the list of code generator, associate to this workspace
-    for rec in self:
-        cg_missing_ids_i = list(
-            set(cg_before_ids_i).difference(
-                set(rec.devops_code_generator_ids.ids)
-            )
-        )
-        cg_missing_ids = self.env["devops.code_generator"].browse(
-            cg_missing_ids_i
-        )
-        for cg_id in cg_missing_ids:
-            for module_id in cg_id.module_ids:
-                if rec in module_id.devops_workspace_ids:
-                    module_id.devops_workspace_ids = [(3, rec.id)]
-                for model_id in module_id.model_ids:
-                    if rec in model_id.devops_workspace_ids:
-                        model_id.devops_workspace_ids = [(3, rec.id)]
-                    for field_id in model_id.field_ids:
-                        if rec in field_id.devops_workspace_ids:
-                            field_id.devops_workspace_ids = [
-                                (3, rec.id)
-                            ]
-        cg_adding_ids_i = list(
-            set(rec.devops_code_generator_ids.ids).difference(
-                set(cg_before_ids_i)
-            )
-        )
-        cg_adding_ids = self.env["devops.code_generator"].browse(
-            cg_adding_ids_i
-        )
-        for cg_id in cg_adding_ids:
-            for module_id in cg_id.module_ids:
-                if rec not in module_id.devops_workspace_ids:
-                    module_id.devops_workspace_ids = [(4, rec.id)]
-                for model_id in module_id.model_ids:
-                    if rec not in model_id.devops_workspace_ids:
-                        model_id.devops_workspace_ids = [(4, rec.id)]
-                    for field_id in model_id.field_ids:
-                        if rec not in field_id.devops_workspace_ids:
-                            field_id.devops_workspace_ids = [
-                                (4, rec.id)
-                            ]
-return status""",
-                    "name": "write",
-                    "decorator": "@api.multi",
-                    "param": "self, values",
-                    "sequence": 26,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8735,132 +9182,7 @@ return status""",
                     "name": "install_module",
                     "decorator": "@api.multi",
                     "param": "self, str_module_list",
-                    "sequence": 27,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Install generated module"
-    ) as rec:
-        start = datetime.now()
-        module_list = ",".join(
-            [
-                m.name
-                for cg in rec.devops_code_generator_ids
-                for m in cg.module_ids
-            ]
-        )
-        rec.install_module(module_list)
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_install_all_generated_module = (
-            f"{td:.03f}s"
-        )
-        rec.action_check()""",
-                    "name": "action_install_all_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 28,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("Install all UcA") as rec:
-        start = datetime.now()
-        module_list = ",".join(
-            [
-                f"code_generator_template_{m.name},{m.name}"
-                for cg in rec.devops_code_generator_ids
-                for m in cg.module_ids
-            ]
-        )
-        rec.execute(
-            cmd=f"./script/database/db_restore.py --database cg_uca",
-            folder=rec.path_working_erplibre,
-            to_instance=True,
-        )
-        rec.execute(
-            cmd=(
-                "./script/addons/install_addons_dev.sh"
-                f" cg_uca {module_list}"
-            ),
-            folder=rec.path_working_erplibre,
-            to_instance=True,
-        )
-
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_install_all_uca_generated_module = (
-            f"{td:.03f}s"
-        )
-        rec.action_check()""",
-                    "name": "action_install_all_uca_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 29,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("Install all UcB") as rec:
-        start = datetime.now()
-        module_list = ",".join(
-            [
-                f"code_generator_{m.name}"
-                for cg in rec.devops_code_generator_ids
-                for m in cg.module_ids
-            ]
-        )
-        rec.execute(
-            cmd=f"./script/database/db_restore.py --database cg_ucb",
-            folder=rec.path_working_erplibre,
-            to_instance=True,
-        )
-        rec.execute(
-            cmd=(
-                "./script/addons/install_addons_dev.sh"
-                f" cg_ucb {module_list}"
-            ),
-            folder=rec.path_working_erplibre,
-            to_instance=True,
-        )
-
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_install_all_ucb_generated_module = (
-            f"{td:.03f}s"
-        )
-        rec.action_check()""",
-                    "name": "action_install_all_ucb_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 30,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Install and generate all"
-    ) as rec:
-        start = datetime.now()
-        rec.action_code_generator_generate_all()
-        rec.action_git_commit_all_generated_module()
-        rec.action_refresh_meta_cg_generated_module()
-        rec.action_install_all_generated_module()
-        end = datetime.now()
-        td = (end - start).total_seconds()
-        rec.time_exec_action_install_and_generate_all_generated_module = (
-            f"{td:.03f}s"
-        )""",
-                    "name": "action_install_and_generate_all_generated_module",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 31,
+                    "sequence": 18,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8871,7 +9193,7 @@ return status""",
                     "name": "action_open_terminal",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 32,
+                    "sequence": 19,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -8888,407 +9210,22 @@ return status""",
                     "name": "action_open_directory",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 33,
+                    "sequence": 20,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
                 {
                     "code": """for rec in self:
-    rec.time_exec_action_code_generator_generate_all = False
-    rec.time_exec_action_clear_all_generated_module = False
-    rec.time_exec_action_install_all_generated_module = False
-    rec.time_exec_action_install_all_uca_generated_module = False
-    rec.time_exec_action_install_all_ucb_generated_module = False
-    rec.time_exec_action_install_and_generate_all_generated_module = (
-        False
-    )
-    rec.time_exec_action_refresh_meta_cg_generated_module = False
-    rec.time_exec_action_git_commit_all_generated_module = False
-    rec.devops_code_generator_status = False
-    rec.devops_code_generator_diff = False
-    rec.devops_code_generator_stat = False
-    rec.devops_code_generator_tree_addons = False
+    rec.devops_cg_status = False
+    rec.devops_cg_diff = False
+    rec.devops_cg_stat = False
+    rec.devops_cg_tree_addons = False
     rec.log_workspace = False
-    rec.devops_code_generator_log_addons = False""",
+    rec.devops_cg_log_addons = False""",
                     "name": "action_clear_cache",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 34,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Open Terminal addons"
-    ) as rec:
-        folder = os.path.join(
-            rec.path_working_erplibre,
-            rec.path_code_generator_to_generate,
-        )
-        cmd = f"ls -l"
-        if rec.is_debug_log:
-            _logger.info(cmd)
-        rec.execute(
-            cmd=cmd,
-            folder=folder,
-            force_open_terminal=True,
-            docker=bool(rec.mode_exec in ["docker"]),
-        )""",
-                    "name": "action_open_terminal_addons",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 35,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("Generate data demo") as rec:
-        if rec.cg_demo_type_data == "simple":
-            # Project
-            cg_id = self.env["devops.code_generator"].create(
-                {
-                    "name": "Parc de voiture",
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                    "force_clean_before_generate": True,
-                }
-            )
-            # Module
-            cg_module_id = self.env[
-                "devops.code_generator.module"
-            ].create(
-                {
-                    "name": "parc",
-                    "code_generator": cg_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            # Model
-            cg_model_voiture_id = self.env[
-                "devops.code_generator.module.model"
-            ].create(
-                {
-                    "name": "parc.voiture",
-                    "description": "Ensemble de voiture dans le parc",
-                    "module_id": cg_module_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            # Field
-            cg_field_voiture_couleur_id = self.env[
-                "devops.code_generator.module.model.field"
-            ].create(
-                {
-                    "name": "couleur",
-                    "help": "Couleur de la voiture.",
-                    "type": "char",
-                    "model_id": cg_model_voiture_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            if rec.is_clear_before_cg_demo:
-                rec.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-                rec.devops_code_generator_module_ids = [
-                    (6, 0, cg_module_id.ids)
-                ]
-                rec.devops_code_generator_model_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            cg_model_voiture_id.id,
-                        ],
-                    )
-                ]
-                rec.devops_code_generator_field_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            cg_field_voiture_couleur_id.id,
-                        ],
-                    )
-                ]
-            else:
-                rec.devops_code_generator_ids = [(4, cg_id.id)]
-                rec.devops_code_generator_module_ids = [
-                    (4, cg_module_id.id)
-                ]
-                rec.devops_code_generator_model_ids = [
-                    (4, cg_model_voiture_id.id),
-                ]
-                rec.devops_code_generator_field_ids = [
-                    (4, cg_field_voiture_couleur_id.id),
-                ]
-        elif rec.cg_demo_type_data == "devops_example":
-            # Project
-            cg_id = self.env["devops.code_generator"].create(
-                {
-                    "name": "Projet exemple",
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                    "force_clean_before_generate": False,
-                }
-            )
-            # Module
-            cg_module_id = self.env[
-                "devops.code_generator.module"
-            ].create(
-                {
-                    "name": "erplibre_devops",
-                    "code_generator": cg_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            # Model
-            cg_model_example_id = self.env[
-                "devops.code_generator.module.model"
-            ].create(
-                {
-                    "name": "devops.example",
-                    "description": "Example feature to add to devops",
-                    "module_id": cg_module_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            # Field
-            cg_field_size_id = self.env[
-                "devops.code_generator.module.model.field"
-            ].create(
-                {
-                    "name": "size",
-                    "help": "Size of this example.",
-                    "type": "integer",
-                    "model_id": cg_model_example_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            if rec.is_clear_before_cg_demo:
-                rec.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-                rec.devops_code_generator_module_ids = [
-                    (6, 0, cg_module_id.ids)
-                ]
-                rec.devops_code_generator_model_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            cg_model_example_id.id,
-                        ],
-                    )
-                ]
-                rec.devops_code_generator_field_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            cg_field_size_id.id,
-                        ],
-                    )
-                ]
-            else:
-                rec.devops_code_generator_ids = [(4, cg_id.id)]
-                rec.devops_code_generator_module_ids = [
-                    (4, cg_module_id.id)
-                ]
-                rec.devops_code_generator_model_ids = [
-                    (4, cg_model_example_id.id),
-                ]
-                rec.devops_code_generator_field_ids = [
-                    (4, cg_field_size_id.id),
-                ]
-        elif rec.cg_demo_type_data == "ore":
-            # Project
-            cg_id = self.env["devops.code_generator"].create(
-                {
-                    "name": "Offrir Recevoir Échanger",
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                    "force_clean_before_generate": True,
-                }
-            )
-            # Module
-            cg_module_id = self.env[
-                "devops.code_generator.module"
-            ].create(
-                {
-                    "name": "ore",
-                    "code_generator": cg_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            # Model
-            cg_model_offre_id = self.env[
-                "devops.code_generator.module.model"
-            ].create(
-                {
-                    "name": "ore.offre.service",
-                    "description": (
-                        "Permet de créer une offre de service"
-                        " publiable dans la communauté."
-                    ),
-                    "module_id": cg_module_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            cg_model_demande_id = self.env[
-                "devops.code_generator.module.model"
-            ].create(
-                {
-                    "name": "ore.demande.service",
-                    "description": (
-                        "Permet de créer une demande de service"
-                        " publiable dans la communauté."
-                    ),
-                    "module_id": cg_module_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            # Field
-            cg_field_offre_date_afficher_id = self.env[
-                "devops.code_generator.module.model.field"
-            ].create(
-                {
-                    "name": "date_service_afficher",
-                    "help": (
-                        "Date à laquelle l'offre de service sera"
-                        " affiché."
-                    ),
-                    "type": "date",
-                    "model_id": cg_model_offre_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            cg_field_offre_temps_estime_id = self.env[
-                "devops.code_generator.module.model.field"
-            ].create(
-                {
-                    "name": "temp_estime",
-                    "help": (
-                        "Temps estimé pour effectuer le service à"
-                        " offrir."
-                    ),
-                    "type": "float",
-                    "model_id": cg_model_offre_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            cg_field_demande_date_afficher_id = self.env[
-                "devops.code_generator.module.model.field"
-            ].create(
-                {
-                    "name": "date_service_afficher",
-                    "help": (
-                        "Date à laquelle la demande de service sera"
-                        " affiché."
-                    ),
-                    "type": "date",
-                    "model_id": cg_model_demande_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            cg_field_demande_condition_id = self.env[
-                "devops.code_generator.module.model.field"
-            ].create(
-                {
-                    "name": "condition",
-                    "help": "Condition sur la demande de service.",
-                    "type": "text",
-                    "model_id": cg_model_demande_id.id,
-                    "devops_workspace_ids": [(6, 0, rec.ids)],
-                }
-            )
-            if rec.is_clear_before_cg_demo:
-                rec.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-                rec.devops_code_generator_module_ids = [
-                    (6, 0, cg_module_id.ids)
-                ]
-                rec.devops_code_generator_model_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            cg_model_offre_id.id,
-                            cg_model_demande_id.id,
-                        ],
-                    )
-                ]
-                rec.devops_code_generator_field_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            cg_field_offre_date_afficher_id.id,
-                            cg_field_offre_temps_estime_id.id,
-                            cg_field_demande_date_afficher_id.id,
-                            cg_field_demande_condition_id.id,
-                        ],
-                    )
-                ]
-            else:
-                rec.devops_code_generator_ids = [(4, cg_id.id)]
-                rec.devops_code_generator_module_ids = [
-                    (4, cg_module_id.id)
-                ]
-                rec.devops_code_generator_model_ids = [
-                    (4, cg_model_offre_id.id),
-                    (4, cg_model_demande_id.id),
-                ]
-                rec.devops_code_generator_field_ids = [
-                    (4, cg_field_offre_date_afficher_id.id),
-                    (4, cg_field_offre_temps_estime_id.id),
-                    (4, cg_field_demande_date_afficher_id.id),
-                    (4, cg_field_demande_condition_id.id),
-                ]""",
-                    "name": "action_cg_generate_demo",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 36,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """# TODO move to model code_generator ?
-for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Open Terminal and tig"
-    ) as rec:
-        is_docker = False
-        if rec.mode_exec in ["docker"]:
-            is_docker = True
-            exec_id = rec.execute(cmd="which tig", to_instance=True)
-            result = exec_id.log_all
-            if not result:
-                # TODO support OS and not only docker
-                self.workspace_docker_id.action_docker_install_dev_soft()
-        dir_to_check = os.path.join(
-            rec.path_working_erplibre,
-            rec.path_code_generator_to_generate,
-            ".git",
-        )
-        exec_id = rec.execute(cmd=f"ls {dir_to_check}")
-        status_ls = exec_id.log_all
-        if "No such file or directory" in status_ls:
-            raise exceptions.Warning(
-                "Cannot open command 'tig', cannot find directory"
-                f" '{dir_to_check}'."
-            )
-        folder = os.path.join(
-            rec.path_working_erplibre,
-            rec.path_code_generator_to_generate,
-        )
-        cmd = f"tig"
-        if rec.is_debug_log:
-            _logger.info(cmd)
-        rec.execute(
-            cmd=cmd,
-            force_open_terminal=True,
-            folder=folder,
-            docker=is_docker,
-        )""",
-                    "name": "action_open_terminal_tig",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 37,
+                    "sequence": 21,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9298,7 +9235,7 @@ return self.search([]).action_check()''',
                     "name": "action_check_all",
                     "decorator": "@api.model",
                     "param": "self",
-                    "sequence": 38,
+                    "sequence": 22,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9335,7 +9272,7 @@ return self.search([]).action_check()''',
                     "name": "action_check",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 39,
+                    "sequence": 23,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9360,7 +9297,7 @@ return self.search([]).action_check()''',
                     "name": "action_install_me_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 40,
+                    "sequence": 24,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9375,11 +9312,11 @@ return self.search([]).action_check()''',
             folder=folder,
             to_instance=True,
         )
-        rec.devops_code_generator_tree_addons = exec_id.log_all""",
+        rec.devops_cg_tree_addons = exec_id.log_all""",
                     "name": "action_check_tree_addons",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 41,
+                    "sequence": 25,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9519,7 +9456,7 @@ return self.search([]).action_check()''',
                     "name": "action_restore_db_image",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 42,
+                    "sequence": 26,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9540,7 +9477,7 @@ return self.search([]).action_check()''',
                     "name": "check_devops_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 43,
+                    "sequence": 27,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9565,7 +9502,7 @@ return self.search([]).action_check()''',
                     "name": "action_start",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 44,
+                    "sequence": 28,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9591,7 +9528,7 @@ return self.search([]).action_check()''',
                     "name": "action_stop",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 45,
+                    "sequence": 29,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9604,7 +9541,7 @@ return self.search([]).action_check()''',
                     "name": "action_update",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 46,
+                    "sequence": 30,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9638,7 +9575,7 @@ return self.search([]).action_check()''',
                     "name": "action_reboot",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 47,
+                    "sequence": 31,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9672,7 +9609,7 @@ return self.search([]).action_check()''',
                     "name": "kill_process",
                     "decorator": "@api.multi",
                     "param": "self, port=None, sleep_kill=0",
-                    "sequence": 48,
+                    "sequence": 32,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9757,7 +9694,7 @@ return self.search([]).action_check()''',
                     "name": "action_install_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 49,
+                    "sequence": 33,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9789,7 +9726,7 @@ return self.search([]).action_check()''',
                     "name": "update_makefile_from_git",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 50,
+                    "sequence": 34,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9879,7 +9816,6 @@ for rec in self:
     lst_result.append(devops_exec)
     status = None
     if force_open_terminal:
-        rec_force_docker = rec_force_docker or docker
         rec.system_id.execute_terminal_gui(
             folder=force_folder,
             cmd=cmd,
@@ -9922,9 +9858,9 @@ return self.env["devops.exec"].browse([a.id for a in lst_result])""",
                         " force_exit=False, force_docker=False,"
                         " add_stdin_log=False, add_stderr_log=True,"
                         " run_into_workspace=False, to_instance=False,"
-                        " engine='bash', docker=False, delimiter_bash='''"
+                        " engine='bash', delimiter_bash='''"
                     ),
-                    "sequence": 51,
+                    "sequence": 35,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9936,7 +9872,7 @@ return targets""",
                     "name": "get_lst_target_makefile",
                     "decorator": "@api.model",
                     "param": "self, content",
-                    "sequence": 52,
+                    "sequence": 36,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9947,7 +9883,7 @@ return result.log_all.strip() == "true"''',
                     "name": "os_path_exists",
                     "decorator": "@api.model",
                     "param": "self, path, to_instance=False",
-                    "sequence": 53,
+                    "sequence": 37,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9958,7 +9894,7 @@ return result.log_all""",
                     "name": "os_read_file",
                     "decorator": "@api.model",
                     "param": "self, path, to_instance=False",
-                    "sequence": 54,
+                    "sequence": 38,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9969,7 +9905,7 @@ return result.log_all""",
                     "name": "os_write_file",
                     "decorator": "@api.model",
                     "param": "self, path, content, to_instance=False",
-                    "sequence": 55,
+                    "sequence": 39,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10047,7 +9983,7 @@ for escaped_tb in lst_escaped_tb:
                     "name": "find_exec_error_from_log",
                     "decorator": "@api.model",
                     "param": "self, log, devops_exec, devops_exec_bundle_id",
-                    "sequence": 56,
+                    "sequence": 40,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10060,7 +9996,7 @@ for escaped_tb in lst_escaped_tb:
                     "name": "action_poetry_install",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 57,
+                    "sequence": 41,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10076,29 +10012,7 @@ for escaped_tb in lst_escaped_tb:
                     "name": "action_pre_install_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 58,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
-        "Re-execute last new project"
-    ) as rec:
-        if rec._context.get("default_stage_Uc0"):
-            rec.last_new_project_cg.stage_id = self.env.ref(
-                "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
-            ).id
-        # TODO create a copy of new project and not modify older version
-        # TODO next sentence is not useful if made a copy
-        rec.last_new_project_cg.devops_exec_bundle_id = (
-            rec._context.get("devops_exec_bundle")
-        )
-        rec.last_new_project_cg.action_new_project()""",
-                    "name": "action_execute_last_stage_new_project",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 59,
+                    "sequence": 42,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10115,7 +10029,7 @@ for escaped_tb in lst_escaped_tb:
                         "self, ctx=None, default_port_http=8069,"
                         " default_port_longpolling=8072"
                     ),
-                    "sequence": 60,
+                    "sequence": 43,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10144,7 +10058,7 @@ for rec_o in self:
                     "name": "action_network_change_port_random",
                     "decorator": "@api.multi",
                     "param": "self, ctx=None, min_port=10000, max_port=20000",
-                    "sequence": 61,
+                    "sequence": 44,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10179,7 +10093,7 @@ return exec_id.log_all.strip() == "Port is open"''',
                     "name": "check_port_is_open",
                     "decorator": "@staticmethod",
                     "param": "rec, port",
-                    "sequence": 62,
+                    "sequence": 45,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10210,7 +10124,7 @@ return partner_ids, channel_ids""",
                     "name": "get_partner_channel",
                     "decorator": "@api.model",
                     "param": "self",
-                    "sequence": 63,
+                    "sequence": 46,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10262,7 +10176,7 @@ return self.env["devops.exec.error"].browse([a.id for a in lst_result])""",
                         " devops_exec_bundle_id, devops_exec_id,"
                         " parent_root_id, type_error"
                     ),
-                    "sequence": 64,
+                    "sequence": 47,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10386,7 +10300,7 @@ finally:
                         " succeed_msg=False, devops_cg_new_project=None,"
                         " ctx=None"
                     ),
-                    "sequence": 65,
+                    "sequence": 48,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10811,13 +10725,26 @@ volumes:
         addons_path = None
         # TODO this is not good, need a script from manifest to rebuild this path
         if rec.docker_config_gen_cg:
+            if rec.workspace_id.path_code_generator_to_generate:
+                str_path_gen = ",".join(
+                    [
+                        os.path.join(
+                            rec.workspace_id.path_working_erplibre, a
+                        )
+                        for a in rec.workspace_id.path_code_generator_to_generate.strip().split(
+                            ";"
+                        )
+                    ]
+                )
+            else:
+                str_path_gen = ""
             addons_path = (
                 "addons_path ="
                 f" {rec.workspace_id.path_working_erplibre}/odoo/addons,"
-                f"{rec.workspace_id.path_working_erplibre}/{rec.workspace_id.path_code_generator_to_generate},"
+                f"{str_path_gen},"
                 f"{rec.workspace_id.path_working_erplibre}/addons/OCA_web,"
-                f"{rec.workspace_id.path_working_erplibre}/addons{rec.workspace_id.path_working_erplibre}_erplibre_addons,"
-                f"{rec.workspace_id.path_working_erplibre}/addons{rec.workspace_id.path_working_erplibre}_erplibre_theme_addons,"
+                f"{rec.workspace_id.path_working_erplibre}/addons/ERPLibre_erplibre_addons,"
+                f"{rec.workspace_id.path_working_erplibre}/addons/ERPLibre_erplibre_theme_addons,"
                 f"{rec.workspace_id.path_working_erplibre}/addons/MathBenTech_development,"
                 f"{rec.workspace_id.path_working_erplibre}/addons/MathBenTech_erplibre-family-management,"
                 f"{rec.workspace_id.path_working_erplibre}/addons/MathBenTech_odoo-business-spending-management-quebec-canada,"
@@ -11073,6 +11000,51 @@ self.action_docker_check_docker_ps()""",
         )
 
         # Added one2many field, many2one need to be create before add one2many
+        model_model = "devops.cg"
+        dct_field = {
+            "module_ids": {
+                "field_description": "Module",
+                "ttype": "one2many",
+                "code_generator_sequence": 5,
+                "code_generator_form_simple_view_sequence": 12,
+                "code_generator_tree_view_sequence": 11,
+                "force_widget": "many2many_tags",
+                "relation": "devops.cg.module",
+                "relation_field": "code_generator",
+            },
+        }
+        code_generator_id.add_update_model_one2many(model_model, dct_field)
+
+        model_model = "devops.cg.model"
+        dct_field = {
+            "field_ids": {
+                "field_description": "Field",
+                "ttype": "one2many",
+                "code_generator_sequence": 4,
+                "code_generator_form_simple_view_sequence": 13,
+                "code_generator_tree_view_sequence": 13,
+                "force_widget": "many2many_tags",
+                "relation": "devops.cg.field",
+                "relation_field": "model_id",
+            },
+        }
+        code_generator_id.add_update_model_one2many(model_model, dct_field)
+
+        model_model = "devops.cg.module"
+        dct_field = {
+            "model_ids": {
+                "field_description": "Model",
+                "ttype": "one2many",
+                "code_generator_sequence": 4,
+                "code_generator_form_simple_view_sequence": 12,
+                "code_generator_tree_view_sequence": 12,
+                "force_widget": "many2many_tags",
+                "relation": "devops.cg.model",
+                "relation_field": "module_id",
+            },
+        }
+        code_generator_id.add_update_model_one2many(model_model, dct_field)
+
         model_model = "devops.cg.new_project"
         dct_field = {
             "devops_exec_ids": {
@@ -11109,51 +11081,6 @@ self.action_docker_check_docker_ps()""",
                 "readonly": True,
                 "relation": "devops.log.warning",
                 "relation_field": "new_project_id",
-            },
-        }
-        code_generator_id.add_update_model_one2many(model_model, dct_field)
-
-        model_model = "devops.code_generator"
-        dct_field = {
-            "module_ids": {
-                "field_description": "Module",
-                "ttype": "one2many",
-                "code_generator_sequence": 5,
-                "code_generator_form_simple_view_sequence": 12,
-                "code_generator_tree_view_sequence": 11,
-                "force_widget": "many2many_tags",
-                "relation": "devops.code_generator.module",
-                "relation_field": "code_generator",
-            },
-        }
-        code_generator_id.add_update_model_one2many(model_model, dct_field)
-
-        model_model = "devops.code_generator.module"
-        dct_field = {
-            "model_ids": {
-                "field_description": "Model",
-                "ttype": "one2many",
-                "code_generator_sequence": 4,
-                "code_generator_form_simple_view_sequence": 12,
-                "code_generator_tree_view_sequence": 12,
-                "force_widget": "many2many_tags",
-                "relation": "devops.code_generator.module.model",
-                "relation_field": "module_id",
-            },
-        }
-        code_generator_id.add_update_model_one2many(model_model, dct_field)
-
-        model_model = "devops.code_generator.module.model"
-        dct_field = {
-            "field_ids": {
-                "field_description": "Field",
-                "ttype": "one2many",
-                "code_generator_sequence": 4,
-                "code_generator_form_simple_view_sequence": 13,
-                "code_generator_tree_view_sequence": 13,
-                "force_widget": "many2many_tags",
-                "relation": "devops.code_generator.module.model.field",
-                "relation_field": "model_id",
             },
         }
         code_generator_id.add_update_model_one2many(model_model, dct_field)
@@ -11271,7 +11198,7 @@ self.action_docker_check_docker_ps()""",
                 "ttype": "one2many",
                 "force_domain": [("parent_id", "=", False)],
                 "code_generator_sequence": 14,
-                "code_generator_form_simple_view_sequence": 85,
+                "code_generator_form_simple_view_sequence": 54,
                 "relation": "devops.exec.bundle",
                 "relation_field": "devops_workspace",
             },
@@ -11279,7 +11206,7 @@ self.action_docker_check_docker_ps()""",
                 "field_description": "Executions error",
                 "ttype": "one2many",
                 "code_generator_sequence": 15,
-                "code_generator_form_simple_view_sequence": 86,
+                "code_generator_form_simple_view_sequence": 55,
                 "relation": "devops.exec.error",
                 "relation_field": "devops_workspace",
             },
@@ -11287,15 +11214,15 @@ self.action_docker_check_docker_ps()""",
                 "field_description": "Executions",
                 "ttype": "one2many",
                 "code_generator_sequence": 7,
-                "code_generator_form_simple_view_sequence": 84,
+                "code_generator_form_simple_view_sequence": 53,
                 "relation": "devops.exec",
                 "relation_field": "devops_workspace",
             },
             "log_makefile_target_ids": {
                 "field_description": "Makefile Targets",
                 "ttype": "one2many",
-                "code_generator_sequence": 21,
-                "code_generator_form_simple_view_sequence": 79,
+                "code_generator_sequence": 19,
+                "code_generator_form_simple_view_sequence": 48,
                 "relation": "devops.log.makefile.target",
                 "relation_field": "devops_workspace_id",
             },
@@ -11304,9 +11231,18 @@ self.action_docker_check_docker_ps()""",
                     "All new project associate with this workspace"
                 ),
                 "ttype": "one2many",
-                "code_generator_sequence": 84,
+                "code_generator_sequence": 56,
                 "relation": "devops.cg.new_project",
                 "relation_field": "devops_workspace",
+            },
+            "plan_cg_ids": {
+                "field_description": "Plan CG",
+                "ttype": "one2many",
+                "help": "All plan code generator associate to this workspace",
+                "code_generator_sequence": 54,
+                "code_generator_form_simple_view_sequence": 44,
+                "relation": "devops.plan.cg",
+                "relation_field": "workspace_id",
             },
         }
         code_generator_id.add_update_model_one2many(model_model, dct_field)
@@ -11363,6 +11299,2354 @@ _logger = logging.getLogger(__name__)""",
 
         # Generate view
         lst_view_id = []
+        # form view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_ids",
+                    "action_name": "module_ids",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "default_workspace_master",
+                    "action_name": "default_workspace_master",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "force_clean_before_generate",
+                    "action_name": "force_clean_before_generate",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "form",
+                    "view_name": "devops_cg_form",
+                    "view_attr_string": "Titre",
+                    "m2o_model": model_devops_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "has_body_sheet": True,
+                    "id_name": "devops_cg_view_form",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # graph view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "graph",
+                    "view_name": "devops_cg_graph",
+                    "view_attr_string": "DevOps code generator",
+                    "m2o_model": model_devops_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_view_graph",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # kanban view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_ids",
+                    "action_name": "module_ids",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_templates_p1 = env[
+                "code.generator.view.item"
+            ].create(
+                {
+                    "section_type": "body",
+                    "item_type": "templates",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_templates_p1.id)
+
+            view_item_body_t_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "t",
+                    "t_name": "kanban-box",
+                    "parent_id": view_item_body_templates_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_t_p2.id)
+
+            view_item_body_div_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "t_attf_class": "oe_kanban_global_click",
+                    "parent_id": view_item_body_t_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p3.id)
+
+            view_item_body_div_p4 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "class_attr": "oe_kanban_details",
+                    "parent_id": view_item_body_div_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p4.id)
+
+            view_item_body_ul_p5 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "ul",
+                    "parent_id": view_item_body_div_p4.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_ul_p5.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_ids",
+                    "action_name": "module_ids",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "kanban",
+                    "view_name": "devops_cg_kanban",
+                    "view_attr_class": "o_kanban_mobile",
+                    "m2o_model": model_devops_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_view_kanban",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # pivot view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "pivot",
+                    "view_name": "devops_cg_pivot",
+                    "view_attr_string": "DevOps code generator",
+                    "m2o_model": model_devops_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_view_pivot",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # search view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "name",
+                    "domain": "[('name','!=',False)]",
+                    "label": "Name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "module_ids",
+                    "domain": "[('module_ids','!=',False)]",
+                    "label": "No module",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "search",
+                    "view_name": "devops_cg_search",
+                    "view_attr_string": "DevOps code generator",
+                    "m2o_model": model_devops_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_view_search",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # tree view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "module_ids",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "force_clean_before_generate",
+                    "action_name": "force_clean_before_generate",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "tree",
+                    "view_name": "devops_cg_tree",
+                    "m2o_model": model_devops_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_view_tree",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # form view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "type",
+                    "action_name": "type",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "relation",
+                    "attrs": (
+                        "{'invisible': [('type', 'not in', ['many2one',"
+                        " 'many2many', 'one2many'])]}"
+                    ),
+                    "action_name": "relation",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "relation_manual",
+                    "attrs": (
+                        "{'invisible': ['|', ('type', 'not in', ['many2one',"
+                        " 'many2many', 'one2many']), ('relation', '!=',"
+                        " False)]}"
+                    ),
+                    "action_name": "relation_manual",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_relation",
+                    "attrs": (
+                        "{'invisible': [('type', 'not in', ['one2many'])]}"
+                    ),
+                    "action_name": "field_relation",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_relation_manual",
+                    "attrs": (
+                        "{'invisible': ['|', ('type', 'not in', ['one2many']),"
+                        " ('field_relation', '!=', False)]}"
+                    ),
+                    "action_name": "field_relation_manual",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "help",
+                    "action_name": "help",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 7,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_id",
+                    "action_name": "model_id",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "form",
+                    "view_name": "devops_cg_field_form",
+                    "view_attr_string": "Titre",
+                    "m2o_model": model_devops_cg_field.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "has_body_sheet": True,
+                    "id_name": "devops_cg_field_view_form",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # graph view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "help",
+                    "action_name": "help",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "model_id",
+                    "action_name": "model_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "type",
+                    "action_name": "type",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "graph",
+                    "view_name": "devops_cg_field_graph",
+                    "view_attr_string": (
+                        "DevOps code generator module model field"
+                    ),
+                    "m2o_model": model_devops_cg_field.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_field_view_graph",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # kanban view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "help",
+                    "action_name": "help",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_id",
+                    "action_name": "model_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "type",
+                    "action_name": "type",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_templates_p1 = env[
+                "code.generator.view.item"
+            ].create(
+                {
+                    "section_type": "body",
+                    "item_type": "templates",
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_templates_p1.id)
+
+            view_item_body_t_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "t",
+                    "t_name": "kanban-box",
+                    "parent_id": view_item_body_templates_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_t_p2.id)
+
+            view_item_body_div_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "t_attf_class": "oe_kanban_global_click",
+                    "parent_id": view_item_body_t_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p3.id)
+
+            view_item_body_div_p4 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "class_attr": "oe_kanban_details",
+                    "parent_id": view_item_body_div_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p4.id)
+
+            view_item_body_ul_p5 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "ul",
+                    "parent_id": view_item_body_div_p4.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_ul_p5.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "help",
+                    "action_name": "help",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_id",
+                    "action_name": "model_id",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "type",
+                    "action_name": "type",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "kanban",
+                    "view_name": "devops_cg_field_kanban",
+                    "view_attr_class": "o_kanban_mobile",
+                    "m2o_model": model_devops_cg_field.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_field_view_kanban",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # pivot view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "help",
+                    "action_name": "help",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "model_id",
+                    "action_name": "model_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "type",
+                    "action_name": "type",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "pivot",
+                    "view_name": "devops_cg_field_pivot",
+                    "view_attr_string": (
+                        "DevOps code generator module model field"
+                    ),
+                    "m2o_model": model_devops_cg_field.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_field_view_pivot",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # search view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "name",
+                    "domain": "[('name','!=',False)]",
+                    "label": "Name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "help",
+                    "domain": "[('help','!=',False)]",
+                    "label": "Help",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "model_id",
+                    "domain": "[('model_id','!=',False)]",
+                    "label": "Model",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "type",
+                    "domain": "[('type','!=',False)]",
+                    "label": "Type",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "search",
+                    "view_name": "devops_cg_field_search",
+                    "view_attr_string": (
+                        "DevOps code generator module model field"
+                    ),
+                    "m2o_model": model_devops_cg_field.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_field_view_search",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # tree view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "has_error",
+                    "invisible": "True",
+                    "action_name": "has_error",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_id",
+                    "action_name": "model_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "type",
+                    "action_name": "type",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "relation",
+                    "action_name": "relation",
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "relation_manual",
+                    "action_name": "relation_manual",
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_relation",
+                    "action_name": "field_relation",
+                    "sequence": 7,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_relation_manual",
+                    "action_name": "field_relation_manual",
+                    "sequence": 8,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "help",
+                    "action_name": "help",
+                    "sequence": 9,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 10,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "tree",
+                    "view_name": "devops_cg_field_tree",
+                    "view_attr_decoration_danger": "has_error",
+                    "m2o_model": model_devops_cg_field.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_field_view_tree",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # form view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "description",
+                    "action_name": "description",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_id",
+                    "action_name": "module_id",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_ids",
+                    "action_name": "field_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "form",
+                    "view_name": "devops_cg_model_form",
+                    "view_attr_string": "Titre",
+                    "m2o_model": model_devops_cg_model.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "has_body_sheet": True,
+                    "id_name": "devops_cg_model_view_form",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # graph view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "description",
+                    "action_name": "description",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "module_id",
+                    "action_name": "module_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "graph",
+                    "view_name": "devops_cg_model_graph",
+                    "view_attr_string": "DevOps code generator module model",
+                    "m2o_model": model_devops_cg_model.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_model_view_graph",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # kanban view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "description",
+                    "action_name": "description",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_id",
+                    "action_name": "module_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_ids",
+                    "action_name": "field_ids",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_templates_p1 = env[
+                "code.generator.view.item"
+            ].create(
+                {
+                    "section_type": "body",
+                    "item_type": "templates",
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_templates_p1.id)
+
+            view_item_body_t_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "t",
+                    "t_name": "kanban-box",
+                    "parent_id": view_item_body_templates_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_t_p2.id)
+
+            view_item_body_div_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "t_attf_class": "oe_kanban_global_click",
+                    "parent_id": view_item_body_t_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p3.id)
+
+            view_item_body_div_p4 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "class_attr": "oe_kanban_details",
+                    "parent_id": view_item_body_div_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p4.id)
+
+            view_item_body_ul_p5 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "ul",
+                    "parent_id": view_item_body_div_p4.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_ul_p5.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "description",
+                    "action_name": "description",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_id",
+                    "action_name": "module_id",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_ids",
+                    "action_name": "field_ids",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "kanban",
+                    "view_name": "devops_cg_model_kanban",
+                    "view_attr_class": "o_kanban_mobile",
+                    "m2o_model": model_devops_cg_model.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_model_view_kanban",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # pivot view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "description",
+                    "action_name": "description",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "module_id",
+                    "action_name": "module_id",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "pivot",
+                    "view_name": "devops_cg_model_pivot",
+                    "view_attr_string": "DevOps code generator module model",
+                    "m2o_model": model_devops_cg_model.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_model_view_pivot",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # search view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "name",
+                    "domain": "[('name','!=',False)]",
+                    "label": "Name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "description",
+                    "domain": "[('description','!=',False)]",
+                    "label": "Description",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "module_id",
+                    "domain": "[('module_id','!=',False)]",
+                    "label": "Module",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "field_ids",
+                    "domain": "[('field_ids','!=',False)]",
+                    "label": "No field",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "search",
+                    "view_name": "devops_cg_model_search",
+                    "view_attr_string": "DevOps code generator module model",
+                    "m2o_model": model_devops_cg_model.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_model_view_search",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # tree view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "module_id",
+                    "action_name": "module_id",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "description",
+                    "action_name": "description",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "field_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "field_ids",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "tree",
+                    "view_name": "devops_cg_model_tree",
+                    "m2o_model": model_devops_cg_model.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_model_view_tree",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # form view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "code_generator",
+                    "action_name": "code_generator",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_ids",
+                    "action_name": "model_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "action_name": "devops_workspace_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "form",
+                    "view_name": "devops_cg_module_form",
+                    "view_attr_string": "Titre",
+                    "m2o_model": model_devops_cg_module.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "has_body_sheet": True,
+                    "id_name": "devops_cg_module_view_form",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # graph view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "code_generator",
+                    "action_name": "code_generator",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "graph",
+                    "view_name": "devops_cg_module_graph",
+                    "view_attr_string": "DevOps code generator module",
+                    "m2o_model": model_devops_cg_module.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_module_view_graph",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # kanban view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "code_generator",
+                    "action_name": "code_generator",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_ids",
+                    "action_name": "model_ids",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_templates_p1 = env[
+                "code.generator.view.item"
+            ].create(
+                {
+                    "section_type": "body",
+                    "item_type": "templates",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_templates_p1.id)
+
+            view_item_body_t_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "t",
+                    "t_name": "kanban-box",
+                    "parent_id": view_item_body_templates_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_t_p2.id)
+
+            view_item_body_div_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "t_attf_class": "oe_kanban_global_click",
+                    "parent_id": view_item_body_t_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p3.id)
+
+            view_item_body_div_p4 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "class_attr": "oe_kanban_details",
+                    "parent_id": view_item_body_div_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p4.id)
+
+            view_item_body_ul_p5 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "ul",
+                    "parent_id": view_item_body_div_p4.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_ul_p5.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "code_generator",
+                    "action_name": "code_generator",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_ids",
+                    "action_name": "model_ids",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "kanban",
+                    "view_name": "devops_cg_module_kanban",
+                    "view_attr_class": "o_kanban_mobile",
+                    "m2o_model": model_devops_cg_module.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_module_view_kanban",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # pivot view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "code_generator",
+                    "action_name": "code_generator",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "pivot",
+                    "view_name": "devops_cg_module_pivot",
+                    "view_attr_string": "DevOps code generator module",
+                    "m2o_model": model_devops_cg_module.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_module_view_pivot",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # search view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "name",
+                    "domain": "[('name','!=',False)]",
+                    "label": "Name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "code_generator",
+                    "domain": "[('code_generator','!=',False)]",
+                    "label": "Code Generator",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "model_ids",
+                    "domain": "[('model_ids','!=',False)]",
+                    "label": "No model",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "search",
+                    "view_name": "devops_cg_module_search",
+                    "view_attr_string": "DevOps code generator module",
+                    "m2o_model": model_devops_cg_module.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_module_view_search",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # tree view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "code_generator",
+                    "action_name": "code_generator",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "model_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "model_ids",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_workspace_ids",
+                    "widget": "many2many_tags",
+                    "action_name": "devops_workspace_ids",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "tree",
+                    "view_name": "devops_cg_module_tree",
+                    "m2o_model": model_devops_cg_module.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_cg_module_view_tree",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
         # form view
         if True:
             lst_item_view = []
@@ -14474,2382 +16758,6 @@ _logger = logging.getLogger(__name__)""",
                     "m2o_model": model_devops_cg_new_project_stage.id,
                     "view_item_ids": [(6, 0, lst_item_view)],
                     "id_name": "devops_cg_new_project_stage_tree",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # form view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item_body_group_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p2.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_ids",
-                    "action_name": "module_ids",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "default_workspace_master",
-                    "action_name": "default_workspace_master",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "force_clean_before_generate",
-                    "action_name": "force_clean_before_generate",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "form",
-                    "view_name": "devops_code_generator_form",
-                    "view_attr_string": "Titre",
-                    "m2o_model": model_devops_code_generator.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "has_body_sheet": True,
-                    "id_name": "devops_code_generator_view_form",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # graph view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "graph",
-                    "view_name": "devops_code_generator_graph",
-                    "view_attr_string": "DevOps code generator",
-                    "m2o_model": model_devops_code_generator.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_view_graph",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # kanban view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_ids",
-                    "action_name": "module_ids",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_templates_p1 = env[
-                "code.generator.view.item"
-            ].create(
-                {
-                    "section_type": "body",
-                    "item_type": "templates",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_templates_p1.id)
-
-            view_item_body_t_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "t",
-                    "t_name": "kanban-box",
-                    "parent_id": view_item_body_templates_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_t_p2.id)
-
-            view_item_body_div_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "t_attf_class": "oe_kanban_global_click",
-                    "parent_id": view_item_body_t_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p3.id)
-
-            view_item_body_div_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "class_attr": "oe_kanban_details",
-                    "parent_id": view_item_body_div_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p4.id)
-
-            view_item_body_ul_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "ul",
-                    "parent_id": view_item_body_div_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_ul_p5.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_ids",
-                    "action_name": "module_ids",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "kanban",
-                    "view_name": "devops_code_generator_kanban",
-                    "view_attr_class": "o_kanban_mobile",
-                    "m2o_model": model_devops_code_generator.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_view_kanban",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # pivot view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "pivot",
-                    "view_name": "devops_code_generator_pivot",
-                    "view_attr_string": "DevOps code generator",
-                    "m2o_model": model_devops_code_generator.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_view_pivot",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # search view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "name",
-                    "domain": "[('name','!=',False)]",
-                    "label": "Name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "module_ids",
-                    "domain": "[('module_ids','!=',False)]",
-                    "label": "No module",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "search",
-                    "view_name": "devops_code_generator_search",
-                    "view_attr_string": "DevOps code generator",
-                    "m2o_model": model_devops_code_generator.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_view_search",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # tree view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "module_ids",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "force_clean_before_generate",
-                    "action_name": "force_clean_before_generate",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "tree",
-                    "view_name": "devops_code_generator_tree",
-                    "m2o_model": model_devops_code_generator.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_view_tree",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # form view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "code_generator",
-                    "action_name": "code_generator",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_ids",
-                    "action_name": "model_ids",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "form",
-                    "view_name": "devops_code_generator_module_form",
-                    "view_attr_string": "Titre",
-                    "m2o_model": model_devops_code_generator_module.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "has_body_sheet": True,
-                    "id_name": "devops_code_generator_module_view_form",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # graph view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "code_generator",
-                    "action_name": "code_generator",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "graph",
-                    "view_name": "devops_code_generator_module_graph",
-                    "view_attr_string": "DevOps code generator module",
-                    "m2o_model": model_devops_code_generator_module.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_view_graph",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # kanban view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "code_generator",
-                    "action_name": "code_generator",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_ids",
-                    "action_name": "model_ids",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_templates_p1 = env[
-                "code.generator.view.item"
-            ].create(
-                {
-                    "section_type": "body",
-                    "item_type": "templates",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_templates_p1.id)
-
-            view_item_body_t_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "t",
-                    "t_name": "kanban-box",
-                    "parent_id": view_item_body_templates_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_t_p2.id)
-
-            view_item_body_div_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "t_attf_class": "oe_kanban_global_click",
-                    "parent_id": view_item_body_t_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p3.id)
-
-            view_item_body_div_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "class_attr": "oe_kanban_details",
-                    "parent_id": view_item_body_div_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p4.id)
-
-            view_item_body_ul_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "ul",
-                    "parent_id": view_item_body_div_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_ul_p5.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "code_generator",
-                    "action_name": "code_generator",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_ids",
-                    "action_name": "model_ids",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "kanban",
-                    "view_name": "devops_code_generator_module_kanban",
-                    "view_attr_class": "o_kanban_mobile",
-                    "m2o_model": model_devops_code_generator_module.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_view_kanban",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # pivot view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "code_generator",
-                    "action_name": "code_generator",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "pivot",
-                    "view_name": "devops_code_generator_module_pivot",
-                    "view_attr_string": "DevOps code generator module",
-                    "m2o_model": model_devops_code_generator_module.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_view_pivot",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # search view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "name",
-                    "domain": "[('name','!=',False)]",
-                    "label": "Name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "code_generator",
-                    "domain": "[('code_generator','!=',False)]",
-                    "label": "Code Generator",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "model_ids",
-                    "domain": "[('model_ids','!=',False)]",
-                    "label": "No model",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "search",
-                    "view_name": "devops_code_generator_module_search",
-                    "view_attr_string": "DevOps code generator module",
-                    "m2o_model": model_devops_code_generator_module.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_view_search",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # tree view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "code_generator",
-                    "action_name": "code_generator",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "model_ids",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "tree",
-                    "view_name": "devops_code_generator_module_tree",
-                    "m2o_model": model_devops_code_generator_module.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_view_tree",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # form view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "description",
-                    "action_name": "description",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_id",
-                    "action_name": "module_id",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_ids",
-                    "action_name": "field_ids",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "form",
-                    "view_name": "devops_code_generator_module_model_form",
-                    "view_attr_string": "Titre",
-                    "m2o_model": model_devops_code_generator_module_model.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "has_body_sheet": True,
-                    "id_name": "devops_code_generator_module_model_view_form",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # graph view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "description",
-                    "action_name": "description",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "module_id",
-                    "action_name": "module_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "graph",
-                    "view_name": "devops_code_generator_module_model_graph",
-                    "view_attr_string": "DevOps code generator module model",
-                    "m2o_model": model_devops_code_generator_module_model.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_model_view_graph",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # kanban view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "description",
-                    "action_name": "description",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_id",
-                    "action_name": "module_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_ids",
-                    "action_name": "field_ids",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_templates_p1 = env[
-                "code.generator.view.item"
-            ].create(
-                {
-                    "section_type": "body",
-                    "item_type": "templates",
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_templates_p1.id)
-
-            view_item_body_t_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "t",
-                    "t_name": "kanban-box",
-                    "parent_id": view_item_body_templates_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_t_p2.id)
-
-            view_item_body_div_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "t_attf_class": "oe_kanban_global_click",
-                    "parent_id": view_item_body_t_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p3.id)
-
-            view_item_body_div_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "class_attr": "oe_kanban_details",
-                    "parent_id": view_item_body_div_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p4.id)
-
-            view_item_body_ul_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "ul",
-                    "parent_id": view_item_body_div_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_ul_p5.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "description",
-                    "action_name": "description",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_id",
-                    "action_name": "module_id",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_ids",
-                    "action_name": "field_ids",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "kanban",
-                    "view_name": "devops_code_generator_module_model_kanban",
-                    "view_attr_class": "o_kanban_mobile",
-                    "m2o_model": model_devops_code_generator_module_model.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_view_kanban"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # pivot view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "description",
-                    "action_name": "description",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "module_id",
-                    "action_name": "module_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "pivot",
-                    "view_name": "devops_code_generator_module_model_pivot",
-                    "view_attr_string": "DevOps code generator module model",
-                    "m2o_model": model_devops_code_generator_module_model.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_model_view_pivot",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # search view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "name",
-                    "domain": "[('name','!=',False)]",
-                    "label": "Name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "description",
-                    "domain": "[('description','!=',False)]",
-                    "label": "Description",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "module_id",
-                    "domain": "[('module_id','!=',False)]",
-                    "label": "Module",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "field_ids",
-                    "domain": "[('field_ids','!=',False)]",
-                    "label": "No field",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "search",
-                    "view_name": "devops_code_generator_module_model_search",
-                    "view_attr_string": "DevOps code generator module model",
-                    "m2o_model": model_devops_code_generator_module_model.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_view_search"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # tree view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "module_id",
-                    "action_name": "module_id",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "description",
-                    "action_name": "description",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "field_ids",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "tree",
-                    "view_name": "devops_code_generator_module_model_tree",
-                    "m2o_model": model_devops_code_generator_module_model.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": "devops_code_generator_module_model_view_tree",
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # form view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item_body_group_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p2.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "type",
-                    "action_name": "type",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "relation",
-                    "attrs": (
-                        "{'invisible': [('type', 'not in', ['many2one',"
-                        " 'many2many', 'one2many'])]}"
-                    ),
-                    "action_name": "relation",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "relation_manual",
-                    "attrs": (
-                        "{'invisible': ['|', ('type', 'not in', ['many2one',"
-                        " 'many2many', 'one2many']), ('relation', '!=',"
-                        " False)]}"
-                    ),
-                    "action_name": "relation_manual",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_relation",
-                    "attrs": (
-                        "{'invisible': [('type', 'not in', ['one2many'])]}"
-                    ),
-                    "action_name": "field_relation",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_relation_manual",
-                    "attrs": (
-                        "{'invisible': ['|', ('type', 'not in', ['one2many']),"
-                        " ('field_relation', '!=', False)]}"
-                    ),
-                    "action_name": "field_relation_manual",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "help",
-                    "action_name": "help",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 7,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p1 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p1.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_id",
-                    "action_name": "model_id",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "action_name": "devops_workspace_ids",
-                    "parent_id": view_item_body_group_p1.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "form",
-                    "view_name": (
-                        "devops_code_generator_module_model_field_form"
-                    ),
-                    "view_attr_string": "Titre",
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "has_body_sheet": True,
-                    "id_name": (
-                        "devops_code_generator_module_model_field_view_form"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # graph view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "help",
-                    "action_name": "help",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "model_id",
-                    "action_name": "model_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "type",
-                    "action_name": "type",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "graph",
-                    "view_name": (
-                        "devops_code_generator_module_model_field_graph"
-                    ),
-                    "view_attr_string": (
-                        "DevOps code generator module model field"
-                    ),
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_field_view_graph"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # kanban view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "help",
-                    "action_name": "help",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_id",
-                    "action_name": "model_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "type",
-                    "action_name": "type",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_templates_p1 = env[
-                "code.generator.view.item"
-            ].create(
-                {
-                    "section_type": "body",
-                    "item_type": "templates",
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_templates_p1.id)
-
-            view_item_body_t_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "t",
-                    "t_name": "kanban-box",
-                    "parent_id": view_item_body_templates_p1.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_t_p2.id)
-
-            view_item_body_div_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "t_attf_class": "oe_kanban_global_click",
-                    "parent_id": view_item_body_t_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p3.id)
-
-            view_item_body_div_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "class_attr": "oe_kanban_details",
-                    "parent_id": view_item_body_div_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p4.id)
-
-            view_item_body_ul_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "ul",
-                    "parent_id": view_item_body_div_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_ul_p5.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "help",
-                    "action_name": "help",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_id",
-                    "action_name": "model_id",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_li_p6 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "li",
-                    "class_attr": "mb4",
-                    "parent_id": view_item_body_ul_p5.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_li_p6.id)
-
-            view_item_body_strong_p7 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "strong",
-                    "parent_id": view_item_body_li_p6.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_strong_p7.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "type",
-                    "action_name": "type",
-                    "parent_id": view_item_body_strong_p7.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "kanban",
-                    "view_name": (
-                        "devops_code_generator_module_model_field_kanban"
-                    ),
-                    "view_attr_class": "o_kanban_mobile",
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_field_view_kanban"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # pivot view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "help",
-                    "action_name": "help",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "model_id",
-                    "action_name": "model_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "type": "row",
-                    "name": "type",
-                    "action_name": "type",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "pivot",
-                    "view_name": (
-                        "devops_code_generator_module_model_field_pivot"
-                    ),
-                    "view_attr_string": (
-                        "DevOps code generator module model field"
-                    ),
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_field_view_pivot"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # search view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "name",
-                    "domain": "[('name','!=',False)]",
-                    "label": "Name",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "help",
-                    "domain": "[('help','!=',False)]",
-                    "label": "Help",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "model_id",
-                    "domain": "[('model_id','!=',False)]",
-                    "label": "Model",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "filter",
-                    "name": "type",
-                    "domain": "[('type','!=',False)]",
-                    "label": "Type",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "search",
-                    "view_name": (
-                        "devops_code_generator_module_model_field_search"
-                    ),
-                    "view_attr_string": (
-                        "DevOps code generator module model field"
-                    ),
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_field_view_search"
-                    ),
-                }
-            )
-            lst_view_id.append(view_code_generator.id)
-
-        # tree view
-        if True:
-            lst_item_view = []
-            # BODY
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "has_error",
-                    "invisible": "True",
-                    "action_name": "has_error",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "name",
-                    "action_name": "name",
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_id",
-                    "action_name": "model_id",
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "type",
-                    "action_name": "type",
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "relation",
-                    "action_name": "relation",
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "relation_manual",
-                    "action_name": "relation_manual",
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_relation",
-                    "action_name": "field_relation",
-                    "sequence": 7,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "field_relation_manual",
-                    "action_name": "field_relation_manual",
-                    "sequence": 8,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "help",
-                    "action_name": "help",
-                    "sequence": 9,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_workspace_ids",
-                    "widget": "many2many_tags",
-                    "action_name": "devops_workspace_ids",
-                    "sequence": 10,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_code_generator = env["code.generator.view"].create(
-                {
-                    "code_generator_id": code_generator_id.id,
-                    "view_type": "tree",
-                    "view_name": (
-                        "devops_code_generator_module_model_field_tree"
-                    ),
-                    "view_attr_decoration_danger": "has_error",
-                    "m2o_model": model_devops_code_generator_module_model_field.id,
-                    "view_item_ids": [(6, 0, lst_item_view)],
-                    "id_name": (
-                        "devops_code_generator_module_model_field_view_tree"
-                    ),
                 }
             )
             lst_view_id.append(view_code_generator.id)
@@ -21842,6 +21750,7 @@ _logger = logging.getLogger(__name__)""",
                     "item_type": "button",
                     "name": "state_goto_a_b_field",
                     "class_attr": "btn btn-default",
+                    "invisible": "True",
                     "action_name": "state_goto_a_b_field",
                     "button_type": "btn-default",
                     "label": "Add field",
@@ -21857,6 +21766,7 @@ _logger = logging.getLogger(__name__)""",
                     "item_type": "button",
                     "name": "state_goto_a_c_action",
                     "class_attr": "btn btn-default",
+                    "invisible": "True",
                     "action_name": "state_goto_a_c_action",
                     "button_type": "btn-default",
                     "label": "Add action",
@@ -21872,6 +21782,7 @@ _logger = logging.getLogger(__name__)""",
                     "item_type": "button",
                     "name": "state_goto_a_d_view",
                     "class_attr": "btn btn-default",
+                    "invisible": "True",
                     "action_name": "state_goto_a_d_view",
                     "button_type": "btn-default",
                     "label": "Add view",
@@ -21974,22 +21885,10 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "model_name",
-                    "action_name": "model_name",
+                    "name": "model_ids",
+                    "action_name": "model_ids",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "model_description",
-                    "action_name": "model_description",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -22341,6 +22240,19 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
+                    "name": "plan_cg_id",
+                    "attrs": "{'invisible': [('plan_cg_id', '=', False)]}",
+                    "action_name": "plan_cg_id",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
                     "name": "generated_new_project_id",
                     "attrs": (
                         "{'invisible': [('generated_new_project_id', '=',"
@@ -22348,7 +22260,7 @@ _logger = logging.getLogger(__name__)""",
                     ),
                     "action_name": "generated_new_project_id",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
+                    "sequence": 2,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -22363,7 +22275,7 @@ _logger = logging.getLogger(__name__)""",
                     ),
                     "action_name": "create_workspace_id",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
+                    "sequence": 3,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -22379,6 +22291,1159 @@ _logger = logging.getLogger(__name__)""",
                     "inherit_view_name": (
                         "multi_step_wizard.multi_step_wizard_form"
                     ),
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # form view
+        if True:
+            lst_item_view = []
+            # HEADER
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "header",
+                    "item_type": "button",
+                    "name": "action_execute_last_stage_new_project",
+                    "class_attr": "btn-warning",
+                    "attrs": (
+                        "{'invisible': [('has_re_execute_new_project', '=',"
+                        " False)]}"
+                    ),
+                    "action_name": "action_execute_last_stage_new_project",
+                    "button_type": "btn-warning",
+                    "label": "Re-execute last",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "header",
+                    "item_type": "button",
+                    "name": "action_execute_last_stage_new_project",
+                    "context": "{'default_stage_Uc0': True}",
+                    "class_attr": "btn-warning",
+                    "attrs": (
+                        "{'invisible': [('has_re_execute_new_project', '=',"
+                        " False)]}"
+                    ),
+                    "action_name": "action_execute_last_stage_new_project",
+                    "button_type": "btn-warning",
+                    "label": "Re-execute Uc0",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            # BODY
+            view_item_body_div_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "name": "button_box",
+                    "class_attr": "oe_button_box",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p1.id)
+
+            view_item_body_button_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "toggle_active",
+                    "class_attr": "oe_stat_button",
+                    "action_name": "toggle_active",
+                    "button_type": "oe_stat_button",
+                    "icon": "fa-archive",
+                    "parent_id": view_item_body_div_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_button_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "active",
+                    "widget": "boolean_button",
+                    "options": '{"terminology": "archive"}',
+                    "action_name": "active",
+                    "parent_id": view_item_body_button_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "invisible": "True",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "has_re_execute_new_project",
+                    "action_name": "has_re_execute_new_project",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "html",
+                    "class_attr": "bg-warning",
+                    "background_type": "bg-warning",
+                    "label": "Create new project with code generator",
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Action CG",
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_install_and_generate_all_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": (
+                        "action_install_and_generate_all_generated_module"
+                    ),
+                    "button_type": "oe_highlight",
+                    "label": "All",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_code_generator_generate_all",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_code_generator_generate_all",
+                    "button_type": "oe_highlight",
+                    "label": "Generate all",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_install_all_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_install_all_generated_module",
+                    "button_type": "oe_highlight",
+                    "label": "Install all",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_refresh_meta_cg_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_refresh_meta_cg_generated_module",
+                    "button_type": "oe_highlight",
+                    "label": "Refresh CG",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_install_all_uca_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_install_all_uca_generated_module",
+                    "button_type": "oe_highlight",
+                    "label": "Install UCA",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_install_all_ucb_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_install_all_ucb_generated_module",
+                    "button_type": "oe_highlight",
+                    "label": "Install UCB",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Action addons",
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_clear_all_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_clear_all_generated_module",
+                    "button_type": "oe_highlight",
+                    "label": "Clear all",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_git_commit_all_generated_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_git_commit_all_generated_module",
+                    "button_type": "oe_highlight",
+                    "label": "Git commit",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_open_terminal_tig",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_open_terminal_tig",
+                    "button_type": "oe_highlight",
+                    "label": "Terminal tig",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_open_terminal_addons",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_open_terminal_addons",
+                    "button_type": "oe_highlight",
+                    "label": "Terminal addons",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "need_debugger_cg_erplibre_devops",
+                    "invisible": "True",
+                    "action_name": "need_debugger_cg_erplibre_devops",
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "CG new project",
+                    "sequence": 7,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_open_terminal_path_erplibre_devops",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_open_terminal_path_erplibre_devops",
+                    "button_type": "oe_highlight",
+                    "label": "Terminal path erplibre_devops",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_format_erplibre_devops",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_format_erplibre_devops",
+                    "button_type": "oe_highlight",
+                    "label": "Format module erplibre_devops",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_update_erplibre_devops",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_update_erplibre_devops",
+                    "button_type": "oe_highlight",
+                    "label": "Update module erplibre_devops",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "workspace_CG_remove_module",
+                    "class_attr": "oe_highlight",
+                    "action_name": "workspace_CG_remove_module",
+                    "button_type": "oe_highlight",
+                    "label": "Clear modules",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "workspace_CG_git_commit",
+                    "class_attr": "oe_highlight",
+                    "action_name": "workspace_CG_git_commit",
+                    "button_type": "oe_highlight",
+                    "label": "Git commit",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_cg_setup_pycharm_debug",
+                    "class_attr": "oe_highlight",
+                    "attrs": (
+                        "{'invisible': [('need_debugger_cg_erplibre_devops',"
+                        " '=', False)]}"
+                    ),
+                    "action_name": "action_cg_setup_pycharm_debug",
+                    "button_type": "oe_highlight",
+                    "label": "Setup Pycharm debug",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "sequence": 8,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Action other",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_cg_generate_demo",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_cg_generate_demo",
+                    "button_type": "oe_highlight",
+                    "label": "Generate demo",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "is_clear_before_cg_demo",
+                    "action_name": "is_clear_before_cg_demo",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "cg_demo_type_data",
+                    "action_name": "cg_demo_type_data",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Execution",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "last_new_project_cg",
+                    "action_name": "last_new_project_cg",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "stop_execution_if_env_not_clean",
+                    "action_name": "stop_execution_if_env_not_clean",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "cg_self_add_config_cg",
+                    "action_name": "cg_self_add_config_cg",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "name": "group_cg_uca",
+                    "label": "CG config UcA",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "config_uca_enable_export_data",
+                    "action_name": "config_uca_enable_export_data",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Log",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_erplibre_devops_error_log",
+                    "attrs": (
+                        "{'invisible':"
+                        " [('devops_cg_erplibre_devops_error_log', '=',"
+                        " False)]}"
+                    ),
+                    "action_name": "devops_cg_erplibre_devops_error_log",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_erplibre_devops_log",
+                    "action_name": "devops_cg_erplibre_devops_log",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "name": "group_cg_config",
+                    "label": "CG config view",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view",
+                    "action_name": "mode_view",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view_snippet",
+                    "action_name": "mode_view_snippet",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view_snippet_enable_template_website_snippet_view",
+                    "action_name": "mode_view_snippet_enable_template_website_snippet_view",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view_snippet_template_generate_website_snippet_generic_mdl",
+                    "action_name": "mode_view_snippet_template_generate_website_snippet_generic_mdl",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view_snippet_template_generate_website_snippet_ctrl_featur",
+                    "action_name": "mode_view_snippet_template_generate_website_snippet_ctrl_featur",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view_snippet_template_generate_website_enable_javascript",
+                    "action_name": "mode_view_snippet_template_generate_website_enable_javascript",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "mode_view_snippet_template_generate_website_snippet_type",
+                    "action_name": "mode_view_snippet_template_generate_website_snippet_type",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 7,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Configuration",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "code_mode_context_generator",
+                    "action_name": "code_mode_context_generator",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "path_code_generator_to_generate",
+                    "action_name": "path_code_generator_to_generate",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "path_working_erplibre",
+                    "action_name": "path_working_erplibre",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Generator",
+                    "sequence": 9,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "id",
+                    "invisible": "True",
+                    "action_name": "id",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_ids",
+                    "widget": "many2many",
+                    "context": "{'default_devops_workspace_ids': [id]}",
+                    "options": "{'always_reload': True}",
+                    "action_name": "devops_cg_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_module_ids",
+                    "widget": "many2many",
+                    "context": "{'default_devops_workspace_ids': [id]}",
+                    "options": "{'always_reload': True}",
+                    "action_name": "devops_cg_module_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_model_ids",
+                    "widget": "many2many",
+                    "context": "{'default_devops_workspace_ids': [id]}",
+                    "options": "{'always_reload': True}",
+                    "action_name": "devops_cg_model_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_field_ids",
+                    "widget": "many2many",
+                    "context": "{'default_devops_workspace_ids': [id]}",
+                    "options": "{'always_reload': True}",
+                    "action_name": "devops_cg_field_ids",
+                    "parent_id": view_item_body_group_p1.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "form",
+                    "view_name": "devops_plan_cg_form",
+                    "view_attr_string": "Titre",
+                    "m2o_model": model_devops_plan_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "has_body_sheet": True,
+                    "id_name": "devops_plan_cg_view_form",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # graph view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "graph",
+                    "view_name": "devops_plan_cg_graph",
+                    "view_attr_string": "Devops plan cg",
+                    "m2o_model": model_devops_plan_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_plan_cg_view_graph",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # kanban view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_templates_p1 = env[
+                "code.generator.view.item"
+            ].create(
+                {
+                    "section_type": "body",
+                    "item_type": "templates",
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_templates_p1.id)
+
+            view_item_body_t_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "t",
+                    "t_name": "kanban-box",
+                    "parent_id": view_item_body_templates_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_t_p2.id)
+
+            view_item_body_div_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "t_attf_class": "oe_kanban_global_click",
+                    "parent_id": view_item_body_t_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p3.id)
+
+            view_item_body_div_p4 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "div",
+                    "class_attr": "oe_kanban_details",
+                    "parent_id": view_item_body_div_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_div_p4.id)
+
+            view_item_body_ul_p5 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "ul",
+                    "parent_id": view_item_body_div_p4.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_ul_p5.id)
+
+            view_item_body_li_p6 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "li",
+                    "class_attr": "mb4",
+                    "parent_id": view_item_body_ul_p5.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_li_p6.id)
+
+            view_item_body_strong_p7 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "strong",
+                    "parent_id": view_item_body_li_p6.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_strong_p7.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "parent_id": view_item_body_strong_p7.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "kanban",
+                    "view_name": "devops_plan_cg_kanban",
+                    "view_attr_class": "o_kanban_mobile",
+                    "m2o_model": model_devops_plan_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_plan_cg_view_kanban",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # pivot view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "type": "row",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "pivot",
+                    "view_name": "devops_plan_cg_pivot",
+                    "view_attr_string": "Devops plan cg",
+                    "m2o_model": model_devops_plan_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_plan_cg_view_pivot",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # search view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "filter",
+                    "name": "name",
+                    "domain": "[('name','!=',False)]",
+                    "label": "Name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "search",
+                    "view_name": "devops_plan_cg_search",
+                    "view_attr_string": "Devops plan cg",
+                    "m2o_model": model_devops_plan_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_plan_cg_view_search",
+                }
+            )
+            lst_view_id.append(view_code_generator.id)
+
+        # tree view
+        if True:
+            lst_item_view = []
+            # BODY
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "name",
+                    "action_name": "name",
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_code_generator = env["code.generator.view"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "view_type": "tree",
+                    "view_name": "devops_plan_cg_tree",
+                    "m2o_model": model_devops_plan_cg.id,
+                    "view_item_ids": [(6, 0, lst_item_view)],
+                    "id_name": "devops_plan_cg_view_tree",
                 }
             )
             lst_view_id.append(view_code_generator.id)
@@ -23215,43 +24280,6 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "header",
                     "item_type": "button",
-                    "name": "action_execute_last_stage_new_project",
-                    "class_attr": "btn-warning",
-                    "attrs": (
-                        "{'invisible': ['|', ('is_conflict_mode_exec', '=',"
-                        " True), ('has_re_execute_new_project', '=', False)]}"
-                    ),
-                    "action_name": "action_execute_last_stage_new_project",
-                    "button_type": "btn-warning",
-                    "label": "Re-execute last",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "header",
-                    "item_type": "button",
-                    "name": "action_execute_last_stage_new_project",
-                    "context": "{'default_stage_Uc0': True}",
-                    "class_attr": "btn-warning",
-                    "attrs": (
-                        "{'invisible': ['|', ('is_conflict_mode_exec', '=',"
-                        " True), ('has_re_execute_new_project', '=', False)]}"
-                    ),
-                    "action_name": "action_execute_last_stage_new_project",
-                    "button_type": "btn-warning",
-                    "label": "Re-execute Uc0",
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "header",
-                    "item_type": "button",
                     "name": "action_clear_error_exec",
                     "class_attr": "btn-danger",
                     "attrs": (
@@ -23381,6 +24409,38 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "button",
+                    "name": "%(erplibre_devops.devops_plan_cg_plan_cg_action_window)d",
+                    "context": "{'search_default_workspace_id': active_id}",
+                    "class_attr": "oe_stat_button",
+                    "attrs": "{'invisible': [('plan_cg_count', '==', 0)]}",
+                    "action_name": "%(erplibre_devops.devops_plan_cg_plan_cg_action_window)d",
+                    "button_type": "oe_stat_button",
+                    "binding_type": "action",
+                    "icon": "fa-building-o",
+                    "parent_id": view_item_body_div_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_button_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "plan_cg_count",
+                    "widget": "statinfo",
+                    "action_name": "plan_cg_count",
+                    "label": "Plans CG",
+                    "parent_id": view_item_body_button_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_button_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
                     "name": (
                         "%(erplibre_devops.devops_exec_error_action_window)d"
                     ),
@@ -23398,7 +24458,7 @@ _logger = logging.getLogger(__name__)""",
                     "binding_type": "action",
                     "icon": "fa-building-o",
                     "parent_id": view_item_body_div_p1.id,
-                    "sequence": 3,
+                    "sequence": 4,
                 }
             )
             lst_item_view.append(view_item_body_button_p2.id)
@@ -23436,7 +24496,7 @@ _logger = logging.getLogger(__name__)""",
                     "binding_type": "action",
                     "icon": "fa-building-o",
                     "parent_id": view_item_body_div_p1.id,
-                    "sequence": 4,
+                    "sequence": 5,
                 }
             )
             lst_item_view.append(view_item_body_button_p2.id)
@@ -23477,7 +24537,7 @@ _logger = logging.getLogger(__name__)""",
                     "binding_type": "action",
                     "icon": "fa-building-o",
                     "parent_id": view_item_body_div_p1.id,
-                    "sequence": 5,
+                    "sequence": 6,
                 }
             )
             lst_item_view.append(view_item_body_button_p2.id)
@@ -23519,7 +24579,7 @@ _logger = logging.getLogger(__name__)""",
                     "binding_type": "action",
                     "icon": "fa-building-o",
                     "parent_id": view_item_body_div_p1.id,
-                    "sequence": 6,
+                    "sequence": 7,
                 }
             )
             lst_item_view.append(view_item_body_button_p2.id)
@@ -23710,19 +24770,6 @@ _logger = logging.getLogger(__name__)""",
                     "action_name": "is_me",
                     "parent_id": view_item_body_group_p2.id,
                     "sequence": 11,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "has_re_execute_new_project",
-                    "invisible": "True",
-                    "action_name": "has_re_execute_new_project",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 12,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -24157,1074 +25204,12 @@ _logger = logging.getLogger(__name__)""",
             )
             lst_item_view.append(view_item_body_page_p2.id)
 
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "html",
-                    "class_attr": "bg-warning",
-                    "background_type": "bg-warning",
-                    "label": "Create new project with code generator",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Action CG",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_install_and_generate_all_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": (
-                        "action_install_and_generate_all_generated_module"
-                    ),
-                    "button_type": "oe_highlight",
-                    "label": "All",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_install_and_generate_all_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "time_exec_action_install_and_generate_all_generated_module",
-                    "nolabel": "1",
-                    "action_name": "time_exec_action_install_and_generate_all_generated_module",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_code_generator_generate_all",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_code_generator_generate_all",
-                    "button_type": "oe_highlight",
-                    "label": "Generate all",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_code_generator_generate_all',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "time_exec_action_code_generator_generate_all",
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_code_generator_generate_all"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_install_all_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_install_all_generated_module",
-                    "button_type": "oe_highlight",
-                    "label": "Install all",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_install_all_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "time_exec_action_install_all_generated_module",
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_install_all_generated_module"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_refresh_meta_cg_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_refresh_meta_cg_generated_module",
-                    "button_type": "oe_highlight",
-                    "label": "Refresh CG",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_refresh_meta_cg_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": (
-                        "time_exec_action_refresh_meta_cg_generated_module"
-                    ),
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_refresh_meta_cg_generated_module"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_install_all_uca_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_install_all_uca_generated_module",
-                    "button_type": "oe_highlight",
-                    "label": "Install UCA",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_install_all_uca_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": (
-                        "time_exec_action_install_all_uca_generated_module"
-                    ),
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_install_all_uca_generated_module"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_install_all_ucb_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_install_all_ucb_generated_module",
-                    "button_type": "oe_highlight",
-                    "label": "Install UCB",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_install_all_ucb_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": (
-                        "time_exec_action_install_all_ucb_generated_module"
-                    ),
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_install_all_ucb_generated_module"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Action addons",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_clear_all_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_clear_all_generated_module",
-                    "button_type": "oe_highlight",
-                    "label": "Clear all",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_clear_all_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "time_exec_action_clear_all_generated_module",
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_clear_all_generated_module"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_commit_all_generated_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_git_commit_all_generated_module",
-                    "button_type": "oe_highlight",
-                    "label": "Git commit",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_div_p5 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "div",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('time_exec_action_git_commit_all_generated_module',"
-                        " '=', False)]}"
-                    ),
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_div_p5.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "#text",
-                    "inner_text": "Exec in",
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "time_exec_action_git_commit_all_generated_module",
-                    "nolabel": "1",
-                    "action_name": (
-                        "time_exec_action_git_commit_all_generated_module"
-                    ),
-                    "parent_id": view_item_body_div_p5.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_open_terminal_tig",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_open_terminal_tig",
-                    "button_type": "oe_highlight",
-                    "label": "Terminal tig",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_open_terminal_addons",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_open_terminal_addons",
-                    "button_type": "oe_highlight",
-                    "label": "Terminal addons",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "need_debugger_cg_erplibre_devops",
-                    "invisible": "True",
-                    "action_name": "need_debugger_cg_erplibre_devops",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "CG new project",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_open_terminal_path_erplibre_devops",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_open_terminal_path_erplibre_devops",
-                    "button_type": "oe_highlight",
-                    "label": "Terminal path erplibre_devops",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_format_erplibre_devops",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_format_erplibre_devops",
-                    "button_type": "oe_highlight",
-                    "label": "Format module erplibre_devops",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_update_erplibre_devops",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_update_erplibre_devops",
-                    "button_type": "oe_highlight",
-                    "label": "Update module erplibre_devops",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "workspace_CG_remove_module",
-                    "class_attr": "oe_highlight",
-                    "action_name": "workspace_CG_remove_module",
-                    "button_type": "oe_highlight",
-                    "label": "Clear modules",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "workspace_CG_git_commit",
-                    "class_attr": "oe_highlight",
-                    "action_name": "workspace_CG_git_commit",
-                    "button_type": "oe_highlight",
-                    "label": "Git commit",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_cg_setup_pycharm_debug",
-                    "class_attr": "oe_highlight",
-                    "attrs": (
-                        "{'invisible': [('need_debugger_cg_erplibre_devops',"
-                        " '=', False)]}"
-                    ),
-                    "action_name": "action_cg_setup_pycharm_debug",
-                    "button_type": "oe_highlight",
-                    "label": "Setup Pycharm debug",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
             view_item_body_group_p3 = env["code.generator.view.item"].create(
                 {
                     "section_type": "body",
                     "item_type": "group",
                     "parent_id": view_item_body_page_p2.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Action other",
-                    "parent_id": view_item_body_group_p3.id,
                     "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_cg_generate_demo",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_cg_generate_demo",
-                    "button_type": "oe_highlight",
-                    "label": "Generate demo",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "is_clear_before_cg_demo",
-                    "action_name": "is_clear_before_cg_demo",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "cg_demo_type_data",
-                    "action_name": "cg_demo_type_data",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Execution",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "last_new_project_cg",
-                    "action_name": "last_new_project_cg",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "stop_execution_if_env_not_clean",
-                    "action_name": "stop_execution_if_env_not_clean",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "cg_self_add_config_cg",
-                    "action_name": "cg_self_add_config_cg",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "name": "group_cg_uca",
-                    "label": "CG config UcA",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "config_uca_enable_export_data",
-                    "action_name": "config_uca_enable_export_data",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Log",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_erplibre_devops_error_log",
-                    "attrs": (
-                        "{'invisible':"
-                        " [('devops_cg_erplibre_devops_error_log', '=',"
-                        " False)]}"
-                    ),
-                    "action_name": "devops_cg_erplibre_devops_error_log",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_erplibre_devops_log",
-                    "action_name": "devops_cg_erplibre_devops_log",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "name": "group_cg_config",
-                    "label": "CG config view",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view",
-                    "action_name": "mode_view",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_snippet",
-                    "action_name": "mode_view_snippet",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_snippet_enable_template_website_snippet_view",
-                    "action_name": "mode_view_snippet_enable_template_website_snippet_view",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_snippet_template_generate_website_snippet_generic_mdl",
-                    "action_name": "mode_view_snippet_template_generate_website_snippet_generic_mdl",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_snippet_template_generate_website_snippet_ctrl_featur",
-                    "action_name": "mode_view_snippet_template_generate_website_snippet_ctrl_featur",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_snippet_template_generate_website_enable_javascript",
-                    "action_name": "mode_view_snippet_template_generate_website_enable_javascript",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_snippet_template_generate_website_snippet_type",
-                    "action_name": "mode_view_snippet_template_generate_website_snippet_type",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 7,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p4 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Configuration",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p4.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "code_mode_context_generator",
-                    "action_name": "code_mode_context_generator",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "path_code_generator_to_generate",
-                    "action_name": "path_code_generator_to_generate",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "path_working_erplibre",
-                    "action_name": "path_working_erplibre",
-                    "parent_id": view_item_body_group_p4.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "label": "Generator",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 7,
                 }
             )
             lst_item_view.append(view_item_body_group_p3.id)
@@ -25233,71 +25218,10 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "id",
-                    "invisible": "True",
-                    "action_name": "id",
+                    "name": "plan_cg_ids",
+                    "action_name": "plan_cg_ids",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_code_generator_ids",
-                    "widget": "many2many",
-                    "context": "{'default_devops_workspace_ids': [id]}",
-                    "options": "{'always_reload': True}",
-                    "action_name": "devops_code_generator_ids",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_code_generator_module_ids",
-                    "widget": "many2many",
-                    "context": "{'default_devops_workspace_ids': [id]}",
-                    "options": "{'always_reload': True}",
-                    "action_name": "devops_code_generator_module_ids",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_code_generator_model_ids",
-                    "widget": "many2many",
-                    "context": "{'default_devops_workspace_ids': [id]}",
-                    "options": "{'always_reload': True}",
-                    "action_name": "devops_code_generator_model_ids",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_code_generator_field_ids",
-                    "widget": "many2many",
-                    "context": "{'default_devops_workspace_ids': [id]}",
-                    "options": "{'always_reload': True}",
-                    "action_name": "devops_code_generator_field_ids",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 5,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -25318,8 +25242,8 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "devops_code_generator_diff",
-                    "action_name": "devops_code_generator_diff",
+                    "name": "devops_cg_diff",
+                    "action_name": "devops_cg_diff",
                     "parent_id": view_item_body_page_p2.id,
                     "sequence": 1,
                 }
@@ -25342,8 +25266,8 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "devops_code_generator_status",
-                    "action_name": "devops_code_generator_status",
+                    "name": "devops_cg_status",
+                    "action_name": "devops_cg_status",
                     "parent_id": view_item_body_page_p2.id,
                     "sequence": 1,
                 }
@@ -25366,8 +25290,8 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "devops_code_generator_stat",
-                    "action_name": "devops_code_generator_stat",
+                    "name": "devops_cg_stat",
+                    "action_name": "devops_cg_stat",
                     "parent_id": view_item_body_page_p2.id,
                     "sequence": 1,
                 }
@@ -25439,8 +25363,8 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "devops_code_generator_tree_addons",
-                    "action_name": "devops_code_generator_tree_addons",
+                    "name": "devops_cg_tree_addons",
+                    "action_name": "devops_cg_tree_addons",
                     "parent_id": view_item_body_page_p2.id,
                     "sequence": 2,
                 }
@@ -25495,8 +25419,8 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "devops_code_generator_log_addons",
-                    "action_name": "devops_code_generator_log_addons",
+                    "name": "devops_cg_log_addons",
+                    "action_name": "devops_cg_log_addons",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 1,
                 }
@@ -26380,55 +26304,55 @@ _logger = logging.getLogger(__name__)""",
                 }
             )
 
-            devops_code_generator_code_generator_action_window = env[
+            devops_cg_code_generator_action_window = env[
                 "code.generator.act_window"
             ].create(
                 {
                     "code_generator_id": code_generator_id.id,
                     "name": "Code generator",
-                    "id_name": (
-                        "devops_code_generator_code_generator_action_window"
-                    ),
-                    "model_name": "devops.code_generator",
+                    "id_name": "devops_cg_code_generator_action_window",
+                    "model_name": "devops.cg",
                     "view_type": "form",
                     "view_mode": "tree,kanban,pivot,graph,form",
                 }
             )
 
-            devops_code_generator_module_code_generator_module_action_window = env[
+            devops_cg_module_code_generator_module_action_window = env[
                 "code.generator.act_window"
             ].create(
                 {
                     "code_generator_id": code_generator_id.id,
                     "name": "Code generator module",
-                    "id_name": "devops_code_generator_module_code_generator_module_action_window",
-                    "model_name": "devops.code_generator.module",
+                    "id_name": (
+                        "devops_cg_module_code_generator_module_action_window"
+                    ),
+                    "model_name": "devops.cg.module",
                     "view_type": "form",
                     "view_mode": "tree,kanban,pivot,graph,form",
                 }
             )
 
-            devops_code_generator_module_model_code_generator_module_model_action_window = env[
+            devops_cg_model_code_generator_module_model_action_window = env[
                 "code.generator.act_window"
             ].create(
                 {
                     "code_generator_id": code_generator_id.id,
                     "name": "Code generator module model",
-                    "id_name": "devops_code_generator_module_model_code_generator_module_model_action_window",
-                    "model_name": "devops.code_generator.module.model",
+                    "id_name": "devops_cg_model_code_generator_module_model_action_window",
+                    "model_name": "devops.cg.model",
                     "view_type": "form",
                     "view_mode": "tree,kanban,pivot,graph,form",
                 }
             )
 
-            devops_code_generator_module_model_field_code_generator_module_model_field_action_window = env[
+            devops_cg_field_code_generator_module_model_field_action_window = env[
                 "code.generator.act_window"
             ].create(
                 {
                     "code_generator_id": code_generator_id.id,
                     "name": "Code generator module model field",
-                    "id_name": "devops_code_generator_module_model_field_code_generator_module_model_field_action_window",
-                    "model_name": "devops.code_generator.module.model.field",
+                    "id_name": "devops_cg_field_code_generator_module_model_field_action_window",
+                    "model_name": "devops.cg.field",
                     "view_type": "form",
                     "view_mode": "tree,kanban,pivot,graph,form",
                 }
@@ -26564,6 +26488,19 @@ _logger = logging.getLogger(__name__)""",
                 }
             )
 
+            devops_plan_cg_plan_cg_action_window = env[
+                "code.generator.act_window"
+            ].create(
+                {
+                    "code_generator_id": code_generator_id.id,
+                    "name": "Plan cg",
+                    "id_name": "devops_plan_cg_plan_cg_action_window",
+                    "model_name": "devops.plan.cg",
+                    "view_type": "form",
+                    "view_mode": "kanban,tree,pivot,graph,form",
+                }
+            )
+
             action_devops_check_system_conf_form = env[
                 "code.generator.act_window"
             ].create(
@@ -26669,7 +26606,7 @@ _logger = logging.getLogger(__name__)""",
                     "id_name": "menu_code_generator",
                     "sequence": 2,
                     "parent_id_name": "erplibre_devops.menu_code_cg",
-                    "m2o_act_window": devops_code_generator_code_generator_action_window.id,
+                    "m2o_act_window": devops_cg_code_generator_action_window.id,
                 }
             )
             env["code.generator.menu"].create(
@@ -26679,7 +26616,7 @@ _logger = logging.getLogger(__name__)""",
                     "id_name": "menu_code_generator_module",
                     "sequence": 3,
                     "parent_id_name": "erplibre_devops.menu_code_cg",
-                    "m2o_act_window": devops_code_generator_module_code_generator_module_action_window.id,
+                    "m2o_act_window": devops_cg_module_code_generator_module_action_window.id,
                 }
             )
             env["code.generator.menu"].create(
@@ -26689,7 +26626,7 @@ _logger = logging.getLogger(__name__)""",
                     "id_name": "menu_code_generator_module_model",
                     "sequence": 4,
                     "parent_id_name": "erplibre_devops.menu_code_cg",
-                    "m2o_act_window": devops_code_generator_module_model_code_generator_module_model_action_window.id,
+                    "m2o_act_window": devops_cg_model_code_generator_module_model_action_window.id,
                 }
             )
             env["code.generator.menu"].create(
@@ -26699,7 +26636,7 @@ _logger = logging.getLogger(__name__)""",
                     "id_name": "menu_code_generator_module_model_field",
                     "sequence": 5,
                     "parent_id_name": "erplibre_devops.menu_code_cg",
-                    "m2o_act_window": devops_code_generator_module_model_field_code_generator_module_model_field_action_window.id,
+                    "m2o_act_window": devops_cg_field_code_generator_module_model_field_action_window.id,
                 }
             )
             env["code.generator.menu"].create(
@@ -26885,6 +26822,16 @@ _logger = logging.getLogger(__name__)""",
             env["code.generator.menu"].create(
                 {
                     "code_generator_id": code_generator_id.id,
+                    "name": "Code generator",
+                    "id_name": "menu_plan_cg",
+                    "sequence": 1,
+                    "parent_id_name": "erplibre_devops.menu_plan",
+                    "m2o_act_window": devops_plan_cg_plan_cg_action_window.id,
+                }
+            )
+            env["code.generator.menu"].create(
+                {
+                    "code_generator_id": code_generator_id.id,
                     "name": "Process",
                     "id_name": "menu_process",
                     "sequence": 5,
@@ -26970,6 +26917,102 @@ _logger = logging.getLogger(__name__)""",
         group_id = env.ref("base.group_user").with_context(lang=lang)
         access_id = env["ir.model.access"].create(
             {
+                "name": "devops_cg Access User types / Internal User",
+                "model_id": model_devops_cg.id,
+                "group_id": group_id.id,
+                "perm_read": True,
+                "perm_create": True,
+                "perm_write": True,
+                "perm_unlink": True,
+            }
+        )
+
+        env["ir.model.data"].create(
+            {
+                "name": "devops_cg_access_user_types_/_internal_user",
+                "model": "ir.model.access",
+                "module": MODULE_NAME,
+                "res_id": access_id.id,
+            }
+        )
+
+        # Generate access
+        lang = "en_US"
+        group_id = env.ref("base.group_user").with_context(lang=lang)
+        access_id = env["ir.model.access"].create(
+            {
+                "name": "devops_cg_field Access User types / Internal User",
+                "model_id": model_devops_cg_field.id,
+                "group_id": group_id.id,
+                "perm_read": True,
+                "perm_create": True,
+                "perm_write": True,
+                "perm_unlink": True,
+            }
+        )
+
+        env["ir.model.data"].create(
+            {
+                "name": "devops_cg_field_access_user_types_/_internal_user",
+                "model": "ir.model.access",
+                "module": MODULE_NAME,
+                "res_id": access_id.id,
+            }
+        )
+
+        # Generate access
+        lang = "en_US"
+        group_id = env.ref("base.group_user").with_context(lang=lang)
+        access_id = env["ir.model.access"].create(
+            {
+                "name": "devops_cg_model Access User types / Internal User",
+                "model_id": model_devops_cg_model.id,
+                "group_id": group_id.id,
+                "perm_read": True,
+                "perm_create": True,
+                "perm_write": True,
+                "perm_unlink": True,
+            }
+        )
+
+        env["ir.model.data"].create(
+            {
+                "name": "devops_cg_model_access_user_types_/_internal_user",
+                "model": "ir.model.access",
+                "module": MODULE_NAME,
+                "res_id": access_id.id,
+            }
+        )
+
+        # Generate access
+        lang = "en_US"
+        group_id = env.ref("base.group_user").with_context(lang=lang)
+        access_id = env["ir.model.access"].create(
+            {
+                "name": "devops_cg_module Access User types / Internal User",
+                "model_id": model_devops_cg_module.id,
+                "group_id": group_id.id,
+                "perm_read": True,
+                "perm_create": True,
+                "perm_write": True,
+                "perm_unlink": True,
+            }
+        )
+
+        env["ir.model.data"].create(
+            {
+                "name": "devops_cg_module_access_user_types_/_internal_user",
+                "model": "ir.model.access",
+                "module": MODULE_NAME,
+                "res_id": access_id.id,
+            }
+        )
+
+        # Generate access
+        lang = "en_US"
+        group_id = env.ref("base.group_user").with_context(lang=lang)
+        access_id = env["ir.model.access"].create(
+            {
                 "name": (
                     "devops_cg_new_project Access User types / Internal User"
                 ),
@@ -27014,115 +27057,6 @@ _logger = logging.getLogger(__name__)""",
         env["ir.model.data"].create(
             {
                 "name": "devops_cg_new_project_stage_access_user_types_/_internal_user",
-                "model": "ir.model.access",
-                "module": MODULE_NAME,
-                "res_id": access_id.id,
-            }
-        )
-
-        # Generate access
-        lang = "en_US"
-        group_id = env.ref("base.group_user").with_context(lang=lang)
-        access_id = env["ir.model.access"].create(
-            {
-                "name": (
-                    "devops_code_generator Access User types / Internal User"
-                ),
-                "model_id": model_devops_code_generator.id,
-                "group_id": group_id.id,
-                "perm_read": True,
-                "perm_create": True,
-                "perm_write": True,
-                "perm_unlink": True,
-            }
-        )
-
-        env["ir.model.data"].create(
-            {
-                "name": (
-                    "devops_code_generator_access_user_types_/_internal_user"
-                ),
-                "model": "ir.model.access",
-                "module": MODULE_NAME,
-                "res_id": access_id.id,
-            }
-        )
-
-        # Generate access
-        lang = "en_US"
-        group_id = env.ref("base.group_user").with_context(lang=lang)
-        access_id = env["ir.model.access"].create(
-            {
-                "name": (
-                    "devops_code_generator_module Access User types / Internal"
-                    " User"
-                ),
-                "model_id": model_devops_code_generator_module.id,
-                "group_id": group_id.id,
-                "perm_read": True,
-                "perm_create": True,
-                "perm_write": True,
-                "perm_unlink": True,
-            }
-        )
-
-        env["ir.model.data"].create(
-            {
-                "name": "devops_code_generator_module_access_user_types_/_internal_user",
-                "model": "ir.model.access",
-                "module": MODULE_NAME,
-                "res_id": access_id.id,
-            }
-        )
-
-        # Generate access
-        lang = "en_US"
-        group_id = env.ref("base.group_user").with_context(lang=lang)
-        access_id = env["ir.model.access"].create(
-            {
-                "name": (
-                    "devops_code_generator_module_model Access User types /"
-                    " Internal User"
-                ),
-                "model_id": model_devops_code_generator_module_model.id,
-                "group_id": group_id.id,
-                "perm_read": True,
-                "perm_create": True,
-                "perm_write": True,
-                "perm_unlink": True,
-            }
-        )
-
-        env["ir.model.data"].create(
-            {
-                "name": "devops_code_generator_module_model_access_user_types_/_internal_user",
-                "model": "ir.model.access",
-                "module": MODULE_NAME,
-                "res_id": access_id.id,
-            }
-        )
-
-        # Generate access
-        lang = "en_US"
-        group_id = env.ref("base.group_user").with_context(lang=lang)
-        access_id = env["ir.model.access"].create(
-            {
-                "name": (
-                    "devops_code_generator_module_model_field Access User"
-                    " types / Internal User"
-                ),
-                "model_id": model_devops_code_generator_module_model_field.id,
-                "group_id": group_id.id,
-                "perm_read": True,
-                "perm_create": True,
-                "perm_write": True,
-                "perm_unlink": True,
-            }
-        )
-
-        env["ir.model.data"].create(
-            {
-                "name": "devops_code_generator_module_model_field_access_user_types_/_internal_user",
                 "model": "ir.model.access",
                 "module": MODULE_NAME,
                 "res_id": access_id.id,
@@ -27373,6 +27307,30 @@ _logger = logging.getLogger(__name__)""",
         env["ir.model.data"].create(
             {
                 "name": "devops_log_warning_access_user_types_/_internal_user",
+                "model": "ir.model.access",
+                "module": MODULE_NAME,
+                "res_id": access_id.id,
+            }
+        )
+
+        # Generate access
+        lang = "en_US"
+        group_id = env.ref("base.group_user").with_context(lang=lang)
+        access_id = env["ir.model.access"].create(
+            {
+                "name": "devops_plan_cg Access User types / Internal User",
+                "model_id": model_devops_plan_cg.id,
+                "group_id": group_id.id,
+                "perm_read": True,
+                "perm_create": True,
+                "perm_write": True,
+                "perm_unlink": True,
+            }
+        )
+
+        env["ir.model.data"].create(
+            {
+                "name": "devops_plan_cg_access_user_types_/_internal_user",
                 "model": "ir.model.access",
                 "module": MODULE_NAME,
                 "res_id": access_id.id,
