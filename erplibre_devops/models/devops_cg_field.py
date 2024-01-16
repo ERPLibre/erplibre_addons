@@ -17,7 +17,6 @@ class DevopsCgField(models.Model):
     model_id = fields.Many2one(
         comodel_name="devops.cg.model",
         string="Model",
-        required=True,
         ondelete="cascade",
     )
 
@@ -83,7 +82,6 @@ class DevopsCgField(models.Model):
     devops_workspace_ids = fields.Many2many(
         comodel_name="devops.workspace",
         string="DevOps Workspace",
-        required=True,
     )
 
     @api.depends(

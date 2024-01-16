@@ -18,12 +18,10 @@ class DevopsCgModel(models.Model):
     module_id = fields.Many2one(
         comodel_name="devops.cg.module",
         string="Module",
-        required=True,
         ondelete="cascade",
     )
 
     devops_workspace_ids = fields.Many2many(
         comodel_name="devops.workspace",
         string="DevOps Workspace",
-        required=True,
     )

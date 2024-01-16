@@ -59,9 +59,10 @@ class DevopsPlanActionWizard(models.TransientModel):
         )
     )
 
-    model_name = fields.Char(string="Model")
-
-    model_description = fields.Char(string="Model description")
+    model_ids = fields.Many2many(
+        comodel_name="devops.cg.model",
+        string="Model",
+    )
 
     image_db_selection = fields.Many2one(
         comodel_name="devops.db.image",
@@ -270,7 +271,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             "Plan a_a_model"
         ) as wp_id:
             module_name = "erplibre_devops"
-            self.model_description = "Example feature to add to devops"
             self.generate_new_model(
                 wp_id, module_name, "Autopoiesis", is_autopoiesis=True
             )
@@ -348,14 +348,10 @@ class DevopsPlanActionWizard(models.TransientModel):
             }
         )
         # Model
-        cg_model_id = self.env["devops.cg.model"].create(
-            {
-                "name": self.model_name,
-                "description": self.model_description,
-                "module_id": cg_module_id.id,
-                "devops_workspace_ids": [(6, 0, wp_id.ids)],
-            }
-        )
+        for cg_model_id in self.model_ids:
+            cg_model_id.module_id = cg_module_id.id
+            cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
+        lst_field_id = [b.id for a in self.model_ids for b in a.field_ids]
         # Field
         # cg_field_id = self.env[
         #     "devops.cg.field"
@@ -372,8 +368,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         wp_id.path_code_generator_to_generate = relative_path_module
         wp_id.devops_cg_ids = [(6, 0, cg_id.ids)]
         wp_id.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
-        wp_id.devops_cg_model_ids = [(6, 0, [cg_model_id.id])]
-        wp_id.devops_cg_field_ids = [(6, 0, [])]
+        wp_id.devops_cg_model_ids = [(6, 0, self.model_ids.ids)]
+        wp_id.devops_cg_field_ids = [(6, 0, lst_field_id)]
         # Update configuration self-gen
         wp_id.mode_view = "new_view"
         if is_autopoiesis:
@@ -383,15 +379,21 @@ class DevopsPlanActionWizard(models.TransientModel):
         wp_id.action_code_generator_generate_all()
         self.generated_new_project_id = wp_id.last_new_project_cg.id
         # Git add
-        model_file_name = self.model_name.replace(".", "_")
         lst_default_file = [
             f"{module_name}/__manifest__.py",
-            f"{module_name}/models/__init__.py",
-            f"{module_name}/models/{model_file_name}.py",
             f"{module_name}/security/ir.model.access.csv",
             f"{module_name}/views/menu.xml",
-            f"{module_name}/views/{model_file_name}.xml",
         ]
+        if self.model_ids:
+            lst_default_file.append(f"{module_name}/models/__init__.py")
+            for cg_model_id in self.model_ids:
+                model_file_name = cg_model_id.name.replace(".", "_")
+                lst_default_file.append(
+                    f"{module_name}/models/{model_file_name}.py"
+                )
+                lst_default_file.append(
+                    f"{module_name}/views/{model_file_name}.xml"
+                )
         cmd_git_add = ";".join([f"git add '{a}'" for a in lst_default_file])
         wp_id.execute(
             cmd=cmd_git_add,

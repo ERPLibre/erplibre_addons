@@ -13,7 +13,6 @@ class DevopsCg(models.Model):
     devops_workspace_ids = fields.Many2many(
         comodel_name="devops.workspace",
         string="DevOps Workspace",
-        required=True,
     )
 
     # TODO create boolean cache with default workspace to work for the other

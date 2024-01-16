@@ -94,14 +94,27 @@
                 >
                     <group string="Adding feature">
                         <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-default" />
-                        <button name="state_goto_a_b_field" string="Add field" type="object" class="btn btn-default" />
+                        <button
+                            name="state_goto_a_b_field"
+                            string="Add field"
+                            type="object"
+                            class="btn btn-default"
+                            invisible="True"
+                        />
                         <button
                             name="state_goto_a_c_action"
                             string="Add action"
                             type="object"
                             class="btn btn-default"
+                            invisible="True"
                         />
-                        <button name="state_goto_a_d_view" string="Add view" type="object" class="btn btn-default" />
+                        <button
+                            name="state_goto_a_d_view"
+                            string="Add view"
+                            type="object"
+                            class="btn btn-default"
+                            invisible="True"
+                        />
                     </group>
                     <group string="Regenerate feature">
                         <!--                        <button name="state_goto_a_e_cg_regen" string="Code Generator regenerate" type="object" class="btn btn-default" />-->
@@ -123,8 +136,7 @@
                         <field name="working_module_name" string="OR Working Module Name" />
                     </group>
                     <group string="Param">
-                        <field name="model_name" />
-                        <field name="model_description" />
+                        <field name="model_ids" />
                     </group>
                 </group>
                 <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">
