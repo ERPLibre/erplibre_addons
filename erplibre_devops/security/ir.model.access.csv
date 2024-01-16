@@ -1,10 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 devops_cg_new_project_access_user_types_/_internal_user,devops_cg_new_project Access User types / Internal User,model_devops_cg_new_project,base.group_user,1,1,1,1
 devops_cg_new_project_stage_access_user_types_/_internal_user,devops_cg_new_project_stage Access User types / Internal User,model_devops_cg_new_project_stage,base.group_user,1,1,1,1
-devops_code_generator_access_user_types_/_internal_user,devops_code_generator Access User types / Internal User,model_devops_code_generator,base.group_user,1,1,1,1
-devops_code_generator_module_access_user_types_/_internal_user,devops_code_generator_module Access User types / Internal User,model_devops_code_generator_module,base.group_user,1,1,1,1
-devops_code_generator_module_model_access_user_types_/_internal_user,devops_code_generator_module_model Access User types / Internal User,model_devops_code_generator_module_model,base.group_user,1,1,1,1
-devops_code_generator_module_model_field_access_user_types_/_internal_user,devops_code_generator_module_model_field Access User types / Internal User,model_devops_code_generator_module_model_field,base.group_user,1,1,1,1
+devops_cg_access_user_types_/_internal_user,devops_cg Access User types / Internal User,model_devops_cg,base.group_user,1,1,1,1
+devops_cg_module_access_user_types_/_internal_user,devops_cg_module Access User types / Internal User,model_devops_cg_module,base.group_user,1,1,1,1
+devops_cg_model_access_user_types_/_internal_user,devops_cg_model Access User types / Internal User,model_devops_cg_model,base.group_user,1,1,1,1
+devops_cg_field_access_user_types_/_internal_user,devops_cg_field Access User types / Internal User,model_devops_cg_field,base.group_user,1,1,1,1
 devops_db_image_access_user_types_/_internal_user,devops_db_image Access User types / Internal User,model_devops_db_image,base.group_user,1,1,1,1
 devops_exec_access_user_types_/_internal_user,devops_exec Access User types / Internal User,model_devops_exec,base.group_user,1,1,1,1
 devops_exec_bundle_access_user_types_/_internal_user,devops_exec_bundle Access User types / Internal User,model_devops_exec_bundle,base.group_user,1,1,1,1

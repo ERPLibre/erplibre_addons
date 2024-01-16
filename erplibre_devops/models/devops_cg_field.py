@@ -1,9 +1,9 @@
 from odoo import _, api, fields, models
 
 
-class DevopsCodeGeneratorModuleModelField(models.Model):
-    _name = "devops.code_generator.module.model.field"
-    _description = "devops_code_generator_module_model_field"
+class DevopsCgField(models.Model):
+    _name = "devops.cg.field"
+    _description = "devops_cg_field"
 
     name = fields.Char()
 
@@ -15,7 +15,7 @@ class DevopsCodeGeneratorModuleModelField(models.Model):
     )
 
     model_id = fields.Many2one(
-        comodel_name="devops.code_generator.module.model",
+        comodel_name="devops.cg.model",
         string="Model",
         required=True,
         ondelete="cascade",
@@ -40,7 +40,7 @@ class DevopsCodeGeneratorModuleModelField(models.Model):
     )
 
     relation = fields.Many2one(
-        comodel_name="devops.code_generator.module.model",
+        comodel_name="devops.cg.model",
         string="Comodel",
         help="comodel - Create relation for many2one, many2many, one2many",
     )
@@ -54,7 +54,7 @@ class DevopsCodeGeneratorModuleModelField(models.Model):
     )
 
     field_relation = fields.Many2one(
-        comodel_name="devops.code_generator.module.model.field",
+        comodel_name="devops.cg.field",
         domain="[('model_id', '=', relation)]",
         string="Inverse field",
         help="inverse_name - Need for one2many to associate with many2one.",

@@ -1,22 +1,22 @@
 from odoo import _, api, fields, models
 
 
-class DevopsCodeGeneratorModuleModel(models.Model):
-    _name = "devops.code_generator.module.model"
-    _description = "devops_code_generator_module_model"
+class DevopsCgModel(models.Model):
+    _name = "devops.cg.model"
+    _description = "devops_cg_model"
 
     name = fields.Char()
 
     description = fields.Char()
 
     field_ids = fields.One2many(
-        comodel_name="devops.code_generator.module.model.field",
+        comodel_name="devops.cg.field",
         inverse_name="model_id",
         string="Field",
     )
 
     module_id = fields.Many2one(
-        comodel_name="devops.code_generator.module",
+        comodel_name="devops.cg.module",
         string="Module",
         required=True,
         ondelete="cascade",

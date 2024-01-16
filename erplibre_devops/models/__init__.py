@@ -1,12 +1,12 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
 from . import (
+    devops_cg,
+    devops_cg_field,
+    devops_cg_model,
+    devops_cg_module,
     devops_cg_new_project,
     devops_cg_new_project_stage,
-    devops_code_generator,
-    devops_code_generator_module,
-    devops_code_generator_module_model,
-    devops_code_generator_module_model_field,
     devops_db_image,
     devops_exec,
     devops_exec_bundle,

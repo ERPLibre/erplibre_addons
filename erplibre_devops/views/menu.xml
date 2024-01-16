@@ -40,7 +40,7 @@
     <menuitem
         id="menu_code_generator"
         name="Project"
-        action="devops_code_generator_code_generator_action_window"
+        action="devops_cg_code_generator_action_window"
         sequence="2"
         parent="menu_code_cg"
     />
@@ -48,7 +48,7 @@
     <menuitem
         id="menu_code_generator_module"
         name="Module"
-        action="devops_code_generator_module_code_generator_module_action_window"
+        action="devops_cg_module_code_generator_module_action_window"
         sequence="3"
         parent="menu_code_cg"
     />
@@ -56,7 +56,7 @@
     <menuitem
         id="menu_code_generator_module_model"
         name="Model"
-        action="devops_code_generator_module_model_code_generator_module_model_action_window"
+        action="devops_cg_model_code_generator_module_model_action_window"
         sequence="4"
         parent="menu_code_cg"
     />
@@ -64,7 +64,7 @@
     <menuitem
         id="menu_code_generator_module_model_field"
         name="Field"
-        action="devops_code_generator_module_model_field_code_generator_module_model_field_action_window"
+        action="devops_cg_field_code_generator_module_model_field_action_window"
         sequence="5"
         parent="menu_code_cg"
     />

@@ -168,7 +168,7 @@ class DevopsExec(models.Model):
                 "Failed to load registry",
             ]
             keyword_error_to_remove = [
-                "devops.code_generator.module.model.field.has_error",
+                "devops.cg.field.has_error",
                 "devops.exec.error.name",
                 "devops.workspace.devops_exec_error_count",
                 "views/devops_exec_error.xml",

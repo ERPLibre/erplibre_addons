@@ -202,47 +202,47 @@ class DevopsWorkspace(models.Model):
         store=True,
     )
 
-    devops_code_generator_ids = fields.Many2many(
-        comodel_name="devops.code_generator",
+    devops_cg_ids = fields.Many2many(
+        comodel_name="devops.cg",
         string="Project",
     )
 
-    devops_code_generator_module_ids = fields.Many2many(
-        comodel_name="devops.code_generator.module",
+    devops_cg_module_ids = fields.Many2many(
+        comodel_name="devops.cg.module",
         string="Module",
     )
 
-    devops_code_generator_model_ids = fields.Many2many(
-        comodel_name="devops.code_generator.module.model",
+    devops_cg_model_ids = fields.Many2many(
+        comodel_name="devops.cg.model",
         string="Model",
     )
 
-    devops_code_generator_field_ids = fields.Many2many(
-        comodel_name="devops.code_generator.module.model.field",
+    devops_cg_field_ids = fields.Many2many(
+        comodel_name="devops.cg.field",
         string="Field",
     )
 
-    devops_code_generator_tree_addons = fields.Text(
+    devops_cg_tree_addons = fields.Text(
         string="Tree addons",
         help="Will show generated files from code generator or humain",
     )
 
-    devops_code_generator_diff = fields.Text(
+    devops_cg_diff = fields.Text(
         string="Diff addons",
         help="Will show diff git",
     )
 
-    devops_code_generator_status = fields.Text(
+    devops_cg_status = fields.Text(
         string="Status addons",
         help="Will show status git",
     )
 
-    devops_code_generator_stat = fields.Text(
+    devops_cg_stat = fields.Text(
         string="Stat addons",
         help="Will show statistique code",
     )
 
-    devops_code_generator_log_addons = fields.Text(
+    devops_cg_log_addons = fields.Text(
         string="Log code generator",
         help="Will show code generator log, last execution",
     )
@@ -762,13 +762,11 @@ class DevopsWorkspace(models.Model):
                 # Increase speed
                 # TODO keep old configuration of config.conf and not overwrite all
                 # rec.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_code_generator", to_instance=True)
-                if rec.devops_code_generator_ids and rec.mode_exec in [
-                    "docker"
-                ]:
+                if rec.devops_cg_ids and rec.mode_exec in ["docker"]:
                     rec.workspace_docker_id.docker_config_gen_cg = True
                     rec.action_reboot()
                     rec.workspace_docker_id.docker_config_gen_cg = False
-                for rec_cg in rec.devops_code_generator_ids:
+                for rec_cg in rec.devops_cg_ids:
                     for module_id in rec_cg.module_ids:
                         devops_exec_bundle_parent_root_id = (
                             self.env["devops.exec.bundle"]
@@ -833,15 +831,13 @@ class DevopsWorkspace(models.Model):
                         #     f" {rec.path_code_generator_to_generate}{extra_arg}"
                         # )
                         # result = rec.execute(cmd=cmd, to_instance=True)
-                        # rec.devops_code_generator_log_addons = result
+                        # rec.devops_cg_log_addons = result
                         # OR
                         # result = rec.execute(
                         #     cmd=f"cd {rec.folder};./script/code_generator/new_project.py"
                         #     f" -d {addons_path} -m {module_name}",
                         # )
-                if rec.devops_code_generator_ids and rec.mode_exec in [
-                    "docker"
-                ]:
+                if rec.devops_cg_ids and rec.mode_exec in ["docker"]:
                     rec.action_reboot()
                 # rec.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_all", to_instance=True)
                 end = datetime.now()
@@ -857,7 +853,7 @@ class DevopsWorkspace(models.Model):
                 "Clear all generated module"
             ) as rec:
                 start = datetime.now()
-                for cg in rec.devops_code_generator_ids:
+                for cg in rec.devops_cg_ids:
                     for module_id in cg.module_ids:
                         rec.workspace_code_remove_module(module_id)
                 end = datetime.now()
@@ -943,7 +939,7 @@ class DevopsWorkspace(models.Model):
                     rec.path_code_generator_to_generate,
                 )
                 start = datetime.now()
-                # for cg in rec.devops_code_generator_ids:
+                # for cg in rec.devops_cg_ids:
                 # Validate git directory exist
                 exec_id = rec.execute(
                     cmd=f"ls {folder}/.git",
@@ -1025,7 +1021,7 @@ class DevopsWorkspace(models.Model):
                         to_instance=True,
                     )
                     status += exec_id.log_all
-                    for cg in rec.devops_code_generator_ids:
+                    for cg in rec.devops_cg_ids:
                         # Create statistic
                         for module_id in cg.module_ids:
                             exec_id = rec.execute(
@@ -1084,9 +1080,9 @@ class DevopsWorkspace(models.Model):
                                             (4, rec.id)
                                         ]
 
-                rec.devops_code_generator_diff = diff
-                rec.devops_code_generator_status = status
-                rec.devops_code_generator_stat = stat
+                rec.devops_cg_diff = diff
+                rec.devops_cg_status = status
+                rec.devops_cg_stat = stat
                 end = datetime.now()
                 td = (end - start).total_seconds()
                 rec.time_exec_action_refresh_meta_cg_generated_module = (
@@ -1095,20 +1091,16 @@ class DevopsWorkspace(models.Model):
 
     @api.multi
     def write(self, values):
-        cg_before_ids_i = self.devops_code_generator_ids.ids
+        cg_before_ids_i = self.devops_cg_ids.ids
 
         status = super().write(values)
-        if "devops_code_generator_ids" in values.keys():
+        if "devops_cg_ids" in values.keys():
             # Update all the list of code generator, associate to this workspace
             for rec in self:
                 cg_missing_ids_i = list(
-                    set(cg_before_ids_i).difference(
-                        set(rec.devops_code_generator_ids.ids)
-                    )
+                    set(cg_before_ids_i).difference(set(rec.devops_cg_ids.ids))
                 )
-                cg_missing_ids = self.env["devops.code_generator"].browse(
-                    cg_missing_ids_i
-                )
+                cg_missing_ids = self.env["devops.cg"].browse(cg_missing_ids_i)
                 for cg_id in cg_missing_ids:
                     for module_id in cg_id.module_ids:
                         if rec in module_id.devops_workspace_ids:
@@ -1122,13 +1114,9 @@ class DevopsWorkspace(models.Model):
                                         (3, rec.id)
                                     ]
                 cg_adding_ids_i = list(
-                    set(rec.devops_code_generator_ids.ids).difference(
-                        set(cg_before_ids_i)
-                    )
+                    set(rec.devops_cg_ids.ids).difference(set(cg_before_ids_i))
                 )
-                cg_adding_ids = self.env["devops.code_generator"].browse(
-                    cg_adding_ids_i
-                )
+                cg_adding_ids = self.env["devops.cg"].browse(cg_adding_ids_i)
                 for cg_id in cg_adding_ids:
                     for module_id in cg_id.module_ids:
                         if rec not in module_id.devops_workspace_ids:
@@ -1176,11 +1164,7 @@ class DevopsWorkspace(models.Model):
             ) as rec:
                 start = datetime.now()
                 module_list = ",".join(
-                    [
-                        m.name
-                        for cg in rec.devops_code_generator_ids
-                        for m in cg.module_ids
-                    ]
+                    [m.name for cg in rec.devops_cg_ids for m in cg.module_ids]
                 )
                 rec.install_module(module_list)
                 end = datetime.now()
@@ -1198,7 +1182,7 @@ class DevopsWorkspace(models.Model):
                 module_list = ",".join(
                     [
                         f"code_generator_template_{m.name},{m.name}"
-                        for cg in rec.devops_code_generator_ids
+                        for cg in rec.devops_cg_ids
                         for m in cg.module_ids
                     ]
                 )
@@ -1231,7 +1215,7 @@ class DevopsWorkspace(models.Model):
                 module_list = ",".join(
                     [
                         f"code_generator_{m.name}"
-                        for cg in rec.devops_code_generator_ids
+                        for cg in rec.devops_cg_ids
                         for m in cg.module_ids
                     ]
                 )
@@ -1304,12 +1288,12 @@ class DevopsWorkspace(models.Model):
             )
             rec.time_exec_action_refresh_meta_cg_generated_module = False
             rec.time_exec_action_git_commit_all_generated_module = False
-            rec.devops_code_generator_status = False
-            rec.devops_code_generator_diff = False
-            rec.devops_code_generator_stat = False
-            rec.devops_code_generator_tree_addons = False
+            rec.devops_cg_status = False
+            rec.devops_cg_diff = False
+            rec.devops_cg_stat = False
+            rec.devops_cg_tree_addons = False
             rec.log_workspace = False
-            rec.devops_code_generator_log_addons = False
+            rec.devops_cg_log_addons = False
 
     @api.multi
     def action_open_terminal_addons(self):
@@ -1337,7 +1321,7 @@ class DevopsWorkspace(models.Model):
             with rec_o.devops_create_exec_bundle("Generate data demo") as rec:
                 if rec.cg_demo_type_data == "simple":
                     # Project
-                    cg_id = self.env["devops.code_generator"].create(
+                    cg_id = self.env["devops.cg"].create(
                         {
                             "name": "Parc de voiture",
                             "devops_workspace_ids": [(6, 0, rec.ids)],
@@ -1345,9 +1329,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Module
-                    cg_module_id = self.env[
-                        "devops.code_generator.module"
-                    ].create(
+                    cg_module_id = self.env["devops.cg.module"].create(
                         {
                             "name": "parc",
                             "code_generator": cg_id.id,
@@ -1355,9 +1337,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Model
-                    cg_model_voiture_id = self.env[
-                        "devops.code_generator.module.model"
-                    ].create(
+                    cg_model_voiture_id = self.env["devops.cg.model"].create(
                         {
                             "name": "parc.voiture",
                             "description": "Ensemble de voiture dans le parc",
@@ -1367,7 +1347,7 @@ class DevopsWorkspace(models.Model):
                     )
                     # Field
                     cg_field_voiture_couleur_id = self.env[
-                        "devops.code_generator.module.model.field"
+                        "devops.cg.field"
                     ].create(
                         {
                             "name": "couleur",
@@ -1378,11 +1358,9 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     if rec.is_clear_before_cg_demo:
-                        rec.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-                        rec.devops_code_generator_module_ids = [
-                            (6, 0, cg_module_id.ids)
-                        ]
-                        rec.devops_code_generator_model_ids = [
+                        rec.devops_cg_ids = [(6, 0, cg_id.ids)]
+                        rec.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+                        rec.devops_cg_model_ids = [
                             (
                                 6,
                                 0,
@@ -1391,7 +1369,7 @@ class DevopsWorkspace(models.Model):
                                 ],
                             )
                         ]
-                        rec.devops_code_generator_field_ids = [
+                        rec.devops_cg_field_ids = [
                             (
                                 6,
                                 0,
@@ -1401,19 +1379,17 @@ class DevopsWorkspace(models.Model):
                             )
                         ]
                     else:
-                        rec.devops_code_generator_ids = [(4, cg_id.id)]
-                        rec.devops_code_generator_module_ids = [
-                            (4, cg_module_id.id)
-                        ]
-                        rec.devops_code_generator_model_ids = [
+                        rec.devops_cg_ids = [(4, cg_id.id)]
+                        rec.devops_cg_module_ids = [(4, cg_module_id.id)]
+                        rec.devops_cg_model_ids = [
                             (4, cg_model_voiture_id.id),
                         ]
-                        rec.devops_code_generator_field_ids = [
+                        rec.devops_cg_field_ids = [
                             (4, cg_field_voiture_couleur_id.id),
                         ]
                 elif rec.cg_demo_type_data == "devops_example":
                     # Project
-                    cg_id = self.env["devops.code_generator"].create(
+                    cg_id = self.env["devops.cg"].create(
                         {
                             "name": "Projet exemple",
                             "devops_workspace_ids": [(6, 0, rec.ids)],
@@ -1421,9 +1397,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Module
-                    cg_module_id = self.env[
-                        "devops.code_generator.module"
-                    ].create(
+                    cg_module_id = self.env["devops.cg.module"].create(
                         {
                             "name": "erplibre_devops",
                             "code_generator": cg_id.id,
@@ -1431,9 +1405,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Model
-                    cg_model_example_id = self.env[
-                        "devops.code_generator.module.model"
-                    ].create(
+                    cg_model_example_id = self.env["devops.cg.model"].create(
                         {
                             "name": "devops.example",
                             "description": "Example feature to add to devops",
@@ -1442,9 +1414,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Field
-                    cg_field_size_id = self.env[
-                        "devops.code_generator.module.model.field"
-                    ].create(
+                    cg_field_size_id = self.env["devops.cg.field"].create(
                         {
                             "name": "size",
                             "help": "Size of this example.",
@@ -1454,11 +1424,9 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     if rec.is_clear_before_cg_demo:
-                        rec.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-                        rec.devops_code_generator_module_ids = [
-                            (6, 0, cg_module_id.ids)
-                        ]
-                        rec.devops_code_generator_model_ids = [
+                        rec.devops_cg_ids = [(6, 0, cg_id.ids)]
+                        rec.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+                        rec.devops_cg_model_ids = [
                             (
                                 6,
                                 0,
@@ -1467,7 +1435,7 @@ class DevopsWorkspace(models.Model):
                                 ],
                             )
                         ]
-                        rec.devops_code_generator_field_ids = [
+                        rec.devops_cg_field_ids = [
                             (
                                 6,
                                 0,
@@ -1477,19 +1445,17 @@ class DevopsWorkspace(models.Model):
                             )
                         ]
                     else:
-                        rec.devops_code_generator_ids = [(4, cg_id.id)]
-                        rec.devops_code_generator_module_ids = [
-                            (4, cg_module_id.id)
-                        ]
-                        rec.devops_code_generator_model_ids = [
+                        rec.devops_cg_ids = [(4, cg_id.id)]
+                        rec.devops_cg_module_ids = [(4, cg_module_id.id)]
+                        rec.devops_cg_model_ids = [
                             (4, cg_model_example_id.id),
                         ]
-                        rec.devops_code_generator_field_ids = [
+                        rec.devops_cg_field_ids = [
                             (4, cg_field_size_id.id),
                         ]
                 elif rec.cg_demo_type_data == "ore":
                     # Project
-                    cg_id = self.env["devops.code_generator"].create(
+                    cg_id = self.env["devops.cg"].create(
                         {
                             "name": "Offrir Recevoir Échanger",
                             "devops_workspace_ids": [(6, 0, rec.ids)],
@@ -1497,9 +1463,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Module
-                    cg_module_id = self.env[
-                        "devops.code_generator.module"
-                    ].create(
+                    cg_module_id = self.env["devops.cg.module"].create(
                         {
                             "name": "ore",
                             "code_generator": cg_id.id,
@@ -1507,9 +1471,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     # Model
-                    cg_model_offre_id = self.env[
-                        "devops.code_generator.module.model"
-                    ].create(
+                    cg_model_offre_id = self.env["devops.cg.model"].create(
                         {
                             "name": "ore.offre.service",
                             "description": (
@@ -1520,9 +1482,7 @@ class DevopsWorkspace(models.Model):
                             "devops_workspace_ids": [(6, 0, rec.ids)],
                         }
                     )
-                    cg_model_demande_id = self.env[
-                        "devops.code_generator.module.model"
-                    ].create(
+                    cg_model_demande_id = self.env["devops.cg.model"].create(
                         {
                             "name": "ore.demande.service",
                             "description": (
@@ -1535,7 +1495,7 @@ class DevopsWorkspace(models.Model):
                     )
                     # Field
                     cg_field_offre_date_afficher_id = self.env[
-                        "devops.code_generator.module.model.field"
+                        "devops.cg.field"
                     ].create(
                         {
                             "name": "date_service_afficher",
@@ -1549,7 +1509,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     cg_field_offre_temps_estime_id = self.env[
-                        "devops.code_generator.module.model.field"
+                        "devops.cg.field"
                     ].create(
                         {
                             "name": "temp_estime",
@@ -1563,7 +1523,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     cg_field_demande_date_afficher_id = self.env[
-                        "devops.code_generator.module.model.field"
+                        "devops.cg.field"
                     ].create(
                         {
                             "name": "date_service_afficher",
@@ -1577,7 +1537,7 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     cg_field_demande_condition_id = self.env[
-                        "devops.code_generator.module.model.field"
+                        "devops.cg.field"
                     ].create(
                         {
                             "name": "condition",
@@ -1588,11 +1548,9 @@ class DevopsWorkspace(models.Model):
                         }
                     )
                     if rec.is_clear_before_cg_demo:
-                        rec.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-                        rec.devops_code_generator_module_ids = [
-                            (6, 0, cg_module_id.ids)
-                        ]
-                        rec.devops_code_generator_model_ids = [
+                        rec.devops_cg_ids = [(6, 0, cg_id.ids)]
+                        rec.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+                        rec.devops_cg_model_ids = [
                             (
                                 6,
                                 0,
@@ -1602,7 +1560,7 @@ class DevopsWorkspace(models.Model):
                                 ],
                             )
                         ]
-                        rec.devops_code_generator_field_ids = [
+                        rec.devops_cg_field_ids = [
                             (
                                 6,
                                 0,
@@ -1615,15 +1573,13 @@ class DevopsWorkspace(models.Model):
                             )
                         ]
                     else:
-                        rec.devops_code_generator_ids = [(4, cg_id.id)]
-                        rec.devops_code_generator_module_ids = [
-                            (4, cg_module_id.id)
-                        ]
-                        rec.devops_code_generator_model_ids = [
+                        rec.devops_cg_ids = [(4, cg_id.id)]
+                        rec.devops_cg_module_ids = [(4, cg_module_id.id)]
+                        rec.devops_cg_model_ids = [
                             (4, cg_model_offre_id.id),
                             (4, cg_model_demande_id.id),
                         ]
-                        rec.devops_code_generator_field_ids = [
+                        rec.devops_cg_field_ids = [
                             (4, cg_field_offre_date_afficher_id.id),
                             (4, cg_field_offre_temps_estime_id.id),
                             (4, cg_field_demande_date_afficher_id.id),
@@ -1740,7 +1696,7 @@ class DevopsWorkspace(models.Model):
                     folder=folder,
                     to_instance=True,
                 )
-                rec.devops_code_generator_tree_addons = exec_id.log_all
+                rec.devops_cg_tree_addons = exec_id.log_all
 
     @api.multi
     def action_restore_db_image(self):

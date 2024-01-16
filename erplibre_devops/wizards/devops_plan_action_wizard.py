@@ -285,7 +285,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             wp_id.code_mode_context_generator = "autopoiesis"
             wp_id.mode_view = "same_view"
             # Project
-            cg_id = self.env["devops.code_generator"].create(
+            cg_id = self.env["devops.cg"].create(
                 {
                     "name": "Autopoiesis regenerate",
                     "devops_workspace_ids": [(6, 0, wp_id.ids)],
@@ -293,7 +293,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 }
             )
             # Module
-            cg_module_id = self.env["devops.code_generator.module"].create(
+            cg_module_id = self.env["devops.cg.module"].create(
                 {
                     "name": "erplibre_devops",
                     "code_generator": cg_id.id,
@@ -302,10 +302,10 @@ class DevopsPlanActionWizard(models.TransientModel):
             )
             # Overwrite information
             # TODO this is a bug, no need that in reality, but action_code_generator_generate_all loop into it
-            wp_id.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-            wp_id.devops_code_generator_module_ids = [(6, 0, cg_module_id.ids)]
-            wp_id.devops_code_generator_model_ids = [(6, 0, [])]
-            wp_id.devops_code_generator_field_ids = [(6, 0, [])]
+            wp_id.devops_cg_ids = [(6, 0, cg_id.ids)]
+            wp_id.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+            wp_id.devops_cg_model_ids = [(6, 0, [])]
+            wp_id.devops_cg_field_ids = [(6, 0, [])]
             # Generate
             wp_id.action_code_generator_generate_all()
             self.generated_new_project_id = wp_id.last_new_project_cg.id
@@ -332,7 +332,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         else:
             relative_path_module = dir_name
         # Project
-        cg_id = self.env["devops.code_generator"].create(
+        cg_id = self.env["devops.cg"].create(
             {
                 "name": project_name,
                 "devops_workspace_ids": [(6, 0, wp_id.ids)],
@@ -340,7 +340,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             }
         )
         # Module
-        cg_module_id = self.env["devops.code_generator.module"].create(
+        cg_module_id = self.env["devops.cg.module"].create(
             {
                 "name": module_name,
                 "code_generator": cg_id.id,
@@ -348,7 +348,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             }
         )
         # Model
-        cg_model_id = self.env["devops.code_generator.module.model"].create(
+        cg_model_id = self.env["devops.cg.model"].create(
             {
                 "name": self.model_name,
                 "description": self.model_description,
@@ -358,7 +358,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         )
         # Field
         # cg_field_id = self.env[
-        #     "devops.code_generator.module.model.field"
+        #     "devops.cg.field"
         # ].create(
         #     {
         #         "name": "size",
@@ -370,10 +370,10 @@ class DevopsPlanActionWizard(models.TransientModel):
         # )
         # Overwrite information
         wp_id.path_code_generator_to_generate = relative_path_module
-        wp_id.devops_code_generator_ids = [(6, 0, cg_id.ids)]
-        wp_id.devops_code_generator_module_ids = [(6, 0, cg_module_id.ids)]
-        wp_id.devops_code_generator_model_ids = [(6, 0, [cg_model_id.id])]
-        wp_id.devops_code_generator_field_ids = [(6, 0, [])]
+        wp_id.devops_cg_ids = [(6, 0, cg_id.ids)]
+        wp_id.devops_cg_module_ids = [(6, 0, cg_module_id.ids)]
+        wp_id.devops_cg_model_ids = [(6, 0, [cg_model_id.id])]
+        wp_id.devops_cg_field_ids = [(6, 0, [])]
         # Update configuration self-gen
         wp_id.mode_view = "new_view"
         if is_autopoiesis:

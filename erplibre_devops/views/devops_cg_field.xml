@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="devops_code_generator_module_model_field_view_form" model="ir.ui.view">
-        <field name="name">devops_code_generator_module_model_field_form</field>
-        <field name="model">devops.code_generator.module.model.field</field>
+    <record id="devops_cg_field_view_form" model="ir.ui.view">
+        <field name="name">devops_cg_field_form</field>
+        <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
@@ -35,9 +35,9 @@
         </field>
     </record>
 
-    <record id="devops_code_generator_module_model_field_view_graph" model="ir.ui.view">
-        <field name="name">devops_code_generator_module_model_field_graph</field>
-        <field name="model">devops.code_generator.module.model.field</field>
+    <record id="devops_cg_field_view_graph" model="ir.ui.view">
+        <field name="name">devops_cg_field_graph</field>
+        <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <graph string="DevOps code generator module model field">
                 <field name="name" type="row" />
@@ -48,9 +48,9 @@
         </field>
     </record>
 
-    <record id="devops_code_generator_module_model_field_view_kanban" model="ir.ui.view">
-        <field name="name">devops_code_generator_module_model_field_kanban</field>
-        <field name="model">devops.code_generator.module.model.field</field>
+    <record id="devops_cg_field_view_kanban" model="ir.ui.view">
+        <field name="name">devops_cg_field_kanban</field>
+        <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -91,9 +91,9 @@
         </field>
     </record>
 
-    <record id="devops_code_generator_module_model_field_view_pivot" model="ir.ui.view">
-        <field name="name">devops_code_generator_module_model_field_pivot</field>
-        <field name="model">devops.code_generator.module.model.field</field>
+    <record id="devops_cg_field_view_pivot" model="ir.ui.view">
+        <field name="name">devops_cg_field_pivot</field>
+        <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <pivot string="DevOps code generator module model field">
                 <field name="name" type="row" />
@@ -104,9 +104,9 @@
         </field>
     </record>
 
-    <record id="devops_code_generator_module_model_field_view_search" model="ir.ui.view">
-        <field name="name">devops_code_generator_module_model_field_search</field>
-        <field name="model">devops.code_generator.module.model.field</field>
+    <record id="devops_cg_field_view_search" model="ir.ui.view">
+        <field name="name">devops_cg_field_search</field>
+        <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <search string="DevOps code generator module model field">
                 <filter name="name" string="Name" domain="[('name','!=',False)]" />
@@ -117,9 +117,9 @@
         </field>
     </record>
 
-    <record id="devops_code_generator_module_model_field_view_tree" model="ir.ui.view">
-        <field name="name">devops_code_generator_module_model_field_tree</field>
-        <field name="model">devops.code_generator.module.model.field</field>
+    <record id="devops_cg_field_view_tree" model="ir.ui.view">
+        <field name="name">devops_cg_field_tree</field>
+        <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <tree decoration-danger="has_error">
                 <field name="has_error" invisible="True" />
@@ -137,9 +137,9 @@
     </record>
 
     <act_window
-        id="devops_code_generator_module_model_field_code_generator_module_model_field_action_window"
+        id="devops_cg_field_code_generator_module_model_field_action_window"
         name="Code generator module model field"
-        res_model="devops.code_generator.module.model.field"
+        res_model="devops.cg.field"
         view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

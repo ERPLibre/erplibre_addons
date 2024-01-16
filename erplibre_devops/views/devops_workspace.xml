@@ -491,25 +491,25 @@
                         <group string="Generator">
                             <field name="id" invisible="True" />
                             <field
-                                name="devops_code_generator_ids"
+                                name="devops_cg_ids"
                                 widget="many2many"
                                 options="{'always_reload': True}"
                                 context="{'default_devops_workspace_ids': [id]}"
                             />
                             <field
-                                name="devops_code_generator_module_ids"
+                                name="devops_cg_module_ids"
                                 widget="many2many"
                                 options="{'always_reload': True}"
                                 context="{'default_devops_workspace_ids': [id]}"
                             />
                             <field
-                                name="devops_code_generator_model_ids"
+                                name="devops_cg_model_ids"
                                 widget="many2many"
                                 options="{'always_reload': True}"
                                 context="{'default_devops_workspace_ids': [id]}"
                             />
                             <field
-                                name="devops_code_generator_field_ids"
+                                name="devops_cg_field_ids"
                                 widget="many2many"
                                 options="{'always_reload': True}"
                                 context="{'default_devops_workspace_ids': [id]}"
@@ -517,13 +517,13 @@
                         </group>
                     </page>
                     <page name="code_generator_info_diff" string="Diff">
-                        <field name="devops_code_generator_diff" />
+                        <field name="devops_cg_diff" />
                     </page>
                     <page name="code_generator_info_status" string="Status">
-                        <field name="devops_code_generator_status" />
+                        <field name="devops_cg_status" />
                     </page>
                     <page name="code_generator_info_stat" string="Stat">
-                        <field name="devops_code_generator_stat" />
+                        <field name="devops_cg_stat" />
                     </page>
                     <page name="makefile" string="Makefile">
                         <field name="log_makefile_target_ids" />
@@ -537,14 +537,14 @@
                                 class="oe_highlight"
                             />
                         </group>
-                        <field name="devops_code_generator_tree_addons" />
+                        <field name="devops_cg_tree_addons" />
                     </page>
                     <page name="log" string="Log">
                         <group>
                             <field name="log_workspace" />
                         </group>
                         <group>
-                            <field name="devops_code_generator_log_addons" />
+                            <field name="devops_cg_log_addons" />
                         </group>
                     </page>
                     <page name="install" string="Install">
