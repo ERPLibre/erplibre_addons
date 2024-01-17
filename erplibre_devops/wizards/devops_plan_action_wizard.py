@@ -130,6 +130,9 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("f_new_project_society", "New society"),
             ("g_test_erplibre", "Test ERPLibre"),
             ("g_a_local", "Test ERPLibre local"),
+            ("h_run_test", "Run test"),
+            ("h_a_all", "Run all test"),
+            ("h_b_cg", "Run test code generator"),
             ("not_supported", "Not supported"),
             ("final", "Final"),
         ]
@@ -164,6 +167,20 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_g_test_erplibre(self):
         self.state = "g_test_erplibre"
+        return self._reopen_self()
+
+    def state_goto_h_run_test(self):
+        self.state = "h_run_test"
+        return self._reopen_self()
+
+    def state_goto_h_a_all(self):
+
+        # finally
+        self.state = "final"
+        return self._reopen_self()
+
+    def state_goto_h_b_cg(self):
+        self.state = "h_b_cg"
         return self._reopen_self()
 
     def state_goto_g_a_local(self):
@@ -224,6 +241,16 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_previous_g_a_local(self):
         self.state = "g_test_erplibre"
+
+    def state_previous_h_run_test(self):
+        self.state = "init"
+
+    #
+    # def state_previous_h_a_all(self):
+    #     self.state = "h_run_test"
+
+    def state_previous_h_b_cg(self):
+        self.state = "h_run_test"
 
     def state_exit_c_a_model(self):
         with self.root_workspace_id.devops_create_exec_bundle(

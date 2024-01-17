@@ -74,12 +74,12 @@
                         <!--                        />-->
                     </group>
                     <group string="Quality">
-                        <!--                        <button-->
-                        <!--                            name="state_goto_not_supported"-->
-                        <!--                            string="Running test"-->
-                        <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
-                        <!--                        />-->
+                        <button
+                            name="state_goto_h_run_test"
+                            string="Running test"
+                            type="object"
+                            class="btn btn-default"
+                        />
                         <!--                        <button-->
                         <!--                            name="state_goto_not_supported"-->
                         <!--                            string="Analyse/inspection"-->
@@ -177,6 +177,20 @@
                     <group string="Option">
                         <button name="state_goto_c_a_model" string="Add model" type="object" class="btn btn-default" />
                     </group>
+                </group>
+                <group name="group_h_run_test" attrs="{'invisible': [('state', '!=', 'h_run_test')]}">
+                    <group string="Test type">
+                        <button name="state_goto_h_a_all" string="Run ALL" type="object" class="btn btn-default" />
+                        <button
+                            name="state_goto_h_b_cg"
+                            string="Code generator by selection"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                    </group>
+                </group>
+                <group name="group_h_b_cg" attrs="{'invisible': [('state', '!=', 'h_b_cg')]}">
+                    <group string="Test type" />
                 </group>
                 <!--                <group name="group_a_autopoiesis_devops" attrs="{'invisible': [('state', '!=', 'a_a_model')]}">-->
                 <!--                    <group>-->
