@@ -21,7 +21,7 @@ from . import (
     devops_system,
     devops_test,
     devops_test_cg_exec,
-    devops_test_exec,
+    devops_test_devops_exec,
     devops_test_plan,
     devops_test_plan_cg,
     devops_test_plan_devops,

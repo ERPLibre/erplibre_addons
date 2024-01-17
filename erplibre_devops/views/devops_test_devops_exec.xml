@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="devops_test_exec_view_form" model="ir.ui.view">
-        <field name="name">devops_test_exec_form</field>
-        <field name="model">devops.test.exec</field>
+    <record id="devops_test_devops_exec_view_form" model="ir.ui.view">
+        <field name="name">devops_test_devops_exec_form</field>
+        <field name="model">devops.test.devops.exec</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
                     <group>
                         <field name="name" />
+                        <field name="is_finish" />
+                        <field name="is_pass" />
+                        <field name="log" />
+                        <field name="test_plan_devops_id" />
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <record id="devops_test_exec_view_graph" model="ir.ui.view">
-        <field name="name">devops_test_exec_graph</field>
-        <field name="model">devops.test.exec</field>
+    <record id="devops_test_devops_exec_view_graph" model="ir.ui.view">
+        <field name="name">devops_test_devops_exec_graph</field>
+        <field name="model">devops.test.devops.exec</field>
         <field name="arch" type="xml">
             <graph string="Devops test exec">
                 <field name="name" type="row" />
@@ -24,9 +28,9 @@
         </field>
     </record>
 
-    <record id="devops_test_exec_view_kanban" model="ir.ui.view">
-        <field name="name">devops_test_exec_kanban</field>
-        <field name="model">devops.test.exec</field>
+    <record id="devops_test_devops_exec_view_kanban" model="ir.ui.view">
+        <field name="name">devops_test_devops_exec_kanban</field>
+        <field name="model">devops.test.devops.exec</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -49,9 +53,9 @@
         </field>
     </record>
 
-    <record id="devops_test_exec_view_pivot" model="ir.ui.view">
-        <field name="name">devops_test_exec_pivot</field>
-        <field name="model">devops.test.exec</field>
+    <record id="devops_test_devops_exec_view_pivot" model="ir.ui.view">
+        <field name="name">devops_test_devops_exec_pivot</field>
+        <field name="model">devops.test.devops.exec</field>
         <field name="arch" type="xml">
             <pivot string="Devops test exec">
                 <field name="name" type="row" />
@@ -59,9 +63,9 @@
         </field>
     </record>
 
-    <record id="devops_test_exec_view_search" model="ir.ui.view">
-        <field name="name">devops_test_exec_search</field>
-        <field name="model">devops.test.exec</field>
+    <record id="devops_test_devops_exec_view_search" model="ir.ui.view">
+        <field name="name">devops_test_devops_exec_search</field>
+        <field name="model">devops.test.devops.exec</field>
         <field name="arch" type="xml">
             <search string="Devops test exec">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
@@ -69,9 +73,9 @@
         </field>
     </record>
 
-    <record id="devops_test_exec_view_tree" model="ir.ui.view">
-        <field name="name">devops_test_exec_tree</field>
-        <field name="model">devops.test.exec</field>
+    <record id="devops_test_devops_exec_view_tree" model="ir.ui.view">
+        <field name="name">devops_test_devops_exec_tree</field>
+        <field name="model">devops.test.devops.exec</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -80,9 +84,9 @@
     </record>
 
     <act_window
-        id="devops_test_exec_test_exec_action_window"
+        id="devops_test_devops_exec_test_devops_exec_action_window"
         name="Test exec"
-        res_model="devops.test.exec"
+        res_model="devops.test.devops.exec"
         view_mode="kanban,tree,pivot,graph,form"
     />
 </odoo>

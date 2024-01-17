@@ -44,7 +44,6 @@
                     />
                     <button name="action_start_pycharm" string="Start PyCharm" type="object" class="oe_highlight" />
                     <button name="action_kill_pycharm" string="Kill PyCharm" type="object" class="oe_highlight" />
-                    <button name="action_run_test" string="Run test" type="object" class="oe_highlight" />
                     <button
                         name="action_new_project"
                         string="Run this stage only"

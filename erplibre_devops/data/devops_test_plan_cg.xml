@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_test_plan_cg_1" model="devops.test.plan.cg">
+            <field name="name">test 1</field>
+        </record>
+    </data>
+</odoo>

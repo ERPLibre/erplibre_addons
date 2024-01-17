@@ -96,9 +96,9 @@
     />
 
     <menuitem
-        id="menu_test_exec"
-        name="Test exec"
-        action="devops_test_exec_test_exec_action_window"
+        id="menu_test_devops_exec"
+        name="Test DevOps exec"
+        action="devops_test_devops_exec_test_devops_exec_action_window"
         sequence="3"
         parent="menu_test"
     />

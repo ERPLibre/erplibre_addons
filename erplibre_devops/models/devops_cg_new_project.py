@@ -784,52 +784,6 @@ class DevopsCgNewProject(models.Model):
                     )
 
     @api.multi
-    def action_run_test(self, ctx=None):
-        for rec in self:
-            with rec.devops_workspace.devops_create_exec_bundle(
-                "New project run test",
-                devops_cg_new_project=rec.id,
-                ctx=ctx,
-            ) as rec_ws:
-                rec = rec.with_context(rec_ws._context)
-                bp_ids = self.env["devops.ide.breakpoint"].search([])
-                if not bp_ids:
-                    msg = f"List of breakpoint is empty."
-                    _logger.error(msg)
-                    raise exceptions.Warning(msg)
-                for bp_id in bp_ids:
-                    if bp_id.ignore_test:
-                        continue
-
-                    try:
-                        lst_line = bp_id.get_breakpoint_info(
-                            rec_ws, new_project_id=rec
-                        )
-                    except Exception as e:
-                        raise exceptions.Warning(
-                            f"Breakpoint '{bp_id.name}' : {e}"
-                        )
-                    if not lst_line:
-                        msg = (
-                            f"Cannot find breakpoint {bp_id.name} for file"
-                            f" {bp_id.filename}, key : {bp_id.keyword}"
-                        )
-                        _logger.error(msg)
-                        raise exceptions.Warning(msg)
-                    if not bp_id.is_multiple and (
-                        len(lst_line) != 1 or len(lst_line[0][1]) > 1
-                    ):
-                        msg = (
-                            f"Breakpoint {bp_id.name} is not suppose to find"
-                            f" multiple line and got '{lst_line}' into file"
-                            f" '{bp_id.filename}' with key '{bp_id.keyword}'"
-                        )
-                        _logger.error(msg)
-                        raise exceptions.Warning(msg)
-
-                _logger.info("Test pass")
-
-    @api.multi
     def action_new_project(self, ctx=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
