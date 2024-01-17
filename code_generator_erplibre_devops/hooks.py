@@ -4646,7 +4646,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 1145,
+            "no_line": 1085,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4656,7 +4656,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 609,
+            "no_line": 563,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4666,7 +4666,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 896,
+            "no_line": 836,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4676,7 +4676,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 978,
+            "no_line": 918,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4686,7 +4686,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 982,
+            "no_line": 922,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4696,7 +4696,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 1318,
+            "no_line": 1258,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -4706,7 +4706,7 @@ for o_rec in self:
             "generated_by_execution": True,
             "ignore_test": True,
             "name": "breakpoint_exec",
-            "no_line": 1318,
+            "no_line": 1258,
         }
         env["devops.ide.breakpoint"].create(value)
 
@@ -6454,7 +6454,7 @@ self.state = "final"''',
             },
             "cg_demo_type_data": {
                 "code_generator_form_simple_view_sequence": 14,
-                "code_generator_sequence": 25,
+                "code_generator_sequence": 30,
                 "default": "simple",
                 "field_description": "Cg Demo Type Data",
                 "help": (
@@ -6469,7 +6469,7 @@ self.state = "final"''',
             },
             "cg_self_add_config_cg": {
                 "code_generator_form_simple_view_sequence": 17,
-                "code_generator_sequence": 23,
+                "code_generator_sequence": 28,
                 "field_description": "Cg Self Add Config Cg",
                 "help": "Will use both feature of cg for self generate.",
                 "ttype": "boolean",
@@ -6488,7 +6488,7 @@ self.state = "final"''',
             },
             "config_uca_enable_export_data": {
                 "code_generator_form_simple_view_sequence": 18,
-                "code_generator_sequence": 13,
+                "code_generator_sequence": 18,
                 "default": True,
                 "field_description": "Config Uca Enable Export Data",
                 "help": (
@@ -6496,6 +6496,13 @@ self.state = "final"''',
                     " associate to models."
                 ),
                 "ttype": "boolean",
+            },
+            "devops_cg_diff": {
+                "code_generator_form_simple_view_sequence": 36,
+                "code_generator_sequence": 8,
+                "field_description": "Diff addons",
+                "help": "Will show diff git",
+                "ttype": "text",
             },
             "devops_cg_erplibre_devops_error_log": {
                 "code_generator_form_simple_view_sequence": 19,
@@ -6510,7 +6517,7 @@ self.state = "final"''',
             },
             "devops_cg_erplibre_devops_log": {
                 "code_generator_form_simple_view_sequence": 20,
-                "code_generator_sequence": 8,
+                "code_generator_sequence": 13,
                 "field_description": "Log CG erplibre_devops new_project",
                 "help": (
                     "Will show code generator log for new project"
@@ -6521,7 +6528,7 @@ self.state = "final"''',
             },
             "devops_cg_field_ids": {
                 "code_generator_form_simple_view_sequence": 35,
-                "code_generator_sequence": 12,
+                "code_generator_sequence": 17,
                 "field_description": "Field",
                 "force_widget": "many2many",
                 "relation": "devops.cg.field",
@@ -6529,15 +6536,22 @@ self.state = "final"''',
             },
             "devops_cg_ids": {
                 "code_generator_form_simple_view_sequence": 32,
-                "code_generator_sequence": 9,
+                "code_generator_sequence": 14,
                 "field_description": "Project",
                 "force_widget": "many2many",
                 "relation": "devops.cg",
                 "ttype": "many2many",
             },
+            "devops_cg_log_addons": {
+                "code_generator_form_simple_view_sequence": 40,
+                "code_generator_sequence": 12,
+                "field_description": "Log code generator",
+                "help": "Will show code generator log, last execution",
+                "ttype": "text",
+            },
             "devops_cg_model_ids": {
                 "code_generator_form_simple_view_sequence": 34,
-                "code_generator_sequence": 11,
+                "code_generator_sequence": 16,
                 "field_description": "Model",
                 "force_widget": "many2many",
                 "relation": "devops.cg.model",
@@ -6545,25 +6559,48 @@ self.state = "final"''',
             },
             "devops_cg_module_ids": {
                 "code_generator_form_simple_view_sequence": 33,
-                "code_generator_sequence": 10,
+                "code_generator_sequence": 15,
                 "field_description": "Module",
                 "force_widget": "many2many",
                 "relation": "devops.cg.module",
                 "ttype": "many2many",
+            },
+            "devops_cg_stat": {
+                "code_generator_form_simple_view_sequence": 38,
+                "code_generator_sequence": 10,
+                "field_description": "Stat addons",
+                "help": "Will show statistique code",
+                "ttype": "text",
+            },
+            "devops_cg_status": {
+                "code_generator_form_simple_view_sequence": 37,
+                "code_generator_sequence": 9,
+                "field_description": "Status addons",
+                "help": "Will show status git",
+                "ttype": "text",
+            },
+            "devops_cg_tree_addons": {
+                "code_generator_form_simple_view_sequence": 39,
+                "code_generator_sequence": 11,
+                "field_description": "Tree addons",
+                "help": (
+                    "Will show generated files from code generator or humain"
+                ),
+                "ttype": "text",
             },
             "has_re_execute_new_project": {
                 "code_generator_compute": (
                     "_compute_has_re_execute_new_project"
                 ),
                 "code_generator_form_simple_view_sequence": 11,
-                "code_generator_sequence": 14,
+                "code_generator_sequence": 19,
                 "field_description": "Has Re Execute New Project",
                 "store": True,
                 "ttype": "boolean",
             },
             "is_clear_before_cg_demo": {
                 "code_generator_form_simple_view_sequence": 13,
-                "code_generator_sequence": 28,
+                "code_generator_sequence": 33,
                 "default": True,
                 "field_description": "Is Clear Before Cg Demo",
                 "help": (
@@ -6574,14 +6611,14 @@ self.state = "final"''',
             },
             "last_new_project_cg": {
                 "code_generator_form_simple_view_sequence": 15,
-                "code_generator_sequence": 26,
+                "code_generator_sequence": 31,
                 "field_description": "Last new project cg",
                 "relation": "devops.cg.new_project",
                 "ttype": "many2one",
             },
             "mode_view": {
                 "code_generator_form_simple_view_sequence": 21,
-                "code_generator_sequence": 15,
+                "code_generator_sequence": 20,
                 "default": "same_view",
                 "field_description": "Mode View",
                 "help": (
@@ -6595,7 +6632,7 @@ self.state = "final"''',
             },
             "mode_view_snippet": {
                 "code_generator_form_simple_view_sequence": 22,
-                "code_generator_sequence": 16,
+                "code_generator_sequence": 21,
                 "default": "no_snippet",
                 "field_description": "Mode View Snippet",
                 "help": "Will active feature to generate snippet",
@@ -6607,7 +6644,7 @@ self.state = "final"''',
             },
             "mode_view_snippet_enable_template_website_snippet_view": {
                 "code_generator_form_simple_view_sequence": 23,
-                "code_generator_sequence": 17,
+                "code_generator_sequence": 22,
                 "default": True,
                 "field_description": (
                     "Mode View Snippet Enable Template Website Snippet View"
@@ -6617,7 +6654,7 @@ self.state = "final"''',
             },
             "mode_view_snippet_template_generate_website_enable_javascript": {
                 "code_generator_form_simple_view_sequence": 26,
-                "code_generator_sequence": 20,
+                "code_generator_sequence": 25,
                 "default": True,
                 "field_description": (
                     "Mode View Snippet Template Generate Website Enable"
@@ -6628,7 +6665,7 @@ self.state = "final"''',
             },
             "mode_view_snippet_template_generate_website_snippet_ctrl_featur": {
                 "code_generator_form_simple_view_sequence": 25,
-                "code_generator_sequence": 19,
+                "code_generator_sequence": 24,
                 "default": "model_show_item_individual",
                 "field_description": (
                     "Mode View Snippet Template Generate Website Snippet Ctrl"
@@ -6645,7 +6682,7 @@ self.state = "final"''',
             },
             "mode_view_snippet_template_generate_website_snippet_generic_mdl": {
                 "code_generator_form_simple_view_sequence": 24,
-                "code_generator_sequence": 18,
+                "code_generator_sequence": 23,
                 "field_description": (
                     "Mode View Snippet Template Generate Website Snippet"
                     " Generic Mdl"
@@ -6655,7 +6692,7 @@ self.state = "final"''',
             },
             "mode_view_snippet_template_generate_website_snippet_type": {
                 "code_generator_form_simple_view_sequence": 27,
-                "code_generator_sequence": 21,
+                "code_generator_sequence": 26,
                 "default": "effect",
                 "field_description": (
                     "Mode View Snippet Template Generate Website Snippet Type"
@@ -6677,7 +6714,7 @@ self.state = "final"''',
             },
             "need_debugger_cg_erplibre_devops": {
                 "code_generator_form_simple_view_sequence": 12,
-                "code_generator_sequence": 24,
+                "code_generator_sequence": 29,
                 "field_description": "Need Debugger Cg Erplibre Devops",
                 "help": (
                     "CG erplibre_devops got error, detect can use the debugger"
@@ -6686,14 +6723,14 @@ self.state = "final"''',
             },
             "path_code_generator_to_generate": {
                 "code_generator_form_simple_view_sequence": 29,
-                "code_generator_sequence": 27,
+                "code_generator_sequence": 32,
                 "default": "addons/addons",
                 "field_description": "Path Code Generator To Generate",
                 "ttype": "char",
             },
             "path_working_erplibre": {
                 "code_generator_form_simple_view_sequence": 30,
-                "code_generator_sequence": 22,
+                "code_generator_sequence": 27,
                 "default": "/ERPLibre",
                 "field_description": "Path Working Erplibre",
                 "ttype": "char",
@@ -7684,6 +7721,43 @@ return model_conf""",
                 },
                 {
                     "code": """for rec in self:
+    with rec.workspace_id.devops_create_exec_bundle(
+        "Open terminal ERPLibre DevOps"
+    ) as rec_ws:
+        folder = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        rec_ws.execute(folder=folder, force_open_terminal=True)""",
+                    "name": "action_open_terminal_path_erplibre_devops",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 19,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec_o in self:
+    with rec_o.devops_create_exec_bundle("Check tree addons") as rec:
+        folder = os.path.join(
+            rec.path_working_erplibre,
+            rec.path_code_generator_to_generate,
+        )
+        exec_id = rec.execute(
+            cmd=f"tree",
+            folder=folder,
+            to_instance=True,
+        )
+        rec.devops_cg_tree_addons = exec_id.log_all""",
+                    "name": "action_check_tree_addons",
+                    "decorator": "@api.multi",
+                    "param": "self",
+                    "sequence": 20,
+                    "m2o_module": code_generator_id.id,
+                    "m2o_model": model_devops_plan_cg.id,
+                },
+                {
+                    "code": """for rec in self:
     rec.has_re_execute_new_project = bool(
         rec.last_new_project_cg and rec.last_new_project_cg.has_error
     )""",
@@ -7693,7 +7767,7 @@ return model_conf""",
                         ' "last_new_project_cg.has_error")'
                     ),
                     "param": "self",
-                    "sequence": 19,
+                    "sequence": 21,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_plan_cg.id,
                 },
@@ -8441,43 +8515,6 @@ for rec in self:
                 "field_description": "DB instance name",
                 "ttype": "char",
             },
-            "devops_cg_diff": {
-                "code_generator_form_simple_view_sequence": 45,
-                "code_generator_sequence": 38,
-                "field_description": "Diff addons",
-                "help": "Will show diff git",
-                "ttype": "text",
-            },
-            "devops_cg_log_addons": {
-                "code_generator_form_simple_view_sequence": 51,
-                "code_generator_sequence": 41,
-                "field_description": "Log code generator",
-                "help": "Will show code generator log, last execution",
-                "ttype": "text",
-            },
-            "devops_cg_stat": {
-                "code_generator_form_simple_view_sequence": 47,
-                "code_generator_sequence": 40,
-                "field_description": "Stat addons",
-                "help": "Will show statistique code",
-                "ttype": "text",
-            },
-            "devops_cg_status": {
-                "code_generator_form_simple_view_sequence": 46,
-                "code_generator_sequence": 39,
-                "field_description": "Status addons",
-                "help": "Will show status git",
-                "ttype": "text",
-            },
-            "devops_cg_tree_addons": {
-                "code_generator_form_simple_view_sequence": 49,
-                "code_generator_sequence": 37,
-                "field_description": "Tree addons",
-                "help": (
-                    "Will show generated files from code generator or humain"
-                ),
-                "ttype": "text",
-            },
             "devops_exec_bundle_count": {
                 "code_generator_compute": "_compute_devops_exec_bundle_count",
                 "code_generator_form_simple_view_sequence": 16,
@@ -8549,20 +8586,20 @@ for rec in self:
             },
             "git_branch": {
                 "code_generator_form_simple_view_sequence": 34,
-                "code_generator_sequence": 48,
+                "code_generator_sequence": 43,
                 "field_description": "Git branch",
                 "ttype": "char",
             },
             "git_url": {
                 "code_generator_form_simple_view_sequence": 35,
-                "code_generator_sequence": 49,
+                "code_generator_sequence": 44,
                 "default": "https://github.com/ERPLibre/ERPLibre",
                 "field_description": "Git URL",
                 "ttype": "char",
             },
             "has_error_restore_db": {
                 "code_generator_form_simple_view_sequence": 43,
-                "code_generator_sequence": 53,
+                "code_generator_sequence": 48,
                 "field_description": "Has Error Restore Db",
                 "ttype": "boolean",
             },
@@ -8575,7 +8612,7 @@ for rec in self:
             },
             "image_db_selection": {
                 "code_generator_form_simple_view_sequence": 38,
-                "code_generator_sequence": 57,
+                "code_generator_sequence": 52,
                 "default_lambda": "_default_image_db_selection",
                 "field_description": "Image Db Selection",
                 "relation": "devops.db.image",
@@ -8584,7 +8621,7 @@ for rec in self:
             "is_conflict_mode_exec": {
                 "code_generator_compute": "_compute_is_conflict_mode_exec",
                 "code_generator_form_simple_view_sequence": 25,
-                "code_generator_sequence": 45,
+                "code_generator_sequence": 40,
                 "field_description": "Is Conflict Mode Exec",
                 "store": True,
                 "ttype": "boolean",
@@ -8625,14 +8662,14 @@ for rec in self:
                 "ttype": "boolean",
             },
             "log_workspace": {
-                "code_generator_form_simple_view_sequence": 50,
+                "code_generator_form_simple_view_sequence": 46,
                 "code_generator_sequence": 17,
                 "field_description": "Log Workspace",
                 "ttype": "text",
             },
             "mode_environnement": {
                 "code_generator_form_simple_view_sequence": 22,
-                "code_generator_sequence": 44,
+                "code_generator_sequence": 39,
                 "code_generator_tree_view_sequence": 16,
                 "default": "test",
                 "field_description": "Mode Environnement",
@@ -8649,7 +8686,7 @@ for rec in self:
             },
             "mode_exec": {
                 "code_generator_form_simple_view_sequence": 21,
-                "code_generator_sequence": 43,
+                "code_generator_sequence": 38,
                 "code_generator_tree_view_sequence": 15,
                 "comment_before": "TODO add SystemD",
                 "default": "docker",
@@ -8662,7 +8699,7 @@ for rec in self:
             },
             "mode_source": {
                 "code_generator_form_simple_view_sequence": 20,
-                "code_generator_sequence": 42,
+                "code_generator_sequence": 37,
                 "code_generator_tree_view_sequence": 14,
                 "default": "docker",
                 "field_description": "Mode Source",
@@ -8672,7 +8709,7 @@ for rec in self:
             },
             "mode_version_base": {
                 "code_generator_form_simple_view_sequence": 24,
-                "code_generator_sequence": 47,
+                "code_generator_sequence": 42,
                 "code_generator_tree_view_sequence": 18,
                 "default": "12.0",
                 "field_description": "Mode Version Base",
@@ -8683,7 +8720,7 @@ for rec in self:
             },
             "mode_version_erplibre": {
                 "code_generator_form_simple_view_sequence": 23,
-                "code_generator_sequence": 46,
+                "code_generator_sequence": 41,
                 "code_generator_tree_view_sequence": 17,
                 "default": "1.5.0",
                 "field_description": "Mode Version Erplibre",
@@ -8742,7 +8779,7 @@ for rec in self:
             "plan_cg_count": {
                 "code_generator_compute": "_compute_plan_cg_count",
                 "code_generator_form_simple_view_sequence": 13,
-                "code_generator_sequence": 55,
+                "code_generator_sequence": 50,
                 "field_description": "Plan CG count",
                 "force_widget": "statinfo",
                 "store": True,
@@ -8793,8 +8830,8 @@ for rec in self:
                 "ttype": "many2one",
             },
             "test_ids": {
-                "code_generator_form_simple_view_sequence": 52,
-                "code_generator_sequence": 51,
+                "code_generator_form_simple_view_sequence": 47,
+                "code_generator_sequence": 46,
                 "field_description": "Tests",
                 "relation": "devops.test",
                 "ttype": "many2many",
@@ -8819,13 +8856,13 @@ for rec in self:
             },
             "workspace_docker_id": {
                 "code_generator_form_simple_view_sequence": 40,
-                "code_generator_sequence": 50,
+                "code_generator_sequence": 45,
                 "field_description": "Workspace Docker",
                 "relation": "devops.workspace.docker",
                 "ttype": "many2one",
             },
             "workspace_terminal_id": {
-                "code_generator_sequence": 52,
+                "code_generator_sequence": 47,
                 "field_description": "Workspace Terminal",
                 "relation": "devops.workspace.terminal",
                 "ttype": "many2one",
@@ -9105,22 +9142,6 @@ return r_ids""",
                 {
                     "code": """for rec_o in self:
     with rec_o.devops_create_exec_bundle(
-        "Open terminal ERPLibre DevOps"
-    ) as rec:
-        folder_path = os.path.join(
-            rec.folder, "addons", "ERPLibre_erplibre_addons"
-        )
-        rec.execute(folder=folder_path, force_open_terminal=True)""",
-                    "name": "action_open_terminal_path_erplibre_devops",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 15,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle(
         "Format ERPLibre DevOps"
     ) as rec:
         rec.execute(
@@ -9132,7 +9153,7 @@ return r_ids""",
                     "name": "action_format_erplibre_devops",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 16,
+                    "sequence": 15,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9152,7 +9173,7 @@ return r_ids""",
                     "name": "action_update_erplibre_devops",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 17,
+                    "sequence": 16,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9182,7 +9203,7 @@ return r_ids""",
                     "name": "install_module",
                     "decorator": "@api.multi",
                     "param": "self, str_module_list",
-                    "sequence": 18,
+                    "sequence": 17,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9193,7 +9214,7 @@ return r_ids""",
                     "name": "action_open_terminal",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 19,
+                    "sequence": 18,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9210,22 +9231,7 @@ return r_ids""",
                     "name": "action_open_directory",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 20,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec in self:
-    rec.devops_cg_status = False
-    rec.devops_cg_diff = False
-    rec.devops_cg_stat = False
-    rec.devops_cg_tree_addons = False
-    rec.log_workspace = False
-    rec.devops_cg_log_addons = False""",
-                    "name": "action_clear_cache",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 21,
+                    "sequence": 19,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9235,7 +9241,7 @@ return self.search([]).action_check()''',
                     "name": "action_check_all",
                     "decorator": "@api.model",
                     "param": "self",
-                    "sequence": 22,
+                    "sequence": 20,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9272,7 +9278,7 @@ return self.search([]).action_check()''',
                     "name": "action_check",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 23,
+                    "sequence": 21,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9297,26 +9303,7 @@ return self.search([]).action_check()''',
                     "name": "action_install_me_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 24,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_workspace.id,
-                },
-                {
-                    "code": """for rec_o in self:
-    with rec_o.devops_create_exec_bundle("Check tree addons") as rec:
-        folder = os.path.join(
-            rec.path_working_erplibre, "addons", "addons"
-        )
-        exec_id = rec.execute(
-            cmd=f"tree",
-            folder=folder,
-            to_instance=True,
-        )
-        rec.devops_cg_tree_addons = exec_id.log_all""",
-                    "name": "action_check_tree_addons",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 25,
+                    "sequence": 22,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9456,7 +9443,7 @@ return self.search([]).action_check()''',
                     "name": "action_restore_db_image",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 26,
+                    "sequence": 23,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9477,7 +9464,7 @@ return self.search([]).action_check()''',
                     "name": "check_devops_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 27,
+                    "sequence": 24,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9502,7 +9489,7 @@ return self.search([]).action_check()''',
                     "name": "action_start",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 28,
+                    "sequence": 25,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9528,7 +9515,7 @@ return self.search([]).action_check()''',
                     "name": "action_stop",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 29,
+                    "sequence": 26,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9541,7 +9528,7 @@ return self.search([]).action_check()''',
                     "name": "action_update",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 30,
+                    "sequence": 27,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9575,7 +9562,7 @@ return self.search([]).action_check()''',
                     "name": "action_reboot",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 31,
+                    "sequence": 28,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9609,7 +9596,7 @@ return self.search([]).action_check()''',
                     "name": "kill_process",
                     "decorator": "@api.multi",
                     "param": "self, port=None, sleep_kill=0",
-                    "sequence": 32,
+                    "sequence": 29,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9694,7 +9681,7 @@ return self.search([]).action_check()''',
                     "name": "action_install_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 33,
+                    "sequence": 30,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9726,7 +9713,7 @@ return self.search([]).action_check()''',
                     "name": "update_makefile_from_git",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 34,
+                    "sequence": 31,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9860,7 +9847,7 @@ return self.env["devops.exec"].browse([a.id for a in lst_result])""",
                         " run_into_workspace=False, to_instance=False,"
                         " engine='bash', delimiter_bash='''"
                     ),
-                    "sequence": 35,
+                    "sequence": 32,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9872,7 +9859,7 @@ return targets""",
                     "name": "get_lst_target_makefile",
                     "decorator": "@api.model",
                     "param": "self, content",
-                    "sequence": 36,
+                    "sequence": 33,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9883,7 +9870,7 @@ return result.log_all.strip() == "true"''',
                     "name": "os_path_exists",
                     "decorator": "@api.model",
                     "param": "self, path, to_instance=False",
-                    "sequence": 37,
+                    "sequence": 34,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9894,7 +9881,7 @@ return result.log_all""",
                     "name": "os_read_file",
                     "decorator": "@api.model",
                     "param": "self, path, to_instance=False",
-                    "sequence": 38,
+                    "sequence": 35,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9905,7 +9892,7 @@ return result.log_all""",
                     "name": "os_write_file",
                     "decorator": "@api.model",
                     "param": "self, path, content, to_instance=False",
-                    "sequence": 39,
+                    "sequence": 36,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9983,7 +9970,7 @@ for escaped_tb in lst_escaped_tb:
                     "name": "find_exec_error_from_log",
                     "decorator": "@api.model",
                     "param": "self, log, devops_exec, devops_exec_bundle_id",
-                    "sequence": 40,
+                    "sequence": 37,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -9996,7 +9983,7 @@ for escaped_tb in lst_escaped_tb:
                     "name": "action_poetry_install",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 41,
+                    "sequence": 38,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10012,7 +9999,7 @@ for escaped_tb in lst_escaped_tb:
                     "name": "action_pre_install_workspace",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 42,
+                    "sequence": 39,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10029,7 +10016,7 @@ for escaped_tb in lst_escaped_tb:
                         "self, ctx=None, default_port_http=8069,"
                         " default_port_longpolling=8072"
                     ),
-                    "sequence": 43,
+                    "sequence": 40,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10058,7 +10045,7 @@ for rec_o in self:
                     "name": "action_network_change_port_random",
                     "decorator": "@api.multi",
                     "param": "self, ctx=None, min_port=10000, max_port=20000",
-                    "sequence": 44,
+                    "sequence": 41,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10093,7 +10080,7 @@ return exec_id.log_all.strip() == "Port is open"''',
                     "name": "check_port_is_open",
                     "decorator": "@staticmethod",
                     "param": "rec, port",
-                    "sequence": 45,
+                    "sequence": 42,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10124,7 +10111,7 @@ return partner_ids, channel_ids""",
                     "name": "get_partner_channel",
                     "decorator": "@api.model",
                     "param": "self",
-                    "sequence": 46,
+                    "sequence": 43,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10176,7 +10163,7 @@ return self.env["devops.exec.error"].browse([a.id for a in lst_result])""",
                         " devops_exec_bundle_id, devops_exec_id,"
                         " parent_root_id, type_error"
                     ),
-                    "sequence": 47,
+                    "sequence": 44,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -10300,7 +10287,7 @@ finally:
                         " succeed_msg=False, devops_cg_new_project=None,"
                         " ctx=None"
                     ),
-                    "sequence": 48,
+                    "sequence": 45,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_workspace.id,
                 },
@@ -11198,7 +11185,7 @@ self.action_docker_check_docker_ps()""",
                 "ttype": "one2many",
                 "force_domain": [("parent_id", "=", False)],
                 "code_generator_sequence": 14,
-                "code_generator_form_simple_view_sequence": 54,
+                "code_generator_form_simple_view_sequence": 49,
                 "relation": "devops.exec.bundle",
                 "relation_field": "devops_workspace",
             },
@@ -11206,7 +11193,7 @@ self.action_docker_check_docker_ps()""",
                 "field_description": "Executions error",
                 "ttype": "one2many",
                 "code_generator_sequence": 15,
-                "code_generator_form_simple_view_sequence": 55,
+                "code_generator_form_simple_view_sequence": 50,
                 "relation": "devops.exec.error",
                 "relation_field": "devops_workspace",
             },
@@ -11214,7 +11201,7 @@ self.action_docker_check_docker_ps()""",
                 "field_description": "Executions",
                 "ttype": "one2many",
                 "code_generator_sequence": 7,
-                "code_generator_form_simple_view_sequence": 53,
+                "code_generator_form_simple_view_sequence": 48,
                 "relation": "devops.exec",
                 "relation_field": "devops_workspace",
             },
@@ -11222,7 +11209,7 @@ self.action_docker_check_docker_ps()""",
                 "field_description": "Makefile Targets",
                 "ttype": "one2many",
                 "code_generator_sequence": 19,
-                "code_generator_form_simple_view_sequence": 48,
+                "code_generator_form_simple_view_sequence": 45,
                 "relation": "devops.log.makefile.target",
                 "relation_field": "devops_workspace_id",
             },
@@ -11231,7 +11218,7 @@ self.action_docker_check_docker_ps()""",
                     "All new project associate with this workspace"
                 ),
                 "ttype": "one2many",
-                "code_generator_sequence": 56,
+                "code_generator_sequence": 51,
                 "relation": "devops.cg.new_project",
                 "relation_field": "devops_workspace",
             },
@@ -11239,7 +11226,7 @@ self.action_docker_check_docker_ps()""",
                 "field_description": "Plan CG",
                 "ttype": "one2many",
                 "help": "All plan code generator associate to this workspace",
-                "code_generator_sequence": 54,
+                "code_generator_sequence": 49,
                 "code_generator_form_simple_view_sequence": 44,
                 "relation": "devops.plan.cg",
                 "relation_field": "workspace_id",
@@ -23205,6 +23192,172 @@ _logger = logging.getLogger(__name__)""",
             )
             lst_item_view.append(view_item.id)
 
+            view_item_body_notebook_p1 = env[
+                "code.generator.view.item"
+            ].create(
+                {
+                    "section_type": "body",
+                    "item_type": "notebook",
+                    "sequence": 10,
+                }
+            )
+            lst_item_view.append(view_item_body_notebook_p1.id)
+
+            view_item_body_page_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "page",
+                    "name": "code_generator_info_diff",
+                    "label": "Diff",
+                    "parent_id": view_item_body_notebook_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_page_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_diff",
+                    "action_name": "devops_cg_diff",
+                    "parent_id": view_item_body_page_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_page_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "page",
+                    "name": "code_generator_info_status",
+                    "label": "Status",
+                    "parent_id": view_item_body_notebook_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_page_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_status",
+                    "action_name": "devops_cg_status",
+                    "parent_id": view_item_body_page_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_page_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "page",
+                    "name": "code_generator_info_stat",
+                    "label": "Stat",
+                    "parent_id": view_item_body_notebook_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_page_p2.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_stat",
+                    "action_name": "devops_cg_stat",
+                    "parent_id": view_item_body_page_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_page_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "page",
+                    "name": "code_generator_info_tree",
+                    "label": "Tree",
+                    "parent_id": view_item_body_notebook_p1.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_page_p2.id)
+
+            view_item_body_group_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_page_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p3.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_check_tree_addons",
+                    "class_attr": "oe_highlight",
+                    "action_name": "action_check_tree_addons",
+                    "button_type": "oe_highlight",
+                    "label": "Update tree",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_tree_addons",
+                    "action_name": "devops_cg_tree_addons",
+                    "parent_id": view_item_body_page_p2.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_page_p2 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "page",
+                    "name": "log",
+                    "label": "Log",
+                    "parent_id": view_item_body_notebook_p1.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item_body_page_p2.id)
+
+            view_item_body_group_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "parent_id": view_item_body_page_p2.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p3.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "devops_cg_log_addons",
+                    "action_name": "devops_cg_log_addons",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
             view_code_generator = env["code.generator.view"].create(
                 {
                     "code_generator_id": code_generator_id.id,
@@ -25084,28 +25237,13 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "button",
-                    "name": "action_clear_cache",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_clear_cache",
-                    "button_type": "oe_highlight",
-                    "label": "Clear cache",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
                     "name": "action_open_directory",
                     "class_attr": "oe_highlight",
                     "action_name": "action_open_directory",
                     "button_type": "oe_highlight",
                     "label": "Open directory",
                     "parent_id": view_item_body_group_p2.id,
-                    "sequence": 3,
+                    "sequence": 2,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -25230,82 +25368,10 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "page",
-                    "name": "code_generator_info_diff",
-                    "label": "Diff",
-                    "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item_body_page_p2.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_diff",
-                    "action_name": "devops_cg_diff",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_page_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "page",
-                    "name": "code_generator_info_status",
-                    "label": "Status",
-                    "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_page_p2.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_status",
-                    "action_name": "devops_cg_status",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_page_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "page",
-                    "name": "code_generator_info_stat",
-                    "label": "Stat",
-                    "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item_body_page_p2.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_stat",
-                    "action_name": "devops_cg_stat",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_page_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "page",
                     "name": "makefile",
                     "label": "Makefile",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 6,
+                    "sequence": 3,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
@@ -25326,59 +25392,10 @@ _logger = logging.getLogger(__name__)""",
                 {
                     "section_type": "body",
                     "item_type": "page",
-                    "name": "code_generator_info_tree",
-                    "label": "Tree",
-                    "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 7,
-                }
-            )
-            lst_item_view.append(view_item_body_page_p2.id)
-
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_check_tree_addons",
-                    "class_attr": "oe_highlight",
-                    "action_name": "action_check_tree_addons",
-                    "button_type": "oe_highlight",
-                    "label": "Update tree",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_tree_addons",
-                    "action_name": "devops_cg_tree_addons",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_page_p2 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "page",
                     "name": "log",
                     "label": "Log",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 8,
+                    "sequence": 4,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
@@ -25405,28 +25422,6 @@ _logger = logging.getLogger(__name__)""",
             )
             lst_item_view.append(view_item.id)
 
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "parent_id": view_item_body_page_p2.id,
-                    "sequence": 2,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "devops_cg_log_addons",
-                    "action_name": "devops_cg_log_addons",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
             view_item_body_page_p2 = env["code.generator.view.item"].create(
                 {
                     "section_type": "body",
@@ -25434,7 +25429,7 @@ _logger = logging.getLogger(__name__)""",
                     "name": "install",
                     "label": "Install",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 9,
+                    "sequence": 5,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
@@ -25481,7 +25476,7 @@ _logger = logging.getLogger(__name__)""",
                     "name": "test",
                     "label": "Test",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 10,
+                    "sequence": 6,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
@@ -25525,7 +25520,7 @@ _logger = logging.getLogger(__name__)""",
                     "name": "exec",
                     "label": "Execution",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 11,
+                    "sequence": 7,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
@@ -25549,7 +25544,7 @@ _logger = logging.getLogger(__name__)""",
                     "name": "exec_bundle",
                     "label": "Bundle exec",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 12,
+                    "sequence": 8,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
@@ -25573,7 +25568,7 @@ _logger = logging.getLogger(__name__)""",
                     "name": "exec_error",
                     "label": "Error exec",
                     "parent_id": view_item_body_notebook_p1.id,
-                    "sequence": 13,
+                    "sequence": 9,
                 }
             )
             lst_item_view.append(view_item_body_page_p2.id)
