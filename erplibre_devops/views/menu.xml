@@ -88,6 +88,46 @@
     />
 
     <menuitem
+        id="menu_test_cg_exec"
+        name="Test CG exec"
+        action="devops_test_cg_exec_test_cg_exec_action_window"
+        sequence="2"
+        parent="menu_test"
+    />
+
+    <menuitem
+        id="menu_test_exec"
+        name="Test exec"
+        action="devops_test_exec_test_exec_action_window"
+        sequence="3"
+        parent="menu_test"
+    />
+
+    <menuitem
+        id="menu_test_plan"
+        name="Test plan"
+        action="devops_test_plan_test_plan_action_window"
+        sequence="4"
+        parent="menu_test"
+    />
+
+    <menuitem
+        id="menu_test_plan_cg"
+        name="Test plan CG"
+        action="devops_test_plan_cg_test_plan_cg_action_window"
+        sequence="5"
+        parent="menu_test"
+    />
+
+    <menuitem
+        id="menu_test_plan_devops"
+        name="Test plan devops"
+        action="devops_test_plan_devops_test_plan_devops_action_window"
+        sequence="6"
+        parent="menu_test"
+    />
+
+    <menuitem
         id="menu_code_ide_breakpoint"
         name="IDE breakpoint"
         action="devops_ide_breakpoint_action_window"
