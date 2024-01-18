@@ -11,11 +11,11 @@ class DevopsTestPlan(models.Model):
 
     name = fields.Char()
 
-    workspace_id = fields.Many2one(
-        comodel_name="devops.workspace",
-        string="Workspace",
-        required=True,
-    )
+    # workspace_id = fields.Many2one(
+    #     comodel_name="devops.workspace",
+    #     string="Workspace",
+    #     required=True,
+    # )
 
     global_success = fields.Boolean(
         help="Global result",
