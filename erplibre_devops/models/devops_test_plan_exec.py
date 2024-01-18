@@ -18,8 +18,8 @@ class DevopsTestPlanExec(models.Model):
     )
 
     exec_ids = fields.One2many(
-        comodel_name="devops.test.exec",
-        inverse_name="test_plan_id",
+        comodel_name="devops.test.case.exec",
+        inverse_name="test_plan_exec_id",
         string="Execution",
     )
 
