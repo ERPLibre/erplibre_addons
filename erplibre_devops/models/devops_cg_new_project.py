@@ -1344,6 +1344,13 @@ class DevopsCgNewProject(models.Model):
                         lst_template_hooks_py_replace.append(
                             (old_str, new_str)
                         )
+                    if not has_error and rec.model_to_remove:
+                        for model_to_remove in rec.model_to_remove.strip().split(";"):
+                            old_str = f"{model_to_remove};"
+                            new_str = ""
+                            lst_template_hooks_py_replace.append(
+                                (old_str, new_str)
+                            )
 
                 if lst_template_hooks_py_replace:
                     self.search_and_replace_file(
@@ -1703,6 +1710,7 @@ class DevopsCgNewProject(models.Model):
         """
         lst_search_and_replace is a list of tuple, first item is search, second is replace
         """
+        # TODO open file from workspace and not from this execution
         with open(filepath, "r") as file:
             txt = file.read()
             for search, replace in lst_search_and_replace:
