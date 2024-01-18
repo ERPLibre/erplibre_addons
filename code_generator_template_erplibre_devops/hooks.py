@@ -51,8 +51,9 @@ def post_init_hook(cr, e):
             " devops.ide.pycharm.configuration; devops.log.error;"
             " devops.log.makefile.target; devops.log.warning;"
             " devops.plan.action.wizard; devops.plan.cg; devops.system;"
-            " devops.test; devops.workspace; devops.workspace.docker;"
-            " devops.workspace.terminal"
+            " devops.test.case; devops.test.case.exec; devops.test.plan;"
+            " devops.test.plan.exec; devops.test.result; devops.workspace;"
+            " devops.workspace.docker; devops.workspace.terminal"
         )
         value["template_inherit_model_name"] = ""
         value[
