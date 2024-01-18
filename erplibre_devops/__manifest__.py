@@ -37,7 +37,6 @@
         "views/res_config_settings.xml",
         "views/devops_test_case.xml",
         "views/devops_test_case_exec.xml",
-        "views/devops_test_exec.xml",
         "views/devops_test_plan.xml",
         "views/devops_test_plan_exec.xml",
         "views/devops_workspace.xml",

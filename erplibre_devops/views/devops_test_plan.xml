@@ -8,9 +8,6 @@
                 <sheet>
                     <group>
                         <field name="name" />
-<!--                        <field name="workspace_id" />-->
-                        <field name="global_success" />
-                        <field name="exec_ids" />
                     </group>
                 </sheet>
             </form>
@@ -78,7 +75,6 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
-                <field name="global_success" />
             </tree>
         </field>
     </record>

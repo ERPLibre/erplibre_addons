@@ -19,7 +19,6 @@ devops_plan_cg_access_user_types_/_internal_user,devops_plan_cg Access User type
 devops_system_access_user_types_/_internal_user,devops_system Access User types / Internal User,model_devops_system,base.group_user,1,1,1,1
 devops_test_case_access_user_types_/_internal_user,devops_test_case Access User types / Internal User,model_devops_test_case,base.group_user,1,1,1,1
 devops_test_case_exec_access_user_types_/_internal_user,devops_test_case_exec Access User types / Internal User,model_devops_test_case_exec,base.group_user,1,1,1,1
-devops_test_exec_access_user_types_/_internal_user,devops_test_exec Access User types / Internal User,model_devops_test_exec,base.group_user,1,1,1,1
 devops_test_plan_access_user_types_/_internal_user,devops_test_plan Access User types / Internal User,model_devops_test_plan,base.group_user,1,1,1,1
 devops_test_plan_exec_access_user_types_/_internal_user,devops_test_plan_exec Access User types / Internal User,model_devops_test_plan_exec,base.group_user,1,1,1,1
 devops_workspace_access_user_types_/_internal_user,devops_workspace Access User types / Internal User,model_devops_workspace,base.group_user,1,1,1,1

@@ -21,7 +21,6 @@ from . import (
     devops_system,
     devops_test_case,
     devops_test_case_exec,
-    devops_test_exec,
     devops_test_plan,
     devops_test_plan_exec,
     devops_workspace,
