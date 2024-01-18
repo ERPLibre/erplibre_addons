@@ -228,6 +228,12 @@
                             options="{'always_reload': True}"
                             context="{'default_devops_workspace_ids': [id]}"
                         />
+                        <field
+                            name="devops_cg_model_to_remove_ids"
+                            widget="many2many"
+                            options="{'always_reload': True}"
+                            context="{'default_devops_workspace_ids': [id]}"
+                        />
                     </group>
                     <notebook>
                         <page name="code_generator_info_diff" string="Diff">

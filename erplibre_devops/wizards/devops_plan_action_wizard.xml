@@ -135,8 +135,9 @@
                         <field name="working_module_id" />
                         <field name="working_module_name" string="OR Working Module Name" />
                     </group>
-                    <group string="Param">
+                    <group>
                         <field name="model_ids" />
+                        <field name="model_to_remove_ids" />
                     </group>
                 </group>
                 <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">

@@ -91,6 +91,12 @@ class DevopsPlanCg(models.Model):
         string="Model",
     )
 
+    devops_cg_model_to_remove_ids = fields.Many2many(
+        comodel_name="devops.cg.model",
+        string="Model to remove",
+        relation="devops_plan_cg_model_remove_rel",
+    )
+
     devops_cg_field_ids = fields.Many2many(
         comodel_name="devops.cg.field",
         string="Field",
@@ -396,6 +402,8 @@ class DevopsPlanCg(models.Model):
                         if model_conf:
                             dct_new_project["config"] = model_conf
                             # extra_arg = f" --config '{model_conf}'"
+                        if rec.devops_cg_model_to_remove_ids:
+                            dct_new_project["model_to_remove"] = ";".join([a.name for a in rec.devops_cg_model_to_remove_ids])
 
                         new_project_id = self.env[
                             "devops.cg.new_project"

@@ -108,6 +108,7 @@
                             <field name="module" />
                             <field name="directory" />
                             <field name="config" />
+                            <field name="model_to_remove" />
                             <field name="odoo_config" />
                             <field name="new_project_with_code_generator" />
                             <field name="keep_bd_alive" />

@@ -160,6 +160,8 @@ class DevopsCgNewProject(models.Model):
 
     config = fields.Char()
 
+    model_to_remove = fields.Char(help="Separate model by ; to remove to CG.")
+
     code_generator_name = fields.Char()
 
     template_name = fields.Char()

@@ -69,6 +69,12 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="Model",
     )
 
+    model_to_remove_ids = fields.Many2many(
+        comodel_name="devops.cg.model",
+        string="Model to remove",
+        relation="devops_plan_action_model_remove_rel",
+    )
+
     image_db_selection = fields.Many2one(
         comodel_name="devops.db.image",
         default=_default_image_db_selection,
@@ -387,6 +393,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         for cg_model_id in self.model_ids:
             cg_model_id.module_id = cg_module_id.id
             cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
+        for cg_model_id in self.model_to_remove_ids:
+            cg_model_id.module_id = cg_module_id.id
+            cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
         lst_field_id = [b.id for a in self.model_ids for b in a.field_ids]
         # Field
         # cg_field_id = self.env[
@@ -408,6 +417,9 @@ class DevopsPlanActionWizard(models.TransientModel):
             "devops_cg_ids": [(6, 0, cg_id.ids)],
             "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
             "devops_cg_model_ids": [(6, 0, self.model_ids.ids)],
+            "devops_cg_model_to_remove_ids": [
+                (6, 0, self.model_to_remove_ids.ids)
+            ],
             "devops_cg_field_ids": [(6, 0, lst_field_id)],
             "stop_execution_if_env_not_clean": not self.force_generate,
         }
@@ -451,3 +463,4 @@ class DevopsPlanActionWizard(models.TransientModel):
         for rec in self:
             if rec.plan_cg_id:
                 rec.plan_cg_id.action_git_commit()
+        return self._reopen_self()
