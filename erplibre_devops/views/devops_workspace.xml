@@ -283,13 +283,6 @@
                             </group>
                         </group>
                     </page>
-                    <page name="test" string="Test">
-                        <group>
-                            <group>
-                                <field name="test_ids" />
-                            </group>
-                        </group>
-                    </page>
                     <page name="exec" string="Execution">
                         <field name="devops_exec_ids" />
                     </page>

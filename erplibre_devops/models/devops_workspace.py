@@ -267,11 +267,6 @@ class DevopsWorkspace(models.Model):
         string="Workspace Docker",
     )
 
-    test_ids = fields.Many2many(
-        comodel_name="devops.test",
-        string="Tests",
-    )
-
     workspace_terminal_id = fields.Many2one(
         comodel_name="devops.workspace.terminal",
         string="Workspace Terminal",
