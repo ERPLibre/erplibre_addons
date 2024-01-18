@@ -40,6 +40,7 @@
         "views/devops_test_case_exec.xml",
         "views/devops_test_plan.xml",
         "views/devops_test_plan_exec.xml",
+        "views/devops_test_result.xml",
         "views/devops_workspace.xml",
         "views/devops_workspace_docker.xml",
         "views/devops_workspace_terminal.xml",

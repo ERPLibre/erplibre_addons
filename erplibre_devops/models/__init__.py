@@ -23,6 +23,7 @@ from . import (
     devops_test_case_exec,
     devops_test_plan,
     devops_test_plan_exec,
+    devops_test_result,
     devops_workspace,
     devops_workspace_docker,
     devops_workspace_terminal,
