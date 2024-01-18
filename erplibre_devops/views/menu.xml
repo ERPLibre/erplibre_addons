@@ -112,6 +112,14 @@
     />
 
     <menuitem
+        id="menu_test_result"
+        name="Test result"
+        action="devops_test_result_test_result_action_window"
+        sequence="5"
+        parent="menu_test"
+    />
+
+    <menuitem
         id="menu_code_ide_breakpoint"
         name="IDE breakpoint"
         action="devops_ide_breakpoint_action_window"
