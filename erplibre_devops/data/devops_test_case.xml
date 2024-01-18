@@ -3,7 +3,7 @@
     <data noupdate="1">
         <record id="devops_test_case_breakpoint" model="devops.test.case">
             <field name="name">Breakpoint test file and line number exist.</field>
-            <field name="test_plan_id" ref="devops_test_plan_internal"/>
+            <field name="test_plan_id" ref="devops_test_plan_internal" />
             <field name="test_cb_method_name">test_breakpoint</field>
         </record>
     </data>

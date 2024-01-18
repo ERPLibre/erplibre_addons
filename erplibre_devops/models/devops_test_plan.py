@@ -17,4 +17,3 @@ class DevopsTestPlan(models.Model):
     #     string="Workspace",
     #     required=True,
     # )
-

@@ -4,6 +4,7 @@ from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
 
+
 class DevopsTestCaseExec(models.Model):
     _name = "devops.test.case.exec"
     _description = "devops_test_case_exec"
