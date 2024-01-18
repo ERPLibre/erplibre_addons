@@ -80,50 +80,34 @@
     />
 
     <menuitem
-        id="menu_code_generator_test"
-        name="Test"
-        action="action_devops_test_conf_form"
+        id="menu_test_plan"
+        name="Test plan"
+        action="devops_test_plan_test_plan_action_window"
         sequence="1"
         parent="menu_test"
     />
 
     <menuitem
-        id="menu_test_cg_exec"
-        name="Test CG exec"
-        action="devops_test_cg_exec_test_cg_exec_action_window"
+        id="menu_test_plan_exec"
+        name="Test plan exec"
+        action="devops_test_plan_exec_test_plan_exec_action_window"
         sequence="2"
         parent="menu_test"
     />
 
     <menuitem
-        id="menu_test_devops_exec"
-        name="Test DevOps exec"
-        action="devops_test_devops_exec_test_devops_exec_action_window"
+        id="menu_test_case"
+        name="Test case"
+        action="devops_test_case_test_case_action_window"
         sequence="3"
         parent="menu_test"
     />
 
     <menuitem
-        id="menu_test_plan"
-        name="Test plan"
-        action="devops_test_plan_test_plan_action_window"
+        id="menu_test_case_exec"
+        name="Test case exec"
+        action="devops_test_case_exec_test_case_exec_action_window"
         sequence="4"
-        parent="menu_test"
-    />
-
-    <menuitem
-        id="menu_test_plan_cg"
-        name="Test plan CG"
-        action="devops_test_plan_cg_test_plan_cg_action_window"
-        sequence="5"
-        parent="menu_test"
-    />
-
-    <menuitem
-        id="menu_test_plan_devops"
-        name="Test plan devops"
-        action="devops_test_plan_devops_test_plan_devops_action_window"
-        sequence="6"
         parent="menu_test"
     />
 
