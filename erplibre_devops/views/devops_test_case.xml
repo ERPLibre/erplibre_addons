@@ -64,7 +64,7 @@
         <field name="model">devops.test.case</field>
         <field name="arch" type="xml">
             <search string="Devops test case">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter name="name" string="Name" domain="[('name','!=',False)]" />
             </search>
         </field>
     </record>

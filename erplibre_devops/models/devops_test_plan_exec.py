@@ -12,9 +12,9 @@ class DevopsTestPlanExec(models.Model):
     name = fields.Char()
 
     global_success = fields.Boolean(
-        help="Global result",
         compute="_compute_global_success",
         store=True,
+        help="Global result",
     )
 
     exec_ids = fields.One2many(

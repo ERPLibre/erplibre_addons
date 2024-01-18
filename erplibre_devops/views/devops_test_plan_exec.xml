@@ -8,7 +8,6 @@
                 <sheet>
                     <group>
                         <field name="name" />
-                        <!--                        <field name="workspace_id" />-->
                         <field name="global_success" />
                         <field name="exec_ids" />
                     </group>
@@ -67,7 +66,7 @@
         <field name="model">devops.test.plan.exec</field>
         <field name="arch" type="xml">
             <search string="Devops test plan exec">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter name="name" string="Name" domain="[('name','!=',False)]" />
             </search>
         </field>
     </record>
