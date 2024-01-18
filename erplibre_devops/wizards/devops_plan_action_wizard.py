@@ -446,12 +446,33 @@ class DevopsPlanActionWizard(models.TransientModel):
                     f"{module_name}/views/{model_file_name}.xml"
                 )
         cmd_git_add = ";".join([f"git add '{a}'" for a in lst_default_file])
-        wp_id.execute(
-            cmd=cmd_git_add,
-            folder=relative_path_module,
-            run_into_workspace=True,
-            to_instance=True,
-        )
+        # Git remove
+        lst_default_file_rm = []
+        if self.model_to_remove_ids:
+            for cg_model_id in self.model_to_remove_ids:
+                model_file_name = cg_model_id.name.replace(".", "_")
+                lst_default_file_rm.append(
+                    f"{module_name}/models/{model_file_name}.py"
+                )
+                lst_default_file_rm.append(
+                    f"{module_name}/views/{model_file_name}.xml"
+                )
+        cmd_git_rm = ";".join([f"git rm '{a}'" for a in lst_default_file_rm])
+        if cmd_git_add and cmd_git_rm:
+            cmd_git = f"{cmd_git_add};{cmd_git_rm}"
+        elif cmd_git_add:
+            cmd_git = cmd_git_add
+        elif cmd_git_rm:
+            cmd_git = cmd_git_rm
+        else:
+            cmd_git = ""
+        if cmd_git:
+            wp_id.execute(
+                cmd=cmd_git,
+                folder=relative_path_module,
+                run_into_workspace=True,
+                to_instance=True,
+            )
         # finally
         self.state = "final"
 

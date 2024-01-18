@@ -1345,7 +1345,9 @@ class DevopsCgNewProject(models.Model):
                             (old_str, new_str)
                         )
                     if not has_error and rec.model_to_remove:
-                        for model_to_remove in rec.model_to_remove.strip().split(";"):
+                        for (
+                            model_to_remove
+                        ) in rec.model_to_remove.strip().split(";"):
                             old_str = f"{model_to_remove};"
                             new_str = ""
                             lst_template_hooks_py_replace.append(

@@ -403,7 +403,12 @@ class DevopsPlanCg(models.Model):
                             dct_new_project["config"] = model_conf
                             # extra_arg = f" --config '{model_conf}'"
                         if rec.devops_cg_model_to_remove_ids:
-                            dct_new_project["model_to_remove"] = ";".join([a.name for a in rec.devops_cg_model_to_remove_ids])
+                            dct_new_project["model_to_remove"] = ";".join(
+                                [
+                                    a.name
+                                    for a in rec.devops_cg_model_to_remove_ids
+                                ]
+                            )
 
                         new_project_id = self.env[
                             "devops.cg.new_project"
