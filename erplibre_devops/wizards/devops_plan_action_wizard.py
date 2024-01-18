@@ -393,9 +393,6 @@ class DevopsPlanActionWizard(models.TransientModel):
         for cg_model_id in self.model_ids:
             cg_model_id.module_id = cg_module_id.id
             cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
-        for cg_model_id in self.model_to_remove_ids:
-            cg_model_id.module_id = cg_module_id.id
-            cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
         lst_field_id = [b.id for a in self.model_ids for b in a.field_ids]
         # Field
         # cg_field_id = self.env[
