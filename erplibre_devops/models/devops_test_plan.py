@@ -11,6 +11,7 @@ class DevopsTestPlan(models.Model):
 
     name = fields.Char()
 
+    # test_case_ids = fields.One2many()
     # workspace_id = fields.Many2one(
     #     comodel_name="devops.workspace",
     #     string="Workspace",

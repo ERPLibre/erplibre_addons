@@ -19,6 +19,7 @@
         "wizards/devops_plan_action_wizard.xml",
         "data/mail_message_subtype.xml",
         "data/devops_test_plan.xml",
+        "data/devops_test_case.xml",
         "views/devops_cg.xml",
         "views/devops_cg_field.xml",
         "views/devops_cg_model.xml",

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_test_plan_internal" model="devops.test.case">
+            <field name="name">Internal DevOps test</field>
+            <field name="test_plan_id" ref="devops_test_plan_internal"/>
+            <field name="test_cb_method_name">Internal DevOps test</field>
+        </record>
+    </data>
+</odoo>
