@@ -47,7 +47,7 @@ class DevopsTestCaseExec(models.Model):
                     try:
                         lst_line = bp_id.get_breakpoint_info(rec_ws)
                     except Exception as e:
-                        self.env["devops.test.devops.exec"].create(
+                        self.env["devops.test.result"].create(
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": (
@@ -56,7 +56,7 @@ class DevopsTestCaseExec(models.Model):
                                 ),
                                 "is_finish": True,
                                 "is_pass": False,
-                                "test_plan_devops_id": rec.id,
+                                "test_case_exec_id": rec.id,
                             }
                         )
                         continue
@@ -65,13 +65,13 @@ class DevopsTestCaseExec(models.Model):
                             f"Cannot find breakpoint {bp_id.name} for file"
                             f" {bp_id.filename}, key : {bp_id.keyword}"
                         )
-                        self.env["devops.test.devops.exec"].create(
+                        self.env["devops.test.result"].create(
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": msg,
                                 "is_finish": True,
                                 "is_pass": False,
-                                "test_plan_devops_id": rec.id,
+                                "test_case_exec_id": rec.id,
                             }
                         )
                         continue
@@ -83,22 +83,22 @@ class DevopsTestCaseExec(models.Model):
                             f" multiple line and got '{lst_line}' into file"
                             f" '{bp_id.filename}' with key '{bp_id.keyword}'"
                         )
-                        self.env["devops.test.devops.exec"].create(
+                        self.env["devops.test.result"].create(
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": msg,
                                 "is_finish": True,
                                 "is_pass": False,
-                                "test_plan_devops_id": rec.id,
+                                "test_case_exec_id": rec.id,
                             }
                         )
                         continue
-                    self.env["devops.test.devops.exec"].create(
+                    self.env["devops.test.result"].create(
                         {
                             "name": f"Test breakpoint ID {bp_id.id}",
                             "is_finish": True,
                             "is_pass": True,
-                            "test_plan_devops_id": rec.id,
+                            "test_case_exec_id": rec.id,
                         }
                     )
         pass

@@ -11,10 +11,17 @@ class DevopsTestPlanExec(models.Model):
 
     name = fields.Char()
 
+    execution_is_finished = fields.Boolean(help="Will be true when the test plan execution is finish to be execute.")
+
     global_success = fields.Boolean(
         compute="_compute_global_success",
         store=True,
         help="Global result",
+    )
+
+    test_plan_id = fields.Many2one(
+        comodel_name="devops.test.plan",
+        string="Test plan",
     )
 
     exec_ids = fields.One2many(
