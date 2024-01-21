@@ -5,10 +5,32 @@
         <field name="model">devops.test.plan.exec</field>
         <field name="arch" type="xml">
             <form string="Titre">
+                <header>
+                    <button
+                        name="execute_test_action"
+                        string="Execute"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('execution_is_launched', '=', True)]}"
+                    />
+                </header>
                 <sheet>
                     <group>
-                        <field name="name" />
-                        <field name="global_success" />
+                        <group string="Information">
+                            <field name="name" />
+                            <field name="workspace_id" />
+                        </group>
+                        <group string="Status">
+                            <field name="global_success" />
+                            <field name="execution_is_finished" />
+                            <field name="execution_is_launched" />
+                        </group>
+                    </group>
+                    <group string="Test">
+                        <field name="test_plan_id" options='{"no_open": True, "no_create": True}' />
+                        <field name="test_case_ids" attrs="{'invisible': [('test_plan_id', '!=', False)]}" />
+                    </group>
+                    <group string="Result execution">
                         <field name="exec_ids" />
                     </group>
                 </sheet>

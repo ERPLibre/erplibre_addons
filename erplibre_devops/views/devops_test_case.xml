@@ -8,6 +8,8 @@
                 <sheet>
                     <group>
                         <field name="name" />
+                        <field name="test_plan_id" />
+                        <field name="test_cb_method_name" />
                     </group>
                 </sheet>
             </form>
