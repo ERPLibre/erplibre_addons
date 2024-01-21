@@ -11,7 +11,12 @@ class DevopsTestPlanExec(models.Model):
 
     name = fields.Char()
 
-    execution_is_finished = fields.Boolean(help="Will be true when the test plan execution is finish to be execute.")
+    execution_is_finished = fields.Boolean(
+        help=(
+            "Will be true when the test plan execution is finish to be"
+            " execute."
+        )
+    )
 
     global_success = fields.Boolean(
         compute="_compute_global_success",

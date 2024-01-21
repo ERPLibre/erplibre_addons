@@ -15,6 +15,7 @@ class DevopsTestResult(models.Model):
 
     test_case_exec_id = fields.Many2one(
         comodel_name="devops.test.case.exec",
+        string="Test Case Exec",
     )
 
     test_plan_exec_id = fields.Many2one(
