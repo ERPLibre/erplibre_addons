@@ -11,9 +11,11 @@ class DevopsTestCaseExec(models.Model):
 
     name = fields.Char()
 
-    is_finish = fields.Boolean(help="Execution is finish")
+    is_finish = fields.Boolean(readonly=True, help="Execution is finish")
 
-    is_pass = fields.Boolean(help="True test pass, else test fail.")
+    is_pass = fields.Boolean(
+        compute="_compute_is_pass", help="True test pass, else test fail."
+    )
 
     log = fields.Text(help="Log for the test")
 
@@ -23,13 +25,29 @@ class DevopsTestCaseExec(models.Model):
         ondelete="cascade",
     )
 
+    result_ids = fields.One2many(
+        comodel_name="devops.test.result",
+        inverse_name="test_case_exec_id",
+        string="Results",
+        readonly=True,
+    )
+
     workspace_id = fields.Many2one(
         comodel_name="devops.workspace",
         string="Workspace",
         required=True,
     )
 
+    @api.depends("result_ids", "result_ids.is_pass")
+    def _compute_is_pass(self):
+        for rec in self:
+            if rec.result_ids:
+                rec.is_pass = all([a.is_pass for a in rec.result_ids])
+            else:
+                rec.is_pass = False
+
     def test_breakpoint(self, ctx=None):
+        lst_result_value = []
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
                 "Test plan DevOps run test",
@@ -47,7 +65,8 @@ class DevopsTestCaseExec(models.Model):
                     try:
                         lst_line = bp_id.get_breakpoint_info(rec_ws)
                     except Exception as e:
-                        self.env["devops.test.result"].create(
+                        rec.is_finish = True
+                        lst_result_value.append(
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": (
@@ -65,7 +84,8 @@ class DevopsTestCaseExec(models.Model):
                             f"Cannot find breakpoint {bp_id.name} for file"
                             f" {bp_id.filename}, key : {bp_id.keyword}"
                         )
-                        self.env["devops.test.result"].create(
+                        rec.is_finish = True
+                        lst_result_value.append(
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": msg,
@@ -83,7 +103,8 @@ class DevopsTestCaseExec(models.Model):
                             f" multiple line and got '{lst_line}' into file"
                             f" '{bp_id.filename}' with key '{bp_id.keyword}'"
                         )
-                        self.env["devops.test.result"].create(
+                        rec.is_finish = True
+                        lst_result_value.append(
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": msg,
@@ -93,7 +114,8 @@ class DevopsTestCaseExec(models.Model):
                             }
                         )
                         continue
-                    self.env["devops.test.result"].create(
+                    rec.is_finish = True
+                    lst_result_value.append(
                         {
                             "name": f"Test breakpoint ID {bp_id.id}",
                             "is_finish": True,
@@ -101,4 +123,4 @@ class DevopsTestCaseExec(models.Model):
                             "test_case_exec_id": rec.id,
                         }
                     )
-        pass
+        self.env["devops.test.result"].create(lst_result_value)

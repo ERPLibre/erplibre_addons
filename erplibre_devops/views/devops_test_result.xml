@@ -82,6 +82,7 @@
                 <field name="name" />
                 <field name="is_finish" />
                 <field name="is_pass" />
+                <field name="log" />
             </tree>
         </field>
     </record>

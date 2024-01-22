@@ -7,8 +7,15 @@
             <form string="Titre">
                 <sheet>
                     <group>
-                        <field name="name" />
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                    <group string="Information">
                         <field name="test_case_ids" />
+                    </group>
+                    <group string="Result">
+                        <field name="test_plan_exec_ids" />
                     </group>
                 </sheet>
             </form>

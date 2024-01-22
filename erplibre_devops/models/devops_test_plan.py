@@ -16,3 +16,9 @@ class DevopsTestPlan(models.Model):
         inverse_name="test_plan_id",
         string="Test cases",
     )
+
+    test_plan_exec_ids = fields.One2many(
+        comodel_name="devops.test.plan.exec",
+        inverse_name="test_plan_id",
+        string="Test plan executions",
+    )

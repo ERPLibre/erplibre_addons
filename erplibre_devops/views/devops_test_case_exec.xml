@@ -12,6 +12,7 @@
                         <field name="is_pass" />
                         <field name="log" />
                         <field name="test_plan_exec_id" />
+                        <field name="result_ids" />
                         <field name="workspace_id" />
                     </group>
                 </sheet>

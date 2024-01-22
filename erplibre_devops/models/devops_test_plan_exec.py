@@ -48,6 +48,13 @@ class DevopsTestPlanExec(models.Model):
         readonly=True,
     )
 
+    result_ids = fields.One2many(
+        comodel_name="devops.test.result",
+        inverse_name="test_plan_exec_id",
+        string="Results",
+        readonly=True,
+    )
+
     workspace_id = fields.Many2one(
         comodel_name="devops.workspace",
         string="Workspace",
@@ -66,7 +73,7 @@ class DevopsTestPlanExec(models.Model):
         result = super().create(vals_list)
         return result
 
-    @api.depends("exec_ids.is_pass")
+    @api.depends("exec_ids", "exec_ids.is_pass")
     def _compute_global_success(self):
         for rec in self:
             if rec.exec_ids:
@@ -86,6 +93,7 @@ class DevopsTestPlanExec(models.Model):
                     raise exceptions.Warning(
                         "Missing test plan or test cases."
                     )
+                rec.execution_is_launched = True
                 test_case_ids = (
                     rec.test_plan_id.test_case_ids
                     if rec.test_plan_id
@@ -101,10 +109,26 @@ class DevopsTestPlanExec(models.Model):
                             "workspace_id": rec_ws.id,
                         }
                     )
-                    cb_method = getattr(
+                    if hasattr(
                         test_case_exec_id, test_case_id.test_cb_method_name
-                    )
-                    if cb_method:
+                    ):
+                        cb_method = getattr(
+                            test_case_exec_id, test_case_id.test_cb_method_name
+                        )
                         cb_method(ctx=rec_ws._context)
-
-                print("read")
+                    else:
+                        self.env["devops.test.result"].create(
+                            {
+                                "name": f"Search method",
+                                "log": (
+                                    "Cannot find method"
+                                    f" '{test_case_id.test_cb_method_name}'"
+                                ),
+                                "is_finish": True,
+                                "is_pass": False,
+                                "test_case_exec_id": test_case_exec_id.id,
+                            }
+                        )
+                rec.execution_is_finished = True
+        # # Force compute result
+        # self._compute_global_success()

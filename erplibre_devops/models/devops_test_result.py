@@ -7,11 +7,11 @@ class DevopsTestResult(models.Model):
 
     name = fields.Char()
 
-    log = fields.Text()
+    log = fields.Text(readonly=True)
 
-    is_finish = fields.Boolean()
+    is_finish = fields.Boolean(readonly=True)
 
-    is_pass = fields.Boolean()
+    is_pass = fields.Boolean(readonly=True)
 
     test_case_exec_id = fields.Many2one(
         comodel_name="devops.test.case.exec",
