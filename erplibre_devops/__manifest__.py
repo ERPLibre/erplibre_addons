@@ -26,6 +26,7 @@
         "views/devops_cg_module.xml",
         "views/devops_cg_new_project.xml",
         "views/devops_cg_new_project_stage.xml",
+        "views/devops_cg_test_case.xml",
         "views/devops_db_image.xml",
         "views/devops_exec.xml",
         "views/devops_exec_bundle.xml",

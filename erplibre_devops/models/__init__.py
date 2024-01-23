@@ -7,6 +7,7 @@ from . import (
     devops_cg_module,
     devops_cg_new_project,
     devops_cg_new_project_stage,
+    devops_cg_test_case,
     devops_db_image,
     devops_exec,
     devops_exec_bundle,
