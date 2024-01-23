@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_cg_module_demo_helpdesk_data" model="devops.cg.module">
+            <field name="name">demo_helpdesk_data</field>
+        </record>
+        <record id="devops_cg_module_demo_internal" model="devops.cg.module">
+            <field name="name">demo_internal</field>
+        </record>
+        <record id="devops_cg_module_demo_internal_inherit" model="devops.cg.module">
+            <field name="name">demo_internal_inherit</field>
+        </record>
+        <record id="devops_cg_module_demo_mariadb_sql_example_1" model="devops.cg.module">
+            <field name="name">demo_mariadb_sql_example_1</field>
+        </record>
+        <record id="devops_cg_module_demo_portal" model="devops.cg.module">
+            <field name="name">demo_portal</field>
+        </record>
+        <record id="devops_cg_module_demo_website_data" model="devops.cg.module">
+            <field name="name">demo_website_data</field>
+        </record>
+        <record id="devops_cg_module_demo_website_leaflet" model="devops.cg.module">
+            <field name="name">demo_website_leaflet</field>
+        </record>
+        <record id="devops_cg_module_demo_website_snippet" model="devops.cg.module">
+            <field name="name">demo_website_snippet</field>
+        </record>
+        <record id="devops_cg_module_code_generator_portal" model="devops.cg.module">
+            <field name="name">code_generator_portal</field>
+        </record>
+        <record id="devops_cg_module_auto_backup" model="devops.cg.module">
+            <field name="name">auto_backup</field>
+        </record>
+<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+<!--            <field name="name">WIP</field>-->
+<!--        </record>-->
+<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+<!--            <field name="name">WIP</field>-->
+<!--        </record>-->
+<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+<!--            <field name="name">WIP</field>-->
+<!--        </record>-->
+<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+<!--            <field name="name">WIP</field>-->
+<!--        </record>-->
+    </data>
+</odoo>

@@ -13,16 +13,24 @@ class DevopsCgTestCase(models.Model):
 
     keep_cache = fields.Boolean()
 
-    module_generated = fields.Many2many(comodel_name="devops.cg.module")
+    module_generated = fields.Many2many(
+        comodel_name="devops.cg.module", relation="devops_module_generated_rel"
+    )
 
     module_init_ids = fields.Many2many(
         comodel_name="devops.cg.module",
         string="Module Init",
+        relation="devops_module_init_ids_rel",
     )
 
-    module_search_class = fields.Many2many(comodel_name="devops.cg.module")
+    module_search_class = fields.Many2many(
+        comodel_name="devops.cg.module",
+        relation="devops_module_search_class_rel",
+    )
 
-    module_tested = fields.Many2many(comodel_name="devops.cg.module")
+    module_tested = fields.Many2many(
+        comodel_name="devops.cg.module", relation="devops_module_tested_rel"
+    )
 
     path_module_check = fields.Char()
 

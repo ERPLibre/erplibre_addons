@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_cg_test_case_demo_test" model="devops.cg.test.case">
+            <field name="name">demo_test</field>
+<!--            <field name="module_init_ids" ref="devops_test_plan_internal" />-->
+<!--            <field name="module_init_ids" eval="[(4, ref('base.user_demo'))]"/>-->
+            <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_demo_helpdesk_data, devops_cg_module_demo_internal, devops_cg_module_demo_internal_inherit, devops_cg_module_demo_mariadb_sql_example_1, devops_cg_module_demo_portal, devops_cg_module_demo_website_data, devops_cg_module_demo_website_leaflet, devops_cg_module_demo_website_snippet])]"/>
+<!--            <field name="tag_ids" eval="[(6, 0, [categ_oppor2])]"/>-->
+<!--            <field name="member_ids" eval="[(4, ref('base.user_demo'))]"/>-->
+<!--            <field name"test_cb_method_name">test_breakpoint</field>-->
+            <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+        </record>
+    </data>
+</odoo>
