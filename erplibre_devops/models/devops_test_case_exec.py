@@ -11,10 +11,15 @@ class DevopsTestCaseExec(models.Model):
 
     name = fields.Char()
 
-    is_finish = fields.Boolean(readonly=True, help="Execution is finish")
+    is_finish = fields.Boolean(
+        readonly=True,
+        help="Execution is finish",
+    )
 
     is_pass = fields.Boolean(
-        compute="_compute_is_pass", help="True test pass, else test fail."
+        compute="_compute_is_pass",
+        store=True,
+        help="True test pass, else test fail.",
     )
 
     log = fields.Text(help="Log for the test")

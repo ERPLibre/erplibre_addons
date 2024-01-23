@@ -22,7 +22,8 @@ class DevopsTestPlanExec(models.Model):
     )
 
     execution_is_launched = fields.Boolean(
-        readonly=True, help="True when start execution."
+        readonly=True,
+        help="True when start execution.",
     )
 
     global_success = fields.Boolean(
