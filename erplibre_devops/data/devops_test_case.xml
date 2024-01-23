@@ -6,5 +6,10 @@
             <field name="test_plan_id" ref="devops_test_plan_internal" />
             <field name="test_cb_method_name">test_breakpoint</field>
         </record>
+        <record id="devops_test_case_cg_demo_test" model="devops.test.case">
+            <field name="name">Demo test</field>
+            <field name="test_plan_id" ref="devops_test_plan_cg" />
+            <field name="test_cb_method_cg_id" ref="devops_cg_test_case_demo_test" />
+        </record>
     </data>
 </odoo>

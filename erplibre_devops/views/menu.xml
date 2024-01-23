@@ -120,6 +120,14 @@
     />
 
     <menuitem
+        id="menu_test_case_cg"
+        name="Test case CG"
+        action="devops_cg_test_case_cg_test_case_action_window"
+        sequence="6"
+        parent="menu_test"
+    />
+
+    <menuitem
         id="menu_code_ide_breakpoint"
         name="IDE breakpoint"
         action="devops_ide_breakpoint_action_window"

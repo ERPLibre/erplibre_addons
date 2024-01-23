@@ -1,10 +1,20 @@
 import logging
+import os
+import sys
 
 import pytz
 
 from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
+# TODO use system instead
+# Get root of ERPLibre
+new_path = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")
+)
+sys.path.append(new_path)
+
+from script import lib_asyncio
 
 
 class DevopsTestPlanExec(models.Model):
@@ -84,6 +94,7 @@ class DevopsTestPlanExec(models.Model):
 
     @api.multi
     def execute_test_action(self, ctx=None):
+        lst_test_cb_method_cg_id = []
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
                 "Execute - test plan exec", ctx=ctx
@@ -110,13 +121,17 @@ class DevopsTestPlanExec(models.Model):
                             "workspace_id": rec_ws.id,
                         }
                     )
-                    if hasattr(
+                    if test_case_id.test_cb_method_name and hasattr(
                         test_case_exec_id, test_case_id.test_cb_method_name
                     ):
                         cb_method = getattr(
                             test_case_exec_id, test_case_id.test_cb_method_name
                         )
                         cb_method(ctx=rec_ws._context)
+                    elif test_case_id.test_cb_method_cg_id:
+                        lst_test_cb_method_cg_id.append(
+                            test_case_id.test_cb_method_cg_id.async_execute
+                        )
                     else:
                         self.env["devops.test.result"].create(
                             {
@@ -133,3 +148,6 @@ class DevopsTestPlanExec(models.Model):
                 rec.execution_is_finished = True
         # # Force compute result
         # self._compute_global_success()
+        if lst_test_cb_method_cg_id:
+            lib_asyncio.print_summary_task(lst_test_cb_method_cg_id)
+            print("yeah")

@@ -16,6 +16,11 @@ class DevopsTestCase(models.Model):
         string="Test plan",
     )
 
+    test_cb_method_cg_id = fields.Many2one(
+        comodel_name="devops.cg.test.case",
+        string="Method CG test case",
+    )
+
     test_cb_method_name = fields.Char(
         string="Method name",
         help="Will call this method name",

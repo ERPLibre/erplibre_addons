@@ -10,6 +10,7 @@
                         <field name="name" />
                         <field name="test_plan_id" />
                         <field name="test_cb_method_name" />
+                        <field name="test_cb_method_cg_id" />
                     </group>
                 </sheet>
             </form>

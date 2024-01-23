@@ -31,17 +31,17 @@
         <record id="devops_cg_module_auto_backup" model="devops.cg.module">
             <field name="name">auto_backup</field>
         </record>
-<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
-<!--            <field name="name">WIP</field>-->
-<!--        </record>-->
-<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
-<!--            <field name="name">WIP</field>-->
-<!--        </record>-->
-<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
-<!--            <field name="name">WIP</field>-->
-<!--        </record>-->
-<!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
-<!--            <field name="name">WIP</field>-->
-<!--        </record>-->
+        <!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+        <!--            <field name="name">WIP</field>-->
+        <!--        </record>-->
+        <!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+        <!--            <field name="name">WIP</field>-->
+        <!--        </record>-->
+        <!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+        <!--            <field name="name">WIP</field>-->
+        <!--        </record>-->
+        <!--        <record id="devops_cg_module_WIP" model="devops.cg.module">-->
+        <!--            <field name="name">WIP</field>-->
+        <!--        </record>-->
     </data>
 </odoo>

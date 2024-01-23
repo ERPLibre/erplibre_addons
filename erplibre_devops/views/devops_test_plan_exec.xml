@@ -27,7 +27,7 @@
                         </group>
                     </group>
                     <group string="Test">
-                        <field name="test_plan_id" options='{"no_open": True, "no_create": True}' />
+                        <field name="test_plan_id" options='{"no_create": True}' />
                         <field name="test_case_ids" attrs="{'invisible': [('test_plan_id', '!=', False)]}" />
                     </group>
                     <group string="Result execution">
