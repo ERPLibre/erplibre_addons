@@ -8,7 +8,7 @@ import sys
 import tempfile
 import time
 import uuid
-from typing import Tuple
+from typing import Any, Coroutine, Tuple
 
 import aioshutil
 
@@ -85,9 +85,22 @@ class DevopsCgTestCase(models.Model):
 
     test_name = fields.Char()
 
+    def async_execute(self):
+        is_keep_cache = False
+        is_coverage = False
+        generated_module = ",".join([a.name for a in self.module_generated])
+        init_module = ",".join([a.name for a in self.module_init_ids])
+        return AsyncTestCase().async_execute(
+            self.path_module_check,
+            generated_module,
+            is_keep_cache,
+            is_coverage,
+        )
+
+
+class AsyncTestCase:
     async def async_execute(
-        self,
-        config,
+        self, path_module_check, generated_module, keep_cache, coverage
     ) -> Tuple[str, int]:
         # Template
         res, status = await self.test_exec(
@@ -101,9 +114,24 @@ class DevopsCgTestCase(models.Model):
             ],
             test_name="mariadb_test-template",
             run_in_sandbox=True,
-            keep_cache=config.keep_cache,
-            coverage=config.coverage,
+            keep_cache=keep_cache,
+            coverage=coverage,
         )
+
+        # res, status = await self.test_exec(
+        #     path_module_check,
+        #     generated_module=generated_module,
+        #     tested_module="code_generator_template_demo_mariadb_sql_example_1",
+        #     search_class_module="demo_mariadb_sql_example_1",
+        #     lst_init_module_name=[
+        #         "code_generator_portal",
+        #         "demo_mariadb_sql_example_1",
+        #     ],
+        #     test_name="mariadb_test-template",
+        #     run_in_sandbox=True,
+        #     keep_cache=keep_cache,
+        #     coverage=coverage,
+        # )
 
         return res, status
 
@@ -221,10 +249,16 @@ class DevopsCgTestCase(models.Model):
                 for module_name in lst_module_to_test:
                     # Update path to change new emplacement
                     s_lst_path_tested_module = (
-                        await lib_asyncio.run_command_get_output(
-                            "find", "./addons/", "-name", module_name
+                        await lib_asyncio.run_command_get_output_v2(
+                            f"find ./addons/ -name {module_name}"
                         )
                     )
+                    # s_lst_path_tested_module = (
+                    #     await lib_asyncio.run_command_get_output(
+                    #         "find", "./addons/", "-name", module_name
+                    #     )
+                    # )
+                    # s_lst_path_tested_module = ""
                     if not s_lst_path_tested_module:
                         return (
                             f"Error cannot find module '{path_module_check}'"
