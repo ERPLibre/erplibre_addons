@@ -12,4 +12,16 @@
         <field name="code">model.action_check_all()</field>
         <field name="nextcall" eval="(datetime.now() + timedelta(minutes=1)).strftime('%Y-%m-%d %H:%M:00')" />
     </record>
+    <record model="ir.cron" id="ir_cron_devops_run_asyncio_test">
+        <field name="name">ERPLibre DevOps run asyncio test</field>
+        <field name="active" eval="False" />
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="model_id" ref="model_devops_test_plan_exec" />
+        <field name="state">code</field>
+        <field name="code">model.action_test_asyncio()</field>
+<!--        <field name="nextcall" eval="(datetime.now() + timedelta(minutes=1)).strftime('%Y-%m-%d %H:%M:00')" />-->
+    </record>
 </odoo>

@@ -6,7 +6,7 @@ from typing import Tuple
 
 import pytz
 
-from odoo import _, api, exceptions, fields, models
+from odoo import _, api, exceptions, fields, models, http
 
 _logger = logging.getLogger(__name__)
 # TODO use system instead
@@ -18,6 +18,21 @@ sys.path.append(new_path)
 
 from script import lib_asyncio
 
+from odoo.tools.func import wraps
+
+
+def run_in_thread(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            loop.close()
+
+    return wrapper
 
 class DevopsTestPlanExec(models.Model):
     _name = "devops.test.plan.exec"
@@ -94,8 +109,29 @@ class DevopsTestPlanExec(models.Model):
             else:
                 rec.global_success = False
 
+    @api.model
+    @run_in_thread
+    def execute_test_action(self):
+        lst_cmd = ["ls /tmp", "tree /tmp"]
+        task_list = [self.execute_async_subprocess(a) for a in lst_cmd]
+
+        try:
+            commands = asyncio.gather(*task_list)
+            tpl_result = asyncio.run(commands)
+        except RuntimeError as e:
+            print(e)
+
+        for result in tpl_result:
+            _logger.info("prettier " + result[0])
+
+    async def execute_async_subprocess(self, command):
+        # Votre logique asynchrone ici
+        process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE)
+        output, _ = await process.communicate()
+        return output.decode(), process.returncode
+
     @api.multi
-    def execute_test_action(self, ctx=None):
+    def execute_test_action2(self, ctx=None):
         lst_test_cb_method_cg_id = []
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -156,6 +192,9 @@ class DevopsTestPlanExec(models.Model):
         # # Force compute result
         # self._compute_global_success()
         if lst_test_cb_method_cg_id:
+            print("ok")
+            self.env.ref('erplibre_devops.ir_cron_devops_run_asyncio_test').sudo().method_direct_trigger()
+            return
             # Run in parallel prettier for more speed
             parallel = True
             try:
@@ -164,7 +203,13 @@ class DevopsTestPlanExec(models.Model):
             except Exception as e:
                 _logger.error(e)
                 # parallel = False
-                asyncio.set_event_loop(asyncio.new_event_loop())
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                # if sys.platform != "win32":
+                #     policy = asyncio.get_event_loop_policy()
+                #     watcher = asyncio.SafeChildWatcher()
+                #     watcher.attach_loop(loop)
+                #     policy.set_child_watcher(watcher)
             if parallel:
                 lst_cmd = ["ls /tmp", "tree /tmp"]
                 loop = asyncio.get_event_loop()
@@ -217,7 +262,36 @@ class DevopsTestPlanExec(models.Model):
             #         )
             # print("yeah")
 
-
+    def action_test_asyncio(self):
+        parallel = True
+        try:
+            if asyncio.get_event_loop().is_closed():
+                asyncio.set_event_loop(asyncio.new_event_loop())
+        except Exception as e:
+            _logger.error(e)
+            # parallel = False
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            # if sys.platform != "win32":
+            #     policy = asyncio.get_event_loop_policy()
+            #     watcher = asyncio.SafeChildWatcher()
+            #     watcher.attach_loop(loop)
+            #     policy.set_child_watcher(watcher)
+        if parallel:
+            lst_cmd = ["ls /tmp", "tree /tmp"]
+            loop = asyncio.get_event_loop()
+            task_list = [execute_async_subprocess(a) for a in lst_cmd]
+            try:
+                commands = asyncio.gather(*task_list)
+                tpl_result = loop.run_until_complete(commands)
+            except RuntimeError as e:
+                print(e)
+            finally:
+                loop.close()
+            for result in tpl_result:
+                _logger.info("prettier " + result[0])
+        else:
+            print("oups")
 async def execute_async_subprocess(cmd) -> Tuple[str, int]:
     process = await asyncio.create_subprocess_shell(
         cmd, stdout=asyncio.subprocess.PIPE
@@ -230,3 +304,9 @@ async def execute_async_subprocess(cmd) -> Tuple[str, int]:
     if stderr:
         result += stderr.decode()
     return result, 0
+
+# class AsyncIOController(http.Controller):
+#     def __init__(self):
+#         super(AsyncIOController, self).__init__()
+#         self.__loop = asyncio.new_event_loop()
+
