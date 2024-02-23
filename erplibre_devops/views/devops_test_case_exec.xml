@@ -5,18 +5,20 @@
         <field name="model">devops.test.case.exec</field>
         <field name="arch" type="xml">
             <form string="Titre">
-                <sheet>
-                    <group>
-                        <field name="name" />
-                        <field name="is_finish" />
-                        <field name="is_pass" />
-                        <field name="log" />
-                        <field name="test_plan_exec_id" />
-                        <field name="result_ids" />
-                        <field name="test_case_id" />
-                        <field name="workspace_id" />
-                    </group>
-                </sheet>
+                <group>
+                    <field name="name" />
+                    <field name="is_finish" />
+                    <field name="is_pass" />
+                    <field name="test_plan_exec_id" />
+                    <field name="result_ids" />
+                    <field name="test_case_id" />
+                    <field name="workspace_id" />
+                </group>
+                <notebook>
+                    <page string="Log">
+                        <field name="log_html" />
+                    </page>
+                </notebook>
             </form>
         </field>
     </record>
@@ -72,6 +74,17 @@
         <field name="arch" type="xml">
             <search string="Devops test case exec">
                 <filter name="name" string="Name" domain="[('name','!=',False)]" />
+                <group string="Group By" expand="1">
+                    <filter name="is_finish" string="Is finish" context="{'group_by':'is_finish'}" />
+                    <filter name="is_pass" string="Is pass" context="{'group_by':'is_pass'}" />
+                    <filter
+                        name="test_plan_exec_id"
+                        string="Test plan exec"
+                        context="{'group_by':'test_plan_exec_id'}"
+                    />
+                    <filter name="test_case_id" string="Test case" context="{'group_by':'test_case_id'}" />
+                    <filter name="workspace_id" string="Workspace" context="{'group_by':'workspace_id'}" />
+                </group>
             </search>
         </field>
     </record>

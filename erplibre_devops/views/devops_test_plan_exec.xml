@@ -52,19 +52,13 @@
                 </group>
                 <notebook>
                     <page string="Execution">
-                        <group>
-                            <field name="exec_ids" />
-                        </group>
+                        <field name="exec_ids" />
                     </page>
                     <page string="Result">
-                        <group>
-                            <field name="result_ids" />
-                        </group>
+                        <field name="result_ids" />
                     </page>
                     <page string="Log">
-                        <group>
-                            <field name="log" />
-                        </group>
+                        <field name="log_html" />
                     </page>
                 </notebook>
             </form>
