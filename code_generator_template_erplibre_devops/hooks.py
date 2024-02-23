@@ -14,7 +14,7 @@ def post_init_hook(cr, e):
         env = api.Environment(cr, SUPERUSER_ID, {})
 
         # The path of the actual file
-        path_module_generate = "./addons/ERPLibre_erplibre_addons"
+        path_module_generate = "addons/ERPLibre_erplibre_addons"
 
         short_name = MODULE_NAME.replace("_", " ").title()
 
@@ -54,14 +54,15 @@ def post_init_hook(cr, e):
             " devops.system; devops.test.case; devops.test.case.exec;"
             " devops.test.plan; devops.test.plan.exec; devops.test.result;"
             " devops.workspace; devops.workspace.docker;"
-            " devops.workspace.terminal; erplibre.mode; erplibre.mode.env;"
-            " erplibre.mode.exec; erplibre.mode.source;"
-            " erplibre.mode.version.base; erplibre.mode.version.erplibre"
+            " devops.workspace.terminal; erplibre.config.path.home;"
+            " erplibre.mode; erplibre.mode.env; erplibre.mode.exec;"
+            " erplibre.mode.source; erplibre.mode.version.base;"
+            " erplibre.mode.version.erplibre"
         )
         value["template_inherit_model_name"] = ""
         value[
             "template_module_path_generated_extension"
-        ] = "./addons/ERPLibre_erplibre_addons"
+        ] = "addons/ERPLibre_erplibre_addons"
         value["enable_template_wizard_view"] = True
         value["force_generic_template_wizard_view"] = False
         value["disable_generate_access"] = False
