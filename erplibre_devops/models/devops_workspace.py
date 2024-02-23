@@ -1302,6 +1302,7 @@ class DevopsWorkspace(models.Model):
             "raise ValidationError",
             "odoo.exceptions.CacheMiss:",
             "json.decoder.JSONDecodeError:",
+            "RuntimeError:",
         )
         # TODO move lst_exception into model devops.exec.exception
         for exception in lst_exception:

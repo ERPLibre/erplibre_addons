@@ -41,6 +41,10 @@ class DevopsPlanCg(models.Model):
         help="UCA configuration - with inherit"
     )
 
+    code_generator_name = fields.Char()
+
+    template_name = fields.Char()
+
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
     )
@@ -479,6 +483,14 @@ class DevopsPlanCg(models.Model):
                             # "mode_view_portal_models": rec.mode_view_portal_models,
                             "config_uca_enable_export_data": rec.config_uca_enable_export_data,
                         }
+                        if rec.code_generator_name:
+                            dct_new_project[
+                                "code_generator_name"
+                            ] = rec.code_generator_name
+                        if rec.template_name:
+                            dct_new_project[
+                                "template_name"
+                            ] = rec.template_name
                         # extra_arg = ""
                         if model_conf:
                             dct_new_project["config"] = model_conf

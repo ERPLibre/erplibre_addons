@@ -1,5 +1,7 @@
 import logging
 
+from colorama import Fore, Style
+
 from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -16,6 +18,15 @@ LST_CONSOLE_REPLACE_HTML = [
     ("\033[0;36m", '<span style="color: cyan">'),
     ("\033[0;37m", '<span style="color: white">'),
     ("\033[1m", '<span style="font-weight: bold">'),
+    (Style.RESET_ALL, "</span>"),
+    (Fore.BLACK, '<span style="color: black">'),
+    (Fore.RED, '<span style="color: red">'),
+    (Fore.GREEN, '<span style="color: green">'),
+    (Fore.YELLOW, '<span style="color: yellow">'),
+    (Fore.BLUE, '<span style="color: blue">'),
+    (Fore.MAGENTA, '<span style="color: magenta">'),
+    (Fore.CYAN, '<span style="color: cyan">'),
+    (Fore.WHITE, '<span style="color: white">'),
     ("\033[1;30m", '<span style="font-weight: bold;color: black">'),
     ("\033[1;31m", '<span style="font-weight: bold;color: red">'),
     ("\033[1;32m", '<span style="font-weight: bold;color: green">'),
@@ -40,6 +51,8 @@ class DevopsTestCaseExec(models.Model):
     _description = "devops_test_case_exec"
 
     name = fields.Char()
+
+    active = fields.Boolean(default=True)
 
     is_finish = fields.Boolean(
         readonly=True,
@@ -79,6 +92,18 @@ class DevopsTestCaseExec(models.Model):
         string="Workspace",
         required=True,
     )
+
+    has_devops_action = fields.Boolean(
+        store=True, compute="_compute_has_devops_action"
+    )
+
+    @api.multi
+    @api.depends("test_case_id")
+    def _compute_has_devops_action(self):
+        for rec in self:
+            rec.has_devops_action = (
+                rec.test_case_id and rec.test_case_id.test_cb_method_cg_id
+            )
 
     @api.multi
     @api.depends("result_ids", "result_ids.is_pass")
@@ -172,8 +197,92 @@ class DevopsTestCaseExec(models.Model):
     @api.depends("log")
     def _compute_log_html(self):
         for rec in self:
-            if rec.log:
-                log_html = rec.log.strip()
+            log_html = rec.log.strip() if rec.log else ""
+            if log_html:
                 for rep_str_from, rep_str_to in LST_CONSOLE_REPLACE_HTML:
                     log_html = log_html.replace(rep_str_from, rep_str_to)
                 rec.log_html = f"<p>{log_html}</p>"
+            else:
+                rec.log_html = False
+
+    @api.multi
+    def open_devops_action(self):
+        # TODO add self.ensure_one() in all action
+        self.ensure_one()
+        if not self.has_devops_action:
+            return
+        tc_id = self.test_case_id.test_cb_method_cg_id
+        ctx = dict(
+            self.env.context,
+            default_root_workspace_id=self.env.ref(
+                "erplibre_devops.devops_workspace_me", raise_if_not_found=False
+            ).id,
+            default_use_external_cg=True,
+            default_use_existing_meta_module=True,
+            default_state="code_module",
+        )
+        if tc_id.type_test == "gen_ucb":
+            ctx = dict(
+                ctx,
+                default_code_generator_name=tc_id.module_tested[0].name,
+                default_working_module_path=tc_id.path_generated,
+                default_working_module_path_suggestion="#",
+                default_working_module_cg_path=tc_id.path_meta,
+                default_working_module_cg_path_suggestion="#",
+                default_working_module_template_path=tc_id.path_meta,
+                default_working_module_template_path_suggestion="#",
+                default_use_existing_meta_module_ucb_only=True,
+                default_working_module_name=tc_id.module_generated[0].name,
+            )
+        elif tc_id.type_test == "gen_uca":
+            ctx = dict(
+                ctx,
+                default_code_generator_name=tc_id.module_tested[0].name,
+                default_working_module_path=tc_id.path_module_check,
+                default_working_module_path_suggestion="#",
+                default_working_module_cg_path=tc_id.path_meta,
+                default_working_module_cg_path_suggestion="#",
+                default_working_module_template_path=tc_id.path_meta,
+                default_working_module_template_path_suggestion="#",
+                default_use_existing_meta_module_uca_only=True,
+            )
+        # TODO missing type_test run_c, missing install module before run code gen
+        return {
+            "name": _("Run code execution from test."),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "devops.plan.action.wizard",
+            "view_id": self.env.ref(
+                "erplibre_devops.devops_plan_action_form"
+            ).id,
+            "target": "new",
+            "context": ctx,
+        }
+
+    @api.multi
+    def open_new_test_plan_execution(self):
+        # TODO add self.ensure_one() in all action
+        self.ensure_one()
+        # TODO do a copy and change run_in_sandbox, remove all test
+        ctx = dict(
+            self.env.context,
+            default_workspace_id=self.env.ref(
+                "erplibre_devops.devops_workspace_me",
+                raise_if_not_found=False,
+            ).id,
+            default_run_in_sandbox=False,
+            default_test_case_ids=[(4, self.test_case_id.id)],
+        )
+        return {
+            "name": _("Run test plan execution from test case execution."),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "devops.test.plan.exec",
+            "view_id": self.env.ref(
+                "erplibre_devops.devops_test_plan_exec_view_form"
+            ).id,
+            "target": "new",
+            "context": ctx,
+        }

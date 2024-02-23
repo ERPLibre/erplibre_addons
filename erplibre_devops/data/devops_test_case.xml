@@ -6,6 +6,12 @@
             <field name="test_plan_id" ref="devops_test_plan_internal" />
             <field name="test_cb_method_name">test_breakpoint</field>
         </record>
+        <record id="devops_test_case_async_execution_setup_test" model="devops.test.case">
+            <field name="name">Async execution setup</field>
+            <field name="test_plan_id" ref="devops_test_plan_cg" />
+            <field name="active" eval="False" />
+            <field name="note">Async process execution</field>
+        </record>
         <record id="devops_test_case_cg_helloworld_test" model="devops.test.case">
             <field name="name">Helloworld test</field>
             <field name="test_plan_id" ref="devops_test_plan_cg" />

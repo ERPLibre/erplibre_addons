@@ -62,6 +62,10 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="Generated plan CG",
     )
 
+    code_generator_name = fields.Char()
+
+    template_name = fields.Char()
+
     working_module_id = fields.Many2one(
         comodel_name="ir.module.module",
         string="Working module",
@@ -612,6 +616,8 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_code_module_shortcut_autopoieses_devops(self):
         self.working_project_name = "Autopoieses - erplibre_devops"
+        self.code_generator_name = "code_generator_erplibre_devops"
+        self.template_name = "code_generator_template_erplibre_devops"
         return self.goto_autopoiese("erplibre_devops")
 
     def state_goto_code_module_shortcut_autopoieses_code_generator(self):
@@ -622,6 +628,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_module_template_path_suggestion = (
             "addons/TechnoLibre_odoo-code-generator-template"
         )
+        self.code_generator_name = "code_generator_code_generator"
+        self.template_name = "code_generator_template_code_generator"
         self.use_existing_meta_module_ucb_only = True
         self.is_remote_cg = True
         return self.goto_autopoiese("code_generator")
@@ -638,6 +646,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_module_template_path_suggestion = (
             "addons/TechnoLibre_odoo-code-generator-template"
         )
+        self.code_generator_name = "code_generator_code_generator"
+        self.template_name = "code_generator_template_code_generator"
         self.use_existing_meta_module_uca_only = True
         self.uca_option_with_inherit = True
         self.is_remote_cg = True
@@ -955,6 +965,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 for a, b in self._fields[
                     "working_module_path_suggestion"
                 ].selection
+                if a not in ["#"]
             ]
             if relative_path_module in lst_suggest_path:
                 self.working_module_path_suggestion = relative_path_module
@@ -1119,6 +1130,10 @@ class DevopsPlanActionWizard(models.TransientModel):
             plan_cg_value[
                 "mode_view_portal_models"
             ] = self.mode_view_portal_models
+        if self.code_generator_name:
+            plan_cg_value["code_generator_name"] = self.code_generator_name
+        if self.template_name:
+            plan_cg_value["template_name"] = self.template_name
         # Generate
         plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
         plan_cg_id.action_code_generator_generate_all()

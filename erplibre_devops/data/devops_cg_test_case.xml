@@ -12,6 +12,8 @@
             <field name="name">demo_test</field>
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_demo_helpdesk_data, devops_cg_module_demo_internal, devops_cg_module_demo_internal_inherit, devops_cg_module_demo_mariadb_sql_example_1, devops_cg_module_demo_portal, devops_cg_module_demo_website_data, devops_cg_module_demo_website_leaflet, devops_cg_module_demo_website_snippet])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
         </record>
         <record id="devops_cg_test_case_code_generator_theme_test" model="devops.cg.test.case">
@@ -19,28 +21,40 @@
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_theme_website_demo_code_generator])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_theme_website])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_demo_test" model="devops.cg.test.case">
             <field name="name">code_generator_demo_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_code_generator_demo])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_data_test" model="devops.cg.test.case">
             <field name="name">code_generator_data_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_demo_website_data])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_export_helpdesk])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_data_part_2_test" model="devops.cg.test.case">
             <field name="name">code_generator_data_part_2_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_demo_website_data])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_export_website])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
             <field name="note">Merge to code_generator_data_test when fix double export data.</field>
         </record>
         <record id="devops_cg_test_case_code_generator_inherit_test" model="devops.cg.test.case">
@@ -48,7 +62,10 @@
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_demo_internal_inherit])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_internal_inherit])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_template_demo_internal" model="devops.cg.test.case">
             <field name="name">code_generator_template_demo_internal</field>
@@ -56,8 +73,11 @@
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_template_demo_internal])]" />
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_demo_internal])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="search_class_module">demo_internal</field>
+            <field name="type_test">gen_uca</field>
         </record>
         <record id="devops_cg_test_case_mariadb_test_template" model="devops.cg.test.case">
             <field name="name">mariadb_test_template</field>
@@ -65,8 +85,11 @@
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_template_demo_mariadb_sql_example_1])]" />
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_code_generator_portal,devops_cg_module_demo_mariadb_sql_example_1])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="search_class_module">demo_mariadb_sql_example_1</field>
+            <field name="type_test">gen_uca</field>
         </record>
         <record id="devops_cg_test_case_mariadb_test_migrator" model="devops.cg.test.case">
             <field name="name">mariadb_test_migrator</field>
@@ -74,8 +97,11 @@
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_migrator_demo_mariadb_sql_example_1])]" />
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_code_generator_portal])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="script_after_init_check">./script/database/restore_mariadb_sql_example_1.sh</field>
+            <field name="type_test">gen_uca</field>
         </record>
         <record id="devops_cg_test_case_mariadb_test_code_generator" model="devops.cg.test.case">
             <field name="name">mariadb_test_code_generator</field>
@@ -83,7 +109,10 @@
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_mariadb_sql_example_1])]" />
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_code_generator_portal])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_template_demo_internal_inherit" model="devops.cg.test.case">
             <field name="name">code_generator_template_demo_internal_inherit</field>
@@ -91,8 +120,11 @@
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_template_demo_internal_inherit])]" />
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_demo_internal_inherit])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="search_class_module">demo_internal_inherit</field>
+            <field name="type_test">gen_uca</field>
         </record>
         <record id="devops_cg_test_case_code_generator_template_demo_sysadmin_cron" model="devops.cg.test.case">
             <field name="name">code_generator_template_demo_sysadmin_cron</field>
@@ -100,42 +132,56 @@
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_template_demo_sysadmin_cron])]" />
             <field name="module_init_ids" eval="[(6, 0, [devops_cg_module_auto_backup])]" />
             <field name="path_module_check">./addons/OCA_server-tools/auto_backup</field>
+            <field name="path_generated">./addons/OCA_server-tools</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="search_class_module">auto_backup</field>
             <field name="generated_path">./addons/OCA_server-tools/</field>
             <field name="install_path">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="type_test">gen_uca</field>
         </record>
         <record id="devops_cg_test_case_code_generator_export_website_attachments_test" model="devops.cg.test.case">
             <field name="name">code_generator_export_website_attachments_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_demo_website_attachments_data])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_export_website_attachments])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="restore_db_image_name">test_website_attachments</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_demo_generic_test" model="devops.cg.test.case">
             <field name="name">code_generator_demo_generic_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_demo_internal,devops_cg_module_demo_portal])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_internal,devops_cg_module_code_generator_demo_portal])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_website_snippet_test" model="devops.cg.test.case">
             <field name="name">code_generator_website_snippet_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_demo_website_leaflet,devops_cg_module_demo_website_snippet,devops_cg_module_demo_website_multiple_snippet])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_demo_website_leaflet,devops_cg_module_code_generator_demo_website_snippet,devops_cg_module_code_generator_demo_website_multiple_snippet])]" />
             <field name="path_module_check">./addons/TechnoLibre_odoo-code-generator-template</field>
+            <field name="path_generated">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
             <field name="file_to_restore">demo_portal/i18n/demo_portal.pot,demo_portal/i18n/fr_CA.po</field>
             <field name="file_to_restore_origin" eval="True" />
             <field name="note">Because code_generator_demo_website_multiple_snippet depend on code_generator_demo_portal, it will execute it and this delete file demo_portal/i18n/demo_portal.pot and demo_portal/i18n/fr_CA.po</field>
+            <field name="type_test">gen_ucb</field>
         </record>
         <record id="devops_cg_test_case_code_generator_auto_backup_test" model="devops.cg.test.case">
             <field name="name">code_generator_auto_backup_test</field>
             <field name="module_generated" eval="[(6, 0, [devops_cg_module_auto_backup])]" />
             <field name="module_tested" eval="[(6, 0, [devops_cg_module_code_generator_auto_backup])]" />
             <field name="path_module_check">./addons/OCA_server-tools/auto_backup</field>
+            <field name="path_generated">./addons/OCA_server-tools</field>
+            <field name="path_meta">./addons/TechnoLibre_odoo-code-generator-template</field>
             <field name="run_mode">test_exec</field>
+            <field name="type_test">gen_ucb</field>
         </record>
     </data>
 </odoo>

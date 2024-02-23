@@ -11,6 +11,8 @@ class DevopsTestCase(models.Model):
 
     name = fields.Char()
 
+    active = fields.Boolean(default=True)
+
     test_plan_id = fields.Many2one(
         comodel_name="devops.test.plan",
         string="Test plan",
@@ -25,3 +27,5 @@ class DevopsTestCase(models.Model):
         string="Method name",
         help="Will call this method name",
     )
+
+    note = fields.Text()

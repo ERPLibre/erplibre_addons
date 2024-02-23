@@ -459,26 +459,6 @@
                             string="OR Manual path"
                             attrs="{'invisible': [('working_module_path_suggestion', '!=', '#')]}"
                         />
-                        <field
-                            name="working_module_cg_path_suggestion"
-                            string="Suggested CG path"
-                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
-                        />
-                        <field
-                            name="working_module_cg_path"
-                            string="OR Manual CG path"
-                            attrs="{'invisible': ['|',('working_module_cg_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
-                        />
-                        <field
-                            name="working_module_template_path_suggestion"
-                            string="Suggested Template path"
-                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
-                        />
-                        <field
-                            name="working_module_template_path"
-                            string="OR Manual Template path"
-                            attrs="{'invisible': ['|',('working_module_template_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
-                        />
                     </group>
                     <group string="C-Parameter" attrs="{'invisible': [('state', '!=', 'code_module')]}">
                         <field name="use_external_cg" string="CG with metadata" />
@@ -506,6 +486,30 @@
                         <field name="is_remote_cg" />
                         <field name="force_generate" />
                         <field name="mode_view_generator" />
+                    </group>
+                    <group string="C-Parameter advanced" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                        <field name="code_generator_name" />
+                        <field
+                            name="working_module_cg_path_suggestion"
+                            string="Suggested CG path"
+                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
+                        />
+                        <field
+                            name="working_module_cg_path"
+                            string="OR Manual CG path"
+                            attrs="{'invisible': ['|',('working_module_cg_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
+                        />
+                        <field name="template_name" />
+                        <field
+                            name="working_module_template_path_suggestion"
+                            string="Suggested Template path"
+                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
+                        />
+                        <field
+                            name="working_module_template_path"
+                            string="OR Manual Template path"
+                            attrs="{'invisible': ['|',('working_module_template_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
+                        />
                     </group>
                 </group>
                 <group

@@ -4,13 +4,15 @@ import os
 import uuid
 
 import pytz
+from colorama import Fore, Style
 
 from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
 
+HTML_ENDLINE = "<br />"
 LST_CONSOLE_REPLACE_HTML = [
-    ("\n", "<br />"),
+    ("\n", HTML_ENDLINE),
     ("\033[0m", "</span>"),
     ("\033[0;30m", '<span style="color: black">'),
     ("\033[0;31m", '<span style="color: red">'),
@@ -21,6 +23,15 @@ LST_CONSOLE_REPLACE_HTML = [
     ("\033[0;36m", '<span style="color: cyan">'),
     ("\033[0;37m", '<span style="color: white">'),
     ("\033[1m", '<span style="font-weight: bold">'),
+    (Style.RESET_ALL, "</span>"),
+    (Fore.BLACK, '<span style="color: black">'),
+    (Fore.RED, '<span style="color: red">'),
+    (Fore.GREEN, '<span style="color: green">'),
+    (Fore.YELLOW, '<span style="color: yellow">'),
+    (Fore.BLUE, '<span style="color: blue">'),
+    (Fore.MAGENTA, '<span style="color: magenta">'),
+    (Fore.CYAN, '<span style="color: cyan">'),
+    (Fore.WHITE, '<span style="color: white">'),
     ("\033[1;30m", '<span style="font-weight: bold;color: black">'),
     ("\033[1;31m", '<span style="font-weight: bold;color: red">'),
     ("\033[1;32m", '<span style="font-weight: bold;color: green">'),
@@ -105,6 +116,8 @@ class DevopsTestPlanExec(models.Model):
         readonly=True,
     )
 
+    run_in_sandbox = fields.Boolean(default=True)
+
     coverage = fields.Boolean(help="For CG test")
 
     keep_cache = fields.Boolean(help="For CG test")
@@ -128,6 +141,8 @@ class DevopsTestPlanExec(models.Model):
         required=True,
     )
 
+    summary = fields.Html(compute="_compute_log_html", store=True)
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -144,11 +159,26 @@ class DevopsTestPlanExec(models.Model):
     @api.depends("log")
     def _compute_log_html(self):
         for rec in self:
-            if rec.log:
-                log_html = rec.log.strip()
+            rec.summary = False
+            log_html = rec.log.strip() if rec.log else ""
+            if log_html:
                 for rep_str_from, rep_str_to in LST_CONSOLE_REPLACE_HTML:
                     log_html = log_html.replace(rep_str_from, rep_str_to)
                 rec.log_html = f"<p>{log_html}</p>"
+                key_summary = "Summary TEST"
+                if key_summary in rec.log_html:
+                    line_summary_begin = rec.log_html.find(key_summary)
+                    line_summary_end = rec.log_html.find(
+                        "<br>Log file", line_summary_begin
+                    )
+                    extract_summary = rec.log_html[
+                        line_summary_begin:line_summary_end
+                    ]
+                    rec.summary = (
+                        f'<p><span style="color: blue">{extract_summary}</p>'
+                    )
+            else:
+                rec.log_html = False
 
     @api.depends("test_plan_id", "test_case_ids")
     def _compute_has_configuration(self):
@@ -179,7 +209,10 @@ class DevopsTestPlanExec(models.Model):
     @api.multi
     def execute_test_action(self, ctx=None):
         lst_test_erplibre_async = []
+        ws_id = None
         for rec in self:
+            if not ws_id:
+                ws_id = rec.workspace_id
             with rec.workspace_id.devops_create_exec_bundle(
                 "Execute - test plan exec", ctx=ctx
             ) as rec_ws:
@@ -278,7 +311,7 @@ class DevopsTestPlanExec(models.Model):
                     ] = test_case_cg_id.path_module_check
                     model_test[
                         "run_in_sandbox"
-                    ] = test_case_cg_id.run_in_sandbox
+                    ] = test_plan_exec_id.run_in_sandbox
                     if test_case_cg_id.search_class_module:
                         model_test[
                             "search_class_module"
@@ -326,112 +359,143 @@ class DevopsTestPlanExec(models.Model):
                 "tmp",
                 f"erplibre_devops_testcase_cg_log_{uuid.uuid4()}",
             )
-            # TODO store this variable into test plan execution information
-            exec_id = rec_ws.execute(
-                cmd=f"mkdir -p '{path_mkdir_log_external}'"
-            )
-            if exec_id.exec_status:
-                # TODO test_case_exec_id is a wrong association, create a testcase for general execution (async)
-                self.env["devops.test.result"].create(
+            with ws_id.devops_create_exec_bundle(
+                "Execute - test plan async exec", ctx=ctx
+            ) as rec_ws:
+                # Create generic test_case_exec_id
+                # TODO what to do if test_plan_exec_id is missing?
+                test_case_exec_generic_async_id = self.env[
+                    "devops.test.case.exec"
+                ].create(
                     {
-                        "name": f"Cannot mkdir {path_mkdir_log_external}",
-                        "log": exec_id.log_all.strip(),
-                        "is_finish": True,
-                        "is_pass": False,
-                        "test_case_exec_id": test_case_exec_id.id,
+                        "name": "Async execution test - setup",
+                        "test_plan_exec_id": test_plan_exec_id.id,
+                        "workspace_id": rec_ws.id,
+                        "test_case_id": self.env.ref(
+                            "erplibre_devops.devops_test_case_async_execution_setup_test"
+                        ).id,
                     }
                 )
-            pre_cmd_run_test = ""
-            if test_plan_exec_id.coverage:
-                pre_cmd_run_test += "--coverage "
-            if test_plan_exec_id.keep_cache:
-                pre_cmd_run_test += "--keep_cache "
-            if test_plan_exec_id.no_parallel:
-                pre_cmd_run_test += "--no_parallel "
-            if test_plan_exec_id.ignore_init_check_git:
-                pre_cmd_run_test += "--ignore_init_check_git "
-            if test_plan_exec_id.max_process:
-                pre_cmd_run_test += (
-                    f"--max_process={test_plan_exec_id.max_process} "
-                )
-            if test_plan_exec_id.debug:
-                pre_cmd_run_test += "--debug "
-            cmd_run_test = (
-                "./script/test/run_parallel_test.py --output_result_dir"
-                f" {path_mkdir_log_external} {pre_cmd_run_test} --json_model"
-                f' "{json_model}"'
-            )
-            # TODO associate execution per testcase exec and testplan exec
-            exec_id = rec_ws.execute(
-                cmd=cmd_run_test,
-                to_instance=True,
-            )
-            if test_plan_exec_id:
-                test_plan_exec_id.log = exec_id.log_all.strip()
-                test_plan_exec_id.exec_id = exec_id.id
-            if exec_id.exec_status:
-                # Fail return error status
-                self.env["devops.test.result"].create(
-                    {
-                        "name": f"Error execute run ERPLibre parallel test",
-                        "log": exec_id.log_all.strip(),
-                        "is_finish": True,
-                        "is_pass": False,
-                        "test_case_exec_id": test_case_exec_id.id,
-                    }
-                )
-            for test_case_exec_id, test_case_cg_id in lst_test_erplibre_async:
-                test_name = (
-                    test_case_exec_id.name.strip().replace(" ", "_").lower()
-                )
-                path_log = os.path.join(path_mkdir_log_external, test_name)
+                # TODO store this variable into test plan execution information
                 exec_id = rec_ws.execute(
-                    cmd=f"cat {path_log}",
+                    cmd=f"mkdir -p '{path_mkdir_log_external}'"
                 )
-                output = exec_id.log_all.strip()
-                test_case_exec_id.log = output
-                lst_output = output.split("\n")
-                try:
-                    status = int(lst_output[0])
-                except Exception as e:
+                if exec_id.exec_status:
                     self.env["devops.test.result"].create(
                         {
-                            "name": f"Log mal formatted - status",
-                            "log": lst_output[0],
+                            "name": f"Cannot mkdir {path_mkdir_log_external}",
+                            "log": exec_id.log_all.strip(),
                             "is_finish": True,
                             "is_pass": False,
-                            "test_case_exec_id": test_case_exec_id.id,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
                         }
                     )
-                    status = -1
-                if status == -1:
-                    continue
-                test_name = lst_output[1]
-                try:
-                    time_exec_sec = int(float(lst_output[2]))
-                except Exception as e:
-                    self.env["devops.test.result"].create(
-                        {
-                            "name": f"Log mal formatted - time_exec_sec",
-                            "log": lst_output[2],
-                            "is_finish": True,
-                            "is_pass": False,
-                            "test_case_exec_id": test_case_exec_id.id,
-                        }
+                pre_cmd_run_test = ""
+                if test_plan_exec_id.coverage:
+                    pre_cmd_run_test += "--coverage "
+                if test_plan_exec_id.keep_cache:
+                    pre_cmd_run_test += "--keep_cache "
+                if test_plan_exec_id.no_parallel:
+                    pre_cmd_run_test += "--no_parallel "
+                if test_plan_exec_id.ignore_init_check_git:
+                    pre_cmd_run_test += "--ignore_init_check_git "
+                if test_plan_exec_id.max_process:
+                    pre_cmd_run_test += (
+                        f"--max_process={test_plan_exec_id.max_process} "
                     )
-                    time_exec_sec = 0
-                date_log = lst_output[3]
-                test_result = "PASS" if not status else "FAIL"
+                if test_plan_exec_id.debug:
+                    pre_cmd_run_test += "--debug "
+                cmd_run_test = (
+                    "./script/test/run_parallel_test.py --output_result_dir"
+                    f" {path_mkdir_log_external} {pre_cmd_run_test} --json_model"
+                    f' "{json_model}"'
+                )
+                # TODO associate execution per testcase exec and testplan exec
+                exec_id = rec_ws.execute(
+                    cmd=cmd_run_test,
+                    to_instance=True,
+                )
                 self.env["devops.test.result"].create(
                     {
-                        "name": (
-                            f"Test result '{test_name}' - {time_exec_sec}s -"
-                            f" {date_log} - {test_result}"
-                        ),
-                        "log": exec_id.log_all.strip(),
+                        "name": f"Execution async done",
                         "is_finish": True,
-                        "is_pass": not status,
-                        "test_case_exec_id": test_case_exec_id.id,
+                        "is_pass": True,
+                        "test_case_exec_id": test_case_exec_generic_async_id.id,
                     }
                 )
+                if test_plan_exec_id:
+                    test_plan_exec_id.log = exec_id.log_all.strip()
+                    test_plan_exec_id.exec_id = exec_id.id
+                if exec_id.exec_status:
+                    # Fail return error status
+                    self.env["devops.test.result"].create(
+                        {
+                            "name": (
+                                f"Error execute run ERPLibre parallel test"
+                            ),
+                            "log": exec_id.log_all.strip(),
+                            "is_finish": True,
+                            "is_pass": False,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
+                        }
+                    )
+                for (
+                    test_case_exec_id,
+                    test_case_cg_id,
+                ) in lst_test_erplibre_async:
+                    test_name = (
+                        test_case_exec_id.name.strip()
+                        .replace(" ", "_")
+                        .lower()
+                    )
+                    path_log = os.path.join(path_mkdir_log_external, test_name)
+                    exec_id = rec_ws.execute(
+                        cmd=f"cat {path_log}",
+                    )
+                    output = exec_id.log_all.strip()
+                    test_case_exec_id.log = output
+                    lst_output = output.split("\n")
+                    try:
+                        status = int(lst_output[0])
+                    except Exception as e:
+                        self.env["devops.test.result"].create(
+                            {
+                                "name": f"Log mal formatted - status",
+                                "log": lst_output[0],
+                                "is_finish": True,
+                                "is_pass": False,
+                                "test_case_exec_id": test_case_exec_id.id,
+                            }
+                        )
+                        status = -1
+                    if status == -1:
+                        continue
+                    test_name = lst_output[1]
+                    try:
+                        time_exec_sec = int(float(lst_output[2]))
+                    except Exception as e:
+                        self.env["devops.test.result"].create(
+                            {
+                                "name": f"Log mal formatted - time_exec_sec",
+                                "log": lst_output[2],
+                                "is_finish": True,
+                                "is_pass": False,
+                                "test_case_exec_id": test_case_exec_id.id,
+                            }
+                        )
+                        time_exec_sec = 0
+                    date_log = lst_output[3]
+                    test_result = "PASS" if not status else "FAIL"
+                    self.env["devops.test.result"].create(
+                        {
+                            "name": (
+                                f"Test result '{test_name}' - {time_exec_sec}s"
+                                f" - {date_log} - {test_result}"
+                            ),
+                            "log": exec_id.log_all.strip(),
+                            "is_finish": True,
+                            "is_pass": not status,
+                            "test_case_exec_id": test_case_exec_id.id,
+                        }
+                    )
         pass

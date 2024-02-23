@@ -75,13 +75,15 @@ class DevopsCgTestCase(models.Model):
 
     path_module_check = fields.Char()
 
+    path_meta = fields.Char()
+
+    path_generated = fields.Char()
+
     search_class_module = fields.Char()
 
     restore_db_image_name = fields.Char(
         help="TODO use many2one from image db."
     )
-
-    run_in_sandbox = fields.Boolean(default=True)
 
     file_to_restore_origin = fields.Boolean()
 
@@ -100,6 +102,21 @@ class DevopsCgTestCase(models.Model):
             "Option 'command' to run a script or 'test_exec' to run test"
             " script."
         ),
+    )
+
+    type_test = fields.Selection(
+        selection=[
+            ("gen_ucb", "Generate UcB"),
+            ("gen_uca", "Generate UcA"),
+            ("run_c", "Run module"),
+        ],
+        help=(
+            "Type of test to run. "
+            "gen_uca : Execute a template to generate a code generator module."
+            "gen_ucb : Execute code generator to generate a module."
+            "run_c : Run module to check to execution error."
+        ),
+        default="run_c",
     )
 
     sequence_test = fields.Integer(

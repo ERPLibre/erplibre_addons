@@ -15,8 +15,9 @@
                         <field name="module_search_class" />
                         <field name="module_tested" />
                         <field name="path_module_check" />
+                        <field name="path_meta" />
+                        <field name="path_generated" />
                         <field name="restore_db_image_name" />
-                        <field name="run_in_sandbox" />
                         <field name="file_to_restore" />
                         <field name="file_to_restore_origin" />
                         <field name="script_after_init_check" />
@@ -41,7 +42,6 @@
                 <field name="install_path" type="row" />
                 <field name="path_module_check" type="row" />
                 <field name="restore_db_image_name" type="row" />
-                <field name="run_in_sandbox" type="row" />
                 <field name="script_after_init_check" type="row" />
                 <field name="test_name" type="row" />
             </graph>
@@ -61,7 +61,6 @@
                 <field name="module_tested" />
                 <field name="path_module_check" />
                 <field name="restore_db_image_name" />
-                <field name="run_in_sandbox" />
                 <field name="script_after_init_check" />
                 <field name="test_name" />
                 <templates>
@@ -109,12 +108,6 @@
                                             <field name="restore_db_image_name" />
                                         </strong>
                                     </li>
-                                    <li class="text-success float-right mb4" t-if="record.run_in_sandbox.raw_value">
-                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
-                                    </li>
-                                    <li class="text-danger float-right mb4" t-if="!record.run_in_sandbox.raw_value">
-                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
-                                    </li>
                                     <li class="mb4">
                                         <strong>
                                             <field name="script_after_init_check" />
@@ -143,7 +136,6 @@
                 <field name="install_path" type="row" />
                 <field name="path_module_check" type="row" />
                 <field name="restore_db_image_name" type="row" />
-                <field name="run_in_sandbox" type="row" />
                 <field name="script_after_init_check" type="row" />
                 <field name="test_name" type="row" />
             </pivot>
@@ -175,7 +167,6 @@
                     string="Restore Db Image Name"
                     domain="[('restore_db_image_name','!=',False)]"
                 />
-                <filter name="run_in_sandbox" string="Run In Sandbox" domain="[('run_in_sandbox','=',True)]" />
                 <filter
                     name="script_after_init_check"
                     string="Script After Init Check"
@@ -199,7 +190,6 @@
                 <field name="module_tested" />
                 <field name="path_module_check" />
                 <field name="restore_db_image_name" />
-                <field name="run_in_sandbox" />
                 <field name="script_after_init_check" />
                 <field name="test_name" />
             </tree>

@@ -847,6 +847,26 @@ class DevopsCgNewProject(models.Model):
                     rec.has_error = True
                     stop_exec = True
 
+                # Check if create/update UcA or only run it
+                if (
+                    rec.use_existing_meta_module
+                    and (
+                        rec.use_existing_meta_module_uca_only
+                        or rec.use_existing_meta_module_ucb_only
+                    )
+                    # and rec_ws.os_path_exists(
+                    #     rec.template_path, to_instance=True
+                    # )
+                ):
+                    if rec.use_existing_meta_module_uca_only:
+                        rec.stage_id = self.env.ref(
+                            "erplibre_devops.devops_cg_new_project_stage_generate_uca"
+                        )
+                    elif rec.use_existing_meta_module_ucb_only:
+                        rec.stage_id = self.env.ref(
+                            "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
+                        )
+
                 # Stage Uc0
                 # This stage will create a new UcA or update it
                 if not stop_exec and rec.stage_id == stage_uc0_id:
@@ -1001,21 +1021,6 @@ class DevopsCgNewProject(models.Model):
                     )
                     raise Exception(msg_error)
 
-                rec.stage_id = self.env.ref(
-                    "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
-                )
-
-    @api.multi
-    def action_generate_Uc0(self, ctx=None, rec_ws=None):
-        for rec in self:
-            ws_param = rec_ws if rec_ws else rec.devops_workspace
-            with ws_param.devops_create_exec_bundle(
-                "New project generate 2.Uc0", devops_cg_new_project=rec.id
-            ) as ws:
-                rec.stage_id = self.env.ref(
-                    "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
-                )
-
                 # Update configuration
                 config = configparser.ConfigParser()
                 config.read(rec.odoo_config)
@@ -1058,26 +1063,20 @@ class DevopsCgNewProject(models.Model):
                 _logger.info(f"Create temporary config file: {temp_file}")
                 rec.config_path = temp_file
 
-                # Check if create/update UcA or only run it
-                if (
-                    rec.use_existing_meta_module
-                    and (
-                        rec.use_existing_meta_module_uca_only
-                        or rec.use_existing_meta_module_ucb_only
-                    )
-                    and rec_ws.os_path_exists(
-                        rec.template_path, to_instance=True
-                    )
-                ):
-                    if rec.use_existing_meta_module_uca_only:
-                        rec.stage_id = self.env.ref(
-                            "erplibre_devops.devops_cg_new_project_stage_generate_uca"
-                        )
-                    elif rec.use_existing_meta_module_ucb_only:
-                        rec.stage_id = self.env.ref(
-                            "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
-                        )
-                    continue
+                rec.stage_id = self.env.ref(
+                    "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
+                )
+
+    @api.multi
+    def action_generate_Uc0(self, ctx=None, rec_ws=None):
+        for rec in self:
+            ws_param = rec_ws if rec_ws else rec.devops_workspace
+            with ws_param.devops_create_exec_bundle(
+                "New project generate 2.Uc0", devops_cg_new_project=rec.id
+            ) as ws:
+                rec.stage_id = self.env.ref(
+                    "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
+                )
 
                 v_dct_log_error = {
                     "new_project_id": rec.id,
@@ -1777,6 +1776,7 @@ class DevopsCgNewProject(models.Model):
         lst_search_and_replace is a list of tuple, first item is search, second is replace
         """
         # TODO open file from workspace and not from this execution
+        # TODO validate file exist before try to open it
         with open(filepath, "r") as file:
             txt = file.read()
             for search, replace in lst_search_and_replace:

@@ -1,3 +1,5 @@
+from colorama import Fore, Style
+
 from odoo import _, api, fields, models
 
 # TODO duplicate code, use an external lib
@@ -13,6 +15,15 @@ LST_CONSOLE_REPLACE_HTML = [
     ("\033[0;36m", '<span style="color: cyan">'),
     ("\033[0;37m", '<span style="color: white">'),
     ("\033[1m", '<span style="font-weight: bold">'),
+    (Style.RESET_ALL, "</span>"),
+    (Fore.BLACK, '<span style="color: black">'),
+    (Fore.RED, '<span style="color: red">'),
+    (Fore.GREEN, '<span style="color: green">'),
+    (Fore.YELLOW, '<span style="color: yellow">'),
+    (Fore.BLUE, '<span style="color: blue">'),
+    (Fore.MAGENTA, '<span style="color: magenta">'),
+    (Fore.CYAN, '<span style="color: cyan">'),
+    (Fore.WHITE, '<span style="color: white">'),
     ("\033[1;30m", '<span style="font-weight: bold;color: black">'),
     ("\033[1;31m", '<span style="font-weight: bold;color: red">'),
     ("\033[1;32m", '<span style="font-weight: bold;color: green">'),
@@ -62,12 +73,26 @@ class DevopsTestResult(models.Model):
 
     workspace_id = fields.Many2one(related="test_plan_exec_id.workspace_id")
 
+    has_devops_action = fields.Boolean(
+        related="test_case_exec_id.has_devops_action"
+    )
+
     @api.multi
     @api.depends("log")
     def _compute_log_html(self):
         for rec in self:
-            if rec.log:
-                log_html = rec.log.strip()
+            log_html = rec.log.strip() if rec.log else ""
+            if log_html:
                 for rep_str_from, rep_str_to in LST_CONSOLE_REPLACE_HTML:
                     log_html = log_html.replace(rep_str_from, rep_str_to)
                 rec.log_html = f"<p>{log_html}</p>"
+            else:
+                rec.log_html = False
+
+    @api.multi
+    def open_devops_action(self):
+        return self.test_case_exec_id.open_devops_action()
+
+    @api.multi
+    def open_new_test_plan_execution(self):
+        return self.test_case_exec_id.open_new_test_plan_execution()
