@@ -577,7 +577,9 @@ class DevopsSystem(models.Model):
         for rec in self:
             # TODO use mdfind on OSX
             # TODO need to do sometime «sudo updatedb»
-            if not rec.use_search_cmd or rec.use_search_cmd not in (
+            if not rec.use_search_cmd:
+                return
+            if rec.use_search_cmd not in (
                 "locate",
                 "find",
             ):
