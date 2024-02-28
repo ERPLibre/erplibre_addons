@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="tdm.portal_my_tdm_entrevue" name="My Tdm Entrevue">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.entrevue&amp;id=%s&amp;view_type=form' % (tdm_entrevue.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Entrevue -</small>
+                        <span t-field="tdm_entrevue.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_entrevue_stage" name="My Tdm Entrevue Stage">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.entrevue.stage&amp;id=%s&amp;view_type=form' % (tdm_entrevue_stage.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Entrevue Stage -</small>
+                        <span t-field="tdm_entrevue_stage.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi" name="My Tdm Offre Emploi">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.offre.emploi&amp;id=%s&amp;view_type=form' % (tdm_offre_emploi.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Offre Emploi -</small>
+                        <span t-field="tdm_offre_emploi.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi_applique" name="My Tdm Offre Emploi Applique">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.offre.emploi.applique&amp;id=%s&amp;view_type=form' % (tdm_offre_emploi_applique.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Offre Emploi Applique -</small>
+                        <span t-field="tdm_offre_emploi_applique.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi_applique_stage" name="My Tdm Offre Emploi Applique Stage">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.offre.emploi.applique.stage&amp;id=%s&amp;view_type=form' % (tdm_offre_emploi_applique_stage.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Offre Emploi Applique Stage -</small>
+                        <span t-field="tdm_offre_emploi_applique_stage.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi_stage" name="My Tdm Offre Emploi Stage">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.offre.emploi.stage&amp;id=%s&amp;view_type=form' % (tdm_offre_emploi_stage.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Offre Emploi Stage -</small>
+                        <span t-field="tdm_offre_emploi_stage.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_entreprise" name="My Tdm Profil Entreprise">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.profil.entreprise&amp;id=%s&amp;view_type=form' % (tdm_profil_entreprise.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Profil Entreprise -</small>
+                        <span t-field="tdm_profil_entreprise.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_entreprise_stage" name="My Tdm Profil Entreprise Stage">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.profil.entreprise.stage&amp;id=%s&amp;view_type=form' % (tdm_profil_entreprise_stage.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Profil Entreprise Stage -</small>
+                        <span t-field="tdm_profil_entreprise_stage.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_travailleur" name="My Tdm Profil Travailleur">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.profil.travailleur&amp;id=%s&amp;view_type=form' % (tdm_profil_travailleur.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Profil Travailleur -</small>
+                        <span t-field="tdm_profil_travailleur.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_travailleur_stage" name="My Tdm Profil Travailleur Stage">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.profil.travailleur.stage&amp;id=%s&amp;view_type=form' % (tdm_profil_travailleur_stage.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Profil Travailleur Stage -</small>
+                        <span t-field="tdm_profil_travailleur_stage.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_entrevue_stages" name="My Tdm Entrevue Stages">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Entrevue Stages</t>
+            </t>
+            <t t-if="not tdm_entrevue_stages">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_entrevue_stages.</div>
+            </t>
+            <t t-if="tdm_entrevue_stages" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_entrevue_stages" t-as="tdm_entrevue_stage">
+                        <td>
+                            <a t-attf-href="/my/tdm_entrevue_stage/#{tdm_entrevue_stage.id}?{{ keep_query() }}">
+                                <span t-field="tdm_entrevue_stage.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_entrevues" name="My Tdm Entrevues">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Entrevues</t>
+            </t>
+            <t t-if="not tdm_entrevues">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_entrevues.</div>
+            </t>
+            <t t-if="tdm_entrevues" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_entrevues" t-as="tdm_entrevue">
+                        <td>
+                            <a t-attf-href="/my/tdm_entrevue/#{tdm_entrevue.id}?{{ keep_query() }}">
+                                <span t-field="tdm_entrevue.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi_applique_stages" name="My Tdm Offre Emploi Applique Stages">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Offre Emploi Applique Stages</t>
+            </t>
+            <t t-if="not tdm_offre_emploi_applique_stages">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_applique_stages.</div>
+            </t>
+            <t t-if="tdm_offre_emploi_applique_stages" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_offre_emploi_applique_stages" t-as="tdm_offre_emploi_applique_stage">
+                        <td>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi_applique_stage/#{tdm_offre_emploi_applique_stage.id}?{{ keep_query() }}"
+                            >
+                                <span t-field="tdm_offre_emploi_applique_stage.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi_appliques" name="My Tdm Offre Emploi Appliques">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Offre Emploi Appliques</t>
+            </t>
+            <t t-if="not tdm_offre_emploi_appliques">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_appliques.</div>
+            </t>
+            <t t-if="tdm_offre_emploi_appliques" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_offre_emploi_appliques" t-as="tdm_offre_emploi_applique">
+                        <td>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi_applique/#{tdm_offre_emploi_applique.id}?{{ keep_query() }}"
+                            >
+                                <span t-field="tdm_offre_emploi_applique.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emploi_stages" name="My Tdm Offre Emploi Stages">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Offre Emploi Stages</t>
+            </t>
+            <t t-if="not tdm_offre_emploi_stages">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_stages.</div>
+            </t>
+            <t t-if="tdm_offre_emploi_stages" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_offre_emploi_stages" t-as="tdm_offre_emploi_stage">
+                        <td>
+                            <a t-attf-href="/my/tdm_offre_emploi_stage/#{tdm_offre_emploi_stage.id}?{{ keep_query() }}">
+                                <span t-field="tdm_offre_emploi_stage.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_offre_emplois" name="My Tdm Offre Emplois">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Offre Emplois</t>
+            </t>
+            <t t-if="not tdm_offre_emplois">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emplois.</div>
+            </t>
+            <t t-if="tdm_offre_emplois" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_offre_emplois" t-as="tdm_offre_emploi">
+                        <td>
+                            <a t-attf-href="/my/tdm_offre_emploi/#{tdm_offre_emploi.id}?{{ keep_query() }}">
+                                <span t-field="tdm_offre_emploi.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_entreprise_stages" name="My Tdm Profil Entreprise Stages">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Profil Entreprise Stages</t>
+            </t>
+            <t t-if="not tdm_profil_entreprise_stages">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_profil_entreprise_stages.</div>
+            </t>
+            <t t-if="tdm_profil_entreprise_stages" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_profil_entreprise_stages" t-as="tdm_profil_entreprise_stage">
+                        <td>
+                            <a
+                                t-attf-href="/my/tdm_profil_entreprise_stage/#{tdm_profil_entreprise_stage.id}?{{ keep_query() }}"
+                            >
+                                <span t-field="tdm_profil_entreprise_stage.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_entreprises" name="My Tdm Profil Entreprises">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Profil Entreprises</t>
+            </t>
+            <t t-if="not tdm_profil_entreprises">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_profil_entreprises.</div>
+            </t>
+            <t t-if="tdm_profil_entreprises" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_profil_entreprises" t-as="tdm_profil_entreprise">
+                        <td>
+                            <a t-attf-href="/my/tdm_profil_entreprise/#{tdm_profil_entreprise.id}?{{ keep_query() }}">
+                                <span t-field="tdm_profil_entreprise.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_travailleur_stages" name="My Tdm Profil Travailleur Stages">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Profil Travailleur Stages</t>
+            </t>
+            <t t-if="not tdm_profil_travailleur_stages">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_profil_travailleur_stages.</div>
+            </t>
+            <t t-if="tdm_profil_travailleur_stages" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_profil_travailleur_stages" t-as="tdm_profil_travailleur_stage">
+                        <td>
+                            <a
+                                t-attf-href="/my/tdm_profil_travailleur_stage/#{tdm_profil_travailleur_stage.id}?{{ keep_query() }}"
+                            >
+                                <span t-field="tdm_profil_travailleur_stage.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_profil_travailleurs" name="My Tdm Profil Travailleurs">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Profil Travailleurs</t>
+            </t>
+            <t t-if="not tdm_profil_travailleurs">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_profil_travailleurs.</div>
+            </t>
+            <t t-if="tdm_profil_travailleurs" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_profil_travailleurs" t-as="tdm_profil_travailleur">
+                        <td>
+                            <a t-attf-href="/my/tdm_profil_travailleur/#{tdm_profil_travailleur.id}?{{ keep_query() }}">
+                                <span t-field="tdm_profil_travailleur.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_home" name="Portal My Home: Tdm entries" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="tdm_entrevue_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Entrevues</t>
+                <t t-set="url" t-value="'/my/tdm_entrevues'" />
+                <t t-set="count" t-value="tdm_entrevue_count" />
+            </t>
+            <t t-if="tdm_entrevue_stage_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Entrevue Stages</t>
+                <t t-set="url" t-value="'/my/tdm_entrevue_stages'" />
+                <t t-set="count" t-value="tdm_entrevue_stage_count" />
+            </t>
+            <t t-if="tdm_offre_emploi_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Offre Emplois</t>
+                <t t-set="url" t-value="'/my/tdm_offre_emplois'" />
+                <t t-set="count" t-value="tdm_offre_emploi_count" />
+            </t>
+            <t t-if="tdm_offre_emploi_applique_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Offre Emploi Appliques</t>
+                <t t-set="url" t-value="'/my/tdm_offre_emploi_appliques'" />
+                <t t-set="count" t-value="tdm_offre_emploi_applique_count" />
+            </t>
+            <t t-if="tdm_offre_emploi_applique_stage_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Offre Emploi Applique Stages</t>
+                <t t-set="url" t-value="'/my/tdm_offre_emploi_applique_stages'" />
+                <t t-set="count" t-value="tdm_offre_emploi_applique_stage_count" />
+            </t>
+            <t t-if="tdm_offre_emploi_stage_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Offre Emploi Stages</t>
+                <t t-set="url" t-value="'/my/tdm_offre_emploi_stages'" />
+                <t t-set="count" t-value="tdm_offre_emploi_stage_count" />
+            </t>
+            <t t-if="tdm_profil_entreprise_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Profil Entreprises</t>
+                <t t-set="url" t-value="'/my/tdm_profil_entreprises'" />
+                <t t-set="count" t-value="tdm_profil_entreprise_count" />
+            </t>
+            <t t-if="tdm_profil_entreprise_stage_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Profil Entreprise Stages</t>
+                <t t-set="url" t-value="'/my/tdm_profil_entreprise_stages'" />
+                <t t-set="count" t-value="tdm_profil_entreprise_stage_count" />
+            </t>
+            <t t-if="tdm_profil_travailleur_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Profil Travailleurs</t>
+                <t t-set="url" t-value="'/my/tdm_profil_travailleurs'" />
+                <t t-set="count" t-value="tdm_profil_travailleur_count" />
+            </t>
+            <t t-if="tdm_profil_travailleur_stage_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Tdm Profil Travailleur Stages</t>
+                <t t-set="url" t-value="'/my/tdm_profil_travailleur_stages'" />
+                <t t-set="count" t-value="tdm_profil_travailleur_stage_count" />
+            </t>
+        </xpath>
+    </template>
+
+    <template id="tdm.portal_layout" name="Portal layout: Tdm menu entry" inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li
+                t-if="page_name == 'tdm_entrevue' or tdm_entrevue"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_entrevue else ''}"
+            >
+                <a t-if="tdm_entrevue" t-attf-href="/my/tdm_entrevues?{{ keep_query() }}">Tdm Entrevues</a>
+                <t t-else="">Tdm Entrevues</t>
+            </li>
+            <li t-if="tdm_entrevue" class="breadcrumb-item active">
+                <t t-esc="tdm_entrevue.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_entrevue_stage' or tdm_entrevue_stage"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_entrevue_stage else ''}"
+            >
+                <a t-if="tdm_entrevue_stage" t-attf-href="/my/tdm_entrevue_stages?{{ keep_query() }}">
+                    Tdm Entrevue Stages
+                </a>
+                <t t-else="">Tdm Entrevue Stages</t>
+            </li>
+            <li t-if="tdm_entrevue_stage" class="breadcrumb-item active">
+                <t t-esc="tdm_entrevue_stage.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_offre_emploi' or tdm_offre_emploi"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi else ''}"
+            >
+                <a t-if="tdm_offre_emploi" t-attf-href="/my/tdm_offre_emplois?{{ keep_query() }}">Tdm Offre Emplois</a>
+                <t t-else="">Tdm Offre Emplois</t>
+            </li>
+            <li t-if="tdm_offre_emploi" class="breadcrumb-item active">
+                <t t-esc="tdm_offre_emploi.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_offre_emploi_applique' or tdm_offre_emploi_applique"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_applique else ''}"
+            >
+                <a t-if="tdm_offre_emploi_applique" t-attf-href="/my/tdm_offre_emploi_appliques?{{ keep_query() }}">
+                    Tdm Offre Emploi Appliques
+                </a>
+                <t t-else="">Tdm Offre Emploi Appliques</t>
+            </li>
+            <li t-if="tdm_offre_emploi_applique" class="breadcrumb-item active">
+                <t t-esc="tdm_offre_emploi_applique.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_offre_emploi_applique_stage' or tdm_offre_emploi_applique_stage"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_applique_stage else ''}"
+            >
+                <a
+                    t-if="tdm_offre_emploi_applique_stage"
+                    t-attf-href="/my/tdm_offre_emploi_applique_stages?{{ keep_query() }}"
+                >
+                    Tdm Offre Emploi Applique Stages
+                </a>
+                <t t-else="">Tdm Offre Emploi Applique Stages</t>
+            </li>
+            <li t-if="tdm_offre_emploi_applique_stage" class="breadcrumb-item active">
+                <t t-esc="tdm_offre_emploi_applique_stage.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_offre_emploi_stage' or tdm_offre_emploi_stage"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_stage else ''}"
+            >
+                <a t-if="tdm_offre_emploi_stage" t-attf-href="/my/tdm_offre_emploi_stages?{{ keep_query() }}">
+                    Tdm Offre Emploi Stages
+                </a>
+                <t t-else="">Tdm Offre Emploi Stages</t>
+            </li>
+            <li t-if="tdm_offre_emploi_stage" class="breadcrumb-item active">
+                <t t-esc="tdm_offre_emploi_stage.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_profil_entreprise' or tdm_profil_entreprise"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_profil_entreprise else ''}"
+            >
+                <a t-if="tdm_profil_entreprise" t-attf-href="/my/tdm_profil_entreprises?{{ keep_query() }}">
+                    Tdm Profil Entreprises
+                </a>
+                <t t-else="">Tdm Profil Entreprises</t>
+            </li>
+            <li t-if="tdm_profil_entreprise" class="breadcrumb-item active">
+                <t t-esc="tdm_profil_entreprise.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_profil_entreprise_stage' or tdm_profil_entreprise_stage"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_profil_entreprise_stage else ''}"
+            >
+                <a t-if="tdm_profil_entreprise_stage" t-attf-href="/my/tdm_profil_entreprise_stages?{{ keep_query() }}">
+                    Tdm Profil Entreprise Stages
+                </a>
+                <t t-else="">Tdm Profil Entreprise Stages</t>
+            </li>
+            <li t-if="tdm_profil_entreprise_stage" class="breadcrumb-item active">
+                <t t-esc="tdm_profil_entreprise_stage.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_profil_travailleur' or tdm_profil_travailleur"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_profil_travailleur else ''}"
+            >
+                <a t-if="tdm_profil_travailleur" t-attf-href="/my/tdm_profil_travailleurs?{{ keep_query() }}">
+                    Tdm Profil Travailleurs
+                </a>
+                <t t-else="">Tdm Profil Travailleurs</t>
+            </li>
+            <li t-if="tdm_profil_travailleur" class="breadcrumb-item active">
+                <t t-esc="tdm_profil_travailleur.name" />
+            </li>
+            <li
+                t-if="page_name == 'tdm_profil_travailleur_stage' or tdm_profil_travailleur_stage"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_profil_travailleur_stage else ''}"
+            >
+                <a
+                    t-if="tdm_profil_travailleur_stage"
+                    t-attf-href="/my/tdm_profil_travailleur_stages?{{ keep_query() }}"
+                >
+                    Tdm Profil Travailleur Stages
+                </a>
+                <t t-else="">Tdm Profil Travailleur Stages</t>
+            </li>
+            <li t-if="tdm_profil_travailleur_stage" class="breadcrumb-item active">
+                <t t-esc="tdm_profil_travailleur_stage.name" />
+            </li>
+        </xpath>
+    </template>
+</odoo>

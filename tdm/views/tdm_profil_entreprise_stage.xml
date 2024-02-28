@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="tdm_profil_entreprise_stage_view_form" model="ir.ui.view">
+        <field name="name">tdm_profil_entreprise_stage_form</field>
+        <field name="model">tdm.profil.entreprise.stage</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="tdm_profil_entreprise_stage_view_graph" model="ir.ui.view">
+        <field name="name">tdm_profil_entreprise_stage_graph</field>
+        <field name="model">tdm.profil.entreprise.stage</field>
+        <field name="arch" type="xml">
+            <graph string="Tdm profil entreprise stage">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="tdm_profil_entreprise_stage_view_kanban" model="ir.ui.view">
+        <field name="name">tdm_profil_entreprise_stage_kanban</field>
+        <field name="model">tdm.profil.entreprise.stage</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="tdm_profil_entreprise_stage_view_pivot" model="ir.ui.view">
+        <field name="name">tdm_profil_entreprise_stage_pivot</field>
+        <field name="model">tdm.profil.entreprise.stage</field>
+        <field name="arch" type="xml">
+            <pivot string="Tdm profil entreprise stage">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="tdm_profil_entreprise_stage_view_search" model="ir.ui.view">
+        <field name="name">tdm_profil_entreprise_stage_search</field>
+        <field name="model">tdm.profil.entreprise.stage</field>
+        <field name="arch" type="xml">
+            <search string="Tdm profil entreprise stage">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="tdm_profil_entreprise_stage_view_tree" model="ir.ui.view">
+        <field name="name">tdm_profil_entreprise_stage_tree</field>
+        <field name="model">tdm.profil.entreprise.stage</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="tdm_profil_entreprise_stage_profil_entreprise_stage_action_window"
+        name="Profil entreprise stage"
+        res_model="tdm.profil.entreprise.stage"
+        view_mode="kanban,tree,pivot,graph,form"
+    />
+</odoo>

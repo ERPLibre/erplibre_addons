@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="tdm_profil_travailleur_view_form" model="ir.ui.view">
+        <field name="name">tdm_profil_travailleur_form</field>
+        <field name="model">tdm.profil.travailleur</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="tdm_profil_travailleur_view_graph" model="ir.ui.view">
+        <field name="name">tdm_profil_travailleur_graph</field>
+        <field name="model">tdm.profil.travailleur</field>
+        <field name="arch" type="xml">
+            <graph string="Tdm profil travailleur">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="tdm_profil_travailleur_view_kanban" model="ir.ui.view">
+        <field name="name">tdm_profil_travailleur_kanban</field>
+        <field name="model">tdm.profil.travailleur</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="tdm_profil_travailleur_view_pivot" model="ir.ui.view">
+        <field name="name">tdm_profil_travailleur_pivot</field>
+        <field name="model">tdm.profil.travailleur</field>
+        <field name="arch" type="xml">
+            <pivot string="Tdm profil travailleur">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="tdm_profil_travailleur_view_search" model="ir.ui.view">
+        <field name="name">tdm_profil_travailleur_search</field>
+        <field name="model">tdm.profil.travailleur</field>
+        <field name="arch" type="xml">
+            <search string="Tdm profil travailleur">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="tdm_profil_travailleur_view_tree" model="ir.ui.view">
+        <field name="name">tdm_profil_travailleur_tree</field>
+        <field name="model">tdm.profil.travailleur</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="tdm_profil_travailleur_profil_travailleur_action_window"
+        name="Profil travailleur"
+        res_model="tdm.profil.travailleur"
+        view_mode="kanban,tree,pivot,graph,form"
+    />
+</odoo>
