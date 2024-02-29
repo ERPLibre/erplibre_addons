@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="view_partner_form">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="membership.view_partner_form" />
+        <field name="arch" type="xml">
+            <sheet position="before">
+                <header>
+                    <field
+                        name="stage_travailleur_id"
+                        widget="statusbar"
+                        clickable="True"
+                        options="{'fold_field': 'fold'}"
+                        attrs="{'invisible': [('est_travailleur', '=', False)]}"
+                    />
+                </header>
+            </sheet>
+            <notebook position="inside">
+                <page string="Employeurs &amp; Travailleurs">
+                    <group>
+                        <group string="Employeur">
+                            <field name="est_employeur" string="Est un employeur" />
+                            <field name="is_feature_entreprise_bronze" string="Bronze" />
+                            <field name="is_feature_entreprise_argent" string="Argent" />
+                            <field name="is_feature_entreprise_or" string="Or" />
+                        </group>
+                        <group string="Travailleur">
+                            <field name="est_travailleur" string="Est un travailleur" />
+                            <field name="is_feature_travailleur_libre" string="Libre" />
+                        </group>
+                    </group>
+                </page>
+                <page string="Candidature" attrs="{'invisible': [('est_travailleur','=',False)]}">
+                    <group>
+                        <group string="Fichier">
+                            <field name="resume_fr" options="{'no_create': True}" />
+                            <field name="resume_en" options="{'no_create': True}" />
+                            <field name="cv_fr" options="{'no_create': True}" />
+                            <field name="cv_en" options="{'no_create': True}" />
+                            <field name="portfolio_fr" options="{'no_create': True}" />
+                            <field name="portfolio_en" options="{'no_create': True}" />
+                            <field name="diplome_fr" options="{'no_create': True}" />
+                            <field name="diplome_en" options="{'no_create': True}" />
+                            <field name="evaluation_scolaire_fr" options="{'no_create': True}" />
+                            <field name="evaluation_scolaire_en" options="{'no_create': True}" />
+                        </group>
+                        <group string="Préférences">
+                            <field
+                                name="preference_category_ids"
+                                widget="many2many_tags"
+                                options="{'no_create':True}"
+                            />
+                            <field name="preference_type_ids" widget="many2many_tags" options="{'no_create':True}" />
+                            <field name="secteur_activite_ids" widget="many2many_tags" options="{'no_create':True}" />
+                        </group>
+                        <group string="Définition">
+                            <field name="description" />
+                            <field name="aspiration" />
+                            <field name="objectif_carriere" />
+                            <field name="emploi_precedent" />
+                            <field name="competence" />
+                            <field name="experience" />
+                            <field name="avis_juridique" />
+                        </group>
+                    </group>
+                </page>
+                <page string="Entreprise" attrs="{'invisible': [('est_employeur','=',False)]}">
+                    <group string="Caractéristique">
+                        <field name="secteur_activite_ids" widget="many2many_tags" options="{'no_create':True}" />
+                        <field name="description" />
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

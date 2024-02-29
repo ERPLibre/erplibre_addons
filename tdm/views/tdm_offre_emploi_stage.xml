@@ -8,6 +8,10 @@
                 <sheet>
                     <group>
                         <field name="name" />
+                        <field name="description" />
+                        <field name="sequence" />
+                        <field name="is_init" />
+                        <field name="fold" />
                     </group>
                 </sheet>
             </form>
@@ -74,6 +78,7 @@
         <field name="model">tdm.offre.emploi.stage</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="sequence" widget="handle" />
                 <field name="name" />
             </tree>
         </field>
@@ -81,8 +86,8 @@
 
     <act_window
         id="tdm_offre_emploi_stage_offre_emploi_stage_action_window"
-        name="Offre emploi stage"
+        name="État des emplois"
         res_model="tdm.offre.emploi.stage"
-        view_mode="kanban,tree,pivot,graph,form"
+        view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

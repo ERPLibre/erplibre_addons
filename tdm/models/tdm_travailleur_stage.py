@@ -1,10 +1,9 @@
 from odoo import _, api, fields, models
 
 
-class TdmOffreEmploiAppliqueStage(models.Model):
-    _name = "tdm.offre.emploi.applique.stage"
-    _inherit = "portal.mixin"
-    _description = "Stage sur application à une offre d'emploi"
+class TdmTravailleurStage(models.Model):
+    _name = "tdm.travailleur.stage"
+    _description = "tdm_travailleur_stage"
     _order = "sequence, name, id"
 
     name = fields.Char()
@@ -27,11 +26,3 @@ class TdmOffreEmploiAppliqueStage(models.Model):
             " in that stage to display."
         ),
     )
-
-    def _compute_access_url(self):
-        super(TdmOffreEmploiAppliqueStage, self)._compute_access_url()
-        for tdm_offre_emploi_applique_stage in self:
-            tdm_offre_emploi_applique_stage.access_url = (
-                "/my/tdm_offre_emploi_applique_stage/%s"
-                % tdm_offre_emploi_applique_stage.id
-            )

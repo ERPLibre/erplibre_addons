@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="tdm_profil_travailleur_view_form" model="ir.ui.view">
-        <field name="name">tdm_profil_travailleur_form</field>
-        <field name="model">tdm.profil.travailleur</field>
+    <record id="tdm_offre_emploi_tag_view_form" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_tag_form</field>
+        <field name="model">tdm.offre.emploi.tag</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
@@ -14,19 +14,19 @@
         </field>
     </record>
 
-    <record id="tdm_profil_travailleur_view_graph" model="ir.ui.view">
-        <field name="name">tdm_profil_travailleur_graph</field>
-        <field name="model">tdm.profil.travailleur</field>
+    <record id="tdm_offre_emploi_tag_view_graph" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_tag_graph</field>
+        <field name="model">tdm.offre.emploi.tag</field>
         <field name="arch" type="xml">
-            <graph string="Tdm profil travailleur">
+            <graph string="Tdm offre emploi tag">
                 <field name="name" type="row" />
             </graph>
         </field>
     </record>
 
-    <record id="tdm_profil_travailleur_view_kanban" model="ir.ui.view">
-        <field name="name">tdm_profil_travailleur_kanban</field>
-        <field name="model">tdm.profil.travailleur</field>
+    <record id="tdm_offre_emploi_tag_view_kanban" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_tag_kanban</field>
+        <field name="model">tdm.offre.emploi.tag</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -49,29 +49,29 @@
         </field>
     </record>
 
-    <record id="tdm_profil_travailleur_view_pivot" model="ir.ui.view">
-        <field name="name">tdm_profil_travailleur_pivot</field>
-        <field name="model">tdm.profil.travailleur</field>
+    <record id="tdm_offre_emploi_tag_view_pivot" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_tag_pivot</field>
+        <field name="model">tdm.offre.emploi.tag</field>
         <field name="arch" type="xml">
-            <pivot string="Tdm profil travailleur">
+            <pivot string="Tdm offre emploi tag">
                 <field name="name" type="row" />
             </pivot>
         </field>
     </record>
 
-    <record id="tdm_profil_travailleur_view_search" model="ir.ui.view">
-        <field name="name">tdm_profil_travailleur_search</field>
-        <field name="model">tdm.profil.travailleur</field>
+    <record id="tdm_offre_emploi_tag_view_search" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_tag_search</field>
+        <field name="model">tdm.offre.emploi.tag</field>
         <field name="arch" type="xml">
-            <search string="Tdm profil travailleur">
+            <search string="Tdm offre emploi tag">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
             </search>
         </field>
     </record>
 
-    <record id="tdm_profil_travailleur_view_tree" model="ir.ui.view">
-        <field name="name">tdm_profil_travailleur_tree</field>
-        <field name="model">tdm.profil.travailleur</field>
+    <record id="tdm_offre_emploi_tag_view_tree" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_tag_tree</field>
+        <field name="model">tdm.offre.emploi.tag</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -80,9 +80,9 @@
     </record>
 
     <act_window
-        id="tdm_profil_travailleur_profil_travailleur_action_window"
-        name="Profil travailleur"
-        res_model="tdm.profil.travailleur"
+        id="tdm_offre_emploi_tag_offre_emploi_tag_action_window"
+        name="Offre emploi tag"
+        res_model="tdm.offre.emploi.tag"
         view_mode="kanban,tree,pivot,graph,form"
     />
 </odoo>

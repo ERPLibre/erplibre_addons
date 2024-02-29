@@ -5,11 +5,58 @@
         <field name="model">tdm.offre.emploi</field>
         <field name="arch" type="xml">
             <form string="Titre">
+                <header>
+                    <field name="stage_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}" />
+                </header>
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field
+                                name="active"
+                                widget="boolean_button"
+                                options="{&quot;terminology&quot;: &quot;archive&quot;}"
+                            />
+                        </button>
+                    </div>
                     <group>
-                        <field name="name" />
+                        <group string="Info">
+                            <field name="category_id" />
+                            <field name="tag_ids" widget="many2many_tags" />
+                            <field name="type_poste_ids" widget="many2many_tags" />
+                            <field name="secteur_activite_ids" widget="many2many_tags" />
+                        </group>
+                        <group string="Autre">
+                            <field name="evaluation_id" />
+                            <field name="approbation" />
+                            <field name="website_published" />
+                            <field name="partner_employeur_id" />
+                            <field name="localisation" />
+                        </group>
+                        <group string="Besoin">
+                            <field name="salaire" />
+                            <field name="is_temps_pleins" />
+                            <field name="nb_hour_per_week" />
+                            <field name="avantage_social" />
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" />
+                        <field name="description_entreprise" />
+                        <field name="principal_responsabilite" />
+                        <field name="qualification_requise" />
+                        <field name="information_supplementaire" />
                     </group>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
+                </div>
             </form>
         </field>
     </record>
@@ -65,6 +112,16 @@
         <field name="arch" type="xml">
             <search string="Tdm offre emploi">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="stage" context="{'group_by':'stage_id'}" />
+                    <filter string="Évaluation" name="evaluation_id" context="{'group_by':'evaluation_id'}" />
+                    <filter string="Catégorie" name="category_id" context="{'group_by':'category_id'}" />
+                    <filter
+                        string="Employeur"
+                        name="partner_employeur_id"
+                        context="{'group_by':'partner_employeur_id'}"
+                    />
+                </group>
             </search>
         </field>
     </record>
@@ -81,7 +138,7 @@
 
     <act_window
         id="tdm_offre_emploi_offre_emploi_action_window"
-        name="Offre emploi"
+        name="Emploi"
         res_model="tdm.offre.emploi"
         view_mode="kanban,tree,pivot,graph,form"
     />

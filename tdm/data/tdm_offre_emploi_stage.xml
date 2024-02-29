@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="tdm_offre_emploi_stage_evaluation_cours" model="tdm.offre.emploi.stage">
+            <field name="name">Évaluation en cours</field>
+            <field name="is_init" eval="True" />
+            <field name="sequence">10</field>
+        </record>
+        <record id="tdm_offre_emploi_stage_entrevue" model="tdm.offre.emploi.stage">
+            <field name="name">Entrevue</field>
+            <field name="sequence">11</field>
+        </record>
+        <record id="tdm_offre_emploi_stage_offre_soumise" model="tdm.offre.emploi.stage">
+            <field name="name">Offre soumise</field>
+            <field name="sequence">12</field>
+        </record>
+        <record id="tdm_offre_emploi_stage_embauche" model="tdm.offre.emploi.stage">
+            <field name="name">Embauché</field>
+            <field name="sequence">13</field>
+        </record>
+    </data>
+</odoo>

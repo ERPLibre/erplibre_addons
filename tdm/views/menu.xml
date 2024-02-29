@@ -2,85 +2,95 @@
 <odoo>
     <!--Root menu-->
 
-    <menuitem id="tdm" name="Tdm" sequence="20" web_icon="tdm,static/description/icon.png" />
+    <menuitem id="tdm" name="Jumelage-emploi" sequence="20" web_icon="tdm,static/description/icon.png" />
 
     <!--Sub menu-->
 
-    <menuitem id="menu" name="Menu" sequence="1" parent="tdm" />
-
-    <!--Child menu-->
-
-    <menuitem id="entrevue" name="Entrevue" action="tdm_entrevue_entrevue_action_window" sequence="1" parent="menu" />
-
-    <menuitem
-        id="entrevue_stage"
-        name="Entrevue stage"
-        action="tdm_entrevue_stage_entrevue_stage_action_window"
-        sequence="2"
-        parent="menu"
-    />
+    <menuitem id="configuration" name="Configuration" sequence="4" parent="tdm" />
 
     <menuitem
         id="offre_emploi"
-        name="Offre emploi"
+        name="Emploi"
         action="tdm_offre_emploi_offre_emploi_action_window"
-        sequence="3"
-        parent="menu"
+        sequence="1"
+        parent="tdm"
     />
 
     <menuitem
         id="offre_emploi_applique"
-        name="Offre emploi applique"
+        name="Candidat"
         action="tdm_offre_emploi_applique_offre_emploi_applique_action_window"
-        sequence="4"
-        parent="menu"
+        sequence="2"
+        parent="tdm"
+    />
+
+    <menuitem id="entrevue" name="Entrevue" action="tdm_entrevue_entrevue_action_window" sequence="3" parent="tdm" />
+
+    <!--Child menu-->
+
+    <menuitem
+        id="entrevue_stage"
+        name="Processus d'entrevue"
+        action="tdm_entrevue_stage_entrevue_stage_action_window"
+        sequence="1"
+        parent="configuration"
     />
 
     <menuitem
         id="offre_emploi_applique_stage"
-        name="Offre emploi applique stage"
+        name="Processus de candidature"
         action="tdm_offre_emploi_applique_stage_offre_emploi_applique_stage_action_window"
-        sequence="5"
-        parent="menu"
+        sequence="2"
+        parent="configuration"
     />
 
     <menuitem
         id="offre_emploi_stage"
-        name="Offre emploi stage"
+        name="État des emplois"
         action="tdm_offre_emploi_stage_offre_emploi_stage_action_window"
+        sequence="3"
+        parent="configuration"
+    />
+
+    <menuitem
+        id="travailleur_stage"
+        name="État des travailleurs"
+        action="tdm_travailleur_stage_travailleur_stage_action_window"
+        sequence="4"
+        parent="configuration"
+    />
+
+    <menuitem id="configuration_emploi_menu" name="Emploi" sequence="5" parent="configuration" />
+
+    <menuitem
+        id="offre_emploi_category"
+        name="Offre emploi category"
+        action="tdm_offre_emploi_category_offre_emploi_category_action_window"
+        sequence="1"
+        parent="configuration_emploi_menu"
+    />
+
+    <menuitem
+        id="offre_emploi_tag"
+        name="Offre emploi tag"
+        action="tdm_offre_emploi_tag_offre_emploi_tag_action_window"
+        sequence="2"
+        parent="configuration_emploi_menu"
+    />
+
+    <menuitem
+        id="offre_emploi_type"
+        name="Offre emploi type"
+        action="tdm_offre_emploi_type_offre_emploi_type_action_window"
+        sequence="3"
+        parent="configuration_emploi_menu"
+    />
+
+    <menuitem
+        id="secteur_activite"
+        name="Secteur activite"
+        action="tdm_secteur_activite_secteur_activite_action_window"
         sequence="6"
-        parent="menu"
-    />
-
-    <menuitem
-        id="profil_entreprise"
-        name="Profil entreprise"
-        action="tdm_profil_entreprise_profil_entreprise_action_window"
-        sequence="7"
-        parent="menu"
-    />
-
-    <menuitem
-        id="profil_entreprise_stage"
-        name="Profil entreprise stage"
-        action="tdm_profil_entreprise_stage_profil_entreprise_stage_action_window"
-        sequence="8"
-        parent="menu"
-    />
-
-    <menuitem
-        id="profil_travailleur"
-        name="Profil travailleur"
-        action="tdm_profil_travailleur_profil_travailleur_action_window"
-        sequence="9"
-        parent="menu"
-    />
-
-    <menuitem
-        id="profil_travailleur_stage"
-        name="Profil travailleur stage"
-        action="tdm_profil_travailleur_stage_profil_travailleur_stage_action_window"
-        sequence="10"
-        parent="menu"
+        parent="configuration"
     />
 </odoo>

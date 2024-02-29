@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="tdm_profil_entreprise_stage_view_form" model="ir.ui.view">
-        <field name="name">tdm_profil_entreprise_stage_form</field>
-        <field name="model">tdm.profil.entreprise.stage</field>
+    <record id="tdm_offre_emploi_category_view_form" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_category_form</field>
+        <field name="model">tdm.offre.emploi.category</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
@@ -14,19 +14,19 @@
         </field>
     </record>
 
-    <record id="tdm_profil_entreprise_stage_view_graph" model="ir.ui.view">
-        <field name="name">tdm_profil_entreprise_stage_graph</field>
-        <field name="model">tdm.profil.entreprise.stage</field>
+    <record id="tdm_offre_emploi_category_view_graph" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_category_graph</field>
+        <field name="model">tdm.offre.emploi.category</field>
         <field name="arch" type="xml">
-            <graph string="Tdm profil entreprise stage">
+            <graph string="Tdm offre emploi category">
                 <field name="name" type="row" />
             </graph>
         </field>
     </record>
 
-    <record id="tdm_profil_entreprise_stage_view_kanban" model="ir.ui.view">
-        <field name="name">tdm_profil_entreprise_stage_kanban</field>
-        <field name="model">tdm.profil.entreprise.stage</field>
+    <record id="tdm_offre_emploi_category_view_kanban" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_category_kanban</field>
+        <field name="model">tdm.offre.emploi.category</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -49,29 +49,29 @@
         </field>
     </record>
 
-    <record id="tdm_profil_entreprise_stage_view_pivot" model="ir.ui.view">
-        <field name="name">tdm_profil_entreprise_stage_pivot</field>
-        <field name="model">tdm.profil.entreprise.stage</field>
+    <record id="tdm_offre_emploi_category_view_pivot" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_category_pivot</field>
+        <field name="model">tdm.offre.emploi.category</field>
         <field name="arch" type="xml">
-            <pivot string="Tdm profil entreprise stage">
+            <pivot string="Tdm offre emploi category">
                 <field name="name" type="row" />
             </pivot>
         </field>
     </record>
 
-    <record id="tdm_profil_entreprise_stage_view_search" model="ir.ui.view">
-        <field name="name">tdm_profil_entreprise_stage_search</field>
-        <field name="model">tdm.profil.entreprise.stage</field>
+    <record id="tdm_offre_emploi_category_view_search" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_category_search</field>
+        <field name="model">tdm.offre.emploi.category</field>
         <field name="arch" type="xml">
-            <search string="Tdm profil entreprise stage">
+            <search string="Tdm offre emploi category">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
             </search>
         </field>
     </record>
 
-    <record id="tdm_profil_entreprise_stage_view_tree" model="ir.ui.view">
-        <field name="name">tdm_profil_entreprise_stage_tree</field>
-        <field name="model">tdm.profil.entreprise.stage</field>
+    <record id="tdm_offre_emploi_category_view_tree" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_category_tree</field>
+        <field name="model">tdm.offre.emploi.category</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -80,9 +80,9 @@
     </record>
 
     <act_window
-        id="tdm_profil_entreprise_stage_profil_entreprise_stage_action_window"
-        name="Profil entreprise stage"
-        res_model="tdm.profil.entreprise.stage"
+        id="tdm_offre_emploi_category_offre_emploi_category_action_window"
+        name="Offre emploi category"
+        res_model="tdm.offre.emploi.category"
         view_mode="kanban,tree,pivot,graph,form"
     />
 </odoo>

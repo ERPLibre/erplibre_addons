@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="tdm_entrevue_stage_view_form" model="ir.ui.view">
-        <field name="name">tdm_entrevue_stage_form</field>
-        <field name="model">tdm.entrevue.stage</field>
+    <record id="tdm_offre_emploi_type_view_form" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_type_form</field>
+        <field name="model">tdm.offre.emploi.type</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
                     <group>
                         <field name="name" />
-                        <field name="description" />
-                        <field name="sequence" />
-                        <field name="is_init" />
-                        <field name="fold" />
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <record id="tdm_entrevue_stage_view_graph" model="ir.ui.view">
-        <field name="name">tdm_entrevue_stage_graph</field>
-        <field name="model">tdm.entrevue.stage</field>
+    <record id="tdm_offre_emploi_type_view_graph" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_type_graph</field>
+        <field name="model">tdm.offre.emploi.type</field>
         <field name="arch" type="xml">
-            <graph string="Tdm entrevue stage">
+            <graph string="Tdm offre emploi type">
                 <field name="name" type="row" />
             </graph>
         </field>
     </record>
 
-    <record id="tdm_entrevue_stage_view_kanban" model="ir.ui.view">
-        <field name="name">tdm_entrevue_stage_kanban</field>
-        <field name="model">tdm.entrevue.stage</field>
+    <record id="tdm_offre_emploi_type_view_kanban" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_type_kanban</field>
+        <field name="model">tdm.offre.emploi.type</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -53,41 +49,40 @@
         </field>
     </record>
 
-    <record id="tdm_entrevue_stage_view_pivot" model="ir.ui.view">
-        <field name="name">tdm_entrevue_stage_pivot</field>
-        <field name="model">tdm.entrevue.stage</field>
+    <record id="tdm_offre_emploi_type_view_pivot" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_type_pivot</field>
+        <field name="model">tdm.offre.emploi.type</field>
         <field name="arch" type="xml">
-            <pivot string="Tdm entrevue stage">
+            <pivot string="Tdm offre emploi type">
                 <field name="name" type="row" />
             </pivot>
         </field>
     </record>
 
-    <record id="tdm_entrevue_stage_view_search" model="ir.ui.view">
-        <field name="name">tdm_entrevue_stage_search</field>
-        <field name="model">tdm.entrevue.stage</field>
+    <record id="tdm_offre_emploi_type_view_search" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_type_search</field>
+        <field name="model">tdm.offre.emploi.type</field>
         <field name="arch" type="xml">
-            <search string="Tdm entrevue stage">
+            <search string="Tdm offre emploi type">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
             </search>
         </field>
     </record>
 
-    <record id="tdm_entrevue_stage_view_tree" model="ir.ui.view">
-        <field name="name">tdm_entrevue_stage_tree</field>
-        <field name="model">tdm.entrevue.stage</field>
+    <record id="tdm_offre_emploi_type_view_tree" model="ir.ui.view">
+        <field name="name">tdm_offre_emploi_type_tree</field>
+        <field name="model">tdm.offre.emploi.type</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="sequence" widget="handle" />
                 <field name="name" />
             </tree>
         </field>
     </record>
 
     <act_window
-        id="tdm_entrevue_stage_entrevue_stage_action_window"
-        name="Processus d'entrevue"
-        res_model="tdm.entrevue.stage"
-        view_mode="tree,kanban,pivot,graph,form"
+        id="tdm_offre_emploi_type_offre_emploi_type_action_window"
+        name="Offre emploi type"
+        res_model="tdm.offre.emploi.type"
+        view_mode="kanban,tree,pivot,graph,form"
     />
 </odoo>

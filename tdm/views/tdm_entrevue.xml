@@ -5,11 +5,49 @@
         <field name="model">tdm.entrevue</field>
         <field name="arch" type="xml">
             <form string="Titre">
+                <header>
+                    <field name="stage_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}" />
+                </header>
                 <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field
+                                name="active"
+                                widget="boolean_button"
+                                options="{&quot;terminology&quot;: &quot;archive&quot;}"
+                            />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name" />
+                        <group string="Info">
+                            <field name="date_debut_entrevue" />
+                            <field name="offre_emploi_id" />
+                            <field name="offre_emploi_applique_id" />
+                        </group>
+                        <group string="Qui">
+                            <field name="partner_travailleur_id" />
+                            <field name="partner_employeur_id" />
+                        </group>
+                        <group string="Rétroaction">
+                            <field name="evaluation_id" />
+                        </group>
+                        <group string="Videoconference">
+                            <field name="show_jitsi_link" />
+                            <field name="url_jitsi_employeur" widget="url" />
+                            <field name="url_jitsi_travailleur" widget="url" />
+                        </group>
                     </group>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
+                </div>
             </form>
         </field>
     </record>
@@ -65,6 +103,31 @@
         <field name="arch" type="xml">
             <search string="Tdm entrevue">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="stage" context="{'group_by':'stage_id'}" />
+                    <filter
+                        string="Travailleur"
+                        name="partner_travailleur_id"
+                        context="{'group_by':'partner_travailleur_id'}"
+                    />
+                    <filter
+                        string="Employeur"
+                        name="partner_employeur_id"
+                        context="{'group_by':'partner_employeur_id'}"
+                    />
+                    <filter string="Emploi" name="offre_emploi_id" context="{'group_by':'offre_emploi_id'}" />
+                    <filter
+                        string="Candidat"
+                        name="offre_emploi_applique_id"
+                        context="{'group_by':'offre_emploi_applique_id'}"
+                    />
+                    <filter string="Évaluation" name="evaluation_id" context="{'group_by':'evaluation_id'}" />
+                    <filter
+                        string="Feature Jitsi URL"
+                        name="show_jitsi_link"
+                        context="{'group_by':'show_jitsi_link'}"
+                    />
+                </group>
             </search>
         </field>
     </record>

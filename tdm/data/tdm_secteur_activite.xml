@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="tdm_secteur_activite_construction" model="tdm.secteur_activite">
+            <field name="name">Construction</field>
+        </record>
+        <record id="tdm_secteur_activite_sante" model="tdm.secteur_activite">
+            <field name="name">Santé</field>
+        </record>
+        <record id="tdm_secteur_activite_genie" model="tdm.secteur_activite">
+            <field name="name">Génie</field>
+        </record>
+        <record id="tdm_secteur_activite_manufacture" model="tdm.secteur_activite">
+            <field name="name">Manufacture</field>
+        </record>
+    </data>
+</odoo>

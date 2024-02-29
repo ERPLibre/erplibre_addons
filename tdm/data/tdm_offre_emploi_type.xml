@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="tdm_offre_emploi_type_admin" model="tdm.offre.emploi.type">
+            <field name="name">Administration</field>
+        </record>
+        <record id="tdm_offre_emploi_type_technique" model="tdm.offre.emploi.type">
+            <field name="name">Technique</field>
+        </record>
+        <record id="tdm_offre_emploi_type_rh" model="tdm.offre.emploi.type">
+            <field name="name">RH</field>
+        </record>
+        <record id="tdm_offre_emploi_type_ingenierie" model="tdm.offre.emploi.type">
+            <field name="name">Ingénierie</field>
+        </record>
+    </data>
+</odoo>

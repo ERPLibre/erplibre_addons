@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="membership_products_form">
+        <field name="name">Membership Products</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="membership.membership_products_form" />
+        <field name="arch" type="xml">
+            <field name="active" position="after">
+                <field name="is_feature_entreprise_bronze" string="Entreprise bronze" />
+                <field name="is_feature_entreprise_argent" string="Entreprise argent" />
+                <field name="is_feature_entreprise_or" string="Entreprise or" />
+                <field name="is_feature_travailleur_libre" string="Travailleur libre" />
+            </field>
+        </field>
+    </record>
+</odoo>
