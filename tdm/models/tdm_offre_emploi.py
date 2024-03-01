@@ -140,7 +140,7 @@ class TdmOffreEmploi(models.Model):
         stage_id = self.env["tdm.offre.emploi.stage"].search(
             [("is_init", "=", True)], limit=1
         )
-        if not stage_id:
+        if not stage_id.exists():
             # Take first one
             stage_id = self.env["tdm.offre.emploi.stage"].search([], limit=1)
         return stage_id

@@ -154,7 +154,7 @@ class TdmEntrevue(models.Model):
         stage_id = self.env["tdm.entrevue.stage"].search(
             [("is_init", "=", True)], limit=1
         )
-        if not stage_id:
+        if not stage_id.exists():
             # Take first one
             stage_id = self.env["tdm.entrevue.stage"].search([], limit=1)
         return stage_id
