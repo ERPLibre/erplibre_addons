@@ -168,6 +168,7 @@ class DevopsIdePycharm(models.Model):
                     "AssertionError:",
                     "SyntaxError:",
                     "KeyError:",
+                    "psycopg2.errors.UndefinedTable:",
                     "UnboundLocalError:",
                     "FileNotFoundError:",
                     "RuntimeWarning:",
