@@ -74,7 +74,7 @@ class TdmOffreEmploi(models.Model):
         track_visibility="onchange",
     )
 
-    nb_hour_per_week = fields.Integer(
+    nb_hour_per_week = fields.Float(
         string="Nombre d'heure par semaine",
         track_visibility="onchange",
     )

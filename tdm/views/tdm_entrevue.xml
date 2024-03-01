@@ -26,7 +26,7 @@
                     <group>
                         <group string="Info">
                             <field name="date_debut_entrevue" />
-                            <field name="offre_emploi_id" />
+                            <!--                            <field name="offre_emploi_id" />-->
                             <field name="offre_emploi_applique_id" />
                         </group>
                         <group string="Qui">

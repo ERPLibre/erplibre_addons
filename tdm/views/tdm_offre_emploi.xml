@@ -45,9 +45,9 @@
                         </group>
                     </group>
                     <group string="Description">
-                        <field name="description" />
-                        <field name="description_entreprise" />
+                        <field name="description" string="Description du poste" />
                         <field name="principal_responsabilite" />
+                        <field name="description_entreprise" />
                         <field name="qualification_requise" />
                         <field name="information_supplementaire" />
                     </group>
