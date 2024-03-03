@@ -10,9 +10,7 @@ odoo.define("tdm.animation", function (require) {
             let self = this;
             this._eventList = this.$(".container");
             this._originalContent = this._eventList[0].outerHTML;
-            let def = this._rpc({
-                route: "/tdm/tdm_entrevue_and_tdm_offre_emploi_and_tdm_offre_emploi_applique_list",
-            }).then(function (data) {
+            let def = this._rpc({route: "/tdm/tdm_offre_emploi_list"}).then(function (data) {
                 if (data.error) {
                     return;
                 }
