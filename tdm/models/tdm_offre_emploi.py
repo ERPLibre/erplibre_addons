@@ -60,6 +60,7 @@ class TdmOffreEmploi(models.Model):
             " d'emploi."
         ),
         track_visibility="onchange",
+        default=True,
     )
 
     # TODO approbation_date readonly (action write or action create, update date if approbation is True)
@@ -89,6 +90,14 @@ class TdmOffreEmploi(models.Model):
     description = fields.Html(
         string="Description",
         help="Description du poste",
+        track_visibility="onchange",
+    )
+
+    description_sommaire = fields.Html(
+        compute="_compute_description_sommaire",
+        store=True,
+        string="Description sommaire",
+        help="Court résumé de la description",
         track_visibility="onchange",
     )
 
@@ -135,6 +144,16 @@ class TdmOffreEmploi(models.Model):
                 "/my/tdm_offre_emploi/%s" % tdm_offre_emploi.id
             )
 
+    @api.depends(
+        "description",
+    )
+    def _compute_description_sommaire(self):
+        for rec in self:
+            if rec.description:
+                rec.description_sommaire = rec.description[:50]
+            else:
+                rec.description_sommaire = False
+
     @api.model
     def default_stage_id(self):
         stage_id = self.env["tdm.offre.emploi.stage"].search(
@@ -144,3 +163,15 @@ class TdmOffreEmploi(models.Model):
             # Take first one
             stage_id = self.env["tdm.offre.emploi.stage"].search([], limit=1)
         return stage_id
+
+    @api.multi
+    def toggle_website_published(self):
+        self.ensure_one()
+        self.website_published = not self.website_published
+        return True
+
+    @api.multi
+    def toggle_approbation(self):
+        self.ensure_one()
+        self.approbation = not self.approbation
+        return True

@@ -17,7 +17,15 @@
                         </div>
                     </section>
                     <section
-                        t-if="tdm_offre_emploi_id"
+                        t-if="not tdm_offre_emploi_id.website_published"
+                        class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden"
+                        data-scroll-background-ratio="1"
+                        style="background-image: none;"
+                    >
+                        Offre non public
+                    </section>
+                    <section
+                        t-if="tdm_offre_emploi_id.website_published"
                         class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden"
                         data-scroll-background-ratio="1"
                         style="background-image: none;"
@@ -32,159 +40,138 @@
                                     <h1
                                         class="s_title_thin"
                                         style="font-size: 62px; text-align: center;"
-                                        t-field="tdm_offre_emploi_id.localisation"
-                                        t-if="tdm_offre_emploi_id.localisation"
+                                        t-field="tdm_offre_emploi_id.name"
+                                        t-if="tdm_offre_emploi_id.name"
                                     />
                                     <h1
                                         class="s_title_thin"
                                         style="font-size: 62px; text-align: center;"
-                                        t-if="not tdm_offre_emploi_id.localisation"
+                                        t-if="not tdm_offre_emploi_id.name"
                                     >
                                         EMPTY
                                     </h1>
                                 </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.avantage_social"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.avantage_social"
+                                <div class="col-lg-12 s_text pt16 pb16" data-name="Text">
+                                    <h3>Caractéristique</h3>
+                                    <b>Status de l'offre :</b>
+                                    <span t-if="tdm_offre_emploi_id.stage_id" t-field="tdm_offre_emploi_id.stage_id" />
+                                    <br />
+                                    <b>Localisation :</b>
+                                    <span
+                                        t-if="tdm_offre_emploi_id.localisation"
+                                        t-field="tdm_offre_emploi_id.localisation"
                                     />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.description"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.description"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.description_entreprise"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.description_entreprise"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.information_supplementaire"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.information_supplementaire"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.is_temps_pleins"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.is_temps_pleins"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.nb_hour_per_week"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.nb_hour_per_week"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.principal_responsabilite"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.principal_responsabilite"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.qualification_requise"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.qualification_requise"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.salaire"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.salaire"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.secteur_activite_ids"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
+                                    <br />
+                                    <b>Secteur d'activité :</b>
+                                    <span
+                                        t-if="tdm_offre_emploi_id.secteur_activite_ids"
                                         t-field="tdm_offre_emploi_id.secteur_activite_ids"
                                     />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.stage_id"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.stage_id"
-                                    />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.type_poste_ids"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
+                                    <br />
+                                    <b>Type de poste :</b>
+                                    <span
+                                        t-if="tdm_offre_emploi_id.type_poste_ids"
                                         t-field="tdm_offre_emploi_id.type_poste_ids"
                                     />
-                                </div>
-                                <div
-                                    class="col-lg-12 s_text pt16 pb16"
-                                    data-name="Text"
-                                    t-if="tdm_offre_emploi_id.website_published"
-                                >
-                                    <p
-                                        class="lead o_default_snippet_text"
-                                        style="text-align: center;"
-                                        t-field="tdm_offre_emploi_id.website_published"
+                                    <br />
+                                    <b>Nombre d'heure par semaine :</b>
+                                    <span
+                                        t-if="tdm_offre_emploi_id.nb_hour_per_week"
+                                        t-field="tdm_offre_emploi_id.nb_hour_per_week"
                                     />
+                                    <br />
+                                    <b>Salaire :</b>
+                                    <span t-if="tdm_offre_emploi_id.salaire" t-field="tdm_offre_emploi_id.salaire" />
+                                    $/h
+                                    <br />
+                                    <div t-if="tdm_offre_emploi_id.is_temps_pleins">
+                                        Poste à
+                                        <b>temps pleins</b>
+                                    </div>
+                                    <div t-if="not tdm_offre_emploi_id.is_temps_pleins">
+                                        Poste à
+                                        <b>temps partiel</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="s_text_block pt32 pb32">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-10 offset-lg-1 pt32 pb32">
+                                    <div
+                                        class="col-lg-12 s_text pt16 pb16"
+                                        data-name="Text"
+                                        t-if="tdm_offre_emploi_id.description"
+                                    >
+                                        <h3>Description</h3>
+                                        <p
+                                            class="lead o_default_snippet_text"
+                                            style="text-align: center;"
+                                            t-field="tdm_offre_emploi_id.description"
+                                        />
+                                    </div>
+                                    <div
+                                        class="col-lg-12 s_text pt16 pb16"
+                                        data-name="Text"
+                                        t-if="tdm_offre_emploi_id.description_entreprise"
+                                    >
+                                        <h3>Entreprise</h3>
+                                        <p
+                                            class="lead o_default_snippet_text"
+                                            style="text-align: center;"
+                                            t-field="tdm_offre_emploi_id.description_entreprise"
+                                        />
+                                    </div>
+                                    <div
+                                        class="col-lg-12 s_text pt16 pb16"
+                                        data-name="Text"
+                                        t-if="tdm_offre_emploi_id.avantage_social"
+                                    >
+                                        <h3>Avantage social</h3>
+                                        <p
+                                            class="lead o_default_snippet_text"
+                                            style="text-align: center;"
+                                            t-field="tdm_offre_emploi_id.avantage_social"
+                                        />
+                                    </div>
+                                    <div
+                                        class="col-lg-12 s_text pt16 pb16"
+                                        data-name="Text"
+                                        t-if="tdm_offre_emploi_id.principal_responsabilite"
+                                    >
+                                        <h3>Principal responsabilité</h3>
+                                        <p
+                                            class="lead o_default_snippet_text"
+                                            style="text-align: center;"
+                                            t-field="tdm_offre_emploi_id.principal_responsabilite"
+                                        />
+                                    </div>
+                                    <div
+                                        class="col-lg-12 s_text pt16 pb16"
+                                        data-name="Text"
+                                        t-if="tdm_offre_emploi_id.qualification_requise"
+                                    >
+                                        <h3>Qualification requise</h3>
+                                        <p
+                                            class="lead o_default_snippet_text"
+                                            style="text-align: center;"
+                                            t-field="tdm_offre_emploi_id.qualification_requise"
+                                        />
+                                    </div>
+                                    <div
+                                        class="col-lg-12 s_text pt16 pb16"
+                                        data-name="Text"
+                                        t-if="tdm_offre_emploi_id.information_supplementaire"
+                                    >
+                                        <h3>Information supplémentaire</h3>
+                                        <p
+                                            class="lead o_default_snippet_text"
+                                            style="text-align: center;"
+                                            t-field="tdm_offre_emploi_id.information_supplementaire"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -199,87 +186,70 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6 s_col_no_bgcolor pb24">
                         <div class="row" t-if="tdm_offre_emploi_s">
-                            <div t-foreach="tdm_offre_emploi_s" t-as="tdm_offre_emploi">
+                            <div
+                                t-foreach="tdm_offre_emploi_s"
+                                t-as="tdm_offre_emploi"
+                                t-if="tdm_offre_emploi.website_published"
+                            >
                                 <a
                                     t-if="tdm_offre_emploi"
                                     t-att-href="'/tdm/tdm_offre_emploi/%d' % tdm_offre_emploi.id"
                                 >
                                     <div class="col-lg-12 pt16 pb16" data-name="Box">
-                                        <i class="fa fa-2x fa-files-o rounded-circle bg-primary s_features_grid_icon" />
+                                        <i
+                                            class="fa fa-2x fa fa-briefcase rounded-circle bg-primary s_features_grid_icon"
+                                        />
                                         <div class="s_features_grid_content">
                                             <h4
-                                                t-if="tdm_offre_emploi.localisation"
+                                                t-if="tdm_offre_emploi.name"
                                                 class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.localisation"
+                                                t-field="tdm_offre_emploi.name"
                                             />
-                                            <h4 t-if="not tdm_offre_emploi.localisation" class="o_default_snippet_text">
+                                            <h4 t-if="not tdm_offre_emploi.name" class="o_default_snippet_text">
                                                 EMPTY
                                             </h4>
-                                            <p
-                                                t-if="tdm_offre_emploi.avantage_social"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.avantage_social"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.description"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.description"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.description_entreprise"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.description_entreprise"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.information_supplementaire"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.information_supplementaire"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.is_temps_pleins"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.is_temps_pleins"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.nb_hour_per_week"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.nb_hour_per_week"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.principal_responsabilite"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.principal_responsabilite"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.qualification_requise"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.qualification_requise"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.salaire"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.salaire"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.secteur_activite_ids"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.secteur_activite_ids"
-                                            />
-                                            <p
-                                                t-if="tdm_offre_emploi.stage_id"
-                                                class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.stage_id"
-                                            />
                                             <p
                                                 t-if="tdm_offre_emploi.type_poste_ids"
                                                 class="o_default_snippet_text"
                                                 t-field="tdm_offre_emploi.type_poste_ids"
-                                            />
+                                            >
+                                                Type de poste :
+                                                <span t-field="type_poste_ids.stage_id" />
+                                            </p>
                                             <p
-                                                t-if="tdm_offre_emploi.website_published"
+                                                t-if="tdm_offre_emploi.description_sommaire"
                                                 class="o_default_snippet_text"
-                                                t-field="tdm_offre_emploi.website_published"
+                                                t-field="tdm_offre_emploi.description_sommaire"
                                             />
+                                            <p t-if="tdm_offre_emploi.is_temps_pleins" class="o_default_snippet_text">
+                                                Poste à temps pleins
+                                            </p>
+                                            <p
+                                                t-if="not tdm_offre_emploi.is_temps_pleins"
+                                                class="o_default_snippet_text"
+                                            >
+                                                Poste à temps partiel
+                                            </p>
+                                            <p t-if="tdm_offre_emploi.nb_hour_per_week" class="o_default_snippet_text">
+                                                Heure par semaine :
+                                                <span t-field="tdm_offre_emploi.nb_hour_per_week" />
+                                            </p>
+                                            <p t-if="tdm_offre_emploi.salaire" class="o_default_snippet_text">
+                                                Salaire :
+                                                <span t-field="tdm_offre_emploi.salaire" />
+                                                $/h
+                                            </p>
+                                            <p
+                                                t-if="tdm_offre_emploi.secteur_activite_ids"
+                                                class="o_default_snippet_text"
+                                            >
+                                                Secteur d'activité :
+                                                <span t-field="tdm_offre_emploi.secteur_activite_ids" />
+                                            </p>
+                                            <p t-if="tdm_offre_emploi.stage_id" class="o_default_snippet_text">
+                                                Status de l'offre :
+                                                <span t-field="tdm_offre_emploi.stage_id" />
+                                            </p>
                                         </div>
                                     </div>
                                 </a>

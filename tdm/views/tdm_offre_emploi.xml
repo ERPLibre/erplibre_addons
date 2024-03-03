@@ -22,18 +22,30 @@
                                 options="{&quot;terminology&quot;: &quot;archive&quot;}"
                             />
                         </button>
+                        <button name="toggle_website_published" class="oe_stat_button" type="object" icon="fa-globe">
+                            <field
+                                name="website_published"
+                                widget="boolean_button"
+                                options='{"terminology": {"string_true": "Published", "hover_false": "Publish"}}'
+                            />
+                        </button>
+                        <button name="toggle_approbation" class="oe_stat_button" type="object" icon="fa-check">
+                            <field
+                                name="approbation"
+                                widget="boolean_button"
+                                options='{"terminology": {"string_true": "Approuved", "hover_false": "Approuve"}}'
+                            />
+                        </button>
                     </div>
                     <group>
                         <group string="Info">
+                            <field name="secteur_activite_ids" widget="many2many_tags" />
+                            <field name="type_poste_ids" widget="many2many_tags" />
                             <field name="category_id" />
                             <field name="tag_ids" widget="many2many_tags" />
-                            <field name="type_poste_ids" widget="many2many_tags" />
-                            <field name="secteur_activite_ids" widget="many2many_tags" />
                         </group>
                         <group string="Autre">
                             <field name="evaluation_id" />
-                            <field name="approbation" />
-                            <field name="website_published" />
                             <field name="partner_employeur_id" />
                             <field name="localisation" />
                         </group>
