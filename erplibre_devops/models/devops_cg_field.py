@@ -108,6 +108,13 @@ class DevopsCgField(models.Model):
     def get_dct(self):
         self.ensure_one()
         dct_field = {"ttype": self.type}
+        if self.type in ["many2many", "many2one", "one2many"]:
+            if self.relation:
+                dct_field["relation"] = self.relation.name
+            elif self.relation_manual:
+                dct_field["relation"] = self.relation_manual
+            # TODO support one2many with "inverse_field" and "inverse_field_manual"
+            # TODO support many2many with different relation
         if self.help:
             dct_field["help"] = self.help
         return dct_field
