@@ -294,35 +294,30 @@
 
     <template id="tdm.portal_my_home" name="Portal My Home: Tdm entries" inherit_id="portal.portal_my_home">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-if="tdm_entrevue_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Tdm Entrevues</t>
-                <t t-set="url" t-value="'/my/tdm_entrevues'" />
-                <t t-set="count" t-value="tdm_entrevue_count" />
-            </t>
-            <t t-if="tdm_entrevue_stage_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Tdm Entrevue Stages</t>
-                <t t-set="url" t-value="'/my/tdm_entrevue_stages'" />
-                <t t-set="count" t-value="tdm_entrevue_stage_count" />
-            </t>
             <t t-if="tdm_offre_emploi_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Tdm Offre Emplois</t>
+                <t t-set="title">(T/E)Toutes les offres d'emplois</t>
                 <t t-set="url" t-value="'/my/tdm_offre_emplois'" />
                 <t t-set="count" t-value="tdm_offre_emploi_count" />
             </t>
+            <t t-if="tdm_offre_emploi_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">(E)Tes offre d'emplois</t>
+                <t t-set="url" t-value="'/my/tdm_offre_emplois'" />
+                <t t-set="count" t-value="tdm_offre_emploi_count" />
+            </t>
+            <t t-if="tdm_entrevue_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">(T/E)Tes entrevues</t>
+                <t t-set="url" t-value="'/my/tdm_entrevues'" />
+                <t t-set="count" t-value="tdm_entrevue_count" />
+            </t>
             <t t-if="tdm_offre_emploi_applique_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Tdm Offre Emploi Appliques</t>
+                <t t-set="title">(T)Application</t>
                 <t t-set="url" t-value="'/my/tdm_offre_emploi_appliques'" />
                 <t t-set="count" t-value="tdm_offre_emploi_applique_count" />
             </t>
-            <t t-if="tdm_offre_emploi_applique_stage_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Tdm Offre Emploi Applique Stages</t>
-                <t t-set="url" t-value="'/my/tdm_offre_emploi_applique_stages'" />
-                <t t-set="count" t-value="tdm_offre_emploi_applique_stage_count" />
-            </t>
-            <t t-if="tdm_offre_emploi_stage_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Tdm Offre Emploi Stages</t>
-                <t t-set="url" t-value="'/my/tdm_offre_emploi_stages'" />
-                <t t-set="count" t-value="tdm_offre_emploi_stage_count" />
+            <t t-if="tdm_offre_emploi_applique_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">(E)Candidature reçu</t>
+                <t t-set="url" t-value="'/my/tdm_offre_emploi_appliques'" />
+                <t t-set="count" t-value="tdm_offre_emploi_applique_count" />
             </t>
         </xpath>
     </template>
