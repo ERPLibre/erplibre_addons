@@ -116,3 +116,46 @@ class TdmController(http.Controller):
             "tdm.tdm_entrevue_and_tdm_offre_emploi_and_tdm_offre_emploi_applique_list",
             dct_value,
         )
+
+    @http.route(
+        ["/tdm/tdm_offre_emploi/<int:tdm_offre_emploi>"],
+        type="http",
+        auth="public",
+        website=True,
+    )
+    def get_page_tdm_offre_emploi(self, tdm_offre_emploi=None):
+        env = request.env(context=dict(request.env.context))
+
+        tdm_offre_emploi_cls = env["tdm.offre.emploi"]
+        if tdm_offre_emploi:
+            tdm_offre_emploi_id = (
+                tdm_offre_emploi_cls.sudo().browse(tdm_offre_emploi).exists()
+            )
+        else:
+            tdm_offre_emploi_id = None
+        dct_value = {"tdm_offre_emploi_id": tdm_offre_emploi_id}
+
+        # Render page
+        return request.render("tdm.tdm_offre_emploi_unit", dct_value)
+
+    @http.route(
+        ["/tdm/tdm_offre_emploi_list"],
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def get_tdm_offre_emploi_list(self):
+        env = request.env(context=dict(request.env.context))
+
+        tdm_offre_emploi_cls = env["tdm.offre.emploi"]
+        tdm_offre_emploi_ids = tdm_offre_emploi_cls.sudo().search([]).ids
+        tdm_offre_emploi_s = tdm_offre_emploi_cls.sudo().browse(
+            tdm_offre_emploi_ids
+        )
+
+        dct_value = {"tdm_offre_emploi_s": tdm_offre_emploi_s}
+
+        # Render page
+        return request.env["ir.ui.view"].render_template(
+            "tdm.tdm_offre_emploi_list", dct_value
+        )
