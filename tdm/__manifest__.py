@@ -5,7 +5,12 @@
     "license": "AGPL-3",
     "website": "https://technolibre.ca",
     "application": True,
-    "depends": ["portal", "membership", "survey"],
+    "depends": [
+        "portal",
+        "website",
+        "membership",
+        "survey",
+    ],
     "data": [
         "security/ir.model.access.csv",
         "data/tdm_travailleur_stage.xml",
@@ -29,6 +34,8 @@
         "views/tdm_offre_emploi_type.xml",
         "views/tdm_secteur_activite.xml",
         "views/menu.xml",
+        "views/snippets.xml",
+        "templates/website.xml",
     ],
     "installable": True,
 }

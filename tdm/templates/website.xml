@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <template id="tdm_entrevue_unit" name="Tdm Entrevue">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure">
+                    <section class="pt32 pb32" t-if="not tdm_entrevue_id">
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title pt16 pb16" style="text-align: center;">
+                                    <h1 class="s_title_default">
+                                        <font style="font-size: 62px;">tdm_entrevue_id non existante</font>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section
+                        t-if="tdm_entrevue_id"
+                        class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden"
+                        data-scroll-background-ratio="1"
+                        style="background-image: none;"
+                    >
+                        <span
+                            class="s_parallax_bg oe_img_bg oe_custom_bg"
+                            style="background-image: url('/web/image/website.s_cover_default_image'); background-position: 50% 0;"
+                        />
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title" data-name="Title">
+                                    <h1
+                                        class="s_title_thin"
+                                        style="font-size: 62px; text-align: center;"
+                                        t-field="tdm_entrevue_id.name"
+                                        t-if="tdm_entrevue_id.name"
+                                    />
+                                    <h1
+                                        class="s_title_thin"
+                                        style="font-size: 62px; text-align: center;"
+                                        t-if="not tdm_entrevue_id.name"
+                                    >
+                                        EMPTY
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="tdm_offre_emploi_unit" name="Tdm Offre Emploi">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure">
+                    <section class="pt32 pb32" t-if="not tdm_offre_emploi_id">
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title pt16 pb16" style="text-align: center;">
+                                    <h1 class="s_title_default">
+                                        <font style="font-size: 62px;">tdm_offre_emploi_id non existante</font>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section
+                        t-if="tdm_offre_emploi_id"
+                        class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden"
+                        data-scroll-background-ratio="1"
+                        style="background-image: none;"
+                    >
+                        <span
+                            class="s_parallax_bg oe_img_bg oe_custom_bg"
+                            style="background-image: url('/web/image/website.s_cover_default_image'); background-position: 50% 0;"
+                        />
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title" data-name="Title">
+                                    <h1
+                                        class="s_title_thin"
+                                        style="font-size: 62px; text-align: center;"
+                                        t-field="tdm_offre_emploi_id.name"
+                                        t-if="tdm_offre_emploi_id.name"
+                                    />
+                                    <h1
+                                        class="s_title_thin"
+                                        style="font-size: 62px; text-align: center;"
+                                        t-if="not tdm_offre_emploi_id.name"
+                                    >
+                                        EMPTY
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="tdm_offre_emploi_applique_unit" name="Tdm Offre Emploi Applique">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure">
+                    <section class="pt32 pb32" t-if="not tdm_offre_emploi_applique_id">
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title pt16 pb16" style="text-align: center;">
+                                    <h1 class="s_title_default">
+                                        <font style="font-size: 62px;">tdm_offre_emploi_applique_id non existante</font>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section
+                        t-if="tdm_offre_emploi_applique_id"
+                        class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden"
+                        data-scroll-background-ratio="1"
+                        style="background-image: none;"
+                    >
+                        <span
+                            class="s_parallax_bg oe_img_bg oe_custom_bg"
+                            style="background-image: url('/web/image/website.s_cover_default_image'); background-position: 50% 0;"
+                        />
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title" data-name="Title">
+                                    <h1
+                                        class="s_title_thin"
+                                        style="font-size: 62px; text-align: center;"
+                                        t-field="tdm_offre_emploi_applique_id.name"
+                                        t-if="tdm_offre_emploi_applique_id.name"
+                                    />
+                                    <h1
+                                        class="s_title_thin"
+                                        style="font-size: 62px; text-align: center;"
+                                        t-if="not tdm_offre_emploi_applique_id.name"
+                                    >
+                                        EMPTY
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template
+        id="tdm_entrevue_and_tdm_offre_emploi_and_tdm_offre_emploi_applique_list"
+        name="Tdm Entrevue And Tdm Offre Emploi And Tdm Offre Emploi Applique List"
+    >
+        <t t-ignore="true">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 s_col_no_bgcolor pb24">
+                        <div class="row" t-if="tdm_entrevue_s">
+                            <div t-foreach="tdm_entrevue_s" t-as="tdm_entrevue">
+                                <a t-if="tdm_entrevue" t-att-href="'/tdm/tdm_entrevue/%d' % tdm_entrevue.id">
+                                    <div class="col-lg-12 pt16 pb16" data-name="Box">
+                                        <i class="fa fa-2x fa-files-o rounded-circle bg-primary s_features_grid_icon" />
+                                        <div class="s_features_grid_content">
+                                            <h4
+                                                t-if="tdm_entrevue.name"
+                                                class="o_default_snippet_text"
+                                                t-field="tdm_entrevue.name"
+                                            />
+                                            <h4 t-if="not tdm_entrevue.name" class="o_default_snippet_text">EMPTY</h4>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row" t-if="not tdm_entrevue_s">Aucune tdm_entrevue disponible.</div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-lg-6 s_col_no_bgcolor pb24">
+                        <div class="row" t-if="tdm_offre_emploi_s">
+                            <div t-foreach="tdm_offre_emploi_s" t-as="tdm_offre_emploi">
+                                <a
+                                    t-if="tdm_offre_emploi"
+                                    t-att-href="'/tdm/tdm_offre_emploi/%d' % tdm_offre_emploi.id"
+                                >
+                                    <div class="col-lg-12 pt16 pb16" data-name="Box">
+                                        <i class="fa fa-2x fa-files-o rounded-circle bg-primary s_features_grid_icon" />
+                                        <div class="s_features_grid_content">
+                                            <h4
+                                                t-if="tdm_offre_emploi.name"
+                                                class="o_default_snippet_text"
+                                                t-field="tdm_offre_emploi.name"
+                                            />
+                                            <h4 t-if="not tdm_offre_emploi.name" class="o_default_snippet_text">
+                                                EMPTY
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row" t-if="not tdm_offre_emploi_s">Aucune tdm_offre_emploi disponible.</div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-lg-6 s_col_no_bgcolor pb24">
+                        <div class="row" t-if="tdm_offre_emploi_applique_s">
+                            <div t-foreach="tdm_offre_emploi_applique_s" t-as="tdm_offre_emploi_applique">
+                                <a
+                                    t-if="tdm_offre_emploi_applique"
+                                    t-att-href="'/tdm/tdm_offre_emploi_applique/%d' % tdm_offre_emploi_applique.id"
+                                >
+                                    <div class="col-lg-12 pt16 pb16" data-name="Box">
+                                        <i class="fa fa-2x fa-files-o rounded-circle bg-primary s_features_grid_icon" />
+                                        <div class="s_features_grid_content">
+                                            <h4
+                                                t-if="tdm_offre_emploi_applique.name"
+                                                class="o_default_snippet_text"
+                                                t-field="tdm_offre_emploi_applique.name"
+                                            />
+                                            <h4
+                                                t-if="not tdm_offre_emploi_applique.name"
+                                                class="o_default_snippet_text"
+                                            >
+                                                EMPTY
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row" t-if="not tdm_offre_emploi_applique_s">
+                            Aucune tdm_offre_emploi_applique disponible.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

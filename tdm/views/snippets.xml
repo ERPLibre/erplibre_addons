@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Snippets -->
+    <template id="s_tdm" name="Tdm">
+        <section class="o_tdm">
+            <div class="container" />
+        </section>
+    </template>
+    <!-- Add snippets to menu -->
+    <template id="snippet_effect" inherit_id="website.snippets">
+        <xpath expr="//div[@id='snippet_effect']/div[hasclass('o_panel_body')]" position="inside">
+            <t t-snippet="tdm.s_tdm" t-thumbnail="/tdm/static/description/icon.png" />
+        </xpath>
+    </template>
+    <!-- Add stylesheet and Javascript -->
+    <template id="assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" type="text/scss" href="/tdm/static/src/scss/tdm.scss" />
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/tdm/static/src/js/website.tdm.animation.js" />
+        </xpath>
+    </template>
+</odoo>
