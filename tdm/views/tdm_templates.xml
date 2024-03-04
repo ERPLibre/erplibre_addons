@@ -1248,6 +1248,15 @@
                 <t t-set="url" t-value="'/my/tdm_offre_emplois'" />
                 <t t-set="count" t-value="tdm_offre_emploi_count" />
             </t>
+            <a
+                t-if="not tdm_offre_emploi_count"
+                role="button"
+                class="btn btn-primary btn-block mb8"
+                href="/new/tdm_offre_emploi"
+            >
+                <i class="fa fa-plus-circle" />
+                Créer une nouvelle offre d'emploi
+            </a>
             <t t-if="tdm_offre_emploi_count" t-call="portal.portal_docs_entry">
                 <t t-set="title">(E)Tes offre d'emplois</t>
                 <t t-set="url" t-value="'/my/tdm_offre_emplois'" />
