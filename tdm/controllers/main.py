@@ -189,6 +189,22 @@ class TdmController(http.Controller):
             .default_get(["offre_emploi_id"])
             .get("offre_emploi_id")
         )
+        partner_employeur_id = http.request.env["res.partner"].search(
+            [("active", "=", True)]
+        )
+        default_partner_employeur_id = (
+            http.request.env["tdm.entrevue"]
+            .default_get(["partner_employeur_id"])
+            .get("partner_employeur_id")
+        )
+        partner_travailleur_id = http.request.env["res.partner"].search(
+            [("active", "=", True)]
+        )
+        default_partner_travailleur_id = (
+            http.request.env["tdm.entrevue"]
+            .default_get(["partner_travailleur_id"])
+            .get("partner_travailleur_id")
+        )
         default_show_jitsi_link = (
             http.request.env["tdm.entrevue"]
             .default_get(["show_jitsi_link"])
@@ -216,11 +232,15 @@ class TdmController(http.Controller):
                 "name": name,
                 "offre_emploi_applique_id": offre_emploi_applique_id,
                 "offre_emploi_id": offre_emploi_id,
+                "partner_employeur_id": partner_employeur_id,
+                "partner_travailleur_id": partner_travailleur_id,
                 "stage_id": stage_id,
                 "page_name": "create_tdm_entrevue",
                 "default_date_debut_entrevue": default_date_debut_entrevue,
                 "default_offre_emploi_applique_id": default_offre_emploi_applique_id,
                 "default_offre_emploi_id": default_offre_emploi_id,
+                "default_partner_employeur_id": default_partner_employeur_id,
+                "default_partner_travailleur_id": default_partner_travailleur_id,
                 "default_show_jitsi_link": default_show_jitsi_link,
                 "default_stage_id": default_stage_id,
                 "default_url_jitsi_employeur": default_url_jitsi_employeur,
@@ -254,6 +274,20 @@ class TdmController(http.Controller):
 
         if kw.get("offre_emploi_id") and kw.get("offre_emploi_id").isdigit():
             vals["offre_emploi_id"] = int(kw.get("offre_emploi_id"))
+
+        if (
+            kw.get("partner_employeur_id")
+            and kw.get("partner_employeur_id").isdigit()
+        ):
+            vals["partner_employeur_id"] = int(kw.get("partner_employeur_id"))
+
+        if (
+            kw.get("partner_travailleur_id")
+            and kw.get("partner_travailleur_id").isdigit()
+        ):
+            vals["partner_travailleur_id"] = int(
+                kw.get("partner_travailleur_id")
+            )
 
         default_show_jitsi_link = (
             http.request.env["tdm.entrevue"]
@@ -359,6 +393,14 @@ class TdmController(http.Controller):
             .default_get(["nb_hour_per_week"])
             .get("nb_hour_per_week")
         )
+        partner_employeur_id = http.request.env["res.partner"].search(
+            [("active", "=", True)]
+        )
+        default_partner_employeur_id = (
+            http.request.env["tdm.offre.emploi"]
+            .default_get(["partner_employeur_id"])
+            .get("partner_employeur_id")
+        )
         default_principal_responsabilite = (
             http.request.env["tdm.offre.emploi"]
             .default_get(["principal_responsabilite"])
@@ -413,6 +455,7 @@ class TdmController(http.Controller):
             "tdm.portal_create_tdm_offre_emploi",
             {
                 "name": name,
+                "partner_employeur_id": partner_employeur_id,
                 "secteur_activite_ids": secteur_activite_ids,
                 "stage_id": stage_id,
                 "type_poste_ids": type_poste_ids,
@@ -426,6 +469,7 @@ class TdmController(http.Controller):
                 "default_is_temps_pleins": default_is_temps_pleins,
                 "default_localisation": default_localisation,
                 "default_nb_hour_per_week": default_nb_hour_per_week,
+                "default_partner_employeur_id": default_partner_employeur_id,
                 "default_principal_responsabilite": default_principal_responsabilite,
                 "default_qualification_requise": default_qualification_requise,
                 "default_salaire": default_salaire,
@@ -493,6 +537,12 @@ class TdmController(http.Controller):
             nb_hour_per_week_value = kw.get("nb_hour_per_week")
             if nb_hour_per_week_value.replace(".", "", 1).isdigit():
                 vals["nb_hour_per_week"] = float(nb_hour_per_week_value)
+
+        if (
+            kw.get("partner_employeur_id")
+            and kw.get("partner_employeur_id").isdigit()
+        ):
+            vals["partner_employeur_id"] = int(kw.get("partner_employeur_id"))
 
         if kw.get("principal_responsabilite"):
             vals["principal_responsabilite"] = kw.get(
@@ -562,6 +612,22 @@ class TdmController(http.Controller):
             .default_get(["offre_emploi_id"])
             .get("offre_emploi_id")
         )
+        partner_employeur_id = http.request.env["res.partner"].search(
+            [("active", "=", True)]
+        )
+        default_partner_employeur_id = (
+            http.request.env["tdm.offre.emploi.applique"]
+            .default_get(["partner_employeur_id"])
+            .get("partner_employeur_id")
+        )
+        partner_travailleur_id = http.request.env["res.partner"].search(
+            [("active", "=", True)]
+        )
+        default_partner_travailleur_id = (
+            http.request.env["tdm.offre.emploi.applique"]
+            .default_get(["partner_travailleur_id"])
+            .get("partner_travailleur_id")
+        )
         stage_id = http.request.env["tdm.offre.emploi.applique.stage"].search(
             []
         )
@@ -575,10 +641,14 @@ class TdmController(http.Controller):
             {
                 "name": name,
                 "offre_emploi_id": offre_emploi_id,
+                "partner_employeur_id": partner_employeur_id,
+                "partner_travailleur_id": partner_travailleur_id,
                 "stage_id": stage_id,
                 "page_name": "create_tdm_offre_emploi_applique",
                 "default_date_application": default_date_application,
                 "default_offre_emploi_id": default_offre_emploi_id,
+                "default_partner_employeur_id": default_partner_employeur_id,
+                "default_partner_travailleur_id": default_partner_travailleur_id,
                 "default_stage_id": default_stage_id,
             },
         )
@@ -601,6 +671,20 @@ class TdmController(http.Controller):
 
         if kw.get("offre_emploi_id") and kw.get("offre_emploi_id").isdigit():
             vals["offre_emploi_id"] = int(kw.get("offre_emploi_id"))
+
+        if (
+            kw.get("partner_employeur_id")
+            and kw.get("partner_employeur_id").isdigit()
+        ):
+            vals["partner_employeur_id"] = int(kw.get("partner_employeur_id"))
+
+        if (
+            kw.get("partner_travailleur_id")
+            and kw.get("partner_travailleur_id").isdigit()
+        ):
+            vals["partner_travailleur_id"] = int(
+                kw.get("partner_travailleur_id")
+            )
 
         if kw.get("stage_id") and kw.get("stage_id").isdigit():
             vals["stage_id"] = int(kw.get("stage_id"))

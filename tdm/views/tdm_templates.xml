@@ -88,6 +88,48 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="partner_employeur_id">
+                        Partner_employeur_id
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <select
+                            class="form-control o_website_form_input"
+                            id="partner_employeur_id"
+                            name="partner_employeur_id"
+                        >
+                            <t t-foreach="partner_employeur_id" t-as="par">
+                                <option
+                                    t-attf-value="#{par.id}"
+                                    t-att-selected="default_partner_employeur_id == par.id"
+                                >
+                                    <t t-esc="par.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="partner_travailleur_id">
+                        Partner_travailleur_id
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <select
+                            class="form-control o_website_form_input"
+                            id="partner_travailleur_id"
+                            name="partner_travailleur_id"
+                        >
+                            <t t-foreach="partner_travailleur_id" t-as="par">
+                                <option
+                                    t-attf-value="#{par.id}"
+                                    t-att-selected="default_partner_travailleur_id == par.id"
+                                >
+                                    <t t-esc="par.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-md-3 col-sm-4 control-label" for="show_jitsi_link">Show_jitsi_link</label>
                     <div class="col-md-7 col-sm-8">
                         <input
@@ -293,6 +335,27 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="partner_employeur_id">
+                        Partner_employeur_id
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <select
+                            class="form-control o_website_form_input"
+                            id="partner_employeur_id"
+                            name="partner_employeur_id"
+                        >
+                            <t t-foreach="partner_employeur_id" t-as="par">
+                                <option
+                                    t-attf-value="#{par.id}"
+                                    t-att-selected="default_partner_employeur_id == par.id"
+                                >
+                                    <t t-esc="par.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-md-3 col-sm-4 control-label" for="principal_responsabilite">
                         Principal_responsabilite
                     </label>
@@ -458,6 +521,48 @@
                             <t t-foreach="offre_emploi_id" t-as="off">
                                 <option t-attf-value="#{off.id}" t-att-selected="default_offre_emploi_id == off.id">
                                     <t t-esc="off.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="partner_employeur_id">
+                        Partner_employeur_id
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <select
+                            class="form-control o_website_form_input"
+                            id="partner_employeur_id"
+                            name="partner_employeur_id"
+                        >
+                            <t t-foreach="partner_employeur_id" t-as="par">
+                                <option
+                                    t-attf-value="#{par.id}"
+                                    t-att-selected="default_partner_employeur_id == par.id"
+                                >
+                                    <t t-esc="par.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="partner_travailleur_id">
+                        Partner_travailleur_id
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <select
+                            class="form-control o_website_form_input"
+                            id="partner_travailleur_id"
+                            name="partner_travailleur_id"
+                        >
+                            <t t-foreach="partner_travailleur_id" t-as="par">
+                                <option
+                                    t-attf-value="#{par.id}"
+                                    t-att-selected="default_partner_travailleur_id == par.id"
+                                >
+                                    <t t-esc="par.name" />
                                 </option>
                             </t>
                         </select>
@@ -666,6 +771,20 @@
                             />
                         </div>
                         <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Partner Employeur:</b>
+                            <a
+                                t-attf-href="/my/res_partner/#{tdm_entrevue.partner_employeur_id.id}"
+                                t-field="tdm_entrevue.partner_employeur_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Partner Travailleur:</b>
+                            <a
+                                t-attf-href="/my/res_partner/#{tdm_entrevue.partner_travailleur_id.id}"
+                                t-field="tdm_entrevue.partner_travailleur_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
                             <b>Show Jitsi Link:</b>
                             <span t-field="tdm_entrevue.show_jitsi_link" />
                         </div>
@@ -770,6 +889,13 @@
                             <span t-field="tdm_offre_emploi.nb_hour_per_week" />
                         </div>
                         <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Partner Employeur:</b>
+                            <a
+                                t-attf-href="/my/res_partner/#{tdm_offre_emploi.partner_employeur_id.id}"
+                                t-field="tdm_offre_emploi.partner_employeur_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
                             <b>Principal Responsabilite:</b>
                             <span t-raw="tdm_offre_emploi.principal_responsabilite" />
                         </div>
@@ -840,6 +966,20 @@
                             <a
                                 t-attf-href="/my/tdm_offre_emploi/#{tdm_offre_emploi_applique.offre_emploi_id.id}"
                                 t-field="tdm_offre_emploi_applique.offre_emploi_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Partner Employeur:</b>
+                            <a
+                                t-attf-href="/my/res_partner/#{tdm_offre_emploi_applique.partner_employeur_id.id}"
+                                t-field="tdm_offre_emploi_applique.partner_employeur_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Partner Travailleur:</b>
+                            <a
+                                t-attf-href="/my/res_partner/#{tdm_offre_emploi_applique.partner_travailleur_id.id}"
+                                t-field="tdm_offre_emploi_applique.partner_travailleur_id.name"
                             />
                         </div>
                         <div class="col-12 col-md-6 mb-2 mb-md-0">
