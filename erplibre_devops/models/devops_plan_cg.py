@@ -621,16 +621,16 @@ class DevopsPlanCg(models.Model):
             if rec.mode_view_portal and rec.mode_view_portal != "no_portal":
                 value_view_wizard["enable_generate_portal"] = True
                 value_view_wizard[
-                    "mode_view_portal_enable_create"
+                    "portal_enable_create"
                 ] = rec.mode_view_portal_enable_create
                 value_view_wizard[
-                    "mode_view_portal_enable_read"
+                    "portal_enable_read"
                 ] = rec.mode_view_portal_enable_read
                 value_view_wizard[
-                    "mode_view_portal_enable_update"
+                    "portal_enable_update"
                 ] = rec.mode_view_portal_enable_update
                 value_view_wizard[
-                    "mode_view_portal_enable_delete"
+                    "portal_enable_delete"
                 ] = rec.mode_view_portal_enable_delete
 
             wizard_view = self.env[
