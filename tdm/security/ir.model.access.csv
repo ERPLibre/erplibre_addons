@@ -15,4 +15,6 @@ tdm_travailleur_stage_access_user_types_/_internal_user,tdm_travailleur_stage Ac
 tdm_offre_emploi_category_access_user_types_/_internal_user,tdm_offre_emploi_category Access User types / Internal User,model_tdm_offre_emploi_category,base.group_user,1,1,1,1
 tdm_offre_emploi_tag_access_user_types_/_internal_user,tdm_offre_emploi_tag Access User types / Internal User,model_tdm_offre_emploi_tag,base.group_user,1,1,1,1
 tdm_offre_emploi_type_access_user_types_/_internal_user,tdm_offre_emploi_type Access User types / Internal User,model_tdm_offre_emploi_type,base.group_user,1,1,1,1
+tdm_offre_emploi_type_access_user_types_/_portal,tdm_offre_emploi_type Access User types / Portal,model_tdm_offre_emploi_type,base.group_portal,1,1,1,1
 tdm_secteur_activite_access_user_types_/_internal_user,tdm_secteur_activite Access User types / Internal User,model_tdm_secteur_activite,base.group_user,1,1,1,1
+tdm_secteur_activite_access_user_types_/_portal,tdm_secteur_activite Access User types / Portal,model_tdm_secteur_activite,base.group_portal,1,1,1,1

@@ -31,6 +31,12 @@ class TdmController(CustomerPortal):
         values["tdm_offre_emploi_stage_count"] = request.env[
             "tdm.offre.emploi.stage"
         ].search_count([])
+        values["tdm_offre_emploi_type_count"] = request.env[
+            "tdm.offre.emploi.type"
+        ].search_count([])
+        values["tdm_secteur_activite_count"] = request.env[
+            "tdm.secteur_activite"
+        ].search_count([])
         return values
 
     # ------------------------------------------------------------
@@ -925,3 +931,299 @@ class TdmController(CustomerPortal):
             tdm_offre_emploi_stage_sudo, access_token, **kw
         )
         return request.render("tdm.portal_my_tdm_offre_emploi_stage", values)
+
+    # ------------------------------------------------------------
+    # My Tdm Offre Emploi Type
+    # ------------------------------------------------------------
+    def _tdm_offre_emploi_type_get_page_view_values(
+        self, tdm_offre_emploi_type, access_token, **kwargs
+    ):
+        values = {
+            "page_name": "tdm_offre_emploi_type",
+            "tdm_offre_emploi_type": tdm_offre_emploi_type,
+            "user": request.env.user,
+        }
+        return self._get_page_view_values(
+            tdm_offre_emploi_type,
+            access_token,
+            values,
+            "my_tdm_offre_emploi_types_history",
+            False,
+            **kwargs,
+        )
+
+    @http.route(
+        [
+            "/my/tdm_offre_emploi_types",
+            "/my/tdm_offre_emploi_types/page/<int:page>",
+        ],
+        type="http",
+        auth="user",
+        website=True,
+    )
+    def portal_my_tdm_offre_emploi_types(
+        self,
+        page=1,
+        date_begin=None,
+        date_end=None,
+        sortby=None,
+        filterby=None,
+        search=None,
+        search_in="content",
+        **kw,
+    ):
+        values = self._prepare_portal_layout_values()
+        TdmOffreEmploiType = request.env["tdm.offre.emploi.type"]
+        domain = []
+
+        searchbar_sortings = {
+            "date": {"label": _("Newest"), "order": "create_date desc"},
+            "name": {"label": _("Name"), "order": "name"},
+        }
+        searchbar_filters = {
+            "all": {"label": _("All"), "domain": []},
+        }
+        searchbar_inputs = {}
+        searchbar_groupby = {}
+
+        # default sort by value
+        if not sortby:
+            sortby = "date"
+        order = searchbar_sortings[sortby]["order"]
+        # default filter by value
+        if not filterby:
+            filterby = "all"
+        domain = searchbar_filters[filterby]["domain"]
+
+        # search
+        if search and search_in:
+            search_domain = []
+            domain += search_domain
+        # archive groups - Default Group By 'create_date'
+        archive_groups = self._get_archive_groups(
+            "tdm.offre.emploi.type", domain
+        )
+        if date_begin and date_end:
+            domain += [
+                ("create_date", ">", date_begin),
+                ("create_date", "<=", date_end),
+            ]
+        # tdm_offre_emploi_types count
+        tdm_offre_emploi_type_count = TdmOffreEmploiType.search_count(domain)
+        # pager
+        pager = portal_pager(
+            url="/my/tdm_offre_emploi_types",
+            url_args={
+                "date_begin": date_begin,
+                "date_end": date_end,
+                "sortby": sortby,
+                "filterby": filterby,
+                "search_in": search_in,
+                "search": search,
+            },
+            total=tdm_offre_emploi_type_count,
+            page=page,
+            step=self._items_per_page,
+        )
+
+        # content according to pager and archive selected
+        tdm_offre_emploi_types = TdmOffreEmploiType.search(
+            domain,
+            order=order,
+            limit=self._items_per_page,
+            offset=pager["offset"],
+        )
+        request.session[
+            "my_tdm_offre_emploi_types_history"
+        ] = tdm_offre_emploi_types.ids[:100]
+
+        values.update(
+            {
+                "date": date_begin,
+                "date_end": date_end,
+                "tdm_offre_emploi_types": tdm_offre_emploi_types,
+                "page_name": "tdm_offre_emploi_type",
+                "archive_groups": archive_groups,
+                "default_url": "/my/tdm_offre_emploi_types",
+                "pager": pager,
+                "searchbar_sortings": searchbar_sortings,
+                "searchbar_groupby": searchbar_groupby,
+                "searchbar_inputs": searchbar_inputs,
+                "search_in": search_in,
+                "searchbar_filters": OrderedDict(
+                    sorted(searchbar_filters.items())
+                ),
+                "sortby": sortby,
+                "filterby": filterby,
+            }
+        )
+        return request.render("tdm.portal_my_tdm_offre_emploi_types", values)
+
+    @http.route(
+        ["/my/tdm_offre_emploi_type/<int:tdm_offre_emploi_type_id>"],
+        type="http",
+        auth="public",
+        website=True,
+    )
+    def portal_my_tdm_offre_emploi_type(
+        self, tdm_offre_emploi_type_id=None, access_token=None, **kw
+    ):
+        try:
+            tdm_offre_emploi_type_sudo = self._document_check_access(
+                "tdm.offre.emploi.type", tdm_offre_emploi_type_id, access_token
+            )
+        except (AccessError, MissingError):
+            return request.redirect("/my")
+
+        values = self._tdm_offre_emploi_type_get_page_view_values(
+            tdm_offre_emploi_type_sudo, access_token, **kw
+        )
+        return request.render("tdm.portal_my_tdm_offre_emploi_type", values)
+
+    # ------------------------------------------------------------
+    # My Tdm Secteur_Activite
+    # ------------------------------------------------------------
+    def _tdm_secteur_activite_get_page_view_values(
+        self, tdm_secteur_activite, access_token, **kwargs
+    ):
+        values = {
+            "page_name": "tdm_secteur_activite",
+            "tdm_secteur_activite": tdm_secteur_activite,
+            "user": request.env.user,
+        }
+        return self._get_page_view_values(
+            tdm_secteur_activite,
+            access_token,
+            values,
+            "my_tdm_secteur_activites_history",
+            False,
+            **kwargs,
+        )
+
+    @http.route(
+        [
+            "/my/tdm_secteur_activites",
+            "/my/tdm_secteur_activites/page/<int:page>",
+        ],
+        type="http",
+        auth="user",
+        website=True,
+    )
+    def portal_my_tdm_secteur_activites(
+        self,
+        page=1,
+        date_begin=None,
+        date_end=None,
+        sortby=None,
+        filterby=None,
+        search=None,
+        search_in="content",
+        **kw,
+    ):
+        values = self._prepare_portal_layout_values()
+        TdmSecteurActivite = request.env["tdm.secteur_activite"]
+        domain = []
+
+        searchbar_sortings = {
+            "date": {"label": _("Newest"), "order": "create_date desc"},
+            "name": {"label": _("Name"), "order": "name"},
+        }
+        searchbar_filters = {
+            "all": {"label": _("All"), "domain": []},
+        }
+        searchbar_inputs = {}
+        searchbar_groupby = {}
+
+        # default sort by value
+        if not sortby:
+            sortby = "date"
+        order = searchbar_sortings[sortby]["order"]
+        # default filter by value
+        if not filterby:
+            filterby = "all"
+        domain = searchbar_filters[filterby]["domain"]
+
+        # search
+        if search and search_in:
+            search_domain = []
+            domain += search_domain
+        # archive groups - Default Group By 'create_date'
+        archive_groups = self._get_archive_groups(
+            "tdm.secteur_activite", domain
+        )
+        if date_begin and date_end:
+            domain += [
+                ("create_date", ">", date_begin),
+                ("create_date", "<=", date_end),
+            ]
+        # tdm_secteur_activites count
+        tdm_secteur_activite_count = TdmSecteurActivite.search_count(domain)
+        # pager
+        pager = portal_pager(
+            url="/my/tdm_secteur_activites",
+            url_args={
+                "date_begin": date_begin,
+                "date_end": date_end,
+                "sortby": sortby,
+                "filterby": filterby,
+                "search_in": search_in,
+                "search": search,
+            },
+            total=tdm_secteur_activite_count,
+            page=page,
+            step=self._items_per_page,
+        )
+
+        # content according to pager and archive selected
+        tdm_secteur_activites = TdmSecteurActivite.search(
+            domain,
+            order=order,
+            limit=self._items_per_page,
+            offset=pager["offset"],
+        )
+        request.session[
+            "my_tdm_secteur_activites_history"
+        ] = tdm_secteur_activites.ids[:100]
+
+        values.update(
+            {
+                "date": date_begin,
+                "date_end": date_end,
+                "tdm_secteur_activites": tdm_secteur_activites,
+                "page_name": "tdm_secteur_activite",
+                "archive_groups": archive_groups,
+                "default_url": "/my/tdm_secteur_activites",
+                "pager": pager,
+                "searchbar_sortings": searchbar_sortings,
+                "searchbar_groupby": searchbar_groupby,
+                "searchbar_inputs": searchbar_inputs,
+                "search_in": search_in,
+                "searchbar_filters": OrderedDict(
+                    sorted(searchbar_filters.items())
+                ),
+                "sortby": sortby,
+                "filterby": filterby,
+            }
+        )
+        return request.render("tdm.portal_my_tdm_secteur_activites", values)
+
+    @http.route(
+        ["/my/tdm_secteur_activite/<int:tdm_secteur_activite_id>"],
+        type="http",
+        auth="public",
+        website=True,
+    )
+    def portal_my_tdm_secteur_activite(
+        self, tdm_secteur_activite_id=None, access_token=None, **kw
+    ):
+        try:
+            tdm_secteur_activite_sudo = self._document_check_access(
+                "tdm.secteur_activite", tdm_secteur_activite_id, access_token
+            )
+        except (AccessError, MissingError):
+            return request.redirect("/my")
+
+        values = self._tdm_secteur_activite_get_page_view_values(
+            tdm_secteur_activite_sudo, access_token, **kw
+        )
+        return request.render("tdm.portal_my_tdm_secteur_activite", values)

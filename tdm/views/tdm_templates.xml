@@ -1,5 +1,633 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
+    <template id="portal_create_tdm_entrevue" name="Create Tdm Entrevue">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm entrevue</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_entrevue"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="date_debut_entrevue">Date_debut_entrevue</label>
+                    <div class="col-md-7 col-sm-8">
+                        <div
+                            class="input-group date"
+                            data-target-input="nearest"
+                            t-attf-id="date_debut_entrevue_datepicker"
+                        >
+                            <input
+                                class="form-control datetimepicker-input o_website_form_input"
+                                name="date_debut_entrevue"
+                                t-att-value="default_date_debut_entrevue"
+                                t-attf-data-target="#date_debut_entrevue_datepicker"
+                                type="text"
+                            />
+                            <div
+                                class="input-group-append"
+                                t-attf-data-target="#date_debut_entrevue_datepicker"
+                                data-toggle="datetimepicker"
+                            >
+                                <div class="input-group-text">
+                                    <i class="fa fa-calendar" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="offre_emploi_applique_id">
+                        Offre_emploi_applique_id
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <select
+                            class="form-control o_website_form_input"
+                            id="offre_emploi_applique_id"
+                            name="offre_emploi_applique_id"
+                        >
+                            <t t-foreach="offre_emploi_applique_id" t-as="off">
+                                <option
+                                    t-attf-value="#{off.id}"
+                                    t-att-selected="default_offre_emploi_applique_id == off.id"
+                                >
+                                    <t t-esc="off.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="offre_emploi_id">Offre_emploi_id</label>
+                    <div class="col-md-7 col-sm-8">
+                        <select class="form-control o_website_form_input" id="offre_emploi_id" name="offre_emploi_id">
+                            <t t-foreach="offre_emploi_id" t-as="off">
+                                <option t-attf-value="#{off.id}" t-att-selected="default_offre_emploi_id == off.id">
+                                    <t t-esc="off.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="show_jitsi_link">Show_jitsi_link</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="checkbox"
+                            class="form-control o_website_form_input"
+                            name="show_jitsi_link"
+                            id="show_jitsi_link"
+                            t-att-value="True"
+                            t-att-checked="default_show_jitsi_link"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="stage_id">Stage_id</label>
+                    <div class="col-md-7 col-sm-8">
+                        <select class="form-control o_website_form_input" id="stage_id" name="stage_id">
+                            <t t-foreach="stage_id" t-as="sta">
+                                <option t-attf-value="#{sta.id}" t-att-selected="default_stage_id == sta.id">
+                                    <t t-esc="sta.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="url_jitsi_employeur">Url_jitsi_employeur</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="url_jitsi_employeur"
+                            t-att-value="default_url_jitsi_employeur"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="url_jitsi_travailleur">
+                        Url_jitsi_travailleur
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="url_jitsi_travailleur"
+                            t-att-value="default_url_jitsi_travailleur"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Entrevue</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_entrevue_stage" name="Create Tdm Entrevue Stage">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm entrevue stage</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_entrevue_stage"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Entrevue Stage</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_offre_emploi" name="Create Tdm Offre Emploi">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm offre emploi</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_offre_emploi"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="approbation">Approbation</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="checkbox"
+                            class="form-control o_website_form_input"
+                            name="approbation"
+                            id="approbation"
+                            t-att-value="True"
+                            t-att-checked="default_approbation"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="avantage_social">Avantage_social</label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="avantage_social" style="min-height: 120px"><t t-esc="default_avantage_social"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="description">Description</label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="description" style="min-height: 120px"><t t-esc="default_description"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="description_entreprise">
+                        Description_entreprise
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="description_entreprise" style="min-height: 120px"><t t-esc="default_description_entreprise"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="description_sommaire">
+                        Description_sommaire
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="description_sommaire" style="min-height: 120px"><t t-esc="default_description_sommaire"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="information_supplementaire">
+                        Information_supplementaire
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="information_supplementaire" style="min-height: 120px"><t t-esc="default_information_supplementaire"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="is_temps_pleins">Is_temps_pleins</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="checkbox"
+                            class="form-control o_website_form_input"
+                            name="is_temps_pleins"
+                            id="is_temps_pleins"
+                            t-att-value="True"
+                            t-att-checked="default_is_temps_pleins"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="localisation">Localisation</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="localisation"
+                            t-att-value="default_localisation"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="nb_hour_per_week">Nb_hour_per_week</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="nb_hour_per_week"
+                            t-att-value="default_nb_hour_per_week"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="principal_responsabilite">
+                        Principal_responsabilite
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="principal_responsabilite" style="min-height: 120px"><t t-esc="default_principal_responsabilite"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="qualification_requise">
+                        Qualification_requise
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+        <!-- prettier-ignore-start --><textarea class="form-control o_website_form_input" name="qualification_requise" style="min-height: 120px"><t t-esc="default_qualification_requise"/></textarea><!-- prettier-ignore-end -->
+        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="salaire">Salaire</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="salaire"
+                            t-att-value="default_salaire"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="secteur_activite_ids">
+                        Secteur_activite_ids
+                    </label>
+                    <div class="col-md-7 col-sm-8">
+                        <t t-foreach="secteur_activite_ids" t-as="sec">
+                            <input
+                                type="checkbox"
+                                class="form-control o_website_form_input"
+                                name="secteur_activite_ids"
+                                t-att-id="'secteur_activite_ids_' + sec.name + '_' + str(sec_index)"
+                                t-att-value="sec.id"
+                                t-att-checked="sec.id in default_secteur_activite_ids"
+                            />
+                            <label
+                                t-att-for="'secteur_activite_ids_' + sec.name + '_' + str(sec_index)"
+                                t-att-string="sec.name"
+                            >
+                                <t t-esc="sec.name" />
+                            </label>
+                        </t>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="stage_id">Stage_id</label>
+                    <div class="col-md-7 col-sm-8">
+                        <select class="form-control o_website_form_input" id="stage_id" name="stage_id">
+                            <t t-foreach="stage_id" t-as="sta">
+                                <option t-attf-value="#{sta.id}" t-att-selected="default_stage_id == sta.id">
+                                    <t t-esc="sta.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="type_poste_ids">Type_poste_ids</label>
+                    <div class="col-md-7 col-sm-8">
+                        <t t-foreach="type_poste_ids" t-as="typ">
+                            <input
+                                type="checkbox"
+                                class="form-control o_website_form_input"
+                                name="type_poste_ids"
+                                t-att-id="'type_poste_ids_' + typ.name + '_' + str(typ_index)"
+                                t-att-value="typ.id"
+                                t-att-checked="typ.id in default_type_poste_ids"
+                            />
+                            <label
+                                t-att-for="'type_poste_ids_' + typ.name + '_' + str(typ_index)"
+                                t-att-string="typ.name"
+                            >
+                                <t t-esc="typ.name" />
+                            </label>
+                        </t>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="website_published">Website_published</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="checkbox"
+                            class="form-control o_website_form_input"
+                            name="website_published"
+                            id="website_published"
+                            t-att-value="True"
+                            t-att-checked="default_website_published"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Offre Emploi</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_offre_emploi_applique" name="Create Tdm Offre Emploi Applique">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm offre emploi applique</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_offre_emploi_applique"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="date_application">Date_application</label>
+                    <div class="col-md-7 col-sm-8">
+                        <div
+                            class="input-group date"
+                            data-target-input="nearest"
+                            t-attf-id="date_application_datepicker"
+                        >
+                            <input
+                                class="form-control datetimepicker-input o_website_form_input"
+                                name="date_application"
+                                t-att-value="default_date_application"
+                                t-attf-data-target="#date_application_datepicker"
+                                type="text"
+                            />
+                            <div
+                                class="input-group-append"
+                                t-attf-data-target="#date_application_datepicker"
+                                data-toggle="datetimepicker"
+                            >
+                                <div class="input-group-text">
+                                    <i class="fa fa-calendar" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="offre_emploi_id">Offre_emploi_id</label>
+                    <div class="col-md-7 col-sm-8">
+                        <select class="form-control o_website_form_input" id="offre_emploi_id" name="offre_emploi_id">
+                            <t t-foreach="offre_emploi_id" t-as="off">
+                                <option t-attf-value="#{off.id}" t-att-selected="default_offre_emploi_id == off.id">
+                                    <t t-esc="off.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="stage_id">Stage_id</label>
+                    <div class="col-md-7 col-sm-8">
+                        <select class="form-control o_website_form_input" id="stage_id" name="stage_id">
+                            <t t-foreach="stage_id" t-as="sta">
+                                <option t-attf-value="#{sta.id}" t-att-selected="default_stage_id == sta.id">
+                                    <t t-esc="sta.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Offre Emploi Applique</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_offre_emploi_applique_stage" name="Create Tdm Offre Emploi Applique Stage">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm offre emploi applique stage</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_offre_emploi_applique_stage"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Offre Emploi Applique Stage</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_offre_emploi_stage" name="Create Tdm Offre Emploi Stage">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm offre emploi stage</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_offre_emploi_stage"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Offre Emploi Stage</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_offre_emploi_type" name="Create Tdm Offre Emploi Type">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm offre emploi type</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_offre_emploi_type"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Offre Emploi Type</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="portal_create_tdm_secteur_activite" name="Create Tdm Secteur_Activite">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Send a new tdm secteur activite</h1>
+                    </div>
+                </div>
+            </div>
+            <form
+                action="/submitted/tdm_secteur_activite"
+                method="POST"
+                class="form-horizontal mt32"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-4 control-label" for="name">Name</label>
+                    <div class="col-md-7 col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control o_website_form_input"
+                            name="name"
+                            t-attf-value="#{name}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                        <button class="btn btn-primary btn-lg">Submit Tdm Secteur_Activite</button>
+                    </div>
+                </div>
+            </form>
+        </t>
+    </template>
+
     <template id="tdm.portal_my_tdm_entrevue" name="My Tdm Entrevue">
         <t t-call="portal.portal_layout">
             <t t-set="o_portal_fullwidth_alert">
@@ -18,7 +646,45 @@
                     </h5>
                 </t>
                 <t t-set="card_body">
-                    <div class="row" />
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Date Debut Entrevue:</b>
+                            <span t-field="tdm_entrevue.date_debut_entrevue" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Offre Emploi Applique:</b>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi_applique/#{tdm_entrevue.offre_emploi_applique_id.id}"
+                                t-field="tdm_entrevue.offre_emploi_applique_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Offre Emploi:</b>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi/#{tdm_entrevue.offre_emploi_id.id}"
+                                t-field="tdm_entrevue.offre_emploi_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Show Jitsi Link:</b>
+                            <span t-field="tdm_entrevue.show_jitsi_link" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Stage:</b>
+                            <a
+                                t-attf-href="/my/tdm_entrevue_stage/#{tdm_entrevue.stage_id.id}"
+                                t-field="tdm_entrevue.stage_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Url Jitsi Employeur:</b>
+                            <span t-field="tdm_entrevue.url_jitsi_employeur" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Url Jitsi Travailleur:</b>
+                            <span t-field="tdm_entrevue.url_jitsi_travailleur" />
+                        </div>
+                    </div>
                 </t>
             </t>
         </t>
@@ -66,7 +732,81 @@
                     </h5>
                 </t>
                 <t t-set="card_body">
-                    <div class="row" />
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Approbation:</b>
+                            <span t-field="tdm_offre_emploi.approbation" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Avantage Social:</b>
+                            <span t-raw="tdm_offre_emploi.avantage_social" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Description:</b>
+                            <span t-raw="tdm_offre_emploi.description" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Description Entreprise:</b>
+                            <span t-raw="tdm_offre_emploi.description_entreprise" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Description Sommaire:</b>
+                            <span t-raw="tdm_offre_emploi.description_sommaire" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Information Supplementaire:</b>
+                            <span t-raw="tdm_offre_emploi.information_supplementaire" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Is Temps Pleins:</b>
+                            <span t-field="tdm_offre_emploi.is_temps_pleins" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Localisation:</b>
+                            <span t-field="tdm_offre_emploi.localisation" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Nb Hour Per Week:</b>
+                            <span t-field="tdm_offre_emploi.nb_hour_per_week" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Principal Responsabilite:</b>
+                            <span t-raw="tdm_offre_emploi.principal_responsabilite" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Qualification Requise:</b>
+                            <span t-raw="tdm_offre_emploi.qualification_requise" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Salaire:</b>
+                            <span t-field="tdm_offre_emploi.salaire" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Secteur Activite:</b>
+                            <t t-foreach="tdm_offre_emploi.secteur_activite_ids" t-as="sec">
+                                <a t-attf-href="/my/tdm_secteur_activite/#{sec.id}" t-field="sec.name" />
+                                <t t-if="not sec_last">,</t>
+                            </t>
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Stage:</b>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi_stage/#{tdm_offre_emploi.stage_id.id}"
+                                t-field="tdm_offre_emploi.stage_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Type Poste:</b>
+                            <t t-foreach="tdm_offre_emploi.type_poste_ids" t-as="typ">
+                                <a t-attf-href="/my/tdm_offre_emploi_type/#{typ.id}" t-field="typ.name" />
+                                <t t-if="not typ_last">,</t>
+                            </t>
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Website Published:</b>
+                            <span t-field="tdm_offre_emploi.website_published" />
+                        </div>
+                    </div>
                 </t>
             </t>
         </t>
@@ -90,7 +830,26 @@
                     </h5>
                 </t>
                 <t t-set="card_body">
-                    <div class="row" />
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Date Application:</b>
+                            <span t-field="tdm_offre_emploi_applique.date_application" />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Offre Emploi:</b>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi/#{tdm_offre_emploi_applique.offre_emploi_id.id}"
+                                t-field="tdm_offre_emploi_applique.offre_emploi_id.name"
+                            />
+                        </div>
+                        <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <b>Stage:</b>
+                            <a
+                                t-attf-href="/my/tdm_offre_emploi_applique_stage/#{tdm_offre_emploi_applique.stage_id.id}"
+                                t-field="tdm_offre_emploi_applique.stage_id.name"
+                            />
+                        </div>
+                    </div>
                 </t>
             </t>
         </t>
@@ -144,12 +903,77 @@
         </t>
     </template>
 
+    <template id="tdm.portal_my_tdm_offre_emploi_type" name="My Tdm Offre Emploi Type">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.offre.emploi.type&amp;id=%s&amp;view_type=form' % (tdm_offre_emploi_type.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Offre Emploi Type -</small>
+                        <span t-field="tdm_offre_emploi_type.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_secteur_activite" name="My Tdm Secteur_Activite">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=tdm.secteur_activite&amp;id=%s&amp;view_type=form' % (tdm_secteur_activite.id)"
+                    />
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-0">
+                        <small class="text-muted">Tdm Secteur_Activite -</small>
+                        <span t-field="tdm_secteur_activite.name" />
+                    </h5>
+                </t>
+                <t t-set="card_body">
+                    <div class="row" />
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="assets_frontend_tdm_portal" name="Portal assets frontend" inherit_id="web.assets_frontend">
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/tdm/static/src/js/portal.tdm.js" />
+        </xpath>
+    </template>
+
     <template id="tdm.portal_my_tdm_entrevue_stages" name="My Tdm Entrevue Stages">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True" />
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Tdm Entrevue Stages</t>
             </t>
+            <form method="POST" t-attf-action="/new/tdm_entrevue_stage">
+                <button
+                    name="create_new_tdm_entrevue_stage"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Entrevue Stage
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
             <t t-if="not tdm_entrevue_stages">
                 <div class="alert alert-warning mt8" role="alert">There are no tdm_entrevue_stages.</div>
             </t>
@@ -174,6 +998,17 @@
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Tdm Entrevues</t>
             </t>
+            <form method="POST" t-attf-action="/new/tdm_entrevue">
+                <button
+                    name="create_new_tdm_entrevue"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Entrevue
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
             <t t-if="not tdm_entrevues">
                 <div class="alert alert-warning mt8" role="alert">There are no tdm_entrevues.</div>
             </t>
@@ -198,6 +1033,17 @@
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Tdm Offre Emploi Applique Stages</t>
             </t>
+            <form method="POST" t-attf-action="/new/tdm_offre_emploi_applique_stage">
+                <button
+                    name="create_new_tdm_offre_emploi_applique_stage"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Offre Emploi Applique Stage
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
             <t t-if="not tdm_offre_emploi_applique_stages">
                 <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_applique_stages.</div>
             </t>
@@ -224,6 +1070,17 @@
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Tdm Offre Emploi Appliques</t>
             </t>
+            <form method="POST" t-attf-action="/new/tdm_offre_emploi_applique">
+                <button
+                    name="create_new_tdm_offre_emploi_applique"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Offre Emploi Applique
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
             <t t-if="not tdm_offre_emploi_appliques">
                 <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_appliques.</div>
             </t>
@@ -250,6 +1107,17 @@
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Tdm Offre Emploi Stages</t>
             </t>
+            <form method="POST" t-attf-action="/new/tdm_offre_emploi_stage">
+                <button
+                    name="create_new_tdm_offre_emploi_stage"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Offre Emploi Stage
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
             <t t-if="not tdm_offre_emploi_stages">
                 <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_stages.</div>
             </t>
@@ -268,12 +1136,58 @@
         </t>
     </template>
 
+    <template id="tdm.portal_my_tdm_offre_emploi_types" name="My Tdm Offre Emploi Types">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Offre Emploi Types</t>
+            </t>
+            <form method="POST" t-attf-action="/new/tdm_offre_emploi_type">
+                <button
+                    name="create_new_tdm_offre_emploi_type"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Offre Emploi Type
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
+            <t t-if="not tdm_offre_emploi_types">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emploi_types.</div>
+            </t>
+            <t t-if="tdm_offre_emploi_types" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_offre_emploi_types" t-as="tdm_offre_emploi_type">
+                        <td>
+                            <a t-attf-href="/my/tdm_offre_emploi_type/#{tdm_offre_emploi_type.id}?{{ keep_query() }}">
+                                <span t-field="tdm_offre_emploi_type.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
     <template id="tdm.portal_my_tdm_offre_emplois" name="My Tdm Offre Emplois">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True" />
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Tdm Offre Emplois</t>
             </t>
+            <form method="POST" t-attf-action="/new/tdm_offre_emploi">
+                <button
+                    name="create_new_tdm_offre_emploi"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Offre Emploi
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
             <t t-if="not tdm_offre_emplois">
                 <div class="alert alert-warning mt8" role="alert">There are no tdm_offre_emplois.</div>
             </t>
@@ -283,6 +1197,41 @@
                         <td>
                             <a t-attf-href="/my/tdm_offre_emploi/#{tdm_offre_emploi.id}?{{ keep_query() }}">
                                 <span t-field="tdm_offre_emploi.name" />
+                            </a>
+                        </td>
+                        <td class="text-right" />
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="tdm.portal_my_tdm_secteur_activites" name="My Tdm Secteur_Activites">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tdm Secteur_Activites</t>
+            </t>
+            <form method="POST" t-attf-action="/new/tdm_secteur_activite">
+                <button
+                    name="create_new_tdm_secteur_activite"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 5px;"
+                >
+                    New Tdm Secteur_Activite
+                </button>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            </form>
+            <t t-if="not tdm_secteur_activites">
+                <div class="alert alert-warning mt8" role="alert">There are no tdm_secteur_activites.</div>
+            </t>
+            <t t-if="tdm_secteur_activites" t-call="portal.portal_table">
+                <tbody>
+                    <tr t-foreach="tdm_secteur_activites" t-as="tdm_secteur_activite">
+                        <td>
+                            <a t-attf-href="/my/tdm_secteur_activite/#{tdm_secteur_activite.id}?{{ keep_query() }}">
+                                <span t-field="tdm_secteur_activite.name" />
                             </a>
                         </td>
                         <td class="text-right" />
@@ -325,20 +1274,28 @@
     <template id="tdm.portal_layout" name="Portal layout: Tdm menu entry" inherit_id="portal.portal_breadcrumbs">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
             <li
-                t-if="page_name == 'tdm_entrevue' or tdm_entrevue"
+                t-if="page_name in ('tdm_entrevue', 'create_tdm_entrevue') or tdm_entrevue"
                 t-attf-class="breadcrumb-item #{'active ' if not tdm_entrevue else ''}"
             >
-                <a t-if="tdm_entrevue" t-attf-href="/my/tdm_entrevues?{{ keep_query() }}">Tdm Entrevues</a>
+                <a
+                    t-if="tdm_entrevue or page_name == 'create_tdm_entrevue'"
+                    t-attf-href="/my/tdm_entrevues?{{ keep_query() }}"
+                >
+                    Tdm Entrevues
+                </a>
                 <t t-else="">Tdm Entrevues</t>
             </li>
             <li t-if="tdm_entrevue" class="breadcrumb-item active">
                 <t t-esc="tdm_entrevue.name" />
             </li>
             <li
-                t-if="page_name == 'tdm_entrevue_stage' or tdm_entrevue_stage"
+                t-if="page_name in ('tdm_entrevue_stage', 'create_tdm_entrevue_stage') or tdm_entrevue_stage"
                 t-attf-class="breadcrumb-item #{'active ' if not tdm_entrevue_stage else ''}"
             >
-                <a t-if="tdm_entrevue_stage" t-attf-href="/my/tdm_entrevue_stages?{{ keep_query() }}">
+                <a
+                    t-if="tdm_entrevue_stage or page_name == 'create_tdm_entrevue_stage'"
+                    t-attf-href="/my/tdm_entrevue_stages?{{ keep_query() }}"
+                >
                     Tdm Entrevue Stages
                 </a>
                 <t t-else="">Tdm Entrevue Stages</t>
@@ -347,20 +1304,28 @@
                 <t t-esc="tdm_entrevue_stage.name" />
             </li>
             <li
-                t-if="page_name == 'tdm_offre_emploi' or tdm_offre_emploi"
+                t-if="page_name in ('tdm_offre_emploi', 'create_tdm_offre_emploi') or tdm_offre_emploi"
                 t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi else ''}"
             >
-                <a t-if="tdm_offre_emploi" t-attf-href="/my/tdm_offre_emplois?{{ keep_query() }}">Tdm Offre Emplois</a>
+                <a
+                    t-if="tdm_offre_emploi or page_name == 'create_tdm_offre_emploi'"
+                    t-attf-href="/my/tdm_offre_emplois?{{ keep_query() }}"
+                >
+                    Tdm Offre Emplois
+                </a>
                 <t t-else="">Tdm Offre Emplois</t>
             </li>
             <li t-if="tdm_offre_emploi" class="breadcrumb-item active">
                 <t t-esc="tdm_offre_emploi.name" />
             </li>
             <li
-                t-if="page_name == 'tdm_offre_emploi_applique' or tdm_offre_emploi_applique"
+                t-if="page_name in ('tdm_offre_emploi_applique', 'create_tdm_offre_emploi_applique') or tdm_offre_emploi_applique"
                 t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_applique else ''}"
             >
-                <a t-if="tdm_offre_emploi_applique" t-attf-href="/my/tdm_offre_emploi_appliques?{{ keep_query() }}">
+                <a
+                    t-if="tdm_offre_emploi_applique or page_name == 'create_tdm_offre_emploi_applique'"
+                    t-attf-href="/my/tdm_offre_emploi_appliques?{{ keep_query() }}"
+                >
                     Tdm Offre Emploi Appliques
                 </a>
                 <t t-else="">Tdm Offre Emploi Appliques</t>
@@ -369,11 +1334,11 @@
                 <t t-esc="tdm_offre_emploi_applique.name" />
             </li>
             <li
-                t-if="page_name == 'tdm_offre_emploi_applique_stage' or tdm_offre_emploi_applique_stage"
+                t-if="page_name in ('tdm_offre_emploi_applique_stage', 'create_tdm_offre_emploi_applique_stage') or tdm_offre_emploi_applique_stage"
                 t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_applique_stage else ''}"
             >
                 <a
-                    t-if="tdm_offre_emploi_applique_stage"
+                    t-if="tdm_offre_emploi_applique_stage or page_name == 'create_tdm_offre_emploi_applique_stage'"
                     t-attf-href="/my/tdm_offre_emploi_applique_stages?{{ keep_query() }}"
                 >
                     Tdm Offre Emploi Applique Stages
@@ -384,16 +1349,49 @@
                 <t t-esc="tdm_offre_emploi_applique_stage.name" />
             </li>
             <li
-                t-if="page_name == 'tdm_offre_emploi_stage' or tdm_offre_emploi_stage"
+                t-if="page_name in ('tdm_offre_emploi_stage', 'create_tdm_offre_emploi_stage') or tdm_offre_emploi_stage"
                 t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_stage else ''}"
             >
-                <a t-if="tdm_offre_emploi_stage" t-attf-href="/my/tdm_offre_emploi_stages?{{ keep_query() }}">
+                <a
+                    t-if="tdm_offre_emploi_stage or page_name == 'create_tdm_offre_emploi_stage'"
+                    t-attf-href="/my/tdm_offre_emploi_stages?{{ keep_query() }}"
+                >
                     Tdm Offre Emploi Stages
                 </a>
                 <t t-else="">Tdm Offre Emploi Stages</t>
             </li>
             <li t-if="tdm_offre_emploi_stage" class="breadcrumb-item active">
                 <t t-esc="tdm_offre_emploi_stage.name" />
+            </li>
+            <li
+                t-if="page_name in ('tdm_offre_emploi_type', 'create_tdm_offre_emploi_type') or tdm_offre_emploi_type"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_offre_emploi_type else ''}"
+            >
+                <a
+                    t-if="tdm_offre_emploi_type or page_name == 'create_tdm_offre_emploi_type'"
+                    t-attf-href="/my/tdm_offre_emploi_types?{{ keep_query() }}"
+                >
+                    Tdm Offre Emploi Types
+                </a>
+                <t t-else="">Tdm Offre Emploi Types</t>
+            </li>
+            <li t-if="tdm_offre_emploi_type" class="breadcrumb-item active">
+                <t t-esc="tdm_offre_emploi_type.name" />
+            </li>
+            <li
+                t-if="page_name in ('tdm_secteur_activite', 'create_tdm_secteur_activite') or tdm_secteur_activite"
+                t-attf-class="breadcrumb-item #{'active ' if not tdm_secteur_activite else ''}"
+            >
+                <a
+                    t-if="tdm_secteur_activite or page_name == 'create_tdm_secteur_activite'"
+                    t-attf-href="/my/tdm_secteur_activites?{{ keep_query() }}"
+                >
+                    Tdm Secteur_Activites
+                </a>
+                <t t-else="">Tdm Secteur_Activites</t>
+            </li>
+            <li t-if="tdm_secteur_activite" class="breadcrumb-item active">
+                <t t-esc="tdm_secteur_activite.name" />
             </li>
         </xpath>
     </template>
