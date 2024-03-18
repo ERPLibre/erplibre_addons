@@ -78,11 +78,10 @@ class DevopsSystem(models.Model):
     ssh_host_name = fields.Char()
 
     # devops_deploy_vm_ids = fields.One2many(
-    #     comodel_name="devops.deploy.vm",
-    #     inverse_name="system_id",
-    #     string="VMs",
+    # comodel_name="devops.deploy.vm",
+    # inverse_name="system_id",
+    # string="VMs",
     # )
-
     parent_system_id = fields.Many2one(
         comodel_name="devops.system",
         string="Parent system",
