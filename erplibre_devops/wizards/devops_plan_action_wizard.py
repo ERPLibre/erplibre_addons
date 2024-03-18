@@ -201,6 +201,10 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="When it's remote, need tool to copy code with the developers."
     )
 
+    is_cg_temporary = fields.Boolean(
+        help="When it's remote, need tool to copy code with the developers."
+    )
+
     can_search_workspace = fields.Boolean(
         compute="_compute_can_search_workspace", store=True
     )
@@ -678,6 +682,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.use_external_cg = True
             self.config_uca_enable_export_data = False
             self.use_existing_meta_module = True
+            self.is_cg_temporary = True
             self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()

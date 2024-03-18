@@ -15,6 +15,46 @@
                     attrs="{'invisible': [('has_next', '=', False)]}"
                 />
             </xpath>
+            <!--            <xpath expr="//field[@name='state']" position="before">-->
+            <xpath expr="//footer" position="inside">
+                <!--                <header>-->
+                <button
+                    name="action_git_commit"
+                    string="Git commit module"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('plan_cg_id', '=', False)]}"
+                />
+                <button
+                    name="action_git_commit"
+                    string="Git commit UcA"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
+                />
+                <button
+                    name="action_git_commit"
+                    string="Git commit UcB"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_uca_only','==',True)]}"
+                />
+                <button
+                    name="action_git_meld_remote"
+                    string="Git meld remote"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                />
+                <button
+                    name="action_git_clean_remote"
+                    string="Git clean remote"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                />
+                <!--                </header>-->
+            </xpath>
             <xpath expr="//footer" position="before">
                 <field name="root_workspace_id_is_me" invisible="True" />
                 <field name="root_workspace_id" invisible="True" />
@@ -134,34 +174,6 @@
                             string="Generate"
                             type="object"
                             class="btn btn-default"
-                        />
-                        <button
-                            name="action_git_commit"
-                            string="Git commit"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
-                        />
-                        <button
-                            name="action_git_commit_remote"
-                            string="Git commit remote"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                        />
-                        <button
-                            name="action_git_meld_remote"
-                            string="Git meld remote"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                        />
-                        <button
-                            name="action_git_clean_remote"
-                            string="Git clean remote"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                     </group>
                 </group>
@@ -462,8 +474,9 @@
                     </group>
                     <group string="C-Parameter" attrs="{'invisible': [('state', '!=', 'code_module')]}">
                         <field name="mode_view_generator" />
-                        <field name="is_remote_cg" string="Generate outside" />
                         <field name="force_generate" />
+                        <field name="is_remote_cg" string="Generate outside ME" />
+                        <!--                        <field name="is_cg_temporary" string="Generate temporary" />-->
                     </group>
                     <group
                         string="C-Parameter Meta UcA &amp; UcB"
@@ -591,7 +604,10 @@
                         />
                     </group>
                     <group string="Data">
-                        <field name="config_uca_enable_export_data" />
+                        <field
+                            name="config_uca_enable_export_data"
+                            attrs="{'invisible': [('use_external_cg', '==', True)]}"
+                        />
                     </group>
                 </group>
                 <group
@@ -602,7 +618,7 @@
                         name="action_code_module_generate"
                         string="Generate"
                         type="object"
-                        class="btn btn-default"
+                        class="btn btn-success"
                     />
                 </group>
                 <group name="group_g_a_local" attrs="{'invisible': [('state', '!=', 'g_a_local')]}">
@@ -859,27 +875,6 @@
                     <field name="working_system_id" attrs="{'invisible': [('working_system_id', '=', False)]}" />
                     <field name="working_cg_module_id" attrs="{'invisible': [('working_cg_module_id', '=', False)]}" />
                     <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
-                    <button
-                        name="action_git_commit"
-                        string="Git commit module"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': [('plan_cg_id', '=', False)]}"
-                    />
-                    <button
-                        name="action_git_meld"
-                        string="Git meld module"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                    />
-                    <button
-                        name="action_git_clean"
-                        string="Git clean module"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                    />
                 </group>
             </xpath>
         </field>

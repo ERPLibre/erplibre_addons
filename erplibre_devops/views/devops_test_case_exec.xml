@@ -5,7 +5,6 @@
         <field name="model">devops.test.case.exec</field>
         <field name="arch" type="xml">
             <form string="Titre">
-                <field name="has_devops_action" invisible="True" />
                 <header>
                     <button
                         name="open_devops_action"
@@ -21,6 +20,7 @@
                         class="oe_highlight"
                     />
                 </header>
+                <field name="has_devops_action" invisible="True" />
                 <div name="button_box" class="oe_button_box">
                     <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
                         <field
