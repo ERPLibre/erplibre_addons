@@ -79,7 +79,6 @@ def post_init_hook(cr, e):
         model_name = "devops_cg"
         dct_model = {
             "description": "devops_cg",
-            "nomenclator": True,
         }
         dct_field = {
             "default_workspace_master": {
@@ -197,7 +196,6 @@ return r""",
         model_name = "devops_cg_field"
         dct_model = {
             "description": "devops_cg_field",
-            "nomenclator": True,
         }
         dct_field = {
             "devops_workspace_ids": {
@@ -377,7 +375,6 @@ return dct_field""",
         model_name = "devops_cg_model"
         dct_model = {
             "description": "devops_cg_model",
-            "nomenclator": True,
         }
         dct_field = {
             "description": {
@@ -444,7 +441,6 @@ return dct_model""",
         model_name = "devops_cg_module"
         dct_model = {
             "description": "devops_cg_module",
-            "nomenclator": True,
         }
         dct_field = {
             "code_generator": {
@@ -480,513 +476,11 @@ return dct_model""",
             dct_model=dct_model,
         )
 
-        # Add data nomenclator
-        value = {
-            "name": "demo_helpdesk_data",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_helpdesk_data",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 1,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_theme_website",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_theme_website",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 2,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_cron",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_cron",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 3,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_geoengine",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_geoengine",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 4,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_hook",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_hook",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 5,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_db_servers",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_db_servers",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 6,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 7,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_export_helpdesk",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_export_helpdesk",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 8,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 9,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "theme_website_demo_code_generator",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_theme_website_demo_code_generator",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 10,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_internal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_internal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 11,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_internal_inherit",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_internal_inherit",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 12,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_internal_inherit",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_internal_inherit",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 13,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_internal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_internal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 14,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_internal_inherit",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_template_demo_internal_inherit",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 15,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_internal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_template_demo_internal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 16,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_portal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_template_demo_portal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 17,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_portal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_portal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 18,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_mariadb_sql_example_1",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": (
-                "devops_cg_module_code_generator_demo_mariadb_sql_example_1"
-            ),
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 19,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_mariadb_sql_example_1",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_template_demo_mariadb_sql_example_1",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 20,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_mariadb_sql_example_1",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_mariadb_sql_example_1",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 21,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_migrator_demo_mariadb_sql_example_1",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_migrator_demo_mariadb_sql_example_1",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 22,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_portal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_portal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 23,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_auto_backup",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_auto_backup",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 24,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_website_data",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_website_data",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 25,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_export_website",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_export_website",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 26,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_sysadmin_cron",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": (
-                "devops_cg_module_code_generator_template_demo_sysadmin_cron"
-            ),
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 27,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_website_leaflet",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_website_leaflet",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 28,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_website_attachments_data",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_website_attachments_data",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 29,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_export_website_attachments",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_export_website_attachments",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 30,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_website_snippet",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_website_snippet",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 31,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_portal",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_portal",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 32,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_website_multiple_snippet",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_demo_website_multiple_snippet",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 33,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_website_leaflet",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_website_leaflet",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 34,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_website_snippet",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_code_generator_demo_website_snippet",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 35,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_website_multiple_snippet",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": (
-                "devops_cg_module_code_generator_demo_website_multiple_snippet"
-            ),
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 36,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "auto_backup",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_auto_backup",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 37,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "membership",
-        }
-        env["devops.cg.module"].create(value)
-        value = {
-            "name": "devops_cg_module_membership",
-            "model": "devops.cg.module",
-            "module": "erplibre_devops",
-            "res_id": 38,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
         # Add/Update Devops Cg New Project
         model_model = "devops.cg.new_project"
         model_name = "devops_cg_new_project"
         dct_model = {
             "description": "Create new project for CG project",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -2681,17 +2175,35 @@ _logger = logging.getLogger(__name__)""",
                     'value["enable_template_website_snippet_view"] ='
                     " False",
                     f'value["enable_template_website_snippet_view"] ='
-                    f" False\\n"
-                    f"       "
-                    f' value["template_auto_export_data"]'
-                    f" = True\\n"
-                    f"       "
-                    f' value["template_auto_export_data_exclude_model"]'
-                    f" = 'devops.db.image;devops.exec;devops.exec.bundle;devops.ide.pycharm;"
-                    f"devops.log.makefile.target;devops.workspace.terminal;devops.workspace;"
-                    f"devops.test.case;devops.test.plan;erplibre.mode;erplibre.mode.env;"
-                    f"erplibre.mode.exec;erplibre.mode.source;erplibre.mode.version.base;"
-                    f"erplibre.mode.version.erplibre'",
+                    f" False\\n       "
+                    f' value["template_auto_export_data"] = True\\n    '
+                    f'    value["template_auto_export_data_exclude_model"]'
+                    f" = 'devops.db.image; devops.exec;"
+                    f" devops.exec.bundle; devops.ide.pycharm;"
+                    f" devops.log.makefile.target;"
+                    f" devops.workspace.terminal; devops.workspace;"
+                    f" devops.test.case; devops.test.plan;"
+                    f" erplibre.mode; erplibre.mode.env;"
+                    f" erplibre.mode.exec; erplibre.mode.source;"
+                    f" erplibre.mode.version.base;"
+                    f" erplibre.mode.version.erplibre;"
+                    f" ir.actions.act_url; ir.actions.act_window;"
+                    f" ir.actions.report; ir.actions.server;"
+                    f" ir.actions.todo; ir.model; ir.model.constraint;"
+                    f" ir.model.fields; ir.model.server_constrain;"
+                    f" ir.module.module; ir.ui.menu; ir.ui.view;"
+                    f" res.groups'",
+                )
+            )
+        else:
+            lst_template_hooks_py_replace.append(
+                (
+                    'value["enable_template_website_snippet_view"] ='
+                    " False",
+                    f'value["enable_template_website_snippet_view"] ='
+                    f" False\\n       "
+                    f' value["template_ignore_export_data"] ='
+                    f" True",
                 )
             )
         if rec.mode_view_snippet in ["enable_snippet"]:
@@ -3221,7 +2733,6 @@ return True''',
         model_name = "devops_cg_new_project_stage"
         dct_model = {
             "description": "Stage new project for CG project",
-            "nomenclator": True,
             "order": "sequence, name, id",
         }
         dct_field = {
@@ -3265,83 +2776,6 @@ return True''',
             dct_model=dct_model,
         )
 
-        # Add data nomenclator
-        value = {
-            "description": (
-                "Create variable, prepare context, validate variables"
-            ),
-            "name": "Initialization",
-        }
-        env["devops.cg.new_project.stage"].create(value)
-        value = {
-            "name": "devops_cg_new_project_stage_init",
-            "model": "devops.cg.new_project.stage",
-            "module": "erplibre_devops",
-            "res_id": 1,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "Generate code_generator_demo to create UcA",
-            "name": "Generate Uc0",
-            "sequence": 11,
-        }
-        env["devops.cg.new_project.stage"].create(value)
-        value = {
-            "name": "devops_cg_new_project_stage_generate_Uc0",
-            "model": "devops.cg.new_project.stage",
-            "module": "erplibre_devops",
-            "res_id": 2,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "Generate code_generator_template to create UcB",
-            "name": "Generate UcA",
-            "sequence": 12,
-        }
-        env["devops.cg.new_project.stage"].create(value)
-        value = {
-            "name": "devops_cg_new_project_stage_generate_uca",
-            "model": "devops.cg.new_project.stage",
-            "module": "erplibre_devops",
-            "res_id": 3,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "Generate code_generator to create the module C",
-            "name": "Generate UcB",
-            "sequence": 13,
-        }
-        env["devops.cg.new_project.stage"].create(value)
-        value = {
-            "name": "devops_cg_new_project_stage_generate_ucb",
-            "model": "devops.cg.new_project.stage",
-            "module": "erplibre_devops",
-            "res_id": 4,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "New project finish to execute",
-            "name": "Terminate",
-            "sequence": 14,
-        }
-        env["devops.cg.new_project.stage"].create(value)
-        value = {
-            "name": "devops_cg_new_project_stage_generate_terminate",
-            "model": "devops.cg.new_project.stage",
-            "module": "erplibre_devops",
-            "res_id": 5,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
         # Generate code
         if True:
             # Generate code header
@@ -3365,7 +2799,6 @@ _logger = logging.getLogger(__name__)""",
         model_name = "devops_cg_test_case"
         dct_model = {
             "description": "devops_cg_test_case",
-            "nomenclator": True,
         }
         dct_field = {
             "file_to_restore": {
@@ -3538,396 +2971,6 @@ _logger = logging.getLogger(__name__)""",
             dct_model=dct_model,
         )
 
-        # Add data nomenclator
-        value = {
-            "name": "helloworld_test",
-            "note": (
-                "Test helloword_test Will cause conflict with the other"
-                " because write in code_generator_demo/hooks.py"
-            ),
-            "script_path": "./test/code_generator/hello_world.sh",
-            "sequence_test": 10,
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_helloworld_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 1,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "demo_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_demo_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 2,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_theme_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_theme_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 3,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_demo_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 4,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_data_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_data_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 5,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_data_part_2_test",
-            "note": (
-                "Merge to code_generator_data_test when fix double export"
-                " data."
-            ),
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_data_part_2_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 6,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_inherit_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_inherit_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 7,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_internal",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "search_class_module": "demo_internal",
-            "type_test": "gen_uca",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": (
-                "devops_cg_test_case_code_generator_template_demo_internal"
-            ),
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 8,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "mariadb_test_template",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "search_class_module": "demo_mariadb_sql_example_1",
-            "type_test": "gen_uca",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_mariadb_test_template",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 9,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "mariadb_test_migrator",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "script_after_init_check": (
-                "./script/database/restore_mariadb_sql_example_1.sh"
-            ),
-            "type_test": "gen_uca",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_mariadb_test_migrator",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 10,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "mariadb_test_code_generator",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_mariadb_test_code_generator",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 11,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_template_demo_internal_inherit",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "search_class_module": "demo_internal_inherit",
-            "type_test": "gen_uca",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_template_demo_internal_inherit",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 12,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "generated_path": "./addons/OCA_server-tools/",
-            "install_path": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "name": "code_generator_template_demo_sysadmin_cron",
-            "path_generated": "./addons/OCA_server-tools",
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": "./addons/OCA_server-tools/auto_backup",
-            "run_mode": "test_exec",
-            "search_class_module": "auto_backup",
-            "type_test": "gen_uca",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_template_demo_sysadmin_cron",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 13,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_export_website_attachments_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "restore_db_image_name": "test_website_attachments",
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_export_website_attachments_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 14,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_demo_generic_test",
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_demo_generic_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 15,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "file_to_restore": (
-                "demo_portal/i18n/demo_portal.pot,demo_portal/i18n/fr_CA.po"
-            ),
-            "file_to_restore_origin": True,
-            "name": "code_generator_website_snippet_test",
-            "note": (
-                "Because code_generator_demo_website_multiple_snippet depend"
-                " on code_generator_demo_portal, it will execute it and this"
-                " delete file demo_portal/i18n/demo_portal.pot and"
-                " demo_portal/i18n/fr_CA.po"
-            ),
-            "path_generated": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "path_module_check": (
-                "./addons/TechnoLibre_odoo-code-generator-template"
-            ),
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_website_snippet_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 16,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "code_generator_auto_backup_test",
-            "path_generated": "./addons/OCA_server-tools",
-            "path_meta": "./addons/TechnoLibre_odoo-code-generator-template",
-            "path_module_check": "./addons/OCA_server-tools/auto_backup",
-            "run_mode": "test_exec",
-            "type_test": "gen_ucb",
-        }
-        env["devops.cg.test.case"].create(value)
-        value = {
-            "name": "devops_cg_test_case_code_generator_auto_backup_test",
-            "model": "devops.cg.test.case",
-            "module": "erplibre_devops",
-            "res_id": 17,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
         # Generate code
         if True:
             # Generate code header
@@ -3986,7 +3029,6 @@ lst_ignore_error = [
         model_name = "devops_code_todo"
         dct_model = {
             "description": "Associate to a TODO into a file code.",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -4195,7 +3237,6 @@ for cg_module in cg_module_ids:
         model_name = "devops_db_image"
         dct_model = {
             "description": "DB image fast restoration",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -4236,7 +3277,6 @@ for cg_module in cg_module_ids:
         model_name = "devops_deploy_vm"
         dct_model = {
             "description": "devops_deploy_vm",
-            "nomenclator": True,
         }
         dct_field = {
             "has_vm_exec_running": {
@@ -4470,7 +3510,6 @@ except ImportError:  # pragma: no cover
         model_name = "devops_deploy_vm_exec"
         dct_model = {
             "description": "devops_deploy_vm_exec",
-            "nomenclator": True,
         }
         dct_field = {
             "is_running": {
@@ -4516,7 +3555,6 @@ except ImportError:  # pragma: no cover
         model_name = "devops_deploy_vm_exec_stage"
         dct_model = {
             "description": "devops_deploy_vm_exec_stage",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -4539,7 +3577,6 @@ except ImportError:  # pragma: no cover
         model_name = "devops_deploy_vm_snapshot"
         dct_model = {
             "description": "devops_deploy_vm_snapshot",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -4562,7 +3599,6 @@ except ImportError:  # pragma: no cover
         model_name = "devops_exec"
         dct_model = {
             "description": "Execution process",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -4949,7 +3985,6 @@ for o_rec in self:
                 "Bundle of execution process, package of multiple process to"
                 " regroup it."
             ),
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -5156,7 +4191,6 @@ return rec""",
         dct_model = {
             "description": "Execution error",
             "enable_activity": True,
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -5506,7 +4540,6 @@ for o_rec in self:
             "description": (
                 "Breakpoint IDE. It's not associate to a workspace."
             ),
-            "nomenclator": True,
         }
         dct_field = {
             "condition_var_field_attr_name": {
@@ -5719,780 +4752,6 @@ for o_rec in self:
             dct_field=dct_field,
             dct_model=dct_model,
         )
-
-        # Add data nomenclator
-        value = {
-            "description": (
-                "Generic gc breakpoint in beginning of code writing about"
-                " hooks file."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": "if post_init_hook_feature_code_generator:",
-            "name": "breakpoint_all_write_hook_begin",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_all_write_hook_begin",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 1,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": (
-                "Generic gc breakpoint in code writing about hooks file before"
-                " create model."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": (
-                "lst_dependency = [a.name for a in model_id.inherit_model_ids]"
-            ),
-            "name": "breakpoint_all_write_hook_before_model",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_all_write_hook_before_model",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 2,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_field_attr_name": "subkey",
-            "condition_var_field_name": "key",
-            "condition_var_model_name": "model_id.model",
-            "description": (
-                "Generic gc breakpoint in code writing about hooks file before"
-                " write field into model."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": "self._write_dict_key(cw, subkey, value)",
-            "name": "breakpoint_all_write_hook_model_write_field",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_all_write_hook_model_write_field",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 3,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_field_name": "field_id.name",
-            "condition_var_model_name": "model_id.model",
-            "description": (
-                "Generic gc breakpoint in code writing, prepare a set of data"
-                " before write."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": "if model_id.has_same_model_in_inherit_model():",
-            "name": "breakpoint_all_prepare_data_before_write",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_all_prepare_data_before_write",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 4,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": "self.code_generator_data.sync_code(",
-            "name": "breakpoint_all_before_sync_code",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_all_before_sync_code",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 5,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "DEVOPS diagnostic add feature.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_ide_pycharm.py",
-            "keyword": (
-                "id_devops_cg_new_project ="
-                ' self._context.get("devops_cg_new_project")'
-            ),
-            "name": "breakpoint_devops_diagnostic",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_devops_diagnostic",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 6,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "Uc0 gc breakpoint into hook.",
-            "filename_is_code_generator_demo_hooks_py": True,
-            "ignore_test": True,
-            "keyword": "env = api.Environment(cr, SUPERUSER_ID, {})",
-            "name": "breakpoint_Uc0_first_line_hook",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_Uc0_first_line_hook",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 7,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "UcA gc breakpoint into hook.",
-            "filename_is_template_hooks_py": True,
-            "ignore_test": True,
-            "keyword": "env = api.Environment(cr, SUPERUSER_ID, {})",
-            "name": "breakpoint_UcA_first_line_hook",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_first_line_hook",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 8,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "UcB gc breakpoint into hook.",
-            "filename_is_cg_hooks_py": True,
-            "ignore_test": True,
-            "keyword": "env = api.Environment(cr, SUPERUSER_ID, {})",
-            "name": "breakpoint_UcB_first_line_hook",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_first_line_hook",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 9,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "Uc0 gc breakpoint when generate Uc0.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": 'cw.emit("new_module_name = MODULE_NAME")',
-            "name": "breakpoint_Uc0_cg_Uc0",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_Uc0_cg_Uc0",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 10,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "All gc breakpoint beginning write file.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": (
-                "if module.template_model_name or"
-                " module.template_inherit_model_name:"
-            ),
-            "name": "breakpoint_all_begin_generate_file",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_all_begin_generate_file",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 11,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": (
-                "UcA gc breakpoint diagnostic warning into extract view."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "is_multiple": True,
-            "keyword": "_logger.warning(",
-            "name": "breakpoint_UcA_extract_view_warning",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_view_warning",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 12,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": (
-                "UcA gc breakpoint diagnostic warning into extract python"
-                " controller."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_controller.py",
-            "is_multiple": True,
-            "keyword": "_logger.warning(",
-            "name": "breakpoint_UcA_extract_python_controller_warning",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_python_controller_warning",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 13,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": (
-                "UcA gc breakpoint diagnostic warning into extract python"
-                " module."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_module.py",
-            "is_multiple": True,
-            "keyword": "_logger.warning(",
-            "name": "breakpoint_UcA_extract_python_module_warning",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_python_module_warning",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 14,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": (
-                "UcA gc breakpoint diagnostic warning into extract python"
-                " module file."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_module_file.py",
-            "is_multiple": True,
-            "keyword": "_logger.warning(",
-            "name": "breakpoint_UcA_extract_python_module_file_warning",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_python_module_file_warning",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 15,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_field_name": "node.targets[0].id",
-            "condition_var_model_name": "self.model",
-            "description": (
-                "UcA gc breakpoint when extract Python field of model."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_module_file.py",
-            "keyword": "var_name = node.targets[0].id",
-            "name": "breakpoint_UcA_extract_python_detect_field",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_python_detect_field",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 16,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "UcA gc breakpoint extract view first line.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": "self._module = module",
-            "name": "breakpoint_UcA_extract_view_first_line",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_view_first_line",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 17,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "self.model_id.model",
-            "condition_var_xml_id": "debug_xmlid",
-            "description": "UcA gc breakpoint extract view button",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": '"name": "action_name",',
-            "method": "_extract_child_xml",
-            "name": "breakpoint_UcA_extract_xml_button",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_xml_button",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 18,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "self.model_id.model",
-            "condition_var_xml_id": "debug_xmlid",
-            "description": "UcA gc breakpoint extract view header",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": (
-                'view_item_id = self.env["code.generator.view.item"].create('
-            ),
-            "name": "breakpoint_UcA_extract_xml_header",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_xml_header",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 19,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "self.model_id.model",
-            "condition_var_xml_id": "debug_xmlid",
-            "description": "UcA gc breakpoint extract view title",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": "].create(dct_attributes)",
-            "name": "breakpoint_UcA_extract_xml_title",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_xml_title",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 20,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "self.model_id.model",
-            "condition_var_xml_id": "debug_xmlid",
-            "description": "UcA gc breakpoint extract view item",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": '"item_type": node.nodeName,',
-            "name": "breakpoint_UcA_extract_xml_view_item",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_xml_view_item",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 21,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "menu_id.action.res_model",
-            "condition_var_short_xml_id": 'dct_act_value.get("id_name")',
-            "description": "UcA gc breakpoint extract view act_window",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": (
-                'menu_action = self.env["code.generator.act_window"].create('
-            ),
-            "name": "breakpoint_UcA_extract_xml_act_window",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_xml_act_window",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 22,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "UcA gc breakpoint extract view div container",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_view.py",
-            "keyword": "for cached_node in lst_node:",
-            "name": "breakpoint_UcA_extract_xml_div_container",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_xml_div_container",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 23,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_method_name": "node.name",
-            "condition_var_model_name": "self.model",
-            "condition_var_module_name": "self.module.name",
-            "description": (
-                "UcA gc breakpoint extract module when create model code."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_module_file.py",
-            "keyword": "if node.args:",
-            "name": "breakpoint_UcA_extract_module_create_cg_model_code",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_module_create_cg_model_code",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 24,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_method_name": "code_id.name",
-            "condition_var_model_name": "model_id.model",
-            "condition_var_module_name": "module.name",
-            "description": "UcA gc breakpoint write hook code.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": "lst_line = code_id.code.split(",
-            "name": "breakpoint_UcA_write_hook_code",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_write_hook_code",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 25,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "model_id.model",
-            "condition_var_module_name": "module.name",
-            "description": "UcA gc breakpoint write hook model.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": (
-                "lst_dependency = [a.name for a in model_id.inherit_model_ids]"
-            ),
-            "name": "breakpoint_UcA_write_hook_model",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_write_hook_model",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 26,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_item_type_view_item": "view_item_id.item_type",
-            "condition_var_label_view_item": "view_item_id.label",
-            "condition_var_model_name": "view_id.m2o_model.model",
-            "condition_var_name_view_item": "view_item_id.name",
-            "condition_var_view_name": "view_id.id_name",
-            "description": (
-                "UcA gc breakpoint write hook code.generator.view.item"
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator_hook/models/code_generator_writer.py",
-            "keyword": 'f"{var_create_view_item} ="',
-            "name": "breakpoint_UcA_write_hook_cg_view_item",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_write_hook_cg_view_item",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 27,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_method_name": "code.name",
-            "condition_var_model_name": "model.model",
-            "condition_var_module_name": "module.name",
-            "description": "UcB gc breakpoint write code.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": "if code.decorator:",
-            "name": "breakpoint_UcB_write_code_with_cw",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_write_code_with_cw",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 28,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_short_xml_id": "record_id",
-            "description": "UcB gc breakpoint write act_window.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": "if use_complex_view:",
-            "name": "breakpoint_UcB_write_act_window",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_write_act_window",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 29,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": "model.model",
-            "condition_var_module_name": "module.name",
-            "description": "UcB gc breakpoint generate data to xml_data.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": "expression_export_data = model.expression_export_data",
-            "name": "breakpoint_UcB_write_data",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_write_data",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 30,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": (
-                "UcB gc breakpoint diagnostic warning when generate views."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/wizards/code_generator_generate_views_wizard.py",
-            "is_multiple": True,
-            "keyword": "_logger.warning(",
-            "name": "breakpoint_UcB_generate_view_warning",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_generate_view_warning",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 31,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_model_name": (
-                "code_generator_view_id.m2o_model.model"
-            ),
-            "condition_var_short_xml_id": "code_generator_view_id.id_name",
-            "description": (
-                "UcB gc breakpoint when generate specific form view item."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/wizards/code_generator_generate_views_wizard.py",
-            "keyword": "view_type = code_generator_view_id.view_type",
-            "name": "breakpoint_UcB_generate_view_specific_form_item",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_generate_view_specific_form_item",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 32,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "UcB gc breakpoint when generate xml view object.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/wizards/code_generator_generate_views_wizard.py",
-            "keyword": "lst_child_update = [] if not lst_child else lst_child",
-            "name": "breakpoint_UcB_generate_xml_view_object",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_generate_xml_view_object",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 33,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_field_name": "f2export.name",
-            "condition_var_model_name": "model.model",
-            "description": (
-                "UcB gc breakpoint when writing attributes of field into"
-                " model."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": "dct_field_attr_diff = defaultdict(list)",
-            "name": "breakpoint_UcB_write_code_model_field",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_write_code_model_field",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 34,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_field_name": "f2export.name",
-            "condition_var_model_name": "f2export.model",
-            "description": "UcB gc breakpoint generate code - prepare field.",
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py",
-            "keyword": "if dct_field_attr_diff:",
-            "name": "breakpoint_UcB_write_code_model_field_prepare_field",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcB_write_code_model_field_prepare_field",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 35,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "condition_var_method_name": "node.name",
-            "condition_var_model_name": "self.model",
-            "description": (
-                "UcA extract python module - get min/max line method to"
-                " crop it."
-            ),
-            "filename": "addons/TechnoLibre_odoo-code-generator/code_generator/extractor_module_file.py",
-            "keyword": "no_line_min, no_line_max = self._get_min_max_no_line(",
-            "name": "breakpoint_UcA_extract_module_get_min_max_crop",
-        }
-        env["devops.ide.breakpoint"].create(value)
-        value = {
-            "name": "breakpoint_UcA_extract_module_get_min_max_crop",
-            "model": "devops.ide.breakpoint",
-            "module": "erplibre_devops",
-            "res_id": 36,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1284,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 627,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 952,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1103,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1107,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1464,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1464,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1284,
-        }
-        env["devops.ide.breakpoint"].create(value)
-
-        value = {
-            "description": "Breakpoint generate when create an execution.",
-            "filename": "addons/ERPLibre_erplibre_addons/erplibre_devops/models/devops_workspace.py",
-            "generated_by_execution": True,
-            "ignore_test": True,
-            "name": "breakpoint_exec",
-            "no_line": 1284,
-        }
-        env["devops.ide.breakpoint"].create(value)
 
         # Generate code
         if True:
@@ -6709,7 +4968,6 @@ return " and ".join(lst_condition)""",
         model_name = "devops_ide_pycharm"
         dct_model = {
             "description": "Pycharm management for a workspace",
-            "nomenclator": True,
         }
         dct_field = {
             "devops_workspace": {
@@ -6870,7 +5128,9 @@ with self.devops_workspace.devops_create_exec_bundle(
                     "m2o_model": model_devops_ide_pycharm.id,
                 },
                 {
-                    "code": """cmd = "~/.local/share/JetBrains/Toolbox/scripts/pycharm"
+                    "code": """# TODO auto-search pycharm binary
+cmd = "~/.local/share/JetBrains/Toolbox/scripts/pycharm"
+# cmd = "/snap/bin/pycharm-community"
 if pycharm_arg:
     cmd += f" {pycharm_arg}"
 if folder:
@@ -6944,6 +5204,7 @@ rec_ws.execute(cmd=cmd, force_open_terminal=True, force_exit=True)""",
             "AssertionError:",
             "SyntaxError:",
             "KeyError:",
+            "psycopg2.errors.NotNullViolation:",
             "psycopg2.errors.UndefinedTable:",
             "UnboundLocalError:",
             "FileNotFoundError:",
@@ -7342,7 +5603,6 @@ self.devops_workspace.action_stop()""",
         model_name = "devops_ide_pycharm_configuration"
         dct_model = {
             "description": "Pycharm management configuration for a workspace",
-            "nomenclator": True,
             "order": "id desc",
         }
         dct_field = {
@@ -7417,7 +5677,6 @@ _logger = logging.getLogger(__name__)""",
         model_name = "devops_log_error"
         dct_model = {
             "description": "Log error",
-            "nomenclator": True,
         }
         dct_field = {
             "exec_id": {
@@ -7471,7 +5730,6 @@ _logger = logging.getLogger(__name__)""",
             "description": (
                 "Log makefile target (to call command) for a workspace"
             ),
-            "nomenclator": True,
         }
         dct_field = {
             "devops_workspace_id": {
@@ -7533,7 +5791,6 @@ _logger = logging.getLogger(__name__)""",
         model_name = "devops_log_warning"
         dct_model = {
             "description": "Log warning",
-            "nomenclator": True,
         }
         dct_field = {
             "exec_id": {
@@ -7588,7 +5845,6 @@ _logger = logging.getLogger(__name__)""",
             "description": (
                 "Devops planification do an action with a specific workflow"
             ),
-            "nomenclator": True,
         }
         dct_field = {
             "can_search_workspace": {
@@ -7603,6 +5859,16 @@ _logger = logging.getLogger(__name__)""",
                 "field_description": "Code Generator Name",
                 "ttype": "char",
             },
+            "config_uca_enable_export_data": {
+                "code_generator_sequence": 59,
+                "default": True,
+                "field_description": "Config Uca Enable Export Data",
+                "help": (
+                    "Will enable option nonmenclator in CG to export data"
+                    " associate to models."
+                ),
+                "ttype": "boolean",
+            },
             "create_workspace_id": {
                 "code_generator_sequence": 6,
                 "field_description": "Created workspace",
@@ -7612,7 +5878,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "many2one",
             },
             "enable_package_srs": {
-                "code_generator_sequence": 73,
+                "code_generator_sequence": 74,
                 "field_description": "Enable Package Srs",
                 "ttype": "boolean",
             },
@@ -7623,7 +5889,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "many2one",
             },
             "force_generate": {
-                "code_generator_sequence": 69,
+                "code_generator_sequence": 70,
                 "field_description": "Force Generate",
                 "help": (
                     "Ignore secure file edited, can overwrite this file and"
@@ -7632,7 +5898,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "boolean",
             },
             "force_show_final": {
-                "code_generator_sequence": 22,
+                "code_generator_sequence": 21,
                 "field_description": "Force Show Final",
                 "help": "Will show final view without being in this state.",
                 "ttype": "boolean",
@@ -7645,39 +5911,43 @@ _logger = logging.getLogger(__name__)""",
             },
             "has_configured_path": {
                 "code_generator_compute": "_compute_has_configured_path",
-                "code_generator_sequence": 18,
+                "code_generator_sequence": 17,
                 "field_description": "Has Configured Path",
                 "store": True,
                 "ttype": "boolean",
             },
             "has_next": {
                 "code_generator_compute": "_compute_has_next",
-                "code_generator_sequence": 68,
+                "code_generator_sequence": 69,
                 "field_description": "Has Next",
                 "store": True,
                 "ttype": "boolean",
             },
             "image_db_selection": {
-                "code_generator_sequence": 72,
+                "code_generator_sequence": 73,
                 "default_lambda": "_default_image_db_selection",
                 "field_description": "Image Db Selection",
                 "relation": "devops.db.image",
                 "ttype": "many2one",
             },
-            "is_autopoieses": {
-                "code_generator_sequence": 16,
-                "field_description": "Is Autopoieses",
+            "is_cg_temporary": {
+                "code_generator_sequence": 38,
+                "field_description": "Is Cg Temporary",
+                "help": (
+                    "When it's remote, need tool to copy code with the"
+                    " developers."
+                ),
                 "ttype": "boolean",
             },
             "is_force_local_system": {
-                "code_generator_sequence": 36,
+                "code_generator_sequence": 35,
                 "field_description": "Is Force Local System",
                 "help": "Help for view to force local component.",
                 "ttype": "boolean",
             },
             "is_new_module": {
                 "code_generator_compute": "_compute_is_new_module",
-                "code_generator_sequence": 17,
+                "code_generator_sequence": 16,
                 "field_description": "Is New Module",
                 "readonly": False,
                 "store": True,
@@ -7685,13 +5955,13 @@ _logger = logging.getLogger(__name__)""",
             },
             "is_new_or_exist_ssh": {
                 "code_generator_compute": "_compute_is_new_or_exist_ssh",
-                "code_generator_sequence": 37,
+                "code_generator_sequence": 36,
                 "field_description": "Is New Or Exist Ssh",
                 "store": True,
                 "ttype": "boolean",
             },
             "is_remote_cg": {
-                "code_generator_sequence": 38,
+                "code_generator_sequence": 37,
                 "comment_before": (
                     "TODO compute it, detect when it's remote, when cg path is"
                     " different working path"
@@ -7715,7 +5985,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "boolean",
             },
             "mode_context": {
-                "code_generator_sequence": 26,
+                "code_generator_sequence": 25,
                 "comment_before": (
                     "TODO select default context from configuration and export"
                     " it in local environment home configuration"
@@ -7815,7 +6085,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "boolean",
             },
             "mode_view_snippet_template_generate_website_enable_javascript": {
-                "code_generator_sequence": 59,
+                "code_generator_sequence": 60,
                 "default": True,
                 "field_description": (
                     "Mode View Snippet Template Generate Website Enable"
@@ -7851,7 +6121,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "mode_view_snippet_template_generate_website_snippet_type": {
-                "code_generator_sequence": 60,
+                "code_generator_sequence": 61,
                 "default": "effect",
                 "field_description": (
                     "Mode View Snippet Template Generate Website Snippet Type"
@@ -7865,13 +6135,13 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "selection",
             },
             "model_ids": {
-                "code_generator_sequence": 70,
+                "code_generator_sequence": 71,
                 "field_description": "Model",
                 "relation": "devops.cg.model",
                 "ttype": "many2many",
             },
             "model_to_remove_ids": {
-                "code_generator_sequence": 71,
+                "code_generator_sequence": 72,
                 "field_description": "Model to remove",
                 "relation": "devops.cg.model",
                 "ttype": "many2many",
@@ -7931,7 +6201,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "state": {
-                "code_generator_sequence": 67,
+                "code_generator_sequence": 68,
                 "default": "init",
                 "field_description": "State",
                 "required": True,
@@ -7956,13 +6226,13 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "selection",
             },
             "system_erplibre_config_path_home_ids": {
-                "code_generator_sequence": 33,
+                "code_generator_sequence": 32,
                 "field_description": "List path home",
                 "relation": "erplibre.config.path.home",
                 "ttype": "many2many",
             },
             "system_method": {
-                "code_generator_sequence": 32,
+                "code_generator_sequence": 31,
                 "field_description": "Method",
                 "help": "Choose the communication method.",
                 "selection": (
@@ -7971,12 +6241,12 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "selection",
             },
             "system_name": {
-                "code_generator_sequence": 31,
+                "code_generator_sequence": 30,
                 "field_description": "System name",
                 "ttype": "char",
             },
             "system_ssh_connection_status": {
-                "code_generator_sequence": 66,
+                "code_generator_sequence": 67,
                 "field_description": "Ssh Connection Status",
                 "help": "Status of test remote working_system_id",
                 "ttype": "boolean",
@@ -7987,31 +6257,31 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "uca_option_with_inherit": {
-                "code_generator_sequence": 64,
+                "code_generator_sequence": 65,
                 "field_description": "Uca Option With Inherit",
                 "help": "UCA configuration - with inherit",
                 "ttype": "boolean",
             },
             "use_existing_meta_module": {
-                "code_generator_sequence": 62,
+                "code_generator_sequence": 63,
                 "field_description": "Use Existing Meta Module",
                 "help": "If False, will create new meta file from uc0.",
                 "ttype": "boolean",
             },
             "use_existing_meta_module_uca_only": {
-                "code_generator_sequence": 63,
+                "code_generator_sequence": 64,
                 "field_description": "Use Existing Meta Module Uca Only",
                 "help": "Force UcA only from feature use_existing_meta_module",
                 "ttype": "boolean",
             },
             "use_existing_meta_module_ucb_only": {
-                "code_generator_sequence": 65,
+                "code_generator_sequence": 66,
                 "field_description": "Use Existing Meta Module Ucb Only",
                 "help": "Force UcB only from feature use_existing_meta_module",
                 "ttype": "boolean",
             },
             "use_external_cg": {
-                "code_generator_sequence": 61,
+                "code_generator_sequence": 62,
                 "field_description": "Use External Cg",
                 "help": (
                     "If internal, will use same database of devops for build"
@@ -8021,7 +6291,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "boolean",
             },
             "user_id": {
-                "code_generator_sequence": 74,
+                "code_generator_sequence": 75,
                 "default_lambda": "lambda s: s.env.user.id",
                 "field_description": "User",
                 "relation": "res.users",
@@ -8042,33 +6312,33 @@ _logger = logging.getLogger(__name__)""",
             },
             "working_compute_module_cg_path": {
                 "code_generator_compute": "_compute_has_configured_path",
-                "code_generator_sequence": 20,
+                "code_generator_sequence": 19,
                 "field_description": "Working Compute Module Cg Path",
                 "store": True,
                 "ttype": "char",
             },
             "working_compute_module_path": {
                 "code_generator_compute": "_compute_has_configured_path",
-                "code_generator_sequence": 19,
+                "code_generator_sequence": 18,
                 "field_description": "Working Compute Module Path",
                 "store": True,
                 "ttype": "char",
             },
             "working_compute_module_template_path": {
                 "code_generator_compute": "_compute_has_configured_path",
-                "code_generator_sequence": 21,
+                "code_generator_sequence": 20,
                 "field_description": "Working Compute Module Template Path",
                 "store": True,
                 "ttype": "char",
             },
             "working_erplibre_config_path_home_id": {
-                "code_generator_sequence": 34,
+                "code_generator_sequence": 33,
                 "field_description": "Root path",
                 "relation": "erplibre.config.path.home",
                 "ttype": "many2one",
             },
             "working_module_cg_path": {
-                "code_generator_sequence": 29,
+                "code_generator_sequence": 28,
                 "field_description": "Working Module Cg Path",
                 "help": (
                     "Need it for new module CG, relative path from folder of"
@@ -8077,7 +6347,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "working_module_cg_path_suggestion": {
-                "code_generator_sequence": 24,
+                "code_generator_sequence": 23,
                 "default": "-",
                 "field_description": "Working Module Cg Path Suggestion",
                 "help": "Suggestion relative path CG",
@@ -8096,13 +6366,13 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "many2one",
             },
             "working_module_name": {
-                "code_generator_sequence": 27,
+                "code_generator_sequence": 26,
                 "field_description": "Working Module Name",
                 "help": "working_module_id or working_module_name",
                 "ttype": "char",
             },
             "working_module_path": {
-                "code_generator_sequence": 28,
+                "code_generator_sequence": 27,
                 "field_description": "Working Module Path",
                 "help": (
                     "Need it for new module, relative path from folder of"
@@ -8111,7 +6381,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "working_module_path_suggestion": {
-                "code_generator_sequence": 23,
+                "code_generator_sequence": 22,
                 "default": "#",
                 "field_description": "Working Module Path Suggestion",
                 "help": "Suggestion relative path",
@@ -8125,7 +6395,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "selection",
             },
             "working_module_template_path": {
-                "code_generator_sequence": 30,
+                "code_generator_sequence": 29,
                 "field_description": "Working Module Template Path",
                 "help": (
                     "Need it for new module template, relative path from"
@@ -8135,7 +6405,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "working_module_template_path_suggestion": {
-                "code_generator_sequence": 25,
+                "code_generator_sequence": 24,
                 "default": "-",
                 "field_description": "Working Module Template Path Suggestion",
                 "help": "Suggestion relative path template",
@@ -8153,7 +6423,7 @@ _logger = logging.getLogger(__name__)""",
                 "ttype": "char",
             },
             "working_relative_folder": {
-                "code_generator_sequence": 35,
+                "code_generator_sequence": 34,
                 "field_description": "Relative folder",
                 "ttype": "char",
             },
@@ -8568,8 +6838,9 @@ return self.goto_autopoiese("code_generator")""",
                     "code": """if module_name:
     self.fill_working_module_name_or_id(module_name)
     self.use_external_cg = True
+    self.config_uca_enable_export_data = False
     self.use_existing_meta_module = True
-    self.is_autopoieses = True
+    self.is_cg_temporary = True
     self.set_mode_edit_module()
     self.action_code_module_autocomplete_module_path()
 return self.state_goto_code_module()""",
@@ -9015,11 +7286,16 @@ return self._reopen_self()
         run_into_workspace=True,
         error_on_status=False,
     )
-    if exec_id.exec_status:
+    path_module = exec_id.log_all.strip()
+    if exec_id.exec_status == 2:
+        raise exceptions.Warning(
+            f"The module '{module_name}' is duplicated :"
+            f" \\n{path_module}"
+        )
+    elif exec_id.exec_status:
         # raise exceptions.Warning(f"Cannot find module '{module_name}'")
         self.set_mode_new_module()
         return self._reopen_self()
-    path_module = exec_id.log_all.strip()
     if not path_module:
         # raise exceptions.Warning(f"Cannot find module path.")
         self.set_mode_new_module()
@@ -9165,6 +7441,12 @@ plan_cg_value = {
 if is_autopoiesis:
     plan_cg_value["cg_self_add_config_cg"] = True
     plan_cg_value["code_mode_context_generator"] = "autopoiesis"
+# Support data
+plan_cg_value[
+    "config_uca_enable_export_data"
+] = self.config_uca_enable_export_data
+
+# Support snippet
 if self.mode_view_snippet and self.mode_view_snippet != "no_snippet":
     plan_cg_value["mode_view_snippet"] = self.mode_view_snippet
     plan_cg_value[
@@ -9484,7 +7766,10 @@ return self._reopen_self()""",
                 {
                     "code": """for rec in self:
     if rec.plan_cg_id:
-        rec.plan_cg_id.action_git_commit()
+        if not rec.is_remote_cg:
+            rec.plan_cg_id.action_git_commit()
+        else:
+            rec.plan_cg_id.action_git_commit_remote()
 return self._reopen_self()""",
                     "name": "action_git_commit",
                     "decorator": "@api.multi",
@@ -9496,24 +7781,12 @@ return self._reopen_self()""",
                 {
                     "code": """for rec in self:
     if rec.plan_cg_id:
-        rec.plan_cg_id.action_git_commit_remote()
-return self._reopen_self()""",
-                    "name": "action_git_commit_remote",
-                    "decorator": "@api.multi",
-                    "param": "self",
-                    "sequence": 71,
-                    "m2o_module": code_generator_id.id,
-                    "m2o_model": model_devops_plan_action_wizard.id,
-                },
-                {
-                    "code": """for rec in self:
-    if rec.plan_cg_id:
         rec.plan_cg_id.action_git_meld_remote()
 return self._reopen_self()""",
                     "name": "action_git_meld_remote",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 72,
+                    "sequence": 71,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_plan_action_wizard.id,
                 },
@@ -9525,7 +7798,7 @@ return self._reopen_self()""",
                     "name": "action_git_clean_remote",
                     "decorator": "@api.multi",
                     "param": "self",
-                    "sequence": 73,
+                    "sequence": 72,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_plan_action_wizard.id,
                 },
@@ -9545,7 +7818,6 @@ return self._reopen_self()""",
         module_path=self.working_compute_module_path,
         module_cg_path=self.working_compute_module_cg_path,
         module_template_path=self.working_compute_module_template_path,
-        is_autopoiesis=self.is_autopoieses,
         is_new_module=self.is_new_module,
         is_relative_path=True,
     )
@@ -9553,7 +7825,7 @@ self.force_show_final = True
 return self._reopen_self()""",
                     "name": "action_code_module_generate",
                     "param": "self",
-                    "sequence": 74,
+                    "sequence": 73,
                     "m2o_module": code_generator_id.id,
                     "m2o_model": model_devops_plan_action_wizard.id,
                 },
@@ -9565,7 +7837,6 @@ return self._reopen_self()""",
         model_name = "devops_plan_cg"
         dct_model = {
             "description": "Planification to use Code Generator",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -11282,7 +9553,6 @@ return model_conf""",
         model_name = "devops_system"
         dct_model = {
             "description": "devops_system",
-            "nomenclator": True,
         }
         dct_field = {
             "debug_command": {
@@ -11513,48 +9783,6 @@ string=\"VMs\",
             dct_field=dct_field,
             dct_model=dct_model,
         )
-
-        # Add data nomenclator
-        value = {
-            "iterator_port_generator": 10002,
-            "method": "local",
-            "name": "Local",
-            "name_overwrite": "Local",
-            "path_home": "/home/mathben",
-            "system_status": True,
-            "terminal": "gnome-terminal",
-            "use_search_cmd": "locate",
-        }
-        env["devops.system"].create(value)
-        value = {
-            "name": "devops_system_local",
-            "model": "devops.system",
-            "module": "erplibre_devops",
-            "res_id": 1,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "method": "ssh",
-            "name": "SSH Local UP",
-            "name_overwrite": "SSH Local",
-            "path_home": "/home/mathben",
-            "ssh_connection_status": True,
-            "ssh_host": "localhost",
-            "system_status": True,
-            "terminal": "gnome-terminal",
-            "use_search_cmd": "locate",
-        }
-        env["devops.system"].create(value)
-        value = {
-            "name": "devops_system_ssh_localhost",
-            "model": "devops.system",
-            "module": "erplibre_devops",
-            "res_id": 2,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
 
         # Generate code
         if True:
@@ -12539,7 +10767,6 @@ return result.strip() == "true"''',
         model_name = "devops_test_case"
         dct_model = {
             "description": "devops_test_case",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -12617,7 +10844,6 @@ _logger = logging.getLogger(__name__)""",
         model_name = "devops_test_case_exec"
         dct_model = {
             "description": "devops_test_case_exec",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -12993,7 +11219,6 @@ return {
         model_name = "devops_test_plan"
         dct_model = {
             "description": "General test plan -> will choose a plan",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -13031,7 +11256,6 @@ _logger = logging.getLogger(__name__)""",
         model_name = "devops_test_plan_exec"
         dct_model = {
             "description": "devops_test_plan_exec",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -13845,7 +12069,6 @@ self.exec_stop_date = fields.Datetime.now(self)""",
         model_name = "devops_test_result"
         dct_model = {
             "description": "devops_test_result",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -14040,7 +12263,6 @@ LST_CONSOLE_REPLACE_HTML = [
         dct_model = {
             "description": "ERPLibre DevOps Workspace",
             "enable_activity": True,
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -15692,6 +13914,7 @@ lst_exception = (
     "AssertionError:",
     "SyntaxError:",
     "KeyError:",
+    "psycopg2.errors.NotNullViolation:",
     "psycopg2.errors.UndefinedTable:",
     "UnboundLocalError:",
     "FileNotFoundError:",
@@ -16222,7 +14445,6 @@ finally:
         model_name = "devops_workspace_docker"
         dct_model = {
             "description": "ERPLibre DevOps Workspace Docker",
-            "nomenclator": True,
         }
         dct_field = {
             "docker_cmd_extra": {
@@ -16733,7 +14955,6 @@ self.action_docker_check_docker_ps()""",
         model_name = "devops_workspace_terminal"
         dct_model = {
             "description": "ERPLibre DevOps Workspace Terminal",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -16824,7 +15045,6 @@ _logger = logging.getLogger(__name__)""",
         model_name = "erplibre_config_path_home"
         dct_model = {
             "description": "erplibre_config_path_home",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -16841,30 +15061,6 @@ _logger = logging.getLogger(__name__)""",
             dct_field=dct_field,
             dct_model=dct_model,
         )
-
-        # Add data nomenclator
-        value = {
-            "name": "/tmp",
-        }
-        env["erplibre.config.path.home"].create(value)
-        value = {
-            "name": "erplibre_config_path_home_tmp",
-            "model": "erplibre.config.path.home",
-            "module": "erplibre_devops",
-            "res_id": 1,
-            "noupdate": True,
-        }
-        env["ir.model.data"].create(value)
-
-        value = {
-            "name": "/home/mathben",
-        }
-        env["erplibre.config.path.home"].create(value)
-
-        value = {
-            "name": "/home/mathben/git",
-        }
-        env["erplibre.config.path.home"].create(value)
 
         # Generate code
         if True:
@@ -16889,7 +15085,6 @@ return path_home_id""",
         model_name = "erplibre_mode"
         dct_model = {
             "description": "erplibre_mode",
-            "nomenclator": True,
         }
         dct_field = {
             "mode_env": {
@@ -17032,7 +15227,6 @@ return mode_id""",
         model_name = "erplibre_mode_env"
         dct_model = {
             "description": "erplibre_mode_env",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -17062,7 +15256,6 @@ return mode_id""",
         model_name = "erplibre_mode_exec"
         dct_model = {
             "description": "erplibre_mode_exec",
-            "nomenclator": True,
         }
         dct_field = {
             "active": {
@@ -17098,7 +15291,6 @@ return mode_id""",
         model_name = "erplibre_mode_source"
         dct_model = {
             "description": "erplibre_mode_source",
-            "nomenclator": True,
         }
         dct_field = {
             "name": {
@@ -17128,7 +15320,6 @@ return mode_id""",
         model_name = "erplibre_mode_version_base"
         dct_model = {
             "description": "erplibre_mode_version_base",
-            "nomenclator": True,
         }
         dct_field = {
             "is_tag": {
@@ -17166,7 +15357,6 @@ return mode_id""",
         model_name = "erplibre_mode_version_erplibre"
         dct_model = {
             "description": "erplibre_mode_version_erplibre",
-            "nomenclator": True,
         }
         dct_field = {
             "is_tag": {
@@ -32484,8 +30674,120 @@ return mode_id""",
                     "section_type": "body",
                     "item_type": "xpath",
                     "expr": "//footer",
-                    "position": "before",
+                    "position": "inside",
                     "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item_body_xpath_p1.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_git_commit",
+                    "class_attr": "btn btn-success",
+                    "attrs": (
+                        "{'invisible': ['|',('state', '!=',"
+                        " 'code_module'),('plan_cg_id', '=', False)]}"
+                    ),
+                    "action_name": "action_git_commit",
+                    "button_type": "btn-success",
+                    "label": "Git commit module",
+                    "parent_id": view_item_body_xpath_p1.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_git_commit",
+                    "class_attr": "btn btn-success",
+                    "attrs": (
+                        "{'invisible': ['|','|','|',('state', '!=',"
+                        " 'code_module'),('plan_cg_id', '=',"
+                        " False),('use_existing_meta_module', '==',"
+                        " False),('use_existing_meta_module_ucb_only','==',True)]}"
+                    ),
+                    "action_name": "action_git_commit",
+                    "button_type": "btn-success",
+                    "label": "Git commit UcA",
+                    "parent_id": view_item_body_xpath_p1.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_git_commit",
+                    "class_attr": "btn btn-success",
+                    "attrs": (
+                        "{'invisible': ['|','|','|',('state', '!=',"
+                        " 'code_module'),('plan_cg_id', '=',"
+                        " False),('use_existing_meta_module', '==',"
+                        " False),('use_existing_meta_module_uca_only','==',True)]}"
+                    ),
+                    "action_name": "action_git_commit",
+                    "button_type": "btn-success",
+                    "label": "Git commit UcB",
+                    "parent_id": view_item_body_xpath_p1.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_git_meld_remote",
+                    "class_attr": "btn btn-success",
+                    "attrs": (
+                        "{'invisible': ['|','|',('state', '!=',"
+                        " 'code_module'),('plan_cg_id', '=',"
+                        " False),('is_remote_cg', '=', False)]}"
+                    ),
+                    "action_name": "action_git_meld_remote",
+                    "button_type": "btn-success",
+                    "label": "Git meld remote",
+                    "parent_id": view_item_body_xpath_p1.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "button",
+                    "name": "action_git_clean_remote",
+                    "class_attr": "btn btn-success",
+                    "attrs": (
+                        "{'invisible': ['|','|',('state', '!=',"
+                        " 'code_module'),('plan_cg_id', '=',"
+                        " False),('is_remote_cg', '=', False)]}"
+                    ),
+                    "action_name": "action_git_clean_remote",
+                    "button_type": "btn-success",
+                    "label": "Git clean remote",
+                    "parent_id": view_item_body_xpath_p1.id,
+                    "sequence": 5,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_xpath_p1 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "xpath",
+                    "expr": "//footer",
+                    "position": "before",
+                    "sequence": 3,
                 }
             )
             lst_item_view.append(view_item_body_xpath_p1.id)
@@ -32821,11 +31123,11 @@ return mode_id""",
                     "section_type": "body",
                     "item_type": "button",
                     "name": "action_code_module_autocomplete_module_path",
-                    "class_attr": "btn btn-primary",
+                    "class_attr": "btn btn-success",
                     "action_name": (
                         "action_code_module_autocomplete_module_path"
                     ),
-                    "button_type": "btn-primary",
+                    "button_type": "btn-success",
                     "label": "Auto-complete",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 2,
@@ -33005,9 +31307,9 @@ return mode_id""",
                     "section_type": "body",
                     "item_type": "button",
                     "name": "action_code_module_generate",
-                    "class_attr": "btn btn-primary",
+                    "class_attr": "btn btn-success",
                     "action_name": "action_code_module_generate",
-                    "button_type": "btn-primary",
+                    "button_type": "btn-success",
                     "label": "Generate",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 3,
@@ -33204,82 +31506,6 @@ return mode_id""",
                     "label": "Generate",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 3,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_commit",
-                    "class_attr": "btn btn-primary",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', True)]}"
-                    ),
-                    "action_name": "action_git_commit",
-                    "button_type": "btn-primary",
-                    "label": "Git commit",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_commit_remote",
-                    "class_attr": "btn btn-primary",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', False)]}"
-                    ),
-                    "action_name": "action_git_commit_remote",
-                    "button_type": "btn-primary",
-                    "label": "Git commit remote",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_meld_remote",
-                    "class_attr": "btn btn-primary",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', False)]}"
-                    ),
-                    "action_name": "action_git_meld_remote",
-                    "button_type": "btn-primary",
-                    "label": "Git meld remote",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_clean_remote",
-                    "class_attr": "btn btn-primary",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', False)]}"
-                    ),
-                    "action_name": "action_git_clean_remote",
-                    "button_type": "btn-primary",
-                    "label": "Git clean remote",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 7,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -34877,9 +33103,58 @@ return mode_id""",
                 {
                     "section_type": "body",
                     "item_type": "field",
+                    "name": "mode_view_generator",
+                    "action_name": "mode_view_generator",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "force_generate",
+                    "action_name": "force_generate",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 2,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "is_remote_cg",
+                    "action_name": "is_remote_cg",
+                    "label": "Generate outside ME",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item_body_group_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "attrs": "{'invisible': [('state', '!=', 'code_module')]}",
+                    "label": "C-Parameter Meta UcA & UcB",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 4,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p3.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
                     "name": "use_external_cg",
                     "action_name": "use_external_cg",
-                    "label": "CG with metadata",
+                    "label": "With UcA UcB",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 1,
                 }
@@ -34895,7 +33170,7 @@ return mode_id""",
                         "{'invisible': [('use_external_cg', '==', False)]}"
                     ),
                     "action_name": "use_existing_meta_module",
-                    "label": "Meta module",
+                    "label": "Select a meta",
                     "parent_id": view_item_body_group_p3.id,
                     "sequence": 2,
                 }
@@ -34908,8 +33183,9 @@ return mode_id""",
                     "item_type": "field",
                     "name": "use_existing_meta_module_uca_only",
                     "attrs": (
-                        "{'invisible': ['|',('use_external_cg', '==',"
-                        " False),('use_existing_meta_module', '==', False)]}"
+                        "{'invisible': ['|','|',('use_external_cg', '==',"
+                        " False),('use_existing_meta_module', '==',"
+                        " False),('use_existing_meta_module_ucb_only','==',True)]}"
                     ),
                     "action_name": "use_existing_meta_module_uca_only",
                     "label": "UcA only",
@@ -34923,103 +33199,15 @@ return mode_id""",
                 {
                     "section_type": "body",
                     "item_type": "field",
-                    "name": "uca_option_with_inherit",
-                    "attrs": (
-                        "{'invisible': [('use_external_cg', '==', False)]}"
-                    ),
-                    "action_name": "uca_option_with_inherit",
-                    "label": "UcA option with inherit",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "use_existing_meta_module_ucb_only",
-                    "attrs": (
-                        "{'invisible': ['|',('use_external_cg', '==',"
-                        " False),('use_existing_meta_module', '==', False)]}"
-                    ),
-                    "action_name": "use_existing_meta_module_ucb_only",
-                    "label": "UcB only",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 5,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "is_autopoieses",
-                    "action_name": "is_autopoieses",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 6,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "is_remote_cg",
-                    "action_name": "is_remote_cg",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 7,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "force_generate",
-                    "action_name": "force_generate",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 8,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
-                    "name": "mode_view_generator",
-                    "action_name": "mode_view_generator",
-                    "parent_id": view_item_body_group_p3.id,
-                    "sequence": 9,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item_body_group_p3 = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "group",
-                    "attrs": "{'invisible': [('state', '!=', 'code_module')]}",
-                    "label": "C-Parameter advanced",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 4,
-                }
-            )
-            lst_item_view.append(view_item_body_group_p3.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "field",
                     "name": "code_generator_name",
+                    "attrs": (
+                        "{'invisible': ['|',('use_external_cg', '!=',"
+                        " True),('use_existing_meta_module_ucb_only','==',True)]}"
+                    ),
                     "action_name": "code_generator_name",
+                    "label": "UcA name",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 1,
+                    "sequence": 4,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -35030,12 +33218,13 @@ return mode_id""",
                     "item_type": "field",
                     "name": "working_module_cg_path_suggestion",
                     "attrs": (
-                        "{'invisible': [('use_external_cg', '!=', True)]}"
+                        "{'invisible': ['|',('use_external_cg', '!=',"
+                        " True),('use_existing_meta_module_ucb_only','==',True)]}"
                     ),
                     "action_name": "working_module_cg_path_suggestion",
-                    "label": "Suggested CG path",
+                    "label": "UcA suggested path",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 2,
+                    "sequence": 5,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -35047,13 +33236,49 @@ return mode_id""",
                     "name": "working_module_cg_path",
                     "attrs": (
                         "{'invisible':"
-                        " ['|',('working_module_cg_path_suggestion', '!=',"
-                        " '#'),('use_external_cg', '!=', True)]}"
+                        " ['|','|',('working_module_cg_path_suggestion', '!=',"
+                        " '#'),('use_external_cg', '!=',"
+                        " True),('use_existing_meta_module_ucb_only','==',True)]}"
                     ),
                     "action_name": "working_module_cg_path",
-                    "label": "OR Manual CG path",
+                    "label": "OR Manual UcA path",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 3,
+                    "sequence": 6,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "uca_option_with_inherit",
+                    "attrs": (
+                        "{'invisible': ['|',('use_external_cg', '==',"
+                        " False),('use_existing_meta_module_ucb_only','==',True)]}"
+                    ),
+                    "action_name": "uca_option_with_inherit",
+                    "label": "UcA option with inherit",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 7,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "use_existing_meta_module_ucb_only",
+                    "attrs": (
+                        "{'invisible': ['|','|',('use_external_cg', '==',"
+                        " False),('use_existing_meta_module', '==',"
+                        " False),('use_existing_meta_module_uca_only','==',True)]}"
+                    ),
+                    "action_name": "use_existing_meta_module_ucb_only",
+                    "label": "UcB only",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 8,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -35063,9 +33288,14 @@ return mode_id""",
                     "section_type": "body",
                     "item_type": "field",
                     "name": "template_name",
+                    "attrs": (
+                        "{'invisible': ['|',('use_external_cg', '!=',"
+                        " True),('use_existing_meta_module_uca_only','==',True)]}"
+                    ),
                     "action_name": "template_name",
+                    "label": "UcB name",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 4,
+                    "sequence": 9,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -35076,12 +33306,13 @@ return mode_id""",
                     "item_type": "field",
                     "name": "working_module_template_path_suggestion",
                     "attrs": (
-                        "{'invisible': [('use_external_cg', '!=', True)]}"
+                        "{'invisible': ['|',('use_external_cg', '!=',"
+                        " True),('use_existing_meta_module_uca_only','==',True)]}"
                     ),
                     "action_name": "working_module_template_path_suggestion",
-                    "label": "Suggested Template path",
+                    "label": "UcB suggested path",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 5,
+                    "sequence": 10,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -35093,13 +33324,14 @@ return mode_id""",
                     "name": "working_module_template_path",
                     "attrs": (
                         "{'invisible':"
-                        " ['|',('working_module_template_path_suggestion',"
-                        " '!=', '#'),('use_external_cg', '!=', True)]}"
+                        " ['|','|',('working_module_template_path_suggestion',"
+                        " '!=', '#'),('use_external_cg', '!=',"
+                        " True),('use_existing_meta_module_uca_only','==',True)]}"
                     ),
                     "action_name": "working_module_template_path",
-                    "label": "OR Manual Template path",
+                    "label": "OR Manual UcB path",
                     "parent_id": view_item_body_group_p3.id,
-                    "sequence": 6,
+                    "sequence": 11,
                 }
             )
             lst_item_view.append(view_item.id)
@@ -35382,6 +33614,32 @@ return mode_id""",
             )
             lst_item_view.append(view_item.id)
 
+            view_item_body_group_p3 = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "group",
+                    "label": "Data",
+                    "parent_id": view_item_body_group_p2.id,
+                    "sequence": 3,
+                }
+            )
+            lst_item_view.append(view_item_body_group_p3.id)
+
+            view_item = env["code.generator.view.item"].create(
+                {
+                    "section_type": "body",
+                    "item_type": "field",
+                    "name": "config_uca_enable_export_data",
+                    "attrs": (
+                        "{'invisible': [('use_external_cg', '==', True)]}"
+                    ),
+                    "action_name": "config_uca_enable_export_data",
+                    "parent_id": view_item_body_group_p3.id,
+                    "sequence": 1,
+                }
+            )
+            lst_item_view.append(view_item.id)
+
             view_item_body_group_p2 = env["code.generator.view.item"].create(
                 {
                     "section_type": "body",
@@ -35403,9 +33661,9 @@ return mode_id""",
                     "section_type": "body",
                     "item_type": "button",
                     "name": "action_code_module_generate",
-                    "class_attr": "btn btn-default",
+                    "class_attr": "btn btn-success",
                     "action_name": "action_code_module_generate",
-                    "button_type": "btn-default",
+                    "button_type": "btn-success",
                     "label": "Generate",
                     "parent_id": view_item_body_group_p2.id,
                     "sequence": 1,
@@ -36418,82 +34676,6 @@ return mode_id""",
                     "action_name": "working_cg_writer_id",
                     "parent_id": view_item_body_group_p2.id,
                     "sequence": 7,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_commit",
-                    "class_attr": "oe_highlight",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', True)]}"
-                    ),
-                    "action_name": "action_git_commit",
-                    "button_type": "oe_highlight",
-                    "label": "Git commit",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 8,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_commit_remote",
-                    "class_attr": "oe_highlight",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', False)]}"
-                    ),
-                    "action_name": "action_git_commit_remote",
-                    "button_type": "oe_highlight",
-                    "label": "Git commit remote",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 9,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_meld_remote",
-                    "class_attr": "oe_highlight",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', False)]}"
-                    ),
-                    "action_name": "action_git_meld_remote",
-                    "button_type": "oe_highlight",
-                    "label": "Git meld remote",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 10,
-                }
-            )
-            lst_item_view.append(view_item.id)
-
-            view_item = env["code.generator.view.item"].create(
-                {
-                    "section_type": "body",
-                    "item_type": "button",
-                    "name": "action_git_clean_remote",
-                    "class_attr": "oe_highlight",
-                    "attrs": (
-                        "{'invisible': ['|',('plan_cg_id', '=',"
-                        " False),('is_remote_cg', '=', False)]}"
-                    ),
-                    "action_name": "action_git_clean_remote",
-                    "button_type": "oe_highlight",
-                    "label": "Git clean remote",
-                    "parent_id": view_item_body_group_p2.id,
-                    "sequence": 11,
                 }
             )
             lst_item_view.append(view_item.id)

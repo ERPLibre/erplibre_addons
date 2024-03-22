@@ -69,8 +69,7 @@ def post_init_hook(cr, e):
         value["force_generic_template_wizard_view"] = False
         value["disable_generate_access"] = False
         value["enable_template_website_snippet_view"] = False
-        value["template_auto_export_data"] = True
-        value["template_auto_export_data_exclude_model"] = 'devops.db.image;devops.exec;devops.exec.bundle;devops.ide.pycharm;devops.log.makefile.target;devops.workspace.terminal;devops.workspace;devops.test.case;devops.test.plan;erplibre.mode;erplibre.mode.env;erplibre.mode.exec;erplibre.mode.source;erplibre.mode.version.base;erplibre.mode.version.erplibre'
+        value["template_ignore_export_data"] = True
         value["enable_sync_template"] = True
         value["ignore_fields"] = ""
         value["post_init_hook_show"] = True
