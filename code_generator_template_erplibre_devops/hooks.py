@@ -49,11 +49,18 @@ def post_init_hook(cr, e):
             " devops.cg.test.case; devops.code.todo; devops.db.image;"
             " devops.deploy.vm; devops.deploy.vm.exec;"
             " devops.deploy.vm.exec.stage; devops.deploy.vm.snapshot;"
-            " devops.exec; devops.exec.bundle; devops.exec.error;"
+            " devops.docker.compose; devops.docker.compose.template;"
+            " devops.docker.container; devops.docker.image;"
+            " devops.docker.network; devops.docker.volume; devops.exec;"
+            " devops.exec.bundle; devops.exec.error; devops.gen.img.detail;"
+            " devops.gen.img.light; devops.gen.img.style_artist;"
+            " devops.gen.img.style_type; devops.gen.img.texture;"
             " devops.ide.breakpoint; devops.ide.pycharm;"
-            " devops.ide.pycharm.configuration; devops.log.error;"
+            " devops.ide.pycharm.configuration; devops.instance.exec;"
+            " devops.instance.type; devops.log.error;"
             " devops.log.makefile.target; devops.log.warning;"
-            " devops.plan.action.wizard; devops.plan.cg; devops.system;"
+            " devops.operate.localai; devops.plan.action.wizard;"
+            " devops.plan.cg; devops.plan.project; devops.system;"
             " devops.test.case; devops.test.case.exec; devops.test.plan;"
             " devops.test.plan.exec; devops.test.result; devops.workspace;"
             " devops.workspace.docker; devops.workspace.terminal;"
@@ -69,8 +76,7 @@ def post_init_hook(cr, e):
         value["force_generic_template_wizard_view"] = False
         value["disable_generate_access"] = False
         value["enable_template_website_snippet_view"] = False
-        value["template_auto_export_data"] = True
-        value["template_auto_export_data_exclude_model"] = 'devops.db.image;devops.exec;devops.exec.bundle;devops.ide.pycharm;devops.log.makefile.target;devops.workspace.terminal;devops.workspace;devops.test.case;devops.test.plan;erplibre.mode;erplibre.mode.env;erplibre.mode.exec;erplibre.mode.source;erplibre.mode.version.base;erplibre.mode.version.erplibre'
+        value["template_ignore_export_data"] = True
         value["enable_sync_template"] = True
         value["ignore_fields"] = ""
         value["post_init_hook_show"] = True
