@@ -1136,6 +1136,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             if relative_path_module in lst_suggest_path:
                 self.working_module_path_suggestion = relative_path_module
             else:
+                self.working_module_path_suggestion = "#"
                 self.working_module_path = relative_path_module
 
             if not ctx.get("ignore_autocomplete_model", False):
