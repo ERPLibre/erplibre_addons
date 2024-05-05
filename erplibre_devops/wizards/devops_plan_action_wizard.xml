@@ -785,6 +785,7 @@
                     <field name="instance_type_ids" widget="many2many_tags" />
                     <field name="instance_is_support_gpu" invisible="True" />
                     <field name="instance_port_1" />
+                    <field name="with_mistra_openorca" />
                     <field name="instance_gpu_mode" attrs="{'invisible': [('instance_is_support_gpu','=',False)]}" />
                     <button
                         name="instance_deploy"

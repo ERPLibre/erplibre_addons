@@ -395,6 +395,12 @@ class DevopsPlanActionWizard(models.TransientModel):
         related="instance_list_to_deploy.is_support_gpu"
     )
 
+    with_mistra_openorca = fields.Boolean(
+        help=(
+            "If true, force to use mistra openorca for generate text in french"
+        )
+    )
+
     instance_yaml = fields.Text(compute="_compute_instance_yaml")
 
     instance_port_1 = fields.Integer(
@@ -514,7 +520,10 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     @api.multi
     @api.depends(
-        "instance_gpu_mode", "instance_port_1", "instance_list_to_deploy"
+        "instance_gpu_mode",
+        "instance_port_1",
+        "instance_list_to_deploy",
+        "with_mistra_openorca",
     )
     def _compute_instance_yaml(self):
         for rec in self:
@@ -525,6 +534,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                     default={
                         "gpu_mode": rec.instance_gpu_mode,
                         "port_1": rec.instance_port_1,
+                        "with_mistra_openorca": rec.with_mistra_openorca,
                         "active": False,
                     }
                 )
