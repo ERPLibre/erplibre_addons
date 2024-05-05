@@ -315,9 +315,10 @@ class DevopsPlanProject(models.Model):
                     }
                     op_id = self.env["devops.operate.localai"].create(op_value)
                     op_id.execute_ia()
-                    rec.result_one_pager_introduction = (
-                        op_id.last_result_message.replace("\n", "<br />")
-                    )
+                    if op_id.last_result_message:
+                        rec.result_one_pager_introduction = (
+                            op_id.last_result_message.replace("\n", "<br />")
+                        )
                 else:
                     rec.result_one_pager_introduction = rec.type_context
 
