@@ -1381,6 +1381,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "system_id": self.working_system_id.id,
                 "workspace_id": self.root_workspace_id.id,
                 "working_dir_path": working_dir_path,
+                "instance_name": self.instance_name,
             }
             self.instance_last_exec_id = self.env[
                 "devops.instance.exec"
