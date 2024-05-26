@@ -47,6 +47,7 @@
                                 string="Template repas image"
                                 attrs="{'invisible': [('has_aliment', '=', False)]}"
                             />
+                            <field name="advance_presentation_nb_page" string="Template presentation nb page" />
                         </group>
                     </group>
                     <notebook>

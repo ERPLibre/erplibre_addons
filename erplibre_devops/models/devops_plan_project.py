@@ -89,6 +89,11 @@ class DevopsPlanProject(models.Model):
         ),
     )
 
+    advance_presentation_nb_page = fields.Integer(
+        default=5,
+        track_visibility="onchange",
+    )
+
     advance_aliment_template_repas_image = fields.Char(
         default=(
             "Gros plan d'un magnifique plat de «%s» d'une beauté extrême"
@@ -98,6 +103,7 @@ class DevopsPlanProject(models.Model):
             "Need 2 argument, will be aliment name and aliment description max"
             " 100 char."
         ),
+        track_visibility="onchange",
     )
 
     society_type = fields.Selection(
@@ -240,16 +246,13 @@ class DevopsPlanProject(models.Model):
                     " magasin."
                 )
             elif rec.project_type == "presentation_pptx_formation":
-                nb_page = 10
-                context = (
-                    "domaine de la nutrition et spécifiquement sur le produit"
-                    " Cordyceps"
-                )
+                nb_page = rec.advance_presentation_nb_page
                 message = (
                     f"Donne moi une formation de {nb_page} pages, dont chaque"
-                    f" page a un titre et une description, sur le {context}?"
-                    " Ta réponse doit etre sous le format json, tel que le"
-                    " gabarit suivant : {'formation':[{'titre':'Titre"
+                    " page a un titre et une description, sur le"
+                    f" {rec.type_context}? Ta réponse doit etre sous le format"
+                    " json, tel que le gabarit suivant :"
+                    " {'formation':[{'titre':'Titre"
                     " 1','description':'Description 1'},{'titre':'Titre"
                     " 2','description':'Description 2'}]}. En remplaçant"
                     " «Titre 1» par le titre et «Description 1» par la"
@@ -348,6 +351,36 @@ class DevopsPlanProject(models.Model):
                                 dct_form["more"] = op_id.last_result_message
 
                         for dct_form in lst_form:
+                            short_vulgarisation = dct_form.get(
+                                "short_vulgarisation"
+                            )
+                            if short_vulgarisation:
+                                continue
+                            desc = dct_form.get("description")
+                            new_prompt = (
+                                "Donne moi un court résumé de 100 caractères"
+                                " maximum en 3 points du sujet suivant :"
+                                f" {desc}"
+                            )
+                            op_value = {
+                                "prompt": new_prompt,
+                                "feature": "generate_text",
+                                "system_id": self.env.ref(
+                                    "erplibre_devops.devops_system_local"
+                                ).id,
+                                "request_url": rec.instance_exec_text_id.url,
+                                "temperature": rec.temperature,
+                            }
+                            op_id = self.env["devops.operate.localai"].create(
+                                op_value
+                            )
+                            op_id.execute_ia()
+                            if op_id.last_result_message:
+                                dct_form[
+                                    "short_vulgarisation"
+                                ] = op_id.last_result_message
+
+                        for dct_form in lst_form:
                             if not rec.instance_exec_image_id:
                                 break
                             picture = dct_form.get("picture")
@@ -394,7 +427,7 @@ class DevopsPlanProject(models.Model):
                             " continue"
                         )
                     rec.result_one_pager_introduction = result_1
-                    value = {"data": result_1}
+                    value = {"data": result_1, "title": rec.type_context}
                     pptx_id = self.env["devops.plan.project.pptx"].create(
                         value
                     )
