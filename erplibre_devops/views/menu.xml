@@ -391,6 +391,14 @@
         parent="menu_plan"
     />
 
+    <menuitem
+        id="menu_plan_project_pptx"
+        name="Projet pptx"
+        action="devops_plan_project_pptx_plan_project_pptx_action_window"
+        sequence="3"
+        parent="menu_plan"
+    />
+
     <menuitem id="menu_release" name="Release" sequence="7" parent="menu_erplibre_devops" />
 
     <menuitem
