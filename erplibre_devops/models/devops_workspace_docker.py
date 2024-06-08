@@ -108,10 +108,12 @@ services:
       UPDATE_ALL_DB: "False"
     depends_on:
       - db
-    # not behind a proxy
+    # Not behind a proxy
     #command: odoo --workers 0
-    # behind a proxy
+    # Behind a proxy
     #command: odoo --workers 2 --proxy-mode
+    # For production ready
+    #command: odoo --workers 2 --proxy-mode --no-database-list
     command: odoo {workers}{docker_behind_proxy}{docker_cmd_extra}
     volumes:
       # See the volume section at the end of the file
