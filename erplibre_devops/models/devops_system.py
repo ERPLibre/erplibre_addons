@@ -1221,6 +1221,16 @@ class DevopsSystem(models.Model):
             rec.execute_terminal_gui(cmd=cmd)
 
     @api.multi
+    def configure_ntp(self):
+        for rec in self:
+            # Install it
+            cmd = (
+                "sudo apt install ntp;sudo service ntp restart;sudo"
+                " dpkg-reconfigure tzdata"
+            )
+            rec.execute_terminal_gui(cmd=cmd)
+
+    @api.multi
     def action_install_dev_system(self):
         for rec in self:
             # Need this to install ERPLibre for dev
