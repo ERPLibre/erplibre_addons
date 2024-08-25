@@ -20,6 +20,7 @@
                         attrs="{'invisible': [('docker_has_check','=',False)]}"
                     />
                     <button name="configure_ntp" string="Configure NTP" type="object" />
+                    <button name="configure_starship" string="Configure starship" type="object" />
                     <button
                         name="action_check_docker"
                         string="Check docker"

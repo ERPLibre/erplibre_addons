@@ -1231,6 +1231,24 @@ class DevopsSystem(models.Model):
             rec.execute_terminal_gui(cmd=cmd)
 
     @api.multi
+    def configure_starship(self):
+        for rec in self:
+            # Install it
+            cmd = "cd /tmp;curl -sS https://starship.rs/install.sh | sh"
+            _logger.info(f"Execute -> {cmd}")
+            rec.execute_terminal_gui(cmd=cmd)
+            # Automatic way doesn't work because of ' char, broken command
+            # cmd = "echo 'eval \"$(starship init bash)\"' | tee -a ~/.bashrc"
+            # cmd = "cat << EOF >> ~/.bashrc\neval \"$(starship init bash)\"\nEOF"
+            # _logger.info(f"Execute -> {cmd}")
+            # rec.execute_terminal_gui(cmd)
+
+            rec.execute_terminal_gui(cmd="vim ~/.bashrc")
+            raise exceptions.Warning(
+                'Add it at the end of bashrc\neval "$(starship init bash)"'
+            )
+
+    @api.multi
     def action_install_dev_system(self):
         for rec in self:
             # Need this to install ERPLibre for dev
