@@ -13,6 +13,7 @@
                     <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
                     <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
                     <button name="action_install_dev_system" string="Install dev system" type="object" />
+                    <button name="action_install_robotlibre" string="Install robotlibre" type="object" />
                     <button
                         name="action_install_docker"
                         string="Install docker"

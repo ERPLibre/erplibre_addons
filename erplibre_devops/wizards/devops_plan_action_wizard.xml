@@ -950,35 +950,48 @@
                     </group>
                     <group string="2-OS">
                         <button
-                            name="ssh_system_install_minimal"
-                            string="Minimal installation"
+                            name="ssh_system_install_ntp"
+                            string="A) Configure NTP"
                             type="object"
                             class="btn btn-default"
                         />
                         <button
-                            name="ssh_system_install_docker"
-                            string="Docker installation"
+                            name="ssh_system_install_starship"
+                            string="B) Configure starship"
                             type="object"
                             class="btn btn-default"
                         />
                         <button
                             name="ssh_system_install_dev"
-                            string="Dev installation"
+                            string="C) Dev installation"
                             type="object"
                             class="btn btn-default"
                         />
                         <button
-                            name="ssh_system_install_production"
-                            string="Production installation"
+                            name="ssh_system_install_docker"
+                            string="D) Docker installation"
                             type="object"
                             class="btn btn-default"
                         />
                         <button
-                            name="ssh_system_install_all"
-                            string="All installation"
+                            name="ssh_system_install_robotlibre"
+                            string="E) RobotLibre installation"
                             type="object"
                             class="btn btn-default"
                         />
+
+                        <!--                        <button-->
+                        <!--                            name="ssh_system_install_production"-->
+                        <!--                            string="Production installation"-->
+                        <!--                            type="object"-->
+                        <!--                            class="btn btn-default"-->
+                        <!--                        />-->
+                        <!--                        <button-->
+                        <!--                            name="ssh_system_install_all"-->
+                        <!--                            string="All installation"-->
+                        <!--                            type="object"-->
+                        <!--                            class="btn btn-default"-->
+                        <!--                        />-->
                     </group>
                 </group>
                 <group

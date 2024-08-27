@@ -1703,18 +1703,19 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_search_workspace()
         return self._reopen_self()
 
-    def ssh_system_install_minimal(self):
+    def ssh_system_install_ntp(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.configure_ntp()
         return self._reopen_self()
 
     def ssh_system_install_docker(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.action_check_docker()
+        self.working_system_id.action_install_docker()
         return self._reopen_self()
 
     def ssh_system_install_dev(self):
@@ -1724,18 +1725,26 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_install_dev_system()
         return self._reopen_self()
 
-    def ssh_system_install_production(self):
+    def ssh_system_install_starship(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.configure_starship()
         return self._reopen_self()
 
-    def ssh_system_install_all(self):
+    #
+    # def ssh_system_install_all(self):
+    #     if not self.working_system_id:
+    #         # TODO manage this error
+    #         return
+    #     self.working_system_id.action_install_dev_system()
+    #     return self._reopen_self()
+
+    def ssh_system_install_robotlibre(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.action_install_robotlibre()
         return self._reopen_self()
 
     def ssh_system_create_workspace(self):
