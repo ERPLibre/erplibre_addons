@@ -596,10 +596,15 @@ class DevopsSystem(models.Model):
                     ' "StrictHostKeyChecking=no"'
                 )
             if folder:
+                cd_with_keep = str_keep_open if str_keep_open else ""
                 if wrap_cmd.startswith(";"):
-                    wrap_cmd = f'cd "{folder}"{wrap_cmd}'
+                    # Remove ", not supported with gnome-terminal
+                    wrap_cmd = f"cd {folder}{wrap_cmd}{cd_with_keep}"
                 else:
-                    wrap_cmd = f'cd "{folder}";{wrap_cmd}'
+                    wrap_cmd = f"cd {folder};{wrap_cmd}{cd_with_keep}"
+            # Fix command
+            if wrap_cmd.endswith(";bash;bash"):
+                wrap_cmd = wrap_cmd[:-5]
             if not wrap_cmd:
                 wrap_cmd = "bash --login"
             # TODO support other terminal
@@ -609,7 +614,6 @@ class DevopsSystem(models.Model):
                 "gnome-terminal --window -- bash -c"
                 f" '{sshpass}ssh{argument_ssh} -t"
                 f' {addr} "{wrap_cmd}"'
-                + str_keep_open
                 + "'"
             )
             rec._execute_process(cmd_output)
