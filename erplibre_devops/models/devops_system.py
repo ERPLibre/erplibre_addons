@@ -513,7 +513,13 @@ class DevopsSystem(models.Model):
         return lst_result
 
     def execute_terminal_gui(
-        self, folder="", cmd="", docker=False, force_no_sshpass_no_arg=False
+        self,
+        folder="",
+        cmd="",
+        docker=False,
+        force_no_sshpass_no_arg=False,
+        delimiter_bash="'",
+        keep_open_terminal=False,
     ):
         # TODO support argument return_status
         # TODO if folder not exist, cannot CD. don't execute the command if wrong directory
@@ -586,8 +592,9 @@ class DevopsSystem(models.Model):
                 if cmd:
                     wrap_cmd += f' -c \\"{cmd}{str_keep_open}\\"'
             else:
-                # force replace " to \"
-                wrap_cmd = wrap_cmd.replace('"', '\\"')
+                if delimiter_bash == '"':
+                    # force replace " to \"
+                    wrap_cmd = wrap_cmd.replace('"', '\\"')
             argument_ssh = ""
             if rec.ssh_public_host_key:
                 # TODO use public host key instead of ignore it
@@ -605,6 +612,8 @@ class DevopsSystem(models.Model):
             # Fix command
             if wrap_cmd.endswith(";bash;bash"):
                 wrap_cmd = wrap_cmd[:-5]
+            wrap_cmd = wrap_cmd.replace(";;", ";")
+
             if not wrap_cmd:
                 wrap_cmd = "bash --login"
             # TODO support other terminal
@@ -614,8 +623,10 @@ class DevopsSystem(models.Model):
                 "gnome-terminal --window -- bash -c"
                 f" '{sshpass}ssh{argument_ssh} -t"
                 f' {addr} "{wrap_cmd}"'
-                + "'"
             )
+            if keep_open_terminal:
+                cmd_output += str_keep_open
+            cmd_output += "'"
             rec._execute_process(cmd_output)
             if rec.debug_command:
                 print(cmd_output)

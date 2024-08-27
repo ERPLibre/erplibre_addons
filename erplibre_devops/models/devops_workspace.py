@@ -1119,6 +1119,7 @@ class DevopsWorkspace(models.Model):
                                 'bash -c "source'
                                 ' ./.venv/bin/activate;poetry install"'
                             ),
+                            delimiter_bash='"',
                             force_open_terminal=True,
                         )
                         if exec_id.exec_status:
@@ -1340,6 +1341,8 @@ class DevopsWorkspace(models.Model):
                     folder=force_folder,
                     cmd=cmd,
                     docker=rec_force_docker,
+                    delimiter_bash=delimiter_bash,
+                    keep_open_terminal=force_open_terminal,
                 )
             elif rec_force_docker:
                 out, status = rec.system_id.exec_docker(
