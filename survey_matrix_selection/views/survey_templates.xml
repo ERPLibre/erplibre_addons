@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Templates for the custom question type. -->
+    <template id="question_container" name="Survey: question container"
+              inherit_id="survey.question_container">
+        <xpath expr="//t[@t-if=&quot;question.question_type == 'matrix'&quot;]" position="before">
+            <t t-if="question.question_type == 'matrix' and question.matrix_subtype == 'simple' and question.matrix_type_selection">
+                <t t-call="survey_matrix_selection.question_matrix_selection"/>
+            </t>
+        </xpath>
+    </template>
+    <!-- Default Matrix hide Template -->
+    <template id="question_matrix_hide" name="Question: matrix"
+              inherit_id="survey.question_matrix">
+        <xpath expr="//table" position="attributes">
+            <attribute name="t-att-hidden">'hidden' if question.matrix_subtype == 'simple' and question.matrix_type_selection else None
+            </attribute>
+        </xpath>
+    </template>
+    <!-- Matrix type selection Template -->
+    <template id="question_matrix_selection" name="Question: matrix selection">
+        <t t-set="comment_line"
+           t-value="answer_lines.filtered(lambda line: line.value_char_box)"/>
+        <t t-if="question.matrix_subtype == 'simple' and question.matrix_type_selection">
+            <table class="table table-borderless o_survey_question_matrix text-white text-center mb-0 data-force-type-selection"
+                   t-att-data-name="question.id"
+                   t-att-data-force-type-selection="question.matrix_type_selection"
+                   t-att-data-question-type="question.matrix_subtype"
+                   t-att-hidden="None if question.matrix_subtype == 'simple' else 'hidden'"
+                   t-att-data-matrix-type="question.matrix_subtype"
+                   t-att-data-sub-questions="question.matrix_row_ids.ids">
+                <thead>
+                    <tr>
+                        <th/>
+                        <th class="fw-normal"/>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="item_idx" t-value="0"/>
+                    <!-- For matrix, we have an extra check because we have rows * columns total options -->
+                    <t t-set="useKeySelection"
+                       t-value="useKeySelection and (len(question.suggested_answer_ids) * len(question.matrix_row_ids)) &lt; len(letters)"/>
+                    <tr class="bg-white text-white"
+                        t-foreach="question.matrix_row_ids" t-as="row_label"
+                        t-att-id="row_label.id">
+                        <th class="fw-normal text-start">
+                            <span t-field="row_label.value"/>
+                        </th>
+                        <td t-att-class="'o_survey_matrix_btn text-primary position-relative %s' % ('o_survey_selected' if answer else '')">
+                            <div class="dropdown">
+                                <select t-att-name="question.id"
+                                        placeholder="Select here"
+                                        class="form-control"
+                                        t-att-data-row-id="row_label.id"
+                                        t-att-data-selection-key="letters[item_idx] if useKeySelection else ''"
+                                        t-att-data-force-type-selection="question.matrix_type_selection"
+                                        t-att-data-question-type="question.matrix_subtype">
+                                    <t t-if="question.suggested_answer_ids">
+                                        <option t-if="not is_page_print" value="" disabled="disabled" selected="selected" hidden="hidden">Choose ...</option>
+                                        <option t-if="is_page_print" value=""/>
+                                        <t t-foreach="question.suggested_answer_ids"
+                                           t-as="value">
+                                            <t t-set="answer"
+                                               t-value="answer_lines.filtered(lambda line: line.suggested_answer_id.id == value.id and line.matrix_row_id.id == row_label.id)"/>
+                                            <t t-if="answer">
+                                                <option t-att-data-value="value.id" t-att-data-answer-id="value.id"
+                                                        selected="selected">
+                                                    <t t-esc="value.value"/>
+                                                </option>
+                                            </t>
+                                            <t t-if="not answer">
+                                                <option t-att-data-value="value.id" t-att-data-answer-id="value.id">
+                                                    <t t-esc="value.value"/>
+                                                </option>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </select>
+                            </div>
+                        </td>
+                        <t t-set="item_idx" t-value="item_idx + 1"/>
+                    </tr>
+                </tbody>
+            </table>
+        </t>
+    </template>
+</odoo>
