@@ -1190,6 +1190,25 @@ class DevopsWorkspace(models.Model):
                     )
 
     @api.multi
+    def action_add_makefile(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Update makefile") as rec:
+                exec_mk_now_id = rec.execute(
+                    cmd=f"cat Makefile", to_instance=True
+                )
+                now_makefile_content = exec_mk_now_id.log_all
+
+                lst_now = rec.get_lst_target_makefile(now_makefile_content)
+
+                lst_ignore_target = ("PHONY",)
+                for target in lst_now:
+                    if target in lst_ignore_target:
+                        continue
+                    self.env["devops.log.makefile.target"].create(
+                        {"name": target, "devops_workspace_id": rec.id}
+                    )
+
+    @api.multi
     def execute(
         self,
         cmd="",

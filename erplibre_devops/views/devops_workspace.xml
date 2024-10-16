@@ -320,6 +320,12 @@
                         </group>
                     </page>
                     <page name="makefile" string="Makefile">
+                        <button
+                            name="action_add_makefile"
+                            string="Refresh makefile target"
+                            type="object"
+                            class="oe_highlight"
+                        />
                         <field name="log_makefile_target_ids" />
                     </page>
                     <page name="log" string="Log">
