@@ -789,7 +789,7 @@ class DevopsSystem(models.Model):
                     # Is the docker daemon running?
                     cmd = "sudo systemctl start docker"
                     out = rec.execute_terminal_gui(
-                        cmd=f'echo "{cmd}";{cmd}',
+                        cmd=f'echo \\"{cmd}\\";{cmd}',
                     )
                     time.sleep(5)
                     cmd = "docker info"
@@ -1235,7 +1235,7 @@ class DevopsSystem(models.Model):
             cmd_prod = "curl -fsSL https://get.docker.com | sudo sh"
             cmd = cmd_dev
             out = rec.execute_terminal_gui(
-                cmd=f'echo "{cmd}";{cmd}',
+                cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
     @api.multi
@@ -1247,7 +1247,7 @@ class DevopsSystem(models.Model):
                 " dpkg-reconfigure tzdata"
             )
             out = rec.execute_terminal_gui(
-                cmd=f'echo "{cmd}";{cmd}',
+                cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
     @api.multi
@@ -1257,7 +1257,7 @@ class DevopsSystem(models.Model):
             cmd = "cd /tmp;curl -sS https://starship.rs/install.sh | sh"
             _logger.info(f"Execute -> {cmd}")
             out = rec.execute_terminal_gui(
-                cmd=f'echo "{cmd}";{cmd}',
+                cmd=f'echo \\"{cmd}\\";{cmd}',
             )
             # Automatic way doesn't work because of ' char, broken command
             # cmd = "echo 'eval \"$(starship init bash)\"' | tee -a ~/.bashrc"
@@ -1267,7 +1267,7 @@ class DevopsSystem(models.Model):
 
             cmd = "vim ~/.bashrc"
             out = rec.execute_terminal_gui(
-                cmd=f'echo "{cmd}";{cmd}',
+                cmd=f'echo \\"{cmd}\\";{cmd}',
             )
             raise exceptions.Warning(
                 'Add it at the end of bashrc\neval "$(starship init bash)"'
@@ -1292,7 +1292,7 @@ class DevopsSystem(models.Model):
                 " ./.venv/bin/activate;poetry install;make install_dev"
             )
             out = rec.execute_terminal_gui(
-                cmd=f'echo "{full_cmd}";{full_cmd}',
+                cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
             )
 
     @api.multi
@@ -1311,7 +1311,7 @@ class DevopsSystem(models.Model):
             )
             full_cmd = f"sudo apt update;sudo apt install -y {cmd_dev}"
             out = rec.execute_terminal_gui(
-                cmd=f'echo "{full_cmd}";{full_cmd}',
+                cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
             )
             # Debian
             # libxslt-dev libzip-dev libsasl2-dev gdebi-core
