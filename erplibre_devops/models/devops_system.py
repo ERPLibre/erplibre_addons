@@ -1239,6 +1239,13 @@ class DevopsSystem(models.Model):
             )
 
     @api.multi
+    def open_terminal(self):
+        for rec in self:
+            out = rec.execute_terminal_gui(
+                cmd=f'pwd',
+            )
+
+    @api.multi
     def configure_ntp(self):
         for rec in self:
             # Install it
