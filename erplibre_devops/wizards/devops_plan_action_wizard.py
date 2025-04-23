@@ -395,6 +395,12 @@ class DevopsPlanActionWizard(models.TransientModel):
         related="instance_list_to_deploy.is_support_gpu"
     )
 
+    with_mistra_openorca = fields.Boolean(
+        help=(
+            "If true, force to use mistra openorca for generate text in french"
+        )
+    )
+
     instance_yaml = fields.Text(compute="_compute_instance_yaml")
 
     instance_port_1 = fields.Integer(
@@ -514,7 +520,10 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     @api.multi
     @api.depends(
-        "instance_gpu_mode", "instance_port_1", "instance_list_to_deploy"
+        "instance_gpu_mode",
+        "instance_port_1",
+        "instance_list_to_deploy",
+        "with_mistra_openorca",
     )
     def _compute_instance_yaml(self):
         for rec in self:
@@ -525,6 +534,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                     default={
                         "gpu_mode": rec.instance_gpu_mode,
                         "port_1": rec.instance_port_1,
+                        "with_mistra_openorca": rec.with_mistra_openorca,
                         "active": False,
                     }
                 )
@@ -1136,6 +1146,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             if relative_path_module in lst_suggest_path:
                 self.working_module_path_suggestion = relative_path_module
             else:
+                self.working_module_path_suggestion = "#"
                 self.working_module_path = relative_path_module
 
             if not ctx.get("ignore_autocomplete_model", False):
@@ -1370,6 +1381,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "system_id": self.working_system_id.id,
                 "workspace_id": self.root_workspace_id.id,
                 "working_dir_path": working_dir_path,
+                "instance_name": self.instance_name,
             }
             self.instance_last_exec_id = self.env[
                 "devops.instance.exec"
@@ -1691,18 +1703,19 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_search_workspace()
         return self._reopen_self()
 
-    def ssh_system_install_minimal(self):
+    def ssh_system_install_ntp(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.configure_ntp()
         return self._reopen_self()
 
     def ssh_system_install_docker(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.action_check_docker()
+        self.working_system_id.action_install_docker()
         return self._reopen_self()
 
     def ssh_system_install_dev(self):
@@ -1712,18 +1725,26 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_install_dev_system()
         return self._reopen_self()
 
-    def ssh_system_install_production(self):
+    def ssh_system_install_starship(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.configure_starship()
         return self._reopen_self()
 
-    def ssh_system_install_all(self):
+    #
+    # def ssh_system_install_all(self):
+    #     if not self.working_system_id:
+    #         # TODO manage this error
+    #         return
+    #     self.working_system_id.action_install_dev_system()
+    #     return self._reopen_self()
+
+    def ssh_system_install_robotlibre(self):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.action_install_dev_system()
+        self.working_system_id.action_install_robotlibre()
         return self._reopen_self()
 
     def ssh_system_create_workspace(self):

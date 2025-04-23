@@ -28,6 +28,13 @@ class DevopsDockerComposeTemplate(models.Model):
         default=False, help="If true, show gpu_mode", readonly=True
     )
 
+    with_mistra_openorca = fields.Boolean(
+        default=False,
+        help=(
+            "If true, force to use mistra openorca for generate text in french"
+        ),
+    )
+
     gpu_mode = fields.Selection(
         selection=[
             ("no_gpu", "No GPU"),
@@ -88,13 +95,12 @@ class DevopsDockerComposeTemplate(models.Model):
             elif rec.docker_compose_model == "nextcloud":
                 rec.yaml = "fds"
             elif rec.docker_compose_model == "localai":
-                with_mistra_openorca = True
                 if rec.gpu_mode == "gpu_cuda_11":
                     image = "localai/localai:latest-aio-gpu-nvidia-cuda-11"
                 elif rec.gpu_mode == "gpu_cuda_12":
                     image = "localai/localai:latest-aio-gpu-nvidia-cuda-12"
                 else:
-                    if with_mistra_openorca:
+                    if rec.with_mistra_openorca:
                         image = "localai/localai:v2.12.4-ffmpeg-core"
                     else:
                         image = "localai/localai:latest-aio-cpu"
@@ -111,7 +117,7 @@ class DevopsDockerComposeTemplate(models.Model):
              capabilities: [gpu]""".strip()
 
                 command = ""
-                if rec.gpu_mode in ["no_gpu"] and with_mistra_openorca:
+                if rec.gpu_mode in ["no_gpu"] and rec.with_mistra_openorca:
                     command = f"command: mistral-openorca"
 
                 rec.yaml = f"""

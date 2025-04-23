@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_plan_project_pptx_view_form" model="ir.ui.view">
+        <field name="name">devops_plan_project_pptx_form</field>
+        <field name="model">devops.plan.project.pptx</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="data" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_pptx_view_graph" model="ir.ui.view">
+        <field name="name">devops_plan_project_pptx_graph</field>
+        <field name="model">devops.plan.project.pptx</field>
+        <field name="arch" type="xml">
+            <graph string="Devops plan project pptx">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_pptx_view_kanban" model="ir.ui.view">
+        <field name="name">devops_plan_project_pptx_kanban</field>
+        <field name="model">devops.plan.project.pptx</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_pptx_view_pivot" model="ir.ui.view">
+        <field name="name">devops_plan_project_pptx_pivot</field>
+        <field name="model">devops.plan.project.pptx</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops plan project pptx">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_pptx_view_search" model="ir.ui.view">
+        <field name="name">devops_plan_project_pptx_search</field>
+        <field name="model">devops.plan.project.pptx</field>
+        <field name="arch" type="xml">
+            <search string="Devops plan project pptx">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_pptx_view_tree" model="ir.ui.view">
+        <field name="name">devops_plan_project_pptx_tree</field>
+        <field name="model">devops.plan.project.pptx</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_plan_project_pptx_plan_project_pptx_action_window"
+        name="Plan project pptx"
+        res_model="devops.plan.project.pptx"
+        view_mode="tree,kanban,pivot,graph,form"
+    />
+</odoo>

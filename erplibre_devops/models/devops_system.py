@@ -513,7 +513,13 @@ class DevopsSystem(models.Model):
         return lst_result
 
     def execute_terminal_gui(
-        self, folder="", cmd="", docker=False, force_no_sshpass_no_arg=False
+        self,
+        folder="",
+        cmd="",
+        docker=False,
+        force_no_sshpass_no_arg=False,
+        delimiter_bash="'",
+        keep_open_terminal=False,
     ):
         # TODO support argument return_status
         # TODO if folder not exist, cannot CD. don't execute the command if wrong directory
@@ -586,8 +592,9 @@ class DevopsSystem(models.Model):
                 if cmd:
                     wrap_cmd += f' -c \\"{cmd}{str_keep_open}\\"'
             else:
-                # force replace " to \"
-                wrap_cmd = wrap_cmd.replace('"', '\\"')
+                if delimiter_bash == '"':
+                    # force replace " to \"
+                    wrap_cmd = wrap_cmd.replace('"', '\\"')
             argument_ssh = ""
             if rec.ssh_public_host_key:
                 # TODO use public host key instead of ignore it
@@ -596,10 +603,17 @@ class DevopsSystem(models.Model):
                     ' "StrictHostKeyChecking=no"'
                 )
             if folder:
+                cd_with_keep = str_keep_open if str_keep_open else ""
                 if wrap_cmd.startswith(";"):
-                    wrap_cmd = f'cd "{folder}"{wrap_cmd}'
+                    # Remove ", not supported with gnome-terminal
+                    wrap_cmd = f"cd {folder}{wrap_cmd}{cd_with_keep}"
                 else:
-                    wrap_cmd = f'cd "{folder}";{wrap_cmd}'
+                    wrap_cmd = f"cd {folder};{wrap_cmd}{cd_with_keep}"
+            # Fix command
+            if wrap_cmd.endswith(";bash;bash"):
+                wrap_cmd = wrap_cmd[:-5]
+            wrap_cmd = wrap_cmd.replace(";;", ";")
+
             if not wrap_cmd:
                 wrap_cmd = "bash --login"
             # TODO support other terminal
@@ -609,9 +623,10 @@ class DevopsSystem(models.Model):
                 "gnome-terminal --window -- bash -c"
                 f" '{sshpass}ssh{argument_ssh} -t"
                 f' {addr} "{wrap_cmd}"'
-                + str_keep_open
-                + "'"
             )
+            if keep_open_terminal:
+                cmd_output += str_keep_open
+            cmd_output += "'"
             rec._execute_process(cmd_output)
             if rec.debug_command:
                 print(cmd_output)
@@ -772,8 +787,9 @@ class DevopsSystem(models.Model):
                     # Suppose got error :
                     # Cannot connect to the Docker daemon at unix:///var/run/docker.sock.
                     # Is the docker daemon running?
+                    cmd = "sudo systemctl start docker"
                     out = rec.execute_terminal_gui(
-                        cmd="sudo systemctl start docker"
+                        cmd=f'echo \\"{cmd}\\";{cmd}',
                     )
                     time.sleep(5)
                     cmd = "docker info"
@@ -1218,7 +1234,73 @@ class DevopsSystem(models.Model):
             )
             cmd_prod = "curl -fsSL https://get.docker.com | sudo sh"
             cmd = cmd_dev
-            rec.execute_terminal_gui(cmd=cmd)
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{cmd}\\";{cmd}',
+            )
+
+    @api.multi
+    def open_terminal(self):
+        for rec in self:
+            out = rec.execute_terminal_gui(
+                cmd=f'pwd',
+            )
+
+    @api.multi
+    def configure_ntp(self):
+        for rec in self:
+            # Install it
+            cmd = (
+                "sudo apt install -y ntp;sudo service ntp restart;sudo"
+                " dpkg-reconfigure tzdata"
+            )
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{cmd}\\";{cmd}',
+            )
+
+    @api.multi
+    def configure_starship(self):
+        for rec in self:
+            # Install it
+            cmd = "cd /tmp;curl -sS https://starship.rs/install.sh | sh"
+            _logger.info(f"Execute -> {cmd}")
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{cmd}\\";{cmd}',
+            )
+            # Automatic way doesn't work because of ' char, broken command
+            # cmd = "echo 'eval \"$(starship init bash)\"' | tee -a ~/.bashrc"
+            # cmd = "cat << EOF >> ~/.bashrc\neval \"$(starship init bash)\"\nEOF"
+            # _logger.info(f"Execute -> {cmd}")
+            # rec.execute_terminal_gui(cmd)
+
+            cmd = "vim ~/.bashrc"
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{cmd}\\";{cmd}',
+            )
+            raise exceptions.Warning(
+                'Add it at the end of bashrc\neval "$(starship init bash)"'
+            )
+
+    @api.multi
+    def action_install_robotlibre(self):
+        for rec in self:
+            # TODO copy file script/install/install_debian_dependency.sh and run it
+            cmd_dev = (
+                "make build-essential libssl-dev zlib1g-dev libreadline-dev"
+                " libsqlite3-dev curl llvm libncurses5-dev libncursesw5-dev"
+                " xz-utils tk-dev liblzma-dev libbz2-dev libldap2-dev"
+                " libsasl2-dev git curl parallel wget"
+            )
+            me_id = self.env.ref("erplibre_devops.devops_workspace_me")
+            repo_url = me_id.git_url
+            full_cmd = (
+                f"sudo apt update;sudo apt install -y {cmd_dev};mkdir -p"
+                f" ~/git;cd ~/git;git clone {repo_url} -b robotlibre"
+                " robotlibre;cd robotlibre;make install;source"
+                " ./.venv/bin/activate;poetry install;make install_dev"
+            )
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
+            )
 
     @api.multi
     def action_install_dev_system(self):
@@ -1229,13 +1311,14 @@ class DevopsSystem(models.Model):
             # Dev
             # plocate tig vim tree watch git-cola htop make curl build-essential
             # zlib1g-dev libreadline-dev libbz2-dev libffi-dev libssl-dev libldap2-dev wget
+            cmd_dev = (
+                "git make curl parallel plocate vim tree watch git-cola htop"
+                " tig build-essential zlib1g-dev libreadline-dev libbz2-dev"
+                " libffi-dev libssl-dev libldap2-dev wget cmake"
+            )
+            full_cmd = f"sudo apt update;sudo apt install -y {cmd_dev}"
             out = rec.execute_terminal_gui(
-                cmd=(
-                    "sudo apt update;sudo apt install -y git make curl"
-                    " parallel plocate vim tree watch git-cola htop tig"
-                    " build-essential zlib1g-dev libreadline-dev libbz2-dev"
-                    " libffi-dev libssl-dev libldap2-dev wget"
-                ),
+                cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
             )
             # Debian
             # libxslt-dev libzip-dev libsasl2-dev gdebi-core
@@ -1441,6 +1524,7 @@ class DevopsSystem(models.Model):
             # TODO use mdfind on OSX
             # TODO need to do sometime «sudo updatedb»
             if not rec.use_search_cmd:
+                # TODO throw error when no parents call from internal code
                 return
             if rec.use_search_cmd not in (
                 "locate",

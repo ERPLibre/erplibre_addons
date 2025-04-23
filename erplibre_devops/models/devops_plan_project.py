@@ -55,6 +55,7 @@ class DevopsPlanProject(models.Model):
             ),
             ("website_one_pager_sante", "Website one pager Santé"),
             ("website_one_pager_magasin", "Website one pager Magasin"),
+            ("presentation_pptx_formation", "Presentation pptx formation"),
         ],
         required=True,
         track_visibility="onchange",
@@ -88,6 +89,11 @@ class DevopsPlanProject(models.Model):
         ),
     )
 
+    advance_presentation_nb_page = fields.Integer(
+        default=5,
+        track_visibility="onchange",
+    )
+
     advance_aliment_template_repas_image = fields.Char(
         default=(
             "Gros plan d'un magnifique plat de «%s» d'une beauté extrême"
@@ -97,6 +103,7 @@ class DevopsPlanProject(models.Model):
             "Need 2 argument, will be aliment name and aliment description max"
             " 100 char."
         ),
+        track_visibility="onchange",
     )
 
     society_type = fields.Selection(
@@ -238,6 +245,20 @@ class DevopsPlanProject(models.Model):
                     " superbe emballage sur des présentoirs de comptoir du"
                     " magasin."
                 )
+            elif rec.project_type == "presentation_pptx_formation":
+                nb_page = rec.advance_presentation_nb_page
+                message = (
+                    f"Donne moi une formation de {nb_page} pages, dont chaque"
+                    " page a un titre et une description, sur le"
+                    f" {rec.type_context}? Ta réponse doit etre sous le format"
+                    " json, tel que le gabarit suivant :"
+                    " {'formation':[{'titre':'Titre"
+                    " 1','description':'Description 1'},{'titre':'Titre"
+                    " 2','description':'Description 2'}]}. En remplaçant"
+                    " «Titre 1» par le titre et «Description 1» par la"
+                    " description."
+                )
+                message_background = ""
             rec.question_one_pager_introduction = message
             rec.question_one_pager_background_introduction = message_background
 
@@ -281,6 +302,138 @@ class DevopsPlanProject(models.Model):
     @api.multi
     def execute(self):
         for rec in self:
+            if rec.project_type == "presentation_pptx_formation":
+                if rec.instance_exec_text_id:
+                    if not rec.result_one_pager_introduction:
+                        op_value = {
+                            "prompt": rec.question_one_pager_introduction,
+                            "feature": "generate_text",
+                            "system_id": self.env.ref(
+                                "erplibre_devops.devops_system_local"
+                            ).id,
+                            "request_url": rec.instance_exec_text_id.url,
+                            "temperature": rec.temperature,
+                        }
+                        op_id = self.env["devops.operate.localai"].create(
+                            op_value
+                        )
+                        op_id.execute_ia()
+                        if op_id.last_result_message:
+                            rec.result_one_pager_introduction = (
+                                op_id.last_result_message.replace("\n", "")
+                            )
+                    result_1 = rec.result_one_pager_introduction
+                    try:
+                        dct_formation = json.loads(
+                            rec.result_one_pager_introduction
+                        )
+                        lst_form = dct_formation.get("formation")
+                        for dct_form in lst_form:
+                            more = dct_form.get("more")
+                            if more:
+                                continue
+                            desc = dct_form.get("description")
+                            new_prompt = f"Peux-tu élaborer sur {desc}"
+                            op_value = {
+                                "prompt": new_prompt,
+                                "feature": "generate_text",
+                                "system_id": self.env.ref(
+                                    "erplibre_devops.devops_system_local"
+                                ).id,
+                                "request_url": rec.instance_exec_text_id.url,
+                                "temperature": rec.temperature,
+                            }
+                            op_id = self.env["devops.operate.localai"].create(
+                                op_value
+                            )
+                            op_id.execute_ia()
+                            if op_id.last_result_message:
+                                dct_form["more"] = op_id.last_result_message
+
+                        for dct_form in lst_form:
+                            short_vulgarisation = dct_form.get(
+                                "short_vulgarisation"
+                            )
+                            if short_vulgarisation:
+                                continue
+                            desc = dct_form.get("description")
+                            new_prompt = (
+                                "Donne moi un court résumé de 100 caractères"
+                                " maximum en 3 points du sujet suivant :"
+                                f" {desc}"
+                            )
+                            op_value = {
+                                "prompt": new_prompt,
+                                "feature": "generate_text",
+                                "system_id": self.env.ref(
+                                    "erplibre_devops.devops_system_local"
+                                ).id,
+                                "request_url": rec.instance_exec_text_id.url,
+                                "temperature": rec.temperature,
+                            }
+                            op_id = self.env["devops.operate.localai"].create(
+                                op_value
+                            )
+                            op_id.execute_ia()
+                            if op_id.last_result_message:
+                                dct_form[
+                                    "short_vulgarisation"
+                                ] = op_id.last_result_message
+
+                        for dct_form in lst_form:
+                            if not rec.instance_exec_image_id:
+                                break
+                            picture = dct_form.get("picture")
+                            if picture:
+                                continue
+
+                            desc = dct_form.get("description")
+
+                            prompt_img = desc
+                            op_value = {
+                                "prompt": prompt_img,
+                                "feature": "generate_image",
+                                "system_id": self.env.ref(
+                                    "erplibre_devops.devops_system_local"
+                                ).id,
+                                "request_url": rec.instance_exec_image_id.url,
+                                "step": rec.step,
+                                "gen_img_detail_level_id": self.env.ref(
+                                    "erplibre_devops.devops_gen_img_detail_02"
+                                ).id,
+                                "gen_img_light_ids": [
+                                    (
+                                        6,
+                                        0,
+                                        self.env.ref(
+                                            "erplibre_devops.devops_gen_img_light_04"
+                                        ).ids,
+                                    )
+                                ],
+                            }
+                            op_img_id = self.env[
+                                "devops.operate.localai"
+                            ].create(op_value)
+                            op_img_id.execute_ia()
+                            if op_img_id.last_result_url:
+                                dct_form["picture"] = op_img_id.last_result_url
+
+                        result_1 = json.dumps(dct_formation)
+                    except Exception as e:
+                        # TODO create an execution error
+                        _logger.error(
+                            "Cannot parse json from variable"
+                            " result_one_pager_introduction, ignore and"
+                            " continue"
+                        )
+                    rec.result_one_pager_introduction = result_1
+                    value = {"data": result_1, "title": rec.type_context}
+                    pptx_id = self.env["devops.plan.project.pptx"].create(
+                        value
+                    )
+                    pptx_id.execute()
+                continue
+
             # with rec.workspace_id.devops_create_exec_bundle(
             #     "Execute plan project"
             # ) as rec_ws:
@@ -315,9 +468,10 @@ class DevopsPlanProject(models.Model):
                     }
                     op_id = self.env["devops.operate.localai"].create(op_value)
                     op_id.execute_ia()
-                    rec.result_one_pager_introduction = (
-                        op_id.last_result_message.replace("\n", "<br />")
-                    )
+                    if op_id.last_result_message:
+                        rec.result_one_pager_introduction = (
+                            op_id.last_result_message.replace("\n", "<br />")
+                        )
                 else:
                     rec.result_one_pager_introduction = rec.type_context
 

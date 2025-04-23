@@ -13,12 +13,16 @@
                     <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
                     <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
                     <button name="action_install_dev_system" string="Install dev system" type="object" />
+                    <button name="action_install_robotlibre" string="Install robotlibre" type="object" />
                     <button
                         name="action_install_docker"
                         string="Install docker"
                         type="object"
                         attrs="{'invisible': [('docker_has_check','=',False)]}"
                     />
+                    <button name="open_terminal" string="Open terminal" type="object" />
+                    <button name="configure_ntp" string="Configure NTP" type="object" />
+                    <button name="configure_starship" string="Configure starship" type="object" />
                     <button
                         name="action_check_docker"
                         string="Check docker"

@@ -85,7 +85,7 @@ class DevopsDeployVm(models.Model):
                 )
                 if system_vm_id:
                     max_timeout_total = 60
-                    max_timeout_system = 5
+                    max_timeout_system = 20
                     max_timeout = max_timeout_total - max_timeout_system
                     _logger.info(
                         "Waiting system ssh connection test, max"

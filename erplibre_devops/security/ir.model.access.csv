@@ -37,6 +37,7 @@ devops_log_warning_access_user_types_/_internal_user,devops_log_warning Access U
 devops_operate_localai_access_user_types_/_internal_user,devops_operate_localai Access User types / Internal User,model_devops_operate_localai,base.group_user,1,1,1,1
 devops_plan_cg_access_user_types_/_internal_user,devops_plan_cg Access User types / Internal User,model_devops_plan_cg,base.group_user,1,1,1,1
 devops_plan_project_access_user_types_/_internal_user,devops_plan_project Access User types / Internal User,model_devops_plan_project,base.group_user,1,1,1,1
+devops_plan_project_pptx_access_user_types_/_internal_user,devops_plan_project_pptx Access User types / Internal User,model_devops_plan_project_pptx,base.group_user,1,1,1,1
 devops_system_access_user_types_/_internal_user,devops_system Access User types / Internal User,model_devops_system,base.group_user,1,1,1,1
 devops_test_case_access_user_types_/_internal_user,devops_test_case Access User types / Internal User,model_devops_test_case,base.group_user,1,1,1,1
 devops_test_case_exec_access_user_types_/_internal_user,devops_test_case_exec Access User types / Internal User,model_devops_test_case_exec,base.group_user,1,1,1,1

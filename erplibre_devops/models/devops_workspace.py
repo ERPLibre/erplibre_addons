@@ -1119,6 +1119,7 @@ class DevopsWorkspace(models.Model):
                                 'bash -c "source'
                                 ' ./.venv/bin/activate;poetry install"'
                             ),
+                            delimiter_bash='"',
                             force_open_terminal=True,
                         )
                         if exec_id.exec_status:
@@ -1183,6 +1184,25 @@ class DevopsWorkspace(models.Model):
                 lst_diff = list(diff)
                 lst_ignore_target = ("PHONY",)
                 for target in lst_diff:
+                    if target in lst_ignore_target:
+                        continue
+                    self.env["devops.log.makefile.target"].create(
+                        {"name": target, "devops_workspace_id": rec.id}
+                    )
+
+    @api.multi
+    def action_add_makefile(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Update makefile") as rec:
+                exec_mk_now_id = rec.execute(
+                    cmd=f"cat Makefile", to_instance=True
+                )
+                now_makefile_content = exec_mk_now_id.log_all
+
+                lst_now = rec.get_lst_target_makefile(now_makefile_content)
+
+                lst_ignore_target = ("PHONY",)
+                for target in lst_now:
                     if target in lst_ignore_target:
                         continue
                     self.env["devops.log.makefile.target"].create(
@@ -1321,6 +1341,8 @@ class DevopsWorkspace(models.Model):
                     folder=force_folder,
                     cmd=cmd,
                     docker=rec_force_docker,
+                    delimiter_bash=delimiter_bash,
+                    keep_open_terminal=force_open_terminal,
                 )
             elif rec_force_docker:
                 out, status = rec.system_id.exec_docker(
