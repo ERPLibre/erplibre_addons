@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -133,8 +134,11 @@ class ResConfigSettings(models.TransientModel):
             except Exception as e:
                 raise ValidationError(e)
             # print(record_response)
-        # zone = cf.zones.get(params={"name": url_domain_only})
-        # print("ok")
+
+        os.system(
+            "./script/nginx/deploy_nginx_and_cerbot.py --generate_nginx --run_certbot --domain %s"
+            % domain_to_create
+        )
 
     def action_cloudflare_auto_configure_public_ip(self):
         self.ensure_one()

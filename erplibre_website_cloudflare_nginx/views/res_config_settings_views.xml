@@ -31,13 +31,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="website_nginx">
+                    <div
+                        class="col-12 col-lg-6 o_setting_box"
+                        id="website_nginx"
+                        attrs="{'invisible': [('nginx_enabled', '=', False)]}"
+                    >
                         <div class="o_setting_right_pane">
                             <label for="company_id" string="Nginx" />
-                            <div class="text-muted">
-                                "Optional" allows guests to register from the order confirmation email to track
-                                their order.
-                            </div>
+                            <div class="text-muted">Will configure Nginx reverse-proxy and run cerbot.</div>
                             <!--                        <div class="mt8 ms-4">-->
                             <!--                            <field name="account_on_checkout" class="w-75" widget="radio"/>-->
                             <!--                        </div>-->
@@ -77,7 +78,7 @@
                                 type="object"
                                 string="Automatic configure public ip"
                                 class="btn-primary col-auto fa fa-arrow-right"
-                                aria-label="Detect automatily the public ip"
+                                aria-label="Detect automatically the public ip"
                             />
                         </span>
                     </div>
