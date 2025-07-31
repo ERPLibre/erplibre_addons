@@ -92,7 +92,9 @@ class ResConfigSettings(models.TransientModel):
         # List existing, create if not exist, or edit it with notes
         do_update_comment = False
         # Comment is limited to 100 char
-        records_dns = cf.dns.records.list(zone_id=id_zone, content=public_ip)
+        records_dns = cf.dns.records.list(
+            zone_id=id_zone, content=public_ip, name=domain_to_create
+        )
         lst_dns = [a for a in records_dns]
         if lst_dns:
             if do_update_comment:
