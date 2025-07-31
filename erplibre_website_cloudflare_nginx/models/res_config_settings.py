@@ -138,7 +138,7 @@ class ResConfigSettings(models.TransientModel):
             # print(record_response)
 
         os.system(
-            "./script/nginx/deploy_nginx_and_cerbot.py --generate_nginx --run_certbot --domain %s"
+            "sudo ./script/nginx/deploy_nginx_and_cerbot.py --generate_nginx --run_certbot --domain %s"
             % domain_to_create
         )
 
