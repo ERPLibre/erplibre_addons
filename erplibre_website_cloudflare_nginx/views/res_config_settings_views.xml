@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.website</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="20" />
+        <field name="inherit_id" ref="website.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <div id="website_info_settings" position="after">
+                <h2>Deployment</h2>
+                <div class="row mt16 o_settings_container" id="div_website_deployment">
+                    <div
+                        class="col-12 col-lg-6 o_setting_box"
+                        id="website_cloudflare"
+                        attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                    >
+                        <div class="o_setting_right_pane">
+                            <label for="company_id" string="Cloudflare configuration" />
+                            <div class="text-muted">
+                                This will configure the domain of the website over Cloudflare associate with public ip.
+                            </div>
+
+                            <div class="content-group">
+                                <button
+                                    attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                                    name="action_cloudflare_set_website_dns"
+                                    type="object"
+                                    string="Configure DNS"
+                                    class="btn-primary col-auto"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="website_nginx">
+                        <div class="o_setting_right_pane">
+                            <label for="company_id" string="Nginx" />
+                            <div class="text-muted">
+                                "Optional" allows guests to register from the order confirmation email to track
+                                their order.
+                            </div>
+                            <!--                        <div class="mt8 ms-4">-->
+                            <!--                            <field name="account_on_checkout" class="w-75" widget="radio"/>-->
+                            <!--                        </div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <xpath expr="//div[@name='integration']" position="inside">
+                <div class="col-12 col-lg-6 o_setting_box" id="cloudflare">
+                    <div class="o_setting_left_pane">
+                        <field name="cloudflare_enabled" string="Cloudflare" />
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="cloudflare_enabled" />
+                        <div class="text-muted">Enable cloudflare for website configuration</div>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <span attrs="{'invisible': [('cloudflare_enabled', '=', False)]}">
+                            API token:
+                            <field
+                                name="cloudflare_client_token"
+                                attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                            />
+                        </span>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <span attrs="{'invisible': [('cloudflare_enabled', '=', False)]}">
+                            Public IP:
+                            <field
+                                name="cloudflare_public_ip"
+                                attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                            />
+                            <button
+                                attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                                name="action_cloudflare_auto_configure_public_ip"
+                                type="object"
+                                string="Automatic configure public ip"
+                                class="btn-primary col-auto fa fa-arrow-right"
+                                aria-label="Detect automatily the public ip"
+                            />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 o_setting_box" id="nginx">
+                    <div class="o_setting_left_pane">
+                        <field name="nginx_enabled" string="Nginx" />
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="nginx_enabled" />
+                        <div class="text-muted">
+                            Will enable reverse-proxy generate with Nginx and Certbot for https.
+                        </div>
+                        <div class="text-muted">
+                            Nginx need to be configured to run command without password.
+With visudo
+odoo ALL=(root) NOPASSWD: /usr/sbin/nginx -t
+odoo ALL=(root) NOPASSWD: /usr/bin/systemctl reload nginx
+odoo ALL=(root) NOPASSWD: /bin/ln -s * /etc/nginx/sites-enabled/*
+                        </div>
+                    </div>
+                    <!--                    <div class="o_setting_right_pane">-->
+                    <!--                        <span attrs="{'invisible': [('nginx_enabled', '=', False)]}">-->
+                    <!--                            API token:-->
+                    <!--                            <field-->
+                    <!--                                name="nginx_client_token"-->
+                    <!--                                attrs="{'invisible': [('nginx_enabled', '=', False)]}"-->
+                    <!--                            />-->
+                    <!--                        </span>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="o_setting_right_pane">-->
+                    <!--                        <span attrs="{'invisible': [('nginx_enabled', '=', False)]}">-->
+                    <!--                            Public IP:-->
+                    <!--                            <field-->
+                    <!--                                name="nginx_public_ip"-->
+                    <!--                                attrs="{'invisible': [('nginx_enabled', '=', False)]}"-->
+                    <!--                            />-->
+                    <!--                            <button-->
+                    <!--                                attrs="{'invisible': [('nginx_enabled', '=', False)]}"-->
+                    <!--                                name="action_nginx_auto_configure_public_ip"-->
+                    <!--                                type="object"-->
+                    <!--                                string="Automatic configure public ip"-->
+                    <!--                                class="btn-primary col-auto fa fa-arrow-right"-->
+                    <!--                                aria-label="Detect automatily the public ip"-->
+                    <!--                            />-->
+                    <!--                        </span>-->
+                    <!--                    </div>-->
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
