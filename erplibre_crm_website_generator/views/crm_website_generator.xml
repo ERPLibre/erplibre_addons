@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="crm_website_generator_view_form" model="ir.ui.view">
+        <field name="name">crm.website.generator.form</field>
+        <field name="model">crm.website.generator</field>
+        <field name="arch" type="xml">
+            <form string="Generate Website">
+                <header>
+                    <field name="state" widget="statusbar" />
+                    <button
+                        name="action_generate_website"
+                        string="Generate Website"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '=', 'generated')]}"
+                    />
+                    <button
+                        name="action_generate_website"
+                        string="Update Website"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'generated')]}"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Website Name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="lead_id" />
+                        <field name="website_sub_domain" />
+                        <field name="website_domain" />
+                        <field name="website_url" readonly="True" widget="url" />
+                        <field name="website_id" readonly="True" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="crm_website_generator_view_tree" model="ir.ui.view">
+        <field name="name">crm.website.generator.tree</field>
+        <field name="model">crm.website.generator</field>
+        <field name="arch" type="xml">
+            <tree string="Generate Website">
+                <field name="name" />
+                <field name="website_url" widget="url" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="crm_website_generator_action" model="ir.actions.act_window">
+        <field name="name">Generated Websites</field>
+        <field name="res_model">crm.website.generator</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

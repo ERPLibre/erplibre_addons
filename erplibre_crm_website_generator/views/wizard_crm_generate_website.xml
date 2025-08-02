@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="crm_website_wizard_form_view" model="ir.ui.view">
+        <field name="name">crm.website.generator.wizard.form</field>
+        <field name="model">crm.website.generator.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Générer un site web">
+                <sheet>
+                    <group>
+                        <field name="use_generic_name" invisible="1" />
+                        <field name="use_generic_name" groups="base.group_no_one" />
+                        <field name="website_name" attrs="{'invisible': [('use_generic_name', '=', True)]}" />
+                        <field
+                            name="website_name_generated"
+                            string="Website Name"
+                            attrs="{'invisible': [('use_generic_name', '=', False)]}"
+                        />
+                        <field name="website_sub_domain" groups="base.group_no_one" />
+                        <field name="website_sub_domain" invisible="1" />
+                        <field name="website_domain" groups="base.group_no_one" />
+                        <field name="website_domain" invisible="1" />
+                        <field name="website_url" />
+
+                        <field name="lead_id" invisible="1" />
+                        <field name="nb_website_to_generate" groups="base.group_no_one" />
+                        <field name="force_to_generate" groups="base.group_no_one" />
+                    </group>
+                    <footer>
+                        <button
+                            name="action_confirm_generate_website"
+                            string="Afficher le formulaire"
+                            type="object"
+                            class="btn-primary"
+                        />
+                        <button string="Annuler" class="btn-secondary" special="cancel" />
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
