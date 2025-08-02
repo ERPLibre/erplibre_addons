@@ -8,11 +8,8 @@
     "data": [
         "security/ir.model.access.csv",
         "views/res_config_settings_views.xml",
-        # "views/asana_session.xml",
-        # "views/templates.xml",
-        # "views/menu.xml",
     ],
-    "depends": ["website", "crm"],
+    "depends": ["website"],
     "external_dependencies": {"python": ["requests", "tldextract"]},
     "installable": True,
 }
