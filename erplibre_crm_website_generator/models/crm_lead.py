@@ -51,7 +51,7 @@ class CrmLead(models.Model):
         website_generated_name = _("Website for ") + hashed_name
 
         return {
-            "name": "Create Website",
+            "name": "Create Website generator",
             "type": "ir.actions.act_window",
             "res_model": "crm.website.generator.wizard",
             "view_mode": "form",

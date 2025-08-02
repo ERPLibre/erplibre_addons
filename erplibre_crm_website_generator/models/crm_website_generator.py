@@ -30,6 +30,9 @@ class WebsiteGenerator(models.Model):
         ),
     )
     website_sub_domain = fields.Char(string="Website Sub Domain")
+    website_domain_complete = fields.Char(
+        compute="_compute_website_domain_complete"
+    )
     enable_custom_domain = fields.Boolean(
         help="Permit user to change the domain."
     )
@@ -46,23 +49,50 @@ class WebsiteGenerator(models.Model):
         default="draft",
         compute="_compute_state",
     )
+    # configure_cloudflare = fields.Boolean()
 
     def action_generate_website(self):
-        self.ensure_one()
+        for rec in self:
+            if not rec.website_id:
+                new_website = rec.env["website"].create(
+                    {
+                        "name": rec.name,
+                        "domain": rec.website_domain_complete,
+                        "company_id": rec.lead_id.company_id.id
+                        or rec.env.company.id,
+                    }
+                )
+                rec.website_id = new_website.id
+                # rec.state = "generated"
 
-        if not self.website_id:
-            new_website = self.env["website"].create(
-                {
-                    "name": self.name,
-                    "domain": self.website_domain,
-                    "company_id": self.lead_id.company_id.id
-                    or self.env.company.id,
-                }
-            )
-            self.website_id = new_website.id
-            # self.state = "generated"
+                # TODO: Add logic to create the website content (pages, templates, etc.)
+                # TODO fait son domaine cloudflare selon paramètre généraux
 
-            # TODO: Add logic to create the website content (pages, templates, etc.)
+                cloudflare_enabled = (
+                    rec.env["ir.config_parameter"]
+                    .sudo()
+                    .get_param(
+                        "erplibre_website_cloudflare_nginx.cloudflare_enabled"
+                    )
+                )
+                if cloudflare_enabled:
+                    # TODO how to pass new_website to res.config.settings? Il faut le mettre dans un dictionnaire et l'activer.
+                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).execute().action_cloudflare_set_website_dns()
+                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).execute().action_cloudflare_set_website_dns()
+                    new_website.action_cloudflare_set_website_dns()
+
+                nginx_enabled = (
+                    rec.env["ir.config_parameter"]
+                    .sudo()
+                    .get_param(
+                        "erplibre_website_cloudflare_nginx.nginx_enabled"
+                    )
+                )
+                if nginx_enabled:
+                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).action_nginx_set_website_dns()
+                    new_website.action_nginx_set_website_dns()
+                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).action_nginx_set_website_dns()
+                    # rec.env["res.config.settings"].sudo().action_nginx_set_website_dns()
 
     @api.depends("website_id")
     def _compute_state(self):
@@ -86,3 +116,10 @@ class WebsiteGenerator(models.Model):
                 )
             else:
                 rec.website_url = ""
+
+    @api.depends("website_domain", "website_sub_domain")
+    def _compute_website_domain_complete(self):
+        for rec in self:
+            rec.website_domain_complete = (
+                rec.website_sub_domain + "." + rec.website_domain
+            )

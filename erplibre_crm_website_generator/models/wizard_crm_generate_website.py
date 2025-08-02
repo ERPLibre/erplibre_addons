@@ -66,8 +66,14 @@ class CrmWebsiteGenerator(models.TransientModel):
             )
             website_generator_ids += website_generator_id
             if self.force_to_generate:
-                # TODO support now
-                pass
+                # TODO manage error, because it's a generator, or use external event
+                # TODO put external event from parameter
+                try:
+                    website_generator_ids.action_generate_website()
+                except Exception as e:
+                    # TODO put into log
+                    # TODO fetch log from remote
+                    print(e)
 
         if self.nb_website_to_generate == 1 and website_generator_id:
             return {

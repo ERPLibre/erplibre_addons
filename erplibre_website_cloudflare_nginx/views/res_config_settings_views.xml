@@ -25,7 +25,14 @@
                                     attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
                                     name="action_cloudflare_set_website_dns"
                                     type="object"
-                                    string="Configure DNS"
+                                    string="Configure DNS with Cloudflare"
+                                    class="btn-primary col-auto"
+                                />
+                                <button
+                                    attrs="{'invisible': [('nginx_enabled', '=', False)]}"
+                                    name="action_nginx_set_website_dns"
+                                    type="object"
+                                    string="Configure DNS with Nginx"
                                     class="btn-primary col-auto"
                                 />
                             </div>
