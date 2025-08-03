@@ -45,11 +45,11 @@ class Website(models.Model):
             url_extract = tldextract.extract(website_domain)
             domain_to_create = url_extract.fqdn
             os.system(
-                "sudo ./script/nginx/deploy_nginx_and_cerbot.py --generate_nginx --run_certbot --domain %s"
+                "sudo ./script/nginx/deploy_nginx_and_certbot.py --generate_nginx --run_certbot --domain %s"
                 % domain_to_create
             )
             # TODO do a validation the file is created
-            path_to_check = f"/etc/nginx/site-enabled/{domain_to_create}"
+            path_to_check = f"/etc/nginx/sites-enabled/{domain_to_create}"
             if not os.path.exists(path_to_check):
                 _logger.error(
                     f"Path not exist at nginx creation : '{path_to_check}'."
