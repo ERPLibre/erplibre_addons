@@ -5,7 +5,10 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 
-import tldextract
+try:
+    import tldextract
+except ImportError:
+    tldextract = None
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError

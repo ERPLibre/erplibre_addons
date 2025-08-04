@@ -3,8 +3,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import logging
-
-import tldextract
+try:
+    import tldextract
+except ImportError:
+    tldextract = None
 
 from odoo import _, api, fields, models
 
