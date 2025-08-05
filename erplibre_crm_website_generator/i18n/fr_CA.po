@@ -1,0 +1,279 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_crm_website_generator
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-05 02:28+0000\n"
+"PO-Revision-Date: 2025-08-05 02:28+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_lead_view_form_website_generator
+msgid "<span class=\"o_stat_text\">New Website</span>"
+msgstr "<span class=\"o_stat_text\">Nouveau site web</span>"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_lead_view_form_website_generator
+msgid "<span class=\"o_stat_text\">Websites plan</span>"
+msgstr "<span class=\"o_stat_text\">Planification site web</span>"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_res_config_settings__website_generator_base_domain
+msgid "Base domain website generator"
+msgstr "Générateur de domaine de site web de base"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.res_config_settings_view_form
+msgid "CRM website generator"
+msgstr "Générateur site web CRM"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_wizard_form_view
+msgid "Cancel"
+msgstr "Annulé"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__company_id
+msgid "Company"
+msgstr "Compagnie"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model,name:erplibre_crm_website_generator.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__create_uid
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__create_date
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__display_name
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.res_config_settings_view_form
+msgid "Domain base:"
+msgstr "Domaine de base:"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields.selection,name:erplibre_crm_website_generator.selection__crm_website_generator__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__enable_custom_domain
+msgid "Enable Custom Domain"
+msgstr "Activé la personnalisation de domaine"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__force_to_generate
+msgid "Force To Generate"
+msgstr "Forcer à générer"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_generator_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_generator_view_tree
+msgid "Generate Website"
+msgstr "Générer le site web"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_wizard_form_view
+msgid "Generate a Website"
+msgstr "Générer un site web"
+
+#. module: erplibre_crm_website_generator
+#. odoo-python
+#: code:addons/erplibre_crm_website_generator/models/crm_lead.py:0
+#: code:addons/erplibre_crm_website_generator/models/wizard_crm_generate_website.py:0
+#: code:addons/erplibre_crm_website_generator/models/wizard_crm_generate_website.py:0
+#, python-format
+msgid "Generate website from opportunity"
+msgstr "Générer un site web à partir d'opportunité"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields.selection,name:erplibre_crm_website_generator.selection__crm_website_generator__state__generated
+msgid "Generated"
+msgstr "Généré"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.actions.act_window,name:erplibre_crm_website_generator.crm_website_generator_action
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_lead__website_generator_ids
+msgid "Generated Websites"
+msgstr "Sites web générés"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__id
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator____last_update
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__write_uid
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__write_date
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__lead_id
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__lead_id
+msgid "Lead"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model,name:erplibre_crm_website_generator.model_crm_lead
+msgid "Lead/Opportunity"
+msgstr "Piste/Opportunité"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__nb_website_to_generate
+msgid "Nb Website To Generate"
+msgstr "NB de site web à générer"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_lead__website_generator_count
+msgid "Number of Websites"
+msgstr "Nombre de site web"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,help:erplibre_crm_website_generator.field_crm_website_generator__enable_custom_domain
+msgid "Permit user to change the domain."
+msgstr "Permet à l'utilisateur de changer de domaine"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__product_to_copy_ids
+msgid "Product To Copy"
+msgstr "Produit à copier"
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_wizard_form_view
+msgid "Show form"
+msgstr "Afficher le formulaire"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__state
+msgid "Status"
+msgstr ""
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_generator_view_form
+msgid "Update Website"
+msgstr "Mise à jour du site web"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__use_generic_name
+msgid "Use Generic Name"
+msgstr "Utiliser un nom générique"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__website_id
+msgid "Website"
+msgstr "Site web"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__website_domain
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__website_domain
+msgid "Website Domain"
+msgstr "Domaine de site web"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__website_domain_complete
+msgid "Website Domain Complete"
+msgstr "Domaine de site web à compléter"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model,name:erplibre_crm_website_generator.model_crm_website_generator
+msgid "Website Generator from CRM Lead"
+msgstr "Générateur de site web à partir d'opportunité CRM"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model,name:erplibre_crm_website_generator.model_crm_website_generator_wizard
+msgid "Website Generator from CRM lead"
+msgstr "Générateur de site web à partir d'opportunité CRM"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__name
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__website_name
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_generator_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.crm_website_wizard_form_view
+msgid "Website Name"
+msgstr "Nom de site web"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__website_name_generated
+msgid "Website Name Generated"
+msgstr "Nom de site web générique"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__website_sub_domain
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__website_sub_domain
+msgid "Website Sub Domain"
+msgstr "Nom de sous domaine"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__website_sub_domain_generated
+msgid "Website Sub Domain Generated"
+msgstr "Nom de sous domaine générique"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator__website_url
+#: model:ir.model.fields,field_description:erplibre_crm_website_generator.field_crm_website_generator_wizard__website_url
+msgid "Website URL"
+msgstr "Lien du site web"
+
+#. module: erplibre_crm_website_generator
+#. odoo-python
+#: code:addons/erplibre_crm_website_generator/models/crm_lead.py:0
+#: code:addons/erplibre_crm_website_generator/models/crm_lead.py:0
+#, python-format
+msgid "Website for "
+msgstr "Site web pour "
+
+#. module: erplibre_crm_website_generator
+#: model_terms:ir.ui.view,arch_db:erplibre_crm_website_generator.res_config_settings_view_form
+msgid "Website generator"
+msgstr "Générateur de site web"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,help:erplibre_crm_website_generator.field_crm_website_generator_wizard__use_generic_name
+msgid "Will generate a random name, instead using crm leads name."
+msgstr "Va générer un nom aléatoire, au lieu du nom de l'opportunité."
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,help:erplibre_crm_website_generator.field_crm_website_generator_wizard__nb_website_to_generate
+msgid "Will generate more website plan."
+msgstr "Va générer plusieurs plan de site"
+
+#. module: erplibre_crm_website_generator
+#: model:ir.model.fields,help:erplibre_crm_website_generator.field_crm_website_generator_wizard__force_to_generate
+msgid "Will generate website immediately."
+msgstr "Va générer le site web maintenant."

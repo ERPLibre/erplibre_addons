@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+import re
+import unicodedata
 
 from odoo import _, api, fields, models
 
@@ -46,7 +48,7 @@ class WebsiteGenerator(models.Model):
         default="draft",
         compute="_compute_state",
     )
-    # configure_cloudflare = fields.Boolean()
+    product_to_copy_ids = fields.Many2many(comodel_name="product.product")
 
     def action_generate_website(self):
         for rec in self:
@@ -60,7 +62,17 @@ class WebsiteGenerator(models.Model):
                     }
                 )
                 rec.website_id = new_website.id
-                # rec.state = "generated"
+
+                # Duplicating product
+                if rec.product_to_copy_ids:
+                    for product_id in rec.product_to_copy_ids:
+                        product_copied_id = product_id.copy()
+                        product_copied_id.website_id = rec.website_id.id
+                        str_copy_to_detect = " (copie)"
+                        if product_copied_id.name.endswith(str_copy_to_detect):
+                            product_copied_id.name = product_copied_id.name[
+                                : -len(str_copy_to_detect)
+                            ]
 
                 # TODO: Add logic to create the website content (pages, templates, etc.)
                 # TODO fait son domaine cloudflare selon paramètre généraux
@@ -108,15 +120,28 @@ class WebsiteGenerator(models.Model):
                 http = (
                     "https://" if actuel_url.startswith("https") else "http://"
                 )
-                rec.website_url = (
-                    f"{http}{rec.website_sub_domain}.{rec.website_domain}"
+
+                normalize_sub_domain = unicodedata.normalize(
+                    "NFD", rec.website_sub_domain.lower()
                 )
+                website_sub_domain = re.sub(
+                    r"[^a-z]", "", normalize_sub_domain
+                )
+
+                rec.website_url = (
+                    f"{http}{website_sub_domain}.{rec.website_domain}"
+                )
+
             else:
                 rec.website_url = ""
 
     @api.depends("website_domain", "website_sub_domain")
     def _compute_website_domain_complete(self):
         for rec in self:
+            normalize_sub_domain = unicodedata.normalize(
+                "NFD", rec.website_sub_domain.lower()
+            )
+            website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)
             rec.website_domain_complete = (
-                rec.website_sub_domain + "." + rec.website_domain
+                website_sub_domain + "." + rec.website_domain
             )

@@ -4,21 +4,23 @@
         <field name="name">crm.website.generator.wizard.form</field>
         <field name="model">crm.website.generator.wizard</field>
         <field name="arch" type="xml">
-            <form string="Générer un site web">
+            <form string="Generate a Website">
                 <sheet>
                     <group>
-                        <field name="use_generic_name" invisible="1" />
-                        <field name="use_generic_name" groups="base.group_no_one" />
+                        <field name="use_generic_name" />
                         <field name="website_name" attrs="{'invisible': [('use_generic_name', '=', True)]}" />
                         <field
                             name="website_name_generated"
                             string="Website Name"
                             attrs="{'invisible': [('use_generic_name', '=', False)]}"
                         />
-                        <field name="website_sub_domain" groups="base.group_no_one" />
-                        <field name="website_sub_domain" invisible="1" />
-                        <field name="website_domain" groups="base.group_no_one" />
+                        <field name="website_sub_domain" attrs="{'invisible': [('use_generic_name', '=', True)]}" />
+                        <field
+                            name="website_sub_domain_generated"
+                            attrs="{'invisible': [('use_generic_name', '=', False)]}"
+                        />
                         <field name="website_domain" invisible="1" />
+                        <field name="website_domain" groups="base.group_no_one" />
                         <field name="website_url" />
 
                         <field name="lead_id" invisible="1" />
@@ -28,11 +30,11 @@
                     <footer>
                         <button
                             name="action_confirm_generate_website"
-                            string="Afficher le formulaire"
+                            string="Show form"
                             type="object"
                             class="btn-primary"
                         />
-                        <button string="Annuler" class="btn-secondary" special="cancel" />
+                        <button string="Cancel" class="btn-secondary" special="cancel" />
                     </footer>
                 </sheet>
             </form>

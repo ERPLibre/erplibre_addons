@@ -4,6 +4,8 @@
 
 import hashlib
 import random
+import re
+import unicodedata
 import uuid
 
 from odoo import _, api, fields, models
@@ -46,8 +48,10 @@ class CrmLead(models.Model):
         hashed_name = (
             chr(ord("a") + random.randint(0, 25)) + hashed_name
         ).lower()
-        # TODO validate doublon
-        website_sub_domain = hashed_name
+
+        normalize_sub_domain = unicodedata.normalize("NFD", self.name.lower())
+        website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)
+        website_generated_sub_domain = hashed_name
         website_generated_name = _("Website for ") + hashed_name
 
         return {
@@ -61,5 +65,6 @@ class CrmLead(models.Model):
                 "default_website_name_generated": website_generated_name,
                 "default_website_name": _("Website for ") + self.name,
                 "default_website_sub_domain": website_sub_domain,
+                "default_website_sub_domain_generated": website_generated_sub_domain,
             },
         }

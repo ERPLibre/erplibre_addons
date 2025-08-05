@@ -1,7 +1,8 @@
 # Copyright 2025 TechnoLibre inc.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from poetry.console.commands import self
+import re
+import unicodedata
 
 from odoo import _, api, fields, models
 
@@ -18,12 +19,12 @@ class CrmWebsiteGenerator(models.TransientModel):
         help="Will generate website immediately."
     )
     use_generic_name = fields.Boolean(
-        default=True,
         help="Will generate a random name, instead using crm leads name.",
     )
     website_name_generated = fields.Char()
     website_name = fields.Char()
     website_sub_domain = fields.Char()
+    website_sub_domain_generated = fields.Char()
     website_domain = fields.Char(
         string="Website Domain",
         default=lambda self: self.env["ir.config_parameter"]
@@ -39,6 +40,8 @@ class CrmWebsiteGenerator(models.TransientModel):
     def action_confirm_generate_website(self):
         self.ensure_one()
 
+        # TODO validate doublon website name
+
         website_generator_ids = self.env["crm.website.generator"]
         website_generator_id = None
         for i in range(self.nb_website_to_generate):
@@ -52,15 +55,25 @@ class CrmWebsiteGenerator(models.TransientModel):
                 "company_id": self.lead_id.company_id.id
                 or self.env.company.id,
                 "website_domain": self.website_domain,
-                "website_sub_domain": self.website_sub_domain + prefix_domain,
                 "enable_custom_domain": not self.use_generic_name,
             }
             if self.use_generic_name:
                 website_generator_values["name"] = (
                     self.website_name_generated + prefix_domain
                 )
+                website_sub_domain = (
+                    self.website_sub_domain_generated + prefix_domain
+                )
             else:
                 website_generator_values["name"] = self.website_name
+                website_sub_domain = self.website_sub_domain + prefix_domain
+
+            normalize_sub_domain = unicodedata.normalize(
+                "NFD", website_sub_domain.lower()
+            )
+            website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)
+            website_generator_values["website_sub_domain"] = website_sub_domain
+
             website_generator_id = self.env["crm.website.generator"].create(
                 website_generator_values
             )
@@ -106,8 +119,20 @@ class CrmWebsiteGenerator(models.TransientModel):
                 http = (
                     "https://" if actuel_url.startswith("https") else "http://"
                 )
+                if self.use_generic_name:
+                    website_sub_domain = rec.website_sub_domain_generated
+                else:
+                    website_sub_domain = rec.website_sub_domain
+
+                normalize_sub_domain = unicodedata.normalize(
+                    "NFD", website_sub_domain.lower()
+                )
+                website_sub_domain = re.sub(
+                    r"[^a-z]", "", normalize_sub_domain
+                )
+
                 rec.website_url = (
-                    f"{http}{rec.website_sub_domain}.{rec.website_domain}"
+                    f"{http}{website_sub_domain}.{rec.website_domain}"
                 )
             else:
                 rec.website_url = ""

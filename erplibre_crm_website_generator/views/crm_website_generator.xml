@@ -34,6 +34,7 @@
                         <field name="website_domain" />
                         <field name="website_url" readonly="True" widget="url" />
                         <field name="website_id" readonly="True" />
+                        <field name="product_to_copy_ids" widget="many2many_tags" />
                     </group>
                 </sheet>
             </form>
