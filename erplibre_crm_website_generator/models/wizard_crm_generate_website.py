@@ -101,7 +101,7 @@ class CrmWebsiteGenerator(models.TransientModel):
             return {
                 "name": _("Generate website from opportunity"),
                 "type": "ir.actions.act_window",
-                "view_mode": "tree,form",
+                "view_mode": "list,form",
                 "res_model": "crm.website.generator",
                 "domain": [("id", "in", website_generator_ids.ids)],
                 "context": self.env.context,
