@@ -6,7 +6,7 @@
         <field name="priority" eval="20" />
         <field name="inherit_id" ref="website.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <div id="website_info_settings" position="after">
+            <block id="website_info_settings" position="after">
                 <h2>Deployment</h2>
                 <div class="row mt16 o_settings_container" id="div_website_deployment">
                     <div
@@ -48,9 +48,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </block>
 
-            <xpath expr="//div[@name='integration']" position="inside">
+            <xpath expr="//block[@name='integration']" position="inside">
                 <div class="col-12 col-lg-6 o_setting_box" id="cloudflare">
                     <div class="o_setting_left_pane">
                         <field name="cloudflare_enabled" string="Cloudflare" />
