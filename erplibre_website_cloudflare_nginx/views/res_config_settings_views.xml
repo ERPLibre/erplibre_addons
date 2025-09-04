@@ -12,8 +12,7 @@
                     <div
                         class="col-12 col-lg-6 o_setting_box"
                         id="website_cloudflare"
-                        attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
-                    >
+                        invisible="not cloudflare_enabled">
                         <div class="o_setting_right_pane">
                             <label for="company_id" string="Cloudflare configuration" />
                             <div class="text-muted">
@@ -22,27 +21,24 @@
 
                             <div class="content-group">
                                 <button
-                                    attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                                    invisible="not cloudflare_enabled"
                                     name="action_cloudflare_set_website_dns"
                                     type="object"
                                     string="Configure DNS with Cloudflare"
-                                    class="btn-primary col-auto"
-                                />
+                                    class="btn-primary col-auto"/>
                                 <button
-                                    attrs="{'invisible': [('nginx_enabled', '=', False)]}"
+                                    invisible="not nginx_enabled"
                                     name="action_nginx_set_website_dns"
                                     type="object"
                                     string="Configure DNS with Nginx"
-                                    class="btn-primary col-auto"
-                                />
+                                    class="btn-primary col-auto"/>
                             </div>
                         </div>
                     </div>
                     <div
                         class="col-12 col-lg-6 o_setting_box"
                         id="website_nginx"
-                        attrs="{'invisible': [('nginx_enabled', '=', False)]}"
-                    >
+                        invisible="not nginx_enabled">
                         <div class="o_setting_right_pane">
                             <label for="company_id" string="Nginx" />
                             <div class="text-muted">Will configure Nginx reverse-proxy and run cerbot.</div>
@@ -64,29 +60,26 @@
                         <div class="text-muted">Enable cloudflare for website configuration</div>
                     </div>
                     <div class="o_setting_right_pane">
-                        <span attrs="{'invisible': [('cloudflare_enabled', '=', False)]}">
+                        <span invisible="not cloudflare_enabled">
                             API token:
                             <field
                                 name="cloudflare_client_token"
-                                attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
-                            />
+                                invisible="not cloudflare_enabled"/>
                         </span>
                     </div>
                     <div class="o_setting_right_pane">
-                        <span attrs="{'invisible': [('cloudflare_enabled', '=', False)]}">
+                        <span invisible="not cloudflare_enabled">
                             Public IP:
                             <field
                                 name="cloudflare_public_ip"
-                                attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
-                            />
+                                invisible="not cloudflare_enabled"/>
                             <button
-                                attrs="{'invisible': [('cloudflare_enabled', '=', False)]}"
+                                invisible="not cloudflare_enabled"
                                 name="action_cloudflare_auto_configure_public_ip"
                                 type="object"
                                 string="Automatic configure public ip"
                                 class="btn-primary col-auto fa fa-arrow-right"
-                                aria-label="Detect automatically the public ip"
-                            />
+                                aria-label="Detect automatically the public ip"/>
                         </span>
                     </div>
                 </div>
