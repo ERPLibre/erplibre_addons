@@ -20,8 +20,7 @@
                     class="oe_stat_button"
                     icon="fa-sitemap"
                     type="object"
-                    attrs="{'invisible': [('website_generator_count','=', 0)]}"
-                >
+                    invisible="website_generator_count == 0">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value">
                             <field name="website_generator_count" />

@@ -8,17 +8,15 @@
                 <sheet>
                     <group>
                         <field name="use_generic_name" />
-                        <field name="website_name" attrs="{'invisible': [('use_generic_name', '=', True)]}" />
+                        <field name="website_name" invisible="use_generic_name" />
                         <field
                             name="website_name_generated"
                             string="Website Name"
-                            attrs="{'invisible': [('use_generic_name', '=', False)]}"
-                        />
-                        <field name="website_sub_domain" attrs="{'invisible': [('use_generic_name', '=', True)]}" />
+                            invisible="not use_generic_name"/>
+                        <field name="website_sub_domain" invisible="use_generic_name" />
                         <field
                             name="website_sub_domain_generated"
-                            attrs="{'invisible': [('use_generic_name', '=', False)]}"
-                        />
+                            invisible="not use_generic_name"/>
                         <field name="website_domain" invisible="1" />
                         <field name="website_domain" groups="base.group_no_one" />
                         <field name="website_url" />
