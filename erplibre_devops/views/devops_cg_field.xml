@@ -18,18 +18,15 @@
                             <field name="string" />
                             <field
                                 name="relation"
-                                attrs="{'invisible': [('type', 'not in', ['many2one', 'many2many', 'one2many'])]}"
-                            />
+                                invisible="type not in ['many2one', 'many2many', 'one2many']"/>
                             <field
                                 name="relation_manual"
-                                attrs="{'invisible': ['|', ('type', 'not in', ['many2one', 'many2many', 'one2many']), ('relation', '!=', False)]}"
-                            />
-                            <field name="field_relation" attrs="{'invisible': [('type', 'not in', ['one2many'])]}" />
+                                invisible="type not in ['many2one', 'many2many', 'one2many'] or relation"/>
+                            <field name="field_relation" invisible="type != 'one2many'" />
                             <field
                                 name="field_relation_manual"
-                                attrs="{'invisible': ['|', ('type', 'not in', ['one2many']), ('field_relation', '!=', False)]}"
-                            />
-                            <field name="relation_ref" attrs="{'invisible': [('type', 'not in', ['many2many'])]}" />
+                                invisible="type != 'one2many' or field_relation"/>
+                            <field name="relation_ref" invisible="type != 'many2many'" />
                             <field name="related_manual" />
                             <!--                            <field name="related_field_id" />-->
                             <field name="help" />
@@ -73,7 +70,7 @@
                 <field name="model_id" />
                 <field name="type" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -136,8 +133,8 @@
         <field name="name">devops_cg_field_tree</field>
         <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
-            <tree decoration-danger="has_error">
-                <field name="has_error" invisible="True" />
+            <list decoration-danger="has_error">
+                <field name="has_error" column_invisible="True" />
                 <field name="name" />
                 <field name="model_id" />
                 <field name="type" />
@@ -146,14 +143,13 @@
                 <field name="field_relation" />
                 <field name="field_relation_manual" />
                 <field name="help" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_cg_field_code_generator_module_model_field_action_window"
-        name="Code generator module model field"
-        res_model="devops.cg.field"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_cg_field_code_generator_module_model_field_action_window" model="ir.actions.act_window">
+        <field name="name">Code generator module model field</field>
+        <field name="res_model">devops.cg.field</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

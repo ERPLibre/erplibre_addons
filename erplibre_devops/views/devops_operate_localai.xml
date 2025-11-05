@@ -11,8 +11,7 @@
                         string="Execute"
                         type="object"
                         class="btn-success"
-                        attrs="{'invisible': [('system_id', '=', False)]}"
-                    />
+                        invisible="not system_id"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -55,11 +54,7 @@
                         <field name="last_result" />
                     </group>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -87,7 +82,7 @@
                 <field name="last_result_url" />
                 <field name="request_url" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -150,19 +145,18 @@
         <field name="name">devops_operate_localai_tree</field>
         <field name="model">devops.operate.localai</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="last_result" />
                 <field name="last_result_url" />
                 <field name="request_url" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_operate_localai_operate_localai_action_window"
-        name="Operate localai"
-        res_model="devops.operate.localai"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_operate_localai_operate_localai_action_window" model="ir.actions.act_window">
+        <field name="name">Operate localai</field>
+        <field name="res_model">devops.operate.localai</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

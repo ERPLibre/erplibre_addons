@@ -11,29 +11,25 @@
                         string="New project"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('execution_finish', '=', True)]}"
-                    />
+                        invisible="execution_finish"/>
                     <button
                         name="action_new_project"
                         string="Re-execute"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('execution_finish', '=', False)]}"
-                    />
+                        invisible="not execution_finish"/>
                     <button
                         name="action_new_project_setup_IDE"
                         string="Setup IDE"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('can_setup_ide', '=', False)]}"
-                    />
+                        invisible="not can_setup_ide"/>
                     <button
                         name="action_new_project_clear_pause"
                         string="Clear pause"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('is_pause', '=', False)]}"
-                    />
+                        invisible="not is_pause"/>
                     <button name="action_new_project_debug" string="Debug" type="object" class="oe_highlight" />
                     <button
                         name="action_new_project_debug"
@@ -58,23 +54,24 @@
                         <field name="name" />
                     </h1>
                 </div>
-                <div class="badge-pill badge-info float-right" attrs="{'invisible': [('is_pause', '=', False)]}">
+                <div class="badge-pill badge-info float-right" invisible="not is_pause">
                     Pause
                 </div>
-                <div class="badge-pill badge-danger float-right" attrs="{'invisible': [('has_error', '=', False)]}">
+                <div class="badge-pill badge-danger float-right" invisible="not has_error">
                     Error
                 </div>
-                <div class="badge-pill badge-warning float-right" attrs="{'invisible': [('has_warning', '=', False)]}">
+                <div class="badge-pill badge-warning float-right" invisible="not has_warning">
                     Warning
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                        <field
-                            name="active"
-                            widget="boolean_button"
-                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
-                        />
-                    </button>
+                    
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+            
                 </div>
                 <group>
                     <group string="Project">
@@ -535,7 +532,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -583,19 +580,18 @@
         <field name="name">devops_new_project_tree</field>
         <field name="model">devops.cg.new_project</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="stage_id" />
                 <field name="exec_start_date" />
                 <field name="exec_time_duration" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_new_project_action_window"
-        name="Code generator new project"
-        res_model="devops.cg.new_project"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_new_project_action_window" model="ir.actions.act_window">
+        <field name="name">Code generator new project</field>
+        <field name="res_model">devops.cg.new_project</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

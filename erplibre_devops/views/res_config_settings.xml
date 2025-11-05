@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="res_config_settings_view_form" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.inherit.erplibre_devops</field>
-        <field name="model">res.config.settings</field>
-        <field name="priority" eval="50" />
-        <field name="inherit_id" ref="base.res_config_settings_view_form" />
-        <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div
-                    class="app_settings_block"
-                    data-string="ERPLibre DevOps"
-                    string="ERPLibre DevOps"
-                    data-key="erplibre_devops"
-                >
-                    <h2>System</h2>
-                    <div class="row mt16 o_settings_container" name="System">
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_left_pane" />
-                            <div class="o_setting_right_pane">
-                                <label for="default_terminal" />
-                                <div class="text-muted">Default terminal</div>
-                                <div class="mt8">
-                                    <field name="default_terminal" class="o_light_label" />
-                                </div>
-                                <div class="mt8">
-                                    <button
-                                        name="auto_select_terminal"
-                                        string="Update default terminal"
-                                        type="object"
-                                        icon="fa-refresh"
-                                    />
-                                </div>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <label for="default_use_search_cmd" />
-                                <div class="text-muted">Default command for search into system</div>
-                                <div class="mt8">
-                                    <field name="default_use_search_cmd" class="o_light_label" />
-                                </div>
-                                <div class="mt8">
-                                    <button
-                                        name="auto_select_use_search_cmd"
-                                        string="Update searching command"
-                                        type="object"
-                                        icon="fa-refresh"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </xpath>
-        </field>
-    </record>
+<!--    <record id="res_config_settings_view_form" model="ir.ui.view">-->
+<!--        <field name="name">res.config.settings.view.form.inherit.erplibre_devops</field>-->
+<!--        <field name="model">res.config.settings</field>-->
+<!--        <field name="priority" eval="50" />-->
+<!--        <field name="inherit_id" ref="base.res_config_settings_view_form" />-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//div[hasclass('settings')]" position="inside">-->
+<!--                <div-->
+<!--                    class="app_settings_block"-->
+<!--                    data-string="ERPLibre DevOps"-->
+<!--                    string="ERPLibre DevOps"-->
+<!--                    data-key="erplibre_devops"-->
+<!--                >-->
+<!--                    <h2>System</h2>-->
+<!--                    <div class="row mt16 o_settings_container" name="System">-->
+<!--                        <div class="col-12 col-lg-6 o_setting_box">-->
+<!--                            <div class="o_setting_left_pane" />-->
+<!--                            <div class="o_setting_right_pane">-->
+<!--                                <label for="default_terminal" />-->
+<!--                                <div class="text-muted">Default terminal</div>-->
+<!--                                <div class="mt8">-->
+<!--                                    <field name="default_terminal" class="o_light_label" />-->
+<!--                                </div>-->
+<!--                                <div class="mt8">-->
+<!--                                    <button-->
+<!--                                        name="auto_select_terminal"-->
+<!--                                        string="Update default terminal"-->
+<!--                                        type="object"-->
+<!--                                        icon="fa-refresh"-->
+<!--                                    />-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="o_setting_right_pane">-->
+<!--                                <label for="default_use_search_cmd" />-->
+<!--                                <div class="text-muted">Default command for search into system</div>-->
+<!--                                <div class="mt8">-->
+<!--                                    <field name="default_use_search_cmd" class="o_light_label" />-->
+<!--                                </div>-->
+<!--                                <div class="mt8">-->
+<!--                                    <button-->
+<!--                                        name="auto_select_use_search_cmd"-->
+<!--                                        string="Update searching command"-->
+<!--                                        type="object"-->
+<!--                                        icon="fa-refresh"-->
+<!--                                    />-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <record id="erplibre_devops_config_settings_action" model="ir.actions.act_window">
         <field name="name">Settings</field>

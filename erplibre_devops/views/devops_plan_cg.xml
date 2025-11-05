@@ -11,26 +11,25 @@
                         string="Re-execute last"
                         type="object"
                         class="btn-warning"
-                        attrs="{'invisible': [('has_re_execute_new_project', '=', False)]}"
-                    />
+                        invisible="not has_re_execute_new_project"/>
                     <button
                         name="action_execute_last_stage_new_project"
                         string="Re-execute Uc0"
                         type="object"
                         class="btn-warning"
                         context="{'default_stage_Uc0': True}"
-                        attrs="{'invisible': [('has_re_execute_new_project', '=', False)]}"
-                    />
+                        invisible="not has_re_execute_new_project"/>
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                            <field
-                                name="active"
-                                widget="boolean_button"
-                                options="{&quot;terminology&quot;: &quot;archive&quot;}"
-                            />
-                        </button>
+
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+
                     </div>
                     <group invisible="True">
                         <field name="has_re_execute_new_project" />
@@ -132,18 +131,18 @@
                                 type="object"
                                 class="oe_highlight"
                             />
-                            <button
-                                name="action_format_erplibre_devops"
-                                string="Format module erplibre_devops"
-                                type="object"
-                                class="oe_highlight"
-                            />
-                            <button
-                                name="action_update_erplibre_devops"
-                                string="Update module erplibre_devops"
-                                type="object"
-                                class="oe_highlight"
-                            />
+<!--                            <button-->
+<!--                                name="action_format_erplibre_devops"-->
+<!--                                string="Format module erplibre_devops"-->
+<!--                                type="object"-->
+<!--                                class="oe_highlight"-->
+<!--                            />-->
+<!--                            <button-->
+<!--                                name="action_update_erplibre_devops"-->
+<!--                                string="Update module erplibre_devops"-->
+<!--                                type="object"-->
+<!--                                class="oe_highlight"-->
+<!--                            />-->
                             <button
                                 name="workspace_CG_remove_module"
                                 string="Clear modules"
@@ -151,13 +150,12 @@
                                 class="oe_highlight"
                             />
                             <button name="action_git_commit" string="Git commit" type="object" class="oe_highlight" />
-                            <button
-                                name="action_cg_setup_pycharm_debug"
-                                string="Setup Pycharm debug"
-                                type="object"
-                                class="oe_highlight"
-                                attrs="{'invisible': [('need_debugger_cg_erplibre_devops', '=', False)]}"
-                            />
+<!--                            <button-->
+<!--                                name="action_cg_setup_pycharm_debug"-->
+<!--                                string="Setup Pycharm debug"-->
+<!--                                type="object"-->
+<!--                                class="oe_highlight"-->
+<!--                                invisible="not need_debugger_cg_erplibre_devops"/>-->
                         </group>
                     </group>
                     <group>
@@ -185,8 +183,7 @@
                         <group string="Log">
                             <field
                                 name="devops_cg_erplibre_devops_error_log"
-                                attrs="{'invisible': [('devops_cg_erplibre_devops_error_log', '=', False)]}"
-                            />
+                                invisible="not devops_cg_erplibre_devops_error_log"/>
                             <field name="devops_cg_erplibre_devops_log" />
                         </group>
                         <group name="group_cg_config" string="CG config view">
@@ -288,7 +285,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -330,16 +327,15 @@
         <field name="name">devops_plan_cg_tree</field>
         <field name="model">devops.plan.cg</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_plan_cg_plan_cg_action_window"
-        name="Plan cg"
-        res_model="devops.plan.cg"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_plan_cg_plan_cg_action_window" model="ir.actions.act_window">
+        <field name="name">Plan cg</field>
+        <field name="res_model">devops.plan.cg</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
+    </record>
 </odoo>

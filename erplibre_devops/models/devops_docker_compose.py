@@ -27,7 +27,7 @@ class DevopsDockerCompose(models.Model):
 
     is_running = fields.Boolean(
         readonly=True,
-        track_visibility="onchange",
+        tracking=True,
     )
 
     @api.depends("config_file_path")

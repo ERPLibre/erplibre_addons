@@ -12,11 +12,10 @@
                         icon="fa-eye"
                         class="btn-secondary"
                         name="%(sync_external_model.action_sync_db_result)d"
-                        context="{'default_sync_db_id': active_id}"
+                        context="{'default_sync_db_id': id}"
                         string="Show result"
                         type="action"
-                        attrs="{'invisible': [('sync_db_result_ids','=',[])]}"
-                    />
+                        invisible="not sync_db_result_ids"/>
                 </header>
                 <div class="oe_title">
                     <h1>
@@ -65,13 +64,16 @@
         <field name="name">sync.db tree</field>
         <field name="model">sync.db</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window id="action_sync_conf_form" name="Automated Syncs" res_model="sync.db" />
+    <record id="action_sync_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated Syncs</field>
+        <field name="res_model">sync.db</field>
+    </record>
 
     <!-- Execute sync from "More" menu -->
     <record id="action_server_sync" model="ir.actions.server">

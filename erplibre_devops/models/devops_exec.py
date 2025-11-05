@@ -253,7 +253,6 @@ class DevopsExec(models.Model):
                 f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
             )
 
-    @api.multi
     def open_file_ide(self):
         ws_id = self.env["devops.workspace"].search(
             [("is_me", "=", True)], limit=1
@@ -266,7 +265,6 @@ class DevopsExec(models.Model):
                     breakpoint_id=o_rec.ide_breakpoint.id
                 ).ide_pycharm.action_start_pycharm()
 
-    @api.multi
     def open_cmd_into_ide(self):
         ws_id = self.env["devops.workspace"].search(
             [("is_me", "=", True)], limit=1

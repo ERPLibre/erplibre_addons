@@ -308,7 +308,6 @@ class DevopsSystem(models.Model):
                 rec.erplibre_config_path_home_ids = [(4, path_home_id.id)]
         return result
 
-    @api.multi
     @api.depends("ssh_connection_status", "method")
     def _compute_system_status(self):
         for rec in self:
@@ -318,13 +317,11 @@ class DevopsSystem(models.Model):
             elif rec.method == "ssh":
                 rec.system_status = rec.ssh_connection_status
 
-    @api.multi
     @api.depends("devops_deploy_vm_id")
     def _compute_is_vm(self):
         for rec in self:
             rec.is_vm = bool(rec.devops_deploy_vm_id)
 
-    @api.multi
     @api.depends(
         "name_overwrite",
         "ssh_connection_status",
@@ -348,7 +345,6 @@ class DevopsSystem(models.Model):
                 # Add state if name_overwrite
                 rec.name += f" {state}"
 
-    @api.multi
     @api.depends("docker_compose_ids", "docker_compose_ids.active")
     def _compute_docker_compose_count(self):
         for rec in self:
@@ -356,7 +352,6 @@ class DevopsSystem(models.Model):
                 "devops.docker.compose"
             ].search_count([("system_id", "=", rec.id)])
 
-    @api.multi
     @api.depends("docker_volume_ids", "docker_volume_ids.active")
     def _compute_docker_volume_count(self):
         for rec in self:
@@ -364,7 +359,6 @@ class DevopsSystem(models.Model):
                 "devops.docker.volume"
             ].search_count([("system_id", "=", rec.id)])
 
-    @api.multi
     @api.depends("docker_image_ids", "docker_image_ids.active")
     def _compute_docker_image_count(self):
         for rec in self:
@@ -372,7 +366,6 @@ class DevopsSystem(models.Model):
                 "devops.docker.image"
             ].search_count([("system_ids", "in", [rec.id])])
 
-    @api.multi
     @api.depends("docker_network_ids", "docker_network_ids.active")
     def _compute_docker_network_count(self):
         for rec in self:
@@ -380,7 +373,6 @@ class DevopsSystem(models.Model):
                 "devops.docker.network"
             ].search_count([("system_id", "=", rec.id)])
 
-    @api.multi
     @api.depends("docker_container_ids", "docker_container_ids.active")
     def _compute_docker_container_count(self):
         for rec in self:
@@ -643,7 +635,6 @@ class DevopsSystem(models.Model):
             cmd_output, folder, return_status=return_status
         )
 
-    @api.multi
     def action_ssh_test_connection(self):
         """Check if the SSH settings are correct."""
         try:
@@ -725,7 +716,6 @@ class DevopsSystem(models.Model):
 
         return ssh_client
 
-    @api.multi
     def action_check_docker(self):
         for rec in self:
             # 1. Check if is installed
@@ -864,7 +854,6 @@ class DevopsSystem(models.Model):
                     )
             rec.docker_has_check = True
 
-    @api.multi
     def action_search_docker(self):
         for rec in self:
             # Debug, force clean all before
@@ -1222,7 +1211,6 @@ class DevopsSystem(models.Model):
                         # Can install it!
                         ws_id.action_install_workspace()
 
-    @api.multi
     def action_install_docker(self):
         for rec in self:
             if not rec.docker_has_check:
@@ -1238,14 +1226,12 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
-    @api.multi
     def open_terminal(self):
         for rec in self:
             out = rec.execute_terminal_gui(
                 cmd=f'pwd',
             )
 
-    @api.multi
     def configure_ntp(self):
         for rec in self:
             # Install it
@@ -1257,7 +1243,6 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
-    @api.multi
     def configure_starship(self):
         for rec in self:
             # Install it
@@ -1280,7 +1265,6 @@ class DevopsSystem(models.Model):
                 'Add it at the end of bashrc\neval "$(starship init bash)"'
             )
 
-    @api.multi
     def action_install_robotlibre(self):
         for rec in self:
             # TODO copy file script/install/install_debian_dependency.sh and run it
@@ -1302,7 +1286,6 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
             )
 
-    @api.multi
     def action_install_dev_system(self):
         for rec in self:
             # Need this to install ERPLibre for dev
@@ -1336,7 +1319,6 @@ class DevopsSystem(models.Model):
             # Dev desktop
             # vanille-gnome-desktop
 
-    @api.multi
     def action_show_security_ssh_keygen(self):
         for rec in self:
             cmd = (
@@ -1351,7 +1333,6 @@ class DevopsSystem(models.Model):
             )
             raise exceptions.Warning(msg)
 
-    @api.multi
     def action_search_vm(self):
         for rec in self:
             dct_vm_identifiant = {}
@@ -1495,7 +1476,6 @@ class DevopsSystem(models.Model):
             #     for guid, dct_net in dct_vm_net_info.items():
             #         print("ok")
 
-    @api.multi
     def action_search_all(self):
         self.action_search_workspace()
         # TODO maybe check system_status before continue
@@ -1507,7 +1487,6 @@ class DevopsSystem(models.Model):
         self.action_check_docker()
         self.action_search_docker()
 
-    @api.multi
     def action_vm_power(self):
         for rec in self:
             if rec.devops_deploy_vm_id:
@@ -1518,7 +1497,6 @@ class DevopsSystem(models.Model):
             else:
                 _logger.warning("Not action VM power.")
 
-    @api.multi
     def action_search_workspace(self):
         for rec in self:
             # TODO use mdfind on OSX
@@ -1739,7 +1717,6 @@ class DevopsSystem(models.Model):
                         {"name": image_name, "path": file_path}
                     )
 
-    @api.multi
     def get_local_system_id_from_ssh_config(self):
         new_sub_system_id = self.env["devops.system"]
         for rec in self:

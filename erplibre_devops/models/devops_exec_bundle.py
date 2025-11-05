@@ -98,7 +98,6 @@ class DevopsExecBundle(models.Model):
         readonly=True,
     )
 
-    @api.multi
     def get_last_exec(self):
         self.ensure_one()
         if self.devops_exec_ids:

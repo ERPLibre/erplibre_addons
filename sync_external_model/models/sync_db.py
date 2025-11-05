@@ -125,7 +125,6 @@ class SyncDB(models.Model):
         elif self.protocol == "https":
             self.sync_port = 443
 
-    @api.multi
     @api.depends(
         "protocol",
         "sync_user",
@@ -143,7 +142,6 @@ class SyncDB(models.Model):
                 f" '{rec.module_name}'"
             )
 
-    @api.multi
     def action_sync_test_connection(self):
         error = ""
         for rec in self:
@@ -209,7 +207,6 @@ class SyncDB(models.Model):
             )
         return odoo
 
-    @api.multi
     def action_sync(self):
         """Run selected sync."""
         for rec in self:

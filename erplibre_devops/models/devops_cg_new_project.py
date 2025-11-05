@@ -710,7 +710,6 @@ class DevopsCgNewProject(models.Model):
             else:
                 rec.exec_time_duration = None
 
-    @api.multi
     def action_new_project_debug(self, ctx=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
@@ -742,7 +741,6 @@ class DevopsCgNewProject(models.Model):
                         "Cannot support debug for this stage"
                     )
 
-    @api.multi
     def action_new_project_setup_IDE(
         self,
         ctx=None,
@@ -801,7 +799,6 @@ class DevopsCgNewProject(models.Model):
                         conf_add_config_path=conf_add_config_path,
                     )
 
-    @api.multi
     def action_new_project(self, ctx=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
@@ -906,7 +903,6 @@ class DevopsCgNewProject(models.Model):
                 if rec.log_warning_ids:
                     rec.has_warning = True
 
-    @api.multi
     def action_init(self, ctx=None, rec_ws=None):
         for rec in self:
             ws_param = rec_ws if rec_ws else rec.devops_workspace
@@ -1067,7 +1063,6 @@ class DevopsCgNewProject(models.Model):
                     "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
                 )
 
-    @api.multi
     def action_generate_Uc0(self, ctx=None, rec_ws=None):
         for rec in self:
             ws_param = rec_ws if rec_ws else rec.devops_workspace
@@ -1213,7 +1208,6 @@ class DevopsCgNewProject(models.Model):
                         "erplibre_devops.devops_cg_new_project_stage_generate_uca"
                     )
 
-    @api.multi
     def action_generate_uca(self, ctx=None, rec_ws=None):
         for rec in self:
             ws_param = rec_ws if rec_ws else rec.devops_workspace
@@ -1518,7 +1512,6 @@ class DevopsCgNewProject(models.Model):
                         "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
                     )
 
-    @api.multi
     def action_generate_ucb(self, ctx=None, rec_ws=None):
         for rec in self:
             ws_param = rec_ws if rec_ws else rec.devops_workspace
@@ -1727,7 +1720,6 @@ class DevopsCgNewProject(models.Model):
 
         git_repo.git.restore(relative_path)
 
-    @api.multi
     def add_breakpoint(
         self,
         bp_id=None,
@@ -1815,7 +1807,6 @@ class DevopsCgNewProject(models.Model):
             file.write(txt)
         return True
 
-    @api.multi
     def action_kill_pycharm(self):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
@@ -1823,7 +1814,6 @@ class DevopsCgNewProject(models.Model):
             ) as rec_ws:
                 rec_ws.ide_pycharm.action_kill_pycharm()
 
-    @api.multi
     def action_start_pycharm(self, ctx=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(

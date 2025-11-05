@@ -36,7 +36,6 @@ class DevopsCodeTodo(models.Model):
         help="Associate a breakpoint to this execution.",
     )
 
-    @api.multi
     def open_file_ide(self):
         ws_id = self.env["devops.workspace"].search(
             [("is_me", "=", True)], limit=1
@@ -70,7 +69,6 @@ class DevopsCodeTodo(models.Model):
                     breakpoint_id=id_ide_breakpoint
                 ).ide_pycharm.action_start_pycharm()
 
-    @api.multi
     def parse_workspace(self, wp_id):
         self.env["devops.code.todo"].search([]).write({"active": False})
         cg_module_ids = self.env["devops.cg.module"].search([])

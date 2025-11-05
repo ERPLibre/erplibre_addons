@@ -12,7 +12,6 @@ class DevopsLogMakefileTarget(models.Model):
         string="Devops Workspace",
     )
 
-    @api.multi
     def action_launch_target(self):
         for rec in self:
             with rec.devops_workspace_id.devops_create_exec_bundle(

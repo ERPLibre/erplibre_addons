@@ -33,7 +33,7 @@
                 <field name="name" />
                 <field name="devops_workspace_id" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -80,7 +80,7 @@
         <field name="name">devops_log_makefile_target_tree</field>
         <field name="model">devops.log.makefile.target</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="devops_workspace_id" />
                 <button
@@ -91,14 +91,13 @@
                     icon="fa-play-circle text-success"
                     tabindex="-1"
                 />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_log_makefile_target_action_window"
-        name="Db image"
-        res_model="devops.log.makefile.target"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_log_makefile_target_action_window" model="ir.actions.act_window">
+        <field name="name">Db image</field>
+        <field name="res_model">devops.log.makefile.target</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

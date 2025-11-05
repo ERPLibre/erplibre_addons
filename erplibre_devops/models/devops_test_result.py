@@ -84,7 +84,6 @@ class DevopsTestResult(models.Model):
         related="test_case_exec_id.has_devops_action"
     )
 
-    @api.multi
     @api.depends("log")
     def _compute_log_html(self):
         for rec in self:
@@ -96,10 +95,8 @@ class DevopsTestResult(models.Model):
             else:
                 rec.log_html = False
 
-    @api.multi
     def open_devops_action(self):
         return self.test_case_exec_id.open_devops_action()
 
-    @api.multi
     def open_new_test_plan_execution(self):
         return self.test_case_exec_id.open_new_test_plan_execution()

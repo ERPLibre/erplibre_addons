@@ -85,7 +85,6 @@ class DevopsDockerComposeTemplate(models.Model):
                 rec.name += f" {rec.gpu_mode}"
 
     @api.depends("docker_compose_model", "gpu_mode", "port_1")
-    @api.multi
     def _compute_yaml(self):
         for rec in self:
             if rec.docker_compose_model == "erplibre":

@@ -29,7 +29,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         comodel_name="devops.workspace",
         string="Root workspace",
         required=True,
-        default=lambda self: self.env.context.get("active_id"),
+        default=lambda self: self.env.context.get("id"),
         ondelete="cascade",
         help="Workspace where to execute the action.",
     )
@@ -507,7 +507,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 record, "state_exit_%s" % record.state, False
             )
 
-    @api.multi
     @api.depends("working_system_id")
     def _compute_is_update_system(self):
         for rec in self:
@@ -518,7 +517,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.ssh_user = rec.working_system_id.ssh_user
                 rec.ssh_password = rec.working_system_id.ssh_password
 
-    @api.multi
     @api.depends(
         "instance_gpu_mode",
         "instance_port_1",
@@ -540,7 +538,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 )
                 rec.instance_yaml = copy_instance_template.yaml
 
-    @api.multi
     @api.depends(
         "working_module_path_suggestion",
         "working_module_path",
@@ -606,7 +603,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             if not rec.working_module_id and not rec.working_module_name:
                 rec.has_configured_path = False
 
-    @api.multi
     @api.depends("working_module_id")
     def _compute_is_new_module(self):
         for rec in self:
@@ -619,7 +615,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             "erplibre_devops.devops_docker_compose_template_default_erplibre"
         )
 
-    @api.multi
     @api.depends(
         "working_erplibre_config_path_home_id",
         "working_erplibre_config_path_home_id.name",
@@ -642,7 +637,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                         rec.working_erplibre_config_path_home_id.name
                     )
 
-    @api.multi
     @api.depends("system_method", "working_system_id")
     def _compute_is_new_or_exist_ssh(self):
         for rec in self:
@@ -651,7 +645,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 or rec.working_system_id.method == "ssh"
             )
 
-    @api.multi
     @api.depends(
         "working_system_id", "system_ssh_connection_status", "system_method"
     )
@@ -1822,7 +1815,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             pass
         return self._reopen_self()
 
-    @api.multi
     def action_git_commit(self):
         for rec in self:
             if rec.plan_cg_id:
@@ -1832,14 +1824,12 @@ class DevopsPlanActionWizard(models.TransientModel):
                     rec.plan_cg_id.action_git_commit_remote()
         return self._reopen_self()
 
-    @api.multi
     def action_git_meld_remote(self):
         for rec in self:
             if rec.plan_cg_id:
                 rec.plan_cg_id.action_git_meld_remote()
         return self._reopen_self()
 
-    @api.multi
     def action_git_clean_remote(self):
         for rec in self:
             if rec.plan_cg_id:

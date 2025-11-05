@@ -11,8 +11,7 @@
                         string="Install requirement"
                         type="object"
                         class="btn-danger"
-                        attrs="{'invisible': [('has_requirement_to_install', '=', False)]}"
-                    />
+                        invisible="not has_requirement_to_install"/>
                     <button name="execute" string="Execute" type="object" class="btn-success" />
                     <button name="clear_result" string="Clear result" type="object" class="btn-warning" />
                 </header>
@@ -33,7 +32,7 @@
                         </group>
                         <group string="Configuration">
                             <field name="temperature" />
-                            <field name="gen_nb_aliment" attrs="{'invisible': [('has_aliment', '=', False)]}" />
+                            <field name="gen_nb_aliment" invisible="not has_aliment" />
                             <field name="step" />
                             <field name="website_max_number_one_pager" string="Mots maximum" />
                         </group>
@@ -45,8 +44,7 @@
                             <field
                                 name="advance_aliment_template_repas_image"
                                 string="Template repas image"
-                                attrs="{'invisible': [('has_aliment', '=', False)]}"
-                            />
+                                invisible="not has_aliment"/>
                             <field name="advance_presentation_nb_page" string="Template presentation nb page" />
                         </group>
                     </group>
@@ -67,37 +65,28 @@
                                 <field
                                     name="question_list_aliment"
                                     string="Q. Liste aliment"
-                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
-                                />
+                                    invisible="not has_aliment"/>
                                 <field
                                     name="result_list_aliment"
                                     string="R. Liste aliment"
-                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
-                                />
+                                    invisible="not has_aliment"/>
                                 <field
                                     name="result_list_aliment_count"
                                     string="CS. Aliment count"
-                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
-                                />
+                                    invisible="not has_aliment"/>
                                 <field
                                     name="question_list_aliment_image"
                                     string="CQ. Aliment image"
-                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
-                                />
+                                    invisible="not has_aliment"/>
                                 <field
                                     name="result_list_aliment_image"
                                     string="R. Aliment image"
-                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
-                                />
+                                    invisible="not has_aliment"/>
                             </group>
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -125,7 +114,7 @@
                 <field name="type_context" />
                 <field name="website_max_number_one_pager" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -192,19 +181,18 @@
         <field name="name">devops_plan_project_tree</field>
         <field name="model">devops.plan.project</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="project_type" />
                 <field name="type_context" />
                 <field name="website_max_number_one_pager" />
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_plan_project_plan_project_action_window"
-        name="Plan project"
-        res_model="devops.plan.project"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_plan_project_plan_project_action_window" model="ir.actions.act_window">
+        <field name="name">Plan project</field>
+        <field name="res_model">devops.plan.project</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
+    </record>
 </odoo>

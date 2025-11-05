@@ -11,14 +11,18 @@
                         string="Open into IDE"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('workspace_id', '=', False)]}"
-                    />
+                        invisible="not workspace_id"/>
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                            <field name="active" widget="boolean_button" />
-                        </button>
+                        
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+            
                     </div>
                     <group>
                         <field name="name" />
@@ -76,7 +80,7 @@
                 <field name="path_module" />
                 <field name="workspace_id" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -162,7 +166,7 @@
         <field name="name">devops_code_todo_tree</field>
         <field name="model">devops.code.todo</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="filename" />
@@ -177,16 +181,14 @@
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"
                     tabindex="-1"
-                    attrs="{'invisible': [('workspace_id', '=', False)]}"
-                />
-            </tree>
+                    invisible="not workspace_id"/>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_code_todo_code_todo_action_window"
-        name="Code todo"
-        res_model="devops.code.todo"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_code_todo_code_todo_action_window" model="ir.actions.act_window">
+        <field name="name">Code todo</field>
+        <field name="res_model">devops.code.todo</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
+    </record>
 </odoo>

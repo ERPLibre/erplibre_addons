@@ -18,8 +18,7 @@
                         name="action_install_docker"
                         string="Install docker"
                         type="object"
-                        attrs="{'invisible': [('docker_has_check','=',False)]}"
-                    />
+                        invisible="not docker_has_check"/>
                     <button name="open_terminal" string="Open terminal" type="object" />
                     <button name="configure_ntp" string="Configure NTP" type="object" />
                     <button name="configure_starship" string="Configure starship" type="object" />
@@ -28,20 +27,17 @@
                         string="Check docker"
                         type="object"
                         class="btn-success"
-                        attrs="{'invisible': [('docker_has_check','=',True)]}"
-                    />
+                        invisible="docker_has_check"/>
                     <button
                         name="action_check_docker"
                         string="Check docker"
                         type="object"
-                        attrs="{'invisible': [('docker_has_check','=',False)]}"
-                    />
+                        invisible="not docker_has_check"/>
                     <button
                         name="action_search_docker"
                         string="Search Docker"
                         type="object"
-                        attrs="{'invisible': [('docker_has_check','=',False)]}"
-                    />
+                        invisible="not docker_has_check"/>
                 </header>
                 <div class="oe_title">
                     <h1>
@@ -49,21 +45,21 @@
                     </h1>
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                        <field
-                            name="active"
-                            widget="boolean_button"
-                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
-                        />
-                    </button>
+
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+
                     <button
                         name="%(erplibre_devops.devops_docker_compose_docker_compose_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
-                        attrs="{'invisible': [('docker_compose_count', '==', 0)]}"
-                    >
+                        context="{'search_default_system_id': id}"
+                        invisible="docker_compose_count == 0">
                         <field name="docker_compose_count" string="Docker Compose" widget="statinfo" />
                     </button>
                     <button
@@ -71,9 +67,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
-                        attrs="{'invisible': [('docker_volume_count', '==', 0)]}"
-                    >
+                        context="{'search_default_system_id': id}"
+                        invisible="docker_volume_count == 0">
                         <field name="docker_volume_count" string="Docker Volume" widget="statinfo" />
                     </button>
                     <button
@@ -82,8 +77,7 @@
                         class="oe_stat_button"
                         icon="fa-tasks"
                         context="{'search_default_system_ids': name}"
-                        attrs="{'invisible': [('docker_image_count', '==', 0)]}"
-                    >
+                        invisible="docker_image_count == 0">
                         <field name="docker_image_count" string="Docker Image" widget="statinfo" />
                     </button>
                     <button
@@ -91,9 +85,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
-                        attrs="{'invisible': [('docker_network_count', '==', 0)]}"
-                    >
+                        context="{'search_default_system_id': id}"
+                        invisible="docker_network_count == 0">
                         <field name="docker_network_count" string="Docker Network" widget="statinfo" />
                     </button>
                     <button
@@ -101,13 +94,12 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
-                        attrs="{'invisible': [('docker_container_count', '==', 0)]}"
-                    >
+                        context="{'search_default_system_id': id}"
+                        invisible="docker_container_count == 0">
                         <field name="docker_container_count" string="Docker container" widget="statinfo" />
                     </button>
                 </div>
-                <div class="bg-danger" attrs="{'invisible': [('terminal', '!=', False)]}">
+                <div class="bg-danger" invisible="terminal">
                     <h3>Error:</h3>
                     The system need to select a validate terminal option for a good execution.
                 </div>
@@ -133,11 +125,11 @@
                             <field name="sub_system_ids" />
                         </group>
                     </page>
-                    <page string="SSH" attrs="{'invisible': [('method', '!=', 'ssh')]}">
+                    <page string="SSH" invisible="method != 'ssh'">
                         <div class="bg-warning">
                             <h3>Warning:</h3>
                             Use SSH with caution!
-                            <div attrs="{'invisible': [('ssh_use_sshpass', '=', False)]}">
+                            <div invisible="not ssh_use_sshpass">
                                 The password can be visible into log.
                             </div>
                         </div>
@@ -249,14 +241,14 @@
         <field name="name">devops.system tree</field>
         <field name="model">devops.system</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="ssh_connection_status" />
                 <field name="ssh_host" />
                 <field name="method" />
                 <field name="terminal" />
                 <field name="use_search_cmd" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -279,7 +271,7 @@
                 <field name="system_status" />
                 <field name="devops_deploy_vm_id" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -300,8 +292,7 @@
                                     type="object"
                                     class="oe_button bg-success"
                                     icon="fa-refresh"
-                                    attrs="{'invisible':['|',('devops_deploy_vm_id','=',False),('system_status','=',True)]}"
-                                >
+                                    invisible="not devops_deploy_vm_id or system_status">
                                     <i class="fa fa-fw o_button_icon fa-power-off" />
                                 </button>
                                 <button
@@ -309,8 +300,7 @@
                                     type="object"
                                     class="oe_button bg-danger"
                                     icon="fa-refresh"
-                                    attrs="{'invisible':['|',('devops_deploy_vm_id','=',False),('system_status','=',False)]}"
-                                >
+                                    invisible="not devops_deploy_vm_id or not system_status">
                                     <i class="fa fa-fw o_button_icon fa-power-off" />
                                 </button>
                                 <button
@@ -318,8 +308,7 @@
                                     type="object"
                                     class="oe_button bg-success"
                                     icon="fa-refresh"
-                                    attrs="{'invisible':[('system_status','=',False)]}"
-                                >
+                                    invisible="not system_status">
                                     <i class="fa fa-fw o_button_icon fa-refresh" />
                                 </button>
                             </div>
@@ -340,10 +329,9 @@
         </field>
     </record>
 
-    <act_window
-        id="action_devops_check_system_conf_form"
-        name="Automated devops_systems"
-        res_model="devops.system"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="action_devops_check_system_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated devops_systems</field>
+        <field name="res_model">devops.system</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
+    </record>
 </odoo>

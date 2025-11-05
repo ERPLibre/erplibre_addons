@@ -12,93 +12,80 @@
                         type="action"
                         class="btn btn-secondary"
                         context="{'default_root_workspace_id': id, 'default_user_id': uid}"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True), ('is_me', '=', False)]}"
-                    />
+                        invisible="(not is_installed or is_conflict_mode_exec) and not is_me"/>
                     <button
                         name="action_install_workspace"
                         string="Install"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', True), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_install_me_workspace"
                         string="Me"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', True), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_check"
                         string="Status"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_start"
                         string="Start"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', '|', ('is_installed', '=', False), ('is_running', '=', True), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_running or is_conflict_mode_exec"/>
                     <button
                         name="action_start"
                         string="Start"
                         type="object"
                         class="btn-success"
-                        attrs="{'invisible': ['|', '|', ('is_installed', '=', False), ('is_running', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or not is_running or is_conflict_mode_exec"/>
                     <button
                         name="action_stop"
                         string="Stop"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', '|', ('is_installed', '=', False), ('is_running', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or not is_running or is_conflict_mode_exec"/>
                     <button
                         name="action_stop"
                         string="Stop"
                         type="object"
                         class="btn-success"
-                        attrs="{'invisible': ['|', '|', ('is_installed', '=', False), ('is_running', '=', True), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_running or is_conflict_mode_exec"/>
                     <button
                         name="action_reboot"
                         string="Reboot"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_reboot"
                         string="Hard Reboot"
                         type="object"
                         class="oe_highlight"
                         context="{'default_exec_reboot_process': True}"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_update"
                         string="Update"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_open_local_view"
                         string="Open browser"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_parse_code"
                         string="Parse code"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="not is_installed or is_conflict_mode_exec"/>
                     <button
                         name="action_install_workspace"
                         string="Re-install"
@@ -106,8 +93,7 @@
                         class="oe_highlight"
                         context="{'force_reinstall_workspace': True}"
                         groups="base.group_no_one"
-                        attrs="{'invisible': [('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="is_conflict_mode_exec"/>
                     <button
                         name="action_install_workspace"
                         string="Re-install full"
@@ -115,40 +101,38 @@
                         class="oe_highlight"
                         context="{'force_reinstall_workspace': True, 'install_dev_workspace': True}"
                         groups="base.group_no_one"
-                        attrs="{'invisible': [('is_conflict_mode_exec', '=', True)]}"
-                    />
+                        invisible="is_conflict_mode_exec"/>
                     <button
                         name="action_clear_error_exec"
                         string="Clear error exec"
                         type="object"
                         class="btn-danger"
-                        attrs="{'invisible': ['|', ('devops_exec_error_count', '==', 0), ('is_installed', '=', False)]}"
-                    />
+                        invisible="devops_exec_error_count == 0 or not is_installed"/>
                 </header>
                 <div class="oe_title">
                     <h1>
                         <field name="name" />
                     </h1>
                 </div>
-                <div class="badge-pill badge-success float-right" attrs="{'invisible': [('is_me', '=', False)]}">
+                <div class="badge-pill badge-success float-right" invisible="not is_me">
                     Same instance
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                        <field
-                            name="active"
-                            widget="boolean_button"
-                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
-                        />
-                    </button>
+
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+
                     <button
                         name="%(erplibre_devops.devops_exec_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id, 'search_default_group_devops_exec_bundle_id': 1}"
-                        attrs="{'invisible': [('devops_exec_count', '==', 0)]}"
-                    >
+                        context="{'search_default_devops_workspace': id, 'search_default_group_devops_exec_bundle_id': 1}"
+                        invisible="devops_exec_count == 0">
                         <field name="devops_exec_count" string="Executions" widget="statinfo" />
                     </button>
                     <button
@@ -156,9 +140,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
-                        attrs="{'invisible': [('devops_test_plan_exec_count', '==', 0)]}"
-                    >
+                        context="{'search_default_workspace_id': id}"
+                        invisible="devops_test_plan_exec_count == 0">
                         <field name="devops_test_plan_exec_count" string="Test plan executions" widget="statinfo" />
                     </button>
                     <button
@@ -166,9 +149,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
-                        attrs="{'invisible': [('devops_code_todo_count', '==', 0)]}"
-                    >
+                        context="{'search_default_workspace_id': id}"
+                        invisible="devops_code_todo_count == 0">
                         <field name="devops_code_todo_count" string="Code TODO" widget="statinfo" />
                     </button>
                     <button
@@ -176,9 +158,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
-                        attrs="{'invisible': [('devops_test_result_count', '==', 0)]}"
-                    >
+                        context="{'search_default_workspace_id': id}"
+                        invisible="devops_test_result_count == 0">
                         <field name="devops_test_result_count" string="Test results" widget="statinfo" />
                     </button>
                     <button
@@ -186,9 +167,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
-                        attrs="{'invisible': [('plan_cg_count', '==', 0)]}"
-                    >
+                        context="{'search_default_workspace_id': id}"
+                        invisible="plan_cg_count == 0">
                         <field name="plan_cg_count" string="Plans CG" widget="statinfo" />
                     </button>
                     <button
@@ -196,9 +176,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id}"
-                        attrs="{'invisible': [('devops_exec_error_count', '==', 0)]}"
-                    >
+                        context="{'search_default_devops_workspace': id}"
+                        invisible="devops_exec_error_count == 0">
                         <field name="devops_exec_error_count" string="Errors" widget="statinfo" />
                     </button>
                     <button
@@ -206,9 +185,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id}"
-                        attrs="{'invisible': [('new_project_count', '==', 0)]}"
-                    >
+                        context="{'search_default_devops_workspace': id}"
+                        invisible="new_project_count == 0">
                         <field name="new_project_count" string="Generations" widget="statinfo" />
                     </button>
                     <button
@@ -216,9 +194,8 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id}"
-                        attrs="{'invisible': [('devops_exec_bundle_count', '==', 0)]}"
-                    >
+                        context="{'search_default_devops_workspace': id}"
+                        invisible="devops_exec_bundle_count == 0">
                         <field name="devops_exec_bundle_count" string="Bundles" widget="statinfo" />
                     </button>
                     <button
@@ -226,13 +203,12 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id, 'search_default_root': 1}"
-                        attrs="{'invisible': [('devops_exec_bundle_root_count', '==', 0)]}"
-                    >
+                        context="{'search_default_devops_workspace': id, 'search_default_root': 1}"
+                        invisible="devops_exec_bundle_root_count == 0">
                         <field name="devops_exec_bundle_root_count" string="Bundles root" widget="statinfo" />
                     </button>
                 </div>
-                <div class="bg-danger" attrs="{'invisible': [('is_conflict_mode_exec', '=', False)]}">
+                <div class="bg-danger" invisible="not is_conflict_mode_exec">
                     <h3>Error:</h3>
                     Cannot support this execution mode with source mode 'docker'.
                 </div>
@@ -253,41 +229,38 @@
                         <field name="show_error_chatter" />
                         <field
                             name="exec_reboot_process"
-                            attrs="{'invisible': ['|', ('mode_exec', '=', 'docker'), ('is_me', '=', False)]}"
-                        />
+                            invisible="mode_exec == 'docker' or not is_me"/>
                     </group>
-                    <group string="Network" attrs="{'invisible': [('is_installed', '=', False)]}">
+                    <group string="Network" invisible="not is_installed">
                         <button
                             name="action_network_change_port_random"
                             string="Random port"
                             type="object"
                             class="oe_highlight"
-                            attrs="{'invisible': [('exec_reboot_process', '=', False)]}"
-                        />
+                            invisible="not exec_reboot_process"/>
                         <button
                             name="action_network_change_port_default"
                             string="Default port"
                             type="object"
                             class="oe_highlight"
-                            attrs="{'invisible': ['|', ('exec_reboot_process', '=', False), ('is_me', '=', False)]}"
-                        />
-                        <field name="port_http" attrs="{'readonly': [('exec_reboot_process', '=', False)]}" />
-                        <field name="port_longpolling" attrs="{'readonly': [('exec_reboot_process', '=', False)]}" />
+                            invisible="not exec_reboot_process or not is_me"/>
+                        <field name="port_http" readonly="not exec_reboot_process" />
+                        <field name="port_longpolling" readonly="not exec_reboot_process" />
                     </group>
                     <group string="Git">
                         <field name="git_branch" />
                         <field name="git_url" />
                     </group>
-                    <group string="Info" attrs="{'invisible': [('is_installed', '=', False)]}">
+                    <group string="Info" invisible="not is_installed">
                         <field name="url_instance" string="URL" widget="url" />
                         <field name="url_instance_database_manager" string="URL Database" widget="url" />
                     </group>
-                    <group string="DB" attrs="{'invisible': [('is_installed', '=', False)]}">
+                    <group string="DB" invisible="not is_installed">
                         <button name="action_restore_db_image" string="Restore" type="object" class="oe_highlight" />
                         <field name="image_db_selection" />
                         <field name="db_name" />
                     </group>
-                    <group string="Docker" attrs="{'invisible': [('is_installed', '=', False)]}">
+                    <group string="Docker" invisible="not is_installed">
                         <field name="workspace_docker_id" />
                         <field name="docker_compose_id" />
                     </group>
@@ -307,7 +280,7 @@
                         <field name="instance_exec_external_project_ids" />
                     </group>
                 </group>
-                <notebook attrs="{'invisible': [('is_installed', '=', False)]}">
+                <notebook invisible="not is_installed">
                     <page name="status" string="Status">
                         <group string="Instance">
                             <field name="db_is_restored" />
@@ -355,11 +328,7 @@
                         <field name="devops_exec_error_ids" />
                     </page>
                 </notebook>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -392,8 +361,8 @@
         <field name="name">devops.workspace tree</field>
         <field name="model">devops.workspace</field>
         <field name="arch" type="xml">
-            <tree>
-                <field name="system_method" invisible="True" />
+            <list>
+                <field name="system_method" column_invisible="True" />
                 <field name="name" />
                 <field name="folder" />
                 <field name="system_id" />
@@ -408,32 +377,28 @@
                     class="oe_stat_button"
                     icon="fa-star"
                     context="{'default_root_workspace_id': id, 'default_user_id': uid}"
-                    attrs="{'invisible': [('is_me', '=', False)]}"
-                    help="Plan action wizard"
-                />
+                    invisible="not is_me"
+                    help="Plan action wizard"/>
                 <button
                     name="action_update"
                     type="object"
                     class="oe_stat_button"
                     icon="fa-level-up"
-                    attrs="{'invisible': [('is_me', '=', False)]}"
-                    help="Update erplibre_devops, can crash..."
-                />
+                    invisible="not is_me"
+                    help="Update erplibre_devops, can crash..."/>
                 <button
                     name="action_reboot"
                     type="object"
                     class="oe_stat_button bg-success"
                     icon="fa-refresh"
-                    attrs="{'invisible': [('is_me', '=', False)]}"
-                    help="Soft reboot"
-                />
+                    invisible="not is_me"
+                    help="Soft reboot"/>
                 <button
                     name="action_open_workspace_pycharm"
                     type="object"
                     class="oe_stat_button"
                     icon="fa-code"
-                    attrs="{'invisible': [('system_method', '!=', 'local')]}"
-                />
+                    invisible="system_method != 'local'"/>
                 <button name="action_open_terminal" type="object" class="oe_stat_button" icon="fa-terminal" />
                 <button name="action_open_directory" type="object" class="oe_stat_button" icon="fa-folder" />
                 <button name="action_open_local_view" type="object" class="oe_stat_button" icon="fa-desktop" />
@@ -444,7 +409,7 @@
                     context="{'default_exec_reboot_process': True}"
                     class="oe_stat_button bg-danger"
                 />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -469,7 +434,7 @@
                 <field name="is_robot" />
                 <field name="is_running" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -521,12 +486,11 @@
         </field>
     </record>
 
-    <act_window
-        id="action_devops_check_workspace_conf_form"
-        name="Automated devops_workspaces"
-        res_model="devops.workspace"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="action_devops_check_workspace_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated devops_workspaces</field>
+        <field name="res_model">devops.workspace</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 
     <record id="action_server_devops_workspace_check" model="ir.actions.server">
         <field name="name">Check workspace(s)</field>

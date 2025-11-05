@@ -11,13 +11,14 @@
                     </h1>
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                        <field
-                            name="active"
-                            widget="boolean_button"
-                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
-                        />
-                    </button>
+                    
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+            
                 </div>
                 <group string="IT">
                     <field name="devops_workspace" />
@@ -75,7 +76,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -140,7 +141,7 @@
         <field name="name">devops_exec_bundle_tree</field>
         <field name="model">devops.exec.bundle</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="time_duration_result" />
                 <field name="exec_start_date" />
@@ -150,14 +151,13 @@
                 <field name="devops_exec_error_ids" widget="many2many_tags" options="{'no_create':True}" />
                 <field name="devops_exec_parent_error_ids" widget="many2many_tags" options="{'no_create':True}" />
                 <field name="devops_new_project_ids" widget="many2many_tags" options="{'no_create':True}" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_exec_bundle_action_window"
-        name="IT executions bundle"
-        res_model="devops.exec.bundle"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_exec_bundle_action_window" model="ir.actions.act_window">
+        <field name="name">IT executions bundle</field>
+        <field name="res_model">devops.exec.bundle</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

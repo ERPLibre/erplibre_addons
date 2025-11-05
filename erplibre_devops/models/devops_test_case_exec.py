@@ -101,7 +101,6 @@ class DevopsTestCaseExec(models.Model):
         store=True,
     )
 
-    @api.multi
     @api.depends("test_case_id")
     def _compute_has_devops_action(self):
         for rec in self:
@@ -109,7 +108,6 @@ class DevopsTestCaseExec(models.Model):
                 rec.test_case_id and rec.test_case_id.test_cb_method_cg_id
             )
 
-    @api.multi
     @api.depends("result_ids", "result_ids.is_pass")
     def _compute_is_pass(self):
         for rec in self:
@@ -197,7 +195,6 @@ class DevopsTestCaseExec(models.Model):
                     )
         self.env["devops.test.result"].create(lst_result_value)
 
-    @api.multi
     @api.depends("log")
     def _compute_log_html(self):
         for rec in self:
@@ -209,7 +206,6 @@ class DevopsTestCaseExec(models.Model):
             else:
                 rec.log_html = False
 
-    @api.multi
     def open_devops_action(self):
         # TODO add self.ensure_one() in all action
         self.ensure_one()
@@ -264,7 +260,6 @@ class DevopsTestCaseExec(models.Model):
             "context": ctx,
         }
 
-    @api.multi
     def open_new_test_plan_execution(self):
         # TODO add self.ensure_one() in all action
         self.ensure_one()

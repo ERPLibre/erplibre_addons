@@ -33,12 +33,10 @@ class DevopsWorkspaceTerminal(models.Model):
         help="When false, it's because not running terminal.",
     )
 
-    @api.multi
     @api.depends("workspace_id", "terminal_is_running")
     def _compute_name(self):
         for rec in self:
             rec.name = f"{rec.workspace_id.name} - {rec.terminal_is_running}"
 
-    @api.multi
     def action_check(self):
         pass

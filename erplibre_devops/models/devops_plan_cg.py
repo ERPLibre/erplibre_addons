@@ -290,7 +290,6 @@ class DevopsPlanCg(models.Model):
         ),
     )
 
-    @api.multi
     def write(self, values):
         cg_before_ids_i = self.devops_cg_ids.ids
 
@@ -341,7 +340,6 @@ class DevopsPlanCg(models.Model):
                 rec.name = ""
             rec.name += rec.workspace_id.name
 
-    @api.multi
     def action_install_all_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -353,7 +351,6 @@ class DevopsPlanCg(models.Model):
                 rec_ws.install_module(module_list)
                 rec_ws.action_check()
 
-    @api.multi
     def action_install_all_uca_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -381,7 +378,6 @@ class DevopsPlanCg(models.Model):
                 )
                 rec_ws.action_check()
 
-    @api.multi
     def action_install_all_ucb_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -409,7 +405,6 @@ class DevopsPlanCg(models.Model):
                 )
                 rec_ws.action_check()
 
-    @api.multi
     def action_install_and_generate_all_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -420,7 +415,6 @@ class DevopsPlanCg(models.Model):
                 rec.action_refresh_meta_cg_generated_module()
                 rec.action_install_all_generated_module()
 
-    @api.multi
     def action_code_generator_generate_all(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -532,7 +526,6 @@ class DevopsPlanCg(models.Model):
                     rec_ws.action_reboot()
                 # rec_ws.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_all", to_instance=True)
 
-    @api.multi
     def execute_internal_cg(self, rec_cg, module_id):
         for rec in self:
             path_module_generate = os.path.join(
@@ -663,7 +656,6 @@ class DevopsPlanCg(models.Model):
             rec.last_code_generator_writer = cg_writer.id
             # print(cg_writer_id)
 
-    @api.multi
     def workspace_code_remove_module(self, module_id):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -675,7 +667,6 @@ class DevopsPlanCg(models.Model):
                 )
                 rec.workspace_remove_module(module_id.name, path_to_remove)
 
-    @api.multi
     def action_git_commit(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -692,7 +683,6 @@ class DevopsPlanCg(models.Model):
                     force_exit=True,
                 )
 
-    @api.multi
     def action_git_commit_remote(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -719,7 +709,6 @@ class DevopsPlanCg(models.Model):
                     to_instance=True,
                 )
 
-    @api.multi
     def action_git_meld_remote(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -742,7 +731,6 @@ class DevopsPlanCg(models.Model):
                     to_instance=True,
                 )
 
-    @api.multi
     def action_git_clean_remote(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -761,7 +749,6 @@ class DevopsPlanCg(models.Model):
                     to_instance=True,
                 )
 
-    @api.multi
     def action_git_commit_all_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -816,7 +803,6 @@ class DevopsPlanCg(models.Model):
                         to_instance=True,
                     )
 
-    @api.multi
     def action_refresh_meta_cg_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -912,7 +898,6 @@ class DevopsPlanCg(models.Model):
                 rec.devops_cg_status = status
                 rec.devops_cg_stat = stat
 
-    @api.multi
     def workspace_remove_module(
         self, module_name, path_to_remove, remove_module=True
     ):
@@ -937,7 +922,6 @@ class DevopsPlanCg(models.Model):
                     to_instance=True,
                 )
 
-    @api.multi
     def workspace_CG_remove_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -951,7 +935,6 @@ class DevopsPlanCg(models.Model):
                     "erplibre_devops", folder, remove_module=False
                 )
 
-    @api.multi
     def action_clear_all_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -962,7 +945,6 @@ class DevopsPlanCg(models.Model):
                         rec.workspace_code_remove_module(module_id)
                 rec_ws.action_check()
 
-    @api.multi
     def action_cg_generate_demo(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -1301,7 +1283,6 @@ class DevopsPlanCg(models.Model):
         )
         return model_conf
 
-    @api.multi
     def action_execute_last_stage_new_project(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -1318,7 +1299,6 @@ class DevopsPlanCg(models.Model):
                 )
                 rec.last_new_project_cg.action_new_project()
 
-    @api.multi
     def action_open_terminal_tig(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -1353,7 +1333,6 @@ class DevopsPlanCg(models.Model):
                     folder=folder,
                 )
 
-    @api.multi
     def action_open_terminal_addons(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -1370,7 +1349,6 @@ class DevopsPlanCg(models.Model):
                     force_open_terminal=True,
                 )
 
-    @api.multi
     def action_open_terminal_path_erplibre_devops(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -1382,7 +1360,6 @@ class DevopsPlanCg(models.Model):
                 )
                 rec_ws.execute(folder=folder, force_open_terminal=True)
 
-    @api.multi
     def action_check_tree_addons(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
@@ -1399,7 +1376,6 @@ class DevopsPlanCg(models.Model):
                 )
                 rec.devops_cg_tree_addons = exec_id.log_all
 
-    @api.multi
     @api.depends("last_new_project_cg", "last_new_project_cg.has_error")
     def _compute_has_re_execute_new_project(self):
         for rec in self:

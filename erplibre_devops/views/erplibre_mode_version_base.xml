@@ -33,7 +33,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -75,18 +75,17 @@
         <field name="name">erplibre_mode_version_base_tree</field>
         <field name="model">erplibre.mode.version.base</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="value" />
                 <field name="is_tag" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="erplibre_mode_version_base_mode_version_base_action_window"
-        name="Mode version base"
-        res_model="erplibre.mode.version.base"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="erplibre_mode_version_base_mode_version_base_action_window" model="ir.actions.act_window">
+        <field name="name">Mode version base</field>
+        <field name="res_model">erplibre.mode.version.base</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
+    </record>
 </odoo>

@@ -11,8 +11,7 @@
                         string="Open into IDE"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('ide_breakpoint', '=', False)]}"
-                    />
+                        invisible="not ide_breakpoint"/>
                     <button name="open_cmd_into_ide" string="Debug CMD into IDE" type="object" class="btn-warning" />
                 </header>
                 <div class="oe_title">
@@ -21,13 +20,14 @@
                     </h1>
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                        <field
-                            name="active"
-                            widget="boolean_button"
-                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
-                        />
-                    </button>
+                    
+            <field name="active" invisible="1" />
+            <widget
+                name="web_ribbon"
+                title="Archived"
+                bg_color="bg-danger"
+                invisible="active"/>
+            
                 </div>
                 <group>
                     <field name="devops_workspace" />
@@ -104,7 +104,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -166,7 +166,7 @@
         <field name="name">devops_exec_tree</field>
         <field name="model">devops.exec</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="time_duration_result" />
                 <field name="exec_start_date" />
@@ -174,7 +174,7 @@
                 <field name="folder" />
                 <field name="cmd" />
                 <field name="devops_workspace" />
-                <field name="ide_breakpoint" invisible="True" />
+                <field name="ide_breakpoint" column_invisible="True" />
                 <button
                     name="open_file_ide"
                     string="Open into IDE"
@@ -182,16 +182,14 @@
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"
                     tabindex="-1"
-                    attrs="{'invisible': [('ide_breakpoint', '=', False)]}"
-                />
-            </tree>
+                    invisible="not ide_breakpoint"/>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_exec_action_window"
-        name="IT executions"
-        res_model="devops.exec"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_exec_action_window" model="ir.actions.act_window">
+        <field name="name">IT executions</field>
+        <field name="res_model">devops.exec</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

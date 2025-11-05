@@ -64,7 +64,7 @@
                 <field name="script_after_init_check" />
                 <field name="test_name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -181,7 +181,7 @@
         <field name="name">devops_cg_test_case_tree</field>
         <field name="model">devops.cg.test.case</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="install_path" />
                 <field name="module_generated" />
@@ -192,14 +192,13 @@
                 <field name="restore_db_image_name" />
                 <field name="script_after_init_check" />
                 <field name="test_name" />
-            </tree>
+            </list>
         </field>
     </record>
 
-    <act_window
-        id="devops_cg_test_case_cg_test_case_action_window"
-        name="Cg test case"
-        res_model="devops.cg.test.case"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_cg_test_case_cg_test_case_action_window" model="ir.actions.act_window">
+        <field name="name">Cg test case</field>
+        <field name="res_model">devops.cg.test.case</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
+    </record>
 </odoo>
