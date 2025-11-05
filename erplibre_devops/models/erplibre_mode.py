@@ -40,7 +40,6 @@ class ErplibreMode(models.Model):
         ),
     )
 
-    @api.multi
     @api.depends(
         "mode_env",
         "mode_exec",

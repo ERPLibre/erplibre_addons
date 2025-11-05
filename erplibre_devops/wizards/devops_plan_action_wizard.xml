@@ -1078,9 +1078,8 @@
         <field name="name">DEVOPS action</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">devops.plan.action.wizard</field>
-        <field name="src_model">devops.workspace</field>
+        <field name="binding_model">devops.workspace</field>
         <field name="view_mode">form</field>
-        <field name="view_type">form</field>
         <field name="target">new</field>
     </record>
 </odoo>

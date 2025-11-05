@@ -343,7 +343,6 @@ class DevopsWorkspace(models.Model):
     def _default_folder(self):
         return os.getcwd()
 
-    @api.multi
     @api.depends("is_me", "is_robot", "folder", "namespace")
     def _compute_name(self):
         for rec in self:
@@ -359,7 +358,6 @@ class DevopsWorkspace(models.Model):
             elif rec.folder:
                 rec.name += rec.folder
 
-    @api.multi
     @api.depends(
         "workspace_docker_id",
         "docker_compose_id",
@@ -386,7 +384,6 @@ class DevopsWorkspace(models.Model):
                 is_running = True
             rec.is_running = is_running
 
-    @api.multi
     @api.depends("erplibre_mode.mode_source", "erplibre_mode.mode_exec")
     def _compute_is_conflict_mode_exec(self):
         for rec in self:
@@ -402,7 +399,6 @@ class DevopsWorkspace(models.Model):
                     )
                 )
 
-    @api.multi
     @api.depends("plan_cg_ids.path_code_generator_to_generate")
     def _compute_path_code_generator_to_generate(self):
         for rec in self:
@@ -421,7 +417,6 @@ class DevopsWorkspace(models.Model):
             ]
             rec.path_code_generator_to_generate = ";".join(set(lst_path))
 
-    @api.multi
     @api.depends("system_id.ssh_host", "system_id.method", "port_http")
     def _compute_url_instance(self):
         for rec in self:
@@ -438,7 +433,6 @@ class DevopsWorkspace(models.Model):
                 f"{rec.url_instance}/web/database/manager"
             )
 
-    @api.multi
     @api.depends("devops_exec_ids", "devops_exec_ids.active")
     def _compute_devops_exec_count(self):
         for rec in self:
@@ -446,7 +440,6 @@ class DevopsWorkspace(models.Model):
                 [("devops_workspace", "=", rec.id)]
             )
 
-    @api.multi
     @api.depends(
         "devops_test_plan_exec_ids", "devops_test_plan_exec_ids.active"
     )
@@ -456,7 +449,6 @@ class DevopsWorkspace(models.Model):
                 "devops.test.plan.exec"
             ].search_count([("workspace_id", "=", rec.id)])
 
-    @api.multi
     @api.depends("devops_code_todo_ids", "devops_code_todo_ids.active")
     def _compute_devops_code_todo_count(self):
         for rec in self:
@@ -464,7 +456,6 @@ class DevopsWorkspace(models.Model):
                 "devops.code.todo"
             ].search_count([("workspace_id", "=", rec.id)])
 
-    @api.multi
     @api.depends("devops_test_result_ids", "devops_test_result_ids.active")
     def _compute_devops_test_result_count(self):
         for rec in self:
@@ -472,7 +463,6 @@ class DevopsWorkspace(models.Model):
                 "devops.test.result"
             ].search_count([("workspace_id", "=", rec.id)])
 
-    @api.multi
     @api.depends("plan_cg_ids", "plan_cg_ids.active")
     def _compute_plan_cg_count(self):
         for rec in self:
@@ -480,7 +470,6 @@ class DevopsWorkspace(models.Model):
                 [("workspace_id", "=", rec.id)]
             )
 
-    @api.multi
     @api.depends("devops_exec_error_ids", "devops_exec_error_ids.active")
     def _compute_devops_exec_error_count(self):
         for rec in self:
@@ -488,7 +477,6 @@ class DevopsWorkspace(models.Model):
                 "devops.exec.error"
             ].search_count([("devops_workspace", "=", rec.id)])
 
-    @api.multi
     @api.depends("devops_exec_bundle_ids", "devops_exec_bundle_ids.active")
     def _compute_devops_exec_bundle_count(self):
         for rec in self:
@@ -501,7 +489,6 @@ class DevopsWorkspace(models.Model):
                 [("devops_workspace", "=", rec.id), ("parent_id", "=", False)]
             )
 
-    @api.multi
     @api.depends("new_project_ids", "new_project_ids.active")
     def _compute_new_project_count(self):
         for rec in self:
@@ -509,26 +496,22 @@ class DevopsWorkspace(models.Model):
                 "devops.cg.new_project"
             ].search_count([("devops_workspace", "=", rec.id)])
 
-    @api.multi
     def action_open_workspace_pycharm(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Setup PyCharm debug") as rec:
                 rec.ide_pycharm.action_pycharm_open(rec, folder=rec.folder)
 
-    @api.multi
     def action_cg_setup_pycharm_debug(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Setup PyCharm debug") as rec:
                 rec.ide_pycharm.action_cg_setup_pycharm_debug()
 
-    @api.multi
     def action_clear_error_exec(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Clear error exec") as rec:
                 for error in rec.devops_exec_error_ids:
                     error.active = False
 
-    @api.multi
     def action_format_erplibre_devops(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle(
@@ -541,7 +524,6 @@ class DevopsWorkspace(models.Model):
                     )
                 )
 
-    @api.multi
     def action_update_erplibre_devops(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle(
@@ -556,7 +538,6 @@ class DevopsWorkspace(models.Model):
                     )
                 )
 
-    @api.multi
     def install_module(self, str_module_list):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Install module") as rec:
@@ -585,13 +566,11 @@ class DevopsWorkspace(models.Model):
                     )
                     rec.action_reboot()
 
-    @api.multi
     def action_open_terminal(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Open Terminal") as rec:
                 rec.execute(force_open_terminal=True)
 
-    @api.multi
     def action_open_directory(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Open directory") as rec:
@@ -620,7 +599,6 @@ class DevopsWorkspace(models.Model):
         """Run all scheduled check."""
         return self.search([]).action_check()
 
-    @api.multi
     def action_check(self):
         for rec_o in self:
             # Track exception because it's run from cron
@@ -668,7 +646,6 @@ class DevopsWorkspace(models.Model):
                         }
                         self.env["devops.instance.exec"].create(value)
 
-    @api.multi
     def action_install_me_workspace(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle(
@@ -692,7 +669,6 @@ class DevopsWorkspace(models.Model):
                 rec.port_http = 8069
                 rec.port_longpolling = 8072
 
-    @api.multi
     def action_restore_db_image(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Restore DB image") as rec:
@@ -831,7 +807,6 @@ class DevopsWorkspace(models.Model):
                     # res = requests.post(url_restore, files=f)
                     # print(res.text)
 
-    @api.multi
     def check_devops_workspace(self):
         for rec in self:
             if rec.erplibre_mode.mode_exec in [
@@ -851,7 +826,6 @@ class DevopsWorkspace(models.Model):
             else:
                 raise exceptions.Warning(f"Cannot support '{rec.mode_exec}'")
 
-    @api.multi
     def action_start(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Start") as rec:
@@ -875,7 +849,6 @@ class DevopsWorkspace(models.Model):
                     # Time to start services, because action_check need time to detect port is open
                     time.sleep(SLEEP_KILL)
 
-    @api.multi
     def action_stop(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Stop") as rec:
@@ -901,7 +874,6 @@ class DevopsWorkspace(models.Model):
                         rec.kill_process()
                         rec.action_check()
 
-    @api.multi
     def action_update(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Update DevOps") as rec:
@@ -909,13 +881,11 @@ class DevopsWorkspace(models.Model):
                 rec.action_update_erplibre_devops()
                 rec.action_reboot()
 
-    @api.multi
     def action_parse_code(self, ctx=None):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Parse code") as rec:
                 self.env["devops.code.todo"].parse_workspace(rec)
 
-    @api.multi
     def action_open_local_view(self, ctx=None, url_instance=None):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Open local view") as rec:
@@ -932,7 +902,6 @@ class DevopsWorkspace(models.Model):
                     run_into_workspace=True,
                 )
 
-    @api.multi
     def action_reboot(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Reboot") as rec:
@@ -963,7 +932,6 @@ class DevopsWorkspace(models.Model):
                     rec.action_stop()
                     rec.action_start()
 
-    @api.multi
     def kill_process(self, port=None, sleep_kill=0):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Kill process") as rec:
@@ -998,7 +966,6 @@ class DevopsWorkspace(models.Model):
                         )
                         rec_o.is_running_with_process = False
 
-    @api.multi
     def action_install_workspace(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Install workspace") as rec:
@@ -1160,7 +1127,6 @@ class DevopsWorkspace(models.Model):
                     ).id
                 )
 
-    @api.multi
     def update_makefile_from_git(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Update makefile") as rec:
@@ -1190,7 +1156,6 @@ class DevopsWorkspace(models.Model):
                         {"name": target, "devops_workspace_id": rec.id}
                     )
 
-    @api.multi
     def action_add_makefile(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Update makefile") as rec:
@@ -1209,7 +1174,6 @@ class DevopsWorkspace(models.Model):
                         {"name": target, "devops_workspace_id": rec.id}
                     )
 
-    @api.multi
     def execute(
         self,
         cmd="",
@@ -1495,7 +1459,6 @@ class DevopsWorkspace(models.Model):
                     "execution",
                 )
 
-    @api.multi
     def action_poetry_install(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Poetry install") as rec:
@@ -1503,7 +1466,6 @@ class DevopsWorkspace(models.Model):
                     cmd='bash -c "source ./.venv/bin/activate;poetry install"'
                 )
 
-    @api.multi
     def action_pre_install_workspace(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle(
@@ -1514,7 +1476,6 @@ class DevopsWorkspace(models.Model):
                 addons_path = os.path.join(rec.folder, "addons", "addons")
                 rec.execute(f"mkdir -p '{addons_path}'")
 
-    @api.multi
     @api.model
     def action_network_change_port_default(
         self, ctx=None, default_port_http=8069, default_port_longpolling=8072
@@ -1526,7 +1487,6 @@ class DevopsWorkspace(models.Model):
                 rec.port_http = default_port_http
                 rec.port_longpolling = default_port_longpolling
 
-    @api.multi
     def action_network_change_port_random(
         self, ctx=None, min_port=10000, max_port=20000
     ):
@@ -1608,7 +1568,6 @@ sock.close()
         ]
         return partner_ids, channel_ids
 
-    @api.multi
     def create_exec_error(
         self,
         description,
@@ -1663,7 +1622,6 @@ sock.close()
             return lst_result[0]
         return self.env["devops.exec.error"].browse([a.id for a in lst_result])
 
-    @api.multi
     @contextmanager
     def devops_create_exec_bundle(
         self,

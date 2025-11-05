@@ -67,13 +67,11 @@ class DevopsWorkspaceDocker(models.Model):
 
     docker_initiate_succeed = fields.Boolean(help="Docker is ready to run")
 
-    @api.multi
     @api.depends("workspace_id", "docker_is_running")
     def _compute_name(self):
         for rec in self:
             rec.name = f"{rec.workspace_id.name} - {rec.docker_is_running}"
 
-    @api.multi
     def action_start_docker_compose(self):
         for rec in self:
             rec.docker_is_running = False
@@ -283,7 +281,6 @@ volumes:
             )
             rec.action_docker_check_docker_ps()
 
-    @api.multi
     def action_stop_docker_compose(self):
         for rec in self:
             rec.workspace_id.execute(
@@ -300,7 +297,6 @@ volumes:
             result = exec_id.log_all
             rec.docker_compose_ps = f"\n{result}"
 
-    @api.multi
     def action_docker_status(self):
         for rec in self:
             exec_id = rec.workspace_id.execute(
@@ -309,7 +305,6 @@ volumes:
             result = exec_id.log_all
             rec.docker_compose_ps = f"\n{result}"
 
-    @api.multi
     def action_docker_check_docker_ps(self):
         for rec in self:
             exec_id = rec.workspace_id.execute(
@@ -326,7 +321,6 @@ volumes:
                     rec.docker_is_running
                 )
 
-    @api.multi
     def action_docker_logs(self):
         for rec in self:
             rec.workspace_id.execute(
@@ -334,7 +328,6 @@ volumes:
                 force_open_terminal=True,
             )
 
-    @api.multi
     def action_open_terminal_docker(self):
         for rec in self:
             workspace = os.path.basename(rec.workspace_id.folder)
@@ -344,7 +337,6 @@ volumes:
                 force_open_terminal=True,
             )
 
-    @api.multi
     def action_docker_install_dev_soft(self):
         for rec in self:
             rec.workspace_id.execute(
@@ -352,7 +344,6 @@ volumes:
                 force_docker=True,
             )
 
-    @api.multi
     def action_os_user_permission_docker(self):
         for rec in self:
             rec.workspace_id.execute(
@@ -369,14 +360,12 @@ volumes:
             # TODO check if all good
         self.docker_initiate_succeed = True
 
-    @api.multi
     def action_analyse_docker_image(self):
         for rec in self:
             rec.workspace_id.execute(
                 cmd=f"dive {rec.docker_version}", force_open_terminal=True
             )
 
-    @api.multi
     def action_check(self):
         self.action_docker_status()
         self.action_docker_check_docker_ps()

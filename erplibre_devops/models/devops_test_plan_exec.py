@@ -180,7 +180,6 @@ class DevopsTestPlanExec(models.Model):
         result = super().create(vals_list)
         return result
 
-    @api.multi
     @api.depends("log")
     def _compute_log_html(self):
         for rec in self:
@@ -231,7 +230,6 @@ class DevopsTestPlanExec(models.Model):
             else:
                 rec.global_success = False
 
-    @api.multi
     def check_requirement_test_exec_cg(
         self, rec_ws, test_case_exec_generic_async_id
     ):
@@ -323,7 +321,6 @@ class DevopsTestPlanExec(models.Model):
             )
         return True
 
-    @api.multi
     def action_rerun_fail_testcase(self, ctx=None):
         for rec in self:
             lst_testcase = list(
@@ -350,7 +347,6 @@ class DevopsTestPlanExec(models.Model):
                 "target": "current",
             }
 
-    @api.multi
     def action_execute_test(self, ctx=None):
         lst_test_erplibre_async = []
         ws_id = None

@@ -33,7 +33,6 @@ class DevopsPlanProjectPptx(models.Model):
 
     subtitle = fields.Char()
 
-    @api.multi
     def execute(self):
         cst_max_word_per_line = 80
         for rec in self:

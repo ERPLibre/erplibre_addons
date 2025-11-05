@@ -154,19 +154,16 @@ class DevopsExecError(models.Model):
             if rec.description:
                 rec.name += f" '{rec.description}'"
 
-    @api.multi
     def action_reboot_force_os_workspace(self):
         self.ensure_one()
         self.devops_workspace.with_context(
             default_exec_reboot_process=True
         ).action_reboot()
 
-    @api.multi
     def action_kill_workspace(self):
         self.ensure_one()
         self.devops_workspace.action_stop()
 
-    @api.multi
     def action_debug_new_project(self, ctx=None):
         for rec in self:
             np_ids = (
@@ -178,17 +175,14 @@ class DevopsExecError(models.Model):
                 np_id.stage_id = rec.stage_new_project_id.id
                 np_id.action_new_project_debug(ctx=None)
 
-    @api.multi
     def action_kill_pycharm(self):
         self.ensure_one()
         self.devops_workspace.ide_pycharm.action_kill_pycharm()
 
-    @api.multi
     def action_start_pycharm(self, ctx=None):
         self.ensure_one()
         self.devops_workspace.ide_pycharm.action_start_pycharm(ctx=ctx)
 
-    @api.multi
     def action_set_breakpoint_pycharm(self):
         for rec_o in self:
             with rec_o.devops_workspace.devops_create_exec_bundle(
@@ -199,7 +193,6 @@ class DevopsExecError(models.Model):
                     exec_error_id=rec,
                 )
 
-    @api.multi
     def open_file_ide(self):
         ws_id = self.env["devops.workspace"].search(
             [("is_me", "=", True)], limit=1

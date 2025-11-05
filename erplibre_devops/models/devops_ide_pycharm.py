@@ -56,7 +56,6 @@ class DevopsIdePycharm(models.Model):
             )
             rec.execute(cmd=cmd, engine="")
 
-    @api.multi
     def action_start_pycharm(self, ctx=None, new_project_id=None):
         self.ensure_one()
         with self.devops_workspace.devops_create_exec_bundle(
@@ -120,7 +119,6 @@ class DevopsIdePycharm(models.Model):
             cmd += f" {filename}"
         rec_ws.execute(cmd=cmd, force_open_terminal=True, force_exit=True)
 
-    @api.multi
     def action_pycharm_conf_init(self, ctx=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
@@ -139,7 +137,6 @@ class DevopsIdePycharm(models.Model):
                 )
                 rec_ws.execute(cmd=cmd, run_into_workspace=True)
 
-    @api.multi
     def action_pycharm_check(self, ctx=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
@@ -148,7 +145,6 @@ class DevopsIdePycharm(models.Model):
                 path_idea = os.path.join(rec_ws.folder, ".idea", "misc.xml")
                 rec.is_installed = rec_ws.os_path_exists(path_idea)
 
-    @api.multi
     def action_cg_setup_pycharm_debug(
         self, ctx=None, log=None, exec_error_id=None
     ):
@@ -556,14 +552,12 @@ class DevopsIdePycharm(models.Model):
                     xml.write(xml_format)
                 _logger.info(f"Write file '{workspace_xml_path}'")
 
-    @api.multi
     def action_reboot_force_os_workspace(self):
         self.ensure_one()
         self.devops_workspace.with_context(
             default_exec_reboot_process=True
         ).action_reboot()
 
-    @api.multi
     def action_kill_workspace(self):
         self.ensure_one()
         self.devops_workspace.action_stop()

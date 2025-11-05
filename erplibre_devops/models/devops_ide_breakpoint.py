@@ -158,7 +158,6 @@ class DevopsIdeBreakpoint(models.Model):
                 except:
                     raise Exception(f"Wrong output command : {cmd}\n{log_all}")
 
-    @api.multi
     def get_breakpoint_info(self, ws, new_project_id=None, condition=None):
         for rec in self:
             with ws.devops_create_exec_bundle("Get breakpoint info") as rec_ws:
@@ -213,7 +212,6 @@ class DevopsIdeBreakpoint(models.Model):
                     lst_all_no_line.append(tpl_info)
         return lst_all_no_line
 
-    @api.multi
     def open_file_ide(self):
         ws_id = self.env["devops.workspace"].search(
             [("is_me", "=", True)], limit=1
@@ -226,7 +224,6 @@ class DevopsIdeBreakpoint(models.Model):
                     breakpoint_id=o_rec.id
                 ).ide_pycharm.action_start_pycharm()
 
-    @api.multi
     def get_condition_str(
         self,
         value_model=False,
