@@ -64,9 +64,9 @@
         <field name="name">sync.db tree</field>
         <field name="model">sync.db</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
