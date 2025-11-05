@@ -93,13 +93,11 @@ class SyncDBResult(models.Model):
         help="The result affect local instance or remote instance?",
     )
 
-    @api.multi
     @api.depends("model_name")
     def _compute_name(self):
         for rec in self:
             rec.name = rec.model_name
 
-    @api.multi
     @api.depends("status")
     def _compute_colored_line(self):
         for rec in self:
@@ -116,7 +114,6 @@ class SyncDBResult(models.Model):
             else:
                 rec.colored_line = False
 
-    @api.multi
     def sync_local(self):
         for rec in self:
             if rec.resolution not in [
@@ -139,7 +136,6 @@ class SyncDBResult(models.Model):
                     _(f"Cannot support type_result '{rec.type_result}'.")
                 )
 
-    @api.multi
     def sync_remote(self):
         odoo = None
         if self and self[0]:
