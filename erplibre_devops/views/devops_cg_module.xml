@@ -116,10 +116,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_cg_module_code_generator_module_action_window"
-        name="Code generator module"
-        res_model="devops.cg.module"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_cg_module_code_generator_module_action_window" model="ir.actions.act_window">
+        <field name="name">Code generator module</field>
+        <field name="res_model">devops.cg.module</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

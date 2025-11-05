@@ -198,10 +198,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_deploy_vm_deploy_vm_action_window"
-        name="Deploy vm"
-        res_model="devops.deploy.vm"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_deploy_vm_deploy_vm_action_window" model="ir.actions.act_window">
+        <field name="name">Deploy vm</field>
+        <field name="res_model">devops.deploy.vm</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

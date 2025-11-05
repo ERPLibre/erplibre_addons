@@ -71,7 +71,10 @@
         </field>
     </record>
 
-    <act_window id="action_sync_conf_form" name="Automated Syncs" res_model="sync.db" />
+    <record id="action_sync_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated Syncs</field>
+        <field name="res_model">sync.db</field>
+    </record>
 
     <!-- Execute sync from "More" menu -->
     <record id="action_server_sync" model="ir.actions.server">

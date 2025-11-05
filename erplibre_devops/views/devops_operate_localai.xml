@@ -159,10 +159,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_operate_localai_operate_localai_action_window"
-        name="Operate localai"
-        res_model="devops.operate.localai"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_operate_localai_operate_localai_action_window" model="ir.actions.act_window">
+        <field name="name">Operate localai</field>
+        <field name="res_model">devops.operate.localai</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

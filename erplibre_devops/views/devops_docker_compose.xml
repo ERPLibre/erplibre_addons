@@ -153,18 +153,16 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_docker_compose_docker_compose_group_action_window"
-        name="Docker compose"
-        res_model="devops.docker.compose"
-        view_mode="kanban,tree,pivot,graph,form"
-        context="{'search_default_group_by_system_id': True}"
-    />
+    <record id="devops_docker_compose_docker_compose_group_action_window" model="ir.actions.act_window">
+        <field name="name">Docker compose</field>
+        <field name="res_model">devops.docker.compose</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="context">{'search_default_group_by_system_id': True}</field>
+    </record>
 
-    <act_window
-        id="devops_docker_compose_docker_compose_action_window"
-        name="Docker compose"
-        res_model="devops.docker.compose"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_docker_compose_docker_compose_action_window" model="ir.actions.act_window">
+        <field name="name">Docker compose</field>
+        <field name="res_model">devops.docker.compose</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

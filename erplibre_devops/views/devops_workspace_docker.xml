@@ -98,10 +98,9 @@
         </field>
     </record>
 
-    <act_window
-        id="action_devops_check_workspace_docker_conf_form"
-        name="Automated devops_workspace_docker"
-        res_model="devops.workspace.docker"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="action_devops_check_workspace_docker_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated devops_workspace_docker</field>
+        <field name="res_model">devops.workspace.docker</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

@@ -79,10 +79,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_gen_img_light_gen_img_light_action_window"
-        name="Gen img light"
-        res_model="devops.gen.img.light"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_gen_img_light_gen_img_light_action_window" model="ir.actions.act_window">
+        <field name="name">Gen img light</field>
+        <field name="res_model">devops.gen.img.light</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

@@ -122,10 +122,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_test_result_test_result_action_window"
-        name="Test result"
-        res_model="devops.test.result"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_test_result_test_result_action_window" model="ir.actions.act_window">
+        <field name="name">Test result</field>
+        <field name="res_model">devops.test.result</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

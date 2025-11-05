@@ -83,10 +83,9 @@
         </field>
     </record>
 
-    <act_window
-        id="erplibre_mode_version_base_mode_version_base_action_window"
-        name="Mode version base"
-        res_model="erplibre.mode.version.base"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="erplibre_mode_version_base_mode_version_base_action_window" model="ir.actions.act_window">
+        <field name="name">Mode version base</field>
+        <field name="res_model">erplibre.mode.version.base</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

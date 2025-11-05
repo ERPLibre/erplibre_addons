@@ -79,10 +79,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_gen_img_texture_gen_img_texture_action_window"
-        name="Gen img texture"
-        res_model="devops.gen.img.texture"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_gen_img_texture_gen_img_texture_action_window" model="ir.actions.act_window">
+        <field name="name">Gen img texture</field>
+        <field name="res_model">devops.gen.img.texture</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

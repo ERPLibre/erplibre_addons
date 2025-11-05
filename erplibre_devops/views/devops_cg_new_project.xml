@@ -594,10 +594,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_new_project_action_window"
-        name="Code generator new project"
-        res_model="devops.cg.new_project"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_new_project_action_window" model="ir.actions.act_window">
+        <field name="name">Code generator new project</field>
+        <field name="res_model">devops.cg.new_project</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

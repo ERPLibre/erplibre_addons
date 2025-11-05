@@ -79,10 +79,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_deploy_vm_exec_stage_deploy_vm_exec_stage_action_window"
-        name="Deploy vm exec stage"
-        res_model="devops.deploy.vm.exec.stage"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_deploy_vm_exec_stage_deploy_vm_exec_stage_action_window" model="ir.actions.act_window">
+        <field name="name">Deploy vm exec stage</field>
+        <field name="res_model">devops.deploy.vm.exec.stage</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

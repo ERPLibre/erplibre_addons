@@ -38,5 +38,8 @@
         </field>
     </record>
 
-    <act_window id="devops_cg_new_project_stage_action" name="Stages" res_model="devops.cg.new_project.stage" />
+    <record id="devops_cg_new_project_stage_action" model="ir.actions.act_window">
+        <field name="name">Stages</field>
+        <field name="res_model">devops.cg.new_project.stage</field>
+    </record>
 </odoo>

@@ -523,12 +523,11 @@
         </field>
     </record>
 
-    <act_window
-        id="action_devops_check_workspace_conf_form"
-        name="Automated devops_workspaces"
-        res_model="devops.workspace"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="action_devops_check_workspace_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated devops_workspaces</field>
+        <field name="res_model">devops.workspace</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 
     <record id="action_server_devops_workspace_check" model="ir.actions.server">
         <field name="name">Check workspace(s)</field>

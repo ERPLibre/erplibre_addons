@@ -128,10 +128,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_test_case_exec_test_case_exec_action_window"
-        name="Test case exec"
-        res_model="devops.test.case.exec"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_test_case_exec_test_case_exec_action_window" model="ir.actions.act_window">
+        <field name="name">Test case exec</field>
+        <field name="res_model">devops.test.case.exec</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

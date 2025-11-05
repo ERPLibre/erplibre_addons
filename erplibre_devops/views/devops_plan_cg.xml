@@ -338,10 +338,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_plan_cg_plan_cg_action_window"
-        name="Plan cg"
-        res_model="devops.plan.cg"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_plan_cg_plan_cg_action_window" model="ir.actions.act_window">
+        <field name="name">Plan cg</field>
+        <field name="res_model">devops.plan.cg</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

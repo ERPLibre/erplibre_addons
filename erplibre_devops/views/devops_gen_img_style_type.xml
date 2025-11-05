@@ -81,10 +81,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_gen_img_style_type_gen_img_style_type_action_window"
-        name="Gen img style type"
-        res_model="devops.gen.img.style_type"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_gen_img_style_type_gen_img_style_type_action_window" model="ir.actions.act_window">
+        <field name="name">Gen img style type</field>
+        <field name="res_model">devops.gen.img.style_type</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

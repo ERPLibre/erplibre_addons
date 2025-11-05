@@ -94,10 +94,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_test_case_test_case_action_window"
-        name="Test case"
-        res_model="devops.test.case"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_test_case_test_case_action_window" model="ir.actions.act_window">
+        <field name="name">Test case</field>
+        <field name="res_model">devops.test.case</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

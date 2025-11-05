@@ -189,10 +189,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_code_todo_code_todo_action_window"
-        name="Code todo"
-        res_model="devops.code.todo"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_code_todo_code_todo_action_window" model="ir.actions.act_window">
+        <field name="name">Code todo</field>
+        <field name="res_model">devops.code.todo</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

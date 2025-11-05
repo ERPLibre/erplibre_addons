@@ -201,10 +201,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_plan_project_plan_project_action_window"
-        name="Plan project"
-        res_model="devops.plan.project"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_plan_project_plan_project_action_window" model="ir.actions.act_window">
+        <field name="name">Plan project</field>
+        <field name="res_model">devops.plan.project</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

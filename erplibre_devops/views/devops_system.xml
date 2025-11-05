@@ -342,10 +342,9 @@
         </field>
     </record>
 
-    <act_window
-        id="action_devops_check_system_conf_form"
-        name="Automated devops_systems"
-        res_model="devops.system"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="action_devops_check_system_conf_form" model="ir.actions.act_window">
+        <field name="name">Automated devops_systems</field>
+        <field name="res_model">devops.system</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

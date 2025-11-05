@@ -81,10 +81,9 @@
         </field>
     </record>
 
-    <act_window
-        id="erplibre_mode_source_mode_source_action_window"
-        name="Mode source"
-        res_model="erplibre.mode.source"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="erplibre_mode_source_mode_source_action_window" model="ir.actions.act_window">
+        <field name="name">Mode source</field>
+        <field name="res_model">erplibre.mode.source</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

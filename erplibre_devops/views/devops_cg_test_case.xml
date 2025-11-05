@@ -196,10 +196,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_cg_test_case_cg_test_case_action_window"
-        name="Cg test case"
-        res_model="devops.cg.test.case"
-        view_mode="kanban,tree,pivot,graph,form"
-    />
+    <record id="devops_cg_test_case_cg_test_case_action_window" model="ir.actions.act_window">
+        <field name="name">Cg test case</field>
+        <field name="res_model">devops.cg.test.case</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+    </record>
 </odoo>

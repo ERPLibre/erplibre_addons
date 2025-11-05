@@ -105,10 +105,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_docker_compose_template_docker_compose_template_action_window"
-        name="Docker compose template"
-        res_model="devops.docker.compose.template"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_docker_compose_template_docker_compose_template_action_window" model="ir.actions.act_window">
+        <field name="name">Docker compose template</field>
+        <field name="res_model">devops.docker.compose.template</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

@@ -189,10 +189,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_instance_exec_instance_exec_action_window"
-        name="Instance exec"
-        res_model="devops.instance.exec"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_instance_exec_instance_exec_action_window" model="ir.actions.act_window">
+        <field name="name">Instance exec</field>
+        <field name="res_model">devops.instance.exec</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

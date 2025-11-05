@@ -155,10 +155,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_ide_breakpoint_action_window"
-        name="IDE breakpoint"
-        res_model="devops.ide.breakpoint"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_ide_breakpoint_action_window" model="ir.actions.act_window">
+        <field name="name">IDE breakpoint</field>
+        <field name="res_model">devops.ide.breakpoint</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>

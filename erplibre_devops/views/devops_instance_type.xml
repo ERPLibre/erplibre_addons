@@ -79,10 +79,9 @@
         </field>
     </record>
 
-    <act_window
-        id="devops_instance_type_instance_type_action_window"
-        name="Instance type"
-        res_model="devops.instance.type"
-        view_mode="tree,kanban,pivot,graph,form"
-    />
+    <record id="devops_instance_type_instance_type_action_window" model="ir.actions.act_window">
+        <field name="name">Instance type</field>
+        <field name="res_model">devops.instance.type</field>
+        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+    </record>
 </odoo>
