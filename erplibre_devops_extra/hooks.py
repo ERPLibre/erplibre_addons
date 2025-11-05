@@ -7,22 +7,19 @@ from odoo import SUPERUSER_ID, _, api
 _logger = logging.getLogger(__name__)
 
 
-def post_init_hook(cr, e):
-    with api.Environment.manage():
-        env = api.Environment(cr, SUPERUSER_ID, {})
-
-        action = env.ref("board.open_board_my_dash_action")
-        menu_board = env.ref("board.menu_board_my_dash")
-        action_workspace_view = env.ref(
-            "erplibre_devops.action_devops_check_workspace_conf_form"
-        )
-        action_system_view = env.ref(
-            "erplibre_devops.action_devops_check_system_conf_form"
-        )
-        action_vm_view = env.ref(
-            "erplibre_devops.devops_deploy_vm_deploy_vm_action_window"
-        )
-        arch = f"""
+def post_init_hook(env):
+    action = env.ref("board.open_board_my_dash_action")
+    menu_board = env.ref("board.menu_board_my_dash")
+    action_workspace_view = env.ref(
+        "erplibre_devops.action_devops_check_workspace_conf_form"
+    )
+    action_system_view = env.ref(
+        "erplibre_devops.action_devops_check_system_conf_form"
+    )
+    action_vm_view = env.ref(
+        "erplibre_devops.devops_deploy_vm_deploy_vm_action_window"
+    )
+    arch = f"""
 <form string="Mon tableau de bord">
     <board style="2-1">
         <column>
@@ -35,11 +32,11 @@ def post_init_hook(cr, e):
         </column>
     </board>
 </form>
-        """
-        env["ir.ui.view.custom"].create(
-            {
-                "user_id": env.ref("base.user_admin").id,
-                "ref_id": env.ref("board.board_my_dash_view").id,
-                "arch": arch,
-            }
-        )
+    """
+    env["ir.ui.view.custom"].create(
+        {
+            "user_id": env.ref("base.user_admin").id,
+            "ref_id": env.ref("board.board_my_dash_view").id,
+            "arch": arch,
+        }
+    )
