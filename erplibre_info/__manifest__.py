@@ -15,7 +15,7 @@ Show information of your ERPLibre in settings app.
 
 """,
     "depends": [
-        "web_settings_dashboard",
+        "base_setup",
     ],
     "data": [],
     "qweb": [
