@@ -28,13 +28,13 @@
     </record>
 
     <record id="devops_cg_new_project_stage_tree" model="ir.ui.view">
-        <field name="name">devops.cg.new_project.stage.tree</field>
+        <field name="name">devops.cg.new_project.stage.list</field>
         <field name="model">devops.cg.new_project.stage</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle" />
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 

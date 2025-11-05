@@ -95,7 +95,7 @@
                 <field name="status_container" />
                 <field name="system_id" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -212,7 +212,7 @@
         <field name="name">devops_docker_container_tree</field>
         <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="command" />
                 <field name="create_at" />
@@ -229,20 +229,20 @@
                 <field name="network_id" />
                 <field name="compose_id" />
                 <field name="volume_ids" widget="many2many_tags" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_docker_container_docker_container_group_action_window" model="ir.actions.act_window">
         <field name="name">Docker group container</field>
         <field name="res_model">devops.docker.container</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
         <field name="context">{'search_default_group_by_system_id': True}</field>
     </record>
 
     <record id="devops_docker_container_docker_container_action_window" model="ir.actions.act_window">
         <field name="name">Docker container</field>
         <field name="res_model">devops.docker.container</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

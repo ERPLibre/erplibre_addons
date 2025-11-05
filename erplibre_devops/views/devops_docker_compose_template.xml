@@ -48,7 +48,7 @@
                 <field name="name" />
                 <field name="yaml" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -97,16 +97,16 @@
         <field name="name">devops_docker_compose_template_tree</field>
         <field name="model">devops.docker.compose.template</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="yaml" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_docker_compose_template_docker_compose_template_action_window" model="ir.actions.act_window">
         <field name="name">Docker compose template</field>
         <field name="res_model">devops.docker.compose.template</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

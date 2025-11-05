@@ -73,7 +73,7 @@
                 <field name="module_id" />
                 <field name="field_ids" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -135,20 +135,20 @@
         <field name="name">devops_cg_model_tree</field>
         <field name="model">devops.cg.model</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="module_id" />
                 <field name="description" />
                 <field name="field_ids" widget="many2many_tags" />
                 <field name="is_to_remove" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_cg_model_code_generator_module_model_action_window" model="ir.actions.act_window">
         <field name="name">Code generator module model</field>
         <field name="res_model">devops.cg.model</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

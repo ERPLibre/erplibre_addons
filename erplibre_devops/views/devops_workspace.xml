@@ -328,11 +328,7 @@
                         <field name="devops_exec_error_ids" />
                     </page>
                 </notebook>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -365,7 +361,7 @@
         <field name="name">devops.workspace tree</field>
         <field name="model">devops.workspace</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="system_method" column_invisible="True" />
                 <field name="name" />
                 <field name="folder" />
@@ -413,7 +409,7 @@
                     context="{'default_exec_reboot_process': True}"
                     class="oe_stat_button bg-danger"
                 />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -438,7 +434,7 @@
                 <field name="is_robot" />
                 <field name="is_running" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -493,7 +489,7 @@
     <record id="action_devops_check_workspace_conf_form" model="ir.actions.act_window">
         <field name="name">Automated devops_workspaces</field>
         <field name="res_model">devops.workspace</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 
     <record id="action_server_devops_workspace_check" model="ir.actions.server">

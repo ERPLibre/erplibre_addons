@@ -81,7 +81,7 @@
                 <field name="scope" />
                 <field name="system_id" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -179,7 +179,7 @@
         <field name="name">devops_docker_network_tree</field>
         <field name="model">devops.docker.network</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="created_at" />
                 <field name="driver" />
                 <field name="id_network" />
@@ -191,20 +191,20 @@
                 <field name="scope" />
                 <field name="name" />
                 <field name="system_id" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_docker_network_docker_network_group_action_window" model="ir.actions.act_window">
         <field name="name">Docker group network</field>
         <field name="res_model">devops.docker.network</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
         <field name="context">{'search_default_group_by_system_id': True}</field>
     </record>
 
     <record id="devops_docker_network_docker_network_action_window" model="ir.actions.act_window">
         <field name="name">Docker network</field>
         <field name="res_model">devops.docker.network</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

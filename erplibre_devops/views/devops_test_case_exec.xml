@@ -65,7 +65,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -118,17 +118,17 @@
         <field name="name">devops_test_case_exec_tree</field>
         <field name="model">devops.test.case.exec</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="is_finish" />
                 <field name="is_pass" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_test_case_exec_test_case_exec_action_window" model="ir.actions.act_window">
         <field name="name">Test case exec</field>
         <field name="res_model">devops.test.case.exec</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
     </record>
 </odoo>

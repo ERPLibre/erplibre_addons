@@ -241,14 +241,14 @@
         <field name="name">devops.system tree</field>
         <field name="model">devops.system</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="ssh_connection_status" />
                 <field name="ssh_host" />
                 <field name="method" />
                 <field name="terminal" />
                 <field name="use_search_cmd" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -271,7 +271,7 @@
                 <field name="system_status" />
                 <field name="devops_deploy_vm_id" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -332,6 +332,6 @@
     <record id="action_devops_check_system_conf_form" model="ir.actions.act_window">
         <field name="name">Automated devops_systems</field>
         <field name="res_model">devops.system</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
     </record>
 </odoo>

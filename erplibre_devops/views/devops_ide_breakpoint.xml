@@ -68,7 +68,7 @@
                 <field name="filename" />
                 <field name="no_line" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -127,7 +127,7 @@
         <field name="name">devops_ide_breakpoint_tree</field>
         <field name="model">devops.ide.breakpoint</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="no_line" />
                 <field name="keyword" />
@@ -149,13 +149,13 @@
                     icon="fa-play-circle text-success"
                     tabindex="-1"
                     invisible="not filename"/>
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_ide_breakpoint_action_window" model="ir.actions.act_window">
         <field name="name">IDE breakpoint</field>
         <field name="res_model">devops.ide.breakpoint</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

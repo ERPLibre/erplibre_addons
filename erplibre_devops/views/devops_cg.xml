@@ -40,7 +40,7 @@
                 <field name="devops_workspace_ids" />
                 <field name="module_ids" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -94,18 +94,18 @@
         <field name="name">devops_cg_tree</field>
         <field name="model">devops.cg</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="module_ids" widget="many2many_tags" />
                 <field name="force_clean_before_generate" />
                 <field name="devops_workspace_ids" widget="many2many_tags" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_cg_code_generator_action_window" model="ir.actions.act_window">
         <field name="name">Code generator</field>
         <field name="res_model">devops.cg</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

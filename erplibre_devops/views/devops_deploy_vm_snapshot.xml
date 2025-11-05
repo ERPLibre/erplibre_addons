@@ -31,7 +31,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -73,15 +73,15 @@
         <field name="name">devops_deploy_vm_snapshot_tree</field>
         <field name="model">devops.deploy.vm.snapshot</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_deploy_vm_snapshot_deploy_vm_snapshot_action_window" model="ir.actions.act_window">
         <field name="name">Deploy vm snapshot</field>
         <field name="res_model">devops.deploy.vm.snapshot</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
     </record>
 </odoo>

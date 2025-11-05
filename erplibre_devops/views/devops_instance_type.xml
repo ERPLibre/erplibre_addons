@@ -31,7 +31,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -73,15 +73,15 @@
         <field name="name">devops_instance_type_tree</field>
         <field name="model">devops.instance.type</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_instance_type_instance_type_action_window" model="ir.actions.act_window">
         <field name="name">Instance type</field>
         <field name="res_model">devops.instance.type</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

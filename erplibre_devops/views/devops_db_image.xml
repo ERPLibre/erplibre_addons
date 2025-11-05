@@ -34,7 +34,7 @@
                 <field name="name" />
                 <field name="path" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -83,16 +83,16 @@
         <field name="name">devops_db_image_tree</field>
         <field name="model">devops.db.image</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="path" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_db_image_db_image_action_window" model="ir.actions.act_window">
         <field name="name">Db image</field>
         <field name="res_model">devops.db.image</field>
-        <field name="view_mode">tree,kanban,pivot,graph,form</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
     </record>
 </odoo>

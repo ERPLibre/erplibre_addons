@@ -86,11 +86,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -118,7 +114,7 @@
                 <field name="type_context" />
                 <field name="website_max_number_one_pager" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -185,18 +181,18 @@
         <field name="name">devops_plan_project_tree</field>
         <field name="model">devops.plan.project</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="project_type" />
                 <field name="type_context" />
                 <field name="website_max_number_one_pager" />
                 <field name="name" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_plan_project_plan_project_action_window" model="ir.actions.act_window">
         <field name="name">Plan project</field>
         <field name="res_model">devops.plan.project</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
     </record>
 </odoo>

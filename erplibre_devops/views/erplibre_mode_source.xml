@@ -32,7 +32,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -74,16 +74,16 @@
         <field name="name">erplibre_mode_source_tree</field>
         <field name="model">erplibre.mode.source</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="value" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="erplibre_mode_source_mode_source_action_window" model="ir.actions.act_window">
         <field name="name">Mode source</field>
         <field name="res_model">erplibre.mode.source</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
     </record>
 </odoo>

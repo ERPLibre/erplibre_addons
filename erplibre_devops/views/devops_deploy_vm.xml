@@ -79,7 +79,7 @@
                 <field name="vm_exec_last_id" />
                 <field name="workspace_ids" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
@@ -185,7 +185,7 @@
         <field name="name">devops_deploy_vm_tree</field>
         <field name="model">devops.deploy.vm</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="has_vm_exec_running" />
                 <field name="vm_exec_last_id" />
                 <field name="name" />
@@ -194,13 +194,13 @@
                 <field name="provider" />
                 <field name="system_id" />
                 <field name="workspace_ids" />
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="devops_deploy_vm_deploy_vm_action_window" model="ir.actions.act_window">
         <field name="name">Deploy vm</field>
         <field name="res_model">devops.deploy.vm</field>
-        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="view_mode">kanban,list,pivot,graph,form</field>
     </record>
 </odoo>
