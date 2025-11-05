@@ -5,7 +5,7 @@
     "name": "ERPLibre DevOps me",
     "category": "Tools",
     "summary": "Call other action to auto-configure me",
-    "version": "16.0.1.0.0",
+    "version": "17.0.1.0.0",
     "author": "Mathieu Benoit",
     "license": "AGPL-3",
     "website": "https://erplibre.ca",
