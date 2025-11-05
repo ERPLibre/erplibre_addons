@@ -45,20 +45,20 @@
                     </h1>
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    
+
             <field name="active" invisible="1" />
             <widget
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
                 invisible="active"/>
-            
+
                     <button
                         name="%(erplibre_devops.devops_docker_compose_docker_compose_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
+                        context="{'search_default_system_id': id}"
                         invisible="docker_compose_count == 0">
                         <field name="docker_compose_count" string="Docker Compose" widget="statinfo" />
                     </button>
@@ -67,7 +67,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
+                        context="{'search_default_system_id': id}"
                         invisible="docker_volume_count == 0">
                         <field name="docker_volume_count" string="Docker Volume" widget="statinfo" />
                     </button>
@@ -85,7 +85,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
+                        context="{'search_default_system_id': id}"
                         invisible="docker_network_count == 0">
                         <field name="docker_network_count" string="Docker Network" widget="statinfo" />
                     </button>
@@ -94,7 +94,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
-                        context="{'search_default_system_id': active_id}"
+                        context="{'search_default_system_id': id}"
                         invisible="docker_container_count == 0">
                         <field name="docker_container_count" string="Docker container" widget="statinfo" />
                     </button>

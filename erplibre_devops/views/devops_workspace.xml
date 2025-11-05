@@ -118,20 +118,20 @@
                     Same instance
                 </div>
                 <div name="button_box" class="oe_button_box">
-                    
+
             <field name="active" invisible="1" />
             <widget
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
                 invisible="active"/>
-            
+
                     <button
                         name="%(erplibre_devops.devops_exec_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id, 'search_default_group_devops_exec_bundle_id': 1}"
+                        context="{'search_default_devops_workspace': id, 'search_default_group_devops_exec_bundle_id': 1}"
                         invisible="devops_exec_count == 0">
                         <field name="devops_exec_count" string="Executions" widget="statinfo" />
                     </button>
@@ -140,7 +140,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
+                        context="{'search_default_workspace_id': id}"
                         invisible="devops_test_plan_exec_count == 0">
                         <field name="devops_test_plan_exec_count" string="Test plan executions" widget="statinfo" />
                     </button>
@@ -149,7 +149,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
+                        context="{'search_default_workspace_id': id}"
                         invisible="devops_code_todo_count == 0">
                         <field name="devops_code_todo_count" string="Code TODO" widget="statinfo" />
                     </button>
@@ -158,7 +158,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
+                        context="{'search_default_workspace_id': id}"
                         invisible="devops_test_result_count == 0">
                         <field name="devops_test_result_count" string="Test results" widget="statinfo" />
                     </button>
@@ -167,7 +167,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_workspace_id': active_id}"
+                        context="{'search_default_workspace_id': id}"
                         invisible="plan_cg_count == 0">
                         <field name="plan_cg_count" string="Plans CG" widget="statinfo" />
                     </button>
@@ -176,7 +176,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id}"
+                        context="{'search_default_devops_workspace': id}"
                         invisible="devops_exec_error_count == 0">
                         <field name="devops_exec_error_count" string="Errors" widget="statinfo" />
                     </button>
@@ -185,7 +185,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id}"
+                        context="{'search_default_devops_workspace': id}"
                         invisible="new_project_count == 0">
                         <field name="new_project_count" string="Generations" widget="statinfo" />
                     </button>
@@ -194,7 +194,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id}"
+                        context="{'search_default_devops_workspace': id}"
                         invisible="devops_exec_bundle_count == 0">
                         <field name="devops_exec_bundle_count" string="Bundles" widget="statinfo" />
                     </button>
@@ -203,7 +203,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-building-o"
-                        context="{'search_default_devops_workspace': active_id, 'search_default_root': 1}"
+                        context="{'search_default_devops_workspace': id, 'search_default_root': 1}"
                         invisible="devops_exec_bundle_root_count == 0">
                         <field name="devops_exec_bundle_root_count" string="Bundles root" widget="statinfo" />
                     </button>

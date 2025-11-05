@@ -1,0 +1,8 @@
+colorama
+python-pptx
+uvloop
+isort
+pyjsparser
+code_writer
+babel
+plotly

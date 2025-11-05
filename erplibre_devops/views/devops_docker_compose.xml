@@ -12,21 +12,21 @@
                         </h1>
                     </div>
                     <div name="button_box" class="oe_button_box">
-                        
+
             <field name="active" invisible="1" />
             <widget
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
                 invisible="active"/>
-            
+
                         <button
                             name="%(erplibre_devops.devops_docker_container_docker_container_action_window)d"
                             string="Docker container"
                             type="action"
                             class="oe_stat_button"
                             icon="fa-tasks"
-                            context="{'search_default_compose_id': [active_id]}"
+                            context="{'search_default_compose_id': [id]}"
                         />
                         <button
                             name="%(erplibre_devops.devops_docker_volume_docker_volume_action_window)d"
@@ -34,7 +34,7 @@
                             type="action"
                             class="oe_stat_button"
                             icon="fa-tasks"
-                            context="{'search_default_compose_id': [active_id]}"
+                            context="{'search_default_compose_id': [id]}"
                         />
                     </div>
                     <group>

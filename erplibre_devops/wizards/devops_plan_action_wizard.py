@@ -29,7 +29,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         comodel_name="devops.workspace",
         string="Root workspace",
         required=True,
-        default=lambda self: self.env.context.get("active_id"),
+        default=lambda self: self.env.context.get("id"),
         ondelete="cascade",
         help="Workspace where to execute the action.",
     )

@@ -10,7 +10,7 @@ import time
 import uuid
 from typing import Any, Coroutine, Tuple
 
-import aioshutil
+# import aioshutil
 
 from odoo import _, api, fields, models
 

@@ -12,7 +12,7 @@
                         icon="fa-eye"
                         class="btn-secondary"
                         name="%(sync_external_model.action_sync_db_result)d"
-                        context="{'default_sync_db_id': active_id}"
+                        context="{'default_sync_db_id': id}"
                         string="Show result"
                         type="action"
                         invisible="not sync_db_result_ids"/>

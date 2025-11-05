@@ -48,7 +48,7 @@
         "data/erplibre_mode_version_base.xml",
         "data/erplibre_mode_version_erplibre.xml",
         "data/erplibre_mode.xml",
-        "data/ir_cron.xml",
+        # "data/ir_cron.xml",
         "views/devops_cg.xml",
         "views/devops_cg_field.xml",
         "views/devops_cg_model.xml",
