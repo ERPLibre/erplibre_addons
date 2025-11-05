@@ -15,8 +15,7 @@
                         context="{'default_sync_db_id': active_id}"
                         string="Show result"
                         type="action"
-                        attrs="{'invisible': [('sync_db_result_ids','=',[])]}"
-                    />
+                        invisible="not sync_db_result_ids"/>
                 </header>
                 <div class="oe_title">
                     <h1>

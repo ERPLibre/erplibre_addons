@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <tree colors="bg_color_field: colored_line" limit="1000">
                 <field name="sequence" widget="handle" />
-                <field name="colored_line" invisible="True" />
+                <field name="colored_line" column_invisible="True" />
                 <field name="id" />
                 <field name="sync_db_id" />
                 <field name="type_result" />
@@ -19,19 +19,17 @@
                 <field name="msg" />
                 <field name="data" />
                 <field name="status" />
-                <field name="resolution" invisible="True" />
+                <field name="resolution" column_invisible="True" />
                 <button
                     name="sync_local"
                     string="Sync local"
                     type="object"
-                    attrs="{'invisible': ['|',('resolution','not in',['solution_local', 'solution_remote_local']),('status','in',['not_solvable','solved'])]}"
-                />
+                    invisible="resolution not in ['solution_local', 'solution_remote_local'] or status in ['not_solvable', 'solved']"/>
                 <button
                     name="sync_remote"
                     string="Sync remote"
                     type="object"
-                    attrs="{'invisible': ['|',('resolution','not in',['solution_remote', 'solution_remote_local']),('status','in',['not_solvable','solved'])]}"
-                />
+                    invisible="resolution not in ['solution_remote', 'solution_remote_local'] or status in ['not_solvable', 'solved']"/>
             </tree>
         </field>
     </record>
