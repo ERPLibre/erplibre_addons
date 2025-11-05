@@ -13,8 +13,7 @@
                         string="Setup debug from last execution"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('is_installed', '=', False)]}"
-                    />
+                        invisible="not is_installed"/>
                     <button name="action_start_pycharm" string="Start PyCharm" type="object" class="oe_highlight" />
                     <button name="action_kill_pycharm" string="Kill PyCharm" type="object" class="oe_highlight" />
                     <button

@@ -36,8 +36,7 @@
                         string="Give docker permission"
                         type="object"
                         class="btn-danger"
-                        attrs="{'invisible': [('docker_initiate_succeed', '=', True)]}"
-                    />
+                        invisible="docker_initiate_succeed"/>
                     <button
                         name="action_analyse_docker_image"
                         string="Analyse docker image"

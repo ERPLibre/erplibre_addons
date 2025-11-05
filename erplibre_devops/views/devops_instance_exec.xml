@@ -11,8 +11,7 @@
                         string="Start"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('workspace_id', '=', False)]}"
-                    />
+                        invisible="not workspace_id"/>
                 </header>
                 <sheet>
                     <group>

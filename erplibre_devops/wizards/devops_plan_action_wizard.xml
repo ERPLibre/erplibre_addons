@@ -12,8 +12,7 @@
                     string="Next"
                     type="object"
                     class="btn-primary"
-                    attrs="{'invisible': [('has_next', '=', False)]}"
-                />
+                    invisible="not has_next"/>
             </xpath>
             <!--            <xpath expr="//field[@name='state']" position="before">-->
             <xpath expr="//div[@name='states_buttons']" position="inside">
@@ -23,57 +22,49 @@
                     string="Auto-complete"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
-                />
+                    invisible="state != 'code_module'"/>
                 <button
                     name="action_purge_metadata"
                     string="Clear cache"
                     type="object"
                     class="btn btn-warning"
-                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
-                />
+                    invisible="state != 'code_module'"/>
                 <button
                     name="action_code_module_generate"
                     string="Generate"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', False)]}"
-                />
+                    invisible="(state != 'code_module' or not has_configured_path) and not force_show_final"/>
                 <button
                     name="action_git_commit"
                     string="Git commit module"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('plan_cg_id', '=', False)]}"
-                />
+                    invisible="state != 'code_module' or not plan_cg_id"/>
                 <button
                     name="action_git_commit"
                     string="Git commit UcA"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': ['|','|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
-                />
+                    invisible="state != 'code_module' or not plan_cg_id or not use_existing_meta_module or use_existing_meta_module_ucb_only"/>
                 <button
                     name="action_git_commit"
                     string="Git commit UcB"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': ['|','|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_uca_only','==',True)]}"
-                />
+                    invisible="state != 'code_module' or not plan_cg_id or not use_existing_meta_module or use_existing_meta_module_uca_only"/>
                 <button
                     name="action_git_meld_remote"
                     string="Git meld remote"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                />
+                    invisible="state != 'code_module' or not plan_cg_id or not is_remote_cg"/>
                 <button
                     name="action_git_clean_remote"
                     string="Git clean remote"
                     type="object"
                     class="btn btn-success"
-                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                />
+                    invisible="state != 'code_module' or not plan_cg_id or not is_remote_cg"/>
                 <!--                </header>-->
             </xpath>
             <xpath expr="//footer" position="before">
@@ -93,7 +84,7 @@
                 <!--                           class="oe_inline"-->
                 <!--                           placeholder="Name"/>-->
                 <!--                </h1>-->
-                <group name="init_context" attrs="{'invisible': [('state', '!=', 'init')]}">
+                <group name="init_context" invisible="state != 'init'">
                     <group>
                         <div>Choose an action into the system development life cycle.</div>
                     </group>
@@ -103,9 +94,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': ['|',('state', '!=', 'plan_project'),('has_configured_path', '==', True)]}"
-                    style="background-color: #057bc2; color: white;"
-                >
+                    invisible="state != 'plan_project' or has_configured_path"
+                    style="background-color: #057bc2; color: white;">
                     <group>
                         <div>
                             <h2>1 Code - Plan a project</h2>
@@ -119,9 +109,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', True)]}"
-                    style="background-color: #08a9cb; color: white;"
-                >
+                    invisible="state != 'code_module' or has_configured_path"
+                    style="background-color: #08a9cb; color: white;">
                     <group>
                         <div>
                             <h2>2 Code - Module generator</h2>
@@ -152,9 +141,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', True)]}"
-                    style="background-color: #08a9cb; color: white;"
-                >
+                    invisible="state != 'code_module' or not has_configured_path or force_show_final"
+                    style="background-color: #08a9cb; color: white;">
                     <group>
                         <div>
                             <h2>2 Code - Module generator</h2>
@@ -192,9 +180,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', False)]}"
-                    style="background-color: #08a9cb; color: white;"
-                >
+                    invisible="state != 'code_module' or not has_configured_path or not force_show_final"
+                    style="background-color: #08a9cb; color: white;">
                     <group>
                         <div>
                             <h2>2 Code - Module generator</h2>
@@ -234,9 +221,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': [('state', '!=', 'code_shortcut')]}"
-                    style="background-color: #08a9cb; color: white;"
-                >
+                    invisible="state != 'code_shortcut'"
+                    style="background-color: #08a9cb; color: white;">
                     <group>
                         <div>
                             <h2>2 Code - Shortcut</h2>
@@ -249,9 +235,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': [('state', '!=', 'h_run_test')]}"
-                    style="background-color: #04c576; color: white;"
-                >
+                    invisible="state != 'h_run_test'"
+                    style="background-color: #04c576; color: white;">
                     <group>
                         <div>
                             <h2>4 Quality</h2>
@@ -264,9 +249,8 @@
                 </group>
                 <group
                     name="init_context"
-                    attrs="{'invisible': [('state', '!=', 'i_new_remote_system')]}"
-                    style="background-color: #f7b905; color: white;"
-                >
+                    invisible="state != 'i_new_remote_system'"
+                    style="background-color: #f7b905; color: white;">
                     <group>
                         <div>
                             <h2>6 Deploy</h2>
@@ -280,11 +264,10 @@
                 <group
                     name="init_soft_dev"
                     string="Software development"
-                    attrs="{'invisible': [('state', '!=', 'init')]}"
-                >
+                    invisible="state != 'init'">
                     <div>Iterate between 4 steps and interact with Operates.</div>
                 </group>
-                <group name="init" attrs="{'invisible': [('state', '!=', 'init')]}">
+                <group name="init" invisible="state != 'init'">
                     <group style="background-color: #057bc2; color: white;">
                         <div>
                             <h2>1 Plan</h2>
@@ -353,12 +336,12 @@
                         <div>Inspection</div>
                     </group>
                 </group>
-                <group name="init_it_ops" string="It operations" attrs="{'invisible': [('state', '!=', 'init')]}">
+                <group name="init_it_ops" string="It operations" invisible="state != 'init'">
                     <div>
                         Operating automation about usage of the software, create reports and feedback for development.
                     </div>
                 </group>
-                <group name="init_2" attrs="{'invisible': [('state', '!=', 'init')]}">
+                <group name="init_2" invisible="state != 'init'">
                     <group style="background-color: #9bc604; color: white;">
                         <div>
                             <h2>5 Release</h2>
@@ -456,7 +439,7 @@
                 <!--                        &lt;!&ndash;                        <button name="state_goto_a_g_regen" string="Regenerate the choosing module" type="object" class="btn btn-default" />&ndash;&gt;-->
                 <!--                    </group>-->
                 <!--                </group>-->
-                <group name="group_plan_project" attrs="{'invisible': [('state', '!=', 'plan_project')]}">
+                <group name="group_plan_project" invisible="state != 'plan_project'">
                     <group string="1. Select a ERPLibre workspace">
                         <field name="root_workspace_id" />
                         <!--                        <button-->
@@ -470,7 +453,7 @@
                         <field name="enable_deploy_llm_into_project" />
                     </group>
                 </group>
-                <group name="group_code_shortcut" attrs="{'invisible': [('state', '!=', 'code_shortcut')]}">
+                <group name="group_code_shortcut" invisible="state != 'code_shortcut'">
                     <group string="Autopoieses">
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_devops"
@@ -504,8 +487,7 @@
                 </group>
                 <group
                     name="group_a_a_model"
-                    attrs="{'invisible': [('state', '!=', 'a_a_model'),('state', '!=', 'c_a_model')]}"
-                >
+                    invisible="state != 'a_a_model' and state != 'c_a_model'">
                     <group string="Module">
                         <field name="working_module_id" />
                         <field name="working_module_name" string="OR Working Module Name" />
@@ -521,14 +503,13 @@
                 <group
                     name="group_a_a_model"
                     string="Model"
-                    attrs="{'invisible': [('state', '!=', 'a_a_model'),('state', '!=', 'c_a_model')]}"
-                >
+                    invisible="state != 'a_a_model' and state != 'c_a_model'">
                     <field name="model_ids" />
                 </group>
                 <!--                <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">-->
                 <!--                    -->
                 <!--                </group>-->
-                <group name="group_g_test_erplibre" attrs="{'invisible': [('state', '!=', 'g_test_erplibre')]}">
+                <group name="group_g_test_erplibre" invisible="state != 'g_test_erplibre'">
                     <group string="Where">
                         <button name="state_goto_g_a_local" string="Local" type="object" class="btn btn-default" />
                     </group>
@@ -536,15 +517,13 @@
                 <group
                     name="group_code_module"
                     string="A-Module"
-                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
-                >
+                    invisible="state != 'code_module'">
                     <group string="Name">
                         <field name="working_module_id" string="By existing" />
                         <field
                             name="working_module_name"
                             string="OR name"
-                            attrs="{'invisible': [('working_module_id', '!=', False)]}"
-                        />
+                            invisible="working_module_id"/>
                         <button
                             name="action_code_module_autocomplete_module_path"
                             string="Auto-complete"
@@ -558,86 +537,72 @@
                         <field
                             name="working_module_path"
                             string="OR Manual path"
-                            attrs="{'invisible': [('working_module_path_suggestion', '!=', '#')]}"
-                        />
+                            invisible="working_module_path_suggestion != '#'"/>
                     </group>
                 </group>
                 <group
                     string="B-Parameter"
                     name="group_code_module_part_2"
-                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
-                >
-                    <group string="Code generator" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                    invisible="state != 'code_module'">
+                    <group string="Code generator" invisible="state != 'code_module'">
                         <field name="mode_view_generator" />
                         <field name="force_generate" />
                         <field name="is_remote_cg" string="Generate outside ME" />
                         <!--                        <field name="is_cg_temporary" string="Generate temporary" />-->
                     </group>
-                    <group string="Meta UcA &amp; UcB" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                    <group string="Meta UcA &amp; UcB" invisible="state != 'code_module'">
                         <field name="use_external_cg" string="With UcA UcB" />
                         <field
                             name="use_existing_meta_module"
                             string="Select a meta"
-                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
-                        />
+                            invisible="not use_external_cg"/>
                         <field
                             name="use_existing_meta_module_uca_only"
                             string="UcA only"
-                            attrs="{'invisible': ['|','|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or not use_existing_meta_module or use_existing_meta_module_ucb_only"/>
                         <field
                             name="code_generator_name"
                             string="UcA name"
-                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_ucb_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"/>
                         <field
                             name="working_module_cg_path_suggestion"
                             string="UcA suggested path"
-                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_ucb_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"/>
                         <field
                             name="working_module_cg_path"
                             string="OR Manual UcA path"
-                            attrs="{'invisible': ['|','|',('working_module_cg_path_suggestion', '!=', '#'),('use_external_cg', '!=', True),('use_existing_meta_module_ucb_only','==',True)]}"
-                        />
+                            invisible="working_module_cg_path_suggestion != '#' or not use_external_cg or use_existing_meta_module_ucb_only"/>
                         <field
                             name="uca_option_with_inherit"
                             string="UcA option with inherit"
-                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"/>
                         <field
                             name="use_existing_meta_module_ucb_only"
                             string="UcB only"
-                            attrs="{'invisible': ['|','|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_uca_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or not use_existing_meta_module or use_existing_meta_module_uca_only"/>
                         <field
                             name="template_name"
                             string="UcB name"
-                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_uca_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or use_existing_meta_module_uca_only"/>
                         <field
                             name="working_module_template_path_suggestion"
                             string="UcB suggested path"
-                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_uca_only','==',True)]}"
-                        />
+                            invisible="not use_external_cg or use_existing_meta_module_uca_only"/>
                         <field
                             name="working_module_template_path"
                             string="OR Manual UcB path"
-                            attrs="{'invisible': ['|','|',('working_module_template_path_suggestion', '!=', '#'),('use_external_cg', '!=', True),('use_existing_meta_module_uca_only','==',True)]}"
-                        />
+                            invisible="working_module_template_path_suggestion != '#' or not use_external_cg or use_existing_meta_module_uca_only"/>
                     </group>
                 </group>
                 <group
                     string="C-Model"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
-                >
+                    invisible="state != 'code_module' or not has_configured_path">
                     <field name="model_ids" />
                 </group>
                 <group
                     name="group_code_module_2"
                     string="D-View"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
-                >
+                    invisible="state != 'code_module' or not has_configured_path">
                     <group string="Web / admin space">
                         <div>Activate by default.</div>
                     </group>
@@ -645,72 +610,60 @@
                         <field name="mode_view_snippet" string="Mode" />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_generic_mdl"
-                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
-                            string="Models"
-                        />
+                            invisible="mode_view_snippet == 'no_snippet'"
+                            string="Models"/>
                         <field
                             name="mode_view_snippet_enable_template_website_snippet_view"
-                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
-                            string="Generate by template"
-                        />
+                            invisible="mode_view_snippet == 'no_snippet'"
+                            string="Generate by template"/>
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_ctrl_featur"
-                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
-                            string="Template feature"
-                        />
+                            invisible="mode_view_snippet == 'no_snippet'"
+                            string="Template feature"/>
                         <field
                             name="mode_view_snippet_template_generate_website_enable_javascript"
-                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
-                            string="With Javascript"
-                        />
+                            invisible="mode_view_snippet == 'no_snippet'"
+                            string="With Javascript"/>
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_type"
-                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
-                            string="Snippet type"
-                        />
+                            invisible="mode_view_snippet == 'no_snippet'"
+                            string="Snippet type"/>
                     </group>
-                    <group string="Portal" attrs="{'invisible': [('use_external_cg', '==', True)]}">
+                    <group string="Portal" invisible="use_external_cg">
                         <field name="mode_view_portal" string="Mode" />
                         <field
                             name="mode_view_portal_models"
-                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
-                            string="Models"
-                        />
+                            invisible="mode_view_portal == 'no_portal'"
+                            string="Models"/>
                         <field
                             name="mode_view_portal_enable_create"
-                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
-                            string="Support create"
-                        />
+                            invisible="mode_view_portal == 'no_portal'"
+                            string="Support create"/>
                         <field
                             name="mode_view_portal_enable_read"
-                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
-                            string="Support read"
-                        />
+                            invisible="mode_view_portal == 'no_portal'"
+                            string="Support read"/>
                         <field
                             name="mode_view_portal_enable_update"
-                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
-                            string="Support update"
-                        />
+                            invisible="mode_view_portal == 'no_portal'"
+                            string="Support update"/>
                         <field
                             name="mode_view_portal_enable_delete"
-                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
-                            string="Support delete"
-                        />
+                            invisible="mode_view_portal == 'no_portal'"
+                            string="Support delete"/>
                     </group>
                 </group>
                 <group
                     name="group_code_module_3"
                     string="E-Data"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
-                >
+                    invisible="state != 'code_module' or not has_configured_path">
                     <group string="Export from ME">
                         <field
                             name="config_uca_enable_export_data"
-                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
-                        />
+                            invisible="not use_external_cg"/>
                     </group>
                 </group>
-                <group name="group_g_a_local" attrs="{'invisible': [('state', '!=', 'g_a_local')]}">
+                <group name="group_g_a_local" invisible="state != 'g_a_local'">
                     <group string="DB">
                         <field name="image_db_selection" />
                     </group>
@@ -720,8 +673,7 @@
                 </group>
                 <group
                     name="group_f_new_project_society"
-                    attrs="{'invisible': [('state', '!=', 'f_new_project_society')]}"
-                >
+                    invisible="state != 'f_new_project_society'">
                     <group>
                         <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-default" />
                         <button name="state_goto_a_b_field" string="Add field" type="object" class="btn btn-default" />
@@ -742,8 +694,7 @@
                 <group
                     string="Introduction"
                     name="group_i_new_instance"
-                    attrs="{'invisible': [('state', '!=', 'i_new_instance')]}"
-                >
+                    invisible="state != 'i_new_instance'">
                     <div>
                         Choose existing system.
                         <br />
@@ -755,7 +706,7 @@
                         />
                     </div>
                 </group>
-                <group string="Choose a system" attrs="{'invisible': [('state', '!=', 'i_new_instance')]}">
+                <group string="Choose a system" invisible="state != 'i_new_instance'">
                     <field name="working_system_id" string="Existing system" options="{'no_create': True}" />
                     <group>
                         <!--                        <button-->
@@ -771,13 +722,11 @@
                             string="Power the system"
                             type="object"
                             class="btn btn-success"
-                            attrs="{'invisible': [('working_system_can_be_power_on', '=', False)]}"
-                        />
+                            invisible="not working_system_can_be_power_on"/>
                     </group>
                 </group>
                 <group
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False),('enable_deploy_llm_into_project', '=', False)]}"
-                >
+                    invisible="(state != 'i_new_instance' or not working_system_id) and not enable_deploy_llm_into_project">
                     <field name="instance_list_to_deploy" />
                     <field name="instance_name" />
                     <field name="instance_exec_from_workspace_id" string="OR duplicate instance" />
@@ -786,37 +735,33 @@
                     <field name="instance_is_support_gpu" invisible="True" />
                     <field name="instance_port_1" />
                     <field name="with_mistra_openorca" />
-                    <field name="instance_gpu_mode" attrs="{'invisible': [('instance_is_support_gpu','=',False)]}" />
+                    <field name="instance_gpu_mode" invisible="not instance_is_support_gpu" />
                     <button
                         name="instance_deploy"
                         string="Deploy"
                         type="object"
                         class="btn btn-success"
-                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False),('instance_exec_from_workspace_id', '=', False)]}"
-                    />
+                        invisible="(not instance_list_to_deploy or not instance_name) and not instance_exec_from_workspace_id"/>
                     <button
                         name="instance_create_operate_localai"
                         string="Create operation"
                         type="object"
                         class="btn btn-success"
-                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False),('instance_exec_from_workspace_id', '=', False)]}"
-                    />
+                        invisible="(not instance_list_to_deploy or not instance_name) and not instance_exec_from_workspace_id"/>
                 </group>
                 <group
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False),('enable_deploy_llm_into_project', '=', False)]}"
-                >
+                    invisible="(state != 'i_new_instance' or not working_system_id) and not enable_deploy_llm_into_project">
                     <field name="instance_exec_text_id" />
                     <field name="instance_exec_image_id" />
                     <field name="instance_last_exec_id" />
                 </group>
-                <group attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False)]}">
+                <group invisible="state != 'i_new_instance' or not working_system_id">
                     <field name="instance_yaml" />
                 </group>
                 <group
                     string="Introduction"
                     name="group_i_new_remote_system"
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_remote_system'),('is_force_local_system', '=', True)]}"
-                >
+                    invisible="state != 'i_new_remote_system' or is_force_local_system">
                     <div>
                         Choose existing system or a remote system.
                         <br />
@@ -841,7 +786,7 @@
                         />
                     </div>
                 </group>
-                <group name="group_plan_project_2" attrs="{'invisible': [('state', '!=', 'plan_project')]}">
+                <group name="group_plan_project_2" invisible="state != 'plan_project'">
                     <group string="4. Requirement">
                         <!--                        <button-->
                         <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
@@ -861,8 +806,7 @@
                 </group>
                 <group
                     string="Choose a system"
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_remote_system'),('is_force_local_system', '=', True)]}"
-                >
+                    invisible="state != 'i_new_remote_system' or is_force_local_system">
                     <field name="working_system_id" string="Existing system" options="{'no_create': True}" />
                     <group>
                         <button
@@ -870,62 +814,54 @@
                             string="A new system please"
                             type="object"
                             class="btn btn-default"
-                            attrs="{'invisible': [('working_system_id', '=', False)]}"
-                        />
+                            invisible="not working_system_id"/>
                         <field name="working_system_can_be_power_on" invisible="True" />
                         <button
                             name="working_system_id_power"
                             string="Power the system"
                             type="object"
                             class="btn btn-success"
-                            attrs="{'invisible': [('working_system_can_be_power_on', '=', False)]}"
-                        />
+                            invisible="not working_system_can_be_power_on"/>
                     </group>
                 </group>
                 <span
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_remote_system'),('working_system_id', '!=', False)]}"
-                >
+                    invisible="state != 'i_new_remote_system' or working_system_id">
                     <h2>
                         <i class="fa fa-fw fa-caret-down" />
                         Create a remote system
                     </h2>
                 </span>
                 <span
-                    attrs="{'invisible': ['|','|',('state', '!=', 'i_new_remote_system'),('working_system_id', '=', False),('is_force_local_system', '=', True)]}"
-                >
+                    invisible="state != 'i_new_remote_system' or not working_system_id or is_force_local_system">
                     <h2>
                         <i class="fa fa-fw fa-caret-down" />
                         Update the system
                     </h2>
                 </span>
-                <group string="System information" attrs="{'invisible': [('state', '!=', 'i_new_remote_system')]}">
+                <group string="System information" invisible="state != 'i_new_remote_system'">
                     <field name="system_name" />
-                    <field name="ssh_user" attrs="{'invisible': [('is_new_or_exist_ssh', '=', False)]}" />
+                    <field name="ssh_user" invisible="not is_new_or_exist_ssh" />
                     <field
                         name="ssh_password"
                         password="True"
-                        attrs="{'invisible': [('is_new_or_exist_ssh', '=', False)]}"
-                    />
-                    <field name="ssh_host" attrs="{'invisible': [('is_new_or_exist_ssh', '=', False)]}" />
-                    <field name="ssh_port" attrs="{'invisible': [('is_new_or_exist_ssh', '=', False)]}" />
+                        invisible="not is_new_or_exist_ssh"/>
+                    <field name="ssh_host" invisible="not is_new_or_exist_ssh" />
+                    <field name="ssh_port" invisible="not is_new_or_exist_ssh" />
                     <button
                         name="ssh_create_and_test"
                         string="Create system and test"
                         type="object"
                         class="btn btn-default"
-                        attrs="{'invisible': ['|',('is_new_or_exist_ssh', '=', False),('working_system_id', '!=', False)]}"
-                    />
+                        invisible="not is_new_or_exist_ssh or working_system_id"/>
                     <button
                         name="ssh_test_system_exist"
                         string="Update system and re-test"
                         type="object"
                         class="btn btn-default"
-                        attrs="{'invisible': ['|',('is_new_or_exist_ssh', '=', False),('working_system_id', '=', False)]}"
-                    />
+                        invisible="not is_new_or_exist_ssh or not working_system_id"/>
                     <div
                         class="bg-warning"
-                        attrs="{'invisible': ['|','|',('is_new_or_exist_ssh', '=', False),('system_ssh_connection_status', '=', True),('working_system_id', '=', False)]}"
-                    >
+                        invisible="not is_new_or_exist_ssh or system_ssh_connection_status or not working_system_id">
                         Test SSH connection fail.
                     </div>
                     <button
@@ -933,13 +869,11 @@
                         string="Search workspace"
                         type="object"
                         class="btn btn-default"
-                        attrs="{'invisible': [('can_search_workspace', '=', False)]}"
-                    />
+                        invisible="not can_search_workspace"/>
                 </group>
                 <group
                     string="A-Installation"
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_remote_system'),('can_search_workspace', '=', False)]}"
-                >
+                    invisible="state != 'i_new_remote_system' or not can_search_workspace">
                     <group string="1-Test comm">
                         <button
                             name="ssh_system_open_terminal"
@@ -996,8 +930,7 @@
                 </group>
                 <group
                     string="B-Workspace"
-                    attrs="{'invisible': ['|',('state', '!=', 'i_new_remote_system'),('can_search_workspace', '=', False)]}"
-                >
+                    invisible="state != 'i_new_remote_system' or not can_search_workspace">
                     <!--                    <group string="Select">-->
                     <!--                        <field name="working_workspace_ids" />-->
                     <!--                    </group>-->
@@ -1020,11 +953,10 @@
                         />
                         <field
                             name="create_workspace_id"
-                            attrs="{'invisible': [('create_workspace_id', '=', False)]}"
-                        />
+                            invisible="not create_workspace_id"/>
                     </group>
                 </group>
-                <group name="group_h_run_test" attrs="{'invisible': [('state', '!=', 'h_run_test')]}">
+                <group name="group_h_run_test" invisible="state != 'h_run_test'">
                     <group string="Test plan">
                         <button
                             name="state_goto_h_a_test_plan_exec"
@@ -1040,7 +972,7 @@
                         <!--                        />-->
                     </group>
                 </group>
-                <group name="group_h_b_cg" attrs="{'invisible': [('state', '!=', 'h_b_cg')]}">
+                <group name="group_h_b_cg" invisible="state != 'h_b_cg'">
                     <group string="Test type" />
                 </group>
                 <!--                <group name="group_a_autopoiesis_devops" attrs="{'invisible': [('state', '!=', 'a_a_model')]}">-->
@@ -1048,27 +980,25 @@
                 <!--                        <field name="model_name" />-->
                 <!--                    </group>-->
                 <!--                </group>-->
-                <group name="not_supported" attrs="{'invisible': [('state', '!=', 'not_supported')]}">
+                <group name="not_supported" invisible="state != 'not_supported'">
                     <p>This state is not supported, please go back.</p>
                 </group>
-                <hr attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}" />
+                <hr invisible="state != 'final' and not force_show_final" />
                 <group
                     string="Result"
                     name="final"
-                    attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}"
-                >
+                    invisible="state != 'final' and not force_show_final">
                     <div>
                         <p>Your action is done, close this dialog below.</p>
                     </div>
-                    <field name="plan_cg_id" string="CG plan" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
+                    <field name="plan_cg_id" string="CG plan" invisible="not plan_cg_id" />
                     <field
                         name="generated_new_project_id"
-                        attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
-                    />
-                    <field name="create_workspace_id" attrs="{'invisible': [('create_workspace_id', '=', False)]}" />
-                    <field name="working_system_id" attrs="{'invisible': [('working_system_id', '=', False)]}" />
-                    <field name="working_cg_module_id" attrs="{'invisible': [('working_cg_module_id', '=', False)]}" />
-                    <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
+                        invisible="not generated_new_project_id"/>
+                    <field name="create_workspace_id" invisible="not create_workspace_id" />
+                    <field name="working_system_id" invisible="not working_system_id" />
+                    <field name="working_cg_module_id" invisible="not working_cg_module_id" />
+                    <field name="working_cg_writer_id" invisible="not working_cg_writer_id" />
                 </group>
             </xpath>
         </field>
@@ -1078,7 +1008,7 @@
         <field name="name">DEVOPS action</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">devops.plan.action.wizard</field>
-        <field name="binding_model">devops.workspace</field>
+        <field name="binding_model_id" ref="model_devops_workspace" />
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>

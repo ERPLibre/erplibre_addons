@@ -131,12 +131,12 @@ class DevopsExecError(models.Model):
                     _("devops.workspace '%s' failed.") % rec.description,
                     rec.escaped_tb,
                 ),
-                subtype=self.env.ref(
+                subtype_id=self.env.ref(
                     "erplibre_devops.mail_message_subtype_failure"
-                ),
+                ).id,
                 author_id=self.env.ref("base.user_root").partner_id.id,
-                partner_ids=[(6, 0, rec.partner_ids.ids)],
-                channel_ids=[(6, 0, rec.channel_ids.ids)],
+                # partner_ids=[(6, 0, rec.partner_ids.ids)],
+                # channel_ids=[(6, 0, rec.channel_ids.ids)],
             )
             rec.devops_workspace.ide_pycharm.action_cg_setup_pycharm_debug(
                 log=rec.escaped_tb.replace("&quot;", '"'), exec_error_id=rec

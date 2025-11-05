@@ -11,8 +11,7 @@
                         string="Run into new action"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('has_devops_action', '=', False)]}"
-                    />
+                        invisible="not has_devops_action"/>
                     <button
                         name="open_new_test_plan_execution"
                         string="Open new testplan"
@@ -28,8 +27,7 @@
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
-                attrs="{'invisible': [('active', '=', True)]}"
-            />
+                invisible="active"/>
             
                 </div>
                 <group>

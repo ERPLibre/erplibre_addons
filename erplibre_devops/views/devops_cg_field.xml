@@ -18,18 +18,15 @@
                             <field name="string" />
                             <field
                                 name="relation"
-                                attrs="{'invisible': [('type', 'not in', ['many2one', 'many2many', 'one2many'])]}"
-                            />
+                                invisible="type not in ['many2one', 'many2many', 'one2many']"/>
                             <field
                                 name="relation_manual"
-                                attrs="{'invisible': ['|', ('type', 'not in', ['many2one', 'many2many', 'one2many']), ('relation', '!=', False)]}"
-                            />
-                            <field name="field_relation" attrs="{'invisible': [('type', 'not in', ['one2many'])]}" />
+                                invisible="type not in ['many2one', 'many2many', 'one2many'] or relation"/>
+                            <field name="field_relation" invisible="type != 'one2many'" />
                             <field
                                 name="field_relation_manual"
-                                attrs="{'invisible': ['|', ('type', 'not in', ['one2many']), ('field_relation', '!=', False)]}"
-                            />
-                            <field name="relation_ref" attrs="{'invisible': [('type', 'not in', ['many2many'])]}" />
+                                invisible="type != 'one2many' or field_relation"/>
+                            <field name="relation_ref" invisible="type != 'many2many'" />
                             <field name="related_manual" />
                             <!--                            <field name="related_field_id" />-->
                             <field name="help" />
@@ -137,7 +134,7 @@
         <field name="model">devops.cg.field</field>
         <field name="arch" type="xml">
             <tree decoration-danger="has_error">
-                <field name="has_error" invisible="True" />
+                <field name="has_error" column_invisible="True" />
                 <field name="name" />
                 <field name="model_id" />
                 <field name="type" />

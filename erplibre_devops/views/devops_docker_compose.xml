@@ -18,8 +18,7 @@
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
-                attrs="{'invisible': [('active', '=', True)]}"
-            />
+                invisible="active"/>
             
                         <button
                             name="%(erplibre_devops.devops_docker_container_docker_container_action_window)d"

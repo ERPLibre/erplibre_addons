@@ -11,16 +11,14 @@
                         string="Re-execute last"
                         type="object"
                         class="btn-warning"
-                        attrs="{'invisible': [('has_re_execute_new_project', '=', False)]}"
-                    />
+                        invisible="not has_re_execute_new_project"/>
                     <button
                         name="action_execute_last_stage_new_project"
                         string="Re-execute Uc0"
                         type="object"
                         class="btn-warning"
                         context="{'default_stage_Uc0': True}"
-                        attrs="{'invisible': [('has_re_execute_new_project', '=', False)]}"
-                    />
+                        invisible="not has_re_execute_new_project"/>
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
@@ -30,8 +28,7 @@
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
-                attrs="{'invisible': [('active', '=', True)]}"
-            />
+                invisible="active"/>
             
                     </div>
                     <group invisible="True">
@@ -158,8 +155,7 @@
                                 string="Setup Pycharm debug"
                                 type="object"
                                 class="oe_highlight"
-                                attrs="{'invisible': [('need_debugger_cg_erplibre_devops', '=', False)]}"
-                            />
+                                invisible="not need_debugger_cg_erplibre_devops"/>
                         </group>
                     </group>
                     <group>
@@ -187,8 +183,7 @@
                         <group string="Log">
                             <field
                                 name="devops_cg_erplibre_devops_error_log"
-                                attrs="{'invisible': [('devops_cg_erplibre_devops_error_log', '=', False)]}"
-                            />
+                                invisible="not devops_cg_erplibre_devops_error_log"/>
                             <field name="devops_cg_erplibre_devops_log" />
                         </group>
                         <group name="group_cg_config" string="CG config view">

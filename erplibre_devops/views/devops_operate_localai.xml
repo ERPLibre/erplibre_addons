@@ -11,8 +11,7 @@
                         string="Execute"
                         type="object"
                         class="btn-success"
-                        attrs="{'invisible': [('system_id', '=', False)]}"
-                    />
+                        invisible="not system_id"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

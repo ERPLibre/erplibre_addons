@@ -11,8 +11,7 @@
                         string="Open into IDE"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('workspace_id', '=', False)]}"
-                    />
+                        invisible="not workspace_id"/>
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
@@ -22,8 +21,7 @@
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
-                attrs="{'invisible': [('active', '=', True)]}"
-            />
+                invisible="active"/>
             
                     </div>
                     <group>
@@ -183,8 +181,7 @@
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"
                     tabindex="-1"
-                    attrs="{'invisible': [('workspace_id', '=', False)]}"
-                />
+                    invisible="not workspace_id"/>
             </tree>
         </field>
     </record>

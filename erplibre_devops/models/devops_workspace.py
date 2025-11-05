@@ -1555,17 +1555,18 @@ sock.close()
                 ],
             )
         ]
-        channel_ids = [
-            (
-                6,
-                0,
-                [
-                    a.channel_id.id
-                    for a in self.message_follower_ids
-                    if a.channel_id
-                ],
-            )
-        ]
+        # channel_ids = [
+        #     (
+        #         6,
+        #         0,
+        #         [
+        #             a.channel_id.id
+        #             for a in self.message_follower_ids
+        #             if a.channel_id
+        #         ],
+        #     )
+        # ]
+        channel_ids = []
         return partner_ids, channel_ids
 
     def create_exec_error(
@@ -1652,8 +1653,8 @@ sock.close()
             rec = rec.with_context(devops_cg_new_project=devops_cg_new_project)
         try:
             yield rec
-        except exceptions.Warning as e:
-            raise e
+        # except exceptions.Warning as e:
+        #     raise e
         except Exception as e:
             _logger.exception(
                 f"'{description}' it.exec.bundle id"

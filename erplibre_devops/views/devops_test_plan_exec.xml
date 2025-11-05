@@ -11,15 +11,13 @@
                         string="Execute"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('execution_is_launched', '=', True)]}"
-                    />
+                        invisible="execution_is_launched"/>
                     <button
                         name="action_rerun_fail_testcase"
                         string="Rerun failed test only"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|','|',('execution_is_launched', '=', False),('execution_is_finished', '=', False),('global_success', '=', True)]}"
-                    />
+                        invisible="not execution_is_launched or not execution_is_finished or global_success"/>
                 </header>
                 <field name="has_configuration" invisible="True" />
                 <div name="button_box" class="oe_button_box">
@@ -29,8 +27,7 @@
                 name="web_ribbon"
                 title="Archived"
                 bg_color="bg-danger"
-                attrs="{'invisible': [('active', '=', True)]}"
-            />
+                invisible="active"/>
             
                 </div>
                 <group>
@@ -50,10 +47,10 @@
                 </group>
                 <group string="Test">
                     <field name="test_plan_id" options='{"no_create": True}' />
-                    <field name="test_case_ids" attrs="{'invisible': [('test_plan_id', '!=', False)]}" />
+                    <field name="test_case_ids" invisible="test_plan_id" />
                 </group>
                 <group>
-                    <group string="Configuration" attrs="{'invisible': [('has_configuration', '=', False)]}">
+                    <group string="Configuration" invisible="not has_configuration">
                         <field name="coverage" />
                         <field name="keep_cache" />
                         <field name="no_parallel" />
@@ -70,7 +67,7 @@
                     <page string="Result">
                         <field name="result_ids" />
                     </page>
-                    <page string="Summary" attrs="{'invisible': [('summary', '=', False)]}">
+                    <page string="Summary" invisible="not summary">
                         <field name="summary" />
                     </page>
                     <page string="Log">

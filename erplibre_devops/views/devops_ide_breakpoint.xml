@@ -11,8 +11,7 @@
                         string="Open into IDE"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('filename', '=', False)]}"
-                    />
+                        invisible="not filename"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -149,8 +148,7 @@
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"
                     tabindex="-1"
-                    attrs="{'invisible': [('filename', '=', False)]}"
-                />
+                    invisible="not filename"/>
             </tree>
         </field>
     </record>
