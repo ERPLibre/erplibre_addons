@@ -89,7 +89,6 @@ def post_init_hook(cr, e):
             )
 
 
-# @api.multi
 # def get_local_system_ids(env):
 #     with env.ref(
 #         "erplibre_devops.devops_workspace_me"
