@@ -54,3 +54,4 @@ erplibre_mode_exec_access_user_types_/_internal_user,erplibre_mode_exec Access U
 erplibre_mode_source_access_user_types_/_internal_user,erplibre_mode_source Access User types / Internal User,model_erplibre_mode_source,base.group_user,1,1,1,1
 erplibre_mode_version_base_access_user_types_/_internal_user,erplibre_mode_version_base Access User types / Internal User,model_erplibre_mode_version_base,base.group_user,1,1,1,1
 erplibre_mode_version_erplibre_access_user_types_/_internal_user,erplibre_mode_version_erplibre Access User types / Internal User,model_erplibre_mode_version_erplibre,base.group_user,1,1,1,1
+erplibre_devops.access_devops_plan_action_wizard,access_devops_plan_action_wizard,erplibre_devops.model_devops_plan_action_wizard,base.group_user,1,1,1,1

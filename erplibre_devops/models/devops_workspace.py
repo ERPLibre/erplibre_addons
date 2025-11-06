@@ -13,7 +13,6 @@ import traceback
 from contextlib import contextmanager
 
 import requests
-
 from odoo import _, api, exceptions, fields, models, service, tools
 
 _logger = logging.getLogger(__name__)
@@ -1000,9 +999,7 @@ class DevopsWorkspace(models.Model):
                         rec.path_working_erplibre = rec.folder
                     branch_str = ""
                     if rec.erplibre_mode.mode_version_erplibre:
-                        branch_str = (
-                            f" -b {rec.erplibre_mode.mode_version_erplibre.value}"
-                        )
+                        branch_str = f" -b {rec.erplibre_mode.mode_version_erplibre.value}"
                     git_arg = f"{branch_str} {rec.folder}"
 
                     # TTODO bug if file has same key
@@ -1592,12 +1589,12 @@ sock.close()
             if devops_exec_id:
                 error_value["devops_exec_id"] = devops_exec_id.id
             if parent_root_id.devops_new_project_ids.exists():
-                error_value[
-                    "new_project_id"
-                ] = parent_root_id.devops_new_project_ids[0].id
-                error_value[
-                    "stage_new_project_id"
-                ] = parent_root_id.devops_new_project_ids[0].stage_id.id
+                error_value["new_project_id"] = (
+                    parent_root_id.devops_new_project_ids[0].id
+                )
+                error_value["stage_new_project_id"] = (
+                    parent_root_id.devops_new_project_ids[0].stage_id.id
+                )
             # this is not true, cannot associate exec_id to this error
             # exec_id = devops_exec_bundle_id.get_last_exec()
             # if exec_id:
@@ -1605,8 +1602,8 @@ sock.close()
             partner_ids, channel_ids = rec.get_partner_channel()
             if partner_ids:
                 error_value["partner_ids"] = partner_ids
-            if channel_ids:
-                error_value["channel_ids"] = channel_ids
+            # if channel_ids:
+            #     error_value["channel_ids"] = channel_ids
             if rec._context.get("devops_workspace_create_exec_error"):
                 exec_error_id = None
                 _logger.warning(
@@ -1665,26 +1662,26 @@ sock.close()
             )
             parent_root_id = devops_exec_bundle_id.get_parent_root()
             # detect is different to reduce recursion depth exceeded
-            found_same_error_ids = self.env["devops.exec.error"].search(
-                [
-                    ("parent_root_exec_bundle_id", "=", parent_root_id.id),
-                    ("description", "=", description),
-                    ("escaped_tb", "=", escaped_tb),
-                ]
-            )
-            if not found_same_error_ids:
-                devops_exec = devops_exec_bundle_id.devops_exec_ids.exists()
-                if devops_exec:
-                    devops_exec = devops_exec[0]
-                rec.create_exec_error(
-                    description,
-                    escaped_tb,
-                    rec,
-                    devops_exec_bundle_id,
-                    devops_exec,
-                    parent_root_id,
-                    "internal",
-                )
+            # found_same_error_ids = self.env["devops.exec.error"].search(
+            #     [
+            #         ("parent_root_exec_bundle_id", "=", parent_root_id.id),
+            #         ("description", "=", description),
+            #         ("escaped_tb", "=", escaped_tb),
+            #     ]
+            # )
+            # if not found_same_error_ids:
+            #     devops_exec = devops_exec_bundle_id.devops_exec_ids.exists()
+            #     if devops_exec:
+            #         devops_exec = devops_exec[0]
+            #     rec.create_exec_error(
+            #         description,
+            #         escaped_tb,
+            #         rec,
+            #         devops_exec_bundle_id,
+            #         devops_exec,
+            #         parent_root_id,
+            #         "internal",
+            #     )
             if rec.show_error_chatter:
                 partner_ids, channel_ids = rec.get_partner_channel()
                 self.message_post(  # pylint: disable=translation-required
@@ -1719,17 +1716,17 @@ sock.close()
                         ],
                     )
                 ]
-                channel_ids = [
-                    (
-                        6,
-                        0,
-                        [
-                            a.channel_id.id
-                            for a in rec.message_follower_ids
-                            if a.channel_id
-                        ],
-                    )
-                ]
+                # channel_ids = [
+                #     (
+                #         6,
+                #         0,
+                #         [
+                #             a.channel_id.id
+                #             for a in rec.message_follower_ids
+                #             if a.channel_id
+                #         ],
+                #     )
+                # ]
 
                 self.message_post(
                     body=_("devops_workspace succeeded '%s': %s")
@@ -1739,7 +1736,7 @@ sock.close()
                     ),
                     author_id=self.env.ref("base.user_root").partner_id.id,
                     partner_ids=partner_ids,
-                    channel_ids=channel_ids,
+                    # channel_ids=channel_ids,
                 )
         finally:
             # Finish bundle

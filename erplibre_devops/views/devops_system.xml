@@ -18,7 +18,8 @@
                         name="action_install_docker"
                         string="Install docker"
                         type="object"
-                        invisible="not docker_has_check"/>
+                        invisible="not docker_has_check"
+                    />
                     <button name="open_terminal" string="Open terminal" type="object" />
                     <button name="configure_ntp" string="Configure NTP" type="object" />
                     <button name="configure_starship" string="Configure starship" type="object" />
@@ -27,17 +28,20 @@
                         string="Check docker"
                         type="object"
                         class="btn-success"
-                        invisible="docker_has_check"/>
+                        invisible="docker_has_check"
+                    />
                     <button
                         name="action_check_docker"
                         string="Check docker"
                         type="object"
-                        invisible="not docker_has_check"/>
+                        invisible="not docker_has_check"
+                    />
                     <button
                         name="action_search_docker"
                         string="Search Docker"
                         type="object"
-                        invisible="not docker_has_check"/>
+                        invisible="not docker_has_check"
+                    />
                 </header>
                 <div class="oe_title">
                     <h1>
@@ -45,13 +49,8 @@
                     </h1>
                 </div>
                 <div name="button_box" class="oe_button_box">
-
-            <field name="active" invisible="1" />
-            <widget
-                name="web_ribbon"
-                title="Archived"
-                bg_color="bg-danger"
-                invisible="active"/>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active" />
 
                     <button
                         name="%(erplibre_devops.devops_docker_compose_docker_compose_action_window)d"
@@ -59,7 +58,8 @@
                         class="oe_stat_button"
                         icon="fa-tasks"
                         context="{'search_default_system_id': id}"
-                        invisible="docker_compose_count == 0">
+                        invisible="docker_compose_count == 0"
+                    >
                         <field name="docker_compose_count" string="Docker Compose" widget="statinfo" />
                     </button>
                     <button
@@ -68,7 +68,8 @@
                         class="oe_stat_button"
                         icon="fa-tasks"
                         context="{'search_default_system_id': id}"
-                        invisible="docker_volume_count == 0">
+                        invisible="docker_volume_count == 0"
+                    >
                         <field name="docker_volume_count" string="Docker Volume" widget="statinfo" />
                     </button>
                     <button
@@ -77,7 +78,8 @@
                         class="oe_stat_button"
                         icon="fa-tasks"
                         context="{'search_default_system_ids': name}"
-                        invisible="docker_image_count == 0">
+                        invisible="docker_image_count == 0"
+                    >
                         <field name="docker_image_count" string="Docker Image" widget="statinfo" />
                     </button>
                     <button
@@ -86,7 +88,8 @@
                         class="oe_stat_button"
                         icon="fa-tasks"
                         context="{'search_default_system_id': id}"
-                        invisible="docker_network_count == 0">
+                        invisible="docker_network_count == 0"
+                    >
                         <field name="docker_network_count" string="Docker Network" widget="statinfo" />
                     </button>
                     <button
@@ -95,7 +98,8 @@
                         class="oe_stat_button"
                         icon="fa-tasks"
                         context="{'search_default_system_id': id}"
-                        invisible="docker_container_count == 0">
+                        invisible="docker_container_count == 0"
+                    >
                         <field name="docker_container_count" string="Docker container" widget="statinfo" />
                     </button>
                 </div>
@@ -129,9 +133,7 @@
                         <div class="bg-warning">
                             <h3>Warning:</h3>
                             Use SSH with caution!
-                            <div invisible="not ssh_use_sshpass">
-                                The password can be visible into log.
-                            </div>
+                            <div invisible="not ssh_use_sshpass">The password can be visible into log.</div>
                         </div>
                         <group string="SSH Settings">
                             <field name="ssh_host_name" />
@@ -292,24 +294,35 @@
                                     type="object"
                                     class="oe_button bg-success"
                                     icon="fa-refresh"
-                                    invisible="not devops_deploy_vm_id or system_status">
-                                    <i class="fa fa-fw o_button_icon fa-power-off" />
+                                    invisible="not devops_deploy_vm_id or system_status"
+                                >
+                                    <i
+                                        class="fa fa-fw o_button_icon fa-power-off"
+                                        aria-hidden="true"
+                                        title="Power off"
+                                    />
                                 </button>
                                 <button
                                     name="action_vm_power"
                                     type="object"
                                     class="oe_button bg-danger"
                                     icon="fa-refresh"
-                                    invisible="not devops_deploy_vm_id or not system_status">
-                                    <i class="fa fa-fw o_button_icon fa-power-off" />
+                                    invisible="not devops_deploy_vm_id or not system_status"
+                                >
+                                    <i
+                                        class="fa fa-fw o_button_icon fa-power-off"
+                                        aria-hidden="true"
+                                        title="Power off"
+                                    />
                                 </button>
                                 <button
                                     name="action_search_all"
                                     type="object"
                                     class="oe_button bg-success"
                                     icon="fa-refresh"
-                                    invisible="not system_status">
-                                    <i class="fa fa-fw o_button_icon fa-refresh" />
+                                    invisible="not system_status"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-refresh" aria-hidden="true" title="Refresh" />
                                 </button>
                             </div>
                         </div>

@@ -7,12 +7,7 @@
         <field name="inherit_id" ref="multi_step_wizard.multi_step_wizard_form" />
         <field name="arch" type="xml">
             <xpath expr="//button[@name='open_next']" position="replace">
-                <button
-                    name="open_next"
-                    string="Next"
-                    type="object"
-                    class="btn-primary"
-                    invisible="not has_next"/>
+                <button name="open_next" string="Next" type="object" class="btn-primary" invisible="not has_next" />
             </xpath>
             <!--            <xpath expr="//field[@name='state']" position="before">-->
             <xpath expr="//div[@name='states_buttons']" position="inside">
@@ -22,49 +17,57 @@
                     string="Auto-complete"
                     type="object"
                     class="btn btn-success"
-                    invisible="state != 'code_module'"/>
+                    invisible="state != 'code_module'"
+                />
                 <button
                     name="action_purge_metadata"
                     string="Clear cache"
                     type="object"
                     class="btn btn-warning"
-                    invisible="state != 'code_module'"/>
+                    invisible="state != 'code_module'"
+                />
                 <button
                     name="action_code_module_generate"
                     string="Generate"
                     type="object"
                     class="btn btn-success"
-                    invisible="(state != 'code_module' or not has_configured_path) and not force_show_final"/>
+                    invisible="(state != 'code_module' or not has_configured_path) and not force_show_final"
+                />
                 <button
                     name="action_git_commit"
                     string="Git commit module"
                     type="object"
                     class="btn btn-success"
-                    invisible="state != 'code_module' or not plan_cg_id"/>
+                    invisible="state != 'code_module' or not plan_cg_id"
+                />
                 <button
                     name="action_git_commit"
                     string="Git commit UcA"
                     type="object"
                     class="btn btn-success"
-                    invisible="state != 'code_module' or not plan_cg_id or not use_existing_meta_module or use_existing_meta_module_ucb_only"/>
+                    invisible="state != 'code_module' or not plan_cg_id or not use_existing_meta_module or use_existing_meta_module_ucb_only"
+                />
                 <button
                     name="action_git_commit"
                     string="Git commit UcB"
                     type="object"
                     class="btn btn-success"
-                    invisible="state != 'code_module' or not plan_cg_id or not use_existing_meta_module or use_existing_meta_module_uca_only"/>
+                    invisible="state != 'code_module' or not plan_cg_id or not use_existing_meta_module or use_existing_meta_module_uca_only"
+                />
                 <button
                     name="action_git_meld_remote"
                     string="Git meld remote"
                     type="object"
                     class="btn btn-success"
-                    invisible="state != 'code_module' or not plan_cg_id or not is_remote_cg"/>
+                    invisible="state != 'code_module' or not plan_cg_id or not is_remote_cg"
+                />
                 <button
                     name="action_git_clean_remote"
                     string="Git clean remote"
                     type="object"
                     class="btn btn-success"
-                    invisible="state != 'code_module' or not plan_cg_id or not is_remote_cg"/>
+                    invisible="state != 'code_module' or not plan_cg_id or not is_remote_cg"
+                />
                 <!--                </header>-->
             </xpath>
             <xpath expr="//footer" position="before">
@@ -95,7 +98,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'plan_project' or has_configured_path"
-                    style="background-color: #057bc2; color: white;">
+                    style="background-color: #057bc2; color: white;"
+                >
                     <group>
                         <div>
                             <h2>1 Code - Plan a project</h2>
@@ -110,7 +114,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'code_module' or has_configured_path"
-                    style="background-color: #08a9cb; color: white;">
+                    style="background-color: #08a9cb; color: white;"
+                >
                     <group>
                         <div>
                             <h2>2 Code - Module generator</h2>
@@ -142,7 +147,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'code_module' or not has_configured_path or force_show_final"
-                    style="background-color: #08a9cb; color: white;">
+                    style="background-color: #08a9cb; color: white;"
+                >
                     <group>
                         <div>
                             <h2>2 Code - Module generator</h2>
@@ -162,7 +168,7 @@
                             name="action_code_module_autocomplete_module_path"
                             string="Auto-complete"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="action_purge_metadata"
@@ -181,7 +187,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'code_module' or not has_configured_path or not force_show_final"
-                    style="background-color: #08a9cb; color: white;">
+                    style="background-color: #08a9cb; color: white;"
+                >
                     <group>
                         <div>
                             <h2>2 Code - Module generator</h2>
@@ -203,7 +210,7 @@
                             name="action_code_module_autocomplete_module_path"
                             string="Auto-complete"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="action_purge_metadata"
@@ -222,7 +229,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'code_shortcut'"
-                    style="background-color: #08a9cb; color: white;">
+                    style="background-color: #08a9cb; color: white;"
+                >
                     <group>
                         <div>
                             <h2>2 Code - Shortcut</h2>
@@ -236,7 +244,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'h_run_test'"
-                    style="background-color: #04c576; color: white;">
+                    style="background-color: #04c576; color: white;"
+                >
                     <group>
                         <div>
                             <h2>4 Quality</h2>
@@ -250,7 +259,8 @@
                 <group
                     name="init_context"
                     invisible="state != 'i_new_remote_system'"
-                    style="background-color: #f7b905; color: white;">
+                    style="background-color: #f7b905; color: white;"
+                >
                     <group>
                         <div>
                             <h2>6 Deploy</h2>
@@ -261,10 +271,7 @@
                         <field name="mode_context" />
                     </group>
                 </group>
-                <group
-                    name="init_soft_dev"
-                    string="Software development"
-                    invisible="state != 'init'">
+                <group name="init_soft_dev" string="Software development" invisible="state != 'init'">
                     <div>Iterate between 4 steps and interact with Operates.</div>
                 </group>
                 <group name="init" invisible="state != 'init'">
@@ -272,7 +279,12 @@
                         <div>
                             <h2>1 Plan</h2>
                         </div>
-                        <button name="state_goto_plan_project" string="Project" type="object" class="btn btn-default" />
+                        <button
+                            name="state_goto_plan_project"
+                            string="Project"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
                         <!--                        <button name="requirement" string="Requirement" groups="base.group_no_one" />-->
                         <div>Requirement</div>
                         <div>Analyse/Observe/Audit</div>
@@ -286,33 +298,33 @@
                         <!--                            name="state_goto_g_test_erplibre"-->
                         <!--                            string="Operate"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                         <button
                             name="state_goto_code_shortcut"
                             string="Auto-complete module"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
-                        <button name="state_goto_code_module" string="Module" type="object" class="btn btn-default" />
+                        <button name="state_goto_code_module" string="Module" type="object" class="btn btn-secondary" />
                         <!--                        <button-->
                         <!--                            name="state_goto_a_autopoiesis_devops"-->
                         <!--                            string="Autopoiesis"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                            attrs="{'invisible': [('root_workspace_id_is_me', '=', False)]}"-->
                         <!--                        />-->
                         <!--                        <button-->
                         <!--                            name="state_goto_not_supported"-->
                         <!--                            string="Import data"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                         <!--                        <button-->
                         <!--                            name="state_goto_not_supported"-->
                         <!--                            string="Migrate from external DDB"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                         <div>Project</div>
                     </group>
@@ -326,12 +338,12 @@
                         <div>
                             <h2>4 Quality</h2>
                         </div>
-                        <button name="state_goto_h_run_test" string="Test" type="object" class="btn btn-default" />
+                        <button name="state_goto_h_run_test" string="Test" type="object" class="btn btn-secondary" />
                         <!--                        <button-->
                         <!--                            name="state_goto_not_supported"-->
                         <!--                            string="Analyse/inspection"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                         <div>Inspection</div>
                     </group>
@@ -357,25 +369,25 @@
                         <!--                            name="state_goto_i_new_remote_system"-->
                         <!--                            string="Local system"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                         <button
                             name="state_goto_i_local_system"
                             string="Local system"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="state_goto_i_new_remote_system"
                             string="Remote system"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="state_goto_i_new_instance"
                             string="Instance"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <div>Migration</div>
                         <div>Backup/Restoration</div>
@@ -405,38 +417,38 @@
                 <!--                    attrs="{'invisible': [('state', '!=', 'a_autopoiesis_devops')]}"-->
                 <!--                >-->
                 <!--                    <group string="Adding feature">-->
-                <!--                        <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-default" />-->
+                <!--                        <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-secondary" />-->
                 <!--                        <button-->
                 <!--                            name="state_goto_a_b_field"-->
                 <!--                            string="Add field"-->
                 <!--                            type="object"-->
-                <!--                            class="btn btn-default"-->
+                <!--                            class="btn btn-secondary"-->
                 <!--                            invisible="True"-->
                 <!--                        />-->
                 <!--                        <button-->
                 <!--                            name="state_goto_a_c_action"-->
                 <!--                            string="Add action"-->
                 <!--                            type="object"-->
-                <!--                            class="btn btn-default"-->
+                <!--                            class="btn btn-secondary"-->
                 <!--                            invisible="True"-->
                 <!--                        />-->
                 <!--                        <button-->
                 <!--                            name="state_goto_a_d_view"-->
                 <!--                            string="Add view"-->
                 <!--                            type="object"-->
-                <!--                            class="btn btn-default"-->
+                <!--                            class="btn btn-secondary"-->
                 <!--                            invisible="True"-->
                 <!--                        />-->
                 <!--                    </group>-->
                 <!--                    <group string="Regenerate feature">-->
-                <!--                        &lt;!&ndash;                        <button name="state_goto_a_e_cg_regen" string="Code Generator regenerate" type="object" class="btn btn-default" />&ndash;&gt;-->
+                <!--                        &lt;!&ndash;                        <button name="state_goto_a_e_cg_regen" string="Code Generator regenerate" type="object" class="btn btn-secondary" />&ndash;&gt;-->
                 <!--                        <button-->
                 <!--                            name="state_goto_a_f_devops_regen"-->
                 <!--                            string="DevOps regenerate"-->
                 <!--                            type="object"-->
-                <!--                            class="btn btn-default"-->
+                <!--                            class="btn btn-secondary"-->
                 <!--                        />-->
-                <!--                        &lt;!&ndash;                        <button name="state_goto_a_g_regen" string="Regenerate the choosing module" type="object" class="btn btn-default" />&ndash;&gt;-->
+                <!--                        &lt;!&ndash;                        <button name="state_goto_a_g_regen" string="Regenerate the choosing module" type="object" class="btn btn-secondary" />&ndash;&gt;-->
                 <!--                    </group>-->
                 <!--                </group>-->
                 <group name="group_plan_project" invisible="state != 'plan_project'">
@@ -446,7 +458,7 @@
                         <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
                         <!--                            string="DevOps"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                     </group>
                     <group string="2. Deploy LLM">
@@ -459,35 +471,33 @@
                             name="state_goto_code_module_shortcut_autopoieses_devops"
                             string="DevOps UcA UcB"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                             context="{'ignore_autocomplete_model': True}"
                         />
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_devops"
                             string="DevOps retro direct"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                             context="{'force_create_view': True, 'ignore_uca_ucb': True}"
                         />
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_code_generator_code_generator"
                             string="Code Generator UcA"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                             context="{'ignore_autocomplete_model': True}"
                         />
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_code_generator"
                             string="Code Generator UcB"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                             context="{'ignore_autocomplete_model': True}"
                         />
                     </group>
                 </group>
-                <group
-                    name="group_a_a_model"
-                    invisible="state != 'a_a_model' and state != 'c_a_model'">
+                <group name="group_a_a_model" invisible="state != 'a_a_model' and state != 'c_a_model'">
                     <group string="Module">
                         <field name="working_module_id" />
                         <field name="working_module_name" string="OR Working Module Name" />
@@ -500,10 +510,7 @@
                         <field name="use_existing_meta_module_ucb_only" string="UcB only" />
                     </group>
                 </group>
-                <group
-                    name="group_a_a_model"
-                    string="Model"
-                    invisible="state != 'a_a_model' and state != 'c_a_model'">
+                <group name="group_a_a_model" string="Model" invisible="state != 'a_a_model' and state != 'c_a_model'">
                     <field name="model_ids" />
                 </group>
                 <!--                <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">-->
@@ -511,24 +518,18 @@
                 <!--                </group>-->
                 <group name="group_g_test_erplibre" invisible="state != 'g_test_erplibre'">
                     <group string="Where">
-                        <button name="state_goto_g_a_local" string="Local" type="object" class="btn btn-default" />
+                        <button name="state_goto_g_a_local" string="Local" type="object" class="btn btn-secondary" />
                     </group>
                 </group>
-                <group
-                    name="group_code_module"
-                    string="A-Module"
-                    invisible="state != 'code_module'">
+                <group name="group_code_module" string="A-Module" invisible="state != 'code_module'">
                     <group string="Name">
                         <field name="working_module_id" string="By existing" />
-                        <field
-                            name="working_module_name"
-                            string="OR name"
-                            invisible="working_module_id"/>
+                        <field name="working_module_name" string="OR name" invisible="working_module_id" />
                         <button
                             name="action_code_module_autocomplete_module_path"
                             string="Auto-complete"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <field name="is_new_module" string="Is new?" />
                     </group>
@@ -537,13 +538,11 @@
                         <field
                             name="working_module_path"
                             string="OR Manual path"
-                            invisible="working_module_path_suggestion != '#'"/>
+                            invisible="working_module_path_suggestion != '#'"
+                        />
                     </group>
                 </group>
-                <group
-                    string="B-Parameter"
-                    name="group_code_module_part_2"
-                    invisible="state != 'code_module'">
+                <group string="B-Parameter" name="group_code_module_part_2" invisible="state != 'code_module'">
                     <group string="Code generator" invisible="state != 'code_module'">
                         <field name="mode_view_generator" />
                         <field name="force_generate" />
@@ -552,57 +551,62 @@
                     </group>
                     <group string="Meta UcA &amp; UcB" invisible="state != 'code_module'">
                         <field name="use_external_cg" string="With UcA UcB" />
-                        <field
-                            name="use_existing_meta_module"
-                            string="Select a meta"
-                            invisible="not use_external_cg"/>
+                        <field name="use_existing_meta_module" string="Select a meta" invisible="not use_external_cg" />
                         <field
                             name="use_existing_meta_module_uca_only"
                             string="UcA only"
-                            invisible="not use_external_cg or not use_existing_meta_module or use_existing_meta_module_ucb_only"/>
+                            invisible="not use_external_cg or not use_existing_meta_module or use_existing_meta_module_ucb_only"
+                        />
                         <field
                             name="code_generator_name"
                             string="UcA name"
-                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"/>
+                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"
+                        />
                         <field
                             name="working_module_cg_path_suggestion"
                             string="UcA suggested path"
-                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"/>
+                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"
+                        />
                         <field
                             name="working_module_cg_path"
                             string="OR Manual UcA path"
-                            invisible="working_module_cg_path_suggestion != '#' or not use_external_cg or use_existing_meta_module_ucb_only"/>
+                            invisible="working_module_cg_path_suggestion != '#' or not use_external_cg or use_existing_meta_module_ucb_only"
+                        />
                         <field
                             name="uca_option_with_inherit"
                             string="UcA option with inherit"
-                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"/>
+                            invisible="not use_external_cg or use_existing_meta_module_ucb_only"
+                        />
                         <field
                             name="use_existing_meta_module_ucb_only"
                             string="UcB only"
-                            invisible="not use_external_cg or not use_existing_meta_module or use_existing_meta_module_uca_only"/>
+                            invisible="not use_external_cg or not use_existing_meta_module or use_existing_meta_module_uca_only"
+                        />
                         <field
                             name="template_name"
                             string="UcB name"
-                            invisible="not use_external_cg or use_existing_meta_module_uca_only"/>
+                            invisible="not use_external_cg or use_existing_meta_module_uca_only"
+                        />
                         <field
                             name="working_module_template_path_suggestion"
                             string="UcB suggested path"
-                            invisible="not use_external_cg or use_existing_meta_module_uca_only"/>
+                            invisible="not use_external_cg or use_existing_meta_module_uca_only"
+                        />
                         <field
                             name="working_module_template_path"
                             string="OR Manual UcB path"
-                            invisible="working_module_template_path_suggestion != '#' or not use_external_cg or use_existing_meta_module_uca_only"/>
+                            invisible="working_module_template_path_suggestion != '#' or not use_external_cg or use_existing_meta_module_uca_only"
+                        />
                     </group>
                 </group>
-                <group
-                    string="C-Model"
-                    invisible="state != 'code_module' or not has_configured_path">
+                <group string="C-Model" invisible="state != 'code_module' or not has_configured_path">
                     <field name="model_ids" />
                 </group>
                 <group
                     name="group_code_module_2"
                     string="D-View"
-                    invisible="state != 'code_module' or not has_configured_path">
+                    invisible="state != 'code_module' or not has_configured_path"
+                >
                     <group string="Web / admin space">
                         <div>Activate by default.</div>
                     </group>
@@ -611,56 +615,65 @@
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_generic_mdl"
                             invisible="mode_view_snippet == 'no_snippet'"
-                            string="Models"/>
+                            string="Models"
+                        />
                         <field
                             name="mode_view_snippet_enable_template_website_snippet_view"
                             invisible="mode_view_snippet == 'no_snippet'"
-                            string="Generate by template"/>
+                            string="Generate by template"
+                        />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_ctrl_featur"
                             invisible="mode_view_snippet == 'no_snippet'"
-                            string="Template feature"/>
+                            string="Template feature"
+                        />
                         <field
                             name="mode_view_snippet_template_generate_website_enable_javascript"
                             invisible="mode_view_snippet == 'no_snippet'"
-                            string="With Javascript"/>
+                            string="With Javascript"
+                        />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_type"
                             invisible="mode_view_snippet == 'no_snippet'"
-                            string="Snippet type"/>
+                            string="Snippet type"
+                        />
                     </group>
                     <group string="Portal" invisible="use_external_cg">
                         <field name="mode_view_portal" string="Mode" />
                         <field
                             name="mode_view_portal_models"
                             invisible="mode_view_portal == 'no_portal'"
-                            string="Models"/>
+                            string="Models"
+                        />
                         <field
                             name="mode_view_portal_enable_create"
                             invisible="mode_view_portal == 'no_portal'"
-                            string="Support create"/>
+                            string="Support create"
+                        />
                         <field
                             name="mode_view_portal_enable_read"
                             invisible="mode_view_portal == 'no_portal'"
-                            string="Support read"/>
+                            string="Support read"
+                        />
                         <field
                             name="mode_view_portal_enable_update"
                             invisible="mode_view_portal == 'no_portal'"
-                            string="Support update"/>
+                            string="Support update"
+                        />
                         <field
                             name="mode_view_portal_enable_delete"
                             invisible="mode_view_portal == 'no_portal'"
-                            string="Support delete"/>
+                            string="Support delete"
+                        />
                     </group>
                 </group>
                 <group
                     name="group_code_module_3"
                     string="E-Data"
-                    invisible="state != 'code_module' or not has_configured_path">
+                    invisible="state != 'code_module' or not has_configured_path"
+                >
                     <group string="Export from ME">
-                        <field
-                            name="config_uca_enable_export_data"
-                            invisible="not use_external_cg"/>
+                        <field name="config_uca_enable_export_data" invisible="not use_external_cg" />
                     </group>
                 </group>
                 <group name="group_g_a_local" invisible="state != 'g_a_local'">
@@ -671,30 +684,35 @@
                         <field name="enable_package_srs" />
                     </group>
                 </group>
-                <group
-                    name="group_f_new_project_society"
-                    invisible="state != 'f_new_project_society'">
+                <group name="group_f_new_project_society" invisible="state != 'f_new_project_society'">
                     <group>
-                        <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-default" />
-                        <button name="state_goto_a_b_field" string="Add field" type="object" class="btn btn-default" />
+                        <button
+                            name="state_goto_a_a_model"
+                            string="Add model"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
+                        <button
+                            name="state_goto_a_b_field"
+                            string="Add field"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
                         <button
                             name="state_goto_a_c_action"
                             string="Add action"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
-                        <button name="state_goto_a_d_view" string="Add view" type="object" class="btn btn-default" />
+                        <button name="state_goto_a_d_view" string="Add view" type="object" class="btn btn-secondary" />
                     </group>
                 </group>
                 <!--                <group name="group_c_existing_module" attrs="{'invisible': [('state', '!=', 'c_existing_module')]}">-->
                 <!--                    <group string="Option">-->
-                <!--                        <button name="state_goto_c_a_model" string="Add model" type="object" class="btn btn-default" />-->
+                <!--                        <button name="state_goto_c_a_model" string="Add model" type="object" class="btn btn-secondary" />-->
                 <!--                    </group>-->
                 <!--                </group>-->
-                <group
-                    string="Introduction"
-                    name="group_i_new_instance"
-                    invisible="state != 'i_new_instance'">
+                <group string="Introduction" name="group_i_new_instance" invisible="state != 'i_new_instance'">
                     <div>
                         Choose existing system.
                         <br />
@@ -702,7 +720,7 @@
                             name="search_subsystem_workspace"
                             string="Update sub-system to find remote system"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                     </div>
                 </group>
@@ -713,7 +731,7 @@
                         <!--                            name="clear_working_system_id"-->
                         <!--                            string="A new system please"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                            attrs="{'invisible': [('working_system_id', '=', False)]}"-->
                         <!--                        />-->
                         <field name="working_system_can_be_power_on" invisible="True" />
@@ -722,11 +740,13 @@
                             string="Power the system"
                             type="object"
                             class="btn btn-success"
-                            invisible="not working_system_can_be_power_on"/>
+                            invisible="not working_system_can_be_power_on"
+                        />
                     </group>
                 </group>
                 <group
-                    invisible="(state != 'i_new_instance' or not working_system_id) and not enable_deploy_llm_into_project">
+                    invisible="(state != 'i_new_instance' or not working_system_id) and not enable_deploy_llm_into_project"
+                >
                     <field name="instance_list_to_deploy" />
                     <field name="instance_name" />
                     <field name="instance_exec_from_workspace_id" string="OR duplicate instance" />
@@ -741,16 +761,19 @@
                         string="Deploy"
                         type="object"
                         class="btn btn-success"
-                        invisible="(not instance_list_to_deploy or not instance_name) and not instance_exec_from_workspace_id"/>
+                        invisible="(not instance_list_to_deploy or not instance_name) and not instance_exec_from_workspace_id"
+                    />
                     <button
                         name="instance_create_operate_localai"
                         string="Create operation"
                         type="object"
                         class="btn btn-success"
-                        invisible="(not instance_list_to_deploy or not instance_name) and not instance_exec_from_workspace_id"/>
+                        invisible="(not instance_list_to_deploy or not instance_name) and not instance_exec_from_workspace_id"
+                    />
                 </group>
                 <group
-                    invisible="(state != 'i_new_instance' or not working_system_id) and not enable_deploy_llm_into_project">
+                    invisible="(state != 'i_new_instance' or not working_system_id) and not enable_deploy_llm_into_project"
+                >
                     <field name="instance_exec_text_id" />
                     <field name="instance_exec_image_id" />
                     <field name="instance_last_exec_id" />
@@ -761,7 +784,8 @@
                 <group
                     string="Introduction"
                     name="group_i_new_remote_system"
-                    invisible="state != 'i_new_remote_system' or is_force_local_system">
+                    invisible="state != 'i_new_remote_system' or is_force_local_system"
+                >
                     <div>
                         Choose existing system or a remote system.
                         <br />
@@ -782,7 +806,7 @@
                             name="search_subsystem_workspace"
                             string="Update sub-system to find remote system"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                     </div>
                 </group>
@@ -792,7 +816,7 @@
                         <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
                         <!--                            string="DevOps"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                     </group>
                     <group string="5. Create a project">
@@ -804,82 +828,79 @@
                         />
                     </group>
                 </group>
-                <group
-                    string="Choose a system"
-                    invisible="state != 'i_new_remote_system' or is_force_local_system">
+                <group string="Choose a system" invisible="state != 'i_new_remote_system' or is_force_local_system">
                     <field name="working_system_id" string="Existing system" options="{'no_create': True}" />
                     <group>
                         <button
                             name="clear_working_system_id"
                             string="A new system please"
                             type="object"
-                            class="btn btn-default"
-                            invisible="not working_system_id"/>
+                            class="btn btn-secondary"
+                            invisible="not working_system_id"
+                        />
                         <field name="working_system_can_be_power_on" invisible="True" />
                         <button
                             name="working_system_id_power"
                             string="Power the system"
                             type="object"
                             class="btn btn-success"
-                            invisible="not working_system_can_be_power_on"/>
+                            invisible="not working_system_can_be_power_on"
+                        />
                     </group>
                 </group>
-                <span
-                    invisible="state != 'i_new_remote_system' or working_system_id">
+                <span invisible="state != 'i_new_remote_system' or working_system_id">
                     <h2>
-                        <i class="fa fa-fw fa-caret-down" />
+                        <i class="fa fa-fw fa-caret-down" aria-hidden="true" title="Caret down" />
                         Create a remote system
                     </h2>
                 </span>
-                <span
-                    invisible="state != 'i_new_remote_system' or not working_system_id or is_force_local_system">
+                <span invisible="state != 'i_new_remote_system' or not working_system_id or is_force_local_system">
                     <h2>
-                        <i class="fa fa-fw fa-caret-down" />
+                        <i class="fa fa-fw fa-caret-down" aria-hidden="true" title="Caret down" />
                         Update the system
                     </h2>
                 </span>
                 <group string="System information" invisible="state != 'i_new_remote_system'">
                     <field name="system_name" />
                     <field name="ssh_user" invisible="not is_new_or_exist_ssh" />
-                    <field
-                        name="ssh_password"
-                        password="True"
-                        invisible="not is_new_or_exist_ssh"/>
+                    <field name="ssh_password" password="True" invisible="not is_new_or_exist_ssh" />
                     <field name="ssh_host" invisible="not is_new_or_exist_ssh" />
                     <field name="ssh_port" invisible="not is_new_or_exist_ssh" />
                     <button
                         name="ssh_create_and_test"
                         string="Create system and test"
                         type="object"
-                        class="btn btn-default"
-                        invisible="not is_new_or_exist_ssh or working_system_id"/>
+                        class="btn btn-secondary"
+                        invisible="not is_new_or_exist_ssh or working_system_id"
+                    />
                     <button
                         name="ssh_test_system_exist"
                         string="Update system and re-test"
                         type="object"
-                        class="btn btn-default"
-                        invisible="not is_new_or_exist_ssh or not working_system_id"/>
+                        class="btn btn-secondary"
+                        invisible="not is_new_or_exist_ssh or not working_system_id"
+                    />
                     <div
                         class="bg-warning"
-                        invisible="not is_new_or_exist_ssh or system_ssh_connection_status or not working_system_id">
+                        invisible="not is_new_or_exist_ssh or system_ssh_connection_status or not working_system_id"
+                    >
                         Test SSH connection fail.
                     </div>
                     <button
                         name="search_workspace_from_system"
                         string="Search workspace"
                         type="object"
-                        class="btn btn-default"
-                        invisible="not can_search_workspace"/>
+                        class="btn btn-secondary"
+                        invisible="not can_search_workspace"
+                    />
                 </group>
-                <group
-                    string="A-Installation"
-                    invisible="state != 'i_new_remote_system' or not can_search_workspace">
+                <group string="A-Installation" invisible="state != 'i_new_remote_system' or not can_search_workspace">
                     <group string="1-Test comm">
                         <button
                             name="ssh_system_open_terminal"
                             string="Test open terminal"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                     </group>
                     <group string="2-OS">
@@ -887,50 +908,48 @@
                             name="ssh_system_install_ntp"
                             string="A) Configure NTP"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="ssh_system_install_starship"
                             string="B) Configure starship"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="ssh_system_install_dev"
                             string="C) Dev installation"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="ssh_system_install_docker"
                             string="D) Docker installation"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <button
                             name="ssh_system_install_robotlibre"
                             string="E) RobotLibre installation"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
 
                         <!--                        <button-->
                         <!--                            name="ssh_system_install_production"-->
                         <!--                            string="Production installation"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                         <!--                        <button-->
                         <!--                            name="ssh_system_install_all"-->
                         <!--                            string="All installation"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                     </group>
                 </group>
-                <group
-                    string="B-Workspace"
-                    invisible="state != 'i_new_remote_system' or not can_search_workspace">
+                <group string="B-Workspace" invisible="state != 'i_new_remote_system' or not can_search_workspace">
                     <!--                    <group string="Select">-->
                     <!--                        <field name="working_workspace_ids" />-->
                     <!--                    </group>-->
@@ -949,11 +968,9 @@
                             name="ssh_system_create_workspace"
                             string="Create workspace"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
-                        <field
-                            name="create_workspace_id"
-                            invisible="not create_workspace_id"/>
+                        <field name="create_workspace_id" invisible="not create_workspace_id" />
                     </group>
                 </group>
                 <group name="group_h_run_test" invisible="state != 'h_run_test'">
@@ -962,13 +979,13 @@
                             name="state_goto_h_a_test_plan_exec"
                             string="Run new test plan execution"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-secondary"
                         />
                         <!--                        <button-->
                         <!--                            name="state_goto_h_b_cg"-->
                         <!--                            string="Code generator by selection"-->
                         <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
+                        <!--                            class="btn btn-secondary"-->
                         <!--                        />-->
                     </group>
                 </group>
@@ -984,17 +1001,12 @@
                     <p>This state is not supported, please go back.</p>
                 </group>
                 <hr invisible="state != 'final' and not force_show_final" />
-                <group
-                    string="Result"
-                    name="final"
-                    invisible="state != 'final' and not force_show_final">
+                <group string="Result" name="final" invisible="state != 'final' and not force_show_final">
                     <div>
                         <p>Your action is done, close this dialog below.</p>
                     </div>
                     <field name="plan_cg_id" string="CG plan" invisible="not plan_cg_id" />
-                    <field
-                        name="generated_new_project_id"
-                        invisible="not generated_new_project_id"/>
+                    <field name="generated_new_project_id" invisible="not generated_new_project_id" />
                     <field name="create_workspace_id" invisible="not create_workspace_id" />
                     <field name="working_system_id" invisible="not working_system_id" />
                     <field name="working_cg_module_id" invisible="not working_cg_module_id" />
