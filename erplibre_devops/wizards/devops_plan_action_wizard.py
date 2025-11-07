@@ -554,6 +554,10 @@ class DevopsPlanActionWizard(models.TransientModel):
     def _compute_has_configured_path(self):
         for rec in self:
             rec.has_configured_path = False
+            with open(".odoo-version", "r") as f:
+                odoo_version = f.readline().strip()
+                str_odoo_version = f"odoo{odoo_version}"
+
             # Module
             if (
                 rec.working_module_path_suggestion == "#"
@@ -563,8 +567,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.working_compute_module_path = rec.working_module_path
             if rec.working_module_path_suggestion != "#":
                 rec.has_configured_path = True
-                rec.working_compute_module_path = (
-                    rec.working_module_path_suggestion
+                rec.working_compute_module_path = os.path.join(
+                    str_odoo_version, rec.working_module_path_suggestion
                 )
             # CG
             if (
