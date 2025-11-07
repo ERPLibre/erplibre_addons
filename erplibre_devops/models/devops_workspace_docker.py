@@ -1,5 +1,6 @@
-# Copyright 2023 TechnoLibre inc. - Mathieu Benoit
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import json
 import logging
@@ -7,7 +8,6 @@ import os
 import time
 
 import requests
-
 from odoo import _, api, exceptions, fields, models, tools
 
 _logger = logging.getLogger(__name__)
@@ -162,8 +162,7 @@ volumes:
             if (
                 "Cannot connect to the Docker daemon at"
                 " unix:///var/run/docker.sock. Is the docker daemon"
-                " running?"
-                in result
+                " running?" in result
             ):
                 rec.docker_initiate_succeed = False
 

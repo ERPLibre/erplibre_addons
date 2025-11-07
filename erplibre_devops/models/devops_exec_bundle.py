@@ -1,6 +1,6 @@
-# Copyright 2023 TechnoLibre inc. - Mathieu Benoit
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import logging
 from datetime import timedelta
 
@@ -144,6 +144,4 @@ class DevopsExecBundle(models.Model):
     @api.depends("exec_time_duration")
     def _compute_time_duration_result(self):
         for rec in self:
-            rec.time_duration_result = (
-                f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
-            )
+            rec.time_duration_result = f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
