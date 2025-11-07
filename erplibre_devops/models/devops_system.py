@@ -983,9 +983,9 @@ class DevopsSystem(models.Model):
                                     compose_id = dct_compose_name_id.get(
                                         docker_compose_project_name
                                     )
-                                    deploy_volume_value[
-                                        "compose_id"
-                                    ] = compose_id.id
+                                    deploy_volume_value["compose_id"] = (
+                                        compose_id.id
+                                    )
                             docker_volume_id = self.env[
                                 "devops.docker.volume"
                             ].create(deploy_volume_value)
@@ -1094,9 +1094,9 @@ class DevopsSystem(models.Model):
                     docker_network_id = self.env[
                         "devops.docker.network"
                     ].create(network_value)
-                    dct_network_name_id[
-                        docker_network_id.name
-                    ] = docker_network_id
+                    dct_network_name_id[docker_network_id.name] = (
+                        docker_network_id
+                    )
             # 5. Container
             cmd = "docker container ls --no-trunc -a --format json"
             out, status = rec.execute_with_result(
@@ -1229,7 +1229,7 @@ class DevopsSystem(models.Model):
     def open_terminal(self):
         for rec in self:
             out = rec.execute_terminal_gui(
-                cmd=f'pwd',
+                cmd=f"pwd",
             )
 
     def configure_ntp(self):
@@ -1280,7 +1280,7 @@ class DevopsSystem(models.Model):
                 f"sudo apt update;sudo apt install -y {cmd_dev};mkdir -p"
                 f" ~/git;cd ~/git;git clone {repo_url} -b robotlibre"
                 " robotlibre;cd robotlibre;make install;source"
-                " ./.venv/bin/activate;poetry install;make install_dev"
+                " ./.venv.erplibre/bin/activate;poetry install;make install_dev"
             )
             out = rec.execute_terminal_gui(
                 cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
@@ -1328,8 +1328,7 @@ class DevopsSystem(models.Model):
             log = rec.execute_with_result(cmd, None).strip()
             msg = (
                 "Security good : 1. No DSA, 2. RSA key size >= 3072, 3. Better"
-                " Ed25519\n"
-                + log
+                " Ed25519\n" + log
             )
             raise exceptions.Warning(msg)
 

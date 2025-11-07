@@ -478,13 +478,13 @@ class DevopsPlanCg(models.Model):
                             "config_uca_enable_export_data": rec.config_uca_enable_export_data,
                         }
                         if rec.code_generator_name:
-                            dct_new_project[
-                                "code_generator_name"
-                            ] = rec.code_generator_name
+                            dct_new_project["code_generator_name"] = (
+                                rec.code_generator_name
+                            )
                         if rec.template_name:
-                            dct_new_project[
-                                "template_name"
-                            ] = rec.template_name
+                            dct_new_project["template_name"] = (
+                                rec.template_name
+                            )
                         # extra_arg = ""
                         if model_conf:
                             dct_new_project["config"] = model_conf
@@ -552,9 +552,9 @@ class DevopsPlanCg(models.Model):
             value["post_init_hook_feature_code_generator"] = False
             value["uninstall_hook_feature_code_generator"] = False
 
-            value[
-                "hook_constant_code"
-            ] = f'module_id.name = "{module_id.name}"'
+            value["hook_constant_code"] = (
+                f'module_id.name = "{module_id.name}"'
+            )
 
             code_generator_id = self.env["code.generator.module"].create(value)
             rec.last_code_generator_module = code_generator_id.id
@@ -617,18 +617,18 @@ class DevopsPlanCg(models.Model):
 
             if rec.mode_view_portal and rec.mode_view_portal != "no_portal":
                 value_view_wizard["enable_generate_portal"] = True
-                value_view_wizard[
-                    "portal_enable_create"
-                ] = rec.mode_view_portal_enable_create
-                value_view_wizard[
-                    "portal_enable_read"
-                ] = rec.mode_view_portal_enable_read
-                value_view_wizard[
-                    "portal_enable_update"
-                ] = rec.mode_view_portal_enable_update
-                value_view_wizard[
-                    "portal_enable_delete"
-                ] = rec.mode_view_portal_enable_delete
+                value_view_wizard["portal_enable_create"] = (
+                    rec.mode_view_portal_enable_create
+                )
+                value_view_wizard["portal_enable_read"] = (
+                    rec.mode_view_portal_enable_read
+                )
+                value_view_wizard["portal_enable_update"] = (
+                    rec.mode_view_portal_enable_update
+                )
+                value_view_wizard["portal_enable_delete"] = (
+                    rec.mode_view_portal_enable_delete
+                )
 
             wizard_view = self.env[
                 "code.generator.generate.views.wizard"
@@ -652,7 +652,7 @@ class DevopsPlanCg(models.Model):
 
             # Generate module
             value = {"code_generator_ids": code_generator_id.ids}
-            cg_writer = self.env["code.generator.writer"].create(value)
+            cg_writer = self.env["code.generator.writer"].create([value])
             rec.last_code_generator_writer = cg_writer.id
             # print(cg_writer_id)
 

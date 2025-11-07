@@ -139,7 +139,10 @@ class DevopsExecError(models.Model):
                 # channel_ids=[(6, 0, rec.channel_ids.ids)],
             )
             rec.devops_workspace.ide_pycharm.action_cg_setup_pycharm_debug(
-                log=rec.escaped_tb.replace("&quot;", '"'), exec_error_id=rec
+                log=rec.escaped_tb.replace("&quot;", '"')
+                .replace("&#34;", '"')
+                .replace("&#39;", "'"),
+                exec_error_id=rec,
             )
         return result
 
@@ -189,7 +192,9 @@ class DevopsExecError(models.Model):
                 "Set breakpoint on error"
             ) as rec:
                 rec.ide_pycharm.action_cg_setup_pycharm_debug(
-                    log=rec_o.escaped_tb.replace("&quot;", '"'),
+                    log=rec_o.escaped_tb.replace("&quot;", '"')
+                    .replace("&#34;", '"')
+                    .replace("&#39;", "'"),
                     exec_error_id=rec,
                 )
 

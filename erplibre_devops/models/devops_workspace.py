@@ -197,6 +197,12 @@ class DevopsWorkspace(models.Model):
         help="Absolute path for storing the devops_workspaces",
     )
 
+    folder_odoo_version = fields.Char(
+        required=True,
+        default=lambda self: self._default_folder_odoo_version(),
+        help="Absolute path for storing the devops_workspaces odoo_version",
+    )
+
     system_id = fields.Many2one(
         comodel_name="devops.system",
         string="System",
@@ -341,6 +347,14 @@ class DevopsWorkspace(models.Model):
     @api.model
     def _default_folder(self):
         return os.getcwd()
+
+    @api.model
+    def _default_folder_odoo_version(self):
+        if os.path.exists(".odoo-version"):
+            with open(".odoo-version", "r") as f:
+                odoo_version = f.readline()
+            return os.path.join(os.getcwd(), f"odoo{odoo_version}")
+        return False
 
     @api.depends("is_me", "is_robot", "folder", "namespace")
     def _compute_name(self):
@@ -633,7 +647,8 @@ class DevopsWorkspace(models.Model):
                     )
                 # Show external project associate to this workspace
                 exec_id = rec.execute(
-                    cmd=f"ls {rec.folder}/.venv/project", error_on_status=False
+                    cmd=f"ls {rec.folder}/.venv.erplibre/project",
+                    error_on_status=False,
                 )
                 if exec_id.exec_status == 0:
                     lst_dir = exec_id.log_all.split()
@@ -894,7 +909,7 @@ class DevopsWorkspace(models.Model):
                 self.env.ref("erplibre_devops.devops_workspace_me").execute(
                     cmd=(
                         "source"
-                        " ./.venv/bin/activate;./script/selenium/web_login.py"
+                        " ./.venv.erplibre/bin/activate;./script/selenium/web_login.py"
                         f" --url {str_url_instance}"
                     ),
                     force_open_terminal=True,
@@ -1081,7 +1096,7 @@ class DevopsWorkspace(models.Model):
                         rec.execute(
                             cmd=(
                                 'bash -c "source'
-                                ' ./.venv/bin/activate;poetry install"'
+                                ' ./.venv.erplibre/bin/activate;poetry install"'
                             ),
                             delimiter_bash='"',
                             force_open_terminal=True,
@@ -1098,17 +1113,26 @@ class DevopsWorkspace(models.Model):
                     #         f"{branch_str}"
                     #     )
                     # else:
-                # TODO if docker attached, retreive port from docker-compose
+                # TODO if docker attached, retrieve port from docker-compose
                 rec.action_network_change_port_random()
                 # TODO this "works" for source git, but source docker, need to check docker inspect
-                folder_venv = os.path.join(rec.folder, ".venv")
+                if os.path.isfile(os.path.join(rec.folder, ".odoo-version")):
+                    with open(".odoo-version") as txt:
+                        odoo_version = txt.read()
+                    folder_venv = os.path.join(
+                        rec.folder, f".venv.odoo{odoo_version}"
+                    )
+                else:
+                    folder_venv = False
 
                 if rec.erplibre_mode.mode_source in [
                     self.env.ref("erplibre_devops.erplibre_mode_source_git")
                 ]:
-                    rec.is_installed = rec.os_path_exists(
-                        rec.folder
-                    ) and rec.os_path_exists(folder_venv)
+                    rec.is_installed = (
+                        rec.os_path_exists(rec.folder)
+                        and folder_venv
+                        and rec.os_path_exists(folder_venv)
+                    )
                 elif rec.erplibre_mode.mode_source in [
                     self.env.ref("erplibre_devops.erplibre_mode_source_docker")
                 ]:
@@ -1212,6 +1236,7 @@ class DevopsWorkspace(models.Model):
                     first_log_debug = False
 
             force_folder = folder if folder else rec.folder
+            # TODO maybe support folder_odoo_version
             devops_exec_value = {
                 "devops_workspace": rec.id,
                 "cmd": cmd,
@@ -1250,6 +1275,7 @@ class DevopsWorkspace(models.Model):
                 # Remove absolute path
                 folder_path = lst_tb[0][6:-1]
                 filename = ""
+                # TODO rec.folder or rec.folder_odoo_version
                 if folder_path.startswith(rec.folder):
                     filename = folder_path[len(rec.folder) + 1 :]
                 else:
@@ -1460,7 +1486,7 @@ class DevopsWorkspace(models.Model):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Poetry install") as rec:
                 rec.execute(
-                    cmd='bash -c "source ./.venv/bin/activate;poetry install"'
+                    cmd='bash -c "source ./.venv.erplibre/bin/activate;poetry install"'
                 )
 
     def action_pre_install_workspace(self):
@@ -1470,7 +1496,9 @@ class DevopsWorkspace(models.Model):
             ) as rec:
                 # Directory must exist
                 # TODO make test to validate if remove next line, permission root the project /tmp/project/addons root
-                addons_path = os.path.join(rec.folder, "addons", "addons")
+                addons_path = os.path.join(
+                    rec.folder_odoo_version, "addons", "addons"
+                )
                 rec.execute(f"mkdir -p '{addons_path}'")
 
     @api.model
@@ -1662,26 +1690,26 @@ sock.close()
             )
             parent_root_id = devops_exec_bundle_id.get_parent_root()
             # detect is different to reduce recursion depth exceeded
-            # found_same_error_ids = self.env["devops.exec.error"].search(
-            #     [
-            #         ("parent_root_exec_bundle_id", "=", parent_root_id.id),
-            #         ("description", "=", description),
-            #         ("escaped_tb", "=", escaped_tb),
-            #     ]
-            # )
-            # if not found_same_error_ids:
-            #     devops_exec = devops_exec_bundle_id.devops_exec_ids.exists()
-            #     if devops_exec:
-            #         devops_exec = devops_exec[0]
-            #     rec.create_exec_error(
-            #         description,
-            #         escaped_tb,
-            #         rec,
-            #         devops_exec_bundle_id,
-            #         devops_exec,
-            #         parent_root_id,
-            #         "internal",
-            #     )
+            found_same_error_ids = self.env["devops.exec.error"].search(
+                [
+                    ("parent_root_exec_bundle_id", "=", parent_root_id.id),
+                    ("description", "=", description),
+                    ("escaped_tb", "=", escaped_tb),
+                ]
+            )
+            if not found_same_error_ids:
+                devops_exec = devops_exec_bundle_id.devops_exec_ids.exists()
+                if devops_exec:
+                    devops_exec = devops_exec[0]
+                rec.create_exec_error(
+                    description,
+                    escaped_tb,
+                    rec,
+                    devops_exec_bundle_id,
+                    devops_exec,
+                    parent_root_id,
+                    "internal",
+                )
             if rec.show_error_chatter:
                 partner_ids, channel_ids = rec.get_partner_channel()
                 self.message_post(  # pylint: disable=translation-required

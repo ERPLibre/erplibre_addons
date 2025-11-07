@@ -6,7 +6,6 @@ from datetime import timedelta
 
 import pytz
 from colorama import Fore, Style
-
 from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -234,7 +233,7 @@ class DevopsTestPlanExec(models.Model):
         self, rec_ws, test_case_exec_generic_async_id
     ):
         exec_id = rec_ws.execute(
-            cmd=f"./.venv/bin/python3 ./odoo/odoo-bin db --list",
+            cmd=f"odoo_bin.sh db --list",
             to_instance=True,
         )
         if not exec_id or exec_id.exec_status > 0:
@@ -268,7 +267,7 @@ class DevopsTestPlanExec(models.Model):
                 return False
             # Validate
             exec_id = rec_ws.execute(
-                cmd=f"./.venv/bin/python3 ./odoo/odoo-bin db --list",
+                cmd=f"odoo_bin.sh db --list",
                 to_instance=True,
             )
             if not exec_id or exec_id.exec_status > 0:
@@ -447,40 +446,40 @@ class DevopsTestPlanExec(models.Model):
                         continue
                 else:
                     model_test["run_test_exec"] = True
-                    model_test[
-                        "path_module_check"
-                    ] = test_case_cg_id.path_module_check
-                    model_test[
-                        "run_in_sandbox"
-                    ] = test_plan_exec_id.run_in_sandbox
+                    model_test["path_module_check"] = (
+                        test_case_cg_id.path_module_check
+                    )
+                    model_test["run_in_sandbox"] = (
+                        test_plan_exec_id.run_in_sandbox
+                    )
                     if test_case_cg_id.search_class_module:
-                        model_test[
-                            "search_class_module"
-                        ] = test_case_cg_id.search_class_module
+                        model_test["search_class_module"] = (
+                            test_case_cg_id.search_class_module
+                        )
                     if test_case_cg_id.file_to_restore:
-                        model_test[
-                            "file_to_restore"
-                        ] = test_case_cg_id.file_to_restore
+                        model_test["file_to_restore"] = (
+                            test_case_cg_id.file_to_restore
+                        )
                     if test_case_cg_id.file_to_restore_origin:
-                        model_test[
-                            "file_to_restore_origin"
-                        ] = test_case_cg_id.file_to_restore_origin
+                        model_test["file_to_restore_origin"] = (
+                            test_case_cg_id.file_to_restore_origin
+                        )
                     if test_case_cg_id.install_path:
-                        model_test[
-                            "install_path"
-                        ] = test_case_cg_id.install_path
+                        model_test["install_path"] = (
+                            test_case_cg_id.install_path
+                        )
                     if test_case_cg_id.restore_db_image_name:
-                        model_test[
-                            "restore_db_image_name"
-                        ] = test_case_cg_id.restore_db_image_name
+                        model_test["restore_db_image_name"] = (
+                            test_case_cg_id.restore_db_image_name
+                        )
                     if test_case_cg_id.generated_path:
-                        model_test[
-                            "generated_path"
-                        ] = test_case_cg_id.generated_path
+                        model_test["generated_path"] = (
+                            test_case_cg_id.generated_path
+                        )
                     if test_case_cg_id.script_after_init_check:
-                        model_test[
-                            "script_after_init_check"
-                        ] = test_case_cg_id.script_after_init_check
+                        model_test["script_after_init_check"] = (
+                            test_case_cg_id.script_after_init_check
+                        )
                     if test_case_cg_id.module_generated:
                         model_test["generated_module"] = ",".join(
                             [a.name for a in test_case_cg_id.module_generated]

@@ -10,7 +10,6 @@ import uuid
 
 from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
-
 from odoo import _, api, exceptions, fields, models, tools
 
 CODE_GENERATOR_DIRECTORY = "./addons/TechnoLibre_odoo-code-generator-template/"
@@ -1182,7 +1181,7 @@ class DevopsCgNewProject(models.Model):
 
                 if not self.keep_bd_alive:
                     cmd = (
-                        "./.venv/bin/python3 ./odoo/odoo-bin db --drop"
+                        "odoo_bin.sh db --drop"
                         f" --database {rec.bd_name_demo}"
                     )
                     _logger.info(cmd)
@@ -1495,7 +1494,7 @@ class DevopsCgNewProject(models.Model):
 
                 if not self.keep_bd_alive:
                     cmd = (
-                        "./.venv/bin/python3 ./odoo/odoo-bin db --drop"
+                        "odoo_bin.sh db --drop"
                         f" --database {rec.bd_name_template}"
                     )
                     _logger.info(cmd)
@@ -1657,7 +1656,7 @@ class DevopsCgNewProject(models.Model):
 
                 if not self.keep_bd_alive:
                     cmd = (
-                        "./.venv/bin/python3 ./odoo/odoo-bin db --drop"
+                        "odoo_bin.sh db --drop"
                         f" --database {rec.bd_name_generator}"
                     )
                     _logger.info(cmd)
@@ -1756,7 +1755,7 @@ class DevopsCgNewProject(models.Model):
                 elif file:
                     file_path = os.path.normpath(
                         os.path.join(
-                            rec_ws.folder,
+                            rec_ws.folder_odoo_version,
                             file,
                         )
                     )

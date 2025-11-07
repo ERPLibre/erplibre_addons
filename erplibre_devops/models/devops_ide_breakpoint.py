@@ -185,7 +185,7 @@ class DevopsIdeBreakpoint(models.Model):
                     filename = rec.filename
 
                 filename = os.path.normpath(
-                    os.path.join(rec_ws.folder, filename)
+                    os.path.join(rec_ws.folder_odoo_version, filename)
                 )
                 lst_no_line = rec.get_no_line_breakpoint(
                     rec.keyword, filename, rec_ws

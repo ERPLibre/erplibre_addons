@@ -21,7 +21,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def _default_instance_path(self):
         workspace_id = self.env.ref("erplibre_devops.devops_workspace_me")
-        return os.path.join(workspace_id.folder, ".venv", "project")
+        return os.path.join(workspace_id.folder, ".venv.erplibre", "project")
 
     name = fields.Char()
 
@@ -1234,9 +1234,9 @@ class DevopsPlanActionWizard(models.TransientModel):
                                         comodel_name
                                     )
                                     if model_id_searched:
-                                        value_value[
-                                            "relation"
-                                        ] = model_id_searched.id
+                                        value_value["relation"] = (
+                                            model_id_searched.id
+                                        )
                                         if (
                                             model_id_searched.id
                                             not in dct_model_cg_depend[
@@ -1252,9 +1252,9 @@ class DevopsPlanActionWizard(models.TransientModel):
                                                 model_name
                                             ].append(model_id_searched.id)
                                     else:
-                                        value_value[
-                                            "relation_manual"
-                                        ] = comodel_name
+                                        value_value["relation_manual"] = (
+                                            comodel_name
+                                        )
                                     if "inverse_name" in dct_field.keys():
                                         inverse_name = dct_field.get(
                                             "inverse_name"
@@ -1267,9 +1267,9 @@ class DevopsPlanActionWizard(models.TransientModel):
                                         relation_ref = dct_field.get(
                                             "relation"
                                         )
-                                        value_value[
-                                            "relation_ref"
-                                        ] = relation_ref
+                                        value_value["relation_ref"] = (
+                                            relation_ref
+                                        )
                                 if "help" in dct_field.keys():
                                     value_value["help"] = dct_field.get("help")
                                 if "string" in dct_field.keys():
@@ -1277,9 +1277,9 @@ class DevopsPlanActionWizard(models.TransientModel):
                                         "string"
                                     )
                                 if "related" in dct_field.keys():
-                                    value_value[
-                                        "related_manual"
-                                    ] = dct_field.get("related")
+                                    value_value["related_manual"] = (
+                                        dct_field.get("related")
+                                    )
 
                                 field_id = self.env["devops.cg.field"].create(
                                     value_value
@@ -1418,13 +1418,13 @@ class DevopsPlanActionWizard(models.TransientModel):
     def instance_create_plan_project(self):
         ctx = {}
         if self.instance_exec_image_id:
-            ctx[
-                "default_instance_exec_image_id"
-            ] = self.instance_exec_image_id.id
+            ctx["default_instance_exec_image_id"] = (
+                self.instance_exec_image_id.id
+            )
         if self.instance_exec_text_id:
-            ctx[
-                "default_instance_exec_text_id"
-            ] = self.instance_exec_text_id.id
+            ctx["default_instance_exec_text_id"] = (
+                self.instance_exec_text_id.id
+            )
         return {
             "name": _("Create plan project."),
             "type": "ir.actions.act_window",
@@ -1554,9 +1554,9 @@ class DevopsPlanActionWizard(models.TransientModel):
             plan_cg_value["cg_self_add_config_cg"] = True
             plan_cg_value["code_mode_context_generator"] = "autopoiesis"
         # Support data
-        plan_cg_value[
-            "config_uca_enable_export_data"
-        ] = self.config_uca_enable_export_data
+        plan_cg_value["config_uca_enable_export_data"] = (
+            self.config_uca_enable_export_data
+        )
 
         # Support snippet
         if self.mode_view_snippet and self.mode_view_snippet != "no_snippet":
@@ -1584,21 +1584,21 @@ class DevopsPlanActionWizard(models.TransientModel):
             ] = self.mode_view_snippet_template_generate_website_snippet_type
         if self.mode_view_portal and self.mode_view_portal != "no_portal":
             plan_cg_value["mode_view_portal"] = self.mode_view_portal
-            plan_cg_value[
-                "mode_view_portal_enable_create"
-            ] = self.mode_view_portal_enable_create
-            plan_cg_value[
-                "mode_view_portal_enable_read"
-            ] = self.mode_view_portal_enable_read
-            plan_cg_value[
-                "mode_view_portal_enable_update"
-            ] = self.mode_view_portal_enable_update
-            plan_cg_value[
-                "mode_view_portal_enable_delete"
-            ] = self.mode_view_portal_enable_delete
-            plan_cg_value[
-                "mode_view_portal_models"
-            ] = self.mode_view_portal_models
+            plan_cg_value["mode_view_portal_enable_create"] = (
+                self.mode_view_portal_enable_create
+            )
+            plan_cg_value["mode_view_portal_enable_read"] = (
+                self.mode_view_portal_enable_read
+            )
+            plan_cg_value["mode_view_portal_enable_update"] = (
+                self.mode_view_portal_enable_update
+            )
+            plan_cg_value["mode_view_portal_enable_delete"] = (
+                self.mode_view_portal_enable_delete
+            )
+            plan_cg_value["mode_view_portal_models"] = (
+                self.mode_view_portal_models
+            )
         if self.code_generator_name:
             plan_cg_value["code_generator_name"] = self.code_generator_name
         if self.template_name:

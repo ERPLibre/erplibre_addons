@@ -82,8 +82,8 @@ class DevopsCodeTodo(models.Model):
             )
             path_absolute = exec_id.log_all.strip()
             path_module = (
-                path_absolute[len(wp_id.folder) + 1 :]
-                if path_absolute.startswith(wp_id.folder)
+                path_absolute[len(wp_id.folder_odoo_version) + 1 :]
+                if path_absolute.startswith(wp_id.folder_odoo_version)
                 else path_absolute
             )
             cmd = (
