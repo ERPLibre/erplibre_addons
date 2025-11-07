@@ -123,7 +123,7 @@ class SyncDBResult(models.Model):
                 continue
             if rec.type_result == "missing_result":
                 rec.status = "solved"
-                self.env[rec.model_name].create(ast.literal_eval(rec.data))
+                self.env[rec.model_name].create([ast.literal_eval(rec.data)])
             elif rec.type_result == "diff_value":
                 rec.status = "solved"
                 setattr(
@@ -158,7 +158,7 @@ class SyncDBResult(models.Model):
                 while create_id < rec.record_id:
                     data = ast.literal_eval(rec.data)
                     try:
-                        create_id = odoo.env[rec.model_name].create(data)
+                        create_id = odoo.env[rec.model_name].create([data])
                     except Exception as e:
                         raise e
                     if create_id < rec.record_id:

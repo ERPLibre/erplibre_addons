@@ -985,7 +985,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "erplibre_mode": self.erplibre_mode.id,
                 "image_db_selection": self.image_db_selection.id,
             }
-            local_wp_id = self.env["devops.workspace"].create(dct_wp)
+            local_wp_id = self.env["devops.workspace"].create([dct_wp])
             self.create_workspace_id = local_wp_id.id
             local_wp_id.action_install_workspace()
             local_wp_id.action_start()
@@ -1023,19 +1023,19 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.state = "final"
             # # Project
             # cg_id = self.env["devops.cg"].create(
-            #     {
+            #     [{
             #         "name": "Autopoiesis regenerate",
             #         "devops_workspace_ids": [(6, 0, wp_id.ids)],
             #         "force_clean_before_generate": self.force_generate,
-            #     }
+            #     }]
             # )
             # Module
             # cg_module_id = self.env["devops.cg.module"].create(
-            #     {
+            #     [{
             #         "name": "erplibre_devops",
             #         "code_generator": cg_id.id,
             #         "devops_workspace_ids": [(6, 0, wp_id.ids)],
-            #     }
+            #     }]
             # )
             # plan_cg_value = {
             #     "workspace_id": wp_id.id,
@@ -1050,7 +1050,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             #     "stop_execution_if_env_not_clean": not self.force_generate,
             #     "use_external_cg": self.use_external_cg,
             # }
-            # plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
+            # plan_cg_id = self.env["devops.plan.cg"].create([plan_cg_value])
             # # Generate
             # plan_cg_id.action_code_generator_generate_all()
             # self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
@@ -1198,7 +1198,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                                 "is_inherit": v.get("is_inherit", False),
                             }
                             model_id = self.env["devops.cg.model"].create(
-                                model_value
+                                [model_value]
                             )
                         lst_model_to_add.append(model_id.id)
                         lst_model_field.append((model_id, v))
@@ -1282,7 +1282,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                                     )
 
                                 field_id = self.env["devops.cg.field"].create(
-                                    value_value
+                                    [value_value]
                                 )
 
                     self.model_ids = [(6, 0, lst_model_to_add)]
@@ -1378,7 +1378,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             }
             self.instance_last_exec_id = self.env[
                 "devops.instance.exec"
-            ].create(inst_exec_value)
+            ].create([inst_exec_value])
             self.instance_last_exec_id.start()
             if (
                 self.env.ref(
@@ -1509,19 +1509,23 @@ class DevopsPlanActionWizard(models.TransientModel):
         #  Remove action_code_generator_generate_all
         # Project
         cg_id = self.env["devops.cg"].create(
-            {
-                "name": project_name,
-                "devops_workspace_ids": [(6, 0, wp_id.ids)],
-                "force_clean_before_generate": self.force_generate,
-            }
+            [
+                {
+                    "name": project_name,
+                    "devops_workspace_ids": [(6, 0, wp_id.ids)],
+                    "force_clean_before_generate": self.force_generate,
+                }
+            ]
         )
         # Module
         cg_module_id = self.env["devops.cg.module"].create(
-            {
-                "name": module_name,
-                "code_generator": cg_id.id,
-                "devops_workspace_ids": [(6, 0, wp_id.ids)],
-            }
+            [
+                {
+                    "name": module_name,
+                    "code_generator": cg_id.id,
+                    "devops_workspace_ids": [(6, 0, wp_id.ids)],
+                }
+            ]
         )
         # Model
         for cg_model_id in self.model_ids:
@@ -1610,7 +1614,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if cg_module_id:
             cg_module_id.unlink()
         # Generate
-        plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
+        plan_cg_id = self.env["devops.plan.cg"].create([plan_cg_value])
         plan_cg_id.action_code_generator_generate_all()
         self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
         self.plan_cg_id = plan_cg_id.id
@@ -1750,7 +1754,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             "erplibre_mode": self.erplibre_mode.id,
             "image_db_selection": self.image_db_selection.id,
         }
-        ws_id = self.env["devops.workspace"].create(ws_value)
+        ws_id = self.env["devops.workspace"].create([ws_value])
         self.create_workspace_id = ws_id.id
         # TODO missing check status before continue
         # TODO missing with workspace me to catch error
@@ -1785,7 +1789,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             "ssh_user": self.ssh_user,
             "ssh_password": self.ssh_password,
         }
-        system_id = self.env["devops.system"].create(system_value)
+        system_id = self.env["devops.system"].create([system_value])
         self.working_system_id = system_id
         try:
             # Just open and close the connection

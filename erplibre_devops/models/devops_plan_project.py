@@ -150,9 +150,7 @@ class DevopsPlanProject(models.Model):
         store=True,
     )
 
-    result_one_pager_background_introduction = fields.Char(
-        tracking=True
-    )
+    result_one_pager_background_introduction = fields.Char(tracking=True)
 
     instance_exec_text_id = fields.Many2one(
         comodel_name="devops.instance.exec",
@@ -309,7 +307,7 @@ class DevopsPlanProject(models.Model):
                             "temperature": rec.temperature,
                         }
                         op_id = self.env["devops.operate.localai"].create(
-                            op_value
+                            [op_value]
                         )
                         op_id.execute_ia()
                         if op_id.last_result_message:
@@ -338,7 +336,7 @@ class DevopsPlanProject(models.Model):
                                 "temperature": rec.temperature,
                             }
                             op_id = self.env["devops.operate.localai"].create(
-                                op_value
+                                [op_value]
                             )
                             op_id.execute_ia()
                             if op_id.last_result_message:
@@ -366,13 +364,13 @@ class DevopsPlanProject(models.Model):
                                 "temperature": rec.temperature,
                             }
                             op_id = self.env["devops.operate.localai"].create(
-                                op_value
+                                [op_value]
                             )
                             op_id.execute_ia()
                             if op_id.last_result_message:
-                                dct_form[
-                                    "short_vulgarisation"
-                                ] = op_id.last_result_message
+                                dct_form["short_vulgarisation"] = (
+                                    op_id.last_result_message
+                                )
 
                         for dct_form in lst_form:
                             if not rec.instance_exec_image_id:
@@ -407,7 +405,7 @@ class DevopsPlanProject(models.Model):
                             }
                             op_img_id = self.env[
                                 "devops.operate.localai"
-                            ].create(op_value)
+                            ].create([op_value])
                             op_img_id.execute_ia()
                             if op_img_id.last_result_url:
                                 dct_form["picture"] = op_img_id.last_result_url
@@ -423,7 +421,7 @@ class DevopsPlanProject(models.Model):
                     rec.result_one_pager_introduction = result_1
                     value = {"data": result_1, "title": rec.type_context}
                     pptx_id = self.env["devops.plan.project.pptx"].create(
-                        value
+                        [value]
                     )
                     pptx_id.execute()
                 continue
@@ -460,7 +458,9 @@ class DevopsPlanProject(models.Model):
                         "request_url": rec.instance_exec_text_id.url,
                         "temperature": rec.temperature,
                     }
-                    op_id = self.env["devops.operate.localai"].create(op_value)
+                    op_id = self.env["devops.operate.localai"].create(
+                        [op_value]
+                    )
                     op_id.execute_ia()
                     if op_id.last_result_message:
                         rec.result_one_pager_introduction = (
@@ -484,7 +484,7 @@ class DevopsPlanProject(models.Model):
                     "request_url": rec.instance_exec_text_id.url,
                     "temperature": rec.temperature,
                 }
-                op_id = self.env["devops.operate.localai"].create(op_value)
+                op_id = self.env["devops.operate.localai"].create([op_value])
                 op_id.execute_ia()
                 rec.result_list_aliment = op_id.last_result_message.replace(
                     "\n", ""
@@ -514,7 +514,7 @@ class DevopsPlanProject(models.Model):
                         ],
                     }
                     op_img_id = self.env["devops.operate.localai"].create(
-                        op_value
+                        [op_value]
                     )
                     op_img_id.execute_ia()
                     rec.result_one_pager_background_introduction = (
@@ -571,7 +571,7 @@ class DevopsPlanProject(models.Model):
                             ],
                         }
                         op_img_id = self.env["devops.operate.localai"].create(
-                            op_value
+                            [op_value]
                         )
                         op_img_id.execute_ia()
                         lst_image_url.append(op_img_id.last_result_url)

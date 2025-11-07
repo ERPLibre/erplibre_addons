@@ -238,12 +238,14 @@ class DevopsTestPlanExec(models.Model):
         )
         if not exec_id or exec_id.exec_status > 0:
             self.env["devops.test.result"].create(
-                {
-                    "name": "Cannot execute db list command to ERPLibre.",
-                    "is_finish": True,
-                    "is_pass": False,
-                    "test_case_exec_id": test_case_exec_generic_async_id.id,
-                }
+                [
+                    {
+                        "name": "Cannot execute db list command to ERPLibre.",
+                        "is_finish": True,
+                        "is_pass": False,
+                        "test_case_exec_id": test_case_exec_generic_async_id.id,
+                    }
+                ]
             )
             return False
         lst_bd = exec_id.log_all.split()
@@ -254,15 +256,17 @@ class DevopsTestPlanExec(models.Model):
             )
             if not exec_id or exec_id.exec_status > 0:
                 self.env["devops.test.result"].create(
-                    {
-                        "name": (
-                            "Cannot execute db restore test command to"
-                            " ERPLibre."
-                        ),
-                        "is_finish": True,
-                        "is_pass": False,
-                        "test_case_exec_id": test_case_exec_generic_async_id.id,
-                    }
+                    [
+                        {
+                            "name": (
+                                "Cannot execute db restore test command to"
+                                " ERPLibre."
+                            ),
+                            "is_finish": True,
+                            "is_pass": False,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
+                        }
+                    ]
                 )
                 return False
             # Validate
@@ -272,51 +276,59 @@ class DevopsTestPlanExec(models.Model):
             )
             if not exec_id or exec_id.exec_status > 0:
                 self.env["devops.test.result"].create(
-                    {
-                        "name": (
-                            "Cannot execute db list second try command to"
-                            " ERPLibre."
-                        ),
-                        "is_finish": True,
-                        "is_pass": False,
-                        "test_case_exec_id": test_case_exec_generic_async_id.id,
-                    }
+                    [
+                        {
+                            "name": (
+                                "Cannot execute db list second try command to"
+                                " ERPLibre."
+                            ),
+                            "is_finish": True,
+                            "is_pass": False,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
+                        }
+                    ]
                 )
                 return False
             lst_bd = exec_id.log_all.split()
             if "_cache_erplibre_base" not in lst_bd:
                 self.env["devops.test.result"].create(
-                    {
-                        "name": (
-                            "Restore a database test with default parameters"
-                            " cannot create DB '_cache_erplibre_base'."
-                        ),
-                        "is_finish": True,
-                        "is_pass": False,
-                        "test_case_exec_id": test_case_exec_generic_async_id.id,
-                    }
+                    [
+                        {
+                            "name": (
+                                "Restore a database test with default parameters"
+                                " cannot create DB '_cache_erplibre_base'."
+                            ),
+                            "is_finish": True,
+                            "is_pass": False,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
+                        }
+                    ]
                 )
                 return False
             else:
                 self.env["devops.test.result"].create(
+                    [
+                        {
+                            "name": (
+                                "DB _cache_erplibre_base restored with success and"
+                                " validated!"
+                            ),
+                            "is_finish": True,
+                            "is_pass": True,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
+                        }
+                    ]
+                )
+        else:
+            self.env["devops.test.result"].create(
+                [
                     {
-                        "name": (
-                            "DB _cache_erplibre_base restored with success and"
-                            " validated!"
-                        ),
+                        "name": "DB _cache_erplibre_base already exist.",
                         "is_finish": True,
                         "is_pass": True,
                         "test_case_exec_id": test_case_exec_generic_async_id.id,
                     }
-                )
-        else:
-            self.env["devops.test.result"].create(
-                {
-                    "name": "DB _cache_erplibre_base already exist.",
-                    "is_finish": True,
-                    "is_pass": True,
-                    "test_case_exec_id": test_case_exec_generic_async_id.id,
-                }
+                ]
             )
         return True
 
@@ -372,12 +384,14 @@ class DevopsTestPlanExec(models.Model):
                     test_case_exec_id = self.env[
                         "devops.test.case.exec"
                     ].create(
-                        {
-                            "name": test_case_id.name,
-                            "test_plan_exec_id": rec.id,
-                            "workspace_id": rec_ws.id,
-                            "test_case_id": test_case_id.id,
-                        }
+                        [
+                            {
+                                "name": test_case_id.name,
+                                "test_plan_exec_id": rec.id,
+                                "workspace_id": rec_ws.id,
+                                "test_case_id": test_case_id.id,
+                            }
+                        ]
                     )
                     if test_case_id.test_cb_method_name and hasattr(
                         test_case_exec_id, test_case_id.test_cb_method_name
@@ -395,16 +409,18 @@ class DevopsTestPlanExec(models.Model):
                         )
                     else:
                         self.env["devops.test.result"].create(
-                            {
-                                "name": f"Search method",
-                                "log": (
-                                    "Cannot find method"
-                                    f" '{test_case_id.test_cb_method_name}'"
-                                ),
-                                "is_finish": True,
-                                "is_pass": False,
-                                "test_case_exec_id": test_case_exec_id.id,
-                            }
+                            [
+                                {
+                                    "name": f"Search method",
+                                    "log": (
+                                        "Cannot find method"
+                                        f" '{test_case_id.test_cb_method_name}'"
+                                    ),
+                                    "is_finish": True,
+                                    "is_pass": False,
+                                    "test_case_exec_id": test_case_exec_id.id,
+                                }
+                            ]
                         )
                 # TODO support better execution_is_finished for async, when execution is really finish
                 rec.execution_is_finished = True
@@ -433,15 +449,17 @@ class DevopsTestPlanExec(models.Model):
                         model_test["script"] = test_case_cg_id.script_path
                     else:
                         self.env["devops.test.result"].create(
-                            {
-                                "name": (
-                                    "Missing field 'script_path' for test"
-                                    f" {test_name}."
-                                ),
-                                "is_finish": False,
-                                "is_pass": False,
-                                "test_case_exec_id": test_case_exec_id.id,
-                            }
+                            [
+                                {
+                                    "name": (
+                                        "Missing field 'script_path' for test"
+                                        f" {test_name}."
+                                    ),
+                                    "is_finish": False,
+                                    "is_pass": False,
+                                    "test_case_exec_id": test_case_exec_id.id,
+                                }
+                            ]
                         )
                         continue
                 else:
@@ -507,14 +525,16 @@ class DevopsTestPlanExec(models.Model):
                 test_case_exec_generic_async_id = self.env[
                     "devops.test.case.exec"
                 ].create(
-                    {
-                        "name": "Async execution test - setup",
-                        "test_plan_exec_id": test_plan_exec_id.id,
-                        "workspace_id": rec_ws.id,
-                        "test_case_id": self.env.ref(
-                            "erplibre_devops.devops_test_case_async_execution_setup_test"
-                        ).id,
-                    }
+                    [
+                        {
+                            "name": "Async execution test - setup",
+                            "test_plan_exec_id": test_plan_exec_id.id,
+                            "workspace_id": rec_ws.id,
+                            "test_case_id": self.env.ref(
+                                "erplibre_devops.devops_test_case_async_execution_setup_test"
+                            ).id,
+                        }
+                    ]
                 )
                 # Requirement, the test need db cache before run or it crash
                 status = self.check_requirement_test_exec_cg(
@@ -528,13 +548,15 @@ class DevopsTestPlanExec(models.Model):
                 )
                 if exec_id.exec_status:
                     self.env["devops.test.result"].create(
-                        {
-                            "name": f"Cannot mkdir {path_mkdir_log_external}",
-                            "log": exec_id.log_all.strip(),
-                            "is_finish": True,
-                            "is_pass": False,
-                            "test_case_exec_id": test_case_exec_generic_async_id.id,
-                        }
+                        [
+                            {
+                                "name": f"Cannot mkdir {path_mkdir_log_external}",
+                                "log": exec_id.log_all.strip(),
+                                "is_finish": True,
+                                "is_pass": False,
+                                "test_case_exec_id": test_case_exec_generic_async_id.id,
+                            }
+                        ]
                     )
                 pre_cmd_run_test = ""
                 if test_plan_exec_id.coverage:
@@ -562,12 +584,14 @@ class DevopsTestPlanExec(models.Model):
                     to_instance=True,
                 )
                 self.env["devops.test.result"].create(
-                    {
-                        "name": f"Execution async done",
-                        "is_finish": True,
-                        "is_pass": True,
-                        "test_case_exec_id": test_case_exec_generic_async_id.id,
-                    }
+                    [
+                        {
+                            "name": f"Execution async done",
+                            "is_finish": True,
+                            "is_pass": True,
+                            "test_case_exec_id": test_case_exec_generic_async_id.id,
+                        }
+                    ]
                 )
                 if test_plan_exec_id:
                     test_plan_exec_id.log = exec_id.log_all.strip()
@@ -575,15 +599,17 @@ class DevopsTestPlanExec(models.Model):
                 if exec_id.exec_status:
                     # Fail return error status
                     self.env["devops.test.result"].create(
-                        {
-                            "name": (
-                                f"Error execute run ERPLibre parallel test"
-                            ),
-                            "log": exec_id.log_all.strip(),
-                            "is_finish": True,
-                            "is_pass": False,
-                            "test_case_exec_id": test_case_exec_generic_async_id.id,
-                        }
+                        [
+                            {
+                                "name": (
+                                    f"Error execute run ERPLibre parallel test"
+                                ),
+                                "log": exec_id.log_all.strip(),
+                                "is_finish": True,
+                                "is_pass": False,
+                                "test_case_exec_id": test_case_exec_generic_async_id.id,
+                            }
+                        ]
                     )
                 for (
                     test_case_exec_id,
@@ -606,13 +632,15 @@ class DevopsTestPlanExec(models.Model):
                         status = int(lst_output[0])
                     except Exception as e:
                         self.env["devops.test.result"].create(
-                            {
-                                "name": f"Log mal formatted - status",
-                                "log": lst_output[0],
-                                "is_finish": True,
-                                "is_pass": False,
-                                "test_case_exec_id": test_case_exec_id.id,
-                            }
+                            [
+                                {
+                                    "name": f"Log mal formatted - status",
+                                    "log": lst_output[0],
+                                    "is_finish": True,
+                                    "is_pass": False,
+                                    "test_case_exec_id": test_case_exec_id.id,
+                                }
+                            ]
                         )
                         status = -1
                     if status == -1:
@@ -622,29 +650,33 @@ class DevopsTestPlanExec(models.Model):
                         time_exec_sec = int(float(lst_output[2]))
                     except Exception as e:
                         self.env["devops.test.result"].create(
-                            {
-                                "name": f"Log mal formatted - time_exec_sec",
-                                "log": lst_output[2],
-                                "is_finish": True,
-                                "is_pass": False,
-                                "test_case_exec_id": test_case_exec_id.id,
-                            }
+                            [
+                                {
+                                    "name": f"Log mal formatted - time_exec_sec",
+                                    "log": lst_output[2],
+                                    "is_finish": True,
+                                    "is_pass": False,
+                                    "test_case_exec_id": test_case_exec_id.id,
+                                }
+                            ]
                         )
                         time_exec_sec = 0
                     date_log = lst_output[3]
                     test_result = "PASS" if not status else "FAIL"
                     self.env["devops.test.result"].create(
-                        {
-                            "name": (
-                                f"Test result '{test_name}' - {test_result}"
-                            ),
-                            "log": exec_id.log_all.strip(),
-                            "is_finish": True,
-                            "time_duration_seconds": time_exec_sec,
-                            "date_log": date_log,
-                            "is_pass": not status,
-                            "test_case_exec_id": test_case_exec_id.id,
-                        }
+                        [
+                            {
+                                "name": (
+                                    f"Test result '{test_name}' - {test_result}"
+                                ),
+                                "log": exec_id.log_all.strip(),
+                                "is_finish": True,
+                                "time_duration_seconds": time_exec_sec,
+                                "date_log": date_log,
+                                "is_pass": not status,
+                                "test_case_exec_id": test_case_exec_id.id,
+                            }
+                        ]
                     )
         self.exec_stop_date = fields.Datetime.now(self)
 

@@ -226,7 +226,7 @@ class DevopsExec(models.Model):
                         }
                         if rec.new_project_id:
                             v["new_project_id"] = rec.new_project_id.id
-                        self.env["devops.log.error"].create(v)
+                        self.env["devops.log.error"].create([v])
 
                 if has_warning:
                     for ignore_item in lst_item_ignore_warning:
@@ -239,7 +239,7 @@ class DevopsExec(models.Model):
                         }
                         if rec.new_project_id:
                             v["new_project_id"] = rec.new_project_id.id
-                        self.env["devops.log.warning"].create(v)
+                        self.env["devops.log.warning"].create([v])
 
     @api.depends("exec_stop_date")
     def _compute_execution_finish(self):
@@ -249,9 +249,7 @@ class DevopsExec(models.Model):
     @api.depends("exec_time_duration")
     def _compute_time_duration_result(self):
         for rec in self:
-            rec.time_duration_result = (
-                f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
-            )
+            rec.time_duration_result = f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
 
     def open_file_ide(self):
         ws_id = self.env["devops.workspace"].search(

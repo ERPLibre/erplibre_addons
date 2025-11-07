@@ -61,7 +61,7 @@ class DevopsCodeTodo(models.Model):
                     }
                     # TODO maybe check if already exist?
                     ide_breakpoint = self.env["devops.ide.breakpoint"].create(
-                        bp_value
+                        [bp_value]
                     )
                     id_ide_breakpoint = ide_breakpoint.id
 
@@ -124,4 +124,4 @@ class DevopsCodeTodo(models.Model):
                     "workspace_id": wp_id.id,
                     "module_id": cg_module.id,
                 }
-                todo_id = self.env["devops.code.todo"].create(todo_value)
+                todo_id = self.env["devops.code.todo"].create([todo_value])

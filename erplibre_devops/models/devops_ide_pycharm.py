@@ -240,7 +240,7 @@ class DevopsIdePycharm(models.Model):
                     "ignore_test": True,
                     "generated_by_execution": True,
                 }
-                bp_id = self.env["devops.ide.breakpoint"].create(bp_value)
+                bp_id = self.env["devops.ide.breakpoint"].create([bp_value])
                 exec_error_id.exec_filename = filepath_breakpoint
                 exec_error_id.exec_line_number = update_line
                 exec_error_id.ide_breakpoint = bp_id.id
@@ -380,7 +380,7 @@ class DevopsIdePycharm(models.Model):
                         v["devops_cg_new_project_id"] = (
                             id_devops_cg_new_project
                         )
-                    self.env["devops.ide.pycharm.configuration"].create(v)
+                    self.env["devops.ide.pycharm.configuration"].create([v])
 
                     if line_to_add not in file_content_before:
                         new_content = file_content_before + line_to_add
@@ -425,7 +425,7 @@ class DevopsIdePycharm(models.Model):
                     "devops_workspace_id": rec_ws.id,
                     "devops_ide_pycharm": rec.id,
                 }
-                self.env["devops.ide.pycharm.configuration"].create(v)
+                self.env["devops.ide.pycharm.configuration"].create([v])
 
                 if line_to_add not in file_content_before:
                     new_content = file_content_before + line_to_add

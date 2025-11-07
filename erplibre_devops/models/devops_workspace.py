@@ -330,7 +330,7 @@ class DevopsWorkspace(models.Model):
         for rec_id in rec_ids:
             if not rec_id.ide_pycharm:
                 rec_id.ide_pycharm = self.env["devops.ide.pycharm"].create(
-                    {"devops_workspace": rec_id.id}
+                    [{"devops_workspace": rec_id.id}]
                 )
             rec_id.message_subscribe(
                 partner_ids=[self.env.ref("base.partner_admin").id]
@@ -658,7 +658,7 @@ class DevopsWorkspace(models.Model):
                             "instance_name": dir_name,
                             "workspace_id": rec.id,
                         }
-                        self.env["devops.instance.exec"].create(value)
+                        self.env["devops.instance.exec"].create([value])
 
     def action_install_me_workspace(self):
         for rec_o in self:
@@ -829,14 +829,14 @@ class DevopsWorkspace(models.Model):
                 if not rec.workspace_docker_id:
                     rec.workspace_docker_id = self.env[
                         "devops.workspace.docker"
-                    ].create({"workspace_id": rec.id})
+                    ].create([{"workspace_id": rec.id}])
             elif rec.erplibre_mode.mode_exec in [
                 self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
             ]:
                 if not rec.workspace_terminal_id:
                     rec.workspace_terminal_id = self.env[
                         "devops.workspace.terminal"
-                    ].create({"workspace_id": rec.id})
+                    ].create([{"workspace_id": rec.id}])
             else:
                 raise exceptions.Warning(f"Cannot support '{rec.mode_exec}'")
 
@@ -1174,7 +1174,7 @@ class DevopsWorkspace(models.Model):
                     if target in lst_ignore_target:
                         continue
                     self.env["devops.log.makefile.target"].create(
-                        {"name": target, "devops_workspace_id": rec.id}
+                        [{"name": target, "devops_workspace_id": rec.id}]
                     )
 
     def action_add_makefile(self):
@@ -1192,7 +1192,7 @@ class DevopsWorkspace(models.Model):
                     if target in lst_ignore_target:
                         continue
                     self.env["devops.log.makefile.target"].create(
-                        {"name": target, "devops_workspace_id": rec.id}
+                        [{"name": target, "devops_workspace_id": rec.id}]
                     )
 
     def execute(
@@ -1313,14 +1313,14 @@ class DevopsWorkspace(models.Model):
                 if method_name:
                     bp_value["method"] = method_name
                     devops_exec_value["exec_method"] = method_name
-                bp_id = self.env["devops.ide.breakpoint"].create(bp_value)
+                bp_id = self.env["devops.ide.breakpoint"].create([bp_value])
                 devops_exec_value["ide_breakpoint"] = bp_id.id
                 devops_exec_value["exec_filename"] = filename
                 devops_exec_value["exec_line_number"] = line_number
                 devops_exec_value["exec_keyword"] = keyword
             # ### END Find who call us ###
 
-            devops_exec = self.env["devops.exec"].create(devops_exec_value)
+            devops_exec = self.env["devops.exec"].create([devops_exec_value])
             lst_result.append(devops_exec)
             status = None
             if force_open_terminal:
@@ -1641,7 +1641,7 @@ sock.close()
                 exec_error_id = (
                     self.env["devops.exec.error"]
                     .with_context(devops_workspace_create_exec_error=True)
-                    .create(error_value)
+                    .create([error_value])
                 )
             lst_result.append(exec_error_id)
         if len(self) == 1:
@@ -1669,7 +1669,7 @@ sock.close()
             if devops_exec_bundle_parent:
                 value_bundle["parent_id"] = devops_exec_bundle_parent
         devops_exec_bundle_id = self.env["devops.exec.bundle"].create(
-            value_bundle
+            [value_bundle]
         )
         rec = self.with_context(devops_exec_bundle=devops_exec_bundle_id.id)
         if ctx:

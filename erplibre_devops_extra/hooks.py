@@ -34,9 +34,11 @@ def post_init_hook(env):
 </form>
     """
     env["ir.ui.view.custom"].create(
-        {
-            "user_id": env.ref("base.user_admin").id,
-            "ref_id": env.ref("board.board_my_dash_view").id,
-            "arch": arch,
-        }
+        [
+            {
+                "user_id": env.ref("base.user_admin").id,
+                "ref_id": env.ref("board.board_my_dash_view").id,
+                "arch": arch,
+            }
+        ]
     )

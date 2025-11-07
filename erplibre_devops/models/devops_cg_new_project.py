@@ -1606,7 +1606,7 @@ class DevopsCgNewProject(models.Model):
                     #             if True:
                     #                 # Add option "nomenclature", this will export data from all generated model
                     #                 #  This is a mess when inherit another model
-                    #                 txt_replace = 'env["code.generator.writer"].create(value)'
+                    #                 txt_replace = 'env["code.generator.writer"].create([value])'
                     #                 txt_replace_to = f"""        values = {
                     #     "s_data2export": "nomenclator",
                     # }
@@ -1798,7 +1798,7 @@ class DevopsCgNewProject(models.Model):
                 if search not in txt:
                     msg_error = f"Cannot find '{search}' in file '{filepath}'"
                     v_dct_log_error["name"] = msg_error
-                    self.env["devops.log.error"].create(v_dct_log_error)
+                    self.env["devops.log.error"].create([v_dct_log_error])
                     continue
                     # raise Exception(msg_error)
                 txt = txt.replace(search, replace)

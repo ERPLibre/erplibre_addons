@@ -76,7 +76,7 @@ class DevopsDeployVm(models.Model):
                     "vm_id": rec.id,
                     "is_running": True,
                 }
-                vm_exec_id = self.env["devops.deploy.vm.exec"].create(value)
+                vm_exec_id = self.env["devops.deploy.vm.exec"].create([value])
                 rec.vm_exec_last_id = vm_exec_id.id
                 # Find associate system if exist
                 # TODO use one2many instead? Not existing, crash with CG

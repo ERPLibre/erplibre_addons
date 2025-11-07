@@ -499,7 +499,7 @@ class DevopsPlanCg(models.Model):
                         if rec.use_external_cg:
                             new_project_id = self.env[
                                 "devops.cg.new_project"
-                            ].create(dct_new_project)
+                            ].create([dct_new_project])
                             if rec.last_new_project_cg:
                                 new_project_id.last_new_project = (
                                     rec.last_new_project_cg.id
@@ -556,7 +556,9 @@ class DevopsPlanCg(models.Model):
                 f'module_id.name = "{module_id.name}"'
             )
 
-            code_generator_id = self.env["code.generator.module"].create(value)
+            code_generator_id = self.env["code.generator.module"].create(
+                [value]
+            )
             rec.last_code_generator_module = code_generator_id.id
 
             # lst_depend_module = ["mail", "portal", "website"]
@@ -632,7 +634,7 @@ class DevopsPlanCg(models.Model):
 
             wizard_view = self.env[
                 "code.generator.generate.views.wizard"
-            ].create(value_view_wizard)
+            ].create([value_view_wizard])
 
             wizard_view.button_generate_views()
 
@@ -648,7 +650,7 @@ class DevopsPlanCg(models.Model):
                     "snippet_type": rec.mode_view_snippet_template_generate_website_snippet_type,
                     "model_name": rec.mode_view_snippet_template_generate_website_snippet_generic_mdl,
                 }
-                self.env["code.generator.snippet"].create(value_snippet)
+                self.env["code.generator.snippet"].create([value_snippet])
 
             # Generate module
             value = {"code_generator_ids": code_generator_id.ids}
@@ -953,40 +955,48 @@ class DevopsPlanCg(models.Model):
                 if rec.cg_demo_type_data == "simple":
                     # Project
                     cg_id = self.env["devops.cg"].create(
-                        {
-                            "name": "Parc de voiture",
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                            "force_clean_before_generate": True,
-                        }
+                        [
+                            {
+                                "name": "Parc de voiture",
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                                "force_clean_before_generate": True,
+                            }
+                        ]
                     )
                     # Module
                     cg_module_id = self.env["devops.cg.module"].create(
-                        {
-                            "name": "parc",
-                            "code_generator": cg_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "parc",
+                                "code_generator": cg_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Model
                     cg_model_voiture_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "parc.voiture",
-                            "description": "Ensemble de voiture dans le parc",
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "parc.voiture",
+                                "description": "Ensemble de voiture dans le parc",
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Field
                     cg_field_voiture_couleur_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "couleur",
-                            "help": "Couleur de la voiture.",
-                            "type": "char",
-                            "model_id": cg_model_voiture_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "couleur",
+                                "help": "Couleur de la voiture.",
+                                "type": "char",
+                                "model_id": cg_model_voiture_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     if rec.is_clear_before_cg_demo:
                         rec.devops_cg_ids = [(6, 0, cg_id.ids)]
@@ -1021,38 +1031,46 @@ class DevopsPlanCg(models.Model):
                 elif rec.cg_demo_type_data == "devops_example":
                     # Project
                     cg_id = self.env["devops.cg"].create(
-                        {
-                            "name": "Projet exemple",
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                            "force_clean_before_generate": False,
-                        }
+                        [
+                            {
+                                "name": "Projet exemple",
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                                "force_clean_before_generate": False,
+                            }
+                        ]
                     )
                     # Module
                     cg_module_id = self.env["devops.cg.module"].create(
-                        {
-                            "name": "erplibre_devops",
-                            "code_generator": cg_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "erplibre_devops",
+                                "code_generator": cg_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Model
                     cg_model_example_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "devops.example",
-                            "description": "Example feature to add to devops",
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "devops.example",
+                                "description": "Example feature to add to devops",
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Field
                     cg_field_size_id = self.env["devops.cg.field"].create(
-                        {
-                            "name": "size",
-                            "help": "Size of this example.",
-                            "type": "integer",
-                            "model_id": cg_model_example_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "size",
+                                "help": "Size of this example.",
+                                "type": "integer",
+                                "model_id": cg_model_example_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     if rec.is_clear_before_cg_demo:
                         rec.devops_cg_ids = [(6, 0, cg_id.ids)]
@@ -1085,98 +1103,115 @@ class DevopsPlanCg(models.Model):
                             (4, cg_field_size_id.id),
                         ]
                 elif rec.cg_demo_type_data == "ore":
+                    # TODO this is not the good place for this case, ore do not exist
                     # Project
                     cg_id = self.env["devops.cg"].create(
-                        {
-                            "name": "Offrir Recevoir Échanger",
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                            "force_clean_before_generate": True,
-                        }
+                        [
+                            {
+                                "name": "Offrir Recevoir Échanger",
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                                "force_clean_before_generate": True,
+                            }
+                        ]
                     )
                     # Module
                     cg_module_id = self.env["devops.cg.module"].create(
-                        {
-                            "name": "ore",
-                            "code_generator": cg_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "ore",
+                                "code_generator": cg_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Model
                     cg_model_offre_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "ore.offre.service",
-                            "description": (
-                                "Permet de créer une offre de service"
-                                " publiable dans la communauté."
-                            ),
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "ore.offre.service",
+                                "description": (
+                                    "Permet de créer une offre de service"
+                                    " publiable dans la communauté."
+                                ),
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_model_demande_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "ore.demande.service",
-                            "description": (
-                                "Permet de créer une demande de service"
-                                " publiable dans la communauté."
-                            ),
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "ore.demande.service",
+                                "description": (
+                                    "Permet de créer une demande de service"
+                                    " publiable dans la communauté."
+                                ),
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Field
                     cg_field_offre_date_afficher_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "date_service_afficher",
-                            "help": (
-                                "Date à laquelle l'offre de service sera"
-                                " affiché."
-                            ),
-                            "type": "date",
-                            "model_id": cg_model_offre_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "date_service_afficher",
+                                "help": (
+                                    "Date à laquelle l'offre de service sera"
+                                    " affiché."
+                                ),
+                                "type": "date",
+                                "model_id": cg_model_offre_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_field_offre_temps_estime_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "temp_estime",
-                            "help": (
-                                "Temps estimé pour effectuer le service à"
-                                " offrir."
-                            ),
-                            "type": "float",
-                            "model_id": cg_model_offre_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "temp_estime",
+                                "help": (
+                                    "Temps estimé pour effectuer le service à"
+                                    " offrir."
+                                ),
+                                "type": "float",
+                                "model_id": cg_model_offre_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_field_demande_date_afficher_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "date_service_afficher",
-                            "help": (
-                                "Date à laquelle la demande de service sera"
-                                " affiché."
-                            ),
-                            "type": "date",
-                            "model_id": cg_model_demande_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "date_service_afficher",
+                                "help": (
+                                    "Date à laquelle la demande de service sera"
+                                    " affiché."
+                                ),
+                                "type": "date",
+                                "model_id": cg_model_demande_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_field_demande_condition_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "condition",
-                            "help": "Condition sur la demande de service.",
-                            "type": "text",
-                            "model_id": cg_model_demande_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "condition",
+                                "help": "Condition sur la demande de service.",
+                                "type": "text",
+                                "model_id": cg_model_demande_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     if rec.is_clear_before_cg_demo:
                         rec.devops_cg_ids = [(6, 0, cg_id.ids)]

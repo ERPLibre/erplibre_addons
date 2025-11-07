@@ -260,16 +260,18 @@ class SyncDB(models.Model):
         )
         if not local_module:
             self.env["sync.db.result"].create(
-                {
-                    "sync_db_id": rec.id,
-                    "type_result": "missing_module",
-                    "source": "local",
-                    "sequence": 1,
-                    "msg": f"Missing module '{module_name}'",
-                    "data": module_name,
-                    "resolution": "solution_local",
-                    "status": "error",
-                }
+                [
+                    {
+                        "sync_db_id": rec.id,
+                        "type_result": "missing_module",
+                        "source": "local",
+                        "sequence": 1,
+                        "msg": f"Missing module '{module_name}'",
+                        "data": module_name,
+                        "resolution": "solution_local",
+                        "status": "error",
+                    }
+                ]
             )
         else:
             if (
@@ -325,16 +327,18 @@ class SyncDB(models.Model):
         )
         if not remote_module_ids:
             self.env["sync.db.result"].create(
-                {
-                    "sync_db_id": rec.id,
-                    "type_result": "missing_module",
-                    "source": "remote",
-                    "sequence": 1,
-                    "msg": f"Missing module '{module_name}'",
-                    "data": module_name,
-                    "resolution": "solution_remote",
-                    "status": "warning",
-                }
+                [
+                    {
+                        "sync_db_id": rec.id,
+                        "type_result": "missing_module",
+                        "source": "remote",
+                        "sequence": 1,
+                        "msg": f"Missing module '{module_name}'",
+                        "data": module_name,
+                        "resolution": "solution_remote",
+                        "status": "warning",
+                    }
+                ]
             )
         if not remote_module_ids or not local_module:
             # Ignore, module not existing
@@ -344,16 +348,18 @@ class SyncDB(models.Model):
         if remote_module.state != "installed":
             # TODO validate can be install
             self.env["sync.db.result"].create(
-                {
-                    "sync_db_id": rec.id,
-                    "type_result": "module_not_installed",
-                    "source": "remote",
-                    "sequence": 1,
-                    "msg": f"Module '{module_name}' not installed",
-                    "data": module_name,
-                    "resolution": "solution_remote",
-                    "status": "warning",
-                }
+                [
+                    {
+                        "sync_db_id": rec.id,
+                        "type_result": "module_not_installed",
+                        "source": "remote",
+                        "sequence": 1,
+                        "msg": f"Module '{module_name}' not installed",
+                        "data": module_name,
+                        "resolution": "solution_remote",
+                        "status": "warning",
+                    }
+                ]
             )
         elif local_module.latest_version != remote_module.latest_version:
             need_update = (
@@ -375,7 +381,7 @@ class SyncDB(models.Model):
             }
             if need_update:
                 value["resolution"] = "solution_remote"
-            self.env["sync.db.result"].create(value)
+            self.env["sync.db.result"].create([value])
 
         # Validate model
         for model_name, model_value in dct_model.items():
@@ -387,14 +393,16 @@ class SyncDB(models.Model):
                 if key not in lst_existing_result:
                     lst_existing_result.append(key)
                     self.env["sync.db.result"].create(
-                        {
-                            "sync_db_id": rec.id,
-                            "model_name": model_name,
-                            "type_result": "missing_model",
-                            "source": "remote",
-                            "status": "error",
-                            "sequence": 1,
-                        }
+                        [
+                            {
+                                "sync_db_id": rec.id,
+                                "model_name": model_name,
+                                "type_result": "missing_model",
+                                "source": "remote",
+                                "status": "error",
+                                "sequence": 1,
+                            }
+                        ]
                     )
                 continue
 
@@ -403,15 +411,17 @@ class SyncDB(models.Model):
                 lst_v = odoo.execute_kw(model_name, "read", [v], model_kwargs)
             except Exception as e:
                 self.env["sync.db.result"].create(
-                    {
-                        "sync_db_id": rec.id,
-                        "model_name": model_name,
-                        "type_result": "missing_field",
-                        "source": "remote",
-                        "sequence": 1,
-                        "msg": e,
-                        "status": "error",
-                    }
+                    [
+                        {
+                            "sync_db_id": rec.id,
+                            "model_name": model_name,
+                            "type_result": "missing_field",
+                            "source": "remote",
+                            "sequence": 1,
+                            "msg": e,
+                            "status": "error",
+                        }
+                    ]
                 )
                 lst_v = []
 
@@ -422,25 +432,29 @@ class SyncDB(models.Model):
                 )
                 if not local_item:
                     self.env["sync.db.result"].create(
-                        {
-                            "sync_db_id": rec.id,
-                            "model_name": model_name,
-                            # "field_value_remote": (
-                            #     f"id '{v_item.get('id')}' name"
-                            #     f" '{v_item.get('display_name')}'"
-                            # ),
-                            "record_id": v_item.get("id"),
-                            "type_result": "missing_result",
-                            "data": {
-                                a: v
-                                if type(v) is not list
-                                else (v[0] if len(v) else [])
-                                for a, v in v_item.items()
-                                if a not in MAGIC_FIELDS
-                            },
-                            "source": "local",
-                            "resolution": "solution_local",
-                        }
+                        [
+                            {
+                                "sync_db_id": rec.id,
+                                "model_name": model_name,
+                                # "field_value_remote": (
+                                #     f"id '{v_item.get('id')}' name"
+                                #     f" '{v_item.get('display_name')}'"
+                                # ),
+                                "record_id": v_item.get("id"),
+                                "type_result": "missing_result",
+                                "data": {
+                                    a: (
+                                        v
+                                        if type(v) is not list
+                                        else (v[0] if len(v) else [])
+                                    )
+                                    for a, v in v_item.items()
+                                    if a not in MAGIC_FIELDS
+                                },
+                                "source": "local",
+                                "resolution": "solution_local",
+                            }
+                        ]
                     )
                 else:
                     lst_field = model_value.get("fields", {}).get("lst")
@@ -469,18 +483,20 @@ class SyncDB(models.Model):
                                 )
                                 if remote_value_transformed != local_value.id:
                                     self.env["sync.db.result"].create(
-                                        {
-                                            "sync_db_id": rec.id,
-                                            "model_name": model_name,
-                                            "field_name": field_name,
-                                            "record_id": v_item.get("id"),
-                                            "field_value_local": local_value.id,
-                                            "field_value_remote": remote_value,
-                                            "type_result": "diff_value",
-                                            "resolution": (
-                                                "solution_remote_local"
-                                            ),
-                                        }
+                                        [
+                                            {
+                                                "sync_db_id": rec.id,
+                                                "model_name": model_name,
+                                                "field_name": field_name,
+                                                "record_id": v_item.get("id"),
+                                                "field_value_local": local_value.id,
+                                                "field_value_remote": remote_value,
+                                                "type_result": "diff_value",
+                                                "resolution": (
+                                                    "solution_remote_local"
+                                                ),
+                                            }
+                                        ]
                                     )
                             elif field_type in (
                                 "one2many",
@@ -491,36 +507,40 @@ class SyncDB(models.Model):
                                 )
                                 if remote_value_transformed != local_value.ids:
                                     self.env["sync.db.result"].create(
+                                        [
+                                            {
+                                                "sync_db_id": rec.id,
+                                                "model_name": model_name,
+                                                "field_name": field_name,
+                                                "field_value_local": local_value.ids,
+                                                "record_id": v_item.get("id"),
+                                                "field_value_remote": remote_value,
+                                                "type_result": "diff_value",
+                                                "resolution": (
+                                                    "solution_remote_local"
+                                                ),
+                                            }
+                                        ]
+                                    )
+                            elif local_value != remote_value:
+                                self.env["sync.db.result"].create(
+                                    [
                                         {
                                             "sync_db_id": rec.id,
                                             "model_name": model_name,
                                             "field_name": field_name,
-                                            "field_value_local": local_value.ids,
                                             "record_id": v_item.get("id"),
+                                            "field_value_local": local_value,
                                             "field_value_remote": remote_value,
                                             "type_result": "diff_value",
-                                            "resolution": (
-                                                "solution_remote_local"
+                                            "resolution": "solution_remote_local",
+                                            "msg": (
+                                                "Different value, local"
+                                                f" '{local_item}', remote"
+                                                f" '{remote_value}'"
                                             ),
                                         }
-                                    )
-                            elif local_value != remote_value:
-                                self.env["sync.db.result"].create(
-                                    {
-                                        "sync_db_id": rec.id,
-                                        "model_name": model_name,
-                                        "field_name": field_name,
-                                        "record_id": v_item.get("id"),
-                                        "field_value_local": local_value,
-                                        "field_value_remote": remote_value,
-                                        "type_result": "diff_value",
-                                        "resolution": "solution_remote_local",
-                                        "msg": (
-                                            "Different value, local"
-                                            f" '{local_item}', remote"
-                                            f" '{remote_value}'"
-                                        ),
-                                    }
+                                    ]
                                 )
                         else:
                             key = (
@@ -532,20 +552,22 @@ class SyncDB(models.Model):
                             if key not in lst_existing_result:
                                 lst_existing_result.append(key)
                                 self.env["sync.db.result"].create(
-                                    {
-                                        "sync_db_id": rec.id,
-                                        "model_name": model_name,
-                                        "type_result": "missing_field",
-                                        "source": "local",
-                                        "field_name": field_name,
-                                        "sequence": 1,
-                                        "msg": (
-                                            "Missing field"
-                                            f" '{field_name}' to"
-                                            " local instance."
-                                        ),
-                                        "status": "error",
-                                    }
+                                    [
+                                        {
+                                            "sync_db_id": rec.id,
+                                            "model_name": model_name,
+                                            "type_result": "missing_field",
+                                            "source": "local",
+                                            "field_name": field_name,
+                                            "sequence": 1,
+                                            "msg": (
+                                                "Missing field"
+                                                f" '{field_name}' to"
+                                                " local instance."
+                                            ),
+                                            "status": "error",
+                                        }
+                                    ]
                                 )
 
             lst_v_local = self.env[model_name].search([])
@@ -588,17 +610,19 @@ class SyncDB(models.Model):
                             data[field_name] = v
 
                     self.env["sync.db.result"].create(
-                        {
-                            "sync_db_id": rec.id,
-                            "model_name": model_name,
-                            # "field_value_local": (
-                            #     f"id '{v_item.id}' name"
-                            #     f" '{v_item.display_name}'"
-                            # ),
-                            "record_id": v_item.id,
-                            "type_result": "missing_result",
-                            "data": data,
-                            "source": "remote",
-                            "resolution": "solution_remote",
-                        }
+                        [
+                            {
+                                "sync_db_id": rec.id,
+                                "model_name": model_name,
+                                # "field_value_local": (
+                                #     f"id '{v_item.id}' name"
+                                #     f" '{v_item.display_name}'"
+                                # ),
+                                "record_id": v_item.id,
+                                "type_result": "missing_result",
+                                "data": data,
+                                "source": "remote",
+                                "resolution": "solution_remote",
+                            }
+                        ]
                     )

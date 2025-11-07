@@ -929,7 +929,7 @@ class DevopsSystem(models.Model):
                     #     deploy_image_value["history_full"] = out
                     docker_compose_id = self.env[
                         "devops.docker.compose"
-                    ].create(compose_value)
+                    ].create([compose_value])
                 dct_compose_name_id[compose_name] = docker_compose_id
 
             # 2. Volume
@@ -988,7 +988,7 @@ class DevopsSystem(models.Model):
                                     )
                             docker_volume_id = self.env[
                                 "devops.docker.volume"
-                            ].create(deploy_volume_value)
+                            ].create([deploy_volume_value])
                         dct_volume_name_id[volume_name] = docker_volume_id
             # 3. Image
             # cmd = "docker container ls --no-trunc -a --format json"
@@ -1044,7 +1044,7 @@ class DevopsSystem(models.Model):
                     if status == 0:
                         deploy_image_value["inspect_full"] = out
                     docker_image_id = self.env["devops.docker.image"].create(
-                        deploy_image_value
+                        [deploy_image_value]
                     )
                 elif (
                     not docker_image_id.system_ids
@@ -1093,7 +1093,7 @@ class DevopsSystem(models.Model):
                         network_value["inspect_full"] = out
                     docker_network_id = self.env[
                         "devops.docker.network"
-                    ].create(network_value)
+                    ].create([network_value])
                     dct_network_name_id[docker_network_id.name] = (
                         docker_network_id
                     )
@@ -1188,7 +1188,7 @@ class DevopsSystem(models.Model):
 
                     docker_container_id = self.env[
                         "devops.docker.container"
-                    ].create(container_value)
+                    ].create([container_value])
 
                 dct_container_name_id[id_container] = docker_container_id
             for compose_id in dct_compose_name_id.values():
@@ -1393,7 +1393,7 @@ class DevopsSystem(models.Model):
                             "provider": provider,
                             "system_id": rec.id,
                         }
-                        vm_id = self.env["devops.deploy.vm"].create(value)
+                        vm_id = self.env["devops.deploy.vm"].create([value])
                     if vm_id and key in lst_identifiant_running:
                         # TODO need to be somewhere else to check status
                         value = {
@@ -1401,7 +1401,7 @@ class DevopsSystem(models.Model):
                             "is_running": True,
                         }
                         vm_exec_id = self.env["devops.deploy.vm.exec"].create(
-                            value
+                            [value]
                         )
                         vm_id.vm_exec_last_id = vm_exec_id.id
 
@@ -1713,7 +1713,7 @@ class DevopsSystem(models.Model):
                 )
                 if not image_db_id:
                     self.env["devops.db.image"].create(
-                        {"name": image_name, "path": file_path}
+                        [{"name": image_name, "path": file_path}]
                     )
 
     def get_local_system_id_from_ssh_config(self):
@@ -1752,7 +1752,7 @@ class DevopsSystem(models.Model):
                         value["ssh_user"] = dev_config.get("user")
 
                     value["parent_system_id"] = rec.id
-                    system_id = self.env["devops.system"].create(value)
+                    system_id = self.env["devops.system"].create([value])
                 if system_id:
                     new_sub_system_id += system_id
         return new_sub_system_id
