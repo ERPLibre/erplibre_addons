@@ -129,7 +129,7 @@ class DevopsTestCaseExec(models.Model):
                 if not bp_ids:
                     msg = f"List of breakpoint is empty."
                     _logger.error(msg)
-                    raise exceptions.Warning(msg)
+                    raise exceptions.UserError(msg)
                 for bp_id in bp_ids:
                     if bp_id.ignore_test:
                         continue

@@ -349,7 +349,9 @@ class DevopsTestPlanExec(models.Model):
                 )
             )
             if not lst_testcase:
-                raise exceptions.Warning("Missing failed testcase to execute.")
+                raise exceptions.UserError(
+                    "Missing failed testcase to execute."
+                )
             return {
                 "type": "ir.actions.act_window",
                 "res_model": self._name,
@@ -374,7 +376,7 @@ class DevopsTestPlanExec(models.Model):
                 if rec.execution_is_launched:
                     continue
                 if not rec.test_plan_id and not rec.test_case_ids:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Missing test plan or test cases."
                     )
                 rec.execution_is_launched = True

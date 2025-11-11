@@ -92,7 +92,7 @@ class DevopsIdePycharm(models.Model):
                             rec_ws, new_project_id=new_project_id
                         )
                     except Exception as e:
-                        raise exceptions.Warning(
+                        raise exceptions.UserError(
                             f"Breakpoint '{bp_id.name}' : {e}"
                         )
             if lst_line:

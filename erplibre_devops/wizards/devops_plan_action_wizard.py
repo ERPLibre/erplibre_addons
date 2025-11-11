@@ -1104,7 +1104,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 module_name = self.working_module_name
             if not module_name:
                 # TODO manage error into action wizard
-                # raise exceptions.Warning(f"Module name is empty.")
+                # raise exceptions.UserError(f"Module name is empty.")
                 return self._reopen_self()
             # Search absolute path
             exec_id = wp_id.execute(
@@ -1117,16 +1117,16 @@ class DevopsPlanActionWizard(models.TransientModel):
             )
             path_module = exec_id.log_all.strip()
             if exec_id.exec_status == 2:
-                raise exceptions.Warning(
+                raise exceptions.UserError(
                     f"The module '{module_name}' is duplicated :"
                     f" \n{path_module}"
                 )
             elif exec_id.exec_status:
-                # raise exceptions.Warning(f"Cannot find module '{module_name}'")
+                # raise exceptions.UserError(f"Cannot find module '{module_name}'")
                 self.set_mode_new_module()
                 return self._reopen_self()
             if not path_module:
-                # raise exceptions.Warning(f"Cannot find module path.")
+                # raise exceptions.UserError(f"Cannot find module path.")
                 self.set_mode_new_module()
                 return self._reopen_self()
             # Extract relative path
@@ -1478,13 +1478,13 @@ class DevopsPlanActionWizard(models.TransientModel):
         #         run_into_workspace=True,
         #     )
         #     if exec_id.exec_status:
-        #         raise exceptions.Warning(f"Cannot find module '{module_name}'")
+        #         raise exceptions.UserError(f"Cannot find module '{module_name}'")
         #     path_module = exec_id.log_all.strip()
         if module_path:
             # Overwrite it
             path_module = module_path
         if not path_module:
-            raise exceptions.Warning(f"Cannot find module path.")
+            raise exceptions.UserError(f"Cannot find module path.")
         if not is_relative_path:
             dir_name, basename = os.path.split(path_module)
             if dir_name.startswith(wp_id.folder):
@@ -1808,7 +1808,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def ssh_test_system_exist(self):
         if not self.working_system_id:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 "Missing SSH system id from plan Wizard, wrong configuration,"
                 " please contact your administrator."
             )

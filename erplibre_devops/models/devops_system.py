@@ -570,7 +570,7 @@ class DevopsSystem(models.Model):
             sshpass = ""
             if rec.ssh_use_sshpass and not force_no_sshpass_no_arg:
                 if not rec.ssh_password:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Please, configure your password, because you enable"
                         " the feature 'ssh_use_sshpass'"
                     )
@@ -643,7 +643,7 @@ class DevopsSystem(models.Model):
         try:
             # Just open and close the connection
             with self.ssh_connection(force_exception=True):
-                raise exceptions.Warning(_("Connection Test Succeeded!"))
+                raise exceptions.UserError(_("Connection Test Succeeded!"))
         except (
             paramiko.AuthenticationException,
             paramiko.PasswordRequiredException,
@@ -651,7 +651,7 @@ class DevopsSystem(models.Model):
             paramiko.SSHException,
         ):
             _logger.info("Connection Test Failed!", exc_info=True)
-            raise exceptions.Warning(_("Connection Test Failed!"))
+            raise exceptions.UserError(_("Connection Test Failed!"))
 
     @api.model
     def ssh_connection(self, timeout=5, force_exception=False):
@@ -1264,7 +1264,7 @@ class DevopsSystem(models.Model):
             out = rec.execute_terminal_gui(
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 'Add it at the end of bashrc\neval "$(starship init bash)"'
             )
 
@@ -1333,7 +1333,7 @@ class DevopsSystem(models.Model):
                 "Security good : 1. No DSA, 2. RSA key size >= 3072, 3. Better"
                 " Ed25519\n" + log
             )
-            raise exceptions.Warning(msg)
+            raise exceptions.UserError(msg)
 
     def action_search_vm(self):
         for rec in self:

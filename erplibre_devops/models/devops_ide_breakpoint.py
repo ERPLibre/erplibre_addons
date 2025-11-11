@@ -154,7 +154,7 @@ class DevopsIdeBreakpoint(models.Model):
                     f" '{key}'. Command : {cmd}"
                 )
             if "No such file or directory" in log_all:
-                raise exceptions.Warning(f"No such file '{file}'")
+                raise exceptions.UserError(f"No such file '{file}'")
             if log_all:
                 try:
                     return [int(a) for a in log_all.split("\n")]

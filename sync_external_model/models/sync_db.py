@@ -162,10 +162,10 @@ class SyncDB(models.Model):
                 error = _("Cannot connect")
         if error:
             _logger.error("Error sync connexion test")
-            raise exceptions.Warning(_("FAILED - Sync connexion : ") + error)
+            raise exceptions.UserError(_("FAILED - Sync connexion : ") + error)
         else:
             _logger.info("Succeed sync connexion test")
-            raise exceptions.Warning(_("SUCCEED - Sync connexion"))
+            raise exceptions.UserError(_("SUCCEED - Sync connexion"))
 
     def get_odoo(self, rec):
         if rec.protocol == "https":
@@ -178,7 +178,7 @@ class SyncDB(models.Model):
             )
         db_list = odoo.db.list()
         if not db_list:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 _("The server {} has not database.").format(self.sync_host)
             )
         db = rec.database
@@ -186,11 +186,11 @@ class SyncDB(models.Model):
             if len(db_list) == 1:
                 db = db_list[0]
             else:
-                raise exceptions.Warning(
+                raise exceptions.UserError(
                     _("Please specify the database to sync.")
                 )
         elif db not in db_list:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 _("The server {} has not database named {}.").format(
                     self.sync_host, db
                 )
@@ -199,7 +199,7 @@ class SyncDB(models.Model):
         try:
             odoo.login(db, rec.sync_user, rec.sync_password)
         except Exception:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 _(
                     "FAILED - wrong credentials, is it good user name or"
                     " password?"

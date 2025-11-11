@@ -1294,7 +1294,7 @@ class DevopsPlanCg(models.Model):
                             " relation because type is"
                             f" '{field_id.type}'"
                         )
-                        raise exceptions.Warning(msg_err)
+                        raise exceptions.UserError(msg_err)
                 if not ignore_field_relation and field_id.type in [
                     "one2many",
                 ]:
@@ -1310,7 +1310,7 @@ class DevopsPlanCg(models.Model):
                             " relation field because type is"
                             f" '{field_id.type}'"
                         )
-                        raise exceptions.Warning(msg_err)
+                        raise exceptions.UserError(msg_err)
                 if field_id.widget:
                     dct_value_field = field_id.widget
                 lst_field.append(dct_value_field)
@@ -1356,7 +1356,7 @@ class DevopsPlanCg(models.Model):
                 exec_id = rec_ws.execute(cmd=f"ls {dir_to_check}")
                 status_ls = exec_id.log_all
                 if "No such file or directory" in status_ls:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Cannot open command 'tig', cannot find directory"
                         f" '{dir_to_check}'."
                     )

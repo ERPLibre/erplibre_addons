@@ -711,7 +711,7 @@ class DevopsWorkspace(models.Model):
                     url_drop = f"{rec.url_instance}/web/database/drop"
                     if not rec.image_db_selection:
                         # TODO create stage, need a stage ready to restore
-                        raise exceptions.Warning(
+                        raise exceptions.UserError(
                             _("Error, need field db_selection")
                         )
                     rec.db_is_restored = False
@@ -839,7 +839,7 @@ class DevopsWorkspace(models.Model):
                         "devops.workspace.terminal"
                     ].create([{"workspace_id": rec.id}])
             else:
-                raise exceptions.Warning(f"Cannot support '{rec.mode_exec}'")
+                raise exceptions.UserError(f"Cannot support '{rec.mode_exec}'")
 
     def action_start(self):
         for rec_o in self:
@@ -1405,7 +1405,7 @@ class DevopsWorkspace(models.Model):
     ):
         # nb_error_estimate = log.count("During handling of the above exception, another exception occurred:")
         if not devops_exec_bundle_id:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 f"Executable command {devops_exec.cmd} missing exec.bundle."
             )
 
@@ -1679,8 +1679,8 @@ sock.close()
             rec = rec.with_context(devops_cg_new_project=devops_cg_new_project)
         try:
             yield rec
-        # except exceptions.Warning as e:
-        #     raise e
+        except exceptions.UserError as e:
+            raise e
         except Exception as e:
             _logger.exception(
                 f"'{description}' it.exec.bundle id"

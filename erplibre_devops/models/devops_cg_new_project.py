@@ -737,7 +737,7 @@ class DevopsCgNewProject(models.Model):
                 if has_debug:
                     rec.with_context(rec_ws._context).action_new_project()
                 else:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Cannot support debug for this stage"
                     )
 

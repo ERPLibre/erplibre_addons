@@ -277,7 +277,7 @@ class DevopsExec(models.Model):
                 split_cmd = self.cmd.split(" ", 1)
                 cmd = split_cmd[0]
                 if not cmd.endswith(".py"):
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         _("CMD need to be a python file.")
                     )
                 if len(split_cmd) > 1:
