@@ -4,8 +4,11 @@
 import json
 import logging
 import os
+import re
 import time
+import unicodedata
 import uuid
+from datetime import datetime
 
 from odoo import _, api, exceptions, fields, models
 
@@ -488,6 +491,38 @@ class DevopsPlanActionWizard(models.TransientModel):
         comodel_name="devops.cg.model",
         string="Model to remove",
         relation="devops_plan_action_model_remove_rel",
+    )
+
+    model_fast_creation_enabled = fields.Boolean(
+        string="Enable fast creation feature",
+    )
+
+    model_fast_creation_model_name = fields.Char(
+        string="Model name fast creation",
+    )
+
+    model_fast_creation_field_name = fields.Text(
+        string="Field name fast creation", help="Separate field name by ;"
+    )
+
+    model_fast_creation_field_separator = fields.Selection(
+        string="Field separator fast creation",
+        default=";",
+        selection=[
+            ("\t", "tab"),
+            (";", ";"),
+            (",", ","),
+            ("\n", "saut de ligne \\n"),
+        ],
+    )
+
+    model_fast_creation_field_example_value = fields.Text(
+        string="Field value fast creation",
+        help="Separate field name by ;, need to be same column of model_fast_creation_field_name",
+    )
+
+    model_fast_creation_error = fields.Text(
+        string="Fast creation error", readonly=True
     )
 
     image_db_selection = fields.Many2one(
@@ -1090,6 +1125,91 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.env["devops.cg.field"].search([]).unlink()
         return self._reopen_self()
 
+    def action_enable_model_fast_creation(self):
+        for rec in self:
+            rec.model_fast_creation_enabled = True
+        return self._reopen_self()
+
+    def action_model_fast_creation(self):
+        for rec in self:
+            rec.model_fast_creation_error = ""
+            if not rec.model_fast_creation_model_name:
+                rec.model_fast_creation_error = "Missing model name."
+                continue
+            if rec.model_fast_creation_field_name:
+                lst_field_name = [
+                    a.strip()
+                    for a in rec.model_fast_creation_field_name.strip(
+                        "\n"
+                    ).split(rec.model_fast_creation_field_separator)
+                    if a.strip()
+                ]
+                # Check doublon
+                if len(set(lst_field_name)) != len(lst_field_name):
+                    rec.model_fast_creation_error = "Detect doublon into field name, validate all is unique."
+                    continue
+                # Extract value
+                lst_field_value = [
+                    a.strip()
+                    for a in rec.model_fast_creation_field_example_value.strip(
+                        "\n"
+                    ).split(rec.model_fast_creation_field_separator)
+                ]
+                if lst_field_value and len(lst_field_value) != len(
+                    lst_field_name
+                ):
+                    msg = (
+                        f"The number '{len(lst_field_value)}' of item value is incoherent "
+                        f"with item number '{len(lst_field_name)}' of field name."
+                    )
+                    for index in range(len(lst_field_value)):
+                        if index < len(lst_field_name) and index < len(
+                            lst_field_value
+                        ):
+                            msg += f"\n[{lst_field_name[index]}:{lst_field_value[index]}]"
+                    rec.model_fast_creation_error = msg
+                    continue
+            else:
+                lst_field_name = []
+                lst_field_value = []
+
+            dct_field_json = {}
+            for field_index, field_name in enumerate(lst_field_name):
+                field_name_code = self.to_field_name(field_name)
+                if lst_field_value:
+                    field_value = lst_field_value[field_index]
+                    # Try to detect date, try to detect number
+                    value_type, value_transform = rec.detect_type_from_string(
+                        field_value
+                    )
+                else:
+                    value_type = "Char"
+                # TODO if type float or int and got $ in name, it's monetary
+                dct_field_json[field_name_code] = {
+                    "name": field_name_code,
+                    "sequence": field_index + 10,
+                    "string": field_name,
+                    "type": value_type,
+                }
+
+            dct_field = {
+                rec.model_fast_creation_model_name: {
+                    "fields": dct_field_json,
+                    "is_inherit": False,
+                    "model_name": rec.model_fast_creation_model_name,
+                }
+            }
+
+            str_dct_model = json.dumps(dct_field)
+            self.generate_from_json(str_dct_model)
+
+            # Clean
+            # rec.model_fast_creation_model_name = ""
+            # rec.model_fast_creation_field_name = ""
+            # rec.model_fast_creation_field_example_value = ""
+            rec.model_fast_creation_error = ""
+        return self._reopen_self()
+
     def action_code_module_autocomplete_module_path(self, ctx=None):
         if ctx is None:
             ctx = {}
@@ -1164,135 +1284,14 @@ class DevopsPlanActionWizard(models.TransientModel):
                 if exec_id.exec_status != 0:
                     _logger.error("TODO i crash and forgot to raise an error!")
                 else:
-                    # The file need to finish by }, or cut it and remove output execution
-                    last_pos_char = str_dct_model.rfind("}")
-                    if last_pos_char == -1:
-                        _logger.error(
-                            "Cannot detect JSON dict when searching class"
-                            " model."
-                        )
-                        # TODO You can stop execution here, but let crash later
-                        str_dct_model_complete = str_dct_model
-                        lst_logs_model = []
-                    else:
-                        str_dct_model_complete = str_dct_model[
-                            : last_pos_char + 1
-                        ]
-                        lst_logs_model = (
-                            str_dct_model[last_pos_char + 1 :]
-                            .strip()
-                            .split("\n")
-                        )
-                        # TODO show this log to action view
-                        lst_logs_model = [
-                            a.strip() for a in lst_logs_model if a.strip()
-                        ]
-                        if lst_logs_model:
-                            _logger.warning("\n".join(lst_logs_model))
-                    # Create cg.model
-                    dct_model = json.loads(str_dct_model_complete)
                     dct_model_cg = {}
                     dct_model_cg_depend = {}
-                    lst_model_to_add = []
-                    lst_model_field = []
-                    for model_name, v in dct_model.items():
-                        model_id = self.env["devops.cg.model"].search(
-                            [("name", "=", model_name)]
-                        )
-                        if not model_id:
-                            model_value = {
-                                "name": model_name,
-                                "is_inherit": v.get("is_inherit", False),
-                            }
-                            model_id = self.env["devops.cg.model"].create(
-                                [model_value]
-                            )
-                        lst_model_to_add.append(model_id.id)
-                        lst_model_field.append((model_id, v))
-                        dct_model_cg[model_name] = model_id
-                        dct_model_cg_depend[model_name] = []
-                    # Create cg.field
-                    for model_id, v in lst_model_field:
-                        if "fields" in v.keys():
-                            # This algorithm only works when the module is working and formatted
-                            for dct_field in v.get("fields").values():
-                                ttype = dct_field.get("type").lower()
-                                field_name = dct_field.get("name")
-                                value_value = {
-                                    "name": field_name,
-                                    "type": ttype,
-                                    "model_id": model_id.id,
-                                }
-                                model_name = model_id.name
-                                # Check if exist
-                                field_id = self.env["devops.cg.field"].search(
-                                    [
-                                        ("name", "=", field_name),
-                                        ("model_id", "=", model_id.id),
-                                    ]
-                                )
-                                if field_id:
-                                    continue
-                                if "comodel_name" in dct_field.keys():
-                                    comodel_name = dct_field.get(
-                                        "comodel_name"
-                                    )
-                                    model_id_searched = dct_model_cg.get(
-                                        comodel_name
-                                    )
-                                    if model_id_searched:
-                                        value_value["relation"] = (
-                                            model_id_searched.id
-                                        )
-                                        if (
-                                            model_id_searched.id
-                                            not in dct_model_cg_depend[
-                                                model_name
-                                            ]
-                                            and ttype not in ["one2many"]
-                                            and model_id_searched.id
-                                            != model_id.id
-                                        ):
-                                            # Ignore one2many and depend on itself
-                                            # Keep cache on depend model
-                                            dct_model_cg_depend[
-                                                model_name
-                                            ].append(model_id_searched.id)
-                                    else:
-                                        value_value["relation_manual"] = (
-                                            comodel_name
-                                        )
-                                    if "inverse_name" in dct_field.keys():
-                                        inverse_name = dct_field.get(
-                                            "inverse_name"
-                                        )
-                                        # TODO detect field_relation, need to reorder the field model
-                                        value_value[
-                                            "field_relation_manual"
-                                        ] = inverse_name
-                                    if "relation" in dct_field.keys():
-                                        relation_ref = dct_field.get(
-                                            "relation"
-                                        )
-                                        value_value["relation_ref"] = (
-                                            relation_ref
-                                        )
-                                if "help" in dct_field.keys():
-                                    value_value["help"] = dct_field.get("help")
-                                if "string" in dct_field.keys():
-                                    value_value["string"] = dct_field.get(
-                                        "string"
-                                    )
-                                if "related" in dct_field.keys():
-                                    value_value["related_manual"] = (
-                                        dct_field.get("related")
-                                    )
-
-                                field_id = self.env["devops.cg.field"].create(
-                                    [value_value]
-                                )
-
-                    self.model_ids = [(6, 0, lst_model_to_add)]
+                    self.generate_from_json(
+                        str_dct_model,
+                        force_new=True,
+                        dct_model_cg=dct_model_cg,
+                        dct_model_cg_depend=dct_model_cg_depend,
+                    )
                     # reorder from dependency
                     # TODO reorder from dependency list, change sequence
                     lst_model_delete = []
@@ -1680,6 +1679,117 @@ class DevopsPlanActionWizard(models.TransientModel):
                 to_instance=True,
             )
 
+    def generate_from_json(
+        self,
+        str_dct_model,
+        force_new=False,
+        dct_model_cg={},
+        dct_model_cg_depend={},
+    ):
+        # The file need to finish by }, or cut it and remove output execution
+        last_pos_char = str_dct_model.rfind("}")
+        if last_pos_char == -1:
+            _logger.error(
+                "Cannot detect JSON dict when searching class" " model."
+            )
+            # TODO You can stop execution here, but let crash later
+            str_dct_model_complete = str_dct_model
+            lst_logs_model = []
+        else:
+            str_dct_model_complete = str_dct_model[: last_pos_char + 1]
+            lst_logs_model = (
+                str_dct_model[last_pos_char + 1 :].strip().split("\n")
+            )
+            # TODO show this log to action view
+            lst_logs_model = [a.strip() for a in lst_logs_model if a.strip()]
+            if lst_logs_model:
+                _logger.warning("\n".join(lst_logs_model))
+        # Create cg.model
+        dct_model = json.loads(str_dct_model_complete)
+        lst_model_to_add = []
+        lst_model_field = []
+        for model_name, v in dct_model.items():
+            model_id = self.env["devops.cg.model"].search(
+                [("name", "=", model_name)]
+            )
+            if not model_id:
+                model_value = {
+                    "name": model_name,
+                    "is_inherit": v.get("is_inherit", False),
+                }
+                model_id = self.env["devops.cg.model"].create([model_value])
+            lst_model_to_add.append(model_id.id)
+            lst_model_field.append((model_id, v))
+            dct_model_cg[model_name] = model_id
+            dct_model_cg_depend[model_name] = []
+        # Create cg.field
+        for model_id, v in lst_model_field:
+            if "fields" in v.keys():
+                # This algorithm only works when the module is working and formatted
+                for dct_field in v.get("fields").values():
+                    ttype = dct_field.get("type").lower()
+                    field_name = dct_field.get("name")
+                    value_value = {
+                        "name": field_name,
+                        "type": ttype,
+                        "model_id": model_id.id,
+                    }
+                    model_name = model_id.name
+                    # Check if exist
+                    field_id = self.env["devops.cg.field"].search(
+                        [
+                            ("name", "=", field_name),
+                            ("model_id", "=", model_id.id),
+                        ]
+                    )
+                    if field_id:
+                        continue
+                    if "comodel_name" in dct_field.keys():
+                        comodel_name = dct_field.get("comodel_name")
+                        model_id_searched = dct_model_cg.get(comodel_name)
+                        if model_id_searched:
+                            value_value["relation"] = model_id_searched.id
+                            if (
+                                model_id_searched.id
+                                not in dct_model_cg_depend[model_name]
+                                and ttype not in ["one2many"]
+                                and model_id_searched.id != model_id.id
+                            ):
+                                # Ignore one2many and depend on itself
+                                # Keep cache on depend model
+                                dct_model_cg_depend[model_name].append(
+                                    model_id_searched.id
+                                )
+                        else:
+                            value_value["relation_manual"] = comodel_name
+                        if "inverse_name" in dct_field.keys():
+                            inverse_name = dct_field.get("inverse_name")
+                            # TODO detect field_relation, need to reorder the field model
+                            value_value["field_relation_manual"] = inverse_name
+                        if "relation" in dct_field.keys():
+                            relation_ref = dct_field.get("relation")
+                            value_value["relation_ref"] = relation_ref
+                    if "help" in dct_field.keys():
+                        value_value["help"] = dct_field.get("help")
+                    if "string" in dct_field.keys():
+                        value_value["string"] = dct_field.get("string")
+                    if "related" in dct_field.keys():
+                        value_value["related_manual"] = dct_field.get(
+                            "related"
+                        )
+
+                    field_id = self.env["devops.cg.field"].create(
+                        [value_value]
+                    )
+
+        if force_new:
+            # Replace all
+            self.model_ids = [(6, 0, lst_model_to_add)]
+        else:
+            # TODO support update and not append
+            # Append
+            self.model_ids = [(4, a) for a in lst_model_to_add]
+
     def fill_working_module_name_or_id(self, module_name):
         if not module_name:
             return
@@ -1868,3 +1978,71 @@ class DevopsPlanActionWizard(models.TransientModel):
             )
         self.force_show_final = True
         return self._reopen_self()
+
+    def detect_type_from_string(self, value) -> (str, object):
+        value_type = ""
+
+        datetime_formats = [
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
+        ]
+
+        # 4. DATETIME ?
+        for fmt in datetime_formats:
+            try:
+                dt = datetime.strptime(value, fmt)
+                return "Datetime", dt
+            except ValueError:
+                pass
+
+        date_formats = [
+            "%Y-%m-%d",
+            "%d/%m/%Y",
+            "%m/%d/%Y",
+        ]
+
+        # 3. DATE ?
+        for fmt in date_formats:
+            try:
+                d = datetime.strptime(value, fmt).date()
+                return "Date", d
+            except ValueError:
+                pass
+
+        try:
+            fv = float(value)
+            return "Float", fv
+        except ValueError:
+            pass
+
+        try:
+            fv = int(value)
+            return "Integer", fv
+        except ValueError:
+            pass
+
+        return "Char", value
+
+    def to_field_name(self, label: str) -> str:
+        # 1) Normaliser les accents → é => e, ç => c, etc.
+        label = unicodedata.normalize("NFKD", label)
+        label = label.encode("ascii", "ignore").decode("ascii")
+
+        # 2) tout en minuscule
+        label = label.lower()
+
+        # 3) remplacer tout ce qui n'est pas lettre ou chiffre par des underscores
+        label = re.sub(r"[^a-z0-9]+", "_", label)
+
+        # 4) enlever les underscores en trop au début/fin
+        label = label.strip("_")
+
+        # 5) éviter un nom vide
+        if not label:
+            label = "field"
+
+        # 6) éviter un début par chiffre (pas valide pour un identifiant Python)
+        if label[0].isdigit():
+            label = "no_" + label
+
+        return label

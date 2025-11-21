@@ -600,7 +600,38 @@
                     </group>
                 </group>
                 <group string="C-Model" invisible="state != 'code_module' or not has_configured_path">
-                    <field name="model_ids" />
+                    <field name="model_ids" nolabel="1" />
+                    <group>
+                        <button
+                            name="action_enable_model_fast_creation"
+                            string="Enable feature fast model creation"
+                            type="object"
+                            class="btn btn-secondary"
+                            invisible="model_fast_creation_enabled"
+                        />
+                    </group>
+                </group>
+                <group
+                    string="Fast model creation"
+                    invisible="state != 'code_module' or not has_configured_path or not model_fast_creation_enabled"
+                >
+                    <field name="model_fast_creation_model_name" />
+                    <field name="model_fast_creation_field_separator" />
+                    <field name="model_fast_creation_field_name" />
+                    <field name="model_fast_creation_field_example_value" />
+                    <button
+                        name="action_model_fast_creation"
+                        string="Add"
+                        type="object"
+                        class="btn btn-success"
+                        invisible="not model_fast_creation_model_name"
+                    />
+                </group>
+                <group
+                    style="background-color: #f7b905; color: white;"
+                    invisible="state != 'code_module' or not has_configured_path or not model_fast_creation_error or not model_fast_creation_enabled"
+                >
+                    <field name="model_fast_creation_error" nolabel="1" />
                 </group>
                 <group
                     name="group_code_module_2"
