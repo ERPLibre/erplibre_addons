@@ -1180,7 +1180,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                     field_value = lst_field_value[field_index]
                     # Try to detect date, try to detect number
                     value_type, value_transform = rec.detect_type_from_string(
-                        field_value
+                        field_value, field_name
                     )
                 else:
                     value_type = "Char"
@@ -1208,6 +1208,19 @@ class DevopsPlanActionWizard(models.TransientModel):
             # rec.model_fast_creation_field_name = ""
             # rec.model_fast_creation_field_example_value = ""
             rec.model_fast_creation_error = ""
+        return self._reopen_self()
+
+    def action_open_last_generated(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Open last generated module"
+        ) as wp_id:
+            plan_cg_id = self.env["devops.plan.cg"].search(
+                [], limit=1, order="id desc"
+            )
+            self.working_module_name = plan_cg_id.devops_cg_module_ids[0].name
+            self.action_code_module_autocomplete_module_path(ctx=ctx)
         return self._reopen_self()
 
     def action_code_module_autocomplete_module_path(self, ctx=None):
@@ -1769,6 +1782,14 @@ class DevopsPlanActionWizard(models.TransientModel):
                         if "relation" in dct_field.keys():
                             relation_ref = dct_field.get("relation")
                             value_value["relation_ref"] = relation_ref
+                    if "currency_field" in dct_field.keys():
+                        value_value["currency_field"] = dct_field.get(
+                            "currency_field"
+                        )
+                    if "compute_method" in dct_field.keys():
+                        value_value["compute"] = dct_field.get(
+                            "compute_method"
+                        )
                     if "help" in dct_field.keys():
                         value_value["help"] = dct_field.get("help")
                     if "string" in dct_field.keys():
@@ -1979,9 +2000,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.force_show_final = True
         return self._reopen_self()
 
-    def detect_type_from_string(self, value) -> (str, object):
-        value_type = ""
-
+    def detect_type_from_string(self, value: str, name: str) -> (str, object):
         datetime_formats = [
             "%Y-%m-%d %H:%M:%S",
             "%Y-%m-%dT%H:%M:%S",
@@ -2009,11 +2028,19 @@ class DevopsPlanActionWizard(models.TransientModel):
             except ValueError:
                 pass
 
-        try:
-            fv = float(value)
-            return "Float", fv
-        except ValueError:
-            pass
+        if "$" in name:
+            try:
+                fv = float(value)
+                return "Monetary", fv
+            except ValueError:
+                pass
+
+        if "," in value:
+            try:
+                fv = float(value)
+                return "Float", fv
+            except ValueError:
+                pass
 
         try:
             fv = int(value)
@@ -2046,3 +2073,68 @@ class DevopsPlanActionWizard(models.TransientModel):
             label = "no_" + label
 
         return label
+
+    def action_auto_complete_monetary(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Auto complete monetary"
+        ) as wp_id:
+            for cg_model_id in self.model_ids:
+                has_monetary_to_fix = [
+                    a
+                    for a in cg_model_id.field_ids
+                    if a.type == "monetary" and not a.currency_field
+                ]
+                if not has_monetary_to_fix:
+                    continue
+                # Detect company_currency_id or first Many2one with comodel_name == res.currency
+                lst_company_currency_id_field = [
+                    a
+                    for a in cg_model_id.field_ids
+                    if a.type == "many2one"
+                    and a.relation_manual == "res.currency"
+                ]
+                if not lst_company_currency_id_field:
+                    company_currency_id = self.env["devops.cg.field"].create(
+                        [
+                            {
+                                "name": "company_currency_id",
+                                "help": "Company currency",
+                                "type": "many2one",
+                                "relation_manual": "res.currency",
+                                "model_id": cg_model_id.id,
+                                "compute_method": "_compute_company_currency_id",
+                                "devops_workspace_ids": [
+                                    (
+                                        6,
+                                        0,
+                                        cg_model_id.devops_workspace_ids.ids,
+                                    )
+                                ],
+                            }
+                        ]
+                    )
+                    lst_company_currency_id_field = [company_currency_id]
+                elif len(lst_company_currency_id_field) > 1:
+                    lst_company_currency_id_field_if_find = [
+                        a
+                        for a in lst_company_currency_id_field
+                        if a.name == "company_currency_id"
+                    ]
+                    if lst_company_currency_id_field_if_find:
+                        lst_company_currency_id_field = (
+                            lst_company_currency_id_field_if_find[0]
+                        )
+                    else:
+                        lst_company_currency_id_field = (
+                            lst_company_currency_id_field[0]
+                        )
+                company_currency_id = lst_company_currency_id_field[0]
+                for field_id in cg_model_id.field_ids:
+                    if (
+                        field_id.type == "monetary"
+                        and not field_id.currency_field
+                    ):
+                        field_id.currency_field = company_currency_id.name
+        return self._reopen_self()

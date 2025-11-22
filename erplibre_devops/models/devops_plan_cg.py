@@ -1277,6 +1277,13 @@ class DevopsPlanCg(models.Model):
                     # else:
                     #     # TODO support related field id
                     #     dct_value_field["related"] = field_id.related_manual
+                if not field_id.currency_field and field_id.type == "monetary":
+                    msg_err = (
+                        f"Model '{model_id.name}', field"
+                        f" '{field_id.name}' need a currency_field because type is"
+                        f" '{field_id.type}'"
+                    )
+                    raise exceptions.UserError(msg_err)
                 if not ignore_field_relation and field_id.type in [
                     "many2one",
                     "many2many",

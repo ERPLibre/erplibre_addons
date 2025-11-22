@@ -10,6 +10,13 @@ class DevopsCgField(models.Model):
 
     name = fields.Char(required=True)
 
+    compute_method = fields.Char(help="Will add compute method on field")
+
+    currency_field = fields.Char(
+        string="Currency field",
+        help="The name of field with Many2one on model res.currency.",
+    )
+
     help = fields.Char()
 
     has_error = fields.Boolean(
@@ -122,6 +129,7 @@ class DevopsCgField(models.Model):
         "relation_manual",
         "field_relation",
         "field_relation_manual",
+        "currency_field",
     )
     def _compute_has_error(self):
         for rec in self:
@@ -135,6 +143,8 @@ class DevopsCgField(models.Model):
                         rec.field_relation or rec.field_relation_manual
                     )
                 rec.has_error = not has_relation or not has_field_relation
+            elif rec.type == "monetary":
+                rec.has_error = not rec.currency_field
 
     def get_dct(self):
         self.ensure_one()
@@ -150,4 +160,8 @@ class DevopsCgField(models.Model):
             dct_field["help"] = self.help
         if self.string:
             dct_field["field_description"] = self.string
+        if self.currency_field:
+            dct_field["currency_field"] = self.currency_field
+        if self.compute_method:
+            dct_field["compute"] = self.compute_method
         return dct_field
