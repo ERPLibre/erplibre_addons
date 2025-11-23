@@ -287,6 +287,17 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="True if editing an existing system or False to create a system",
     )
 
+    has_error_model = fields.Boolean(
+        compute="_compute_has_error",
+        store=True,
+    )
+
+    has_error_msg_model = fields.Text(compute="_compute_has_error", store=True)
+
+    has_last_generated = fields.Boolean(
+        help="Can show button to restore last generated module."
+    )
+
     mode_view_generator = fields.Selection(
         selection=[
             ("no_view", "Nothing"),
@@ -538,6 +549,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         required=True,
         default=lambda s: s.env.user.id,
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super(DevopsPlanActionWizard, self).create(vals_list)
+        res.has_last_generated = bool(
+            self.env["devops.plan.cg"].search_count([], limit=1)
+        )
+        return res
 
     def _compute_has_next(self):
         for record in self:
@@ -1123,6 +1142,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.env["devops.cg.module"].search([]).unlink()
             self.env["devops.cg.model"].search([]).unlink()
             self.env["devops.cg.field"].search([]).unlink()
+            self.has_error_model = False
+            self.has_error_msg_model = ""
         return self._reopen_self()
 
     def action_enable_model_fast_creation(self):
@@ -1220,7 +1241,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                 [], limit=1, order="id desc"
             )
             self.working_module_name = plan_cg_id.devops_cg_module_ids[0].name
-            self.action_code_module_autocomplete_module_path(ctx=ctx)
+            if self.working_module_name:
+                self.action_code_module_autocomplete_module_path(ctx=ctx)
         return self._reopen_self()
 
     def action_code_module_autocomplete_module_path(self, ctx=None):
@@ -1355,6 +1377,38 @@ class DevopsPlanActionWizard(models.TransientModel):
                             model_id.sequence = sequence_no
                             sequence_no += 1
 
+        return self._reopen_self()
+
+    def action_refresh_error(self):
+        return self._compute_has_error()
+
+    @api.depends(
+        "model_ids.has_error",
+        "model_ids.has_error_msg",
+        "model_ids.field_ids.has_error",
+        "model_ids.field_ids.has_error_msg",
+    )
+    def _compute_has_error(self):
+        # compute on many2many compute is not working, so implement button action_refresh_error
+        for rec in self:
+            lst_has_error_model = []
+            lst_has_error_msg_model = []
+            for model_id in rec.model_ids:
+                if model_id.has_error:
+                    lst_has_error_model.append(True)
+                    lst_model_error = model_id.has_error_msg.split("\n")
+                    if len(lst_model_error) > 1:
+                        msg_model_error = f"Model '{model_id.name}': {'\n\t'.join(lst_model_error)}"
+                    else:
+                        msg_model_error = (
+                            f"Model '{model_id.name}': {lst_model_error[0]}"
+                        )
+                    lst_has_error_msg_model.append(msg_model_error)
+            rec.has_error_model = any(lst_has_error_model)
+            if rec.has_error_model:
+                rec.has_error_msg_model = "\n".join(lst_has_error_msg_model)
+            else:
+                rec.has_error_msg_model = ""
         return self._reopen_self()
 
     def instance_deploy(self):
@@ -2137,4 +2191,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                         and not field_id.currency_field
                     ):
                         field_id.currency_field = company_currency_id.name
+                cg_model_id.is_method_compute_company_currency_id = True
+            self.action_refresh_error()
         return self._reopen_self()

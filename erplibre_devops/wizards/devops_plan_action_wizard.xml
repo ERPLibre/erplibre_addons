@@ -536,7 +536,9 @@
                             string="Open last generated"
                             type="object"
                             class="btn btn-secondary"
+                            invisible="not has_last_generated"
                         />
+                        <field name="has_last_generated" invisible="True" />
                         <field name="is_new_module" string="Is new?" />
                     </group>
                     <group string="Path">
@@ -621,7 +623,19 @@
                             type="object"
                             class="oe_highlight"
                         />
+                        <button
+                            name="action_refresh_error"
+                            string="Refresh error detection"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
                     </group>
+                </group>
+                <group
+                    style="background-color: #dc0527; color: white;"
+                    invisible="state != 'code_module' or not has_configured_path or not has_error_model"
+                >
+                    <field name="has_error_msg_model" nolabel="1" />
                 </group>
                 <group
                     string="Fast model creation"

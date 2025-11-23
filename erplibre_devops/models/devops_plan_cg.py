@@ -604,11 +604,15 @@ class DevopsPlanCg(models.Model):
                     and model_model_id.name in lst_portal_model
                 ):
                     lst_depend_model = ["portal.mixin"]
-                code_generator_id.add_update_model(
+                model_id = code_generator_id.add_update_model(
                     model_model_id.name,
                     dct_field=model_model_id.get_field_dct(),
                     lst_depend_model=lst_depend_model,
                 )
+                if model_model_id.is_method_compute_company_currency_id:
+                    code_generator_id.add_method_model(
+                        model_id, compute_company_currency_id=True
+                    )
 
             # Generate view
             # Action generate view

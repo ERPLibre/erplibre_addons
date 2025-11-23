@@ -24,6 +24,11 @@ class DevopsCgField(models.Model):
         store=True,
     )
 
+    has_error_msg = fields.Text(
+        compute="_compute_has_error",
+        store=True,
+    )
+
     model_id = fields.Many2one(
         comodel_name="devops.cg.model",
         string="Model",
@@ -135,6 +140,7 @@ class DevopsCgField(models.Model):
         for rec in self:
             # Disable all error
             rec.has_error = False
+            rec.has_error_msg = ""
             if rec.type in ("many2many", "many2one", "one2many"):
                 has_relation = rec.relation or rec.relation_manual
                 has_field_relation = True
@@ -143,8 +149,10 @@ class DevopsCgField(models.Model):
                         rec.field_relation or rec.field_relation_manual
                     )
                 rec.has_error = not has_relation or not has_field_relation
+                rec.has_error_msg += f"Missing relation"
             elif rec.type == "monetary":
                 rec.has_error = not rec.currency_field
+                rec.has_error_msg += f"Missing currency_field"
 
     def get_dct(self):
         self.ensure_one()

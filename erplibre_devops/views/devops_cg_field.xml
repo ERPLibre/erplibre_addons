@@ -12,6 +12,9 @@
                             <field name="name" />
                         </h1>
                     </div>
+                    <group style="background-color: #dc0527; color: white;" invisible="not has_error">
+                        <field name="has_error_msg" nolabel="1" />
+                    </group>
                     <group>
                         <group>
                             <field name="type" />
