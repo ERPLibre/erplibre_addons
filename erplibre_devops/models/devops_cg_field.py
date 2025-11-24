@@ -19,6 +19,8 @@ class DevopsCgField(models.Model):
 
     help = fields.Char()
 
+    precompute = fields.Boolean(help="Pre-compute field, associate with compute")
+
     has_error = fields.Boolean(
         compute="_compute_has_error",
         store=True,
@@ -110,6 +112,8 @@ class DevopsCgField(models.Model):
 
     string = fields.Char(help="Label of the field")
 
+    store = fields.Char(help="Store attribute")
+
     widget = fields.Selection(
         selection=[
             ("image", "image"),
@@ -172,4 +176,8 @@ class DevopsCgField(models.Model):
             dct_field["currency_field"] = self.currency_field
         if self.compute_method:
             dct_field["compute"] = self.compute_method
+        if self.store:
+            dct_field["store"] = self.store
+        if self.precompute:
+            dct_field["precompute"] = self.precompute
         return dct_field

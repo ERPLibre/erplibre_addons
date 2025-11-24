@@ -1848,6 +1848,10 @@ class DevopsPlanActionWizard(models.TransientModel):
                         value_value["help"] = dct_field.get("help")
                     if "string" in dct_field.keys():
                         value_value["string"] = dct_field.get("string")
+                    if "store" in dct_field.keys():
+                        value_value["store"] = dct_field.get("store")
+                    if "precompute" in dct_field.keys():
+                        value_value["precompute"] = dct_field.get("precompute")
                     if "related" in dct_field.keys():
                         value_value["related_manual"] = dct_field.get(
                             "related"
@@ -2157,6 +2161,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                                 "help": "Company currency",
                                 "type": "many2one",
                                 "relation_manual": "res.currency",
+                                "store": True,
+                                "precompute": True,
                                 "model_id": cg_model_id.id,
                                 "compute_method": "_compute_company_currency_id",
                                 "devops_workspace_ids": [
