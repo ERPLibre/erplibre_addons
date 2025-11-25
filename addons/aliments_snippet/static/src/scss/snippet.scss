@@ -1,0 +1,36 @@
+.aliments-snippet {
+       background-color: #f8f9fa;
+       padding: 2rem 0;
+
+       h2 {
+           color: #333;
+           margin-bottom: 1rem;
+       }
+
+       #aliments-list {
+           ul {
+               list-style-type: none;
+               padding-left: 0;
+
+               li {
+                   background-color: #fff;
+                   border: 1px solid #ddd;
+                   border-radius: 4px;
+                   margin-bottom: 0.5rem;
+                   padding: 0.5rem 1rem;
+                   transition: all 0.3s ease;
+
+                   &:hover {
+                       background-color: #e9ecef;
+                   }
+               }
+           }
+       }
+
+       #add-aliment-form {
+           .input-group {
+               max-width: 400px;
+               margin: 0 auto;
+           }
+       }
+   }
