@@ -13,7 +13,11 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
 from odoo import _, api, exceptions, fields, models, tools
 
-CODE_GENERATOR_DIRECTORY = "./addons/TechnoLibre_odoo-code-generator-template/"
+with open(".odoo-version", "r") as f:
+    odoo_version = f.readline()
+CODE_GENERATOR_DIRECTORY = (
+    f"./odoo{odoo_version}/addons/TechnoLibre_odoo-code-generator-template/"
+)
 CODE_GENERATOR_DEMO_NAME = "code_generator_demo"
 KEY_REPLACE_CODE_GENERATOR_DEMO = 'MODULE_NAME = "%s"'
 _logger = logging.getLogger(__name__)
@@ -1305,8 +1309,7 @@ class DevopsCgNewProject(models.Model):
                             'value["enable_template_website_snippet_view"] ='
                             " False",
                             f'value["enable_template_website_snippet_view"] ='
-                            f" False\n       "
-                            f' value["template_auto_export_data"] = True\n    '
+                            f' False\n    value["template_auto_export_data"] = True\n'
                             f'    value["template_auto_export_data_exclude_model"]'
                             f" = 'devops.db.image; devops.exec;"
                             f" devops.exec.bundle; devops.ide.pycharm;"
@@ -1406,8 +1409,7 @@ class DevopsCgNewProject(models.Model):
                         old_str = 'value["template_model_name"] ='
                         new_str = (
                             'value["template_model_name"] ='
-                            f' "{str_lst_model};"\n       '
-                            ' value["template_model_name"] +='
+                            f' "{str_lst_model};"\n    value["template_model_name"] +='
                         )
                         lst_template_hooks_py_replace.append(
                             (old_str, new_str)
