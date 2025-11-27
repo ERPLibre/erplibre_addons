@@ -39,6 +39,12 @@ class DevopsCgModel(models.Model):
 
     is_inherit = fields.Boolean(help="If the model inherit another model.")
 
+    is_activity = fields.Boolean(help="Will enable activity and chatter.")
+
+    is_all_tracking = fields.Boolean(
+        help="Depend on is_activity, will enable tracking for all fields."
+    )
+
     is_method_compute_company_currency_id = fields.Boolean(
         help="Will write method compute_company_currency_id"
     )

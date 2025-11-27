@@ -2200,3 +2200,14 @@ class DevopsPlanActionWizard(models.TransientModel):
                 cg_model_id.is_method_compute_company_currency_id = True
             self.action_refresh_error()
         return self._reopen_self()
+
+    def action_enable_all_tracking(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Enable all tracking"
+        ) as wp_id:
+            for cg_model_id in self.model_ids:
+                cg_model_id.is_activity = True
+                cg_model_id.is_all_tracking = True
+        return self._reopen_self()

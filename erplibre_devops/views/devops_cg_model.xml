@@ -20,6 +20,8 @@
                         <field name="description" />
                         <field name="module_id" />
                         <field name="is_to_remove" />
+                        <field name="is_activity" />
+                        <field name="is_all_tracking" invisible="not is_activity" />
                     </group>
                     <group style="background-color: #dc0527; color: white;" invisible="not has_error">
                         <field name="has_error_msg" nolabel="1" />

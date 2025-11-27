@@ -624,6 +624,12 @@
                             class="oe_highlight"
                         />
                         <button
+                            name="action_enable_all_tracking"
+                            string="Enable all tracking"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
+                        <button
                             name="action_refresh_error"
                             string="Refresh error detection"
                             type="object"
