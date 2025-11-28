@@ -1519,17 +1519,17 @@ class DevopsSystem(models.Model):
                 )
                 return
             if rec.use_search_cmd == "locate":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into .erplibre-version
                 cmd = (
-                    "locate -b -r '^default\.xml$'|grep -v "
+                    "locate -b -r '^\.erplibre-version$'|grep -v "
                     '".repo"|grep -v'
                     ' "/var/lib/docker"| xargs -I {} sh -c "grep -l "ERPLibre"'
                     ' "{}" 2>/dev/null || true"'
                 )
             elif rec.use_search_cmd == "find":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into .erplibre-version
                 cmd = (
-                    'find "/" -name "default.xml" -type f -print 2>/dev/null |'
+                    'find "/" -name ".erplibre-version" -type f -print 2>/dev/null |'
                     " grep -v .repo | grep -v /var/lib/docker | xargs -I {} sh"
                     ' -c "grep -l "ERPLibre" "{}" 2>/dev/null || true"'
                 )
@@ -1541,14 +1541,14 @@ class DevopsSystem(models.Model):
             else:
                 lst_dir_git = []
             if rec.use_search_cmd == "locate":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
                     'locate -b -r "^docker-compose\.yml$"|grep -v .repo|grep'
                     ' -v /var/lib/docker|xargs -I {} sh -c "grep -l "ERPLibre"'
                     ' "{}" 2>/dev/null || true"'
                 )
             elif rec.use_search_cmd == "find":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
                     'find "/" -name "docker-compose.yml" -type f -print'
                     " 2>/dev/null | grep -v .repo | grep -v /var/lib/docker |"
@@ -1660,7 +1660,7 @@ class DevopsSystem(models.Model):
                     "erplibre_devops.erplibre_mode_source_docker"
                 )
                 # TODO cannot find odoo version from a simple docker-compose, need more information from docker image
-                mode_version_base = "12.0"
+                mode_version_base = "18.0"
                 key_version = "/erplibre:"
                 cmd = (
                     f'grep "image:" ./docker-compose.yml |grep "{key_version}"'
