@@ -1523,15 +1523,13 @@ class DevopsSystem(models.Model):
                 cmd = (
                     "locate -b -r '^\.erplibre-version$'|grep -v "
                     '".repo"|grep -v'
-                    ' "/var/lib/docker"| xargs -I {} sh -c "grep -l "ERPLibre"'
-                    ' "{}" 2>/dev/null || true"'
+                    ' "/var/lib/docker"'
                 )
             elif rec.use_search_cmd == "find":
                 # Validate word ERPLibre is into .erplibre-version
                 cmd = (
                     'find "/" -name ".erplibre-version" -type f -print 2>/dev/null |'
-                    " grep -v .repo | grep -v /var/lib/docker | xargs -I {} sh"
-                    ' -c "grep -l "ERPLibre" "{}" 2>/dev/null || true"'
+                    " grep -v .repo | grep -v /var/lib/docker"
                 )
             out_default_git = rec.execute_with_result(cmd, None).strip()
             if out_default_git:
@@ -1544,16 +1542,13 @@ class DevopsSystem(models.Model):
                 # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
                     'locate -b -r "^docker-compose\.yml$"|grep -v .repo|grep'
-                    ' -v /var/lib/docker|xargs -I {} sh -c "grep -l "ERPLibre"'
-                    ' "{}" 2>/dev/null || true"'
+                    " -v /var/lib/docker"
                 )
             elif rec.use_search_cmd == "find":
                 # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
                     'find "/" -name "docker-compose.yml" -type f -print'
-                    " 2>/dev/null | grep -v .repo | grep -v /var/lib/docker |"
-                    ' xargs -I {} sh -c "grep -l "ERPLibre" "{}" 2>/dev/null'
-                    ' || true"'
+                    " 2>/dev/null | grep -v .repo | grep -v /var/lib/docker"
                 )
             out_docker_compose = rec.execute_with_result(cmd, None).strip()
             if out_docker_compose:
@@ -1616,22 +1611,50 @@ class DevopsSystem(models.Model):
                     "git branch --show-current", dir_name
                 ).strip()
 
-                mode_version_base = rec.execute_with_result(
-                    "git branch --show-current",
-                    os.path.join(dir_name, BASE_VERSION_SOFTWARE_NAME),
-                ).strip()
-                if not mode_version_base:
-                    # Search somewhere else, because it's a commit!
-                    mode_version_base_raw = rec.execute_with_result(
-                        'grep "<default remote=" default.xml',
+                odoo_version = ""
+                odoo_version_path = os.path.join(dir_name, ".odoo-version")
+                if os.path.exists(odoo_version_path):
+                    with open(
+                        odoo_version_path, "r", encoding="utf-8"
+                    ) as fichier:
+                        odoo_version = fichier.read().strip()
+                if odoo_version:
+                    is_old_erplibre = False
+                    dir_path = os.path.join(
                         dir_name,
+                        f"odoo{odoo_version}",
+                        BASE_VERSION_SOFTWARE_NAME,
                     )
-                    regex = r'revision="([^"]+)"'
-                    result = re.search(regex, mode_version_base_raw)
-                    mode_version_base = result.group(1) if result else None
-                    _logger.debug(
-                        f"Find mode version base {mode_version_base}"
+                    if not os.path.exists(dir_path):
+                        is_old_erplibre = True
+                        # Support old version
+                        dir_path = os.path.join(
+                            dir_name,
+                            BASE_VERSION_SOFTWARE_NAME,
+                        )
+                    mode_version_base, status = rec.execute_with_result(
+                        "git branch --show-current",
+                        dir_path,
+                        return_status=True,
                     )
+                    mode_version_base = mode_version_base.strip()
+                    if not mode_version_base:
+                        # Search somewhere else, because it's a commit!
+                        if is_old_erplibre:
+                            cmd = 'grep "<default remote=" default.xml'
+                        else:
+                            cmd = 'grep "odoo.git" .repo/local_manifests/erplibre_manifest.xml'
+
+                        mode_version_base_raw = rec.execute_with_result(
+                            cmd,
+                            dir_name,
+                        )
+                        regex = r'revision="([^"]+)"'
+                        result = re.search(regex, mode_version_base_raw)
+                        mode_version_base = result.group(1) if result else None
+                        _logger.debug(
+                            f"Find mode version base {mode_version_base}"
+                        )
 
                 erplibre_mode = self.env["erplibre.mode"].get_mode(
                     mode_env_id,

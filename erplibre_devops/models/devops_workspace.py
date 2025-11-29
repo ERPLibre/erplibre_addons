@@ -606,7 +606,7 @@ class DevopsWorkspace(models.Model):
                         cmd = f"nautilus {rec.folder}"
                     self.env.ref(
                         "erplibre_devops.devops_workspace_me"
-                    ).execute(cmd=cmd)
+                    ).with_context(rec.env.context).execute(cmd=cmd)
 
     @api.model
     def action_check_all(self):
@@ -852,10 +852,18 @@ class DevopsWorkspace(models.Model):
                 elif rec.erplibre_mode.mode_exec in [
                     self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
                 ]:
+                    # TODO support odoo < 14
+                    # rec.execute(
+                    #     cmd=(
+                    #         "./run.sh -d"
+                    #         f" {rec.db_name} --http-port={rec.port_http} --longpolling-port={rec.port_longpolling}"
+                    #     ),
+                    #     force_open_terminal=True,
+                    # )
                     rec.execute(
                         cmd=(
                             "./run.sh -d"
-                            f" {rec.db_name} --http-port={rec.port_http} --longpolling-port={rec.port_longpolling}"
+                            f" {rec.db_name} --http-port={rec.port_http} --gevent-port={rec.port_longpolling}"
                         ),
                         force_open_terminal=True,
                     )
@@ -938,7 +946,7 @@ class DevopsWorkspace(models.Model):
                         rec.execute(
                             cmd=(
                                 f"sleep {SLEEP_WAIT_KILL};./run.sh -d"
-                                f" {rec.db_name} --http-port={rec.port_http} --longpolling-port={rec.port_longpolling}"
+                                f" {rec.db_name} --http-port={rec.port_http} --gevent-port={rec.port_longpolling}"
                             ),
                             force_open_terminal=True,
                             error_on_status=False,
@@ -1117,11 +1125,14 @@ class DevopsWorkspace(models.Model):
                 # TODO if docker attached, retrieve port from docker-compose
                 rec.action_network_change_port_random()
                 # TODO this "works" for source git, but source docker, need to check docker inspect
-                if os.path.isfile(os.path.join(rec.folder, ".odoo-version")):
-                    with open(".odoo-version") as txt:
-                        odoo_version = txt.read()
+                erplibre_version_path = os.path.join(
+                    rec.folder, ".erplibre-version"
+                )
+                if os.path.isfile(erplibre_version_path):
+                    with open(erplibre_version_path) as txt:
+                        erplibre_version = txt.read()
                     folder_venv = os.path.join(
-                        rec.folder, f".venv.odoo{odoo_version}"
+                        rec.folder, f".venv.{erplibre_version}"
                     )
                 else:
                     folder_venv = False
