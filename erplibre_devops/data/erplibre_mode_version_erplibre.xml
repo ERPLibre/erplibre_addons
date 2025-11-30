@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data noupdate="1">
-        <record id="erplibre_mode_version_erplibre_1_5_0" model="erplibre.mode.version.erplibre">
-            <field name="name">1.5.0</field>
-            <field name="value">v1.5.0</field>
+        <record id="erplibre_mode_version_erplibre_1_6_0" model="erplibre.mode.version.erplibre">
+            <field name="name">1.6.0</field>
+            <field name="value">v1.6.0</field>
             <field name="is_tag" eval="True" />
         </record>
         <record id="erplibre_mode_version_erplibre_master" model="erplibre.mode.version.erplibre">

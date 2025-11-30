@@ -445,6 +445,7 @@ class DevopsSystem(models.Model):
         """
         engine can be bash, python or sh
         """
+        init_return_status = return_status  # Ssh will force return status
         result = ""
         status = None
         if folder:
@@ -471,7 +472,8 @@ class DevopsSystem(models.Model):
                     )
                     continue
                 status = 0
-                cmd += ";echo $?"
+                return_status = True
+                cmd += ';echo -e "\n$?"'
                 stdin, stdout, stderr = ssh_client.exec_command(cmd)
                 if add_stdin_log:
                     result = stdin.read().decode("utf-8")
@@ -480,11 +482,11 @@ class DevopsSystem(models.Model):
                 stdout_log = stdout.read().decode("utf-8")
                 # Extract echo $?
                 count_endline_log = stdout_log.count("\n")
-                if count_endline_log:
+                if count_endline_log and return_status:
                     # Minimum 1, we know we have a command output by echo $?
                     # output is only the status
                     try:
-                        status = int(stdout_log.strip())
+                        status = int(stdout_log.strip().split("\n")[-1])
                     except Exception:
                         _logger.warning(
                             f"System id {rec.id} communicate by SSH cannot"
@@ -500,7 +502,7 @@ class DevopsSystem(models.Model):
                 if add_stderr_log:
                     result += stderr.read().decode("utf-8")
         if len(self) == 1:
-            if not return_status:
+            if not init_return_status:
                 return result
             else:
                 return result, status
@@ -673,13 +675,18 @@ class DevopsSystem(models.Model):
                 hostname=self.ssh_host, keytype="ssh-rsa", key=key
             )
         try:
-            ssh_client.connect(
-                hostname=self.ssh_host,
-                port=self.ssh_port,
-                username=None if not self.ssh_user else self.ssh_user,
-                password=None if not self.ssh_password else self.ssh_password,
-                timeout=timeout,
-            )
+            dct_ssh_client = {
+                "hostname": self.ssh_host,
+                "port": self.ssh_port,
+                "username": None if not self.ssh_user else self.ssh_user,
+                "password": (
+                    None if not self.ssh_password else self.ssh_password
+                ),
+                "timeout": timeout,
+            }
+            if self.ssh_private_key:
+                dct_ssh_client["key_filename"] = self.ssh_private_key
+            ssh_client.connect(**dct_ssh_client)
         except paramiko.ssh_exception.NoValidConnectionsError as e:
             if force_exception:
                 raise e
@@ -1612,49 +1619,58 @@ class DevopsSystem(models.Model):
                 ).strip()
 
                 odoo_version = ""
+                mode_version_erplibre = rec.execute_with_result(
+                    "git branch --show-current", dir_name
+                ).strip()
+
                 odoo_version_path = os.path.join(dir_name, ".odoo-version")
-                if os.path.exists(odoo_version_path):
-                    with open(
-                        odoo_version_path, "r", encoding="utf-8"
-                    ) as fichier:
-                        odoo_version = fichier.read().strip()
+                odoo_version_path_exist = rec.os_path_exists(odoo_version_path)
+                if odoo_version_path_exist:
+                    odoo_version = rec.execute_with_result(
+                        f"cat .odoo-version",
+                        dir_name,
+                    ).strip()
+                mode_version_base = ""
+                dir_path_exist = ""
+                dir_path = "/home"
+                is_old_erplibre = False
                 if odoo_version:
-                    is_old_erplibre = False
                     dir_path = os.path.join(
                         dir_name,
                         f"odoo{odoo_version}",
                         BASE_VERSION_SOFTWARE_NAME,
                     )
-                    if not os.path.exists(dir_path):
-                        is_old_erplibre = True
-                        # Support old version
-                        dir_path = os.path.join(
-                            dir_name,
-                            BASE_VERSION_SOFTWARE_NAME,
-                        )
-                    mode_version_base, status = rec.execute_with_result(
-                        "git branch --show-current",
-                        dir_path,
-                        return_status=True,
+                    dir_path_exist = rec.os_path_exists(dir_path)
+                if not dir_path_exist:
+                    is_old_erplibre = True
+                    # Support old version
+                    dir_path = os.path.join(
+                        dir_name,
+                        BASE_VERSION_SOFTWARE_NAME,
                     )
-                    mode_version_base = mode_version_base.strip()
-                    if not mode_version_base:
-                        # Search somewhere else, because it's a commit!
-                        if is_old_erplibre:
-                            cmd = 'grep "<default remote=" default.xml'
-                        else:
-                            cmd = 'grep "odoo.git" .repo/local_manifests/erplibre_manifest.xml'
+                mode_version_base, status = rec.execute_with_result(
+                    "git branch --show-current",
+                    dir_path,
+                    return_status=True,
+                )
+                mode_version_base = mode_version_base.strip()
+                if not mode_version_base:
+                    # Search somewhere else, because it's a commit!
+                    if is_old_erplibre:
+                        cmd = 'grep "<default remote=" default.xml'
+                    else:
+                        cmd = 'grep "odoo.git" .repo/local_manifests/erplibre_manifest.xml'
 
-                        mode_version_base_raw = rec.execute_with_result(
-                            cmd,
-                            dir_name,
-                        )
-                        regex = r'revision="([^"]+)"'
-                        result = re.search(regex, mode_version_base_raw)
-                        mode_version_base = result.group(1) if result else None
-                        _logger.debug(
-                            f"Find mode version base {mode_version_base}"
-                        )
+                    mode_version_base_raw = rec.execute_with_result(
+                        cmd,
+                        dir_name,
+                    )
+                    regex = r'revision="([^"]+)"'
+                    result = re.search(regex, mode_version_base_raw)
+                    mode_version_base = result.group(1) if result else None
+                    _logger.debug(
+                        f"Find mode version base {mode_version_base}"
+                    )
 
                 erplibre_mode = self.env["erplibre.mode"].get_mode(
                     mode_env_id,
@@ -1760,8 +1776,13 @@ class DevopsSystem(models.Model):
             for host in lst_host:
                 dev_config = config.lookup(host)
                 hostname = dev_config.get("hostname")
+                try:
+                    ssh_port = int(dev_config.get("port", 22))
+                except ValueError:
+                    ssh_port = 22
                 system_id = self.env["devops.system"].search(
-                    [("ssh_host", "=", hostname)], limit=1
+                    [("ssh_host", "=", hostname), ("ssh_port", "=", ssh_port)],
+                    limit=1,
                 )
                 if not system_id:
                     name = f"{host}[{hostname}]"
@@ -1773,9 +1794,16 @@ class DevopsSystem(models.Model):
                         # "ssh_password": dev_config.get("password"),
                     }
                     if "port" in dev_config.keys():
-                        value["ssh_port"] = dev_config.get("port")
+                        value["ssh_port"] = ssh_port
                     if "user" in dev_config.keys():
                         value["ssh_user"] = dev_config.get("user")
+                    if "identityfile" in dev_config.keys():
+                        identity_file = dev_config.get("identityfile")
+                        if type(identity_file) is list:
+                            value["ssh_private_key"] = identity_file[0]
+                        else:
+                            value["ssh_private_key"] = identity_file
+                    # TODO support identitiesonly , PubkeyAuthentication , PreferredAuthentications
 
                     value["parent_system_id"] = rec.id
                     system_id = self.env["devops.system"].create([value])

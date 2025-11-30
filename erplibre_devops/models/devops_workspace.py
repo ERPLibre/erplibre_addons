@@ -199,7 +199,6 @@ class DevopsWorkspace(models.Model):
     )
 
     folder_odoo_version = fields.Char(
-        required=True,
         default=lambda self: self._default_folder_odoo_version(),
         help="Absolute path for storing the devops_workspaces odoo_version",
     )
@@ -992,21 +991,11 @@ class DevopsWorkspace(models.Model):
     def action_install_workspace(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Install workspace") as rec:
-                exec_id = rec.execute(
-                    cmd=f"ls {rec.folder}", error_on_status=False
-                )
-                is_detect_docker_compose = False
-                lst_file = exec_id.log_all.strip().split("\n")
                 rec.namespace = os.path.basename(rec.folder)
+                folder_exist = rec.os_path_exists(rec.folder)
                 if rec.erplibre_mode.mode_source in [
                     self.env.ref("erplibre_devops.erplibre_mode_source_docker")
                 ]:
-                    if "docker-compose.yml" in lst_file:
-                        # TODO try to reuse
-                        _logger.info(
-                            "detect docker-compose.yml, please read it"
-                        )
-                        is_detect_docker_compose = True
                     rec.action_pre_install_workspace()
                     rec.path_working_erplibre = "/ERPLibre"
                 elif rec.erplibre_mode.mode_source in [
@@ -1035,7 +1024,7 @@ class DevopsWorkspace(models.Model):
                     #     ]
                     # ):
                     is_first_install = False
-                    if exec_id.exec_status:
+                    if not folder_exist:
                         dir_name = os.path.dirname(rec.folder)
                         # No such directory
                         exec_id = rec.execute(
@@ -1125,12 +1114,37 @@ class DevopsWorkspace(models.Model):
                 # TODO if docker attached, retrieve port from docker-compose
                 rec.action_network_change_port_random()
                 # TODO this "works" for source git, but source docker, need to check docker inspect
+                rec.refresh_installation_state()
+
+    def refresh_installation_state(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle(
+                "Refresh installation state workspace"
+            ) as rec:
+                odoo_version_path = os.path.join(rec.folder, ".odoo-version")
+                odoo_version_path_exist = rec.os_path_exists(odoo_version_path)
+                if odoo_version_path_exist:
+                    odoo_version = rec.system_id.execute_with_result(
+                        f"cat .odoo-version",
+                        rec.folder,
+                    ).strip()
+                    folder_odoo = os.path.join(
+                        rec.folder, f"odoo{odoo_version}"
+                    )
+                    rec.folder_odoo_version = folder_odoo
+                else:
+                    rec.folder_odoo_version = False
                 erplibre_version_path = os.path.join(
                     rec.folder, ".erplibre-version"
                 )
-                if os.path.isfile(erplibre_version_path):
-                    with open(erplibre_version_path) as txt:
-                        erplibre_version = txt.read()
+                erplibre_version_path_exist = rec.os_path_exists(
+                    erplibre_version_path
+                )
+                if erplibre_version_path_exist:
+                    erplibre_version = rec.system_id.execute_with_result(
+                        f"cat .erplibre-version",
+                        rec.folder,
+                    ).strip()
                     folder_venv = os.path.join(
                         rec.folder, f".venv.{erplibre_version}"
                     )
@@ -1148,6 +1162,17 @@ class DevopsWorkspace(models.Model):
                 elif rec.erplibre_mode.mode_source in [
                     self.env.ref("erplibre_devops.erplibre_mode_source_docker")
                 ]:
+                    is_detect_docker_compose = False
+                    exec_id = rec.execute(
+                        cmd=f"ls {rec.folder}", error_on_status=False
+                    )
+                    lst_file = exec_id.log_all.strip().split("\n")
+                    if "docker-compose.yml" in lst_file:
+                        # TODO try to reuse
+                        _logger.info(
+                            "detect docker-compose.yml, please read it"
+                        )
+                        is_detect_docker_compose = True
                     rec.is_installed = (
                         rec.os_path_exists(rec.folder)
                         and is_detect_docker_compose

@@ -29,6 +29,12 @@
                         invisible="is_installed or is_conflict_mode_exec"
                     />
                     <button
+                        name="refresh_installation_state"
+                        string="Refresh installation state"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    <button
                         name="action_check"
                         string="Status"
                         type="object"
