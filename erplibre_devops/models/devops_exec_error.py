@@ -139,7 +139,9 @@ class DevopsExecError(models.Model):
                 # partner_ids=[(6, 0, rec.partner_ids.ids)],
                 # channel_ids=[(6, 0, rec.channel_ids.ids)],
             )
-            rec.devops_workspace.ide_pycharm.action_cg_setup_pycharm_debug(
+            self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).ide_pycharm.action_cg_setup_pycharm_debug(
                 log=rec.escaped_tb.replace("&quot;", '"')
                 .replace("&#34;", '"')
                 .replace("&#39;", "'"),
@@ -181,15 +183,21 @@ class DevopsExecError(models.Model):
 
     def action_kill_pycharm(self):
         self.ensure_one()
-        self.devops_workspace.ide_pycharm.action_kill_pycharm()
+        self.env.ref(
+            "erplibre_devops.devops_workspace_me"
+        ).ide_pycharm.action_kill_pycharm()
 
     def action_start_pycharm(self, ctx=None):
         self.ensure_one()
-        self.devops_workspace.ide_pycharm.action_start_pycharm(ctx=ctx)
+        self.env.ref(
+            "erplibre_devops.devops_workspace_me"
+        ).ide_pycharm.action_start_pycharm(ctx=ctx)
 
     def action_set_breakpoint_pycharm(self):
         for rec_o in self:
-            with rec_o.devops_workspace.devops_create_exec_bundle(
+            with self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).devops_workspace.devops_create_exec_bundle(
                 "Set breakpoint on error"
             ) as rec:
                 rec.ide_pycharm.action_cg_setup_pycharm_debug(
@@ -206,7 +214,9 @@ class DevopsExecError(models.Model):
         if not ws_id:
             return
         for o_rec in self:
-            with ws_id.devops_create_exec_bundle("Open file IDE") as rec_ws:
+            with self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).devops_create_exec_bundle("Open file IDE") as rec_ws:
                 rec_ws.with_context(
                     breakpoint_id=o_rec.ide_breakpoint.id
                 ).ide_pycharm.action_start_pycharm()

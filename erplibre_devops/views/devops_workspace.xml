@@ -20,6 +20,7 @@
                         type="object"
                         class="oe_highlight"
                         invisible="is_installed or is_conflict_mode_exec"
+                        context="{'force_reinstall_workspace': True}"
                     />
                     <button
                         name="action_install_me_workspace"
