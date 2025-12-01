@@ -683,6 +683,39 @@ class DevopsWorkspace(models.Model):
                 rec.port_http = 8069
                 rec.port_longpolling = 8072
 
+    def action_module_install_erplibre_odoo_18(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle(
+                "Module install erplibre base odoo 18"
+            ) as rec:
+                if rec.erplibre_mode.mode_exec in [
+                    self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
+                ]:
+                    module_list = (
+                        "auth_user_case_insensitive,"
+                        "disable_odoo_online,"
+                        "remove_odoo_enterprise,"
+                        "web_dark_mode,"
+                        "web_theme_classic,"
+                        "muk_web_theme,"
+                        "web_timeline,"
+                        "server_action_mass_edit,"
+                        "partner_firstname,"
+                        "web_search_with_and,"
+                        "web_dialog_size,"
+                        "web_refresher,"
+                        "date_range,"
+                        "partner_contact_access_link,"
+                        "queue_job"
+                    )
+                    cmd = (
+                        "./script/addons/install_addons.sh"
+                        f" {rec.db_name} {module_list}"
+                    )
+                    exec_id = rec.execute(
+                        cmd=cmd, folder=rec.path_working_erplibre
+                    )
+
     def action_restore_db_image(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Restore DB image") as rec:
@@ -690,13 +723,17 @@ class DevopsWorkspace(models.Model):
                 if rec.erplibre_mode.mode_exec in [
                     self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
                 ]:
-                    image = ""
                     if rec.image_db_selection:
-                        image = f" --image {rec.image_db_selection.name}"
-                    cmd = (
-                        "./script/database/db_restore.py --database"
-                        f" {rec.db_name}{image};"
-                    )
+                        cmd = (
+                            "./script/database/db_restore.py --database"
+                            f" {rec.db_name} --image {rec.image_db_selection.name};"
+                        )
+                    else:
+                        cmd = (
+                            f"./odoo_bin.sh db --drop --database {rec.db_name};"
+                            f"./script/addons/install_addons.sh {rec.db_name} base;"
+                        )
+
                     exec_id = rec.execute(
                         cmd=cmd, folder=rec.path_working_erplibre
                     )
@@ -1101,16 +1138,16 @@ class DevopsWorkspace(models.Model):
                         #     " ./.venv/bin/activate;poetry install"
                         # )
                         # rec.log_workspace += result
-                        rec.execute(
-                            cmd=(
-                                'bash -c "source'
-                                ' ./.venv.erplibre/bin/activate;poetry install"'
-                            ),
-                            delimiter_bash='"',
-                            force_open_terminal=True,
-                        )
-                        if exec_id.exec_status:
-                            raise Exception(exec_id.log_all)
+                        # rec.execute(
+                        #     cmd=(
+                        #         'bash -c "source'
+                        #         ' ./.venv.erplibre/bin/activate;poetry install"'
+                        #     ),
+                        #     delimiter_bash='"',
+                        #     force_open_terminal=True,
+                        # )
+                        # if exec_id.exec_status:
+                        #     raise Exception(exec_id.log_all)
                     rec.update_makefile_from_git()
 
                     # lst_file = rec.execute(cmd=f"ls {rec.folder}").log_all.strip().split("\n")

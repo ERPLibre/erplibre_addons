@@ -255,6 +255,10 @@
                         <field name="show_error_chatter" />
                         <field name="exec_reboot_process" invisible="mode_exec == 'docker' or not is_me" />
                     </group>
+                    <group string="Info" invisible="not is_installed">
+                        <field name="url_instance" string="URL" widget="url" />
+                        <field name="url_instance_database_manager" string="URL Database" widget="url" />
+                    </group>
                     <group string="Network" invisible="not is_installed">
                         <button
                             name="action_network_change_port_random"
@@ -277,18 +281,22 @@
                         <field name="git_branch" />
                         <field name="git_url" />
                     </group>
-                    <group string="Info" invisible="not is_installed">
-                        <field name="url_instance" string="URL" widget="url" />
-                        <field name="url_instance_database_manager" string="URL Database" widget="url" />
+                    <group string="Docker" invisible="not is_installed">
+                        <field name="workspace_docker_id" />
+                        <field name="docker_compose_id" />
                     </group>
                     <group string="DB" invisible="not is_installed">
                         <button name="action_restore_db_image" string="Restore" type="object" class="oe_highlight" />
                         <field name="image_db_selection" />
                         <field name="db_name" />
                     </group>
-                    <group string="Docker" invisible="not is_installed">
-                        <field name="workspace_docker_id" />
-                        <field name="docker_compose_id" />
+                    <group string="Module" invisible="not is_installed">
+                        <button
+                            name="action_module_install_erplibre_odoo_18"
+                            string="Install erplibre base odoo 18"
+                            type="object"
+                            class="oe_highlight"
+                        />
                     </group>
                     <group string="Action">
                         <button name="action_open_terminal" string="Terminal" type="object" class="oe_highlight" />
