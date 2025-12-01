@@ -859,12 +859,14 @@ class DevopsWorkspace(models.Model):
                     #     ),
                     #     force_open_terminal=True,
                     # )
+                    arg_database = f" -d {rec.db_name}" if rec.db_name else " "
                     rec.execute(
                         cmd=(
-                            "./run.sh -d"
-                            f" {rec.db_name} --http-port={rec.port_http} --gevent-port={rec.port_longpolling}"
+                            "./run.sh"
+                            f"{arg_database} --http-port={rec.port_http} --gevent-port={rec.port_longpolling}"
                         ),
                         force_open_terminal=True,
+                        print_command=True,
                     )
                     # TODO validate output if execution conflict port to remove time.sleep
                     rec.is_running_with_process = True
@@ -1075,11 +1077,19 @@ class DevopsWorkspace(models.Model):
                         "force_reinstall_workspace"
                     ):
                         # TODO implement debug with step and open with open-terminal async
-                        exec_id = rec.execute(
-                            cmd=f"./script/install/install_locally_dev.sh",
-                            folder=rec.folder,
-                            error_on_status=False,
-                        )
+                        if self.env.context.get("force_reinstall_workspace"):
+                            exec_id = rec.execute(
+                                cmd=f"make install_odoo_18",
+                                folder=rec.folder,
+                                to_instance=True,
+                                error_on_status=False,
+                            )
+                        else:
+                            exec_id = rec.execute(
+                                cmd=f"make install_odoo_18",
+                                folder=rec.folder,
+                                error_on_status=False,
+                            )
                         rec.log_workspace = exec_id.log_all
                         if exec_id.exec_status:
                             raise Exception(exec_id.log_all)
@@ -1246,6 +1256,7 @@ class DevopsWorkspace(models.Model):
         engine="bash",
         delimiter_bash="'",
         error_on_status=True,
+        print_command=False,
     ):
         # TODO search into context if need to parallel or serial
         lst_result = []
@@ -1279,6 +1290,8 @@ class DevopsWorkspace(models.Model):
                 "cmd": cmd,
                 "folder": force_folder,
             }
+            if print_command:
+                print(cmd)
             devops_exec_bundle = self.env.context.get("devops_exec_bundle")
             devops_exec_bundle_id = None
             if devops_exec_bundle:
