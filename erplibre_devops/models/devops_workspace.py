@@ -288,6 +288,31 @@ class DevopsWorkspace(models.Model):
         default="https://github.com/ERPLibre/ERPLibre",
     )
 
+    select_installation = fields.Selection(
+        [
+            ("odoo_workspace", "Odoo workspace"),
+            ("erplibre", "ERPLibre only"),
+        ]
+    )
+
+    docker_build_odoo_version = fields.Selection(
+        [
+            ("18", "18"),
+            ("17", "17"),
+            ("16", "16"),
+            ("15", "15"),
+            ("14", "14"),
+            ("13", "13"),
+            ("12", "12"),
+        ],
+        required=True,
+        default="18",
+    )
+
+    log_action_docker_build_odoo = fields.Text(
+        help="Will be fill into method action_docker_build_odoo"
+    )
+
     workspace_docker_id = fields.Many2one(
         comodel_name="devops.workspace.docker",
         string="Workspace Docker",
@@ -518,6 +543,19 @@ class DevopsWorkspace(models.Model):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Setup PyCharm debug") as rec:
                 rec.ide_pycharm.action_cg_setup_pycharm_debug()
+
+    def action_docker_build_odoo(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Docker build") as rec:
+                cmd = f"make docker_build_odoo_{rec.docker_build_odoo_version}"
+                exec_id = rec.execute(
+                    cmd=cmd,
+                    folder=rec.folder,
+                    to_instance=True,
+                    error_on_status=False,
+                    force_open_terminal=True,
+                )
+                rec.log_action_docker_build_odoo = exec_id.log_all.strip()
 
     def action_clear_error_exec(self):
         for rec_o in self:
@@ -1050,9 +1088,12 @@ class DevopsWorkspace(models.Model):
                     else:
                         rec.path_working_erplibre = rec.folder
                     branch_str = ""
-                    if rec.erplibre_mode.mode_version_erplibre:
+                    if rec.git_branch:
+                        branch_str = f" -b {rec.git_branch}"
+                    elif rec.erplibre_mode.mode_version_erplibre:
                         branch_str = f" -b {rec.erplibre_mode.mode_version_erplibre.value}"
-                    git_arg = f"{branch_str} {rec.folder}"
+                    folder_basename = os.path.basename(rec.folder)
+                    git_arg = f"{branch_str} {folder_basename}"
 
                     # TTODO bug if file has same key
                     # if any(["ls:cannot access " in str_file for str_file in lst_file]):
@@ -1113,20 +1154,31 @@ class DevopsWorkspace(models.Model):
                     if is_first_install or self.env.context.get(
                         "force_reinstall_workspace"
                     ):
+
                         # TODO implement debug with step and open with open-terminal async
-                        if self.env.context.get("force_reinstall_workspace"):
+                        if rec.select_installation == "odoo_workspace":
                             exec_id = rec.execute(
                                 cmd=f"make install_odoo_18",
                                 folder=rec.folder,
-                                to_instance=True,
+                                to_instance=bool(
+                                    self.env.context.get(
+                                        "force_reinstall_workspace"
+                                    )
+                                ),
                                 error_on_status=False,
                             )
-                        else:
+                        elif rec.select_installation == "erplibre":
                             exec_id = rec.execute(
-                                cmd=f"make install_odoo_18",
+                                cmd=f"make install_erplibre",
                                 folder=rec.folder,
+                                to_instance=bool(
+                                    self.env.context.get(
+                                        "force_reinstall_workspace"
+                                    )
+                                ),
                                 error_on_status=False,
                             )
+
                         rec.log_workspace = exec_id.log_all
                         if exec_id.exec_status:
                             raise Exception(exec_id.log_all)
@@ -1181,23 +1233,25 @@ class DevopsWorkspace(models.Model):
                     rec.folder_odoo_version = folder_odoo
                 else:
                     rec.folder_odoo_version = False
-                erplibre_version_path = os.path.join(
-                    rec.folder, ".erplibre-version"
-                )
-                erplibre_version_path_exist = rec.os_path_exists(
-                    erplibre_version_path
-                )
-                if erplibre_version_path_exist:
-                    erplibre_version = rec.system_id.execute_with_result(
-                        f"cat .erplibre-version",
-                        rec.folder,
-                    ).strip()
-                    folder_venv = os.path.join(
-                        rec.folder, f".venv.{erplibre_version}"
+                if rec.select_installation == "odoo_workspace":
+                    erplibre_version_path = os.path.join(
+                        rec.folder, ".erplibre-version"
                     )
-                else:
-                    folder_venv = False
-
+                    erplibre_version_path_exist = rec.os_path_exists(
+                        erplibre_version_path
+                    )
+                    if erplibre_version_path_exist:
+                        erplibre_version = rec.system_id.execute_with_result(
+                            f"cat .erplibre-version",
+                            rec.folder,
+                        ).strip()
+                        folder_venv = os.path.join(
+                            rec.folder, f".venv.{erplibre_version}"
+                        )
+                    else:
+                        folder_venv = False
+                elif rec.select_installation == "erplibre":
+                    folder_venv = os.path.join(rec.folder, f".venv.erplibre")
                 if rec.erplibre_mode.mode_source in [
                     self.env.ref("erplibre_devops.erplibre_mode_source_git")
                 ]:

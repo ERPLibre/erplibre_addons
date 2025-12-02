@@ -1026,14 +1026,25 @@
                         <field name="working_relative_folder" />
                         <field name="workspace_folder" />
                         <field name="erplibre_mode" />
-                        <field name="image_db_selection" />
+                        <field name="deploy_select_installation" />
+                        <field name="deploy_with_database" />
+                        <field name="deploy_git_branch" />
+                        <field name="image_db_selection" invisible="not deploy_with_database" />
                         <button
-                            name="ssh_system_create_workspace"
+                            name="action_system_deploy_create_workspace"
                             string="Create workspace"
                             type="object"
                             class="btn btn-secondary"
                         />
                         <field name="create_workspace_id" invisible="not create_workspace_id" />
+                    </group>
+                    <group string="Shortcut">
+                        <button
+                            name="action_shortcut_deploy_generate_docker"
+                            string="Generate docker"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
                     </group>
                 </group>
                 <group name="group_h_run_test" invisible="state != 'h_run_test'">

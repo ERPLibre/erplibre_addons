@@ -397,12 +397,15 @@ class DevopsSystem(models.Model):
         add_stdin_log=False,
         add_stderr_log=True,
         return_status=False,
+        use_bash=False,
     ):
-        # subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
-        # (output, err) = p.communicate()
-        p = subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        if use_bash:
+            args = ["bash", "-lc", cmd]
+            shell = False
+        else:
+            args = cmd
+            shell = True
+
         # p = subprocess.Popen(
         #     cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, executable="/bin/bash"
         # )
@@ -423,11 +426,17 @@ class DevopsSystem(models.Model):
         #     if out != '':
         #         sys.stdout.write(out)
         #         sys.stdout.flush()
-        (output, err) = p.communicate()
+
+        p = subprocess.Popen(
+            args, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        output, err = p.communicate()
         p_status = p.wait()
+
         result = output.decode()
         if add_stderr_log:
             result += err.decode()
+
         if not return_status:
             return result
         return result, p_status

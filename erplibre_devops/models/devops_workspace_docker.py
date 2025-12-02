@@ -104,6 +104,7 @@ services:
       STOP_BEFORE_INIT: "False"
       DB_NAME: ""
       UPDATE_ALL_DB: "False"
+      INIT_CMD: ""
     depends_on:
       - db
     # Not behind a proxy

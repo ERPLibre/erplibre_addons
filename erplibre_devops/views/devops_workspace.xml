@@ -246,7 +246,8 @@
                     <group string="Basic">
                         <field name="system_id" />
                         <field name="folder" />
-                        <field name="folder_odoo_version" />
+                        <field name="folder_odoo_version" invisible="select_installation not in ['odoo_workspace']" />
+                        <field name="select_installation" />
                         <field name="erplibre_mode" />
                         <field name="is_running" />
                     </group>
@@ -360,6 +361,18 @@
                     </page>
                     <page name="exec_error" string="Error exec">
                         <field name="devops_exec_error_ids" />
+                    </page>
+                    <page name="docker_page" string="Docker action">
+                        <group string="Docker build">
+                            <field name="docker_build_odoo_version" string="Odoo version" />
+                            <button
+                                name="action_docker_build_odoo"
+                                string="Launch docker build"
+                                type="object"
+                                class="oe_highlight"
+                            />
+                            <field name="log_action_docker_build_odoo" />
+                        </group>
                     </page>
                 </notebook>
                 <chatter />

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+import getpass
 import json
 import logging
 import os
@@ -48,6 +49,17 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     root_workspace_id_is_me = fields.Boolean(related="root_workspace_id.is_me")
+
+    deploy_git_branch = fields.Char()
+
+    deploy_with_database = fields.Boolean(help="Will deploy database")
+
+    deploy_select_installation = fields.Selection(
+        [
+            ("odoo_workspace", "Odoo workspace"),
+            ("erplibre", "ERPLibre only"),
+        ]
+    )
 
     # working_workspace_ids = fields.One2many(
     #     related="working_system_id.devops_workspace_ids"
@@ -553,6 +565,7 @@ class DevopsPlanActionWizard(models.TransientModel):
     @api.model_create_multi
     def create(self, vals_list):
         res = super(DevopsPlanActionWizard, self).create(vals_list)
+        # Fill variable when open wizard
         res.has_last_generated = bool(
             self.env["devops.plan.cg"].search_count([], limit=1)
         )
@@ -1940,7 +1953,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_install_robotlibre()
         return self._reopen_self()
 
-    def ssh_system_create_workspace(self):
+    def action_system_deploy_create_workspace(self):
         if not self.working_system_id:
             # TODO manage this error
             return
@@ -1948,18 +1961,64 @@ class DevopsPlanActionWizard(models.TransientModel):
             "system_id": self.working_system_id.id,
             "folder": self.workspace_folder,
             "erplibre_mode": self.erplibre_mode.id,
-            "image_db_selection": self.image_db_selection.id,
+            "select_installation": self.deploy_select_installation,
         }
+        if self.deploy_git_branch:
+            ws_value["git_branch"] = self.deploy_git_branch
+        if self.deploy_with_database:
+            ws_value["image_db_selection"] = self.image_db_selection.id
         ws_id = self.env["devops.workspace"].create([ws_value])
         self.create_workspace_id = ws_id.id
         # TODO missing check status before continue
         # TODO missing with workspace me to catch error
         ws_id.action_install_workspace()
-        ws_id.action_start()
+        if self.deploy_with_database:
+            ws_id.action_start()
         # TODO implement detect when website is up or cancel state with error
         time.sleep(5)
-        ws_id.action_restore_db_image()
-        ws_id.action_open_local_view()
+        if self.deploy_with_database:
+            ws_id.action_restore_db_image()
+            ws_id.action_open_local_view()
+        return self._reopen_self()
+
+    def action_shortcut_deploy_generate_docker(self):
+        if not self.working_system_id:
+            # TODO manage this error
+            return
+        search_path_home = [
+            a
+            for a in self.env["erplibre.config.path.home"].search([])
+            if f"{getpass.getuser()}/git" in a.name
+        ]
+        if search_path_home:
+            self.working_erplibre_config_path_home_id = search_path_home[0].id
+        # TODO validate if exist, do we need to change it to create it? or reuse it?
+        self.working_relative_folder = "erplibre_generate_docker"
+        self.erplibre_mode = False
+        mode_env_id = self.env.ref("erplibre_devops.erplibre_mode_env_dev")
+        mode_exec_id = self.env.ref(
+            "erplibre_devops.erplibre_mode_exec_terminal"
+        )
+        mode_source_id = self.env.ref(
+            "erplibre_devops.erplibre_mode_source_git"
+        )
+        mode_version_base = "18.0"
+        mode_version_erplibre = "erplibre_mode_version_erplibre_1_6_0"
+        self.erplibre_mode = (
+            self.env["erplibre.mode"]
+            .get_mode(
+                mode_env_id,
+                mode_exec_id,
+                mode_source_id,
+                mode_version_base,
+                mode_version_erplibre,
+            )
+            .id
+        )
+        self.deploy_with_database = False
+        self.deploy_select_installation = "erplibre"
+        self.deploy_git_branch = "develop"
+
         return self._reopen_self()
 
     def search_subsystem_workspace(self):
