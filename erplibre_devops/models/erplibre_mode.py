@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
 
 
@@ -73,7 +76,7 @@ class ErplibreMode(models.Model):
         if not mode_version_base_id:
             mode_version_base_id = self.env[
                 "erplibre.mode.version.base"
-            ].create({"value": mode_version_base, "name": mode_version_base})
+            ].create([{"value": mode_version_base, "name": mode_version_base}])
         mode_version_erplibre_id = self.env[
             "erplibre.mode.version.erplibre"
         ].search([("value", "=", mode_version_erplibre)])
@@ -81,7 +84,12 @@ class ErplibreMode(models.Model):
             mode_version_erplibre_id = self.env[
                 "erplibre.mode.version.erplibre"
             ].create(
-                {"value": mode_version_erplibre, "name": mode_version_erplibre}
+                [
+                    {
+                        "value": mode_version_erplibre,
+                        "name": mode_version_erplibre,
+                    }
+                ]
             )
         mode_id = self.env["erplibre.mode"].search(
             [

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import base64
 import json
 import logging
@@ -394,12 +397,15 @@ class DevopsSystem(models.Model):
         add_stdin_log=False,
         add_stderr_log=True,
         return_status=False,
+        use_bash=False,
     ):
-        # subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
-        # (output, err) = p.communicate()
-        p = subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        if use_bash:
+            args = ["bash", "-lc", cmd]
+            shell = False
+        else:
+            args = cmd
+            shell = True
+
         # p = subprocess.Popen(
         #     cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, executable="/bin/bash"
         # )
@@ -420,11 +426,17 @@ class DevopsSystem(models.Model):
         #     if out != '':
         #         sys.stdout.write(out)
         #         sys.stdout.flush()
-        (output, err) = p.communicate()
+
+        p = subprocess.Popen(
+            args, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        output, err = p.communicate()
         p_status = p.wait()
+
         result = output.decode()
         if add_stderr_log:
             result += err.decode()
+
         if not return_status:
             return result
         return result, p_status
@@ -442,6 +454,7 @@ class DevopsSystem(models.Model):
         """
         engine can be bash, python or sh
         """
+        init_return_status = return_status  # Ssh will force return status
         result = ""
         status = None
         if folder:
@@ -468,7 +481,8 @@ class DevopsSystem(models.Model):
                     )
                     continue
                 status = 0
-                cmd += ";echo $?"
+                return_status = True
+                cmd += ';echo -e "\n$?"'
                 stdin, stdout, stderr = ssh_client.exec_command(cmd)
                 if add_stdin_log:
                     result = stdin.read().decode("utf-8")
@@ -477,11 +491,11 @@ class DevopsSystem(models.Model):
                 stdout_log = stdout.read().decode("utf-8")
                 # Extract echo $?
                 count_endline_log = stdout_log.count("\n")
-                if count_endline_log:
+                if count_endline_log and return_status:
                     # Minimum 1, we know we have a command output by echo $?
                     # output is only the status
                     try:
-                        status = int(stdout_log.strip())
+                        status = int(stdout_log.strip().split("\n")[-1])
                     except Exception:
                         _logger.warning(
                             f"System id {rec.id} communicate by SSH cannot"
@@ -497,7 +511,7 @@ class DevopsSystem(models.Model):
                 if add_stderr_log:
                     result += stderr.read().decode("utf-8")
         if len(self) == 1:
-            if not return_status:
+            if not init_return_status:
                 return result
             else:
                 return result, status
@@ -567,7 +581,7 @@ class DevopsSystem(models.Model):
             sshpass = ""
             if rec.ssh_use_sshpass and not force_no_sshpass_no_arg:
                 if not rec.ssh_password:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Please, configure your password, because you enable"
                         " the feature 'ssh_use_sshpass'"
                     )
@@ -640,7 +654,7 @@ class DevopsSystem(models.Model):
         try:
             # Just open and close the connection
             with self.ssh_connection(force_exception=True):
-                raise exceptions.Warning(_("Connection Test Succeeded!"))
+                raise exceptions.UserError(_("Connection Test Succeeded!"))
         except (
             paramiko.AuthenticationException,
             paramiko.PasswordRequiredException,
@@ -648,7 +662,7 @@ class DevopsSystem(models.Model):
             paramiko.SSHException,
         ):
             _logger.info("Connection Test Failed!", exc_info=True)
-            raise exceptions.Warning(_("Connection Test Failed!"))
+            raise exceptions.UserError(_("Connection Test Failed!"))
 
     @api.model
     def ssh_connection(self, timeout=5, force_exception=False):
@@ -670,13 +684,18 @@ class DevopsSystem(models.Model):
                 hostname=self.ssh_host, keytype="ssh-rsa", key=key
             )
         try:
-            ssh_client.connect(
-                hostname=self.ssh_host,
-                port=self.ssh_port,
-                username=None if not self.ssh_user else self.ssh_user,
-                password=None if not self.ssh_password else self.ssh_password,
-                timeout=timeout,
-            )
+            dct_ssh_client = {
+                "hostname": self.ssh_host,
+                "port": self.ssh_port,
+                "username": None if not self.ssh_user else self.ssh_user,
+                "password": (
+                    None if not self.ssh_password else self.ssh_password
+                ),
+                "timeout": timeout,
+            }
+            if self.ssh_private_key:
+                dct_ssh_client["key_filename"] = self.ssh_private_key
+            ssh_client.connect(**dct_ssh_client)
         except paramiko.ssh_exception.NoValidConnectionsError as e:
             if force_exception:
                 raise e
@@ -929,7 +948,7 @@ class DevopsSystem(models.Model):
                     #     deploy_image_value["history_full"] = out
                     docker_compose_id = self.env[
                         "devops.docker.compose"
-                    ].create(compose_value)
+                    ].create([compose_value])
                 dct_compose_name_id[compose_name] = docker_compose_id
 
             # 2. Volume
@@ -983,12 +1002,12 @@ class DevopsSystem(models.Model):
                                     compose_id = dct_compose_name_id.get(
                                         docker_compose_project_name
                                     )
-                                    deploy_volume_value[
-                                        "compose_id"
-                                    ] = compose_id.id
+                                    deploy_volume_value["compose_id"] = (
+                                        compose_id.id
+                                    )
                             docker_volume_id = self.env[
                                 "devops.docker.volume"
-                            ].create(deploy_volume_value)
+                            ].create([deploy_volume_value])
                         dct_volume_name_id[volume_name] = docker_volume_id
             # 3. Image
             # cmd = "docker container ls --no-trunc -a --format json"
@@ -1044,7 +1063,7 @@ class DevopsSystem(models.Model):
                     if status == 0:
                         deploy_image_value["inspect_full"] = out
                     docker_image_id = self.env["devops.docker.image"].create(
-                        deploy_image_value
+                        [deploy_image_value]
                     )
                 elif (
                     not docker_image_id.system_ids
@@ -1093,10 +1112,10 @@ class DevopsSystem(models.Model):
                         network_value["inspect_full"] = out
                     docker_network_id = self.env[
                         "devops.docker.network"
-                    ].create(network_value)
-                    dct_network_name_id[
-                        docker_network_id.name
-                    ] = docker_network_id
+                    ].create([network_value])
+                    dct_network_name_id[docker_network_id.name] = (
+                        docker_network_id
+                    )
             # 5. Container
             cmd = "docker container ls --no-trunc -a --format json"
             out, status = rec.execute_with_result(
@@ -1188,7 +1207,7 @@ class DevopsSystem(models.Model):
 
                     docker_container_id = self.env[
                         "devops.docker.container"
-                    ].create(container_value)
+                    ].create([container_value])
 
                 dct_container_name_id[id_container] = docker_container_id
             for compose_id in dct_compose_name_id.values():
@@ -1229,7 +1248,7 @@ class DevopsSystem(models.Model):
     def open_terminal(self):
         for rec in self:
             out = rec.execute_terminal_gui(
-                cmd=f'pwd',
+                cmd=f"pwd",
             )
 
     def configure_ntp(self):
@@ -1261,7 +1280,7 @@ class DevopsSystem(models.Model):
             out = rec.execute_terminal_gui(
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 'Add it at the end of bashrc\neval "$(starship init bash)"'
             )
 
@@ -1280,7 +1299,7 @@ class DevopsSystem(models.Model):
                 f"sudo apt update;sudo apt install -y {cmd_dev};mkdir -p"
                 f" ~/git;cd ~/git;git clone {repo_url} -b robotlibre"
                 " robotlibre;cd robotlibre;make install;source"
-                " ./.venv/bin/activate;poetry install;make install_dev"
+                " ./.venv.erplibre/bin/activate;poetry install;make install_dev"
             )
             out = rec.execute_terminal_gui(
                 cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
@@ -1328,10 +1347,9 @@ class DevopsSystem(models.Model):
             log = rec.execute_with_result(cmd, None).strip()
             msg = (
                 "Security good : 1. No DSA, 2. RSA key size >= 3072, 3. Better"
-                " Ed25519\n"
-                + log
+                " Ed25519\n" + log
             )
-            raise exceptions.Warning(msg)
+            raise exceptions.UserError(msg)
 
     def action_search_vm(self):
         for rec in self:
@@ -1394,7 +1412,7 @@ class DevopsSystem(models.Model):
                             "provider": provider,
                             "system_id": rec.id,
                         }
-                        vm_id = self.env["devops.deploy.vm"].create(value)
+                        vm_id = self.env["devops.deploy.vm"].create([value])
                     if vm_id and key in lst_identifiant_running:
                         # TODO need to be somewhere else to check status
                         value = {
@@ -1402,7 +1420,7 @@ class DevopsSystem(models.Model):
                             "is_running": True,
                         }
                         vm_exec_id = self.env["devops.deploy.vm.exec"].create(
-                            value
+                            [value]
                         )
                         vm_id.vm_exec_last_id = vm_exec_id.id
 
@@ -1517,19 +1535,17 @@ class DevopsSystem(models.Model):
                 )
                 return
             if rec.use_search_cmd == "locate":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into .erplibre-version
                 cmd = (
-                    "locate -b -r '^default\.xml$'|grep -v "
+                    "locate -b -r '^\.erplibre-version$'|grep -v "
                     '".repo"|grep -v'
-                    ' "/var/lib/docker"| xargs -I {} sh -c "grep -l "ERPLibre"'
-                    ' "{}" 2>/dev/null || true"'
+                    ' "/var/lib/docker"'
                 )
             elif rec.use_search_cmd == "find":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into .erplibre-version
                 cmd = (
-                    'find "/" -name "default.xml" -type f -print 2>/dev/null |'
-                    " grep -v .repo | grep -v /var/lib/docker | xargs -I {} sh"
-                    ' -c "grep -l "ERPLibre" "{}" 2>/dev/null || true"'
+                    'find "/" -name ".erplibre-version" -type f -print 2>/dev/null |'
+                    " grep -v .repo | grep -v /var/lib/docker"
                 )
             out_default_git = rec.execute_with_result(cmd, None).strip()
             if out_default_git:
@@ -1539,19 +1555,16 @@ class DevopsSystem(models.Model):
             else:
                 lst_dir_git = []
             if rec.use_search_cmd == "locate":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
                     'locate -b -r "^docker-compose\.yml$"|grep -v .repo|grep'
-                    ' -v /var/lib/docker|xargs -I {} sh -c "grep -l "ERPLibre"'
-                    ' "{}" 2>/dev/null || true"'
+                    " -v /var/lib/docker"
                 )
             elif rec.use_search_cmd == "find":
-                # Validate word ERPLibre is into default.xml
+                # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
                     'find "/" -name "docker-compose.yml" -type f -print'
-                    " 2>/dev/null | grep -v .repo | grep -v /var/lib/docker |"
-                    ' xargs -I {} sh -c "grep -l "ERPLibre" "{}" 2>/dev/null'
-                    ' || true"'
+                    " 2>/dev/null | grep -v .repo | grep -v /var/lib/docker"
                 )
             out_docker_compose = rec.execute_with_result(cmd, None).strip()
             if out_docker_compose:
@@ -1614,14 +1627,51 @@ class DevopsSystem(models.Model):
                     "git branch --show-current", dir_name
                 ).strip()
 
-                mode_version_base = rec.execute_with_result(
-                    "git branch --show-current",
-                    os.path.join(dir_name, BASE_VERSION_SOFTWARE_NAME),
+                odoo_version = ""
+                mode_version_erplibre = rec.execute_with_result(
+                    "git branch --show-current", dir_name
                 ).strip()
+
+                odoo_version_path = os.path.join(dir_name, ".odoo-version")
+                odoo_version_path_exist = rec.os_path_exists(odoo_version_path)
+                if odoo_version_path_exist:
+                    odoo_version = rec.execute_with_result(
+                        f"cat .odoo-version",
+                        dir_name,
+                    ).strip()
+                mode_version_base = ""
+                dir_path_exist = ""
+                dir_path = "/home"
+                is_old_erplibre = False
+                if odoo_version:
+                    dir_path = os.path.join(
+                        dir_name,
+                        f"odoo{odoo_version}",
+                        BASE_VERSION_SOFTWARE_NAME,
+                    )
+                    dir_path_exist = rec.os_path_exists(dir_path)
+                if not dir_path_exist:
+                    is_old_erplibre = True
+                    # Support old version
+                    dir_path = os.path.join(
+                        dir_name,
+                        BASE_VERSION_SOFTWARE_NAME,
+                    )
+                mode_version_base, status = rec.execute_with_result(
+                    "git branch --show-current",
+                    dir_path,
+                    return_status=True,
+                )
+                mode_version_base = mode_version_base.strip()
                 if not mode_version_base:
                     # Search somewhere else, because it's a commit!
+                    if is_old_erplibre:
+                        cmd = 'grep "<default remote=" default.xml'
+                    else:
+                        cmd = 'grep "odoo.git" .repo/local_manifests/erplibre_manifest.xml'
+
                     mode_version_base_raw = rec.execute_with_result(
-                        'grep "<default remote=" default.xml',
+                        cmd,
                         dir_name,
                     )
                     regex = r'revision="([^"]+)"'
@@ -1658,7 +1708,7 @@ class DevopsSystem(models.Model):
                     "erplibre_devops.erplibre_mode_source_docker"
                 )
                 # TODO cannot find odoo version from a simple docker-compose, need more information from docker image
-                mode_version_base = "12.0"
+                mode_version_base = "18.0"
                 key_version = "/erplibre:"
                 cmd = (
                     f'grep "image:" ./docker-compose.yml |grep "{key_version}"'
@@ -1714,7 +1764,7 @@ class DevopsSystem(models.Model):
                 )
                 if not image_db_id:
                     self.env["devops.db.image"].create(
-                        {"name": image_name, "path": file_path}
+                        [{"name": image_name, "path": file_path}]
                     )
 
     def get_local_system_id_from_ssh_config(self):
@@ -1735,8 +1785,13 @@ class DevopsSystem(models.Model):
             for host in lst_host:
                 dev_config = config.lookup(host)
                 hostname = dev_config.get("hostname")
+                try:
+                    ssh_port = int(dev_config.get("port", 22))
+                except ValueError:
+                    ssh_port = 22
                 system_id = self.env["devops.system"].search(
-                    [("ssh_host", "=", hostname)], limit=1
+                    [("ssh_host", "=", hostname), ("ssh_port", "=", ssh_port)],
+                    limit=1,
                 )
                 if not system_id:
                     name = f"{host}[{hostname}]"
@@ -1748,12 +1803,19 @@ class DevopsSystem(models.Model):
                         # "ssh_password": dev_config.get("password"),
                     }
                     if "port" in dev_config.keys():
-                        value["ssh_port"] = dev_config.get("port")
+                        value["ssh_port"] = ssh_port
                     if "user" in dev_config.keys():
                         value["ssh_user"] = dev_config.get("user")
+                    if "identityfile" in dev_config.keys():
+                        identity_file = dev_config.get("identityfile")
+                        if type(identity_file) is list:
+                            value["ssh_private_key"] = identity_file[0]
+                        else:
+                            value["ssh_private_key"] = identity_file
+                    # TODO support identitiesonly , PubkeyAuthentication , PreferredAuthentications
 
                     value["parent_system_id"] = rec.id
-                    system_id = self.env["devops.system"].create(value)
+                    system_id = self.env["devops.system"].create([value])
                 if system_id:
                     new_sub_system_id += system_id
         return new_sub_system_id

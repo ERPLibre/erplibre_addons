@@ -1,3 +1,6 @@
+# !/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
 
 
@@ -78,9 +81,7 @@ class DevopsDockerComposeTemplate(models.Model):
     )
     def _compute_name_info(self):
         for rec in self:
-            rec.name_info = (
-                f"{rec.name} {rec.docker_compose_model} {[a.name for a in rec.type_ids]} {rec.port_1}"
-            )
+            rec.name_info = f"{rec.name} {rec.docker_compose_model} {[a.name for a in rec.type_ids]} {rec.port_1}"
             if rec.is_support_gpu:
                 rec.name += f" {rec.gpu_mode}"
 

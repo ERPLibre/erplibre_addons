@@ -7,14 +7,8 @@
             <form string="Titre">
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-                        
-            <field name="active" invisible="1" />
-            <widget
-                name="web_ribbon"
-                title="Archived"
-                bg_color="bg-danger"
-                invisible="active"/>
-            
+                        <field name="active" invisible="1" />
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active" />
                     </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
@@ -26,6 +20,11 @@
                         <field name="description" />
                         <field name="module_id" />
                         <field name="is_to_remove" />
+                        <field name="is_activity" />
+                        <field name="is_all_tracking" invisible="not is_activity" />
+                    </group>
+                    <group style="background-color: #dc0527; color: white;" invisible="not has_error">
+                        <field name="has_error_msg" nolabel="1" />
                     </group>
                     <notebook>
                         <page string="Field">

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import logging
 import time
 
@@ -76,7 +79,7 @@ class DevopsDeployVm(models.Model):
                     "vm_id": rec.id,
                     "is_running": True,
                 }
-                vm_exec_id = self.env["devops.deploy.vm.exec"].create(value)
+                vm_exec_id = self.env["devops.deploy.vm.exec"].create([value])
                 rec.vm_exec_last_id = vm_exec_id.id
                 # Find associate system if exist
                 # TODO use one2many instead? Not existing, crash with CG

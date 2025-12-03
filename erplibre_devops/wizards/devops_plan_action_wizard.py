@@ -1,8 +1,15 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+import getpass
 import json
 import logging
 import os
+import re
 import time
+import unicodedata
 import uuid
+from datetime import datetime
 
 from odoo import _, api, exceptions, fields, models
 
@@ -21,7 +28,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def _default_instance_path(self):
         workspace_id = self.env.ref("erplibre_devops.devops_workspace_me")
-        return os.path.join(workspace_id.folder, ".venv", "project")
+        return os.path.join(workspace_id.folder, ".venv.erplibre", "project")
 
     name = fields.Char()
 
@@ -42,6 +49,17 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     root_workspace_id_is_me = fields.Boolean(related="root_workspace_id.is_me")
+
+    deploy_git_branch = fields.Char()
+
+    deploy_with_database = fields.Boolean(help="Will deploy database")
+
+    deploy_select_installation = fields.Selection(
+        [
+            ("odoo_workspace", "Odoo workspace"),
+            ("erplibre", "ERPLibre only"),
+        ]
+    )
 
     # working_workspace_ids = fields.One2many(
     #     related="working_system_id.devops_workspace_ids"
@@ -281,6 +299,17 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="True if editing an existing system or False to create a system",
     )
 
+    has_error_model = fields.Boolean(
+        compute="_compute_has_error",
+        store=True,
+    )
+
+    has_error_msg_model = fields.Text(compute="_compute_has_error", store=True)
+
+    has_last_generated = fields.Boolean(
+        help="Can show button to restore last generated module."
+    )
+
     mode_view_generator = fields.Selection(
         selection=[
             ("no_view", "Nothing"),
@@ -487,6 +516,38 @@ class DevopsPlanActionWizard(models.TransientModel):
         relation="devops_plan_action_model_remove_rel",
     )
 
+    model_fast_creation_enabled = fields.Boolean(
+        string="Enable fast creation feature",
+    )
+
+    model_fast_creation_model_name = fields.Char(
+        string="Model name fast creation",
+    )
+
+    model_fast_creation_field_name = fields.Text(
+        string="Field name fast creation", help="Separate field name by ;"
+    )
+
+    model_fast_creation_field_separator = fields.Selection(
+        string="Field separator fast creation",
+        default=";",
+        selection=[
+            ("\t", "tab"),
+            (";", ";"),
+            (",", ","),
+            ("\n", "saut de ligne \\n"),
+        ],
+    )
+
+    model_fast_creation_field_example_value = fields.Text(
+        string="Field value fast creation",
+        help="Separate field name by ;, need to be same column of model_fast_creation_field_name",
+    )
+
+    model_fast_creation_error = fields.Text(
+        string="Fast creation error", readonly=True
+    )
+
     image_db_selection = fields.Many2one(
         comodel_name="devops.db.image",
         default=_default_image_db_selection,
@@ -500,6 +561,15 @@ class DevopsPlanActionWizard(models.TransientModel):
         required=True,
         default=lambda s: s.env.user.id,
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super(DevopsPlanActionWizard, self).create(vals_list)
+        # Fill variable when open wizard
+        res.has_last_generated = bool(
+            self.env["devops.plan.cg"].search_count([], limit=1)
+        )
+        return res
 
     def _compute_has_next(self):
         for record in self:
@@ -551,6 +621,10 @@ class DevopsPlanActionWizard(models.TransientModel):
     def _compute_has_configured_path(self):
         for rec in self:
             rec.has_configured_path = False
+            with open(".odoo-version", "r") as f:
+                odoo_version = f.readline().strip()
+                str_odoo_version = f"odoo{odoo_version}"
+
             # Module
             if (
                 rec.working_module_path_suggestion == "#"
@@ -560,8 +634,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.working_compute_module_path = rec.working_module_path
             if rec.working_module_path_suggestion != "#":
                 rec.has_configured_path = True
-                rec.working_compute_module_path = (
-                    rec.working_module_path_suggestion
+                rec.working_compute_module_path = os.path.join(
+                    str_odoo_version, rec.working_module_path_suggestion
                 )
             # CG
             if (
@@ -985,7 +1059,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "erplibre_mode": self.erplibre_mode.id,
                 "image_db_selection": self.image_db_selection.id,
             }
-            local_wp_id = self.env["devops.workspace"].create(dct_wp)
+            local_wp_id = self.env["devops.workspace"].create([dct_wp])
             self.create_workspace_id = local_wp_id.id
             local_wp_id.action_install_workspace()
             local_wp_id.action_start()
@@ -1023,19 +1097,19 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.state = "final"
             # # Project
             # cg_id = self.env["devops.cg"].create(
-            #     {
+            #     [{
             #         "name": "Autopoiesis regenerate",
             #         "devops_workspace_ids": [(6, 0, wp_id.ids)],
             #         "force_clean_before_generate": self.force_generate,
-            #     }
+            #     }]
             # )
             # Module
             # cg_module_id = self.env["devops.cg.module"].create(
-            #     {
+            #     [{
             #         "name": "erplibre_devops",
             #         "code_generator": cg_id.id,
             #         "devops_workspace_ids": [(6, 0, wp_id.ids)],
-            #     }
+            #     }]
             # )
             # plan_cg_value = {
             #     "workspace_id": wp_id.id,
@@ -1050,7 +1124,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             #     "stop_execution_if_env_not_clean": not self.force_generate,
             #     "use_external_cg": self.use_external_cg,
             # }
-            # plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
+            # plan_cg_id = self.env["devops.plan.cg"].create([plan_cg_value])
             # # Generate
             # plan_cg_id.action_code_generator_generate_all()
             # self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
@@ -1081,6 +1155,107 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.env["devops.cg.module"].search([]).unlink()
             self.env["devops.cg.model"].search([]).unlink()
             self.env["devops.cg.field"].search([]).unlink()
+            self.has_error_model = False
+            self.has_error_msg_model = ""
+        return self._reopen_self()
+
+    def action_enable_model_fast_creation(self):
+        for rec in self:
+            rec.model_fast_creation_enabled = True
+        return self._reopen_self()
+
+    def action_model_fast_creation(self):
+        for rec in self:
+            rec.model_fast_creation_error = ""
+            if not rec.model_fast_creation_model_name:
+                rec.model_fast_creation_error = "Missing model name."
+                continue
+            if rec.model_fast_creation_field_name:
+                lst_field_name = [
+                    a.strip()
+                    for a in rec.model_fast_creation_field_name.strip(
+                        "\n"
+                    ).split(rec.model_fast_creation_field_separator)
+                    if a.strip()
+                ]
+                # Check doublon
+                if len(set(lst_field_name)) != len(lst_field_name):
+                    rec.model_fast_creation_error = "Detect doublon into field name, validate all is unique."
+                    continue
+                # Extract value
+                lst_field_value = [
+                    a.strip()
+                    for a in rec.model_fast_creation_field_example_value.strip(
+                        "\n"
+                    ).split(rec.model_fast_creation_field_separator)
+                ]
+                if lst_field_value and len(lst_field_value) != len(
+                    lst_field_name
+                ):
+                    msg = (
+                        f"The number '{len(lst_field_value)}' of item value is incoherent "
+                        f"with item number '{len(lst_field_name)}' of field name."
+                    )
+                    for index in range(len(lst_field_value)):
+                        if index < len(lst_field_name) and index < len(
+                            lst_field_value
+                        ):
+                            msg += f"\n[{lst_field_name[index]}:{lst_field_value[index]}]"
+                    rec.model_fast_creation_error = msg
+                    continue
+            else:
+                lst_field_name = []
+                lst_field_value = []
+
+            dct_field_json = {}
+            for field_index, field_name in enumerate(lst_field_name):
+                field_name_code = self.to_field_name(field_name)
+                if lst_field_value:
+                    field_value = lst_field_value[field_index]
+                    # Try to detect date, try to detect number
+                    value_type, value_transform = rec.detect_type_from_string(
+                        field_value, field_name
+                    )
+                else:
+                    value_type = "Char"
+                # TODO if type float or int and got $ in name, it's monetary
+                dct_field_json[field_name_code] = {
+                    "name": field_name_code,
+                    "sequence": field_index + 10,
+                    "string": field_name,
+                    "type": value_type,
+                }
+
+            dct_field = {
+                rec.model_fast_creation_model_name: {
+                    "fields": dct_field_json,
+                    "is_inherit": False,
+                    "model_name": rec.model_fast_creation_model_name,
+                }
+            }
+
+            str_dct_model = json.dumps(dct_field)
+            self.generate_from_json(str_dct_model)
+
+            # Clean
+            # rec.model_fast_creation_model_name = ""
+            # rec.model_fast_creation_field_name = ""
+            # rec.model_fast_creation_field_example_value = ""
+            rec.model_fast_creation_error = ""
+        return self._reopen_self()
+
+    def action_open_last_generated(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Open last generated module"
+        ) as wp_id:
+            plan_cg_id = self.env["devops.plan.cg"].search(
+                [], limit=1, order="id desc"
+            )
+            self.working_module_name = plan_cg_id.devops_cg_module_ids[0].name
+            if self.working_module_name:
+                self.action_code_module_autocomplete_module_path(ctx=ctx)
         return self._reopen_self()
 
     def action_code_module_autocomplete_module_path(self, ctx=None):
@@ -1097,7 +1272,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 module_name = self.working_module_name
             if not module_name:
                 # TODO manage error into action wizard
-                # raise exceptions.Warning(f"Module name is empty.")
+                # raise exceptions.UserError(f"Module name is empty.")
                 return self._reopen_self()
             # Search absolute path
             exec_id = wp_id.execute(
@@ -1110,16 +1285,16 @@ class DevopsPlanActionWizard(models.TransientModel):
             )
             path_module = exec_id.log_all.strip()
             if exec_id.exec_status == 2:
-                raise exceptions.Warning(
+                raise exceptions.UserError(
                     f"The module '{module_name}' is duplicated :"
                     f" \n{path_module}"
                 )
             elif exec_id.exec_status:
-                # raise exceptions.Warning(f"Cannot find module '{module_name}'")
+                # raise exceptions.UserError(f"Cannot find module '{module_name}'")
                 self.set_mode_new_module()
                 return self._reopen_self()
             if not path_module:
-                # raise exceptions.Warning(f"Cannot find module path.")
+                # raise exceptions.UserError(f"Cannot find module path.")
                 self.set_mode_new_module()
                 return self._reopen_self()
             # Extract relative path
@@ -1157,135 +1332,14 @@ class DevopsPlanActionWizard(models.TransientModel):
                 if exec_id.exec_status != 0:
                     _logger.error("TODO i crash and forgot to raise an error!")
                 else:
-                    # The file need to finish by }, or cut it and remove output execution
-                    last_pos_char = str_dct_model.rfind("}")
-                    if last_pos_char == -1:
-                        _logger.error(
-                            "Cannot detect JSON dict when searching class"
-                            " model."
-                        )
-                        # TODO You can stop execution here, but let crash later
-                        str_dct_model_complete = str_dct_model
-                        lst_logs_model = []
-                    else:
-                        str_dct_model_complete = str_dct_model[
-                            : last_pos_char + 1
-                        ]
-                        lst_logs_model = (
-                            str_dct_model[last_pos_char + 1 :]
-                            .strip()
-                            .split("\n")
-                        )
-                        # TODO show this log to action view
-                        lst_logs_model = [
-                            a.strip() for a in lst_logs_model if a.strip()
-                        ]
-                        if lst_logs_model:
-                            _logger.warning("\n".join(lst_logs_model))
-                    # Create cg.model
-                    dct_model = json.loads(str_dct_model_complete)
                     dct_model_cg = {}
                     dct_model_cg_depend = {}
-                    lst_model_to_add = []
-                    lst_model_field = []
-                    for model_name, v in dct_model.items():
-                        model_id = self.env["devops.cg.model"].search(
-                            [("name", "=", model_name)]
-                        )
-                        if not model_id:
-                            model_value = {
-                                "name": model_name,
-                                "is_inherit": v.get("is_inherit", False),
-                            }
-                            model_id = self.env["devops.cg.model"].create(
-                                model_value
-                            )
-                        lst_model_to_add.append(model_id.id)
-                        lst_model_field.append((model_id, v))
-                        dct_model_cg[model_name] = model_id
-                        dct_model_cg_depend[model_name] = []
-                    # Create cg.field
-                    for model_id, v in lst_model_field:
-                        if "fields" in v.keys():
-                            # This algorithm only works when the module is working and formatted
-                            for dct_field in v.get("fields").values():
-                                ttype = dct_field.get("type").lower()
-                                field_name = dct_field.get("name")
-                                value_value = {
-                                    "name": field_name,
-                                    "type": ttype,
-                                    "model_id": model_id.id,
-                                }
-                                model_name = model_id.name
-                                # Check if exist
-                                field_id = self.env["devops.cg.field"].search(
-                                    [
-                                        ("name", "=", field_name),
-                                        ("model_id", "=", model_id.id),
-                                    ]
-                                )
-                                if field_id:
-                                    continue
-                                if "comodel_name" in dct_field.keys():
-                                    comodel_name = dct_field.get(
-                                        "comodel_name"
-                                    )
-                                    model_id_searched = dct_model_cg.get(
-                                        comodel_name
-                                    )
-                                    if model_id_searched:
-                                        value_value[
-                                            "relation"
-                                        ] = model_id_searched.id
-                                        if (
-                                            model_id_searched.id
-                                            not in dct_model_cg_depend[
-                                                model_name
-                                            ]
-                                            and ttype not in ["one2many"]
-                                            and model_id_searched.id
-                                            != model_id.id
-                                        ):
-                                            # Ignore one2many and depend on itself
-                                            # Keep cache on depend model
-                                            dct_model_cg_depend[
-                                                model_name
-                                            ].append(model_id_searched.id)
-                                    else:
-                                        value_value[
-                                            "relation_manual"
-                                        ] = comodel_name
-                                    if "inverse_name" in dct_field.keys():
-                                        inverse_name = dct_field.get(
-                                            "inverse_name"
-                                        )
-                                        # TODO detect field_relation, need to reorder the field model
-                                        value_value[
-                                            "field_relation_manual"
-                                        ] = inverse_name
-                                    if "relation" in dct_field.keys():
-                                        relation_ref = dct_field.get(
-                                            "relation"
-                                        )
-                                        value_value[
-                                            "relation_ref"
-                                        ] = relation_ref
-                                if "help" in dct_field.keys():
-                                    value_value["help"] = dct_field.get("help")
-                                if "string" in dct_field.keys():
-                                    value_value["string"] = dct_field.get(
-                                        "string"
-                                    )
-                                if "related" in dct_field.keys():
-                                    value_value[
-                                        "related_manual"
-                                    ] = dct_field.get("related")
-
-                                field_id = self.env["devops.cg.field"].create(
-                                    value_value
-                                )
-
-                    self.model_ids = [(6, 0, lst_model_to_add)]
+                    self.generate_from_json(
+                        str_dct_model,
+                        force_new=True,
+                        dct_model_cg=dct_model_cg,
+                        dct_model_cg_depend=dct_model_cg_depend,
+                    )
                     # reorder from dependency
                     # TODO reorder from dependency list, change sequence
                     lst_model_delete = []
@@ -1338,6 +1392,38 @@ class DevopsPlanActionWizard(models.TransientModel):
 
         return self._reopen_self()
 
+    def action_refresh_error(self):
+        return self._compute_has_error()
+
+    @api.depends(
+        "model_ids.has_error",
+        "model_ids.has_error_msg",
+        "model_ids.field_ids.has_error",
+        "model_ids.field_ids.has_error_msg",
+    )
+    def _compute_has_error(self):
+        # compute on many2many compute is not working, so implement button action_refresh_error
+        for rec in self:
+            lst_has_error_model = []
+            lst_has_error_msg_model = []
+            for model_id in rec.model_ids:
+                if model_id.has_error:
+                    lst_has_error_model.append(True)
+                    lst_model_error = model_id.has_error_msg.split("\n")
+                    if len(lst_model_error) > 1:
+                        msg_model_error = f"Model '{model_id.name}': {'\n\t'.join(lst_model_error)}"
+                    else:
+                        msg_model_error = (
+                            f"Model '{model_id.name}': {lst_model_error[0]}"
+                        )
+                    lst_has_error_msg_model.append(msg_model_error)
+            rec.has_error_model = any(lst_has_error_model)
+            if rec.has_error_model:
+                rec.has_error_msg_model = "\n".join(lst_has_error_msg_model)
+            else:
+                rec.has_error_msg_model = ""
+        return self._reopen_self()
+
     def instance_deploy(self):
         if self.instance_list_to_deploy and self.instance_yaml:
             # TODO move this into devops.instance.exec, this to create
@@ -1378,7 +1464,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             }
             self.instance_last_exec_id = self.env[
                 "devops.instance.exec"
-            ].create(inst_exec_value)
+            ].create([inst_exec_value])
             self.instance_last_exec_id.start()
             if (
                 self.env.ref(
@@ -1418,13 +1504,13 @@ class DevopsPlanActionWizard(models.TransientModel):
     def instance_create_plan_project(self):
         ctx = {}
         if self.instance_exec_image_id:
-            ctx[
-                "default_instance_exec_image_id"
-            ] = self.instance_exec_image_id.id
+            ctx["default_instance_exec_image_id"] = (
+                self.instance_exec_image_id.id
+            )
         if self.instance_exec_text_id:
-            ctx[
-                "default_instance_exec_text_id"
-            ] = self.instance_exec_text_id.id
+            ctx["default_instance_exec_text_id"] = (
+                self.instance_exec_text_id.id
+            )
         return {
             "name": _("Create plan project."),
             "type": "ir.actions.act_window",
@@ -1471,13 +1557,13 @@ class DevopsPlanActionWizard(models.TransientModel):
         #         run_into_workspace=True,
         #     )
         #     if exec_id.exec_status:
-        #         raise exceptions.Warning(f"Cannot find module '{module_name}'")
+        #         raise exceptions.UserError(f"Cannot find module '{module_name}'")
         #     path_module = exec_id.log_all.strip()
         if module_path:
             # Overwrite it
             path_module = module_path
         if not path_module:
-            raise exceptions.Warning(f"Cannot find module path.")
+            raise exceptions.UserError(f"Cannot find module path.")
         if not is_relative_path:
             dir_name, basename = os.path.split(path_module)
             if dir_name.startswith(wp_id.folder):
@@ -1509,19 +1595,23 @@ class DevopsPlanActionWizard(models.TransientModel):
         #  Remove action_code_generator_generate_all
         # Project
         cg_id = self.env["devops.cg"].create(
-            {
-                "name": project_name,
-                "devops_workspace_ids": [(6, 0, wp_id.ids)],
-                "force_clean_before_generate": self.force_generate,
-            }
+            [
+                {
+                    "name": project_name,
+                    "devops_workspace_ids": [(6, 0, wp_id.ids)],
+                    "force_clean_before_generate": self.force_generate,
+                }
+            ]
         )
         # Module
         cg_module_id = self.env["devops.cg.module"].create(
-            {
-                "name": module_name,
-                "code_generator": cg_id.id,
-                "devops_workspace_ids": [(6, 0, wp_id.ids)],
-            }
+            [
+                {
+                    "name": module_name,
+                    "code_generator": cg_id.id,
+                    "devops_workspace_ids": [(6, 0, wp_id.ids)],
+                }
+            ]
         )
         # Model
         for cg_model_id in self.model_ids:
@@ -1554,9 +1644,9 @@ class DevopsPlanActionWizard(models.TransientModel):
             plan_cg_value["cg_self_add_config_cg"] = True
             plan_cg_value["code_mode_context_generator"] = "autopoiesis"
         # Support data
-        plan_cg_value[
-            "config_uca_enable_export_data"
-        ] = self.config_uca_enable_export_data
+        plan_cg_value["config_uca_enable_export_data"] = (
+            self.config_uca_enable_export_data
+        )
 
         # Support snippet
         if self.mode_view_snippet and self.mode_view_snippet != "no_snippet":
@@ -1584,21 +1674,21 @@ class DevopsPlanActionWizard(models.TransientModel):
             ] = self.mode_view_snippet_template_generate_website_snippet_type
         if self.mode_view_portal and self.mode_view_portal != "no_portal":
             plan_cg_value["mode_view_portal"] = self.mode_view_portal
-            plan_cg_value[
-                "mode_view_portal_enable_create"
-            ] = self.mode_view_portal_enable_create
-            plan_cg_value[
-                "mode_view_portal_enable_read"
-            ] = self.mode_view_portal_enable_read
-            plan_cg_value[
-                "mode_view_portal_enable_update"
-            ] = self.mode_view_portal_enable_update
-            plan_cg_value[
-                "mode_view_portal_enable_delete"
-            ] = self.mode_view_portal_enable_delete
-            plan_cg_value[
-                "mode_view_portal_models"
-            ] = self.mode_view_portal_models
+            plan_cg_value["mode_view_portal_enable_create"] = (
+                self.mode_view_portal_enable_create
+            )
+            plan_cg_value["mode_view_portal_enable_read"] = (
+                self.mode_view_portal_enable_read
+            )
+            plan_cg_value["mode_view_portal_enable_update"] = (
+                self.mode_view_portal_enable_update
+            )
+            plan_cg_value["mode_view_portal_enable_delete"] = (
+                self.mode_view_portal_enable_delete
+            )
+            plan_cg_value["mode_view_portal_models"] = (
+                self.mode_view_portal_models
+            )
         if self.code_generator_name:
             plan_cg_value["code_generator_name"] = self.code_generator_name
         if self.template_name:
@@ -1610,7 +1700,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if cg_module_id:
             cg_module_id.unlink()
         # Generate
-        plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
+        plan_cg_id = self.env["devops.plan.cg"].create([plan_cg_value])
         plan_cg_id.action_code_generator_generate_all()
         self.generated_new_project_id = plan_cg_id.last_new_project_cg.id
         self.plan_cg_id = plan_cg_id.id
@@ -1668,6 +1758,129 @@ class DevopsPlanActionWizard(models.TransientModel):
                 run_into_workspace=True,
                 to_instance=True,
             )
+
+    def generate_from_json(
+        self,
+        str_dct_model,
+        force_new=False,
+        dct_model_cg={},
+        dct_model_cg_depend={},
+    ):
+        # The file need to finish by }, or cut it and remove output execution
+        last_pos_char = str_dct_model.rfind("}")
+        if last_pos_char == -1:
+            _logger.error(
+                "Cannot detect JSON dict when searching class" " model."
+            )
+            # TODO You can stop execution here, but let crash later
+            str_dct_model_complete = str_dct_model
+            lst_logs_model = []
+        else:
+            str_dct_model_complete = str_dct_model[: last_pos_char + 1]
+            lst_logs_model = (
+                str_dct_model[last_pos_char + 1 :].strip().split("\n")
+            )
+            # TODO show this log to action view
+            lst_logs_model = [a.strip() for a in lst_logs_model if a.strip()]
+            if lst_logs_model:
+                _logger.warning("\n".join(lst_logs_model))
+        # Create cg.model
+        dct_model = json.loads(str_dct_model_complete)
+        lst_model_to_add = []
+        lst_model_field = []
+        for model_name, v in dct_model.items():
+            model_id = self.env["devops.cg.model"].search(
+                [("name", "=", model_name)]
+            )
+            if not model_id:
+                model_value = {
+                    "name": model_name,
+                    "is_inherit": v.get("is_inherit", False),
+                }
+                model_id = self.env["devops.cg.model"].create([model_value])
+            lst_model_to_add.append(model_id.id)
+            lst_model_field.append((model_id, v))
+            dct_model_cg[model_name] = model_id
+            dct_model_cg_depend[model_name] = []
+        # Create cg.field
+        for model_id, v in lst_model_field:
+            if "fields" in v.keys():
+                # This algorithm only works when the module is working and formatted
+                for dct_field in v.get("fields").values():
+                    ttype = dct_field.get("type").lower()
+                    field_name = dct_field.get("name")
+                    value_value = {
+                        "name": field_name,
+                        "type": ttype,
+                        "model_id": model_id.id,
+                    }
+                    model_name = model_id.name
+                    # Check if exist
+                    field_id = self.env["devops.cg.field"].search(
+                        [
+                            ("name", "=", field_name),
+                            ("model_id", "=", model_id.id),
+                        ]
+                    )
+                    if field_id:
+                        continue
+                    if "comodel_name" in dct_field.keys():
+                        comodel_name = dct_field.get("comodel_name")
+                        model_id_searched = dct_model_cg.get(comodel_name)
+                        if model_id_searched:
+                            value_value["relation"] = model_id_searched.id
+                            if (
+                                model_id_searched.id
+                                not in dct_model_cg_depend[model_name]
+                                and ttype not in ["one2many"]
+                                and model_id_searched.id != model_id.id
+                            ):
+                                # Ignore one2many and depend on itself
+                                # Keep cache on depend model
+                                dct_model_cg_depend[model_name].append(
+                                    model_id_searched.id
+                                )
+                        else:
+                            value_value["relation_manual"] = comodel_name
+                        if "inverse_name" in dct_field.keys():
+                            inverse_name = dct_field.get("inverse_name")
+                            # TODO detect field_relation, need to reorder the field model
+                            value_value["field_relation_manual"] = inverse_name
+                        if "relation" in dct_field.keys():
+                            relation_ref = dct_field.get("relation")
+                            value_value["relation_ref"] = relation_ref
+                    if "currency_field" in dct_field.keys():
+                        value_value["currency_field"] = dct_field.get(
+                            "currency_field"
+                        )
+                    if "compute_method" in dct_field.keys():
+                        value_value["compute"] = dct_field.get(
+                            "compute_method"
+                        )
+                    if "help" in dct_field.keys():
+                        value_value["help"] = dct_field.get("help")
+                    if "string" in dct_field.keys():
+                        value_value["string"] = dct_field.get("string")
+                    if "store" in dct_field.keys():
+                        value_value["store"] = dct_field.get("store")
+                    if "precompute" in dct_field.keys():
+                        value_value["precompute"] = dct_field.get("precompute")
+                    if "related" in dct_field.keys():
+                        value_value["related_manual"] = dct_field.get(
+                            "related"
+                        )
+
+                    field_id = self.env["devops.cg.field"].create(
+                        [value_value]
+                    )
+
+        if force_new:
+            # Replace all
+            self.model_ids = [(6, 0, lst_model_to_add)]
+        else:
+            # TODO support update and not append
+            # Append
+            self.model_ids = [(4, a) for a in lst_model_to_add]
 
     def fill_working_module_name_or_id(self, module_name):
         if not module_name:
@@ -1740,7 +1953,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_install_robotlibre()
         return self._reopen_self()
 
-    def ssh_system_create_workspace(self):
+    def action_system_deploy_create_workspace(self):
         if not self.working_system_id:
             # TODO manage this error
             return
@@ -1748,18 +1961,64 @@ class DevopsPlanActionWizard(models.TransientModel):
             "system_id": self.working_system_id.id,
             "folder": self.workspace_folder,
             "erplibre_mode": self.erplibre_mode.id,
-            "image_db_selection": self.image_db_selection.id,
+            "select_installation": self.deploy_select_installation,
         }
-        ws_id = self.env["devops.workspace"].create(ws_value)
+        if self.deploy_git_branch:
+            ws_value["git_branch"] = self.deploy_git_branch
+        if self.deploy_with_database:
+            ws_value["image_db_selection"] = self.image_db_selection.id
+        ws_id = self.env["devops.workspace"].create([ws_value])
         self.create_workspace_id = ws_id.id
         # TODO missing check status before continue
         # TODO missing with workspace me to catch error
         ws_id.action_install_workspace()
-        ws_id.action_start()
+        if self.deploy_with_database:
+            ws_id.action_start()
         # TODO implement detect when website is up or cancel state with error
         time.sleep(5)
-        ws_id.action_restore_db_image()
-        ws_id.action_open_local_view()
+        if self.deploy_with_database:
+            ws_id.action_restore_db_image()
+            ws_id.action_open_local_view()
+        return self._reopen_self()
+
+    def action_shortcut_deploy_generate_docker(self):
+        if not self.working_system_id:
+            # TODO manage this error
+            return
+        search_path_home = [
+            a
+            for a in self.env["erplibre.config.path.home"].search([])
+            if f"{getpass.getuser()}/git" in a.name
+        ]
+        if search_path_home:
+            self.working_erplibre_config_path_home_id = search_path_home[0].id
+        # TODO validate if exist, do we need to change it to create it? or reuse it?
+        self.working_relative_folder = "erplibre_generate_docker"
+        self.erplibre_mode = False
+        mode_env_id = self.env.ref("erplibre_devops.erplibre_mode_env_dev")
+        mode_exec_id = self.env.ref(
+            "erplibre_devops.erplibre_mode_exec_terminal"
+        )
+        mode_source_id = self.env.ref(
+            "erplibre_devops.erplibre_mode_source_git"
+        )
+        mode_version_base = "18.0"
+        mode_version_erplibre = "erplibre_mode_version_erplibre_1_6_0"
+        self.erplibre_mode = (
+            self.env["erplibre.mode"]
+            .get_mode(
+                mode_env_id,
+                mode_exec_id,
+                mode_source_id,
+                mode_version_base,
+                mode_version_erplibre,
+            )
+            .id
+        )
+        self.deploy_with_database = False
+        self.deploy_select_installation = "erplibre"
+        self.deploy_git_branch = "develop"
+
         return self._reopen_self()
 
     def search_subsystem_workspace(self):
@@ -1785,7 +2044,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             "ssh_user": self.ssh_user,
             "ssh_password": self.ssh_password,
         }
-        system_id = self.env["devops.system"].create(system_value)
+        system_id = self.env["devops.system"].create([system_value])
         self.working_system_id = system_id
         try:
             # Just open and close the connection
@@ -1797,7 +2056,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def ssh_test_system_exist(self):
         if not self.working_system_id:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 "Missing SSH system id from plan Wizard, wrong configuration,"
                 " please contact your administrator."
             )
@@ -1856,4 +2115,158 @@ class DevopsPlanActionWizard(models.TransientModel):
                 is_relative_path=True,
             )
         self.force_show_final = True
+        return self._reopen_self()
+
+    def detect_type_from_string(self, value: str, name: str) -> (str, object):
+        datetime_formats = [
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
+        ]
+
+        # 4. DATETIME ?
+        for fmt in datetime_formats:
+            try:
+                dt = datetime.strptime(value, fmt)
+                return "Datetime", dt
+            except ValueError:
+                pass
+
+        date_formats = [
+            "%Y-%m-%d",
+            "%d/%m/%Y",
+            "%m/%d/%Y",
+        ]
+
+        # 3. DATE ?
+        for fmt in date_formats:
+            try:
+                d = datetime.strptime(value, fmt).date()
+                return "Date", d
+            except ValueError:
+                pass
+
+        if "$" in name:
+            try:
+                fv = float(value)
+                return "Monetary", fv
+            except ValueError:
+                pass
+
+        if "," in value:
+            try:
+                fv = float(value)
+                return "Float", fv
+            except ValueError:
+                pass
+
+        try:
+            fv = int(value)
+            return "Integer", fv
+        except ValueError:
+            pass
+
+        return "Char", value
+
+    def to_field_name(self, label: str) -> str:
+        # 1) Normaliser les accents → é => e, ç => c, etc.
+        label = unicodedata.normalize("NFKD", label)
+        label = label.encode("ascii", "ignore").decode("ascii")
+
+        # 2) tout en minuscule
+        label = label.lower()
+
+        # 3) remplacer tout ce qui n'est pas lettre ou chiffre par des underscores
+        label = re.sub(r"[^a-z0-9]+", "_", label)
+
+        # 4) enlever les underscores en trop au début/fin
+        label = label.strip("_")
+
+        # 5) éviter un nom vide
+        if not label:
+            label = "field"
+
+        # 6) éviter un début par chiffre (pas valide pour un identifiant Python)
+        if label[0].isdigit():
+            label = "no_" + label
+
+        return label
+
+    def action_auto_complete_monetary(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Auto complete monetary"
+        ) as wp_id:
+            for cg_model_id in self.model_ids:
+                has_monetary_to_fix = [
+                    a
+                    for a in cg_model_id.field_ids
+                    if a.type == "monetary" and not a.currency_field
+                ]
+                if not has_monetary_to_fix:
+                    continue
+                # Detect company_currency_id or first Many2one with comodel_name == res.currency
+                lst_company_currency_id_field = [
+                    a
+                    for a in cg_model_id.field_ids
+                    if a.type == "many2one"
+                    and a.relation_manual == "res.currency"
+                ]
+                if not lst_company_currency_id_field:
+                    company_currency_id = self.env["devops.cg.field"].create(
+                        [
+                            {
+                                "name": "company_currency_id",
+                                "help": "Company currency",
+                                "type": "many2one",
+                                "relation_manual": "res.currency",
+                                "store": True,
+                                "precompute": True,
+                                "model_id": cg_model_id.id,
+                                "compute_method": "_compute_company_currency_id",
+                                "devops_workspace_ids": [
+                                    (
+                                        6,
+                                        0,
+                                        cg_model_id.devops_workspace_ids.ids,
+                                    )
+                                ],
+                            }
+                        ]
+                    )
+                    lst_company_currency_id_field = [company_currency_id]
+                elif len(lst_company_currency_id_field) > 1:
+                    lst_company_currency_id_field_if_find = [
+                        a
+                        for a in lst_company_currency_id_field
+                        if a.name == "company_currency_id"
+                    ]
+                    if lst_company_currency_id_field_if_find:
+                        lst_company_currency_id_field = (
+                            lst_company_currency_id_field_if_find[0]
+                        )
+                    else:
+                        lst_company_currency_id_field = (
+                            lst_company_currency_id_field[0]
+                        )
+                company_currency_id = lst_company_currency_id_field[0]
+                for field_id in cg_model_id.field_ids:
+                    if (
+                        field_id.type == "monetary"
+                        and not field_id.currency_field
+                    ):
+                        field_id.currency_field = company_currency_id.name
+                cg_model_id.is_method_compute_company_currency_id = True
+            self.action_refresh_error()
+        return self._reopen_self()
+
+    def action_enable_all_tracking(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Enable all tracking"
+        ) as wp_id:
+            for cg_model_id in self.model_ids:
+                cg_model_id.is_activity = True
+                cg_model_id.is_all_tracking = True
         return self._reopen_self()

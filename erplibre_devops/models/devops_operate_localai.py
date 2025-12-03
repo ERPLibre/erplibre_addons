@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import json
 import logging
 
@@ -119,9 +122,7 @@ class DevopsOperateLocalai(models.Model):
         default="512x512",
     )
 
-    cmd = fields.Char(
-        compute="_compute_cmd", store=True, tracking=True
-    )
+    cmd = fields.Char(compute="_compute_cmd", store=True, tracking=True)
 
     def execute_ia(self):
         for rec in self:

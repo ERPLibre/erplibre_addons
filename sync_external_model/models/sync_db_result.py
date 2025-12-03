@@ -123,7 +123,7 @@ class SyncDBResult(models.Model):
                 continue
             if rec.type_result == "missing_result":
                 rec.status = "solved"
-                self.env[rec.model_name].create(ast.literal_eval(rec.data))
+                self.env[rec.model_name].create([ast.literal_eval(rec.data)])
             elif rec.type_result == "diff_value":
                 rec.status = "solved"
                 setattr(
@@ -132,7 +132,7 @@ class SyncDBResult(models.Model):
                     rec.field_value_remote,
                 )
             else:
-                raise exceptions.Warning(
+                raise exceptions.UserError(
                     _(f"Cannot support type_result '{rec.type_result}'.")
                 )
 
@@ -141,7 +141,7 @@ class SyncDBResult(models.Model):
         if self and self[0]:
             odoo = self[0].sync_db_id.get_odoo(self[0].sync_db_id)
         if not odoo:
-            raise exceptions.Warning(
+            raise exceptions.UserError(
                 _(f"Cannot support get connexion to remote.")
             )
 
@@ -158,7 +158,7 @@ class SyncDBResult(models.Model):
                 while create_id < rec.record_id:
                     data = ast.literal_eval(rec.data)
                     try:
-                        create_id = odoo.env[rec.model_name].create(data)
+                        create_id = odoo.env[rec.model_name].create([data])
                     except Exception as e:
                         raise e
                     if create_id < rec.record_id:
@@ -172,7 +172,7 @@ class SyncDBResult(models.Model):
                 Module = odoo.env["ir.module.module"]
                 module_id = Module.search([("name", "=", rec.data)])
                 if not module_id:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         _(f"Module '{rec.data}' not existing.")
                     )
                 module_check = Module.browse(module_id)
@@ -181,7 +181,7 @@ class SyncDBResult(models.Model):
                     status = Module.button_immediate_install(module_id)
                     module_check = Module.browse(module_id)
                     if not module_check.latest_version:
-                        raise exceptions.Warning(
+                        raise exceptions.UserError(
                             _(f"Cannot install module '{rec.data}'.")
                         )
                 rec.status = "solved"
@@ -199,6 +199,6 @@ class SyncDBResult(models.Model):
                     v,
                 )
             else:
-                raise exceptions.Warning(
+                raise exceptions.UserError(
                     _(f"Cannot support type_result '{rec.type_result}'.")
                 )

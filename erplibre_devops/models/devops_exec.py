@@ -1,5 +1,6 @@
-# Copyright 2023 TechnoLibre inc. - Mathieu Benoit
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
 from datetime import timedelta
@@ -226,7 +227,7 @@ class DevopsExec(models.Model):
                         }
                         if rec.new_project_id:
                             v["new_project_id"] = rec.new_project_id.id
-                        self.env["devops.log.error"].create(v)
+                        self.env["devops.log.error"].create([v])
 
                 if has_warning:
                     for ignore_item in lst_item_ignore_warning:
@@ -239,7 +240,7 @@ class DevopsExec(models.Model):
                         }
                         if rec.new_project_id:
                             v["new_project_id"] = rec.new_project_id.id
-                        self.env["devops.log.warning"].create(v)
+                        self.env["devops.log.warning"].create([v])
 
     @api.depends("exec_stop_date")
     def _compute_execution_finish(self):
@@ -249,9 +250,7 @@ class DevopsExec(models.Model):
     @api.depends("exec_time_duration")
     def _compute_time_duration_result(self):
         for rec in self:
-            rec.time_duration_result = (
-                f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
-            )
+            rec.time_duration_result = f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
 
     def open_file_ide(self):
         ws_id = self.env["devops.workspace"].search(
@@ -278,7 +277,7 @@ class DevopsExec(models.Model):
                 split_cmd = self.cmd.split(" ", 1)
                 cmd = split_cmd[0]
                 if not cmd.endswith(".py"):
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         _("CMD need to be a python file.")
                     )
                 if len(split_cmd) > 1:

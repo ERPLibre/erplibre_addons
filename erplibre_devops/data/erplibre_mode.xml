@@ -6,13 +6,13 @@
             <field name="mode_exec" ref="erplibre_mode_exec_docker" />
             <field name="mode_source" ref="erplibre_mode_source_docker" />
             <field name="mode_version_base" ref="erplibre_mode_version_base_12_0" />
-            <field name="mode_version_erplibre" ref="erplibre_mode_version_erplibre_1_5_0" />
+            <field name="mode_version_erplibre" ref="erplibre_mode_version_erplibre_1_6_0" />
         </record>
         <record id="erplibre_mode_git_robot_libre" model="erplibre.mode">
             <field name="mode_env" ref="erplibre_mode_env_dev" />
             <field name="mode_exec" ref="erplibre_mode_exec_terminal" />
             <field name="mode_source" ref="erplibre_mode_source_git" />
-            <field name="mode_version_base" ref="erplibre_mode_version_base_12_0" />
+            <field name="mode_version_base" ref="erplibre_mode_version_base_18_0" />
             <field name="mode_version_erplibre" ref="erplibre_mode_version_erplibre_robot_libre" />
         </record>
     </data>

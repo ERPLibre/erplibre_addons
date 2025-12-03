@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import re
 import unicodedata
 
@@ -54,12 +54,14 @@ class WebsiteGenerator(models.Model):
         for rec in self:
             if not rec.website_id:
                 new_website = rec.env["website"].create(
-                    {
-                        "name": rec.name,
-                        "domain": rec.website_domain_complete,
-                        "company_id": rec.lead_id.company_id.id
-                        or rec.env.company.id,
-                    }
+                    [
+                        {
+                            "name": rec.name,
+                            "domain": rec.website_domain_complete,
+                            "company_id": rec.lead_id.company_id.id
+                            or rec.env.company.id,
+                        }
+                    ]
                 )
                 rec.website_id = new_website.id
 
@@ -86,8 +88,7 @@ class WebsiteGenerator(models.Model):
                 )
                 if cloudflare_enabled:
                     # TODO how to pass new_website to res.config.settings? Il faut le mettre dans un dictionnaire et l'activer.
-                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).execute().action_cloudflare_set_website_dns()
-                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).execute().action_cloudflare_set_website_dns()
+                    # rec.env["res.config.settings"].create([{"website_id": new_website.id}]).execute().action_cloudflare_set_website_dns()
                     new_website.action_cloudflare_set_website_dns()
 
                 nginx_enabled = (
@@ -98,9 +99,9 @@ class WebsiteGenerator(models.Model):
                     )
                 )
                 if nginx_enabled:
-                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).action_nginx_set_website_dns()
+                    # rec.env["res.config.settings"].create([{"website_id": new_website.id}]).action_nginx_set_website_dns()
                     new_website.action_nginx_set_website_dns()
-                    # rec.env["res.config.settings"].create({"website_id": new_website.id}).action_nginx_set_website_dns()
+                    # rec.env["res.config.settings"].create([{"website_id": new_website.id}]).action_nginx_set_website_dns()
                     # rec.env["res.config.settings"].sudo().action_nginx_set_website_dns()
 
     @api.depends("website_id")

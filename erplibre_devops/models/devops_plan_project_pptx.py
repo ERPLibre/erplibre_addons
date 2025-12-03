@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import datetime
 import json
 import logging
@@ -8,6 +11,7 @@ import uuid
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from odoo import _, api, fields, models
 from pptx import Presentation
 from pptx.chart.data import CategoryChartData, ChartData
 from pptx.dml.color import RGBColor
@@ -15,8 +19,6 @@ from pptx.enum.chart import XL_CHART_TYPE
 from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
-
-from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 

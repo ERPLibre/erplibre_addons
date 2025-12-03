@@ -12,80 +12,100 @@
                         type="action"
                         class="btn btn-secondary"
                         context="{'default_root_workspace_id': id, 'default_user_id': uid}"
-                        invisible="(not is_installed or is_conflict_mode_exec) and not is_me"/>
+                        invisible="(not is_installed or is_conflict_mode_exec) and not is_me"
+                    />
                     <button
                         name="action_install_workspace"
                         string="Install"
                         type="object"
                         class="oe_highlight"
-                        invisible="is_installed or is_conflict_mode_exec"/>
+                        invisible="is_installed or is_conflict_mode_exec"
+                        context="{'force_reinstall_workspace': True}"
+                    />
                     <button
                         name="action_install_me_workspace"
                         string="Me"
                         type="object"
                         class="oe_highlight"
-                        invisible="is_installed or is_conflict_mode_exec"/>
+                        invisible="is_installed or is_conflict_mode_exec"
+                    />
+                    <button
+                        name="refresh_installation_state"
+                        string="Refresh installation state"
+                        type="object"
+                        class="oe_highlight"
+                    />
                     <button
                         name="action_check"
                         string="Status"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_start"
                         string="Start"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or is_running or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_running or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_start"
                         string="Start"
                         type="object"
                         class="btn-success"
-                        invisible="not is_installed or not is_running or is_conflict_mode_exec"/>
+                        invisible="not is_installed or not is_running or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_stop"
                         string="Stop"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or not is_running or is_conflict_mode_exec"/>
+                        invisible="not is_installed or not is_running or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_stop"
                         string="Stop"
                         type="object"
                         class="btn-success"
-                        invisible="not is_installed or is_running or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_running or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_reboot"
                         string="Reboot"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_reboot"
                         string="Hard Reboot"
                         type="object"
                         class="oe_highlight"
                         context="{'default_exec_reboot_process': True}"
-                        invisible="not is_installed or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_update"
                         string="Update"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_open_local_view"
                         string="Open browser"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_parse_code"
                         string="Parse code"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_installed or is_conflict_mode_exec"/>
+                        invisible="not is_installed or is_conflict_mode_exec"
+                    />
                     <button
                         name="action_install_workspace"
                         string="Re-install"
@@ -93,7 +113,8 @@
                         class="oe_highlight"
                         context="{'force_reinstall_workspace': True}"
                         groups="base.group_no_one"
-                        invisible="is_conflict_mode_exec"/>
+                        invisible="is_conflict_mode_exec"
+                    />
                     <button
                         name="action_install_workspace"
                         string="Re-install full"
@@ -101,30 +122,25 @@
                         class="oe_highlight"
                         context="{'force_reinstall_workspace': True, 'install_dev_workspace': True}"
                         groups="base.group_no_one"
-                        invisible="is_conflict_mode_exec"/>
+                        invisible="is_conflict_mode_exec"
+                    />
                     <button
                         name="action_clear_error_exec"
                         string="Clear error exec"
                         type="object"
                         class="btn-danger"
-                        invisible="devops_exec_error_count == 0 or not is_installed"/>
+                        invisible="devops_exec_error_count == 0 or not is_installed"
+                    />
                 </header>
                 <div class="oe_title">
                     <h1>
                         <field name="name" />
                     </h1>
                 </div>
-                <div class="badge-pill badge-success float-right" invisible="not is_me">
-                    Same instance
-                </div>
+                <div class="badge-pill badge-success float-right" invisible="not is_me">Same instance</div>
                 <div name="button_box" class="oe_button_box">
-
-            <field name="active" invisible="1" />
-            <widget
-                name="web_ribbon"
-                title="Archived"
-                bg_color="bg-danger"
-                invisible="active"/>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active" />
 
                     <button
                         name="%(erplibre_devops.devops_exec_action_window)d"
@@ -132,7 +148,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_devops_workspace': id, 'search_default_group_devops_exec_bundle_id': 1}"
-                        invisible="devops_exec_count == 0">
+                        invisible="devops_exec_count == 0"
+                    >
                         <field name="devops_exec_count" string="Executions" widget="statinfo" />
                     </button>
                     <button
@@ -141,7 +158,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_workspace_id': id}"
-                        invisible="devops_test_plan_exec_count == 0">
+                        invisible="devops_test_plan_exec_count == 0"
+                    >
                         <field name="devops_test_plan_exec_count" string="Test plan executions" widget="statinfo" />
                     </button>
                     <button
@@ -150,7 +168,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_workspace_id': id}"
-                        invisible="devops_code_todo_count == 0">
+                        invisible="devops_code_todo_count == 0"
+                    >
                         <field name="devops_code_todo_count" string="Code TODO" widget="statinfo" />
                     </button>
                     <button
@@ -159,7 +178,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_workspace_id': id}"
-                        invisible="devops_test_result_count == 0">
+                        invisible="devops_test_result_count == 0"
+                    >
                         <field name="devops_test_result_count" string="Test results" widget="statinfo" />
                     </button>
                     <button
@@ -168,7 +188,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_workspace_id': id}"
-                        invisible="plan_cg_count == 0">
+                        invisible="plan_cg_count == 0"
+                    >
                         <field name="plan_cg_count" string="Plans CG" widget="statinfo" />
                     </button>
                     <button
@@ -177,7 +198,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_devops_workspace': id}"
-                        invisible="devops_exec_error_count == 0">
+                        invisible="devops_exec_error_count == 0"
+                    >
                         <field name="devops_exec_error_count" string="Errors" widget="statinfo" />
                     </button>
                     <button
@@ -186,7 +208,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_devops_workspace': id}"
-                        invisible="new_project_count == 0">
+                        invisible="new_project_count == 0"
+                    >
                         <field name="new_project_count" string="Generations" widget="statinfo" />
                     </button>
                     <button
@@ -195,7 +218,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_devops_workspace': id}"
-                        invisible="devops_exec_bundle_count == 0">
+                        invisible="devops_exec_bundle_count == 0"
+                    >
                         <field name="devops_exec_bundle_count" string="Bundles" widget="statinfo" />
                     </button>
                     <button
@@ -204,7 +228,8 @@
                         class="oe_stat_button"
                         icon="fa-building-o"
                         context="{'search_default_devops_workspace': id, 'search_default_root': 1}"
-                        invisible="devops_exec_bundle_root_count == 0">
+                        invisible="devops_exec_bundle_root_count == 0"
+                    >
                         <field name="devops_exec_bundle_root_count" string="Bundles root" widget="statinfo" />
                     </button>
                 </div>
@@ -221,15 +246,19 @@
                     <group string="Basic">
                         <field name="system_id" />
                         <field name="folder" />
+                        <field name="folder_odoo_version" invisible="select_installation not in ['odoo_workspace']" />
+                        <field name="select_installation" />
                         <field name="erplibre_mode" />
                         <field name="is_running" />
                     </group>
                     <group string="Execution">
                         <field name="is_debug_log" />
                         <field name="show_error_chatter" />
-                        <field
-                            name="exec_reboot_process"
-                            invisible="mode_exec == 'docker' or not is_me"/>
+                        <field name="exec_reboot_process" invisible="mode_exec == 'docker' or not is_me" />
+                    </group>
+                    <group string="Info" invisible="not is_installed">
+                        <field name="url_instance" string="URL" widget="url" />
+                        <field name="url_instance_database_manager" string="URL Database" widget="url" />
                     </group>
                     <group string="Network" invisible="not is_installed">
                         <button
@@ -237,13 +266,15 @@
                             string="Random port"
                             type="object"
                             class="oe_highlight"
-                            invisible="not exec_reboot_process"/>
+                            invisible="not exec_reboot_process"
+                        />
                         <button
                             name="action_network_change_port_default"
                             string="Default port"
                             type="object"
                             class="oe_highlight"
-                            invisible="not exec_reboot_process or not is_me"/>
+                            invisible="not exec_reboot_process or not is_me"
+                        />
                         <field name="port_http" readonly="not exec_reboot_process" />
                         <field name="port_longpolling" readonly="not exec_reboot_process" />
                     </group>
@@ -251,18 +282,22 @@
                         <field name="git_branch" />
                         <field name="git_url" />
                     </group>
-                    <group string="Info" invisible="not is_installed">
-                        <field name="url_instance" string="URL" widget="url" />
-                        <field name="url_instance_database_manager" string="URL Database" widget="url" />
+                    <group string="Docker" invisible="not is_installed">
+                        <field name="workspace_docker_id" />
+                        <field name="docker_compose_id" />
                     </group>
                     <group string="DB" invisible="not is_installed">
                         <button name="action_restore_db_image" string="Restore" type="object" class="oe_highlight" />
                         <field name="image_db_selection" />
                         <field name="db_name" />
                     </group>
-                    <group string="Docker" invisible="not is_installed">
-                        <field name="workspace_docker_id" />
-                        <field name="docker_compose_id" />
+                    <group string="Module" invisible="not is_installed">
+                        <button
+                            name="action_module_install_erplibre_odoo_18"
+                            string="Install erplibre base odoo 18"
+                            type="object"
+                            class="oe_highlight"
+                        />
                     </group>
                     <group string="Action">
                         <button name="action_open_terminal" string="Terminal" type="object" class="oe_highlight" />
@@ -327,8 +362,20 @@
                     <page name="exec_error" string="Error exec">
                         <field name="devops_exec_error_ids" />
                     </page>
+                    <page name="docker_page" string="Docker action">
+                        <group string="Docker build">
+                            <field name="docker_build_odoo_version" string="Odoo version" />
+                            <button
+                                name="action_docker_build_odoo"
+                                string="Launch docker build"
+                                type="object"
+                                class="oe_highlight"
+                            />
+                            <field name="log_action_docker_build_odoo" />
+                        </group>
+                    </page>
                 </notebook>
-                <chatter/>
+                <chatter />
             </form>
         </field>
     </record>
@@ -340,6 +387,7 @@
             <search>
                 <field name="name" />
                 <field name="folder" />
+                <field name="folder_odoo_version" />
                 <filter name="is_me" string="Is me" domain="[('is_me','=',True)]" />
                 <filter name="is_robot" string="Is robot" domain="[('is_robot','=',True)]" />
                 <filter
@@ -350,6 +398,11 @@
                 <group string="Group By" expand="1">
                     <filter name="system_id" string="System" context="{'group_by':'system_id'}" />
                     <filter name="folder" string="Folder" context="{'group_by':'folder'}" />
+                    <filter
+                        name="folder_odoo_version"
+                        string="Folder odoo workspace"
+                        context="{'group_by':'folder_odoo_version'}"
+                    />
                     <filter name="db_name" string="Database name" context="{'group_by':'db_name'}" />
                     <filter name="db_is_restored" string="DB is restored" context="{'group_by':'db_is_restored'}" />
                 </group>
@@ -365,6 +418,7 @@
                 <field name="system_method" column_invisible="True" />
                 <field name="name" />
                 <field name="folder" />
+                <field name="folder_odoo_version" />
                 <field name="system_id" />
                 <field name="erplibre_mode" />
                 <field name="is_me" />
@@ -378,36 +432,63 @@
                     icon="fa-star"
                     context="{'default_root_workspace_id': id, 'default_user_id': uid}"
                     invisible="not is_me"
-                    help="Plan action wizard"/>
+                    help="Plan action wizard"
+                    title="Wizard"
+                />
                 <button
                     name="action_update"
                     type="object"
                     class="oe_stat_button"
                     icon="fa-level-up"
                     invisible="not is_me"
-                    help="Update erplibre_devops, can crash..."/>
+                    help="Update erplibre_devops, can crash..."
+                    title="Update"
+                />
                 <button
                     name="action_reboot"
                     type="object"
                     class="oe_stat_button bg-success"
                     icon="fa-refresh"
                     invisible="not is_me"
-                    help="Soft reboot"/>
+                    help="Soft reboot"
+                    title="Reboot"
+                />
                 <button
                     name="action_open_workspace_pycharm"
                     type="object"
                     class="oe_stat_button"
                     icon="fa-code"
-                    invisible="system_method != 'local'"/>
-                <button name="action_open_terminal" type="object" class="oe_stat_button" icon="fa-terminal" />
-                <button name="action_open_directory" type="object" class="oe_stat_button" icon="fa-folder" />
-                <button name="action_open_local_view" type="object" class="oe_stat_button" icon="fa-desktop" />
+                    invisible="system_method != 'local'"
+                    title="Open Pycharm"
+                />
+                <button
+                    name="action_open_terminal"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-terminal"
+                    title="Open terminal"
+                />
+                <button
+                    name="action_open_directory"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-folder"
+                    title="Open directory"
+                />
+                <button
+                    name="action_open_local_view"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-desktop"
+                    title="Open local view"
+                />
                 <button
                     name="action_reboot"
                     type="object"
                     icon="fa-refresh"
                     context="{'default_exec_reboot_process': True}"
                     class="oe_stat_button bg-danger"
+                    title="Hard reboot"
                 />
             </list>
         </field>

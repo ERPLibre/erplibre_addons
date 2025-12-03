@@ -32,7 +32,7 @@
         </record>
         <record id="breakpoint_all_before_sync_code" model="devops.ide.breakpoint">
             <field name="filename">addons/TechnoLibre_odoo-code-generator/code_generator/models/code_generator_writer.py</field>
-            <field name="keyword">self.code_generator_data.sync_code(</field>
+            <field name="keyword">code_generator_data.get_code_generator_data(self.env).sync_code(</field>
             <field name="name">breakpoint_all_before_sync_code</field>
         </record>
         <record id="breakpoint_devops_diagnostic" model="devops.ide.breakpoint">

@@ -1,5 +1,6 @@
-# Copyright 2023 TechnoLibre inc. - Mathieu Benoit
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
 from datetime import timedelta
@@ -60,10 +61,10 @@ class DevopsExecError(models.Model):
         string="Partner",
     )
 
-    channel_ids = fields.Many2many(
-        comodel_name="mail.channel",
-        string="Channel",
-    )
+    # channel_ids = fields.Many2many(
+    #     comodel_name="mail.channel",
+    #     string="Channel",
+    # )
 
     type_error = fields.Selection(
         selection=[("internal", "Internal"), ("execution", "Execution")]
@@ -138,8 +139,13 @@ class DevopsExecError(models.Model):
                 # partner_ids=[(6, 0, rec.partner_ids.ids)],
                 # channel_ids=[(6, 0, rec.channel_ids.ids)],
             )
-            rec.devops_workspace.ide_pycharm.action_cg_setup_pycharm_debug(
-                log=rec.escaped_tb.replace("&quot;", '"'), exec_error_id=rec
+            self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).ide_pycharm.action_cg_setup_pycharm_debug(
+                log=rec.escaped_tb.replace("&quot;", '"')
+                .replace("&#34;", '"')
+                .replace("&#39;", "'"),
+                exec_error_id=rec,
             )
         return result
 
@@ -177,19 +183,27 @@ class DevopsExecError(models.Model):
 
     def action_kill_pycharm(self):
         self.ensure_one()
-        self.devops_workspace.ide_pycharm.action_kill_pycharm()
+        self.env.ref(
+            "erplibre_devops.devops_workspace_me"
+        ).ide_pycharm.action_kill_pycharm()
 
     def action_start_pycharm(self, ctx=None):
         self.ensure_one()
-        self.devops_workspace.ide_pycharm.action_start_pycharm(ctx=ctx)
+        self.env.ref(
+            "erplibre_devops.devops_workspace_me"
+        ).ide_pycharm.action_start_pycharm(ctx=ctx)
 
     def action_set_breakpoint_pycharm(self):
         for rec_o in self:
-            with rec_o.devops_workspace.devops_create_exec_bundle(
+            with self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).devops_workspace.devops_create_exec_bundle(
                 "Set breakpoint on error"
             ) as rec:
                 rec.ide_pycharm.action_cg_setup_pycharm_debug(
-                    log=rec_o.escaped_tb.replace("&quot;", '"'),
+                    log=rec_o.escaped_tb.replace("&quot;", '"')
+                    .replace("&#34;", '"')
+                    .replace("&#39;", "'"),
                     exec_error_id=rec,
                 )
 
@@ -200,7 +214,9 @@ class DevopsExecError(models.Model):
         if not ws_id:
             return
         for o_rec in self:
-            with ws_id.devops_create_exec_bundle("Open file IDE") as rec_ws:
+            with self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).devops_create_exec_bundle("Open file IDE") as rec_ws:
                 rec_ws.with_context(
                     breakpoint_id=o_rec.ide_breakpoint.id
                 ).ide_pycharm.action_start_pycharm()

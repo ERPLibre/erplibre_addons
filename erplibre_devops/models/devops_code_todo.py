@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import os
 
 from odoo import _, api, fields, models
@@ -61,7 +64,7 @@ class DevopsCodeTodo(models.Model):
                     }
                     # TODO maybe check if already exist?
                     ide_breakpoint = self.env["devops.ide.breakpoint"].create(
-                        bp_value
+                        [bp_value]
                     )
                     id_ide_breakpoint = ide_breakpoint.id
 
@@ -82,8 +85,8 @@ class DevopsCodeTodo(models.Model):
             )
             path_absolute = exec_id.log_all.strip()
             path_module = (
-                path_absolute[len(wp_id.folder) + 1 :]
-                if path_absolute.startswith(wp_id.folder)
+                path_absolute[len(wp_id.folder_odoo_version) + 1 :]
+                if path_absolute.startswith(wp_id.folder_odoo_version)
                 else path_absolute
             )
             cmd = (
@@ -124,4 +127,4 @@ class DevopsCodeTodo(models.Model):
                     "workspace_id": wp_id.id,
                     "module_id": cg_module.id,
                 }
-                todo_id = self.env["devops.code.todo"].create(todo_value)
+                todo_id = self.env["devops.code.todo"].create([todo_value])

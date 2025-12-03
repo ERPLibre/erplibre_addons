@@ -1,4 +1,6 @@
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
 import os
@@ -39,9 +41,7 @@ def post_init_hook(env):
         with env.ref(
             "erplibre_devops.devops_workspace_me"
         ).devops_create_exec_bundle("Search system SSH") as rec:
-            system_ids = (
-                rec.system_id.get_local_system_id_from_ssh_config()
-            )
+            system_ids = rec.system_id.get_local_system_id_from_ssh_config()
 
             for system_id in system_ids:
                 system_id.action_search_workspace()
@@ -59,27 +59,27 @@ def post_init_hook(env):
 
     if os.environ.get("IS_ME_AUTO", False):
         subprocess.Popen(
-            f"cd {os.getcwd()};./.venv/bin/python"
+            f"cd {os.getcwd()};./.venv.erplibre/bin/python"
             " ./script/selenium/web_login.py"
             f" --open_me_devops_auto{arg_selenium}",
             shell=True,
         )
     elif os.environ.get("IS_ME_AUTO_FORCE", False):
         subprocess.Popen(
-            f"cd {os.getcwd()};./.venv/bin/python"
+            f"cd {os.getcwd()};./.venv.erplibre/bin/python"
             " ./script/selenium/web_login.py"
             f" --open_me_devops_auto_force{arg_selenium}",
             shell=True,
         )
     elif arg_selenium:
         subprocess.Popen(
-            f"cd {os.getcwd()};./.venv/bin/python"
+            f"cd {os.getcwd()};./.venv.erplibre/bin/python"
             f" ./script/selenium/web_login.py{arg_selenium}",
             shell=True,
         )
     else:
         subprocess.Popen(
-            f"cd {os.getcwd()};./.venv/bin/python"
+            f"cd {os.getcwd()};./.venv.erplibre/bin/python"
             " ./script/selenium/web_login.py"
             f" --open_me_devops{arg_selenium}",
             shell=True,

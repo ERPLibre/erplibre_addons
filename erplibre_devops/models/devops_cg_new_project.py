@@ -1,5 +1,6 @@
-# Copyright 2023 TechnoLibre inc. - Mathieu Benoit
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import configparser
 import json
@@ -10,10 +11,13 @@ import uuid
 
 from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
-
 from odoo import _, api, exceptions, fields, models, tools
 
-CODE_GENERATOR_DIRECTORY = "./addons/TechnoLibre_odoo-code-generator-template/"
+with open(".odoo-version", "r") as f:
+    odoo_version = f.readline()
+CODE_GENERATOR_DIRECTORY = (
+    f"./odoo{odoo_version}/addons/TechnoLibre_odoo-code-generator-template/"
+)
 CODE_GENERATOR_DEMO_NAME = "code_generator_demo"
 KEY_REPLACE_CODE_GENERATOR_DEMO = 'MODULE_NAME = "%s"'
 _logger = logging.getLogger(__name__)
@@ -737,7 +741,7 @@ class DevopsCgNewProject(models.Model):
                 if has_debug:
                     rec.with_context(rec_ws._context).action_new_project()
                 else:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Cannot support debug for this stage"
                     )
 
@@ -1182,7 +1186,7 @@ class DevopsCgNewProject(models.Model):
 
                 if not self.keep_bd_alive:
                     cmd = (
-                        "./.venv/bin/python3 ./odoo/odoo-bin db --drop"
+                        "odoo_bin.sh db --drop"
                         f" --database {rec.bd_name_demo}"
                     )
                     _logger.info(cmd)
@@ -1305,8 +1309,7 @@ class DevopsCgNewProject(models.Model):
                             'value["enable_template_website_snippet_view"] ='
                             " False",
                             f'value["enable_template_website_snippet_view"] ='
-                            f" False\n       "
-                            f' value["template_auto_export_data"] = True\n    '
+                            f' False\n    value["template_auto_export_data"] = True\n'
                             f'    value["template_auto_export_data_exclude_model"]'
                             f" = 'devops.db.image; devops.exec;"
                             f" devops.exec.bundle; devops.ide.pycharm;"
@@ -1406,8 +1409,7 @@ class DevopsCgNewProject(models.Model):
                         old_str = 'value["template_model_name"] ='
                         new_str = (
                             'value["template_model_name"] ='
-                            f' "{str_lst_model};"\n       '
-                            ' value["template_model_name"] +='
+                            f' "{str_lst_model};"\n    value["template_model_name"] +='
                         )
                         lst_template_hooks_py_replace.append(
                             (old_str, new_str)
@@ -1495,7 +1497,7 @@ class DevopsCgNewProject(models.Model):
 
                 if not self.keep_bd_alive:
                     cmd = (
-                        "./.venv/bin/python3 ./odoo/odoo-bin db --drop"
+                        "odoo_bin.sh db --drop"
                         f" --database {rec.bd_name_template}"
                     )
                     _logger.info(cmd)
@@ -1607,7 +1609,7 @@ class DevopsCgNewProject(models.Model):
                     #             if True:
                     #                 # Add option "nomenclature", this will export data from all generated model
                     #                 #  This is a mess when inherit another model
-                    #                 txt_replace = 'env["code.generator.writer"].create(value)'
+                    #                 txt_replace = 'env["code.generator.writer"].create([value])'
                     #                 txt_replace_to = f"""        values = {
                     #     "s_data2export": "nomenclator",
                     # }
@@ -1657,7 +1659,7 @@ class DevopsCgNewProject(models.Model):
 
                 if not self.keep_bd_alive:
                     cmd = (
-                        "./.venv/bin/python3 ./odoo/odoo-bin db --drop"
+                        "odoo_bin.sh db --drop"
                         f" --database {rec.bd_name_generator}"
                     )
                     _logger.info(cmd)
@@ -1756,7 +1758,7 @@ class DevopsCgNewProject(models.Model):
                 elif file:
                     file_path = os.path.normpath(
                         os.path.join(
-                            rec_ws.folder,
+                            rec_ws.folder_odoo_version,
                             file,
                         )
                     )
@@ -1799,7 +1801,7 @@ class DevopsCgNewProject(models.Model):
                 if search not in txt:
                     msg_error = f"Cannot find '{search}' in file '{filepath}'"
                     v_dct_log_error["name"] = msg_error
-                    self.env["devops.log.error"].create(v_dct_log_error)
+                    self.env["devops.log.error"].create([v_dct_log_error])
                     continue
                     # raise Exception(msg_error)
                 txt = txt.replace(search, replace)

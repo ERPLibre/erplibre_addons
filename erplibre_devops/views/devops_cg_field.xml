@@ -12,22 +12,24 @@
                             <field name="name" />
                         </h1>
                     </div>
+                    <group style="background-color: #dc0527; color: white;" invisible="not has_error">
+                        <field name="has_error_msg" nolabel="1" />
+                    </group>
                     <group>
                         <group>
                             <field name="type" />
                             <field name="string" />
-                            <field
-                                name="relation"
-                                invisible="type not in ['many2one', 'many2many', 'one2many']"/>
+                            <field name="relation" invisible="type not in ['many2one', 'many2many', 'one2many']" />
                             <field
                                 name="relation_manual"
-                                invisible="type not in ['many2one', 'many2many', 'one2many'] or relation"/>
+                                invisible="type not in ['many2one', 'many2many', 'one2many'] or relation"
+                            />
                             <field name="field_relation" invisible="type != 'one2many'" />
-                            <field
-                                name="field_relation_manual"
-                                invisible="type != 'one2many' or field_relation"/>
+                            <field name="field_relation_manual" invisible="type != 'one2many' or field_relation" />
                             <field name="relation_ref" invisible="type != 'many2many'" />
                             <field name="related_manual" />
+                            <field name="currency_field" />
+                            <field name="compute_method" />
                             <!--                            <field name="related_field_id" />-->
                             <field name="help" />
                         </group>
@@ -142,6 +144,8 @@
                 <field name="relation_manual" />
                 <field name="field_relation" />
                 <field name="field_relation_manual" />
+                <field name="currency_field" />
+                <field name="compute_method" />
                 <field name="help" />
             </list>
         </field>

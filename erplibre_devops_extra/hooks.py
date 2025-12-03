@@ -1,4 +1,6 @@
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
 
@@ -34,9 +36,11 @@ def post_init_hook(env):
 </form>
     """
     env["ir.ui.view.custom"].create(
-        {
-            "user_id": env.ref("base.user_admin").id,
-            "ref_id": env.ref("board.board_my_dash_view").id,
-            "arch": arch,
-        }
+        [
+            {
+                "user_id": env.ref("base.user_admin").id,
+                "ref_id": env.ref("board.board_my_dash_view").id,
+                "arch": arch,
+            }
+        ]
     )

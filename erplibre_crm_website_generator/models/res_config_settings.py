@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
 
@@ -50,7 +50,9 @@ class ResConfigSettings(models.TransientModel):
                 .get_param("web.base.url")
             )
             url_extract = tldextract.extract(website_url)
-            website_generator_base_domain = url_extract.top_domain_under_public_suffix
+            website_generator_base_domain = (
+                url_extract.top_domain_under_public_suffix
+            )
 
         res.update(
             website_generator_base_domain=website_generator_base_domain,

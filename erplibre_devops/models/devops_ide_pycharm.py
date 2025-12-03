@@ -1,5 +1,7 @@
-# Copyright 2023 TechnoLibre inc. - Mathieu Benoit
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
 import logging
 import os
 import re
@@ -7,7 +9,6 @@ import time
 import uuid
 
 import xmltodict
-
 from odoo import _, api, exceptions, fields, models, tools
 
 _logger = logging.getLogger(__name__)
@@ -91,7 +92,7 @@ class DevopsIdePycharm(models.Model):
                             rec_ws, new_project_id=new_project_id
                         )
                     except Exception as e:
-                        raise exceptions.Warning(
+                        raise exceptions.UserError(
                             f"Breakpoint '{bp_id.name}' : {e}"
                         )
             if lst_line:
@@ -102,7 +103,9 @@ class DevopsIdePycharm(models.Model):
                     rec_ws, filename=filename, pycharm_arg=add_line
                 )
             else:
-                self.action_pycharm_open(rec_ws, folder=rec_ws.folder)
+                self.action_pycharm_open(
+                    rec_ws, folder=rec_ws.folder_odoo_version
+                )
 
     @staticmethod
     def action_pycharm_open(
@@ -132,7 +135,7 @@ class DevopsIdePycharm(models.Model):
                         rec.action_pycharm_check()
                 cmd = (
                     "source"
-                    " ./.venv/bin/activate;./script/ide/pycharm_configuration.py"
+                    " ./.venv.erplibre/bin/activate;./script/ide/pycharm_configuration.py"
                     " --init --overwrite"
                 )
                 rec_ws.execute(cmd=cmd, run_into_workspace=True)
@@ -190,9 +193,12 @@ class DevopsIdePycharm(models.Model):
                 # TODO search multiple path
                 search_path = (
                     "File"
-                    f' "{os.path.normpath(os.path.join(rec_ws.folder, "./addons"))}'
+                    f' "{os.path.normpath(os.path.join(rec_ws.folder_odoo_version, "./addons"))}'
                 )
                 no_last_file_error = log.rfind(search_path, 0, index_error)
+                if no_last_file_error == -1:
+                    # TODO what to do when cannot find it?
+                    pass
                 no_end_line_error = log.find("\n", no_last_file_error)
                 error_line = log[no_last_file_error:no_end_line_error]
                 rec.line_file_tb_detected = error_line
@@ -236,7 +242,7 @@ class DevopsIdePycharm(models.Model):
                     "ignore_test": True,
                     "generated_by_execution": True,
                 }
-                bp_id = self.env["devops.ide.breakpoint"].create(bp_value)
+                bp_id = self.env["devops.ide.breakpoint"].create([bp_value])
                 exec_error_id.exec_filename = filepath_breakpoint
                 exec_error_id.exec_line_number = update_line
                 exec_error_id.ide_breakpoint = bp_id.id
@@ -255,13 +261,13 @@ class DevopsIdePycharm(models.Model):
                 return False
             work_dir = os.path.normpath(
                 os.path.join(
-                    ws.folder,
+                    ws.folder_odoo_version,
                     devops_cg_new_project_id.directory,
                     devops_cg_new_project_id.module,
                 )
             )
         else:
-            work_dir = ws.folder
+            work_dir = ws.folder_odoo_version
         if exception == "NameError:":
             # Check 1, is not defined
             result = re.search(r"NameError: name '(\w+)' is not defined", log)
@@ -373,10 +379,10 @@ class DevopsIdePycharm(models.Model):
                         "devops_cg_new_project"
                     )
                     if id_devops_cg_new_project:
-                        v[
-                            "devops_cg_new_project_id"
-                        ] = id_devops_cg_new_project
-                    self.env["devops.ide.pycharm.configuration"].create(v)
+                        v["devops_cg_new_project_id"] = (
+                            id_devops_cg_new_project
+                        )
+                    self.env["devops.ide.pycharm.configuration"].create([v])
 
                     if line_to_add not in file_content_before:
                         new_content = file_content_before + line_to_add
@@ -421,7 +427,7 @@ class DevopsIdePycharm(models.Model):
                     "devops_workspace_id": rec_ws.id,
                     "devops_ide_pycharm": rec.id,
                 }
-                self.env["devops.ide.pycharm.configuration"].create(v)
+                self.env["devops.ide.pycharm.configuration"].create([v])
 
                 if line_to_add not in file_content_before:
                     new_content = file_content_before + line_to_add

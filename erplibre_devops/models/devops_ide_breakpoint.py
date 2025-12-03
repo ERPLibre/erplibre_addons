@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import logging
 import os
 
@@ -151,7 +154,7 @@ class DevopsIdeBreakpoint(models.Model):
                     f" '{key}'. Command : {cmd}"
                 )
             if "No such file or directory" in log_all:
-                raise exceptions.Warning(f"No such file '{file}'")
+                raise exceptions.UserError(f"No such file '{file}'")
             if log_all:
                 try:
                     return [int(a) for a in log_all.split("\n")]
@@ -185,7 +188,7 @@ class DevopsIdeBreakpoint(models.Model):
                     filename = rec.filename
 
                 filename = os.path.normpath(
-                    os.path.join(rec_ws.folder, filename)
+                    os.path.join(rec_ws.folder_odoo_version, filename)
                 )
                 lst_no_line = rec.get_no_line_breakpoint(
                     rec.keyword, filename, rec_ws

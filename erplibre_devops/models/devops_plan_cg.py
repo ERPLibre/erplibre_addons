@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import json
 import os
 
@@ -478,13 +481,13 @@ class DevopsPlanCg(models.Model):
                             "config_uca_enable_export_data": rec.config_uca_enable_export_data,
                         }
                         if rec.code_generator_name:
-                            dct_new_project[
-                                "code_generator_name"
-                            ] = rec.code_generator_name
+                            dct_new_project["code_generator_name"] = (
+                                rec.code_generator_name
+                            )
                         if rec.template_name:
-                            dct_new_project[
-                                "template_name"
-                            ] = rec.template_name
+                            dct_new_project["template_name"] = (
+                                rec.template_name
+                            )
                         # extra_arg = ""
                         if model_conf:
                             dct_new_project["config"] = model_conf
@@ -499,7 +502,7 @@ class DevopsPlanCg(models.Model):
                         if rec.use_external_cg:
                             new_project_id = self.env[
                                 "devops.cg.new_project"
-                            ].create(dct_new_project)
+                            ].create([dct_new_project])
                             if rec.last_new_project_cg:
                                 new_project_id.last_new_project = (
                                     rec.last_new_project_cg.id
@@ -552,11 +555,13 @@ class DevopsPlanCg(models.Model):
             value["post_init_hook_feature_code_generator"] = False
             value["uninstall_hook_feature_code_generator"] = False
 
-            value[
-                "hook_constant_code"
-            ] = f'module_id.name = "{module_id.name}"'
+            value["hook_constant_code"] = (
+                f'module_id.name = "{module_id.name}"'
+            )
 
-            code_generator_id = self.env["code.generator.module"].create(value)
+            code_generator_id = self.env["code.generator.module"].create(
+                [value]
+            )
             rec.last_code_generator_module = code_generator_id.id
 
             # lst_depend_module = ["mail", "portal", "website"]
@@ -599,11 +604,18 @@ class DevopsPlanCg(models.Model):
                     and model_model_id.name in lst_portal_model
                 ):
                     lst_depend_model = ["portal.mixin"]
-                code_generator_id.add_update_model(
+                model_id = code_generator_id.add_update_model(
                     model_model_id.name,
                     dct_field=model_model_id.get_field_dct(),
                     lst_depend_model=lst_depend_model,
+                    enable_activity=model_model_id.is_activity,
+                    enable_tracking=model_model_id.is_all_tracking,
                 )
+
+                if model_model_id.is_method_compute_company_currency_id:
+                    code_generator_id.add_method_model(
+                        model_id, compute_company_currency_id=True
+                    )
 
             # Generate view
             # Action generate view
@@ -617,22 +629,22 @@ class DevopsPlanCg(models.Model):
 
             if rec.mode_view_portal and rec.mode_view_portal != "no_portal":
                 value_view_wizard["enable_generate_portal"] = True
-                value_view_wizard[
-                    "portal_enable_create"
-                ] = rec.mode_view_portal_enable_create
-                value_view_wizard[
-                    "portal_enable_read"
-                ] = rec.mode_view_portal_enable_read
-                value_view_wizard[
-                    "portal_enable_update"
-                ] = rec.mode_view_portal_enable_update
-                value_view_wizard[
-                    "portal_enable_delete"
-                ] = rec.mode_view_portal_enable_delete
+                value_view_wizard["portal_enable_create"] = (
+                    rec.mode_view_portal_enable_create
+                )
+                value_view_wizard["portal_enable_read"] = (
+                    rec.mode_view_portal_enable_read
+                )
+                value_view_wizard["portal_enable_update"] = (
+                    rec.mode_view_portal_enable_update
+                )
+                value_view_wizard["portal_enable_delete"] = (
+                    rec.mode_view_portal_enable_delete
+                )
 
             wizard_view = self.env[
                 "code.generator.generate.views.wizard"
-            ].create(value_view_wizard)
+            ].create([value_view_wizard])
 
             wizard_view.button_generate_views()
 
@@ -648,11 +660,11 @@ class DevopsPlanCg(models.Model):
                     "snippet_type": rec.mode_view_snippet_template_generate_website_snippet_type,
                     "model_name": rec.mode_view_snippet_template_generate_website_snippet_generic_mdl,
                 }
-                self.env["code.generator.snippet"].create(value_snippet)
+                self.env["code.generator.snippet"].create([value_snippet])
 
             # Generate module
             value = {"code_generator_ids": code_generator_id.ids}
-            cg_writer = self.env["code.generator.writer"].create(value)
+            cg_writer = self.env["code.generator.writer"].create([value])
             rec.last_code_generator_writer = cg_writer.id
             # print(cg_writer_id)
 
@@ -953,40 +965,48 @@ class DevopsPlanCg(models.Model):
                 if rec.cg_demo_type_data == "simple":
                     # Project
                     cg_id = self.env["devops.cg"].create(
-                        {
-                            "name": "Parc de voiture",
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                            "force_clean_before_generate": True,
-                        }
+                        [
+                            {
+                                "name": "Parc de voiture",
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                                "force_clean_before_generate": True,
+                            }
+                        ]
                     )
                     # Module
                     cg_module_id = self.env["devops.cg.module"].create(
-                        {
-                            "name": "parc",
-                            "code_generator": cg_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "parc",
+                                "code_generator": cg_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Model
                     cg_model_voiture_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "parc.voiture",
-                            "description": "Ensemble de voiture dans le parc",
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "parc.voiture",
+                                "description": "Ensemble de voiture dans le parc",
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Field
                     cg_field_voiture_couleur_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "couleur",
-                            "help": "Couleur de la voiture.",
-                            "type": "char",
-                            "model_id": cg_model_voiture_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "couleur",
+                                "help": "Couleur de la voiture.",
+                                "type": "char",
+                                "model_id": cg_model_voiture_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     if rec.is_clear_before_cg_demo:
                         rec.devops_cg_ids = [(6, 0, cg_id.ids)]
@@ -1021,38 +1041,46 @@ class DevopsPlanCg(models.Model):
                 elif rec.cg_demo_type_data == "devops_example":
                     # Project
                     cg_id = self.env["devops.cg"].create(
-                        {
-                            "name": "Projet exemple",
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                            "force_clean_before_generate": False,
-                        }
+                        [
+                            {
+                                "name": "Projet exemple",
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                                "force_clean_before_generate": False,
+                            }
+                        ]
                     )
                     # Module
                     cg_module_id = self.env["devops.cg.module"].create(
-                        {
-                            "name": "erplibre_devops",
-                            "code_generator": cg_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "erplibre_devops",
+                                "code_generator": cg_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Model
                     cg_model_example_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "devops.example",
-                            "description": "Example feature to add to devops",
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "devops.example",
+                                "description": "Example feature to add to devops",
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Field
                     cg_field_size_id = self.env["devops.cg.field"].create(
-                        {
-                            "name": "size",
-                            "help": "Size of this example.",
-                            "type": "integer",
-                            "model_id": cg_model_example_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "size",
+                                "help": "Size of this example.",
+                                "type": "integer",
+                                "model_id": cg_model_example_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     if rec.is_clear_before_cg_demo:
                         rec.devops_cg_ids = [(6, 0, cg_id.ids)]
@@ -1085,98 +1113,115 @@ class DevopsPlanCg(models.Model):
                             (4, cg_field_size_id.id),
                         ]
                 elif rec.cg_demo_type_data == "ore":
+                    # TODO this is not the good place for this case, ore do not exist
                     # Project
                     cg_id = self.env["devops.cg"].create(
-                        {
-                            "name": "Offrir Recevoir Échanger",
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                            "force_clean_before_generate": True,
-                        }
+                        [
+                            {
+                                "name": "Offrir Recevoir Échanger",
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                                "force_clean_before_generate": True,
+                            }
+                        ]
                     )
                     # Module
                     cg_module_id = self.env["devops.cg.module"].create(
-                        {
-                            "name": "ore",
-                            "code_generator": cg_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "ore",
+                                "code_generator": cg_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Model
                     cg_model_offre_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "ore.offre.service",
-                            "description": (
-                                "Permet de créer une offre de service"
-                                " publiable dans la communauté."
-                            ),
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "ore.offre.service",
+                                "description": (
+                                    "Permet de créer une offre de service"
+                                    " publiable dans la communauté."
+                                ),
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_model_demande_id = self.env["devops.cg.model"].create(
-                        {
-                            "name": "ore.demande.service",
-                            "description": (
-                                "Permet de créer une demande de service"
-                                " publiable dans la communauté."
-                            ),
-                            "module_id": cg_module_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "ore.demande.service",
+                                "description": (
+                                    "Permet de créer une demande de service"
+                                    " publiable dans la communauté."
+                                ),
+                                "module_id": cg_module_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     # Field
                     cg_field_offre_date_afficher_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "date_service_afficher",
-                            "help": (
-                                "Date à laquelle l'offre de service sera"
-                                " affiché."
-                            ),
-                            "type": "date",
-                            "model_id": cg_model_offre_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "date_service_afficher",
+                                "help": (
+                                    "Date à laquelle l'offre de service sera"
+                                    " affiché."
+                                ),
+                                "type": "date",
+                                "model_id": cg_model_offre_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_field_offre_temps_estime_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "temp_estime",
-                            "help": (
-                                "Temps estimé pour effectuer le service à"
-                                " offrir."
-                            ),
-                            "type": "float",
-                            "model_id": cg_model_offre_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "temp_estime",
+                                "help": (
+                                    "Temps estimé pour effectuer le service à"
+                                    " offrir."
+                                ),
+                                "type": "float",
+                                "model_id": cg_model_offre_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_field_demande_date_afficher_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "date_service_afficher",
-                            "help": (
-                                "Date à laquelle la demande de service sera"
-                                " affiché."
-                            ),
-                            "type": "date",
-                            "model_id": cg_model_demande_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "date_service_afficher",
+                                "help": (
+                                    "Date à laquelle la demande de service sera"
+                                    " affiché."
+                                ),
+                                "type": "date",
+                                "model_id": cg_model_demande_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     cg_field_demande_condition_id = self.env[
                         "devops.cg.field"
                     ].create(
-                        {
-                            "name": "condition",
-                            "help": "Condition sur la demande de service.",
-                            "type": "text",
-                            "model_id": cg_model_demande_id.id,
-                            "devops_workspace_ids": [(6, 0, rec_ws.ids)],
-                        }
+                        [
+                            {
+                                "name": "condition",
+                                "help": "Condition sur la demande de service.",
+                                "type": "text",
+                                "model_id": cg_model_demande_id.id,
+                                "devops_workspace_ids": [(6, 0, rec_ws.ids)],
+                            }
+                        ]
                     )
                     if rec.is_clear_before_cg_demo:
                         rec.devops_cg_ids = [(6, 0, cg_id.ids)]
@@ -1239,6 +1284,13 @@ class DevopsPlanCg(models.Model):
                     # else:
                     #     # TODO support related field id
                     #     dct_value_field["related"] = field_id.related_manual
+                if not field_id.currency_field and field_id.type == "monetary":
+                    msg_err = (
+                        f"Model '{model_id.name}', field"
+                        f" '{field_id.name}' need a currency_field because type is"
+                        f" '{field_id.type}'"
+                    )
+                    raise exceptions.UserError(msg_err)
                 if not ignore_field_relation and field_id.type in [
                     "many2one",
                     "many2many",
@@ -1256,7 +1308,7 @@ class DevopsPlanCg(models.Model):
                             " relation because type is"
                             f" '{field_id.type}'"
                         )
-                        raise exceptions.Warning(msg_err)
+                        raise exceptions.UserError(msg_err)
                 if not ignore_field_relation and field_id.type in [
                     "one2many",
                 ]:
@@ -1272,7 +1324,7 @@ class DevopsPlanCg(models.Model):
                             " relation field because type is"
                             f" '{field_id.type}'"
                         )
-                        raise exceptions.Warning(msg_err)
+                        raise exceptions.UserError(msg_err)
                 if field_id.widget:
                     dct_value_field = field_id.widget
                 lst_field.append(dct_value_field)
@@ -1318,7 +1370,7 @@ class DevopsPlanCg(models.Model):
                 exec_id = rec_ws.execute(cmd=f"ls {dir_to_check}")
                 status_ls = exec_id.log_all
                 if "No such file or directory" in status_ls:
-                    raise exceptions.Warning(
+                    raise exceptions.UserError(
                         "Cannot open command 'tig', cannot find directory"
                         f" '{dir_to_check}'."
                     )

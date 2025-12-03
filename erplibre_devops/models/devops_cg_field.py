@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
 
 
@@ -7,9 +10,23 @@ class DevopsCgField(models.Model):
 
     name = fields.Char(required=True)
 
+    compute_method = fields.Char(help="Will add compute method on field")
+
+    currency_field = fields.Char(
+        string="Currency field",
+        help="The name of field with Many2one on model res.currency.",
+    )
+
     help = fields.Char()
 
+    precompute = fields.Boolean(help="Pre-compute field, associate with compute")
+
     has_error = fields.Boolean(
+        compute="_compute_has_error",
+        store=True,
+    )
+
+    has_error_msg = fields.Text(
         compute="_compute_has_error",
         store=True,
     )
@@ -95,6 +112,8 @@ class DevopsCgField(models.Model):
 
     string = fields.Char(help="Label of the field")
 
+    store = fields.Char(help="Store attribute")
+
     widget = fields.Selection(
         selection=[
             ("image", "image"),
@@ -119,11 +138,13 @@ class DevopsCgField(models.Model):
         "relation_manual",
         "field_relation",
         "field_relation_manual",
+        "currency_field",
     )
     def _compute_has_error(self):
         for rec in self:
             # Disable all error
             rec.has_error = False
+            rec.has_error_msg = ""
             if rec.type in ("many2many", "many2one", "one2many"):
                 has_relation = rec.relation or rec.relation_manual
                 has_field_relation = True
@@ -132,6 +153,10 @@ class DevopsCgField(models.Model):
                         rec.field_relation or rec.field_relation_manual
                     )
                 rec.has_error = not has_relation or not has_field_relation
+                rec.has_error_msg += f"Missing relation"
+            elif rec.type == "monetary":
+                rec.has_error = not rec.currency_field
+                rec.has_error_msg += f"Missing currency_field"
 
     def get_dct(self):
         self.ensure_one()
@@ -147,4 +172,12 @@ class DevopsCgField(models.Model):
             dct_field["help"] = self.help
         if self.string:
             dct_field["field_description"] = self.string
+        if self.currency_field:
+            dct_field["currency_field"] = self.currency_field
+        if self.compute_method:
+            dct_field["compute"] = self.compute_method
+        if self.store:
+            dct_field["store"] = self.store
+        if self.precompute:
+            dct_field["precompute"] = self.precompute
         return dct_field

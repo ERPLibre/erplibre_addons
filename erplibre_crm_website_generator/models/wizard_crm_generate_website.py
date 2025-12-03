@@ -1,5 +1,6 @@
-# Copyright 2025 TechnoLibre inc.
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+#!/usr/bin/env python3
+# © 2021-2025 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import re
 import unicodedata
@@ -75,7 +76,7 @@ class CrmWebsiteGenerator(models.TransientModel):
             website_generator_values["website_sub_domain"] = website_sub_domain
 
             website_generator_id = self.env["crm.website.generator"].create(
-                website_generator_values
+                [website_generator_values]
             )
             website_generator_ids += website_generator_id
             if self.force_to_generate:
