@@ -1627,11 +1627,8 @@ class DevopsSystem(models.Model):
                     "git branch --show-current", dir_name
                 ).strip()
 
+                # TODO this code is duplicate from devops_workspace.py
                 odoo_version = ""
-                mode_version_erplibre = rec.execute_with_result(
-                    "git branch --show-current", dir_name
-                ).strip()
-
                 odoo_version_path = os.path.join(dir_name, ".odoo-version")
                 odoo_version_path_exist = rec.os_path_exists(odoo_version_path)
                 if odoo_version_path_exist:
@@ -1639,7 +1636,20 @@ class DevopsSystem(models.Model):
                         f"cat .odoo-version",
                         dir_name,
                     ).strip()
-                mode_version_base = ""
+
+                # TODO this code is duplicate from devops_workspace.py
+                erplibre_version = ""
+                erplibre_version_path = os.path.join(
+                    dir_name, ".erplibre-version"
+                )
+                erplibre_version_path_exist = rec.os_path_exists(
+                    erplibre_version_path
+                )
+                if erplibre_version_path_exist:
+                    erplibre_version = rec.execute_with_result(
+                        f"cat .erplibre-version",
+                        dir_name,
+                    ).strip()
                 dir_path_exist = ""
                 dir_path = "/home"
                 is_old_erplibre = False
@@ -1689,6 +1699,13 @@ class DevopsSystem(models.Model):
                     mode_version_erplibre,
                 )
                 value["erplibre_mode"] = erplibre_mode.id
+                if odoo_version:
+                    value["select_installation"] = "odoo_workspace"
+                elif erplibre_version:
+                    value["select_installation"] = "erplibre"
+                if mode_version_erplibre:
+                    value["git_branch"] = mode_version_erplibre
+
                 lst_ws_value.append(value)
             for dir_name in lst_dir_docker:
                 # Check if already exist

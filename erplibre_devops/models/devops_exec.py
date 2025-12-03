@@ -21,7 +21,7 @@ class DevopsExec(models.Model):
 
     active = fields.Boolean(default=True)
 
-    cmd = fields.Char()
+    cmd = fields.Text()
 
     exec_status = fields.Integer(help="Return status of execution. 0=success")
 
