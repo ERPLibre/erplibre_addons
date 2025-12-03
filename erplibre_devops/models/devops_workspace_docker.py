@@ -67,6 +67,8 @@ class DevopsWorkspaceDocker(models.Model):
 
     docker_initiate_succeed = fields.Boolean(help="Docker is ready to run")
 
+    log_workspace = fields.Text()
+
     @api.depends("workspace_id", "docker_is_running")
     def _compute_name(self):
         for rec in self:
@@ -280,6 +282,7 @@ volumes:
                 force_docker=True,
             )
             rec.action_docker_check_docker_ps()
+            rec.workspace_id.refresh_installation_state()
 
     def action_stop_docker_compose(self):
         for rec in self:

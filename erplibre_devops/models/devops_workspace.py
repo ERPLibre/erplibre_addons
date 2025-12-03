@@ -381,6 +381,13 @@ class DevopsWorkspace(models.Model):
             return os.path.join(os.getcwd(), f"odoo{odoo_version}")
         return False
 
+    @api.depends("folder")
+    def _compute_folder_odoo_version(self):
+        for rec in self:
+            rec.folder_odoo_version = os.path.join(
+                rec.folder, os.path.basename(rec.folder_odoo_version)
+            )
+
     @api.depends("is_me", "is_robot", "folder", "namespace")
     def _compute_name(self):
         for rec in self:
@@ -904,7 +911,14 @@ class DevopsWorkspace(models.Model):
                 if not rec.workspace_docker_id:
                     rec.workspace_docker_id = self.env[
                         "devops.workspace.docker"
-                    ].create([{"workspace_id": rec.id}])
+                    ].create(
+                        [
+                            {
+                                "workspace_id": rec.id,
+                                "docker_version": f"technolibre/erplibre:{rec.erplibre_mode.mode_version_erplibre.name}",
+                            }
+                        ]
+                    )
             elif rec.erplibre_mode.mode_exec in [
                 self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
             ]:
@@ -1639,7 +1653,10 @@ class DevopsWorkspace(models.Model):
                 # Directory must exist
                 # TODO make test to validate if remove next line, permission root the project /tmp/project/addons root
                 addons_path = os.path.join(
-                    rec.folder_odoo_version, "addons", "addons"
+                    rec.folder,
+                    f"odoo{rec.docker_build_odoo_version}.0",
+                    "addons",
+                    "addons",
                 )
                 rec.execute(f"mkdir -p '{addons_path}'")
 
