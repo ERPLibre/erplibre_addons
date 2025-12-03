@@ -1233,6 +1233,7 @@ class DevopsWorkspace(models.Model):
                     rec.folder_odoo_version = folder_odoo
                 else:
                     rec.folder_odoo_version = False
+                folder_venv = ""
                 if rec.select_installation == "odoo_workspace":
                     erplibre_version_path = os.path.join(
                         rec.folder, ".erplibre-version"
