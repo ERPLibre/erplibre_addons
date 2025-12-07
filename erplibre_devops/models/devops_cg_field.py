@@ -19,7 +19,9 @@ class DevopsCgField(models.Model):
 
     help = fields.Char()
 
-    precompute = fields.Boolean(help="Pre-compute field, associate with compute")
+    precompute = fields.Boolean(
+        help="Pre-compute field, associate with compute"
+    )
 
     has_error = fields.Boolean(
         compute="_compute_has_error",
@@ -51,6 +53,7 @@ class DevopsCgField(models.Model):
             ("binary", "binary"),
             ("monetary", "monetary"),
             ("many2one", "many2one"),
+            ("many2onereference", "Many2oneReference"),
             ("many2many", "many2many"),
             ("one2many", "one2many"),
         ],
