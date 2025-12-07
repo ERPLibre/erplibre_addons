@@ -130,12 +130,30 @@ class DevopsSystem(models.Model):
         help="Show up or down for system, depend local or ssh.",
     )
 
+    def _default_user_search_cmd(self):
+        default_config = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("erplibre_devops.default_search_engine", False)
+        )
+        # check from system
+        cmd_output = "which locate"
+        result, status = self._execute_process(cmd_output, return_status=True)
+        if status and default_config == "locate":
+            default_config = ""
+        if not default_config:
+            cmd_output = "which find"
+            result, status = self._execute_process(
+                cmd_output, return_status=True
+            )
+            if not status:
+                default_config = "find"
+        return default_config
+
     use_search_cmd = fields.Selection(
         # TODO support mdfind for OSX
         selection=[("locate", "locate"), ("find", "find")],
-        default=lambda self: self.env["ir.config_parameter"]
-        .sudo()
-        .get_param("erplibre_devops.default_search_engine", False),
+        default=_default_user_search_cmd,
         help="find or locate, need sudo updatedb.",
     )
 

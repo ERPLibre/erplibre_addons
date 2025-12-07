@@ -1319,12 +1319,13 @@ class DevopsPlanActionWizard(models.TransientModel):
 
             if not ctx.get("ignore_autocomplete_model", False):
                 self.set_mode_edit_module()
+                cmd = (
+                    "./script/code_generator/search_class_model.py -d"
+                    f" {relative_path_module}/{module_name} --json"
+                    " --with_inherit"
+                )
                 exec_id = wp_id.execute(
-                    cmd=(
-                        "./script/code_generator/search_class_model.py -d"
-                        f" {relative_path_module}/{module_name} --json"
-                        " --with_inherit"
-                    ),
+                    cmd=cmd,
                     run_into_workspace=True,
                     error_on_status=False,
                 )
