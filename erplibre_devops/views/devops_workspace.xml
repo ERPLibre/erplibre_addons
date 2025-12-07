@@ -248,14 +248,18 @@
                         <field name="folder" />
                         <field name="folder_odoo_version" invisible="select_installation not in ['odoo_workspace']" />
                         <field name="select_installation" />
-                        <field name="erplibre_mode" />
-                        <field name="is_running" />
                     </group>
                     <group string="Execution">
                         <field name="is_debug_log" />
                         <field name="show_error_chatter" />
                         <field name="exec_reboot_process" invisible="mode_exec == 'docker' or not is_me" />
                     </group>
+                </group>
+                <group name="instance" string="Instance">
+                    <field name="erplibre_mode" />
+                    <field name="is_running" />
+                </group>
+                <group>
                     <group string="Info" invisible="not is_installed">
                         <field name="url_instance" string="URL" widget="url" />
                         <field name="url_instance_database_manager" string="URL Database" widget="url" />
@@ -410,18 +414,16 @@
         </field>
     </record>
 
-    <record id="view_devops_workspace_conf_tree" model="ir.ui.view">
-        <field name="name">devops.workspace tree</field>
+    <record id="view_devops_workspace_conf_list" model="ir.ui.view">
+        <field name="name">devops.workspace list</field>
         <field name="model">devops.workspace</field>
         <field name="arch" type="xml">
             <list>
-                <field name="system_method" column_invisible="True" />
                 <field name="name" />
                 <field name="folder" />
                 <field name="folder_odoo_version" />
                 <field name="system_id" />
                 <field name="erplibre_mode" />
-                <field name="is_me" />
                 <field name="is_robot" />
                 <field name="is_installed" />
                 <field name="is_running" />
@@ -453,6 +455,7 @@
                     help="Soft reboot"
                     title="Reboot"
                 />
+                <field name="is_me" />
                 <button
                     name="action_open_workspace_pycharm"
                     type="object"
@@ -461,6 +464,7 @@
                     invisible="system_method != 'local'"
                     title="Open Pycharm"
                 />
+                <field name="system_method" />
                 <button
                     name="action_open_terminal"
                     type="object"
