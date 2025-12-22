@@ -1379,6 +1379,16 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
             )
 
+    def action_install_minimal_system(self):
+        for rec in self:
+            cmd_dev = (
+                "git make curl parallel tree htop" " tig build-essential wget"
+            )
+            full_cmd = f"sudo apt update;sudo apt install -y {cmd_dev}"
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
+            )
+
     def action_install_dev_system(self):
         for rec in self:
             # Need this to install ERPLibre for dev

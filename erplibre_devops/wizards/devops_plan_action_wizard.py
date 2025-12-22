@@ -1925,6 +1925,13 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_system_id.action_install_docker()
         return self._reopen_self()
 
+    def ssh_system_install_minimal(self):
+        if not self.working_system_id:
+            # TODO manage this error
+            return
+        self.working_system_id.action_install_minimal_system()
+        return self._reopen_self()
+
     def ssh_system_install_dev(self):
         if not self.working_system_id:
             # TODO manage this error
