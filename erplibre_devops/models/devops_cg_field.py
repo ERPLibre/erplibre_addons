@@ -56,6 +56,7 @@ class DevopsCgField(models.Model):
             ("many2onereference", "Many2oneReference"),
             ("many2many", "many2many"),
             ("one2many", "one2many"),
+            ("json", "Json"),
         ],
         required=True,
         default="char",
