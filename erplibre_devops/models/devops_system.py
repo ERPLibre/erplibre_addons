@@ -421,7 +421,8 @@ class DevopsSystem(models.Model):
             ].search_count([("system_id", "=", rec.id)])
 
     def get_ssh_address(self):
-        # TODO is unique
+        if self.ssh_host_name:
+            return self.ssh_host_name
         s_port = "" if self.ssh_port == 22 else f":{self.ssh_port}"
         s_user = "" if self.ssh_user is False else f"{self.ssh_user}@"
         addr = f"{s_user}{self.ssh_host}{s_port}"
@@ -1872,6 +1873,7 @@ class DevopsSystem(models.Model):
             config = paramiko.SSHConfig.from_text(out)
             # dev_config = config.lookup("martin")
             lst_host = [a for a in config.get_hostnames() if a != "*"]
+            lst_system_jump = []
             for host in lst_host:
                 dev_config = config.lookup(host)
                 hostname = dev_config.get("hostname")
@@ -1890,6 +1892,7 @@ class DevopsSystem(models.Model):
                         "name_overwrite": name,
                         "ssh_host": hostname,
                         "ssh_host_name": host,
+                        "parent_system_id": rec.id,
                         # "ssh_password": dev_config.get("password"),
                     }
                     if "port" in dev_config.keys():
@@ -1902,12 +1905,44 @@ class DevopsSystem(models.Model):
                             value["ssh_private_key"] = identity_file[0]
                         else:
                             value["ssh_private_key"] = identity_file
+                    if "proxyjump" in dev_config.keys():
+                        proxy_jump = dev_config.get("proxyjump")
+                        lst_system_jump.append(
+                            {"proxy_jump": proxy_jump, "value": value}
+                        )
+                        continue
                     # TODO support identitiesonly , PubkeyAuthentication , PreferredAuthentications
-
-                    value["parent_system_id"] = rec.id
                     system_id = self.env["devops.system"].create([value])
                 if system_id:
                     new_sub_system_id += system_id
+
+            # Continue jump system, because better to wait all no jump system is created
+            for dct_jump_value in lst_system_jump:
+                proxy_jump = dct_jump_value["proxy_jump"]
+                value = dct_jump_value["value"]
+                proxy_jump_system_id = self.env["devops.system"].search(
+                    [("ssh_host_name", "=", proxy_jump)], limit=1
+                )
+                if proxy_jump_system_id:
+                    value["ssh_jump"] = True
+                    value["ssh_jump_user"] = proxy_jump_system_id.ssh_user
+                    value["ssh_jump_password"] = (
+                        proxy_jump_system_id.ssh_password
+                    )
+                    value["ssh_jump_port"] = proxy_jump_system_id.ssh_port
+                    value["ssh_jump_host"] = proxy_jump_system_id.ssh_host
+                    value["ssh_jump_host_name"] = (
+                        proxy_jump_system_id.ssh_host_name
+                    )
+                    value["ssh_jump_private_key"] = (
+                        proxy_jump_system_id.ssh_private_key
+                    )
+                    value["ssh_jump_public_host_key"] = (
+                        proxy_jump_system_id.ssh_public_host_key
+                    )
+                    system_id = self.env["devops.system"].create([value])
+                    if system_id:
+                        new_sub_system_id += system_id
         return new_sub_system_id
 
     @api.model
