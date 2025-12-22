@@ -80,6 +80,25 @@ class DevopsSystem(models.Model):
 
     ssh_host_name = fields.Char()
 
+    ssh_jump = fields.Boolean(
+        string="Support Jump",
+        help="Use this to connect to inter SSH before connect to system.",
+    )
+
+    ssh_jump_user = fields.Char(string="Username in the SSH JUMP Server")
+
+    ssh_jump_password = fields.Char(string="SSH JUMP Password")
+
+    ssh_jump_port = fields.Integer(string="SSH JUMP Port", default=22)
+
+    ssh_jump_host = fields.Char(string="SSH JUMP Server")
+
+    ssh_jump_host_name = fields.Char(string="SSH JUMP HostName")
+
+    ssh_jump_private_key = fields.Char(string="SSH JUMP Private key location")
+
+    ssh_jump_public_host_key = fields.Char(string="SSH JUMP Public host key")
+
     # devops_deploy_vm_ids = fields.One2many(
     # comodel_name="devops.deploy.vm",
     # inverse_name="system_id",
@@ -643,9 +662,12 @@ class DevopsSystem(models.Model):
             # TODO support other terminal
             addr = rec.get_ssh_address()
             rec.name = f"SSH {addr}"
+            jump_cmd = ""
+            if rec.ssh_jump:
+                jump_cmd = f" -J {rec.ssh_jump_user}@{rec.ssh_jump_host}"
             cmd_output = (
                 "gnome-terminal --window -- bash -c"
-                f" '{sshpass}ssh{argument_ssh} -t"
+                f" '{sshpass}ssh{jump_cmd}{argument_ssh} -t"
                 f' {addr} "{wrap_cmd}"'
             )
             if keep_open_terminal:
@@ -684,70 +706,103 @@ class DevopsSystem(models.Model):
 
     @api.model
     def ssh_connection(self, timeout=5, force_exception=False):
-        """Return a new SSH connection with found parameters."""
+        """Return a new SSH connection with found parameters.
+        If self.ssh_jump is True, connects through jump host (ssh -J equivalent).
+        """
         self.ensure_one()
 
         has_error = False
         self.ssh_connection_status = False
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.load_system_host_keys()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        if self.ssh_public_host_key:
-            # add to host keys
-            key = paramiko.RSAKey(
-                data=base64.b64decode(self.ssh_public_host_key)
-            )
-            ssh_client.get_host_keys().add(
-                hostname=self.ssh_host, keytype="ssh-rsa", key=key
-            )
+        def _new_client(public_host_key_b64, hostname_for_key):
+            cli = paramiko.SSHClient()
+            cli.load_system_host_keys()
+            cli.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+            if public_host_key_b64:
+                key = paramiko.RSAKey(
+                    data=base64.b64decode(public_host_key_b64)
+                )
+                cli.get_host_keys().add(
+                    hostname=hostname_for_key, keytype="ssh-rsa", key=key
+                )
+
+            return cli
+
+        # Target client (the one we return)
+        ssh_client = _new_client(self.ssh_public_host_key, self.ssh_host)
+
         try:
-            dct_ssh_client = {
-                "hostname": self.ssh_host,
-                "port": self.ssh_port,
-                "username": None if not self.ssh_user else self.ssh_user,
-                "password": (
-                    None if not self.ssh_password else self.ssh_password
-                ),
-                "timeout": timeout,
-            }
-            if self.ssh_private_key:
-                dct_ssh_client["key_filename"] = self.ssh_private_key
-            ssh_client.connect(**dct_ssh_client)
+            # ---- No jump: original behavior ----
+            if not self.ssh_jump:
+                dct_ssh_client = {
+                    "hostname": self.ssh_host,
+                    "port": int(self.ssh_port or 22),
+                    "username": self.ssh_user or None,
+                    "password": self.ssh_password or None,
+                    "timeout": timeout,
+                }
+                if self.ssh_private_key:
+                    dct_ssh_client["key_filename"] = self.ssh_private_key
+
+                ssh_client.connect(**dct_ssh_client)
+
+            # ---- Jump enabled: connect via bastion ----
+            else:
+                # 1) Connect to jump host
+                jump_client = _new_client(
+                    self.ssh_jump_public_host_key, self.ssh_jump_host
+                )
+
+                dct_jump = {
+                    "hostname": self.ssh_jump_host,
+                    "port": int(self.ssh_jump_port or 22),
+                    "username": self.ssh_jump_user or None,
+                    "password": self.ssh_jump_password or None,
+                    "timeout": timeout,
+                }
+                if self.ssh_jump_private_key:
+                    dct_jump["key_filename"] = self.ssh_jump_private_key
+
+                jump_client.connect(**dct_jump)
+
+                # 2) Open a TCP tunnel from jump -> target:22 (or target port)
+                jump_transport = jump_client.get_transport()
+                if not jump_transport:
+                    raise paramiko.SSHException("Jump transport not available")
+
+                dest_addr = (self.ssh_host, int(self.ssh_port or 22))
+                local_addr = ("127.0.0.1", 0)
+                chan = jump_transport.open_channel(
+                    "direct-tcpip", dest_addr, local_addr
+                )
+
+                # 3) Connect to target using the channel as a socket
+                dct_target = {
+                    "hostname": self.ssh_host,  # used for hostkey checking/logging
+                    "port": int(self.ssh_port or 22),  # kept for clarity
+                    "username": self.ssh_user or None,
+                    "password": self.ssh_password or None,
+                    "timeout": timeout,
+                    "sock": chan,  # <-- key part (ProxyJump)
+                }
+                if self.ssh_private_key:
+                    dct_target["key_filename"] = self.ssh_private_key
+
+                ssh_client.connect(**dct_target)
+
+                # Keep jump connection alive as long as ssh_client is alive
+                ssh_client._jump_client = jump_client
+
         except paramiko.ssh_exception.NoValidConnectionsError as e:
             if force_exception:
-                raise e
+                raise
             has_error = True
-        # params = {
-        #     "host": self.ssh_host,
-        #     "username": self.ssh_user,
-        #     "port": self.ssh_port,
-        # }
-        #
-        # # not empty sftp_public_key means that we should verify sftp server with it
-        # cnopts = pysftp.CnOpts()
-        # if self.sftp_public_host_key:
-        #     key = paramiko.RSAKey(
-        #         data=base64.b64decode(self.sftp_public_host_key)
-        #     )
-        #     cnopts.hostkeys.add(self.sftp_host, "ssh-rsa", key)
-        # else:
-        #     cnopts.hostkeys = None
-        #
-        # _logger.debug(
-        #     "Trying to connect to sftp://%(username)s@%(host)s:%(port)d",
-        #     extra=params,
-        # )
-        # if self.sftp_private_key:
-        #     params["private_key"] = self.sftp_private_key
-        #     if self.sftp_password:
-        #         params["private_key_pass"] = self.sftp_password
-        # else:
-        #     params["password"] = self.sftp_password
-        #
-        # return pysftp.Connection(**params, cnopts=cnopts)
+        except Exception as e:
+            if force_exception:
+                raise
+            has_error = True
 
-        # Because, offline will raise an exception
         if not has_error:
             self.ssh_connection_status = True
 
@@ -1299,7 +1354,7 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
             raise exceptions.UserError(
-                'Add it at the end of bashrc\neval "$(starship init bash)"'
+                'Add it at the end of bashrc\neval "$(starship init bash)"\nIf installation fail, you can try "sudo apt install starship"'
             )
 
     def action_install_robotlibre(self):

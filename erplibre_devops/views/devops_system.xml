@@ -135,7 +135,17 @@
                             Use SSH with caution!
                             <div invisible="not ssh_use_sshpass">The password can be visible into log.</div>
                         </div>
+                        <group string="SSH Settings JUMP" invisible="not ssh_jump">
+                            <field name="ssh_jump_host_name" />
+                            <field name="ssh_jump_host" placeholder="ssh.example.com" />
+                            <field name="ssh_jump_port" />
+                            <field name="ssh_jump_user" placeholder="john" />
+                            <field name="ssh_jump_password" password="True" />
+                            <field name="ssh_jump_private_key" placeholder="/home/odoo/.ssh/id_rsa" />
+                            <field name="ssh_jump_public_host_key" placeholder="AAAA..." />
+                        </group>
                         <group string="SSH Settings">
+                            <field name="ssh_jump" />
                             <field name="ssh_host_name" />
                             <field name="ssh_host" placeholder="ssh.example.com" />
                             <field name="ssh_use_sshpass" />
