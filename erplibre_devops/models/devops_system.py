@@ -1304,28 +1304,44 @@ class DevopsSystem(models.Model):
                         # Can install it!
                         ws_id.action_install_workspace()
 
-    def action_install_docker(self):
+    def action_install_docker_dev(self):
         for rec in self:
             if not rec.docker_has_check:
                 continue
             # Install it
-            cmd_dev = (
+            cmd = (
                 "curl -fsSL https://get.docker.com | sudo sh && sudo apt-get"
                 " install -y uidmap && dockerd-rootless-setuptool.sh install"
             )
-            cmd_prod = "curl -fsSL https://get.docker.com | sudo sh"
-            cmd = cmd_dev
             out = rec.execute_terminal_gui(
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
-    def open_terminal(self):
+    def action_install_docker_prod(self):
+        for rec in self:
+            if not rec.docker_has_check:
+                continue
+            # Install it
+            cmd = "curl -fsSL https://get.docker.com | sudo sh"
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"{cmd}\\";{cmd}',
+            )
+
+    def action_restart_systemctl_docker(self):
+        for rec in self:
+            # Restart and status docker.service
+            cmd = "sudo systemctl restart docker.service && sleep 1 && sudo systemctl status docker.service"
+            out = rec.execute_terminal_gui(
+                cmd=cmd,
+            )
+
+    def action_open_terminal(self):
         for rec in self:
             out = rec.execute_terminal_gui(
                 cmd=f"pwd",
             )
 
-    def configure_ntp(self):
+    def action_configure_ntp(self):
         for rec in self:
             # Install it
             cmd = (
@@ -1336,7 +1352,7 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
-    def configure_starship(self):
+    def action_configure_starship(self):
         for rec in self:
             # Install it
             cmd = "cd /tmp;curl -sS https://starship.rs/install.sh | sh"
@@ -1584,7 +1600,7 @@ class DevopsSystem(models.Model):
         if not all([a.system_status for a in self]):
             return
         self.action_refresh_db_image()
-        self.get_local_system_id_from_ssh_config()
+        self.action_search_system_id_from_ssh_config()
         self.action_search_vm()
         self.action_check_docker()
         self.action_search_docker()
@@ -1868,7 +1884,7 @@ class DevopsSystem(models.Model):
                         [{"name": image_name, "path": file_path}]
                     )
 
-    def get_local_system_id_from_ssh_config(self):
+    def action_search_system_id_from_ssh_config(self):
         new_sub_system_id = self.env["devops.system"]
         for rec in self:
             config_path = os.path.join(self.path_home, ".ssh/config")

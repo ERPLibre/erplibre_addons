@@ -1919,7 +1919,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.configure_ntp()
+        self.working_system_id.action_configure_ntp()
         return self._reopen_self()
 
     def ssh_system_install_docker(self):
@@ -1948,7 +1948,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.configure_starship()
+        self.working_system_id.action_configure_starship()
         return self._reopen_self()
 
     #
@@ -2040,7 +2040,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def search_subsystem_workspace(self):
         system_ids = (
-            self.root_workspace_id.system_id.get_local_system_id_from_ssh_config()
+            self.root_workspace_id.system_id.action_search_system_id_from_ssh_config()
         )
         for system_id in system_ids:
             if system_id.ssh_connection_status:

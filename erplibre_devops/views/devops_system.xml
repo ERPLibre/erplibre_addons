@@ -6,42 +6,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_search_all" string="Search ALL" type="object" class="oe_highlight" />
-                    <button name="action_refresh_db_image" string="Reload db image" type="object" />
-                    <button name="action_search_workspace" string="Search workspace" type="object" />
-                    <button name="action_search_vm" string="Search VM" type="object" />
-                    <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
-                    <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
-                    <button name="action_install_dev_system" string="Install dev system" type="object" />
-                    <button name="action_install_robotlibre" string="Install robotlibre" type="object" />
-                    <button
-                        name="action_install_docker"
-                        string="Install docker"
-                        type="object"
-                        invisible="not docker_has_check"
-                    />
-                    <button name="open_terminal" string="Open terminal" type="object" />
-                    <button name="configure_ntp" string="Configure NTP" type="object" />
-                    <button name="configure_starship" string="Configure starship" type="object" />
-                    <button
-                        name="action_check_docker"
-                        string="Check docker"
-                        type="object"
-                        class="btn-success"
-                        invisible="docker_has_check"
-                    />
-                    <button
-                        name="action_check_docker"
-                        string="Check docker"
-                        type="object"
-                        invisible="not docker_has_check"
-                    />
-                    <button
-                        name="action_search_docker"
-                        string="Search Docker"
-                        type="object"
-                        invisible="not docker_has_check"
-                    />
+                    <button name="action_open_terminal" string="Open terminal" type="object" />
                 </header>
                 <div class="oe_title">
                     <h1>
@@ -115,6 +80,23 @@
                         <field name="use_search_cmd" />
                         <field name="debug_command" />
                     </group>
+                    <group string="Search information">
+                        <button name="action_search_all" string="Search ALL" type="object" class="oe_highlight" />
+                        <button name="action_refresh_db_image" string="Reload db image" type="object" />
+                        <button name="action_search_workspace" string="Search workspace" type="object" />
+                        <button
+                            name="action_search_system_id_from_ssh_config"
+                            string="Search sub-system"
+                            type="object"
+                        />
+                        <button name="action_search_vm" string="Search VM" type="object" />
+                    </group>
+                    <group string="Installation from system">
+                        <button name="action_install_dev_system" string="Install dev system" type="object" />
+                        <button name="action_install_robotlibre" string="Install robotlibre" type="object" />
+                        <button name="action_configure_ntp" string="Configure NTP" type="object" />
+                        <button name="action_configure_starship" string="Configure starship" type="object" />
+                    </group>
                 </group>
                 <notebook>
                     <page string="Information">
@@ -170,6 +152,46 @@
                     </page>
                     <page string="Docker">
                         <group>
+                            <group name="docker_action" string="Docker action">
+                                <button
+                                    name="action_check_docker"
+                                    string="Check docker"
+                                    type="object"
+                                    class="btn-success"
+                                    invisible="docker_has_check"
+                                />
+                                <button
+                                    name="action_check_docker"
+                                    string="Check docker"
+                                    type="object"
+                                    invisible="not docker_has_check"
+                                />
+                                <button
+                                    name="action_search_docker"
+                                    string="Search Docker"
+                                    type="object"
+                                    invisible="not docker_has_check"
+                                />
+                                <button
+                                    name="action_install_docker_dev"
+                                    string="Install docker DEV"
+                                    type="object"
+                                    invisible="not docker_has_check"
+                                />
+                                <button
+                                    name="action_install_docker_prod"
+                                    string="Install docker PROD"
+                                    type="object"
+                                    invisible="not docker_has_check"
+                                />
+                                <button
+                                    name="action_restart_systemctl_docker"
+                                    string="Restart systemctl docker"
+                                    type="object"
+                                />
+                            </group>
+                        </group>
+                        <group name="docker_information" string="Docker information">
                             <group>
                                 <field name="docker_has_check" string="Has check" />
                                 <field name="docker_is_installed" string="Is installed" />
@@ -189,6 +211,17 @@
                             </group>
                             <group>
                                 <field name="docker_version" string="Version" />
+                            </group>
+                        </group>
+                    </page>
+                    <page name="page_security" string="Security">
+                        <group>
+                            <group name="Action security">
+                                <button
+                                    name="action_show_security_ssh_keygen"
+                                    string="Show SSH key security"
+                                    type="object"
+                                />
                             </group>
                         </group>
                     </page>
