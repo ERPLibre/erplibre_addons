@@ -1327,6 +1327,17 @@ class DevopsSystem(models.Model):
                 cmd=f'echo \\"{cmd}\\";{cmd}',
             )
 
+    def action_install_docker_GPU(self):
+        for rec in self:
+            if not rec.docker_has_check:
+                continue
+            # Install it
+            # TODO install
+            # cmd = "curl -fsSL https://get.docker.com | sudo sh"
+            out = rec.execute_terminal_gui(
+                cmd=f'echo \\"TODO install nvidia-container-toolkit\\"',
+            )
+
     def action_restart_systemctl_docker(self):
         for rec in self:
             # Restart and status docker.service

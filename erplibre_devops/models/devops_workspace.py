@@ -1568,7 +1568,8 @@ class DevopsWorkspace(models.Model):
 
     @api.model
     def os_write_file(self, path, content, to_instance=False):
-        cmd = f'echo "{content}" > "{path}"'
+        content_str = content.replace('"', '\\"')
+        cmd = f'echo "{content_str}" > "{path}"'
         result = self.execute(cmd=cmd, to_instance=to_instance)
         return result.log_all
 

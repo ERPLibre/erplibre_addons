@@ -1263,6 +1263,18 @@ class DevopsPlanActionWizard(models.TransientModel):
                 self.action_code_module_autocomplete_module_path(ctx=ctx)
         return self._reopen_self()
 
+    def action_test_docker_gpu(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Docker test GPU Nvidia"
+        ) as wp_id:
+            wp_id.execute(
+                cmd=f"docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi",
+                force_open_terminal=True,
+            )
+        return self._reopen_self()
+
     def action_code_module_autocomplete_module_path(self, ctx=None):
         if ctx is None:
             ctx = {}
@@ -1447,15 +1459,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             file_docker_compose = os.path.join(
                 working_dir_path, "docker-compose.yml"
             )
-            self.working_system_id.execute_with_result(
-                f"mkdir '{working_dir_path}'",
-                None,
-                engine="sh",
+            # TODO implement workspace into this view
+            result = self.root_workspace_id.execute(
+                cmd=f'mkdir -p "{working_dir_path}"'
             )
-            self.working_system_id.execute_with_result(
-                f"echo '{yaml}' > '{file_docker_compose}'",
-                None,
-                engine="sh",
+            result = self.root_workspace_id.os_write_file(
+                file_docker_compose, yaml
             )
             # TODO ne pas copier toute la liste de type_ids, sélectionner ce qui est nécessaire
             # Le copier dans la liste par défaut à la copie, l'utilisateur pour l'enlever.

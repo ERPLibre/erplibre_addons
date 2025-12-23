@@ -145,12 +145,8 @@ volumes:
             if rec.force_create_docker_compose or not os.path.exists(
                 file_docker_compose
             ):
-                rec.workspace_id.execute(
-                    cmd=(
-                        f"echo '{docker_compose_content}' >"
-                        f" {file_docker_compose}"
-                    ),
-                    engine="sh",
+                rec.workspace_id.os_write_file(
+                    file_docker_compose, docker_compose_content
                 )
 
             exec_id = rec.workspace_id.execute(

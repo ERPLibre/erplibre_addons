@@ -185,6 +185,12 @@
                                     invisible="not docker_has_check"
                                 />
                                 <button
+                                    name="action_install_docker_GPU"
+                                    string="Install docker GPU"
+                                    type="object"
+                                    invisible="not docker_has_check"
+                                />
+                                <button
                                     name="action_restart_systemctl_docker"
                                     string="Restart systemctl docker"
                                     type="object"

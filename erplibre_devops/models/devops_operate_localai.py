@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+import base64
 import json
 import logging
+import mimetypes
+import os
+from urllib.parse import unquote, urlparse
 
+import requests
 from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -54,6 +59,7 @@ class DevopsOperateLocalai(models.Model):
         selection=[
             ("generate_text", "Generate text"),
             ("generate_image", "Generate image"),
+            ("generate_son", "Generate sound"),
         ],
         required=True,
         tracking=True,
@@ -131,6 +137,15 @@ class DevopsOperateLocalai(models.Model):
                 cmd, None, return_status=True
             )
             if status == 0:
+                if rec.feature == "generate_son":
+                    # rec.last_result_url = data.get("data")[0].get("url")
+                    # if rec.last_result_url:
+                    rec.create_attachment_from_path_or_url(
+                        "/tmp/test_generate_sound.wav"
+                    )
+                    # rec.last_result = json_out
+                    rec.last_result_message = False
+                    continue
                 json_out = out[: out.rfind("}") + 1]
                 data = json.loads(json_out)
                 has_error = data.get("error")
@@ -139,6 +154,10 @@ class DevopsOperateLocalai(models.Model):
                     continue
                 if rec.feature == "generate_image":
                     rec.last_result_url = data.get("data")[0].get("url")
+                    if rec.last_result_url:
+                        rec.create_attachment_from_path_or_url(
+                            rec.last_result_url
+                        )
                     rec.last_result = json_out
                     rec.last_result_message = False
                 elif rec.feature == "generate_text":
@@ -151,6 +170,60 @@ class DevopsOperateLocalai(models.Model):
                     _logger.error(f"Feature not supported '{rec.feature}'")
             else:
                 _logger.error(out)
+
+    def _filename_from_url(self, url: str) -> str:
+        path = urlparse(url).path
+        name = os.path.basename(path)
+        name = unquote(name) or "download"
+        return name
+
+    def create_attachment_from_path_or_url(
+        self, path_or_url: str, filename: str | None = None
+    ):
+        # TODO support sound for attachment
+        # 1) Local file si ça commence par /
+        if isinstance(path_or_url, str) and path_or_url.startswith("/"):
+            filepath = path_or_url
+            if not os.path.isfile(filepath):
+                raise Exception(f"Fichier introuvable: {filepath}")
+
+            filename = filename or os.path.basename(filepath)
+            mimetype = (
+                mimetypes.guess_type(filename)[0] or "application/octet-stream"
+            )
+
+            with open(filepath, "rb") as f:
+                file_bytes = f.read()
+
+        # 2) Sinon, on traite comme URL
+        else:
+            url = path_or_url
+            resp = requests.get(url, timeout=60)
+            resp.raise_for_status()
+            file_bytes = resp.content
+
+            filename = filename or self._filename_from_url(url)
+
+            mimetype = resp.headers.get("Content-Type")
+            if mimetype:
+                mimetype = mimetype.split(";")[0].strip()
+            else:
+                mimetype = (
+                    mimetypes.guess_type(filename)[0]
+                    or "application/octet-stream"
+                )
+
+        # 3) Créer l'attachment Odoo
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": filename,
+                "datas": base64.b64encode(file_bytes),
+                "res_model": self._name,
+                "res_id": self.id,
+                "mimetype": mimetype,
+            }
+        )
+        return attachment
 
     @api.depends(
         "gen_img_detail_level_id",
@@ -213,6 +286,14 @@ class DevopsOperateLocalai(models.Model):
                     ' -d "{ \\"prompt\\": \\"%s\\", \\"step\\": %s,'
                     ' \\"size\\": \\"%s\\" }"'
                     % (prompt, rec.step, rec.gen_img_size)
+                )
+            elif rec.feature == "generate_son":
+                rec.cmd = f"curl {rec.request_url}/tts"
+                rec.cmd += ' -H "Content-Type:application/json"'
+                # TODO support /tmp/test_generate_sound.wav
+                rec.cmd += (
+                    ' -d "{ \\"input\\": \\"%s\\", \\"model\\": \\"tts-1\\" }" --output /tmp/test_generate_sound.wav'
+                    % (prompt)
                 )
             elif rec.feature == "generate_text":
                 rec.cmd = f"curl {rec.request_url}/v1/chat/completions"

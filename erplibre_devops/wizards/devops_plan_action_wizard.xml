@@ -874,13 +874,13 @@
                     </div>
                 </group>
                 <group name="group_plan_project_2" invisible="state != 'plan_project'">
-                    <group string="4. Requirement">
-                        <!--                        <button-->
-                        <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
-                        <!--                            string="DevOps"-->
-                        <!--                            type="object"-->
-                        <!--                            class="btn btn-secondary"-->
-                        <!--                        />-->
+                    <group string="4. Requirement / test">
+                        <button
+                            name="action_test_docker_gpu"
+                            string="Test Nvidia GPU docker"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
                     </group>
                     <group string="5. Create a project">
                         <button
