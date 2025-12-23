@@ -54,6 +54,11 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     deploy_with_database = fields.Boolean(help="Will deploy database")
 
+    # TODO maybe compute, enable if no workspace is installed
+    install_os_first_installation = fields.Boolean(
+        help="Enable to install OS dependency, need git clone of project"
+    )
+
     deploy_select_installation = fields.Selection(
         [
             ("odoo_workspace", "Odoo workspace"),
@@ -1970,6 +1975,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             "folder": self.workspace_folder,
             "erplibre_mode": self.erplibre_mode.id,
             "select_installation": self.deploy_select_installation,
+            "install_os_first_installation": self.install_os_first_installation,
         }
         if self.deploy_git_branch:
             ws_value["git_branch"] = self.deploy_git_branch
@@ -1980,13 +1986,16 @@ class DevopsPlanActionWizard(models.TransientModel):
         # TODO missing check status before continue
         # TODO missing with workspace me to catch error
         ws_id.action_install_workspace()
-        if self.deploy_with_database:
-            ws_id.action_start()
-        # TODO implement detect when website is up or cancel state with error
-        time.sleep(5)
-        if self.deploy_with_database:
-            ws_id.action_restore_db_image()
-            ws_id.action_open_local_view()
+        if not ws_id.install_os_first_installation:
+            if self.deploy_with_database:
+                ws_id.action_start()
+            # TODO implement detect when website is up or cancel state with error
+            time.sleep(5)
+            if self.deploy_with_database:
+                ws_id.action_restore_db_image()
+                ws_id.action_open_local_view()
+        else:
+            ws_id.install_os_first_installation = False
         return self._reopen_self()
 
     def action_shortcut_deploy_generate_docker(self):

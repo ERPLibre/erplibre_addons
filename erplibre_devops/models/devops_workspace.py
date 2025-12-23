@@ -221,6 +221,10 @@ class DevopsWorkspace(models.Model):
         help="The port of http odoo.",
     )
 
+    install_os_first_installation = fields.Boolean(
+        help="Enable to install OS dependency, need git clone of project"
+    )
+
     port_longpolling = fields.Integer(
         string="port longpolling",
         default=8071,
@@ -1122,7 +1126,7 @@ class DevopsWorkspace(models.Model):
                         dir_name = os.path.dirname(rec.folder)
                         # No such directory
                         exec_id = rec.execute(
-                            cmd=f"git clone {rec.git_url}{git_arg}",
+                            cmd=f"mkdir -p {dir_name};cd {dir_name};git clone {rec.git_url}{git_arg}",
                             folder=dir_name,
                             error_on_status=False,
                         )
@@ -1130,6 +1134,20 @@ class DevopsWorkspace(models.Model):
                         if exec_id.exec_status:
                             raise Exception(exec_id.log_all)
                         is_first_install = True
+                        if rec.install_os_first_installation:
+                            exec_id = rec.execute(
+                                cmd=f"make install_os",
+                                folder=rec.folder,
+                                force_open_terminal=True,
+                                to_instance=bool(
+                                    self.env.context.get(
+                                        "force_reinstall_workspace"
+                                    )
+                                ),
+                                error_on_status=True,
+                            )
+                            # TODO need feature to wait gnome-terminal is close and can continue
+                            return
                     else:
                         _logger.info(
                             f'Git project already exist for "{rec.folder}"'

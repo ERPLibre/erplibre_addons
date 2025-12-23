@@ -1023,6 +1023,7 @@
                     <!--                        <field name="working_workspace_ids" />-->
                     <!--                    </group>-->
                     <group string="Information">
+                        <field name="install_os_first_installation" />
                         <field name="system_erplibre_config_path_home_ids" invisible="True" />
                         <field
                             name="working_erplibre_config_path_home_id"
