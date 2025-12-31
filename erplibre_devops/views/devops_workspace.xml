@@ -7,7 +7,7 @@
             <form string="DevOps Workspace">
                 <header>
                     <button
-                        name="%(erplibre_devops.devops_plan_action_action)d"
+                        name="%(erplibre_devops.action_devops_plan_action)d"
                         string="Action"
                         type="action"
                         class="btn btn-secondary"
@@ -428,7 +428,7 @@
                 <field name="is_installed" />
                 <field name="is_running" />
                 <button
-                    name="%(erplibre_devops.devops_plan_action_action)d"
+                    name="%(erplibre_devops.action_devops_plan_action)d"
                     type="action"
                     class="oe_stat_button"
                     icon="fa-star"

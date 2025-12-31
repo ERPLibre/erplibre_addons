@@ -45,9 +45,9 @@
 
     <menuitem id="menu_erplibre_mode" name="Mode" sequence="1" parent="menu_erplibre" />
 
-    <menuitem id="menu_process" name="Process" sequence="5" parent="menu_devops" />
+    <menuitem id="menu_process" name="Process" sequence="16" parent="menu_devops" />
 
-    <menuitem id="menu_workspace_sub" name="Workspace misc" sequence="6" parent="menu_devops" />
+    <menuitem id="menu_workspace_sub" name="Workspace misc" sequence="17" parent="menu_devops" />
 
     <!--Child menu-->
 
@@ -405,7 +405,7 @@
         id="menu_system_item"
         name="System"
         action="action_devops_check_system_conf_form"
-        sequence="4"
+        sequence="15"
         parent="menu_devops"
     />
 
@@ -466,10 +466,18 @@
     />
 
     <menuitem
+        id="menu_action_devops_item"
+        name="Action DevOps"
+        action="action_devops_plan_action_workspace_me"
+        sequence="16"
+        parent="menu_devops"
+    />
+
+    <menuitem
         id="menu_workspace_item"
         name="Workspace"
         action="action_devops_check_workspace_conf_form"
-        sequence="1"
+        sequence="11"
         parent="menu_devops"
     />
 

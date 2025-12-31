@@ -1097,12 +1097,27 @@
         </field>
     </record>
 
-    <record id="devops_plan_action_action" model="ir.actions.act_window">
+    <record id="action_devops_plan_action" model="ir.actions.act_window">
         <field name="name">DEVOPS action</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">devops.plan.action.wizard</field>
         <field name="binding_model_id" ref="model_devops_workspace" />
         <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_devops_plan_action_workspace_me" model="ir.actions.act_window">
+        <field name="name">DEVOPS action ME</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">devops.plan.action.wizard</field>
+        <field name="binding_model_id" ref="model_devops_workspace" />
+        <field name="view_mode">form</field>
+        <field
+            name="context"
+            eval="{
+            'default_root_workspace_id': ref('erplibre_devops.devops_workspace_me'),
+        }"
+        />
         <field name="target">new</field>
     </record>
 </odoo>
