@@ -1908,7 +1908,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         else:
             self.working_module_name = module_name
 
-    def ssh_system_open_terminal(self):
+    def action_ssh_system_open_terminal(self):
         if not self.working_system_id:
             # TODO manage this error
             return
@@ -2013,8 +2013,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             return
         search_path_home = [
             a
-            for a in self.env["erplibre.config.path.home"].search([])
-            if f"{getpass.getuser()}/git" in a.name
+            for a in self.working_system_id.erplibre_config_path_home_ids
+            if self.working_system_id.username_login in a.name
         ]
         if search_path_home:
             self.working_erplibre_config_path_home_id = search_path_home[0].id

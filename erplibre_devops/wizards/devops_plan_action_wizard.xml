@@ -960,7 +960,7 @@
                 <group string="A-Installation" invisible="state != 'i_new_remote_system' or not can_search_workspace">
                     <group string="1-Test comm">
                         <button
-                            name="ssh_system_open_terminal"
+                            name="action_ssh_system_open_terminal"
                             string="Test open terminal"
                             type="object"
                             class="btn btn-secondary"
@@ -1040,6 +1040,12 @@
                         <button
                             name="action_system_deploy_create_workspace"
                             string="Create workspace"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
+                        <button
+                            name="action_ssh_system_open_terminal"
+                            string="Open terminal"
                             type="object"
                             class="btn btn-secondary"
                         />

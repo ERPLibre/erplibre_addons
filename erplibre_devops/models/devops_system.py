@@ -2,6 +2,7 @@
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import base64
+import getpass
 import json
 import logging
 import os
@@ -92,6 +93,10 @@ class DevopsSystem(models.Model):
     ssh_jump_port = fields.Integer(string="SSH JUMP Port", default=22)
 
     ssh_jump_host = fields.Char(string="SSH JUMP Server")
+
+    username_login = fields.Char(
+        string="Username", compute="_compute_username_login"
+    )
 
     ssh_jump_host_name = fields.Char(string="SSH JUMP HostName")
 
@@ -347,6 +352,16 @@ class DevopsSystem(models.Model):
                 ].get_path_home_id(rec.path_home)
                 rec.erplibre_config_path_home_ids = [(4, path_home_id.id)]
         return result
+
+    @api.depends("ssh_user", "method")
+    def _compute_username_login(self):
+        for rec in self:
+            if rec.method == "local":
+                rec.username_login = getpass.getuser()
+            elif rec.method == "ssh":
+                rec.username_login = rec.ssh_user
+            else:
+                rec.username_login = ""
 
     @api.depends("ssh_connection_status", "method")
     def _compute_system_status(self):

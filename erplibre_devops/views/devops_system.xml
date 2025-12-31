@@ -8,7 +8,7 @@
                 <header>
                     <button name="action_open_terminal" string="Open terminal" type="object" />
                     <button
-                        name="%(erplibre_devops.action_devops_plan_action)d"
+                        name="%(erplibre_devops.action_devops_plan_action_workspace_me)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-star"
@@ -110,6 +110,7 @@
                 <notebook>
                     <page string="Information">
                         <group>
+                            <field name="username_login" />
                             <field name="erplibre_config_path_home_ids" />
                             <field name="devops_workspace_ids" />
                         </group>
