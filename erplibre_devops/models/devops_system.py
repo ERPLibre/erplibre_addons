@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+import ast
 import base64
 import getpass
+import ipaddress
 import json
 import logging
 import os
@@ -104,11 +106,12 @@ class DevopsSystem(models.Model):
 
     ssh_jump_public_host_key = fields.Char(string="SSH JUMP Public host key")
 
-    # devops_deploy_vm_ids = fields.One2many(
-    # comodel_name="devops.deploy.vm",
-    # inverse_name="system_id",
-    # string="VMs",
-    # )
+    devops_deploy_vm_ids = fields.One2many(
+        comodel_name="devops.deploy.vm",
+        inverse_name="system_id",
+        string="VMs",
+    )
+
     parent_system_id = fields.Many2one(
         comodel_name="devops.system",
         string="Parent system",
@@ -1478,7 +1481,12 @@ class DevopsSystem(models.Model):
             raise exceptions.UserError(msg)
 
     def action_search_vm(self):
+        self.action_search_vm_virtualbox()
+        self.action_search_vm_qemu()
+
+    def action_search_vm_virtualbox(self):
         for rec in self:
+            # VirtualBox
             dct_vm_identifiant = {}
             cmd = "vboxmanage list runningvms"
             out, status = rec.execute_with_result(
@@ -1619,6 +1627,180 @@ class DevopsSystem(models.Model):
             #             dct_vm_net_info[vm_uid] = dct_net_info
             #     for guid, dct_net in dct_vm_net_info.items():
             #         print("ok")
+
+    def action_search_vm_qemu(self):
+        row_re = re.compile(
+            r"^\s*(\S+)\s+(\S+)\s+(ipv4|ipv6)\s+(\S+)\s*$",
+            re.IGNORECASE,
+        )
+        provider = "Qemu"
+        rx = re.compile(
+            r"^\s*(?P<name>.*?)\s{2,}(?P<created>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\s+[+-]\d{4})\s{2,}(?P<state>\S+)\s*$"
+        )
+        for rec in self:
+            # Qemu
+            cmd = "dconf read /org/virt-manager/virt-manager/connections/uris"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            if status:
+                continue
+            if len(out) > 10_000:
+                raise ValueError(
+                    f"Command '{cmd}' generate too much text, check it by yourself."
+                )
+            lst_qemu_conf = ast.literal_eval(out.strip())
+            for qemu_conf in lst_qemu_conf:
+                cmd = f'virsh -c "{qemu_conf}" list --all'
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+
+                for qemu_vm_line in out.strip().split("\n")[2:]:
+                    key, other_string = qemu_vm_line.strip().split(
+                        " ", maxsplit=1
+                    )
+                    vm_name, other_string = other_string.strip().split(
+                        " ", maxsplit=1
+                    )
+                    state_name = other_string.strip()
+                    # Search if exist before create
+                    vm_id = self.env["devops.deploy.vm"].search(
+                        [
+                            ("identifiant", "=", key),
+                            ("system_id", "=", rec.id),
+                            ("provider", "=", provider),
+                            ("uri", "=", qemu_conf),
+                        ],
+                        limit=1,
+                    )
+                    if not vm_id:
+                        value = {
+                            "name": vm_name,
+                            "identifiant": key,
+                            "provider": provider,
+                            "system_id": rec.id,
+                            "uri": qemu_conf,
+                        }
+                        vm_id = self.env["devops.deploy.vm"].create([value])
+                    if vm_id and state_name in ["en cours d’exécution"]:
+                        if not vm_id.vm_exec_last_id:
+                            value = {
+                                "vm_id": vm_id.id,
+                                "is_running": True,
+                            }
+                            vm_exec_id = self.env[
+                                "devops.deploy.vm.exec"
+                            ].create([value])
+                            vm_id.vm_exec_last_id = vm_exec_id.id
+
+                        # Search ip
+                        cmd = f'virsh -c "{qemu_conf}" domifaddr {vm_name} --source agent'
+                        out, status = rec.execute_with_result(
+                            cmd, None, return_status=True
+                        )
+
+                        if not status:
+                            rows = []
+                            first_ip_not_local = ""
+                            for line in out.splitlines():
+                                line = line.strip()
+                                if not line or set(line) == {
+                                    "-"
+                                }:  # ignore la ligne "-----"
+                                    continue
+                                if line.lower().startswith(
+                                    "nom "
+                                ):  # ignore l’entête
+                                    continue
+
+                                m = row_re.match(line)
+                                if not m:
+                                    continue
+
+                                name, mac, proto, addr = m.groups()
+                                iface = None if name == "-" else name
+                                mac = None if mac == "-" else mac
+
+                                net = ipaddress.ip_interface(
+                                    addr
+                                )  # gère ipv4/ipv6 + CIDR
+                                rows.append(
+                                    {
+                                        "name": iface,
+                                        "mac": mac,
+                                        "family": net.ip.version,  # 4 ou 6
+                                        "ip": str(net.ip),
+                                        "prefixlen": net.network.prefixlen,
+                                        "cidr": str(net),
+                                    }
+                                )
+                                if (
+                                    str(net.ip) != "127.0.0.1"
+                                    and net.ip.version == 4
+                                ):
+                                    first_ip_not_local = str(net.ip)
+                            if first_ip_not_local:
+                                # Associate ip with system
+                                system_vm_id = self.env[
+                                    "devops.system"
+                                ].search(
+                                    [
+                                        (
+                                            "ssh_host",
+                                            "=",
+                                            first_ip_not_local,
+                                        )
+                                    ],
+                                    limit=1,
+                                )
+                                if system_vm_id:
+                                    system_vm_id.devops_deploy_vm_id = vm_id.id
+                                    vm_id.vm_ssh_host = first_ip_not_local
+
+                        # Research snapshot
+                        cmd = f'virsh -c "{qemu_conf}" snapshot-list {vm_name}'
+                        out, status = rec.execute_with_result(
+                            cmd, None, return_status=True
+                        )
+                        for line in out.splitlines():
+                            m = rx.match(line)
+                            if m:
+                                m_dict = m.groupdict()
+                                datetime_snapshot = fields.datetime.strptime(
+                                    m_dict.get("created"),
+                                    "%Y-%m-%d %H:%M:%S %z",
+                                )
+                                datetime_snapshot_naive = (
+                                    datetime_snapshot.replace(tzinfo=None)
+                                )
+                                vm_snapshot_id = self.env[
+                                    "devops.deploy.vm.snapshot"
+                                ].search(
+                                    [
+                                        ("name", "=", m_dict.get("name")),
+                                        (
+                                            "time_creation",
+                                            "=",
+                                            datetime_snapshot_naive,
+                                        ),
+                                        ("vm_id", "=", vm_id.id),
+                                    ],
+                                    limit=1,
+                                )
+                                if not vm_snapshot_id:
+                                    vm_snapshot_values = {
+                                        "name": m_dict.get("name"),
+                                        "time_creation": datetime_snapshot_naive,
+                                        "vm_id": vm_id.id,
+                                        "state": m_dict.get("state"),
+                                    }
+                                    vm_snapshot_id = self.env[
+                                        "devops.deploy.vm.snapshot"
+                                    ].create([vm_snapshot_values])
+                                # print(m.groupdict())
+                        # print("")
+            # print(lst_qemu_conf)
 
     def action_search_all(self):
         self.action_search_workspace()

@@ -36,9 +36,16 @@
                     </group>
                     <group>
                         <field name="provider" />
+                        <field name="uri" />
                     </group>
                     <group>
                         <field name="system_id" />
+                    </group>
+                    <group>
+                        <field name="vm_exec_ids" />
+                    </group>
+                    <group>
+                        <field name="vm_snapshot_ids" />
                     </group>
                     <group>
                         <field name="workspace_ids" />
@@ -193,6 +200,7 @@
                 <field name="os" />
                 <field name="provider" />
                 <field name="system_id" />
+                <field name="vm_ssh_host" />
                 <field name="workspace_ids" />
             </list>
         </field>

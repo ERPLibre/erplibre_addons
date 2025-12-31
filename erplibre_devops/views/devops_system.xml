@@ -159,6 +159,9 @@
                         <group>
                             <field name="devops_deploy_vm_id" />
                         </group>
+                        <group>
+                            <field name="devops_deploy_vm_ids" />
+                        </group>
                     </page>
                     <page string="Docker">
                         <group>
