@@ -185,6 +185,7 @@
                         </group>
                         <group name="group_cg_config" string="CG config view">
                             <field name="mode_view" />
+                            <field name="mode_view_disable_generate_view" />
                             <field name="mode_view_snippet" />
                             <field name="mode_view_snippet_enable_template_website_snippet_view" />
                             <field name="mode_view_snippet_template_generate_website_snippet_generic_mdl" />

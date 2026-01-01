@@ -525,6 +525,10 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="Enable fast creation feature",
     )
 
+    mode_view_disable_generate_view = fields.Boolean(
+        string="Disable generate view from builder", help="Will ignore view generate from builder, it can be generate from code writer because already exist."
+    )
+
     model_fast_creation_model_name = fields.Char(
         string="Model name fast creation",
     )
@@ -1639,6 +1643,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         plan_cg_value = {
             "workspace_id": wp_id.id,
             "mode_view": self.mode_view_generator,
+            "mode_view_disable_generate_view": self.mode_view_disable_generate_view,
             "path_working_erplibre": wp_id.folder,
             "path_code_generator_to_generate": relative_path_module,
             "path_code_generator_to_generate_cg": relative_path_module_cg,

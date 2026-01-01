@@ -1856,8 +1856,9 @@ sock.close()
             rec = rec.with_context(devops_cg_new_project=devops_cg_new_project)
         try:
             yield rec
-        except exceptions.UserError as e:
-            raise e
+        # except exceptions.UserError as e:
+        #     # Disable it, was use in odoo 12, now this exception is generally use
+        #     raise e
         except Exception as e:
             _logger.exception(
                 f"'{description}' it.exec.bundle id"

@@ -670,6 +670,9 @@
                     string="D-View"
                     invisible="state != 'code_module' or not has_configured_path"
                 >
+                    <group string="Option">
+                        <field name="mode_view_disable_generate_view" />
+                    </group>
                     <group string="Web / admin space">
                         <div>Activate by default.</div>
                     </group>
