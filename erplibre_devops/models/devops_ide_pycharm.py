@@ -190,38 +190,47 @@ class DevopsIdePycharm(models.Model):
                     continue
                 if exec_error_id:
                     exec_error_id.exception_name = exception
-                # TODO search multiple path
-                search_path = (
+                lst_search_path = (
                     "File"
-                    f' "{os.path.normpath(os.path.join(rec_ws.folder_odoo_version, "./addons"))}'
+                    f' "{os.path.normpath(os.path.join(rec_ws.folder_odoo_version))}',
+                    "File"
+                    f' "{os.path.normpath(os.path.join(rec_ws.folder, "./script"))}',
+                    "File" f' "{os.path.join(rec_ws.folder, "./script")}',
                 )
-                no_last_file_error = log.rfind(search_path, 0, index_error)
-                if no_last_file_error == -1:
-                    # TODO what to do when cannot find it?
-                    pass
-                no_end_line_error = log.find("\n", no_last_file_error)
-                error_line = log[no_last_file_error:no_end_line_error]
-                rec.line_file_tb_detected = error_line
-                # Detect no line
-                # TODO this code is duplicated by a non-regex method, search into workspace
-                #  for str_tb in traceback.format_stack()[::-1]:
-                regex = r"line (\d+),"
-                result_regex = re.search(regex, error_line)
-                line_breakpoint = None
-                if result_regex:
-                    line_breakpoint = int(result_regex.group(1))
-                # Detect filepath
-                regex = r'File "(.*?)"'
-                result_regex = re.search(regex, error_line)
-                filepath_breakpoint = None
-                if result_regex:
-                    filepath_breakpoint = result_regex.group(1)
-                if line_breakpoint is None or filepath_breakpoint is None:
-                    exec_error_id.find_resolution = "error"
-                    rec.try_find_why(log, exception, rec_ws, exec_error_id)
-                    raise Exception("Cannot find breakpoint information")
-                else:
-                    rec.try_find_why(log, exception, rec_ws, exec_error_id)
+                for search_path in lst_search_path:
+                    if index_error > 0:
+                        no_last_file_error = log.rfind(
+                            search_path, 0, index_error
+                        )
+                    else:
+                        no_last_file_error = log.rfind(search_path, 0)
+                    if no_last_file_error == -1:
+                        # Search with next pattern
+                        continue
+                    no_end_line_error = log.find("\n", no_last_file_error)
+                    error_line = log[no_last_file_error:no_end_line_error]
+                    rec.line_file_tb_detected = error_line
+                    # Detect no line
+                    # TODO this code is duplicated by a non-regex method, search into workspace
+                    #  for str_tb in traceback.format_stack()[::-1]:
+                    regex = r"line (\d+),"
+                    result_regex = re.search(regex, error_line)
+                    line_breakpoint = None
+                    if result_regex:
+                        line_breakpoint = int(result_regex.group(1))
+                    # Detect filepath
+                    regex = r'File "(.*?)"'
+                    result_regex = re.search(regex, error_line)
+                    filepath_breakpoint = None
+                    if result_regex:
+                        filepath_breakpoint = result_regex.group(1)
+                    if line_breakpoint is None or filepath_breakpoint is None:
+                        exec_error_id.find_resolution = "error"
+                        rec.try_find_why(log, exception, rec_ws, exec_error_id)
+                        raise Exception("Cannot find breakpoint information")
+                    else:
+                        rec.try_find_why(log, exception, rec_ws, exec_error_id)
+                        break
                 # -1 to line because start 0, but show 1
                 line = str(line_breakpoint - 1)
                 rec.line_file_tb_detected = error_line
@@ -429,8 +438,16 @@ class DevopsIdePycharm(models.Model):
                 }
                 self.env["devops.ide.pycharm.configuration"].create([v])
 
-                if line_to_add not in file_content_before:
-                    new_content = file_content_before + line_to_add
+                # Remove all default before
+                file_content_update_no_default = file_content_before.replace(
+                    ",True\n", ",False\n"
+                )
+                if file_content_update_no_default.endswith(",True"):
+                    file_content_update_no_default = (
+                        file_content_update_no_default[:-4] + "False"
+                    )
+                if line_to_add not in file_content_update_no_default:
+                    new_content = file_content_update_no_default + line_to_add
                     rec_ws.os_write_file(
                         "conf/pycharm_default_configuration.csv", new_content
                     )

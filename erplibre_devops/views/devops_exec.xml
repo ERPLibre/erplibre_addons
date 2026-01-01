@@ -46,22 +46,20 @@
                         <field name="write_date" />
                     </group>
                 </group>
-                <group>
-                    <group string="CMD">
-                        <field name="folder" />
-                        <field name="cmd" />
-                    </group>
-                    <group string="Error">
-                        <field name="exec_status" />
-                        <field name="devops_exec_error_ids" />
-                    </group>
-                    <group string="Code">
-                        <field name="ide_breakpoint" />
-                        <field name="exec_filename" />
-                        <field name="exec_keyword" />
-                        <field name="exec_method" />
-                        <field name="exec_line_number" />
-                    </group>
+                <group string="CMD">
+                    <field name="folder" />
+                    <field name="cmd" />
+                </group>
+                <group string="Error">
+                    <field name="exec_status" />
+                    <field name="devops_exec_error_ids" />
+                </group>
+                <group string="Code">
+                    <field name="ide_breakpoint" />
+                    <field name="exec_filename" />
+                    <field name="exec_keyword" />
+                    <field name="exec_method" />
+                    <field name="exec_line_number" />
                 </group>
                 <notebook>
                     <page name="page_log_all" string="Log All">
