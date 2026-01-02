@@ -1395,7 +1395,7 @@ class DevopsCgNewProject(models.Model):
                         self.env[
                             "devops.ide.breakpoint"
                         ].get_no_line_breakpoint(
-                            'value\["template_model_name"\] =',
+                            'value\\["template_model_name"\\] =',
                             rec.template_hooks_py,
                             ws,
                         )

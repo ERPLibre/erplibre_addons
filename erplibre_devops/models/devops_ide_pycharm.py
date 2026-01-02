@@ -285,7 +285,7 @@ class DevopsIdePycharm(models.Model):
                 result = ws.execute(
                     to_instance=True,
                     folder=work_dir,
-                    cmd=f'grep -nr "{name_error}" --include=\*.{{py,xml,js}}',
+                    cmd=f'grep -nr "{name_error}" --include=\\*.{{py,xml,js}}',
                 )
                 if exec_error_id and result.log_all:
                     exec_error_id.diagnostic_idea = result.log_all
@@ -327,7 +327,7 @@ class DevopsIdePycharm(models.Model):
                         folder=work_dir,
                         cmd=(
                             f'grep -nr \\"{s_value_error}\\"'
-                            " --include=\*.{py,xml,js}"
+                            " --include=\\*.{py,xml,js}"
                         ),
                         delimiter_bash='"',
                     )
@@ -424,7 +424,7 @@ class DevopsIdePycharm(models.Model):
                 group = "custom_script"
                 default = True
                 if args:
-                    build_args = args.replace(",", "\,")
+                    build_args = args.replace(",", "\\,")
                     cmd = f"{cmd},{build_args}"
                 line_to_add = f"\n{conf_add_conf_name},{cmd},{group},{default}"
 

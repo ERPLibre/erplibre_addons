@@ -143,7 +143,7 @@ class DevopsIdeBreakpoint(models.Model):
     @staticmethod
     def get_no_line_breakpoint(key, file, ws):
         with ws.devops_create_exec_bundle("Get no line breakpoint") as rec:
-            key = key.replace('"', '\\"').replace("[", "\[").replace("]", "\]")
+            key = key.replace('"', '\\"').replace("[", "\\[").replace("]", "\\]")
             cmd = f'grep -n "{key}" {file}'
             cmd += " | awk -F: '{print $1}'"
             result = rec.execute(to_instance=True, cmd=cmd, engine="sh")

@@ -1845,7 +1845,7 @@ class DevopsSystem(models.Model):
             if rec.use_search_cmd == "locate":
                 # Validate word ERPLibre is into .erplibre-version
                 cmd = (
-                    "locate -b -r '^\.erplibre-version$'|grep -v "
+                    "locate -b -r '^\\.erplibre-version$'|grep -v "
                     '".repo"|grep -v'
                     ' "/var/lib/docker"'
                 )
@@ -1865,7 +1865,7 @@ class DevopsSystem(models.Model):
             if rec.use_search_cmd == "locate":
                 # Validate word ERPLibre is into docker-compose.yml
                 cmd = (
-                    'locate -b -r "^docker-compose\.yml$"|grep -v .repo|grep'
+                    'locate -b -r "^docker-compose\\.yml$"|grep -v .repo|grep'
                     " -v /var/lib/docker"
                 )
             elif rec.use_search_cmd == "find":
