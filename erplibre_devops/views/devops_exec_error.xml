@@ -27,7 +27,8 @@
                         string="Open into IDE"
                         type="object"
                         class="oe_highlight"
-                        invisible="not ide_breakpoint"/>
+                        invisible="not ide_breakpoint"
+                    />
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -35,20 +36,10 @@
                             <field name="name" />
                         </h1>
                     </div>
-                    <div
-                        class="badge-pill badge-info float-right"
-                        invisible="not diagnostic_idea">
-                        Diagnostic
-                    </div>
+                    <div class="badge-pill badge-info float-right" invisible="not diagnostic_idea">Diagnostic</div>
                     <div name="button_box" class="oe_button_box">
-                        
-            <field name="active" invisible="1" />
-            <widget
-                name="web_ribbon"
-                title="Archived"
-                bg_color="bg-danger"
-                invisible="active"/>
-            
+                        <field name="active" invisible="1" />
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active" />
                     </div>
                     <group string="IT">
                         <field name="devops_workspace" />
@@ -95,7 +86,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <chatter />
             </form>
         </field>
     </record>
@@ -190,7 +181,8 @@
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"
                     tabindex="-1"
-                    invisible="not ide_breakpoint"/>
+                    invisible="not ide_breakpoint"
+                />
             </list>
         </field>
     </record>

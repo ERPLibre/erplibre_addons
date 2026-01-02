@@ -11,25 +11,21 @@
                         string="Re-execute last"
                         type="object"
                         class="btn-warning"
-                        invisible="not has_re_execute_new_project"/>
+                        invisible="not has_re_execute_new_project"
+                    />
                     <button
                         name="action_execute_last_stage_new_project"
                         string="Re-execute Uc0"
                         type="object"
                         class="btn-warning"
                         context="{'default_stage_Uc0': True}"
-                        invisible="not has_re_execute_new_project"/>
+                        invisible="not has_re_execute_new_project"
+                    />
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-
-            <field name="active" invisible="1" />
-            <widget
-                name="web_ribbon"
-                title="Archived"
-                bg_color="bg-danger"
-                invisible="active"/>
-
+                        <field name="active" invisible="1" />
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active" />
                     </div>
                     <group invisible="True">
                         <field name="has_re_execute_new_project" />
@@ -183,7 +179,8 @@
                         <group string="Log">
                             <field
                                 name="devops_cg_erplibre_devops_error_log"
-                                invisible="not devops_cg_erplibre_devops_error_log"/>
+                                invisible="not devops_cg_erplibre_devops_error_log"
+                            />
                             <field name="devops_cg_erplibre_devops_log" />
                         </group>
                         <group name="group_cg_config" string="CG config view">

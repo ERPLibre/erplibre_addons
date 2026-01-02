@@ -11,7 +11,8 @@
                         string="Install requirement"
                         type="object"
                         class="btn-danger"
-                        invisible="not has_requirement_to_install"/>
+                        invisible="not has_requirement_to_install"
+                    />
                     <button name="execute" string="Execute" type="object" class="btn-success" />
                     <button name="clear_result" string="Clear result" type="object" class="btn-warning" />
                 </header>
@@ -44,7 +45,8 @@
                             <field
                                 name="advance_aliment_template_repas_image"
                                 string="Template repas image"
-                                invisible="not has_aliment"/>
+                                invisible="not has_aliment"
+                            />
                             <field name="advance_presentation_nb_page" string="Template presentation nb page" />
                         </group>
                     </group>
@@ -65,28 +67,33 @@
                                 <field
                                     name="question_list_aliment"
                                     string="Q. Liste aliment"
-                                    invisible="not has_aliment"/>
+                                    invisible="not has_aliment"
+                                />
                                 <field
                                     name="result_list_aliment"
                                     string="R. Liste aliment"
-                                    invisible="not has_aliment"/>
+                                    invisible="not has_aliment"
+                                />
                                 <field
                                     name="result_list_aliment_count"
                                     string="CS. Aliment count"
-                                    invisible="not has_aliment"/>
+                                    invisible="not has_aliment"
+                                />
                                 <field
                                     name="question_list_aliment_image"
                                     string="CQ. Aliment image"
-                                    invisible="not has_aliment"/>
+                                    invisible="not has_aliment"
+                                />
                                 <field
                                     name="result_list_aliment_image"
                                     string="R. Aliment image"
-                                    invisible="not has_aliment"/>
+                                    invisible="not has_aliment"
+                                />
                             </group>
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <chatter />
             </form>
         </field>
     </record>

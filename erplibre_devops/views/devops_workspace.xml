@@ -384,36 +384,6 @@
         </field>
     </record>
 
-    <record id="view_devops_workspace_conf_search" model="ir.ui.view">
-        <field name="name">devops.workspace search</field>
-        <field name="model">devops.workspace</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name" />
-                <field name="folder" />
-                <field name="folder_odoo_version" />
-                <filter name="is_me" string="Is me" domain="[('is_me','=',True)]" />
-                <filter name="is_robot" string="Is robot" domain="[('is_robot','=',True)]" />
-                <filter
-                    name="has_docker_compose"
-                    string="Has docker compose"
-                    domain="[('docker_compose_id','!=',False)]"
-                />
-                <group string="Group By" expand="1">
-                    <filter name="system_id" string="System" context="{'group_by':'system_id'}" />
-                    <filter name="folder" string="Folder" context="{'group_by':'folder'}" />
-                    <filter
-                        name="folder_odoo_version"
-                        string="Folder odoo workspace"
-                        context="{'group_by':'folder_odoo_version'}"
-                    />
-                    <filter name="db_name" string="Database name" context="{'group_by':'db_name'}" />
-                    <filter name="db_is_restored" string="DB is restored" context="{'group_by':'db_is_restored'}" />
-                </group>
-            </search>
-        </field>
-    </record>
-
     <record id="view_devops_workspace_conf_list" model="ir.ui.view">
         <field name="name">devops.workspace list</field>
         <field name="model">devops.workspace</field>
@@ -495,6 +465,36 @@
                     title="Hard reboot"
                 />
             </list>
+        </field>
+    </record>
+
+    <record id="view_devops_workspace_conf_search" model="ir.ui.view">
+        <field name="name">devops.workspace search</field>
+        <field name="model">devops.workspace</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="folder" />
+                <field name="folder_odoo_version" />
+                <filter name="is_me" string="Is me" domain="[('is_me','=',True)]" />
+                <filter name="is_robot" string="Is robot" domain="[('is_robot','=',True)]" />
+                <filter
+                    name="has_docker_compose"
+                    string="Has docker compose"
+                    domain="[('docker_compose_id','!=',False)]"
+                />
+                <group string="Group By" expand="1">
+                    <filter name="system_id" string="System" context="{'group_by':'system_id'}" />
+                    <filter name="folder" string="Folder" context="{'group_by':'folder'}" />
+                    <filter
+                        name="folder_odoo_version"
+                        string="Folder odoo workspace"
+                        context="{'group_by':'folder_odoo_version'}"
+                    />
+                    <filter name="db_name" string="Database name" context="{'group_by':'db_name'}" />
+                    <filter name="db_is_restored" string="DB is restored" context="{'group_by':'db_is_restored'}" />
+                </group>
+            </search>
         </field>
     </record>
 

@@ -11,25 +11,29 @@
                         string="New project"
                         type="object"
                         class="oe_highlight"
-                        invisible="execution_finish"/>
+                        invisible="execution_finish"
+                    />
                     <button
                         name="action_new_project"
                         string="Re-execute"
                         type="object"
                         class="oe_highlight"
-                        invisible="not execution_finish"/>
+                        invisible="not execution_finish"
+                    />
                     <button
                         name="action_new_project_setup_IDE"
                         string="Setup IDE"
                         type="object"
                         class="oe_highlight"
-                        invisible="not can_setup_ide"/>
+                        invisible="not can_setup_ide"
+                    />
                     <button
                         name="action_new_project_clear_pause"
                         string="Clear pause"
                         type="object"
                         class="oe_highlight"
-                        invisible="not is_pause"/>
+                        invisible="not is_pause"
+                    />
                     <button name="action_new_project_debug" string="Debug" type="object" class="oe_highlight" />
                     <button
                         name="action_new_project_debug"
@@ -54,24 +58,12 @@
                         <field name="name" />
                     </h1>
                 </div>
-                <div class="badge-pill badge-info float-right" invisible="not is_pause">
-                    Pause
-                </div>
-                <div class="badge-pill badge-danger float-right" invisible="not has_error">
-                    Error
-                </div>
-                <div class="badge-pill badge-warning float-right" invisible="not has_warning">
-                    Warning
-                </div>
+                <div class="badge-pill badge-info float-right" invisible="not is_pause">Pause</div>
+                <div class="badge-pill badge-danger float-right" invisible="not has_error">Error</div>
+                <div class="badge-pill badge-warning float-right" invisible="not has_warning">Warning</div>
                 <div name="button_box" class="oe_button_box">
-                    
-            <field name="active" invisible="1" />
-            <widget
-                name="web_ribbon"
-                title="Archived"
-                bg_color="bg-danger"
-                invisible="active"/>
-            
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active" />
                 </div>
                 <group>
                     <group string="Project">

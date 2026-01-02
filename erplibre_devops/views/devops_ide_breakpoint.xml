@@ -11,7 +11,8 @@
                         string="Open into IDE"
                         type="object"
                         class="oe_highlight"
-                        invisible="not filename"/>
+                        invisible="not filename"
+                    />
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -148,7 +149,8 @@
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"
                     tabindex="-1"
-                    invisible="not filename"/>
+                    invisible="not filename"
+                />
             </list>
         </field>
     </record>
