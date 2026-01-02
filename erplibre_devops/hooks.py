@@ -10,6 +10,9 @@ _logger = logging.getLogger(__name__)
 
 
 def post_init_hook(env):
+    # Init local system
+    env.ref("erplibre_devops.devops_system_local").action_init_system()
+
     # Refresh DB image
     env["devops.system"].action_refresh_db_image()
 

@@ -526,7 +526,8 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     mode_view_disable_generate_view = fields.Boolean(
-        string="Disable generate view from builder", help="Will ignore view generate from builder, it can be generate from code writer because already exist."
+        string="Disable generate view from builder",
+        help="Will ignore view generate from builder, it can be generate from code writer because already exist.",
     )
 
     model_fast_creation_model_name = fields.Char(
@@ -2076,13 +2077,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             "ssh_password": self.ssh_password,
         }
         system_id = self.env["devops.system"].create([system_value])
+        system_id.action_init_system()
         self.working_system_id = system_id
-        try:
-            # Just open and close the connection
-            with self.working_system_id.ssh_connection():
-                pass
-        except Exception:
-            pass
         return self._reopen_self()
 
     def ssh_test_system_exist(self):

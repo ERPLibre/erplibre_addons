@@ -22,6 +22,7 @@
         "code_generator_website_snippet",
         "mail",
         "multi_step_wizard",
+        "queue_job",
     ],
     "data": [
         "security/ir.model.access.csv",

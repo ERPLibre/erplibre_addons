@@ -12,7 +12,7 @@ import re
 import subprocess
 import time
 
-from odoo import _, api, exceptions, fields, models
+from odoo import _, api, conf, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
 try:
@@ -48,6 +48,11 @@ class DevopsSystem(models.Model):
     devops_deploy_vm_id = fields.Many2one(
         comodel_name="devops.deploy.vm",
         string="Associate VM",
+    )
+
+    is_init_done = fields.Boolean(
+        help="Call method init_system() to set this field at True.",
+        readonly=True,
     )
 
     is_vm = fields.Boolean(
@@ -331,10 +336,26 @@ class DevopsSystem(models.Model):
 
     path_home = fields.Char()
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        result = super().create(vals_list)
-        for rec in result:
+    def action_sub_system_search_all(self):
+        for rec in self:
+            if "queue_job" in conf.server_wide_modules:
+                for sub_system_id in rec.sub_system_ids:
+                    sub_system_id.with_delay().action_search_all()
+            else:
+                rec.sub_system_ids.action_search_all()
+
+    def _job_action_init_system(self):
+        for rec in self:
+            rec = rec.exists()
+            if not rec:
+                continue
+            if "queue_job" in conf.server_wide_modules:
+                rec.with_delay().action_init_system()
+            else:
+                rec.action_init_system()
+
+    def action_init_system(self):
+        for rec in self:
             try:
                 rec.path_home = rec.execute_with_result(
                     "echo $HOME", None
@@ -354,7 +375,7 @@ class DevopsSystem(models.Model):
                     "erplibre.config.path.home"
                 ].get_path_home_id(rec.path_home)
                 rec.erplibre_config_path_home_ids = [(4, path_home_id.id)]
-        return result
+            rec.is_init_done = True
 
     @api.depends("ssh_user", "method")
     def _compute_username_login(self):
@@ -2093,7 +2114,7 @@ class DevopsSystem(models.Model):
                     )
 
     def action_search_system_id_from_ssh_config(self):
-        new_sub_system_id = self.env["devops.system"]
+        new_sub_system_ids = self.env["devops.system"]
         for rec in self:
             config_path = os.path.join(self.path_home, ".ssh/config")
             config_path_exist = rec.os_path_exists(config_path)
@@ -2148,7 +2169,7 @@ class DevopsSystem(models.Model):
                     # TODO support identitiesonly , PubkeyAuthentication , PreferredAuthentications
                     system_id = self.env["devops.system"].create([value])
                 if system_id:
-                    new_sub_system_id += system_id
+                    new_sub_system_ids += system_id
 
             # Continue jump system, because better to wait all no jump system is created
             for dct_jump_value in lst_system_jump:
@@ -2176,8 +2197,12 @@ class DevopsSystem(models.Model):
                     )
                     system_id = self.env["devops.system"].create([value])
                     if system_id:
-                        new_sub_system_id += system_id
-        return new_sub_system_id
+                        new_sub_system_ids += system_id
+
+        for new_sub_system_id in new_sub_system_ids:
+            new_sub_system_id._job_action_init_system()
+
+        return new_sub_system_ids
 
     @api.model
     def os_path_exists(self, path):

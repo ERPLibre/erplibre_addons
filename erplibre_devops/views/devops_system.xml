@@ -6,6 +6,13 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button
+                        name="action_init_system"
+                        string="Init system"
+                        type="object"
+                        class="btn-danger"
+                        invisible="is_init_done"
+                    />
                     <button name="action_open_terminal" string="Open terminal" type="object" />
                     <button
                         name="%(erplibre_devops.action_devops_plan_action_workspace_me)d"
@@ -117,6 +124,12 @@
                     </page>
                     <page string="System">
                         <group string="Connected system">
+                            <button
+                                name="action_sub_system_search_all"
+                                string="Sub system search all"
+                                type="object"
+                                class="oe_highlight"
+                            />
                             <field name="parent_system_id" />
                             <field name="sub_system_ids" />
                         </group>
