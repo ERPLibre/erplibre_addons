@@ -79,7 +79,7 @@ class ErplibreMode(models.Model):
             ].create([{"value": mode_version_base, "name": mode_version_base}])
         mode_version_erplibre_id = self.env[
             "erplibre.mode.version.erplibre"
-        ].search([("value", "=", mode_version_erplibre)])
+        ].search([("value", "=", mode_version_erplibre)], limit=1)
         if not mode_version_erplibre_id:
             mode_version_erplibre_id = self.env[
                 "erplibre.mode.version.erplibre"

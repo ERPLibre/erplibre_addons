@@ -1811,7 +1811,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         lst_model_field = []
         for model_name, v in dct_model.items():
             model_id = self.env["devops.cg.model"].search(
-                [("name", "=", model_name)]
+                [("name", "=", model_name)], limit=1
             )
             if not model_id:
                 model_value = {
