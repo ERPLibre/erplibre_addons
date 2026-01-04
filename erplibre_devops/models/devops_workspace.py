@@ -49,6 +49,12 @@ class DevopsWorkspace(models.Model):
         string="Executions",
     )
 
+    workspace_config_conf_ids = fields.One2many(
+        comodel_name="devops.workspace.config.conf",
+        inverse_name="workspace_id",
+        string="Config conf",
+    )
+
     devops_test_plan_exec_count = fields.Integer(
         string="Test plan exec count",
         compute="_compute_devops_test_plan_exec_count",
@@ -1318,6 +1324,39 @@ class DevopsWorkspace(models.Model):
                         "erplibre_devops.erplibre_mode_version_erplibre_robot_libre"
                     ).id
                 )
+                # Read config
+                rec.search_config_conf()
+
+    def search_config_conf(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Search config conf") as rec:
+                # TODO default config file over docker is /etc/odoo/odoo.conf
+                default_filepath_config = "config.conf"
+                if not rec.os_path_exists(
+                    default_filepath_config, to_instance=True
+                ):
+                    continue
+                content_file = rec.os_read_file(
+                    default_filepath_config, to_instance=True
+                )
+                workspace_config_conf_values = {
+                    "name": default_filepath_config,
+                    "file_content": content_file,
+                    "workspace_id": rec.id,
+                }
+                config_conf_id = self.env[
+                    "devops.workspace.config.conf"
+                ].search(
+                    [
+                        ("name", "=", default_filepath_config),
+                        ("file_content", "=", content_file),
+                        ("workspace_id", "=", rec.id),
+                    ]
+                )
+                if not config_conf_id:
+                    self.env["devops.workspace.config.conf"].create(
+                        [workspace_config_conf_values]
+                    )
 
     def update_makefile_from_git(self):
         for rec_o in self:

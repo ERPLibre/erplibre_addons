@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_system_systemd_service_conf_erplibre_01" model="devops.system.systemd.service.conf.template">
+            <field name="name">ERPLibre default run 01</field>
+            <!-- prettier-ignore-start -->
+            <field name="file_content">
+[Unit]
+Description=$ERPLibreDescription$
+Requires=postgresql.service
+After=network.target network-online.target postgresql.service
+
+[Service]
+Type=simple
+SyslogIdentifier=$ERPLibreUser$
+PermissionsStartOnly=true
+User=$ERPLibreUser$
+Group=$ERPLibreUser$
+Restart=always
+RestartSec=5
+PIDFile=$ERPLibreHome$/.venv.erplibre/service.pid
+ExecStart=$ERPLibreHome$/run.sh $ERPLibreExecParam$
+WorkingDirectory=$ERPLibreHome$
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
+            </field>
+            <!-- prettier-ignore-end -->
+        </record>
+    </data>
+</odoo>

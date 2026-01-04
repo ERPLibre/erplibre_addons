@@ -45,7 +45,11 @@
 
     <menuitem id="menu_erplibre_mode" name="Mode" sequence="1" parent="menu_erplibre" />
 
+    <menuitem id="menu_erplibre_system" name="System" sequence="3" parent="menu_erplibre" />
+
     <menuitem id="menu_process" name="Process" sequence="16" parent="menu_devops" />
+
+    <menuitem id="menu_system" name="System" sequence="15" parent="menu_devops" />
 
     <menuitem id="menu_workspace_sub" name="Workspace misc" sequence="17" parent="menu_devops" />
 
@@ -177,6 +181,70 @@
         action="devops_deploy_vm_snapshot_deploy_vm_snapshot_action_window"
         sequence="3"
         parent="menu_deploy_vm_group"
+    />
+
+    <menuitem
+        id="system_certbot_conf"
+        name="Certbot conf"
+        action="devops_system_certbot_conf_system_certbot_conf_action_window"
+        sequence="1"
+        parent="menu_system"
+    />
+
+    <menuitem
+        id="system_cloudflare_conf"
+        name="Cloudflare conf"
+        action="devops_system_cloudflare_conf_system_cloudflare_conf_action_window"
+        sequence="1"
+        parent="menu_system"
+    />
+
+    <menuitem
+        id="system_nginx_site_conf"
+        name="Nginx site conf"
+        action="devops_system_nginx_site_conf_system_nginx_site_conf_action_window"
+        sequence="1"
+        parent="menu_system"
+    />
+
+    <menuitem
+        id="system_nginx_site_conf_template"
+        name="Nginx site conf template"
+        action="devops_system_nginx_site_conf_template_system_nginx_site_conf_template_action_window"
+        sequence="1"
+        parent="menu_erplibre_system"
+    />
+
+    <menuitem
+        id="system_postgres_conf"
+        name="PostgreSQL conf"
+        action="devops_system_postgres_conf_system_postgres_conf_action_window"
+        sequence="1"
+        parent="menu_system"
+    />
+
+    <menuitem
+        id="system_systemd_service_conf"
+        name="Systemd service conf"
+        action="devops_system_systemd_service_conf_system_systemd_service_conf_action_window"
+        sequence="1"
+        parent="menu_system"
+    />
+
+    <menuitem
+        id="system_systemd_service_conf_template"
+        name="Systemd service conf template"
+        action="devops_system_systemd_service_conf_template_system_systemd_service_conf_template_action_window"
+        sequence="1"
+        parent="menu_erplibre_system"
+    />
+
+    <menuitem
+        id="workspace_config_conf"
+        name="Odoo Config conf"
+        action="devops_workspace_config_conf_workspace_config_conf_action_window"
+        sequence="1"
+        parent="menu_system"
     />
 
     <menuitem
@@ -405,7 +473,7 @@
         id="menu_system_item"
         name="System"
         action="action_devops_check_system_conf_form"
-        sequence="15"
+        sequence="14"
         parent="menu_devops"
     />
 

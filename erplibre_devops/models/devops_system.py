@@ -93,6 +93,10 @@ class DevopsSystem(models.Model):
         help="Use this to connect to inter SSH before connect to system.",
     )
 
+    os_passwd = fields.Text()
+
+    os_group = fields.Text()
+
     ssh_jump_user = fields.Char(string="Username in the SSH JUMP Server")
 
     ssh_jump_password = fields.Char(string="SSH JUMP Password")
@@ -211,6 +215,36 @@ class DevopsSystem(models.Model):
         comodel_name="devops.docker.compose",
         inverse_name="system_id",
         string="Docker compose",
+    )
+
+    system_nginx_site_conf_ids = fields.One2many(
+        comodel_name="devops.system.nginx.site.conf",
+        inverse_name="system_id",
+        string="Nginx site conf",
+    )
+
+    system_systemd_service_ids = fields.One2many(
+        comodel_name="devops.system.systemd.service.conf",
+        inverse_name="system_id",
+        string="Systemd conf",
+    )
+
+    system_postgres_ids = fields.One2many(
+        comodel_name="devops.system.postgres.conf",
+        inverse_name="system_id",
+        string="PostgreSQL conf",
+    )
+
+    system_certbot_ids = fields.One2many(
+        comodel_name="devops.system.certbot.conf",
+        inverse_name="system_id",
+        string="Certbot conf",
+    )
+
+    system_cloudflare_ids = fields.One2many(
+        comodel_name="devops.system.cloudflare.conf",
+        inverse_name="system_id",
+        string="Cloudfare conf",
     )
 
     docker_compose_count = fields.Integer(
@@ -344,7 +378,7 @@ class DevopsSystem(models.Model):
             else:
                 rec.sub_system_ids.action_search_all()
 
-    def _job_action_init_system(self):
+    def job_action_init_system(self):
         for rec in self:
             rec = rec.exists()
             if not rec:
@@ -354,11 +388,39 @@ class DevopsSystem(models.Model):
             else:
                 rec.action_init_system()
 
+    def job_action_search_workspace(self):
+        for rec in self:
+            rec = rec.exists()
+            if not rec:
+                continue
+            if "queue_job" in conf.server_wide_modules:
+                rec.with_delay().action_search_workspace()
+            else:
+                rec.action_search_workspace()
+
+    def job_action_search_all(self):
+        for rec in self:
+            rec = rec.exists()
+            if not rec:
+                continue
+            if "queue_job" in conf.server_wide_modules:
+                rec.with_delay().action_search_all()
+            else:
+                rec.action_search_all()
+
     def action_init_system(self):
         for rec in self:
             try:
                 rec.path_home = rec.execute_with_result(
                     "echo $HOME", None
+                ).strip()
+
+                rec.os_passwd = rec.execute_with_result(
+                    "cat /etc/passwd", None
+                ).strip()
+
+                rec.os_group = rec.execute_with_result(
+                    "cat /etc/group", None
                 ).strip()
             except Exception as e:
                 # TODO catch AuthenticationException exception
@@ -374,8 +436,323 @@ class DevopsSystem(models.Model):
                 path_home_id = self.env[
                     "erplibre.config.path.home"
                 ].get_path_home_id(rec.path_home)
+                # TODO validate not exist
                 rec.erplibre_config_path_home_ids = [(4, path_home_id.id)]
-            rec.is_init_done = True
+
+        self.is_init_done = True
+        self.action_search_nginx_site_conf()
+        self.action_search_systemd_conf()
+        self.action_search_postgresql_conf()
+        self.action_search_certbot_conf()
+        self.action_search_cloudflare_conf()
+
+    def action_search_nginx_site_conf(self):
+        lst_site_enable_values = []
+        for rec in self:
+            if not (
+                rec.method == "local"
+                or (rec.method == "ssh" and rec.ssh_connection_status)
+            ):
+                continue
+            # TODO detect sym link,
+            # ls_file_site_available, status = rec.execute_with_result(
+            #     "ls /etc/nginx/sites-available", None, return_status=True
+            # )
+
+            ls_file_site_enabled, status = rec.execute_with_result(
+                "ls /etc/nginx/sites-enabled", None, return_status=True
+            )
+
+            if status:
+                continue
+
+            for file_name in ls_file_site_enabled.strip().split("\n"):
+                if not file_name:
+                    continue
+                devops_system_nginx_site_id = self.env[
+                    "devops.system.nginx.site.conf"
+                ].search(
+                    [
+                        ("system_id", "=", rec.id),
+                        ("name", "=", file_name),
+                        ("is_sites_enabled", "=", True),
+                    ],
+                    limit=1,
+                )
+                if not devops_system_nginx_site_id:
+                    filepath = os.path.join(
+                        "/etc/nginx/sites-enabled", file_name
+                    )
+                    cmd = f'cat "{filepath}"'
+                    file_content_before = rec.execute_with_result(cmd, None)
+                    service_values = {
+                        "file_content": file_content_before,
+                        "name": file_name,
+                        "is_sites_enabled": True,
+                        "system_id": rec.id,
+                    }
+                    lst_site_enable_values.append(service_values)
+        if lst_site_enable_values:
+            self.env["devops.system.nginx.site.conf"].create(
+                lst_site_enable_values
+            )
+
+    def action_search_systemd_conf(self):
+        lst_systemd_values = []
+        for rec in self:
+            if not (
+                rec.method == "local"
+                or (rec.method == "ssh" and rec.ssh_connection_status)
+            ):
+                continue
+
+            ls_file_systemd_service, status = rec.execute_with_result(
+                'find /etc/systemd -path "/etc/systemd/*/*.target.wants" -prune -o -name "*.service" -print',
+                None,
+                return_status=True,
+            )
+            for systemd_file_path in ls_file_systemd_service.strip().split(
+                "\n"
+            ):
+                if not systemd_file_path:
+                    continue
+                cmd = f'cat "{systemd_file_path}"'
+                file_content_before = rec.execute_with_result(cmd, None)
+                service_values = {
+                    "file_content": file_content_before,
+                    "name": systemd_file_path[len("/etc/systemd/system/") :],
+                    "file_path": systemd_file_path,
+                    "system_id": rec.id,
+                }
+                devops_system_systemd_id = self.env[
+                    "devops.system.systemd.service.conf"
+                ].search(
+                    [
+                        ("system_id", "=", rec.id),
+                        ("file_path", "=", systemd_file_path),
+                    ],
+                    limit=1,
+                )
+                if not devops_system_systemd_id:
+                    lst_systemd_values.append(service_values)
+
+        if lst_systemd_values:
+            self.env["devops.system.systemd.service.conf"].create(
+                lst_systemd_values
+            )
+
+    def action_search_postgresql_conf(self):
+        lst_postgres_values = []
+        for rec in self:
+            if not (
+                rec.method == "local"
+                or (rec.method == "ssh" and rec.ssh_connection_status)
+            ):
+                continue
+
+            result_has_psql, status = rec.execute_with_result(
+                "command -v psql postgres pg_ctl initdb pg_isready pg_config",
+                None,
+                return_status=True,
+            )
+            if status or not result_has_psql:
+                continue
+
+            psql_version, status = rec.execute_with_result(
+                "psql --version", None, return_status=True
+            )
+
+            if not psql_version or status:
+                continue
+
+            # Support OS package
+            package_os = ""
+            result, status = rec.execute_with_result(
+                "dpkg -l | grep -E '^ii\\s+postgresql|^ii\\s+postgresql-client|^ii\\s+libpq'",
+                None,
+                return_status=True,
+            )
+            if not status:
+                package_os = result
+
+            if not package_os:
+                result, status = rec.execute_with_result(
+                    "pacman -Q | grep -E '^postgresql'",
+                    None,
+                    return_status=True,
+                )
+                if not status:
+                    package_os = result
+
+            if not package_os:
+                result, status = rec.execute_with_result(
+                    "rpm -qa | grep -E 'postgresql|libpq'",
+                    None,
+                    return_status=True,
+                )
+                if not status:
+                    package_os = result
+
+            # Support another version
+            postgres_version, status = rec.execute_with_result(
+                "postgres --version 2>/dev/null", None, return_status=True
+            )
+
+            ps_config_version, status = rec.execute_with_result(
+                "pg_config --version 2>/dev/null", None, return_status=True
+            )
+
+            # Support process
+            process_postgres, status = rec.execute_with_result(
+                "ps -eo user,pid,cmd | grep -E '[p]ostgres'",
+                None,
+                return_status=True,
+            )
+
+            ss_postgres, status = rec.execute_with_result(
+                "ss -ltnp 2>/dev/null | grep ':5432'", None, return_status=True
+            )
+
+            name = psql_version
+
+            devops_system_postgres_id = self.env[
+                "devops.system.postgres.conf"
+            ].search(
+                [
+                    ("system_id", "=", rec.id),
+                    ("name", "=", name),
+                ],
+                limit=1,
+            )
+
+            if devops_system_postgres_id:
+                continue
+
+            system_postgres_values = {
+                "name": name,
+                "system_id": rec.id,
+                "psql_version": psql_version,
+                "package_os": package_os,
+                "postgres_version": postgres_version,
+                "ps_config_version": ps_config_version,
+                "process_postgres": process_postgres,
+                "ss_postgres": ss_postgres,
+            }
+
+            lst_postgres_values.append(system_postgres_values)
+
+        if lst_postgres_values:
+            self.env["devops.system.postgres.conf"].create(lst_postgres_values)
+
+    def action_search_certbot_conf(self):
+        lst_certbot_values = []
+        for rec in self:
+            if not (
+                rec.method == "local"
+                or (rec.method == "ssh" and rec.ssh_connection_status)
+            ):
+                continue
+
+            # TODO result can differ if run from workspace
+            result_has_certbot, status = rec.execute_with_result(
+                "command -v certbot",
+                None,
+                return_status=True,
+            )
+            if status or not result_has_certbot:
+                continue
+
+            path_bin = result_has_certbot
+
+            certbot_version, status = rec.execute_with_result(
+                "certbot --version 2>/dev/null", None, return_status=True
+            )
+
+            if not certbot_version or status:
+                continue
+
+            name = certbot_version
+
+            devops_system_certbot_id = self.env[
+                "devops.system.certbot.conf"
+            ].search(
+                [
+                    ("system_id", "=", rec.id),
+                    ("name", "=", name),
+                ],
+                limit=1,
+            )
+
+            if devops_system_certbot_id:
+                continue
+
+            system_certbot_values = {
+                "name": name,
+                "system_id": rec.id,
+                "version": certbot_version,
+                "path_bin": path_bin,
+            }
+
+            lst_certbot_values.append(system_certbot_values)
+
+        if lst_certbot_values:
+            self.env["devops.system.certbot.conf"].create(lst_certbot_values)
+
+    def action_search_cloudflare_conf(self):
+        lst_cloudflare_values = []
+        cloudflare_init_path = "/etc/letsencrypt/cloudflare.ini"
+        for rec in self:
+            if not (
+                rec.method == "local"
+                or (rec.method == "ssh" and rec.ssh_connection_status)
+            ):
+                continue
+
+            result_has_cloudflare, status = rec.execute_with_result(
+                f"ls -l {cloudflare_init_path}",
+                None,
+                return_status=True,
+            )
+            if status or not result_has_cloudflare:
+                continue
+
+            listing = result_has_cloudflare
+
+            cloudflare_permission, status = rec.execute_with_result(
+                f"stat {cloudflare_init_path}", None, return_status=True
+            )
+
+            if not cloudflare_permission or status:
+                continue
+
+            name = cloudflare_init_path
+
+            devops_system_cloudflare_id = self.env[
+                "devops.system.cloudflare.conf"
+            ].search(
+                [
+                    ("system_id", "=", rec.id),
+                    ("name", "=", name),
+                ],
+                limit=1,
+            )
+
+            if devops_system_cloudflare_id:
+                continue
+
+            system_cloudflare_values = {
+                "name": name,
+                "listing": listing,
+                "system_id": rec.id,
+                "permission": cloudflare_permission,
+            }
+
+            lst_cloudflare_values.append(system_cloudflare_values)
+
+        if lst_cloudflare_values:
+            self.env["devops.system.cloudflare.conf"].create(
+                lst_cloudflare_values
+            )
 
     @api.depends("ssh_user", "method")
     def _compute_username_login(self):
@@ -905,19 +1282,20 @@ class DevopsSystem(models.Model):
                 out, status = rec.execute_with_result(
                     cmd, None, return_status=True
                 )
-                if status != 0:
-                    # Suppose got error :
-                    # Cannot connect to the Docker daemon at unix:///var/run/docker.sock.
-                    # Is the docker daemon running?
-                    cmd = "sudo systemctl start docker"
-                    out = rec.execute_terminal_gui(
-                        cmd=f'echo \\"{cmd}\\";{cmd}',
-                    )
-                    time.sleep(5)
-                    cmd = "docker info"
-                    out, status = rec.execute_with_result(
-                        cmd, None, return_status=True
-                    )
+                # Don't force start docker, will be difficult when launch on multiple system
+                # if status != 0:
+                #     # Suppose got error :
+                #     # Cannot connect to the Docker daemon at unix:///var/run/docker.sock.
+                #     # Is the docker daemon running?
+                #     cmd = "sudo systemctl start docker"
+                #     out = rec.execute_terminal_gui(
+                #         cmd=f'echo \\"{cmd}\\";{cmd}',
+                #     )
+                #     time.sleep(5)
+                #     cmd = "docker info"
+                #     out, status = rec.execute_with_result(
+                #         cmd, None, return_status=True
+                #     )
                 rec.docker_daemon_is_running = status == 0
                 rec.docker_system_info = out
                 # 4. Metric system
@@ -1824,6 +2202,9 @@ class DevopsSystem(models.Model):
             # print(lst_qemu_conf)
 
     def action_search_all(self):
+        if not self.is_init_done:
+            self.action_init_system()
+
         self.action_search_workspace()
         # TODO maybe check system_status before continue
         if not all([a.system_status for a in self]):
@@ -2116,7 +2497,17 @@ class DevopsSystem(models.Model):
     def action_search_system_id_from_ssh_config(self):
         new_sub_system_ids = self.env["devops.system"]
         for rec in self:
-            config_path = os.path.join(self.path_home, ".ssh/config")
+            if not (
+                rec.method == "local"
+                or (rec.method == "ssh" and rec.ssh_connection_status)
+            ):
+                continue
+            if not rec.path_home:
+                _logger.warning(
+                    f'Missing path_home from system "{rec}" "{rec.name}".'
+                )
+                continue
+            config_path = os.path.join(rec.path_home, ".ssh/config")
             config_path_exist = rec.os_path_exists(config_path)
             if not config_path_exist:
                 continue
@@ -2200,7 +2591,7 @@ class DevopsSystem(models.Model):
                         new_sub_system_ids += system_id
 
         for new_sub_system_id in new_sub_system_ids:
-            new_sub_system_id._job_action_init_system()
+            new_sub_system_id.job_action_init_system()
 
         return new_sub_system_ids
 

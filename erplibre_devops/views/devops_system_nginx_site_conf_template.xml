@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_system_nginx_site_conf_template_view_form" model="ir.ui.view">
+        <field name="name">devops_system_nginx_site_conf_template_form</field>
+        <field name="model">devops.system.nginx.site.conf.template</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="file_content" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_system_nginx_site_conf_template_view_graph" model="ir.ui.view">
+        <field name="name">devops_system_nginx_site_conf_template_graph</field>
+        <field name="model">devops.system.nginx.site.conf.template</field>
+        <field name="arch" type="xml">
+            <graph string="Devops system nginx site conf template">
+                <field name="name" type="row" />
+                <field name="file_content" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_system_nginx_site_conf_template_view_kanban" model="ir.ui.view">
+        <field name="name">devops_system_nginx_site_conf_template_kanban</field>
+        <field name="model">devops.system.nginx.site.conf.template</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="file_content" />
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_system_nginx_site_conf_template_view_list" model="ir.ui.view">
+        <field name="name">devops_system_nginx_site_conf_template_list</field>
+        <field name="model">devops.system.nginx.site.conf.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+            </list>
+        </field>
+    </record>
+
+    <record id="devops_system_nginx_site_conf_template_view_pivot" model="ir.ui.view">
+        <field name="name">devops_system_nginx_site_conf_template_pivot</field>
+        <field name="model">devops.system.nginx.site.conf.template</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops system nginx site conf template">
+                <field name="name" type="row" />
+                <field name="file_content" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_system_nginx_site_conf_template_view_search" model="ir.ui.view">
+        <field name="name">devops_system_nginx_site_conf_template_search</field>
+        <field name="model">devops.system.nginx.site.conf.template</field>
+        <field name="arch" type="xml">
+            <search string="Devops system nginx site conf template">
+                <field name="name" string="" />
+                <field name="file_content" string="" />
+            </search>
+        </field>
+    </record>
+
+    <record
+        id="devops_system_nginx_site_conf_template_system_nginx_site_conf_template_action_window"
+        model="ir.actions.act_window"
+    >
+        <field name="name">System nginx site conf template</field>
+        <field name="res_model">devops.system.nginx.site.conf.template</field>
+        <field name="view_mode">kanban,pivot,list,graph,form</field>
+    </record>
+</odoo>

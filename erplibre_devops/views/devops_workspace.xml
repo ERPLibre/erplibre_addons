@@ -345,6 +345,11 @@
                             <field name="log_workspace" />
                         </group>
                     </page>
+                    <page name="config" string="Config">
+                        <group>
+                            <field name="workspace_config_conf_ids" />
+                        </group>
+                    </page>
                     <page name="install" string="Install">
                         <group>
                             <group>

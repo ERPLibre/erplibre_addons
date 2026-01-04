@@ -13,6 +13,12 @@
                         class="btn-danger"
                         invisible="is_init_done"
                     />
+                    <button
+                        name="action_init_system"
+                        string="Re-Init system"
+                        type="object"
+                        invisible="not is_init_done"
+                    />
                     <button name="action_open_terminal" string="Open terminal" type="object" />
                     <button
                         name="%(erplibre_devops.action_devops_plan_action_workspace_me)d"
@@ -97,7 +103,7 @@
                         <field name="debug_command" />
                     </group>
                     <group string="Search information">
-                        <button name="action_search_all" string="Search ALL" type="object" class="oe_highlight" />
+                        <button name="job_action_search_all" string="Search ALL" type="object" class="oe_highlight" />
                         <button name="action_refresh_db_image" string="Reload db image" type="object" />
                         <button name="action_search_workspace" string="Search workspace" type="object" />
                         <button
@@ -106,6 +112,11 @@
                             type="object"
                         />
                         <button name="action_search_vm" string="Search VM" type="object" />
+                        <button name="action_search_nginx_site_conf" string="Search Nginx conf" type="object" />
+                        <button name="action_search_systemd_conf" string="Search SystemD conf" type="object" />
+                        <button name="action_search_postgresql_conf" string="Search PostgreSQL conf" type="object" />
+                        <button name="action_search_certbot_conf" string="Search Certbot conf" type="object" />
+                        <button name="action_search_cloudflare_conf" string="Search Cloudflare conf" type="object" />
                     </group>
                     <group string="Installation from system">
                         <button name="action_install_dev_system" string="Install dev system" type="object" />
@@ -166,6 +177,17 @@
                                 type="object"
                                 icon="fa-television"
                             />
+                        </group>
+                    </page>
+                    <page string="System info">
+                        <group>
+                            <field name="system_nginx_site_conf_ids" />
+                            <field name="system_systemd_service_ids" />
+                            <field name="system_postgres_ids" />
+                            <field name="system_certbot_ids" />
+                            <field name="system_cloudflare_ids" />
+                            <field name="os_passwd" />
+                            <field name="os_group" />
                         </group>
                     </page>
                     <page string="VM">
