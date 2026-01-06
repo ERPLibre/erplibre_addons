@@ -54,6 +54,11 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     deploy_with_database = fields.Boolean(help="Will deploy database")
 
+    # TODO maybe compute, enable if no workspace is installed
+    install_os_first_installation = fields.Boolean(
+        help="Enable to install OS dependency, need git clone of project"
+    )
+
     deploy_select_installation = fields.Selection(
         [
             ("odoo_workspace", "Odoo workspace"),
@@ -518,6 +523,11 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     model_fast_creation_enabled = fields.Boolean(
         string="Enable fast creation feature",
+    )
+
+    mode_view_disable_generate_view = fields.Boolean(
+        string="Disable generate view from builder",
+        help="Will ignore view generate from builder, it can be generate from code writer because already exist.",
     )
 
     model_fast_creation_model_name = fields.Char(
@@ -1258,6 +1268,18 @@ class DevopsPlanActionWizard(models.TransientModel):
                 self.action_code_module_autocomplete_module_path(ctx=ctx)
         return self._reopen_self()
 
+    def action_test_docker_gpu(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Docker test GPU Nvidia"
+        ) as wp_id:
+            wp_id.execute(
+                cmd=f"docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi",
+                force_open_terminal=True,
+            )
+        return self._reopen_self()
+
     def action_code_module_autocomplete_module_path(self, ctx=None):
         if ctx is None:
             ctx = {}
@@ -1319,12 +1341,13 @@ class DevopsPlanActionWizard(models.TransientModel):
 
             if not ctx.get("ignore_autocomplete_model", False):
                 self.set_mode_edit_module()
+                cmd = (
+                    "./script/code_generator/search_class_model.py -d"
+                    f" {relative_path_module}/{module_name} --json"
+                    " --with_inherit"
+                )
                 exec_id = wp_id.execute(
-                    cmd=(
-                        "./script/code_generator/search_class_model.py -d"
-                        f" {relative_path_module}/{module_name} --json"
-                        " --with_inherit"
-                    ),
+                    cmd=cmd,
                     run_into_workspace=True,
                     error_on_status=False,
                 )
@@ -1441,15 +1464,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             file_docker_compose = os.path.join(
                 working_dir_path, "docker-compose.yml"
             )
-            self.working_system_id.execute_with_result(
-                f"mkdir '{working_dir_path}'",
-                None,
-                engine="sh",
+            # TODO implement workspace into this view
+            result = self.root_workspace_id.execute(
+                cmd=f'mkdir -p "{working_dir_path}"'
             )
-            self.working_system_id.execute_with_result(
-                f"echo '{yaml}' > '{file_docker_compose}'",
-                None,
-                engine="sh",
+            result = self.root_workspace_id.os_write_file(
+                file_docker_compose, yaml
             )
             # TODO ne pas copier toute la liste de type_ids, sélectionner ce qui est nécessaire
             # Le copier dans la liste par défaut à la copie, l'utilisateur pour l'enlever.
@@ -1624,6 +1644,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         plan_cg_value = {
             "workspace_id": wp_id.id,
             "mode_view": self.mode_view_generator,
+            "mode_view_disable_generate_view": self.mode_view_disable_generate_view,
             "path_working_erplibre": wp_id.folder,
             "path_code_generator_to_generate": relative_path_module,
             "path_code_generator_to_generate_cg": relative_path_module_cg,
@@ -1790,7 +1811,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         lst_model_field = []
         for model_name, v in dct_model.items():
             model_id = self.env["devops.cg.model"].search(
-                [("name", "=", model_name)]
+                [("name", "=", model_name)], limit=1
             )
             if not model_id:
                 model_value = {
@@ -1893,7 +1914,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         else:
             self.working_module_name = module_name
 
-    def ssh_system_open_terminal(self):
+    def action_ssh_system_open_terminal(self):
         if not self.working_system_id:
             # TODO manage this error
             return
@@ -1913,7 +1934,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.configure_ntp()
+        self.working_system_id.action_configure_ntp()
         return self._reopen_self()
 
     def ssh_system_install_docker(self):
@@ -1922,6 +1943,13 @@ class DevopsPlanActionWizard(models.TransientModel):
             return
         self.working_system_id.action_check_docker()
         self.working_system_id.action_install_docker()
+        return self._reopen_self()
+
+    def ssh_system_install_minimal(self):
+        if not self.working_system_id:
+            # TODO manage this error
+            return
+        self.working_system_id.action_install_minimal_system()
         return self._reopen_self()
 
     def ssh_system_install_dev(self):
@@ -1935,7 +1963,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.configure_starship()
+        self.working_system_id.action_configure_starship()
         return self._reopen_self()
 
     #
@@ -1962,6 +1990,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             "folder": self.workspace_folder,
             "erplibre_mode": self.erplibre_mode.id,
             "select_installation": self.deploy_select_installation,
+            "install_os_first_installation": self.install_os_first_installation,
         }
         if self.deploy_git_branch:
             ws_value["git_branch"] = self.deploy_git_branch
@@ -1972,13 +2001,16 @@ class DevopsPlanActionWizard(models.TransientModel):
         # TODO missing check status before continue
         # TODO missing with workspace me to catch error
         ws_id.action_install_workspace()
-        if self.deploy_with_database:
-            ws_id.action_start()
-        # TODO implement detect when website is up or cancel state with error
-        time.sleep(5)
-        if self.deploy_with_database:
-            ws_id.action_restore_db_image()
-            ws_id.action_open_local_view()
+        if not ws_id.install_os_first_installation:
+            if self.deploy_with_database:
+                ws_id.action_start()
+            # TODO implement detect when website is up or cancel state with error
+            time.sleep(5)
+            if self.deploy_with_database:
+                ws_id.action_restore_db_image()
+                ws_id.action_open_local_view()
+        else:
+            ws_id.install_os_first_installation = False
         return self._reopen_self()
 
     def action_shortcut_deploy_generate_docker(self):
@@ -1987,8 +2019,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             return
         search_path_home = [
             a
-            for a in self.env["erplibre.config.path.home"].search([])
-            if f"{getpass.getuser()}/git" in a.name
+            for a in self.working_system_id.erplibre_config_path_home_ids
+            if self.working_system_id.username_login in a.name
         ]
         if search_path_home:
             self.working_erplibre_config_path_home_id = search_path_home[0].id
@@ -2023,7 +2055,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def search_subsystem_workspace(self):
         system_ids = (
-            self.root_workspace_id.system_id.get_local_system_id_from_ssh_config()
+            self.root_workspace_id.system_id.action_search_system_id_from_ssh_config()
         )
         for system_id in system_ids:
             if system_id.ssh_connection_status:
@@ -2045,13 +2077,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             "ssh_password": self.ssh_password,
         }
         system_id = self.env["devops.system"].create([system_value])
+        system_id.action_init_system()
         self.working_system_id = system_id
-        try:
-            # Just open and close the connection
-            with self.working_system_id.ssh_connection():
-                pass
-        except Exception:
-            pass
         return self._reopen_self()
 
     def ssh_test_system_exist(self):

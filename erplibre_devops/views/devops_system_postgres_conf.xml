@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_system_postgres_conf_view_form" model="ir.ui.view">
+        <field name="name">devops_system_postgres_conf_form</field>
+        <field name="model">devops.system.postgres.conf</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="package_os" />
+                        <field name="postgres_version" />
+                        <field name="ps_config_version" />
+                        <field name="psql_version" />
+                        <field name="process_postgres" />
+                        <field name="ss_postgres" />
+                        <field name="system_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_system_postgres_conf_view_graph" model="ir.ui.view">
+        <field name="name">devops_system_postgres_conf_graph</field>
+        <field name="model">devops.system.postgres.conf</field>
+        <field name="arch" type="xml">
+            <graph string="Devops system postgres conf">
+                <field name="name" type="row" />
+                <field name="package_os" type="row" />
+                <field name="postgres_version" type="row" />
+                <field name="ps_config_version" type="row" />
+                <field name="psql_version" type="row" />
+                <field name="system_id" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_system_postgres_conf_view_kanban" model="ir.ui.view">
+        <field name="name">devops_system_postgres_conf_kanban</field>
+        <field name="model">devops.system.postgres.conf</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="package_os" />
+                <field name="postgres_version" />
+                <field name="ps_config_version" />
+                <field name="psql_version" />
+                <field name="system_id" />
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="package_os" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="postgres_version" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="ps_config_version" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="psql_version" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="system_id" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_system_postgres_conf_view_list" model="ir.ui.view">
+        <field name="name">devops_system_postgres_conf_list</field>
+        <field name="model">devops.system.postgres.conf</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="package_os" />
+                <field name="postgres_version" />
+                <field name="ps_config_version" />
+                <field name="psql_version" />
+                <field name="system_id" />
+            </list>
+        </field>
+    </record>
+
+    <record id="devops_system_postgres_conf_view_pivot" model="ir.ui.view">
+        <field name="name">devops_system_postgres_conf_pivot</field>
+        <field name="model">devops.system.postgres.conf</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops system postgres conf">
+                <field name="name" type="row" />
+                <field name="package_os" type="row" />
+                <field name="postgres_version" type="row" />
+                <field name="ps_config_version" type="row" />
+                <field name="psql_version" type="row" />
+                <field name="system_id" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_system_postgres_conf_view_search" model="ir.ui.view">
+        <field name="name">devops_system_postgres_conf_search</field>
+        <field name="model">devops.system.postgres.conf</field>
+        <field name="arch" type="xml">
+            <search string="Devops system postgres conf">
+                <field name="name" string="" />
+                <field name="package_os" string="" />
+                <field name="postgres_version" string="" />
+                <field name="ps_config_version" string="" />
+                <field name="psql_version" string="" />
+                <field name="system_id" string="" />
+                <group expand="1" string="Group by">
+                    <filter string="" name="groupby_system" context="{'group_by':'system_id'}" />
+                </group>
+                <searchpanel>
+                    <field name="system_id" string="" icon="fa-th-list" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_system_postgres_conf_system_postgres_conf_action_window" model="ir.actions.act_window">
+        <field name="name">System postgres conf</field>
+        <field name="res_model">devops.system.postgres.conf</field>
+        <field name="view_mode">kanban,pivot,list,graph,form</field>
+    </record>
+</odoo>

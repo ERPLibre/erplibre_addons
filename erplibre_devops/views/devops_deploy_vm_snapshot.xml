@@ -5,9 +5,20 @@
         <field name="model">devops.deploy.vm.snapshot</field>
         <field name="arch" type="xml">
             <form string="Titre">
+                <header>
+                    <button
+                        name="action_vm_snapshot_restore"
+                        string="Restore Snapshot"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                </header>
                 <sheet>
                     <group>
                         <field name="name" />
+                        <field name="vm_id" />
+                        <field name="time_creation" />
+                        <field name="state" />
                     </group>
                 </sheet>
             </form>
@@ -75,6 +86,9 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name" />
+                <field name="vm_id" />
+                <field name="time_creation" />
+                <field name="state" />
             </list>
         </field>
     </record>

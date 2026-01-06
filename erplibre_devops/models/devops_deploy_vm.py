@@ -29,7 +29,15 @@ class DevopsDeployVm(models.Model):
 
     os = fields.Char()
 
-    provider = fields.Char()
+    provider = fields.Selection(
+        selection=[("VirtualBox", "VirtualBox"), ("Qemu", "Qemu")]
+    )
+
+    uri = fields.Char(
+        string="URI",
+        help="Link to access system like remote VM.",
+        default="local",
+    )
 
     system_id = fields.Many2one(
         comodel_name="devops.system",
@@ -39,6 +47,18 @@ class DevopsDeployVm(models.Model):
     workspace_ids = fields.Many2many(
         comodel_name="devops.workspace",
         string="Workspaces",
+    )
+
+    vm_snapshot_ids = fields.One2many(
+        comodel_name="devops.deploy.vm.snapshot",
+        inverse_name="vm_id",
+        string="VM Snapshots",
+    )
+
+    vm_exec_ids = fields.One2many(
+        comodel_name="devops.deploy.vm.exec",
+        inverse_name="vm_id",
+        string="VM exec",
     )
 
     has_vm_exec_running = fields.Boolean(
@@ -66,7 +86,12 @@ class DevopsDeployVm(models.Model):
                     f"Missing system_id into devops.deploy.vm id {rec.id}"
                 )
                 continue
-            cmd = f"vboxmanage startvm {rec.identifiant} --type gui"
+            if rec.provider == "VirtualBox":
+                cmd = f"vboxmanage startvm {rec.identifiant} --type gui"
+            elif rec.provider == "Qemu":
+                cmd = f'virsh -c "{rec.uri}" start "{rec.name}"'
+            else:
+                raise Exception(f"Cannot support provider '{rec.provider}'")
             out, status = rec.system_id.execute_with_result(
                 cmd, None, return_status=True
             )
@@ -124,7 +149,12 @@ class DevopsDeployVm(models.Model):
                     f"Missing system_id into devops.deploy.vm id {rec.id}"
                 )
                 continue
-            cmd = f"vboxmanage controlvm {rec.identifiant} poweroff"
+            if rec.provider == "VirtualBox":
+                cmd = f"vboxmanage controlvm {rec.identifiant} poweroff"
+            elif rec.provider == "Qemu":
+                cmd = f'virsh -c "{rec.uri}" shutdown "{rec.name}"'
+            else:
+                raise Exception(f"Cannot support provider '{rec.provider}'")
             out, status = rec.system_id.execute_with_result(
                 cmd, None, return_status=True
             )

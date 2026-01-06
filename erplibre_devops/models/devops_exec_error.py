@@ -36,6 +36,10 @@ class DevopsExecError(models.Model):
         help="Associate a breakpoint to this execution.",
     )
 
+    searching_pycharm_debug_has_fail = fields.Boolean(
+        help="Will be enable when cannot search breakpoint into traceback"
+    )
+
     exec_filename = fields.Char(
         string="Execution filename",
         help="Execution information, where it's called.",
@@ -139,14 +143,21 @@ class DevopsExecError(models.Model):
                 # partner_ids=[(6, 0, rec.partner_ids.ids)],
                 # channel_ids=[(6, 0, rec.channel_ids.ids)],
             )
-            self.env.ref(
-                "erplibre_devops.devops_workspace_me"
-            ).ide_pycharm.action_cg_setup_pycharm_debug(
-                log=rec.escaped_tb.replace("&quot;", '"')
-                .replace("&#34;", '"')
-                .replace("&#39;", "'"),
-                exec_error_id=rec,
-            )
+            try:
+                log_to_search = (
+                    rec.escaped_tb.replace("&quot;", '"')
+                    .replace("&#34;", '"')
+                    .replace("&#39;", "'")
+                )
+                self.env.ref(
+                    "erplibre_devops.devops_workspace_me"
+                ).ide_pycharm.action_cg_setup_pycharm_debug(
+                    log=log_to_search,
+                    exec_error_id=rec,
+                )
+            except Exception as e:
+                _logger.error(e)
+                rec.searching_pycharm_debug_has_fail = True
         return result
 
     @api.depends("devops_workspace")

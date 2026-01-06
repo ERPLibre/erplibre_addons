@@ -10,6 +10,6 @@ class ErplibreModeVersionBase(models.Model):
 
     name = fields.Char()
 
-    value = fields.Char()
-
     is_tag = fields.Boolean(help="Is it a tag from Git?")
+
+    value = fields.Char()

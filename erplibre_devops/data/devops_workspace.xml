@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data noupdate="1">
-        <record model="devops.workspace" id="devops_workspace_me" />
+        <record model="devops.workspace" id="devops_workspace_me">
+            <field name="select_installation">odoo_workspace</field>
+        </record>
     </data>
 </odoo>

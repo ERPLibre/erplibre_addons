@@ -11,7 +11,8 @@
                         string="Execute"
                         type="object"
                         class="btn-success"
-                        invisible="not system_id"/>
+                        invisible="not system_id"
+                    />
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -54,7 +55,7 @@
                         <field name="last_result" />
                     </group>
                 </sheet>
-                <chatter/>
+                <chatter />
             </form>
         </field>
     </record>

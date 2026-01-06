@@ -67,6 +67,8 @@ class DevopsWorkspaceDocker(models.Model):
 
     docker_initiate_succeed = fields.Boolean(help="Docker is ready to run")
 
+    log_workspace = fields.Text()
+
     @api.depends("workspace_id", "docker_is_running")
     def _compute_name(self):
         for rec in self:
@@ -143,12 +145,8 @@ volumes:
             if rec.force_create_docker_compose or not os.path.exists(
                 file_docker_compose
             ):
-                rec.workspace_id.execute(
-                    cmd=(
-                        f"echo '{docker_compose_content}' >"
-                        f" {file_docker_compose}"
-                    ),
-                    engine="sh",
+                rec.workspace_id.os_write_file(
+                    file_docker_compose, docker_compose_content
                 )
 
             exec_id = rec.workspace_id.execute(
@@ -280,6 +278,7 @@ volumes:
                 force_docker=True,
             )
             rec.action_docker_check_docker_ps()
+            rec.workspace_id.refresh_installation_state()
 
     def action_stop_docker_compose(self):
         for rec in self:

@@ -30,9 +30,7 @@ def post_init_hook(env):
     if not os.environ.get("IS_ONLY_ME", False):
         # Search other ERPLibre accessible
         # TODO use instead workspace_me
-        env.ref(
-            "erplibre_devops.devops_system_local"
-        ).action_search_workspace()
+        env.ref("erplibre_devops.devops_system_local").job_action_search_all()
         # Search other System accessible
         # system_ids = env.ref(
         #     "erplibre_devops.devops_system_local"
@@ -41,13 +39,15 @@ def post_init_hook(env):
         with env.ref(
             "erplibre_devops.devops_workspace_me"
         ).devops_create_exec_bundle("Search system SSH") as rec:
-            system_ids = rec.system_id.get_local_system_id_from_ssh_config()
+            system_ids = (
+                rec.system_id.action_search_system_id_from_ssh_config()
+            )
 
             for system_id in system_ids:
-                system_id.action_search_workspace()
-                under_system_ids = (
-                    system_id.get_local_system_id_from_ssh_config()
-                )
+                system_id.job_action_search_all()
+                # under_system_ids = (
+                #     system_id.action_search_system_id_from_ssh_config()
+                # )
                 # under_system_ids = system_id.get_local_system_ids(env)
                 # Too much time, user will ask later
                 # if under_system_ids:
@@ -90,5 +90,5 @@ def post_init_hook(env):
 #     with env.ref(
 #         "erplibre_devops.devops_workspace_me"
 #     ).devops_create_exec_bundle("Search system SSH") as rec:
-#         system_ids = rec.system_id.get_local_system_id_from_ssh_config(rec)
+#         system_ids = rec.system_id.action_search_system_id_from_ssh_config(rec)
 #         return system_ids

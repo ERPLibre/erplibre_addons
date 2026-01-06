@@ -188,6 +188,11 @@ class DevopsPlanCg(models.Model):
         help="Feature for portal_enable_delete",
     )
 
+    mode_view_disable_generate_view = fields.Boolean(
+        string="Disable generate view from builder",
+        help="Will ignore view generate from builder, it can be generate from code writer because already exist."
+    )
+
     mode_view_portal_models = fields.Char(
         string="Portal Models",
         help="Separate models by ;",
@@ -642,11 +647,12 @@ class DevopsPlanCg(models.Model):
                     rec.mode_view_portal_enable_delete
                 )
 
-            wizard_view = self.env[
-                "code.generator.generate.views.wizard"
-            ].create([value_view_wizard])
+            if not rec.mode_view_disable_generate_view:
+                wizard_view = self.env[
+                    "code.generator.generate.views.wizard"
+                ].create([value_view_wizard])
 
-            wizard_view.button_generate_views()
+                wizard_view.button_generate_views()
 
             if rec.mode_view_snippet and rec.mode_view_snippet != "no_snippet":
                 # Generate snippet

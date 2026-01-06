@@ -670,6 +670,9 @@
                     string="D-View"
                     invisible="state != 'code_module' or not has_configured_path"
                 >
+                    <group string="Option">
+                        <field name="mode_view_disable_generate_view" />
+                    </group>
                     <group string="Web / admin space">
                         <div>Activate by default.</div>
                     </group>
@@ -874,13 +877,13 @@
                     </div>
                 </group>
                 <group name="group_plan_project_2" invisible="state != 'plan_project'">
-                    <group string="4. Requirement">
-                        <!--                        <button-->
-                        <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
-                        <!--                            string="DevOps"-->
-                        <!--                            type="object"-->
-                        <!--                            class="btn btn-secondary"-->
-                        <!--                        />-->
+                    <group string="4. Requirement / test">
+                        <button
+                            name="action_test_docker_gpu"
+                            string="Test Nvidia GPU docker"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
                     </group>
                     <group string="5. Create a project">
                         <button
@@ -960,7 +963,7 @@
                 <group string="A-Installation" invisible="state != 'i_new_remote_system' or not can_search_workspace">
                     <group string="1-Test comm">
                         <button
-                            name="ssh_system_open_terminal"
+                            name="action_ssh_system_open_terminal"
                             string="Test open terminal"
                             type="object"
                             class="btn btn-secondary"
@@ -980,20 +983,26 @@
                             class="btn btn-secondary"
                         />
                         <button
+                            name="ssh_system_install_minimal"
+                            string="C) Minimal installation"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
+                        <button
                             name="ssh_system_install_dev"
-                            string="C) Dev installation"
+                            string="D) Dev installation"
                             type="object"
                             class="btn btn-secondary"
                         />
                         <button
                             name="ssh_system_install_docker"
-                            string="D) Docker installation"
+                            string="E) Docker installation"
                             type="object"
                             class="btn btn-secondary"
                         />
                         <button
                             name="ssh_system_install_robotlibre"
-                            string="E) RobotLibre installation"
+                            string="F) RobotLibre installation"
                             type="object"
                             class="btn btn-secondary"
                         />
@@ -1017,6 +1026,7 @@
                     <!--                        <field name="working_workspace_ids" />-->
                     <!--                    </group>-->
                     <group string="Information">
+                        <field name="install_os_first_installation" />
                         <field name="system_erplibre_config_path_home_ids" invisible="True" />
                         <field
                             name="working_erplibre_config_path_home_id"
@@ -1033,6 +1043,12 @@
                         <button
                             name="action_system_deploy_create_workspace"
                             string="Create workspace"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
+                        <button
+                            name="action_ssh_system_open_terminal"
+                            string="Open terminal"
                             type="object"
                             class="btn btn-secondary"
                         />
@@ -1090,12 +1106,27 @@
         </field>
     </record>
 
-    <record id="devops_plan_action_action" model="ir.actions.act_window">
+    <record id="action_devops_plan_action" model="ir.actions.act_window">
         <field name="name">DEVOPS action</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">devops.plan.action.wizard</field>
         <field name="binding_model_id" ref="model_devops_workspace" />
         <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_devops_plan_action_workspace_me" model="ir.actions.act_window">
+        <field name="name">DEVOPS action ME</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">devops.plan.action.wizard</field>
+        <field name="binding_model_id" ref="model_devops_workspace" />
+        <field name="view_mode">form</field>
+        <field
+            name="context"
+            eval="{
+            'default_root_workspace_id': ref('erplibre_devops.devops_workspace_me'),
+        }"
+        />
         <field name="target">new</field>
     </record>
 </odoo>

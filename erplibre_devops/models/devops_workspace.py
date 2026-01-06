@@ -49,6 +49,12 @@ class DevopsWorkspace(models.Model):
         string="Executions",
     )
 
+    workspace_config_conf_ids = fields.One2many(
+        comodel_name="devops.workspace.config.conf",
+        inverse_name="workspace_id",
+        string="Config conf",
+    )
+
     devops_test_plan_exec_count = fields.Integer(
         string="Test plan exec count",
         compute="_compute_devops_test_plan_exec_count",
@@ -221,6 +227,10 @@ class DevopsWorkspace(models.Model):
         help="The port of http odoo.",
     )
 
+    install_os_first_installation = fields.Boolean(
+        help="Enable to install OS dependency, need git clone of project"
+    )
+
     port_longpolling = fields.Integer(
         string="port longpolling",
         default=8071,
@@ -380,6 +390,13 @@ class DevopsWorkspace(models.Model):
                 odoo_version = f.readline()
             return os.path.join(os.getcwd(), f"odoo{odoo_version}")
         return False
+
+    @api.depends("folder")
+    def _compute_folder_odoo_version(self):
+        for rec in self:
+            rec.folder_odoo_version = os.path.join(
+                rec.folder, os.path.basename(rec.folder_odoo_version)
+            )
 
     @api.depends("is_me", "is_robot", "folder", "namespace")
     def _compute_name(self):
@@ -904,7 +921,14 @@ class DevopsWorkspace(models.Model):
                 if not rec.workspace_docker_id:
                     rec.workspace_docker_id = self.env[
                         "devops.workspace.docker"
-                    ].create([{"workspace_id": rec.id}])
+                    ].create(
+                        [
+                            {
+                                "workspace_id": rec.id,
+                                "docker_version": f"technolibre/erplibre:{rec.erplibre_mode.mode_version_erplibre.name}",
+                            }
+                        ]
+                    )
             elif rec.erplibre_mode.mode_exec in [
                 self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
             ]:
@@ -1108,7 +1132,7 @@ class DevopsWorkspace(models.Model):
                         dir_name = os.path.dirname(rec.folder)
                         # No such directory
                         exec_id = rec.execute(
-                            cmd=f"git clone {rec.git_url}{git_arg}",
+                            cmd=f"mkdir -p {dir_name};cd {dir_name};git clone {rec.git_url}{git_arg}",
                             folder=dir_name,
                             error_on_status=False,
                         )
@@ -1116,6 +1140,20 @@ class DevopsWorkspace(models.Model):
                         if exec_id.exec_status:
                             raise Exception(exec_id.log_all)
                         is_first_install = True
+                        if rec.install_os_first_installation:
+                            exec_id = rec.execute(
+                                cmd=f"make install_os",
+                                folder=rec.folder,
+                                force_open_terminal=True,
+                                to_instance=bool(
+                                    self.env.context.get(
+                                        "force_reinstall_workspace"
+                                    )
+                                ),
+                                error_on_status=True,
+                            )
+                            # TODO need feature to wait gnome-terminal is close and can continue
+                            return
                     else:
                         _logger.info(
                             f'Git project already exist for "{rec.folder}"'
@@ -1286,6 +1324,39 @@ class DevopsWorkspace(models.Model):
                         "erplibre_devops.erplibre_mode_version_erplibre_robot_libre"
                     ).id
                 )
+                # Read config
+                rec.search_config_conf()
+
+    def search_config_conf(self):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Search config conf") as rec:
+                # TODO default config file over docker is /etc/odoo/odoo.conf
+                default_filepath_config = "config.conf"
+                if not rec.os_path_exists(
+                    default_filepath_config, to_instance=True
+                ):
+                    continue
+                content_file = rec.os_read_file(
+                    default_filepath_config, to_instance=True
+                )
+                workspace_config_conf_values = {
+                    "name": default_filepath_config,
+                    "file_content": content_file,
+                    "workspace_id": rec.id,
+                }
+                config_conf_id = self.env[
+                    "devops.workspace.config.conf"
+                ].search(
+                    [
+                        ("name", "=", default_filepath_config),
+                        ("file_content", "=", content_file),
+                        ("workspace_id", "=", rec.id),
+                    ]
+                )
+                if not config_conf_id:
+                    self.env["devops.workspace.config.conf"].create(
+                        [workspace_config_conf_values]
+                    )
 
     def update_makefile_from_git(self):
         for rec_o in self:
@@ -1536,7 +1607,8 @@ class DevopsWorkspace(models.Model):
 
     @api.model
     def os_write_file(self, path, content, to_instance=False):
-        cmd = f'echo "{content}" > "{path}"'
+        content_str = content.replace('"', '\\"')
+        cmd = f'echo "{content_str}" > "{path}"'
         result = self.execute(cmd=cmd, to_instance=to_instance)
         return result.log_all
 
@@ -1639,7 +1711,10 @@ class DevopsWorkspace(models.Model):
                 # Directory must exist
                 # TODO make test to validate if remove next line, permission root the project /tmp/project/addons root
                 addons_path = os.path.join(
-                    rec.folder_odoo_version, "addons", "addons"
+                    rec.folder,
+                    f"odoo{rec.docker_build_odoo_version}.0",
+                    "addons",
+                    "addons",
                 )
                 rec.execute(f"mkdir -p '{addons_path}'")
 
@@ -1820,8 +1895,9 @@ sock.close()
             rec = rec.with_context(devops_cg_new_project=devops_cg_new_project)
         try:
             yield rec
-        except exceptions.UserError as e:
-            raise e
+        # except exceptions.UserError as e:
+        #     # Disable it, was use in odoo 12, now this exception is generally use
+        #     raise e
         except Exception as e:
             _logger.exception(
                 f"'{description}' it.exec.bundle id"

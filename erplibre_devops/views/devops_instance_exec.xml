@@ -11,7 +11,8 @@
                         string="Start"
                         type="object"
                         class="oe_highlight"
-                        invisible="not workspace_id"/>
+                        invisible="not workspace_id"
+                    />
                 </header>
                 <sheet>
                     <group>

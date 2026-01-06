@@ -115,3 +115,20 @@ auto :
 -   release MISSING
 -   test MISSING
 -   doc MISSING
+
+# Configuration
+
+Mettre dans `config.conf`
+
+Obligatoire
+
+```server_wide_modules = base,web,queue_job```
+
+Facultatif
+
+```
+workers = 2
+
+[queue_job]
+channels = root:2
+```
