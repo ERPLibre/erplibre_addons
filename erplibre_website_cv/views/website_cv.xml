@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="website_cv_view_tree" model="ir.ui.view">
+        <field name="name">website.cv.tree</field>
+        <field name="model">website.cv</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="address" />
+                <field name="phone" />
+                <field name="email" />
+            </tree>
+        </field>
+    </record>
+    <record id="website_cv_view_form" model="ir.ui.view">
+        <field name="name">website.cv.form</field>
+        <field name="model">website.cv</field>
+        <field name="arch" type="xml">
+            <form string="Informations">
+                <sheet>
+                    <group>
+                        <h2 style="text-decoration: underline;">À propos</h2>
+                        <field name="name" />
+                        <field name="address" />
+                        <field name="phone" />
+                        <field name="email" />
+                        <field name="description" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Expérience</h2>
+                        <field name="name_experience" />
+                        <field name="entreprise_name_experience" />
+                        <field name="description_experience" />
+                        <field name="date_experience" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Projets</h2>
+                        <field name="name_projets" />
+                        <field name="entreprise_name_projets" />
+                        <field name="description_projets" />
+                        <field name="date_projets" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Formations</h2>
+                        <field name="name_formations" />
+                        <field name="entreprise_name_formations" />
+                        <field name="description_formations" />
+                        <field name="date_formations" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Interêts</h2>
+                        <field name="name_interets" />
+                        <field name="description_interets" />
+                        <hr
+                            style="height: 2px; width: 100%; border: none; background-color: black; margin-top: 10px; margin-bottom: 10px;" />
+                        <br />
+                        <h2 style="text-decoration: underline;">Trophés et Certifications</h2>
+                        <field name="name_trophes" />
+                        <field name="date_trophes" />
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+    <act_window
+        id="website_cv_website_cv_action_window"
+        name="Website CV"
+        res_model="website.cv"
+        view_mode="tree,form"
+    />
+</odoo>
