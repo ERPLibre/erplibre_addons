@@ -204,18 +204,35 @@ class DevopsExecError(models.Model):
             "erplibre_devops.devops_workspace_me"
         ).ide_pycharm.action_start_pycharm(ctx=ctx)
 
+    def action_set_configuration_pycharm(self):
+        for rec_o in self:
+            with self.env.ref(
+                "erplibre_devops.devops_workspace_me"
+            ).devops_create_exec_bundle(
+                "Set configuration on error"
+            ) as rec_ws:
+                cmd = rec_o.devops_exec_id.cmd
+
+                if cmd.startswith("./script/addons/install_addons_dev.sh"):
+                    # TODO instead of extract information, write it into new project and associate exec
+                    lst_cmd = cmd.split(" ")
+                    rec_ws.ide_pycharm.add_configuration(
+                        conf_add_mode="install",
+                        conf_add_db=lst_cmd[1],
+                        conf_add_module=lst_cmd[2],
+                        conf_add_config_path=lst_cmd[3],
+                    )
+
     def action_set_breakpoint_pycharm(self):
         for rec_o in self:
             with self.env.ref(
                 "erplibre_devops.devops_workspace_me"
-            ).devops_workspace.devops_create_exec_bundle(
-                "Set breakpoint on error"
-            ) as rec:
+            ).devops_create_exec_bundle("Set breakpoint on error") as rec:
                 rec.ide_pycharm.action_cg_setup_pycharm_debug(
                     log=rec_o.escaped_tb.replace("&quot;", '"')
                     .replace("&#34;", '"')
                     .replace("&#39;", "'"),
-                    exec_error_id=rec,
+                    exec_error_id=rec_o,
                 )
 
     def open_file_ide(self):

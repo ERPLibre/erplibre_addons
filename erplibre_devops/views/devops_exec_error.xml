@@ -12,6 +12,12 @@
                         type="object"
                         class="oe_highlight"
                     />
+                    <button
+                        name="action_set_configuration_pycharm"
+                        string="Set configuration Pycharm"
+                        type="object"
+                        class="oe_highlight"
+                    />
                     <button name="action_start_pycharm" string="Start PyCharm" type="object" class="oe_highlight" />
                     <button name="action_kill_pycharm" string="Kill PyCharm" type="object" class="oe_highlight" />
                     <button

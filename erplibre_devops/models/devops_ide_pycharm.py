@@ -103,9 +103,7 @@ class DevopsIdePycharm(models.Model):
                     rec_ws, filename=filename, pycharm_arg=add_line
                 )
             else:
-                self.action_pycharm_open(
-                    rec_ws, folder=rec_ws.folder_odoo_version
-                )
+                self.action_pycharm_open(rec_ws, folder=rec_ws.folder)
 
     @staticmethod
     def action_pycharm_open(
@@ -238,24 +236,27 @@ class DevopsIdePycharm(models.Model):
                     exec_error_id.line_file_tb_detected = error_line
                     exec_error_id.find_resolution = "find"
 
-                update_line = int(line) + 1
-                # Create breakpoint
-                bp_value = {
-                    "name": "breakpoint_exec",
-                    "description": (
-                        "Breakpoint generate when create an execution."
-                    ),
-                    "filename": filepath_breakpoint,
-                    "no_line": update_line,
-                    # "keyword": keyword,
-                    "ignore_test": True,
-                    "generated_by_execution": True,
-                }
-                bp_id = self.env["devops.ide.breakpoint"].create([bp_value])
-                exec_error_id.exec_filename = filepath_breakpoint
-                exec_error_id.exec_line_number = update_line
-                exec_error_id.ide_breakpoint = bp_id.id
+                    update_line = int(line) + 1
+                    # Create breakpoint
+                    bp_value = {
+                        "name": "breakpoint_exec",
+                        "description": (
+                            "Breakpoint generate when create an execution."
+                        ),
+                        "filename": filepath_breakpoint,
+                        "no_line": update_line,
+                        # "keyword": keyword,
+                        "ignore_test": True,
+                        "generated_by_execution": True,
+                    }
+                    bp_id = self.env["devops.ide.breakpoint"].create(
+                        [bp_value]
+                    )
+                    exec_error_id.exec_filename = filepath_breakpoint
+                    exec_error_id.exec_line_number = update_line
+                    exec_error_id.ide_breakpoint = bp_id.id
 
+            if filepath_breakpoint:
                 rec.add_breakpoint(filepath_breakpoint, line)
 
     def try_find_why(self, log, exception, ws, exec_error_id):
