@@ -2044,11 +2044,14 @@ class DevopsSystem(models.Model):
             )
             if status:
                 continue
-            if len(out) > 10_000:
+            out_strip = out.strip()
+            if not out_strip:
+                continue
+            if len(out_strip) > 10_000:
                 raise ValueError(
                     f"Command '{cmd}' generate too much text, check it by yourself."
                 )
-            lst_qemu_conf = ast.literal_eval(out.strip())
+            lst_qemu_conf = ast.literal_eval(out_strip)
             for qemu_conf in lst_qemu_conf:
                 cmd = f'virsh -c "{qemu_conf}" list --all'
                 out, status = rec.execute_with_result(

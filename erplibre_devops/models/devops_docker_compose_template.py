@@ -136,7 +136,7 @@ services:
       - DEBUG=true
     {command}
     volumes:
-      - ./models:/build/models:cached
+      - ./models:/models:cached
     {deploy}
 """.strip()
             else:
