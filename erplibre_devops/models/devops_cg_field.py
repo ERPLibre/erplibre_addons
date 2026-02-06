@@ -23,6 +23,8 @@ class DevopsCgField(models.Model):
         help="Pre-compute field, associate with compute"
     )
 
+    tracking = fields.Boolean(help="Enable tracking")
+
     has_error = fields.Boolean(
         compute="_compute_has_error",
         store=True,
@@ -170,7 +172,13 @@ class DevopsCgField(models.Model):
                 dct_field["relation"] = self.relation.name
             elif self.relation_manual:
                 dct_field["relation"] = self.relation_manual
-            # TODO support one2many with "inverse_field" and "inverse_field_manual"
+            if self.type == "one2many":
+                # Fill inverse_field
+                dct_field["relation_field"] = (
+                    self.field_relation.name
+                    if self.field_relation
+                    else self.field_relation_manual
+                )
             # TODO support many2many with different relation
         if self.help:
             dct_field["help"] = self.help
@@ -182,6 +190,8 @@ class DevopsCgField(models.Model):
             dct_field["compute"] = self.compute_method
         if self.store:
             dct_field["store"] = self.store
+        if self.tracking:
+            dct_field["tracking"] = self.tracking
         if self.precompute:
             dct_field["precompute"] = self.precompute
         return dct_field

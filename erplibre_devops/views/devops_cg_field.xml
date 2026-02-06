@@ -30,6 +30,7 @@
                             <field name="related_manual" />
                             <field name="currency_field" />
                             <field name="compute_method" />
+                            <field name="tracking" />
                             <!--                            <field name="related_field_id" />-->
                             <field name="help" />
                         </group>
@@ -146,6 +147,7 @@
                 <field name="field_relation_manual" />
                 <field name="currency_field" />
                 <field name="compute_method" />
+                <field name="tracking" />
                 <field name="help" />
             </list>
         </field>

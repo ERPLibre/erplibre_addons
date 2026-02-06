@@ -598,7 +598,6 @@ class DevopsPlanCg(models.Model):
                 ]
             else:
                 lst_portal_model = []
-            # TODO reorder the model from dependency inter model, ignore one2many
             model_ids = rec.devops_cg_model_ids.filtered(
                 lambda r: not r.is_to_remove
             )
@@ -634,6 +633,7 @@ class DevopsPlanCg(models.Model):
                     lst_depend_model=lst_depend_model,
                     enable_activity=model_model_id.is_activity,
                     enable_tracking=model_model_id.is_all_tracking,
+                    auto_create_model_when_missing=True,
                 )
 
                 if model_model_id.is_method_compute_company_currency_id:

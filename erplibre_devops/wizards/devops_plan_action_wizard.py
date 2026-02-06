@@ -1830,11 +1830,14 @@ class DevopsPlanActionWizard(models.TransientModel):
                 for dct_field in v.get("fields").values():
                     ttype = dct_field.get("type").lower()
                     field_name = dct_field.get("name")
+                    tracking = dct_field.get("tracking", False)
                     value_value = {
                         "name": field_name,
                         "type": ttype,
                         "model_id": model_id.id,
                     }
+                    if tracking:
+                        value_value["tracking"] = tracking
                     model_name = model_id.name
                     # Check if exist
                     field_id = self.env["devops.cg.field"].search(
