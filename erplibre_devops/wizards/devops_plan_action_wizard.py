@@ -1217,6 +1217,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 lst_field_name = []
                 lst_field_value = []
 
+            # Get field name
             dct_field_json = {}
             for field_index, field_name in enumerate(lst_field_name):
                 field_name_code = self.to_field_name(field_name)
@@ -1823,31 +1824,36 @@ class DevopsPlanActionWizard(models.TransientModel):
             lst_model_field.append((model_id, v))
             dct_model_cg[model_name] = model_id
             dct_model_cg_depend[model_name] = []
+
+            self._generate_from_json_model(model_id)
+
         # Create cg.field
         for model_id, v in lst_model_field:
-            if "fields" in v.keys():
-                # This algorithm only works when the module is working and formatted
-                for dct_field in v.get("fields").values():
-                    ttype = dct_field.get("type").lower()
-                    field_name = dct_field.get("name")
-                    tracking = dct_field.get("tracking", False)
-                    value_value = {
-                        "name": field_name,
-                        "type": ttype,
-                        "model_id": model_id.id,
-                    }
-                    if tracking:
-                        value_value["tracking"] = tracking
-                    model_name = model_id.name
-                    # Check if exist
-                    field_id = self.env["devops.cg.field"].search(
-                        [
-                            ("name", "=", field_name),
-                            ("model_id", "=", model_id.id),
-                        ]
-                    )
-                    if field_id:
-                        continue
+            first_run = True
+            if "fields" not in v.keys():
+                continue
+
+            # This algorithm only works when the module is working and formatted
+            for dct_field in v.get("fields").values():
+                ttype = dct_field.get("type").lower()
+                field_name = dct_field.get("name")
+                # Check if exist
+                field_id = self.env["devops.cg.field"].search(
+                    [
+                        ("name", "=", field_name),
+                        ("model_id", "=", model_id.id),
+                    ]
+                )
+                tracking = dct_field.get("tracking", False)
+                model_name = model_id.name
+                value_value = {
+                    "name": field_name,
+                    "type": ttype,
+                    "model_id": model_id.id,
+                }
+                if tracking:
+                    value_value["tracking"] = tracking
+                if not field_id:
                     if "comodel_name" in dct_field.keys():
                         comodel_name = dct_field.get("comodel_name")
                         model_id_searched = dct_model_cg.get(comodel_name)
@@ -1897,6 +1903,10 @@ class DevopsPlanActionWizard(models.TransientModel):
                     field_id = self.env["devops.cg.field"].create(
                         [value_value]
                     )
+                self._generate_from_json_field(
+                    field_id, dct_field, is_first_run=first_run
+                )
+                first_run = False
 
         if force_new:
             # Replace all
@@ -1905,6 +1915,16 @@ class DevopsPlanActionWizard(models.TransientModel):
             # TODO support update and not append
             # Append
             self.model_ids = [(4, a) for a in lst_model_to_add]
+
+    def _generate_from_json_model(self, model_id):
+        # Need this for inherit module
+        pass
+
+    def _generate_from_json_field(
+        self, field_id, dct_field, is_first_run=False
+    ):
+        # Need this for inherit module
+        pass
 
     def fill_working_module_name_or_id(self, module_name):
         if not module_name:

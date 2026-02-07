@@ -693,11 +693,19 @@ class DevopsPlanCg(models.Model):
                 }
                 self.env["code.generator.snippet"].create([value_snippet])
 
+            self._update_inherit_before_code_generator_writer(
+                code_generator_id
+            )
+
             # Generate module
             value = {"code_generator_ids": code_generator_id.ids}
             cg_writer = self.env["code.generator.writer"].create([value])
             rec.last_code_generator_writer = cg_writer.id
             # print(cg_writer_id)
+
+    def _update_inherit_before_code_generator_writer(self, code_generator_id):
+        # Need this for inherit module
+        pass
 
     def workspace_code_remove_module(self, module_id):
         for rec in self:

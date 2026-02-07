@@ -37,7 +37,7 @@
                                 <field name="devops_workspace_ids" />
                             </group>
                         </page>
-                        <page string="Information">
+                        <page name="page_information" string="Information">
                             <group>
                                 <group>
                                     <field name="sequence" />
