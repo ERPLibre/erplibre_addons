@@ -1193,12 +1193,37 @@ class DevopsPlanActionWizard(models.TransientModel):
                     rec.model_fast_creation_error = "Detect doublon into field name, validate all is unique."
                     continue
                 # Extract value
-                lst_field_value = [
-                    a.strip()
-                    for a in rec.model_fast_creation_field_example_value.strip(
-                        "\n"
-                    ).split(rec.model_fast_creation_field_separator)
-                ]
+                data_per_line = (
+                    rec.model_fast_creation_field_example_value.split("\n")
+                )
+
+                lst_index = [a for a in range(len(lst_field_name))]
+                lst_separate = [None] * len(lst_field_name)
+                lst_index_to_delete = []
+                for str_data_to_threat in data_per_line:
+                    data_separate = str_data_to_threat.split(
+                        rec.model_fast_creation_field_separator
+                    )
+                    for index in lst_index:
+                        data_to_check = data_separate[index]
+                        if data_to_check:
+                            lst_separate[index] = data_to_check
+                            lst_index_to_delete.append(index)
+                    for index_to_delete in lst_index_to_delete:
+                        lst_index.remove(index_to_delete)
+                    lst_index_to_delete = []
+                    if not lst_index:
+                        break
+
+                lst_field_value = []
+                for separate in lst_separate:
+                    if separate is None:
+                        lst_field_value.append("")
+                    elif type(separate) == str:
+                        lst_field_value.append(separate.strip())
+                    else:
+                        lst_field_value.append(separate)
+
                 if lst_field_value and len(lst_field_value) != len(
                     lst_field_name
                 ):
