@@ -1217,12 +1217,28 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.model_fast_creation_error = "Missing model name."
                 continue
             if rec.model_fast_creation_field_name:
+                # Feature to merge header
+                field_name_header = rec.model_fast_creation_field_name.strip(
+                    "\n"
+                )
+                if (
+                    "\n" in field_name_header
+                    and rec.model_fast_creation_field_separator != "\n"
+                ):
+                    lst_field_name_multi = [
+                        a.split(rec.model_fast_creation_field_separator)
+                        for a in field_name_header.split("\n")
+                    ]
+                    lst_field_name = [
+                        " ".join(chars).strip()
+                        for chars in zip(*lst_field_name_multi)
+                    ]
+                else:
+                    lst_field_name = field_name_header.split(
+                        rec.model_fast_creation_field_separator
+                    )
                 lst_field_name = [
-                    a.strip()
-                    for a in rec.model_fast_creation_field_name.strip(
-                        "\n"
-                    ).split(rec.model_fast_creation_field_separator)
-                    if a.strip()
+                    a.strip() for a in lst_field_name if a.strip()
                 ]
                 # Check doublon
                 if len(set(lst_field_name)) != len(lst_field_name):
@@ -1241,7 +1257,11 @@ class DevopsPlanActionWizard(models.TransientModel):
                         rec.model_fast_creation_field_separator
                     )
                     for index in lst_index:
-                        data_to_check = data_separate[index]
+                        try:
+                            data_to_check = data_separate[index]
+                        except Exception as e:
+                            # Ignore this error, this will crash later at execution sync.external
+                            continue
                         if data_to_check:
                             lst_separate[index] = data_to_check
                             lst_index_to_delete.append(index)
