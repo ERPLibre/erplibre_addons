@@ -549,6 +549,25 @@
                             invisible="working_module_path_suggestion != '#'"
                         />
                     </group>
+                    <group string="Depends" invisible="not depends_is_complete">
+                        <field name="depends_to_install" />
+                        <field name="depends_installed" />
+                        <field name="depends_missing" />
+                        <button
+                            name="action_install_depends"
+                            string="Install missing modules"
+                            type="object"
+                            class="btn btn-primary"
+                            invisible="not depends_to_install"
+                        />
+                        <button
+                            name="action_install_depends"
+                            string="Install missing modules"
+                            type="object"
+                            class="btn btn-secondary"
+                            invisible="depends_to_install"
+                        />
+                    </group>
                 </group>
                 <group string="B-Parameter" name="group_code_module_part_2" invisible="state != 'code_module'">
                     <group string="Code generator" invisible="state != 'code_module'">

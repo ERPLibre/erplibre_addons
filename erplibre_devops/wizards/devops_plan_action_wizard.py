@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime
 
 from odoo import _, api, exceptions, fields, models
+from odoo.modules.module import get_module_path
 
 _logger = logging.getLogger(__name__)
 
@@ -57,6 +58,25 @@ class DevopsPlanActionWizard(models.TransientModel):
     # TODO maybe compute, enable if no workspace is installed
     install_os_first_installation = fields.Boolean(
         help="Enable to install OS dependency, need git clone of project"
+    )
+
+    depends_is_complete = fields.Boolean(
+        help="Will enable to view depends list."
+    )
+
+    depends_to_install = fields.Char(
+        string="Depends to install",
+        help="Separate by ;, list a module to install after auto-complete.",
+    )
+
+    depends_installed = fields.Char(
+        string="Depends installed",
+        help="Separate by ;, list a module installed after auto-complete.",
+    )
+
+    depends_missing = fields.Char(
+        string="Depends missing",
+        help="Separate by ;, list a missing module after auto-complete.",
     )
 
     deploy_select_installation = fields.Selection(
@@ -1158,6 +1178,22 @@ class DevopsPlanActionWizard(models.TransientModel):
             # # finally
             # self.state = "final"
 
+    def action_install_depends(self):
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Action Wizard - install depends"
+        ) as wp_id:
+            lst_module = self.depends_to_install.split(";")
+            ir_module_ids = self.env["ir.module.module"].search(
+                [("name", "in", lst_module)]
+            )
+            ir_module_ids.button_immediate_install()
+            if self.depends_installed:
+                self.depends_installed += ";" + self.depends_to_install
+            else:
+                self.depends_installed = self.depends_to_install
+            self.depends_to_install = ""
+        return self._reopen_self()
+
     def action_purge_metadata(self):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - purge metadata"
@@ -1262,15 +1298,15 @@ class DevopsPlanActionWizard(models.TransientModel):
                     "type": value_type,
                 }
 
-            dct_field = {
+            dct_model = {
                 rec.model_fast_creation_model_name: {
                     "fields": dct_field_json,
                     "is_inherit": False,
                     "model_name": rec.model_fast_creation_model_name,
                 }
             }
-
-            str_dct_model = json.dumps(dct_field)
+            dct_data = {"model": dct_model}
+            str_dct_model = json.dumps(dct_data)
             self.generate_from_json(str_dct_model)
 
             # Clean
@@ -1439,6 +1475,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                             model_id.sequence = sequence_no
                             sequence_no += 1
 
+                if True:
+                    module_to_install = "fds;fds"
         return self._reopen_self()
 
     def action_refresh_error(self):
@@ -1831,8 +1869,38 @@ class DevopsPlanActionWizard(models.TransientModel):
             lst_logs_model = [a.strip() for a in lst_logs_model if a.strip()]
             if lst_logs_model:
                 _logger.warning("\n".join(lst_logs_model))
+
+        dct_data = json.loads(str_dct_model_complete)
+        # Create dependencies
+        lst_depends = dct_data.get("depends")
+        ir_module_module_ids = self.env["ir.module.module"].search_read(
+            [("name", "in", lst_depends)], ["name", "state"]
+        )
+        lst_depends_installed = []
+        lst_depends_uninstalled = []
+        lst_depends_missing = []
+        for ir_module_id in ir_module_module_ids:
+            ir_module_name = ir_module_id.get("name")
+            if ir_module_id.get("state") == "uninstalled":
+                lst_depends_uninstalled.append(ir_module_name)
+            elif ir_module_id.get("state") == "installed":
+                lst_depends_installed.append(ir_module_name)
+            else:
+                lst_depends_missing.append(ir_module_name)
+            path = get_module_path(ir_module_name, downloaded=False)
+            if not path:
+                lst_depends_missing.append(ir_module_name)
+        self.depends_to_install = ";".join(lst_depends_uninstalled)
+        self.depends_installed = ";".join(lst_depends_installed)
+        self.depends_missing = ";".join(lst_depends_missing)
+        self.depends_is_complete = (
+            any(self.depends_to_install)
+            or any(self.depends_installed)
+            or any(self.depends_missing)
+        )
+
         # Create cg.model
-        dct_model = json.loads(str_dct_model_complete)
+        dct_model = dct_data.get("model")
         lst_model_to_add = []
         lst_model_field = []
         for model_name, v in dct_model.items():
