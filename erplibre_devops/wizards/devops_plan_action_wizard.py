@@ -1313,7 +1313,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 # TODO if type float or int and got $ in name, it's monetary
                 dct_field_json[field_name_code] = {
                     "name": field_name_code,
-                    "sequence": field_index + 10,
+                    "sequence": field_index + 11,
                     "string": field_name,
                     "type": value_type,
                 }
@@ -2012,6 +2012,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                         value_value["related_manual"] = dct_field.get(
                             "related"
                         )
+                    if "sequence" in dct_field.keys():
+                        value_value["sequence"] = dct_field.get("sequence")
 
                     field_id = self.env["devops.cg.field"].create(
                         [value_value]

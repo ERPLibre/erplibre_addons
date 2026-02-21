@@ -7,6 +7,7 @@ from odoo import _, api, fields, models
 class DevopsCgField(models.Model):
     _name = "devops.cg.field"
     _description = "devops_cg_field"
+    _order = "sequence, id"
 
     name = fields.Char(required=True)
 
@@ -138,6 +139,8 @@ class DevopsCgField(models.Model):
         string="DevOps Workspace",
     )
 
+    sequence = fields.Integer(default=10)
+
     @api.depends(
         "type",
         "relation",
@@ -194,4 +197,6 @@ class DevopsCgField(models.Model):
             dct_field["tracking"] = self.tracking
         if self.precompute:
             dct_field["precompute"] = self.precompute
+        if self.sequence:
+            dct_field["code_generator_list_view_sequence"] = self.sequence
         return dct_field

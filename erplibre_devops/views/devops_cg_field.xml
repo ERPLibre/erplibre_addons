@@ -40,8 +40,13 @@
                     </group>
                     <notebook>
                         <page string="Workspace">
+                            <field name="devops_workspace_ids" />
+                        </page>
+                        <page name="page_information" string="Information">
                             <group>
-                                <field name="devops_workspace_ids" />
+                                <group>
+                                    <field name="sequence" />
+                                </group>
                             </group>
                         </page>
                     </notebook>
@@ -138,6 +143,7 @@
         <field name="arch" type="xml">
             <list decoration-danger="has_error">
                 <field name="has_error" column_invisible="True" />
+                <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="model_id" />
                 <field name="type" />

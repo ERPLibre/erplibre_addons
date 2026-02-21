@@ -28,14 +28,10 @@
                     </group>
                     <notebook>
                         <page string="Field">
-                            <group>
-                                <field name="field_ids" />
-                            </group>
+                            <field name="field_ids" />
                         </page>
                         <page string="Workspace">
-                            <group>
-                                <field name="devops_workspace_ids" />
-                            </group>
+                            <field name="devops_workspace_ids" />
                         </page>
                         <page name="page_information" string="Information">
                             <group>
