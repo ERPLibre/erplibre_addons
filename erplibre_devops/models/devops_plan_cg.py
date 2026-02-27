@@ -190,7 +190,7 @@ class DevopsPlanCg(models.Model):
 
     mode_view_disable_generate_view = fields.Boolean(
         string="Disable generate view from builder",
-        help="Will ignore view generate from builder, it can be generate from code writer because already exist."
+        help="Will ignore view generate from builder, it can be generate from code writer because already exist.",
     )
 
     mode_view_portal_models = fields.Char(
@@ -598,10 +598,10 @@ class DevopsPlanCg(models.Model):
                 ]
             else:
                 lst_portal_model = []
-            # TODO reorder the model from dependency inter model, ignore one2many
             model_ids = rec.devops_cg_model_ids.filtered(
                 lambda r: not r.is_to_remove
             )
+            lst_one_2_many = []
             for model_model_id in model_ids:
                 lst_depend_model = None
                 if (
@@ -609,18 +609,43 @@ class DevopsPlanCg(models.Model):
                     and model_model_id.name in lst_portal_model
                 ):
                     lst_depend_model = ["portal.mixin"]
+
+                # Filtered one2many to be apply at the end
+                dct_one2many = {}
+                dct_other_type = {}
+                for key, item in model_model_id.get_field_dct().items():
+                    if item.get("ttype") == "one2many":
+                        dct_one2many[key] = item
+                    else:
+                        dct_other_type[key] = item
+
+                if dct_one2many:
+                    lst_one_2_many.append(
+                        {
+                            "model_model": model_model_id.name,
+                            "dct_field": dct_one2many,
+                        }
+                    )
+
                 model_id = code_generator_id.add_update_model(
                     model_model_id.name,
-                    dct_field=model_model_id.get_field_dct(),
+                    dct_field=dct_other_type,
                     lst_depend_model=lst_depend_model,
                     enable_activity=model_model_id.is_activity,
                     enable_tracking=model_model_id.is_all_tracking,
+                    auto_create_model_when_missing=True,
                 )
 
                 if model_model_id.is_method_compute_company_currency_id:
                     code_generator_id.add_method_model(
                         model_id, compute_company_currency_id=True
                     )
+            for o2m_value in lst_one_2_many:
+                model_model = o2m_value.get("model_model")
+                dct_field = o2m_value.get("dct_field")
+                code_generator_id.add_update_model_one2many(
+                    model_model, dct_field
+                )
 
             # Generate view
             # Action generate view
@@ -668,11 +693,19 @@ class DevopsPlanCg(models.Model):
                 }
                 self.env["code.generator.snippet"].create([value_snippet])
 
+            self._update_inherit_before_code_generator_writer(
+                code_generator_id
+            )
+
             # Generate module
             value = {"code_generator_ids": code_generator_id.ids}
             cg_writer = self.env["code.generator.writer"].create([value])
             rec.last_code_generator_writer = cg_writer.id
             # print(cg_writer_id)
+
+    def _update_inherit_before_code_generator_writer(self, code_generator_id):
+        # Need this for inherit module
+        pass
 
     def workspace_code_remove_module(self, module_id):
         for rec in self:

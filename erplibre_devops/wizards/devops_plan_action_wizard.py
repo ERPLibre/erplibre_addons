@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime
 
 from odoo import _, api, exceptions, fields, models
+from odoo.modules.module import get_module_path
 
 _logger = logging.getLogger(__name__)
 
@@ -57,6 +58,25 @@ class DevopsPlanActionWizard(models.TransientModel):
     # TODO maybe compute, enable if no workspace is installed
     install_os_first_installation = fields.Boolean(
         help="Enable to install OS dependency, need git clone of project"
+    )
+
+    depends_is_complete = fields.Boolean(
+        help="Will enable to view depends list."
+    )
+
+    depends_to_install = fields.Char(
+        string="Depends to install",
+        help="Separate by ;, list a module to install after auto-complete.",
+    )
+
+    depends_installed = fields.Char(
+        string="Depends installed",
+        help="Separate by ;, list a module installed after auto-complete.",
+    )
+
+    depends_missing = fields.Char(
+        string="Depends missing",
+        help="Separate by ;, list a missing module after auto-complete.",
     )
 
     deploy_select_installation = fields.Selection(
@@ -1158,6 +1178,22 @@ class DevopsPlanActionWizard(models.TransientModel):
             # # finally
             # self.state = "final"
 
+    def action_install_depends(self):
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Action Wizard - install depends"
+        ) as wp_id:
+            lst_module = self.depends_to_install.split(";")
+            ir_module_ids = self.env["ir.module.module"].search(
+                [("name", "in", lst_module)]
+            )
+            ir_module_ids.button_immediate_install()
+            if self.depends_installed:
+                self.depends_installed += ";" + self.depends_to_install
+            else:
+                self.depends_installed = self.depends_to_install
+            self.depends_to_install = ""
+        return self._reopen_self()
+
     def action_purge_metadata(self):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - purge metadata"
@@ -1181,24 +1217,69 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.model_fast_creation_error = "Missing model name."
                 continue
             if rec.model_fast_creation_field_name:
+                # Feature to merge header
+                field_name_header = rec.model_fast_creation_field_name.strip(
+                    "\n"
+                )
+                if (
+                    "\n" in field_name_header
+                    and rec.model_fast_creation_field_separator != "\n"
+                ):
+                    lst_field_name_multi = [
+                        a.split(rec.model_fast_creation_field_separator)
+                        for a in field_name_header.split("\n")
+                    ]
+                    lst_field_name = [
+                        " ".join(chars).strip()
+                        for chars in zip(*lst_field_name_multi)
+                    ]
+                else:
+                    lst_field_name = field_name_header.split(
+                        rec.model_fast_creation_field_separator
+                    )
                 lst_field_name = [
-                    a.strip()
-                    for a in rec.model_fast_creation_field_name.strip(
-                        "\n"
-                    ).split(rec.model_fast_creation_field_separator)
-                    if a.strip()
+                    a.strip() for a in lst_field_name if a.strip()
                 ]
                 # Check doublon
                 if len(set(lst_field_name)) != len(lst_field_name):
                     rec.model_fast_creation_error = "Detect doublon into field name, validate all is unique."
                     continue
                 # Extract value
-                lst_field_value = [
-                    a.strip()
-                    for a in rec.model_fast_creation_field_example_value.strip(
-                        "\n"
-                    ).split(rec.model_fast_creation_field_separator)
-                ]
+                data_per_line = (
+                    rec.model_fast_creation_field_example_value.split("\n")
+                )
+
+                lst_index = [a for a in range(len(lst_field_name))]
+                lst_separate = [None] * len(lst_field_name)
+                lst_index_to_delete = []
+                for str_data_to_threat in data_per_line:
+                    data_separate = str_data_to_threat.split(
+                        rec.model_fast_creation_field_separator
+                    )
+                    for index in lst_index:
+                        try:
+                            data_to_check = data_separate[index]
+                        except Exception as e:
+                            # Ignore this error, this will crash later at execution sync.external
+                            continue
+                        if data_to_check:
+                            lst_separate[index] = data_to_check
+                            lst_index_to_delete.append(index)
+                    for index_to_delete in lst_index_to_delete:
+                        lst_index.remove(index_to_delete)
+                    lst_index_to_delete = []
+                    if not lst_index:
+                        break
+
+                lst_field_value = []
+                for separate in lst_separate:
+                    if separate is None:
+                        lst_field_value.append("")
+                    elif type(separate) == str:
+                        lst_field_value.append(separate.strip())
+                    else:
+                        lst_field_value.append(separate)
+
                 if lst_field_value and len(lst_field_value) != len(
                     lst_field_name
                 ):
@@ -1217,6 +1298,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 lst_field_name = []
                 lst_field_value = []
 
+            # Get field name
             dct_field_json = {}
             for field_index, field_name in enumerate(lst_field_name):
                 field_name_code = self.to_field_name(field_name)
@@ -1231,20 +1313,20 @@ class DevopsPlanActionWizard(models.TransientModel):
                 # TODO if type float or int and got $ in name, it's monetary
                 dct_field_json[field_name_code] = {
                     "name": field_name_code,
-                    "sequence": field_index + 10,
+                    "sequence": field_index + 11,
                     "string": field_name,
                     "type": value_type,
                 }
 
-            dct_field = {
+            dct_model = {
                 rec.model_fast_creation_model_name: {
                     "fields": dct_field_json,
                     "is_inherit": False,
                     "model_name": rec.model_fast_creation_model_name,
                 }
             }
-
-            str_dct_model = json.dumps(dct_field)
+            dct_data = {"model": dct_model}
+            str_dct_model = json.dumps(dct_data)
             self.generate_from_json(str_dct_model)
 
             # Clean
@@ -1413,6 +1495,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                             model_id.sequence = sequence_no
                             sequence_no += 1
 
+                if True:
+                    module_to_install = "fds;fds"
         return self._reopen_self()
 
     def action_refresh_error(self):
@@ -1805,8 +1889,38 @@ class DevopsPlanActionWizard(models.TransientModel):
             lst_logs_model = [a.strip() for a in lst_logs_model if a.strip()]
             if lst_logs_model:
                 _logger.warning("\n".join(lst_logs_model))
+
+        dct_data = json.loads(str_dct_model_complete)
+        # Create dependencies
+        lst_depends = dct_data.get("depends")
+        ir_module_module_ids = self.env["ir.module.module"].search_read(
+            [("name", "in", lst_depends)], ["name", "state"]
+        )
+        lst_depends_installed = []
+        lst_depends_uninstalled = []
+        lst_depends_missing = []
+        for ir_module_id in ir_module_module_ids:
+            ir_module_name = ir_module_id.get("name")
+            if ir_module_id.get("state") == "uninstalled":
+                lst_depends_uninstalled.append(ir_module_name)
+            elif ir_module_id.get("state") == "installed":
+                lst_depends_installed.append(ir_module_name)
+            else:
+                lst_depends_missing.append(ir_module_name)
+            path = get_module_path(ir_module_name, downloaded=False)
+            if not path:
+                lst_depends_missing.append(ir_module_name)
+        self.depends_to_install = ";".join(lst_depends_uninstalled)
+        self.depends_installed = ";".join(lst_depends_installed)
+        self.depends_missing = ";".join(lst_depends_missing)
+        self.depends_is_complete = (
+            any(self.depends_to_install)
+            or any(self.depends_installed)
+            or any(self.depends_missing)
+        )
+
         # Create cg.model
-        dct_model = json.loads(str_dct_model_complete)
+        dct_model = dct_data.get("model")
         lst_model_to_add = []
         lst_model_field = []
         for model_name, v in dct_model.items():
@@ -1823,28 +1937,36 @@ class DevopsPlanActionWizard(models.TransientModel):
             lst_model_field.append((model_id, v))
             dct_model_cg[model_name] = model_id
             dct_model_cg_depend[model_name] = []
+
+            self._generate_from_json_model(model_id)
+
         # Create cg.field
         for model_id, v in lst_model_field:
-            if "fields" in v.keys():
-                # This algorithm only works when the module is working and formatted
-                for dct_field in v.get("fields").values():
-                    ttype = dct_field.get("type").lower()
-                    field_name = dct_field.get("name")
-                    value_value = {
-                        "name": field_name,
-                        "type": ttype,
-                        "model_id": model_id.id,
-                    }
-                    model_name = model_id.name
-                    # Check if exist
-                    field_id = self.env["devops.cg.field"].search(
-                        [
-                            ("name", "=", field_name),
-                            ("model_id", "=", model_id.id),
-                        ]
-                    )
-                    if field_id:
-                        continue
+            first_run = True
+            if "fields" not in v.keys():
+                continue
+
+            # This algorithm only works when the module is working and formatted
+            for dct_field in v.get("fields").values():
+                ttype = dct_field.get("type").lower()
+                field_name = dct_field.get("name")
+                # Check if exist
+                field_id = self.env["devops.cg.field"].search(
+                    [
+                        ("name", "=", field_name),
+                        ("model_id", "=", model_id.id),
+                    ]
+                )
+                tracking = dct_field.get("tracking", False)
+                model_name = model_id.name
+                value_value = {
+                    "name": field_name,
+                    "type": ttype,
+                    "model_id": model_id.id,
+                }
+                if tracking:
+                    value_value["tracking"] = tracking
+                if not field_id:
                     if "comodel_name" in dct_field.keys():
                         comodel_name = dct_field.get("comodel_name")
                         model_id_searched = dct_model_cg.get(comodel_name)
@@ -1890,10 +2012,16 @@ class DevopsPlanActionWizard(models.TransientModel):
                         value_value["related_manual"] = dct_field.get(
                             "related"
                         )
+                    if "sequence" in dct_field.keys():
+                        value_value["sequence"] = dct_field.get("sequence")
 
                     field_id = self.env["devops.cg.field"].create(
                         [value_value]
                     )
+                self._generate_from_json_field(
+                    field_id, dct_field, is_first_run=first_run
+                )
+                first_run = False
 
         if force_new:
             # Replace all
@@ -1902,6 +2030,16 @@ class DevopsPlanActionWizard(models.TransientModel):
             # TODO support update and not append
             # Append
             self.model_ids = [(4, a) for a in lst_model_to_add]
+
+    def _generate_from_json_model(self, model_id):
+        # Need this for inherit module
+        pass
+
+    def _generate_from_json_field(
+        self, field_id, dct_field, is_first_run=False
+    ):
+        # Need this for inherit module
+        pass
 
     def fill_working_module_name_or_id(self, module_name):
         if not module_name:
