@@ -1,0 +1,28 @@
+{
+    "name": "Sync external data",
+    "category": "Uncategorized",
+    "version": "18.0.1.2.4",
+    "author": "TechnoLibre",
+    "license": "AGPL-3",
+    "depends": ["mail", "queue_job"],
+    "external_dependencies": {
+        "python": ["openpyxl", "pdfminer.six"],
+    },
+    "website": "https://technolibre.ca",
+    "application": True,
+    "data": [
+        "security/ir.model.access.csv",
+        "security/groups.xml",
+        "data/mail_template.xml",
+        "data/queue_job_data.xml",
+        "views/sync_data_create.xml",
+        "views/sync_data_exec.xml",
+        "views/sync_data_exec_cron_log.xml",
+        "views/sync_data_transform.xml",
+        "views/sync_data_transform_exec.xml",
+        "views/sync_data_transform_filter_search.xml",
+        "views/sync_model.xml",
+        "views/menu.xml",
+    ],
+    "installable": True,
+}

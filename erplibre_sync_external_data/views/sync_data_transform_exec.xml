@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_data_transform_exec_view_form" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_form</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <header>
+                    <button
+                        name="action_set_no_match"
+                        type="object"
+                        string="Set no match"
+                        class="btn-warning"
+                        icon="fa-play"
+                        invisible="has_no_match or modification_done"
+                    />
+                    <button
+                        string="Apply modification"
+                        name="action_write_modification"
+                        type="object"
+                        class="btn-success"
+                        invisible="modification_done"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                        <group>
+                            <group string="Sync data">
+                                <field name="sync_data_transform_id" />
+                            </group>
+                            <group string="Review">
+                                <field name="need_review" />
+                                <field name="msg_review_reason" />
+                                <field name="msg_review" />
+                            </group>
+                            <group string="Mirror source working data">
+                                <field name="from_id_ref" />
+                                <field name="from_model_name" />
+                            </group>
+                            <group string="Resource model">
+                                <field name="to_model_name" />
+                                <field name="to_id_ref" />
+                            </group>
+                            <group string="Modification">
+                                <field name="modification" />
+                                <field name="modification_done" />
+                            </group>
+                        </group>
+                        <group string="Association">
+                            <field name="method" />
+                            <field name="note" />
+                        </group>
+                        <group string="Depends">
+                            <field name="id_depend_name" />
+                            <field name="depend_ids" />
+                        </group>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_exec_view_graph" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_graph</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <graph string="Sync data transform exec">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_exec_view_kanban" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_kanban</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_exec_view_list" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_list</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="sync_data_transform_id" optional="show" />
+                <field name="from_id_ref" optional="show" />
+                <field name="from_model_name" optional="show" />
+                <field name="depend_ids" optional="show" widget="many2many_tags" />
+                <field name="to_model_name" optional="show" />
+                <field name="to_id_ref" optional="show" />
+                <field name="modification" optional="show" />
+                <field name="modification_done" optional="show" />
+                <field name="note" optional="show" />
+                <field name="need_review" optional="show" />
+                <field name="msg_review_reason" optional="show" />
+                <field name="msg_review" optional="show" />
+                <field name="method" optional="show" />
+                <button
+                    name="action_set_no_match"
+                    type="object"
+                    string="Set no match"
+                    class="btn-warning"
+                    icon="fa-play"
+                    invisible="has_no_match or modification_done"
+                />
+                <button
+                    name="action_write_modification"
+                    type="object"
+                    string="Apply modification"
+                    class="btn-success"
+                    icon="fa-play"
+                    invisible="modification_done"
+                />
+            </list>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_exec_view_list_edit_inline" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_list</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <list create="false" editable="top" edit="true" multi_edit="1">
+                <field name="name" />
+                <field name="sync_data_transform_id" optional="show" />
+                <field name="from_id_ref" optional="show" />
+                <field name="from_model_name" optional="show" />
+                <field name="depend_ids" optional="show" widget="many2many_tags" />
+                <field name="to_model_name" optional="show" />
+                <field name="to_id_ref" optional="show" />
+                <field name="modification" optional="show" />
+                <field name="modification_done" optional="show" />
+                <field name="note" optional="show" />
+                <field name="need_review" optional="show" />
+                <field name="msg_review_reason" optional="show" />
+                <field name="msg_review" optional="show" />
+                <field name="method" optional="show" />
+                <button
+                    name="action_set_no_match"
+                    type="object"
+                    string="Set no match"
+                    class="btn-warning"
+                    icon="fa-play"
+                    invisible="has_no_match or modification_done"
+                />
+                <button
+                    name="action_write_modification"
+                    type="object"
+                    string="Apply modification"
+                    class="btn-success"
+                    icon="fa-play"
+                    invisible="modification_done"
+                />
+            </list>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_exec_view_pivot" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_pivot</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <pivot string="Sync data transform exec">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_exec_view_search" model="ir.ui.view">
+        <field name="name">sync_data_transform_exec_search</field>
+        <field name="model">sync.data.transform.exec</field>
+        <field name="arch" type="xml">
+            <search string="Sync data transform exec">
+                <field name="name" string="Name" />
+                <field name="note" string="Note" />
+                <field name="msg_review" string="Review" />
+                <field name="msg_review_reason" string="Review reason" />
+                <filter string="Need revision" name="need_revision" domain="[('need_review', '=', True)]" />
+                <filter
+                    string="Can apply modification"
+                    name="has_no_write"
+                    domain="[('modification_done', '=', False)]"
+                />
+                <filter string="Has match" name="has_match" domain="[('note', '!=', 'No match')]" />
+                <group expand="1" string="Group By">
+                    <filter string="Method" name="group_by_method" context="{'group_by': 'method'}" />
+                    <filter
+                        string="Msg Review Reason"
+                        name="group_by_msg_review_reason"
+                        context="{'group_by': 'msg_review_reason'}"
+                    />
+                    <filter string="Msg Review" name="group_by_msg_review" context="{'group_by': 'msg_review'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sync_transform_exec_bulk_apply_modification" model="ir.actions.server">
+        <field name="name">Apply modification</field>
+        <field name="model_id" ref="model_sync_data_transform_exec" />
+        <field name="binding_model_id" ref="model_sync_data_transform_exec" />
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">records.action_write_modification()</field>
+    </record>
+
+    <record id="sync_data_transform_exec_data_transform_exec_action_window" model="ir.actions.act_window">
+        <field name="name">Data transform exec</field>
+        <field name="res_model">sync.data.transform.exec</field>
+        <field name="view_mode">kanban,pivot,list,graph,form</field>
+    </record>
+</odoo>

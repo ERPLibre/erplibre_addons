@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_data_transform_filter_search_view_form" model="ir.ui.view">
+        <field name="name">sync_data_transform_filter_search_form</field>
+        <field name="model">sync.data.transform.filter_search</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <header>
+                    <button string="Generate all" name="action_generate_all" type="object" class="btn-primary" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-archive" name="toggle_active" type="object">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <!--                        <field name="pattern_string" />-->
+                        <!--                        <field name="pattern_value" />-->
+                        <field name="sequence" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_filter_search_view_graph" model="ir.ui.view">
+        <field name="name">sync_data_transform_filter_search_graph</field>
+        <field name="model">sync.data.transform.filter_search</field>
+        <field name="arch" type="xml">
+            <graph string="Sync data transform filter search">
+                <field name="name" type="row" />
+                <!--                <field name="pattern_string" type="row" />-->
+                <!--                <field name="pattern_value" type="row" />-->
+                <field name="sequence" type="measure" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_filter_search_view_kanban" model="ir.ui.view">
+        <field name="name">sync_data_transform_filter_search_kanban</field>
+        <field name="model">sync.data.transform.filter_search</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <!--                <field name="pattern_string" />-->
+                <!--                <field name="pattern_value" />-->
+                <field name="sequence" />
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <!--                                    <li class="mb4">-->
+                                    <!--                                        <strong>-->
+                                    <!--                                            <field name="pattern_string" />-->
+                                    <!--                                        </strong>-->
+                                    <!--                                    </li>-->
+                                    <!--                                    <li class="mb4">-->
+                                    <!--                                        <strong>-->
+                                    <!--                                            <field name="pattern_value" />-->
+                                    <!--                                        </strong>-->
+                                    <!--                                    </li>-->
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="sequence" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_filter_search_view_list" model="ir.ui.view">
+        <field name="name">sync_data_transform_filter_search_list</field>
+        <field name="model">sync.data.transform.filter_search</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <!--                <field name="pattern_string" />-->
+                <!--                <field name="pattern_value" />-->
+                <field name="sequence" />
+            </list>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_filter_search_view_pivot" model="ir.ui.view">
+        <field name="name">sync_data_transform_filter_search_pivot</field>
+        <field name="model">sync.data.transform.filter_search</field>
+        <field name="arch" type="xml">
+            <pivot string="Sync data transform filter search">
+                <field name="name" type="row" />
+                <!--                <field name="pattern_string" type="row" />-->
+                <!--                <field name="pattern_value" type="row" />-->
+                <field name="sequence" type="measure" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_filter_search_view_search" model="ir.ui.view">
+        <field name="name">sync_data_transform_filter_search_search</field>
+        <field name="model">sync.data.transform.filter_search</field>
+        <field name="arch" type="xml">
+            <search string="Sync data transform filter search">
+                <field name="name" string="" />
+                <!--                <field name="pattern_string" string="" />-->
+                <!--                <field name="pattern_value" string="" />-->
+                <filter
+                    domain="[('active','=',False)]"
+                    name="Inactive"
+                    string="Inactive Sync data transform filter search"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record
+        id="sync_data_transform_filter_search_data_transform_filter_search_action_window"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Data transform filter search</field>
+        <field name="res_model">sync.data.transform.filter_search</field>
+        <field name="view_mode">list,kanban,pivot,graph,form</field>
+    </record>
+</odoo>
