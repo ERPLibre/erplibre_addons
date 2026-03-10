@@ -169,12 +169,9 @@ class SyncDataTransform(models.Model):
 
     def action_transform(self, ctx=None, do_link=False):
         for rec in self:
-            if not rec.context_name in [
-                "default",
-            ]:
+            if rec.context_name != "default":
                 continue
-            sync_model_ids = rec.sync_model_ids
-            rec.action_transform_default(sync_model_ids, do_link)
+            rec.action_transform_default(rec.sync_model_ids, do_link)
         return {}
 
     def action_transform_default(self, sync_model_ids, do_link):
@@ -203,11 +200,6 @@ class SyncDataTransform(models.Model):
                     if not bind_field_reverse:
                         continue
 
-                    # TODO support this when create (bind_field_reverse, "=", False), write (bind_field_reverse, "!=", False) sync_data_write_ids
-                    sync_model_mirror_create_ids = self.env[
-                        sync_model_id.model_name
-                    ].search([(bind_field_reverse, "=", False)])
-
                     created_ids = [
                         a.res_id
                         for a in sync_data_exec_id.sync_data_create_ids
@@ -216,15 +208,6 @@ class SyncDataTransform(models.Model):
                     sync_model_mirror_create_ids = self.env[
                         sync_model_id.model_name
                     ].browse(created_ids)
-
-                    written_ids = [
-                        a.res_id
-                        for a in sync_data_exec_id.sync_data_write_ids
-                        if a.res_model == sync_model_id.model_name
-                    ]
-                    sync_model_mirror_write_ids = self.env[
-                        sync_model_id.model_name
-                    ].browse(written_ids)
 
                     method_call = bind_config.get("method_call")
                     if not method_call:

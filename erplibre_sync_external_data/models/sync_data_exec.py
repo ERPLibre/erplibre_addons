@@ -298,12 +298,11 @@ class SyncDataExec(models.Model):
 
     def action_process_sync_data(self):
         self.ensure_one()
-        for rec in self:
-            if not rec.time_execution_extract_start:
-                rec.time_execution_extract_start = fields.Datetime.now()
+        if not self.time_execution_extract_start:
+            self.time_execution_extract_start = fields.Datetime.now()
 
-            if rec.what_import == "default":
-                rec.action_import_default_algo()
+        if self.what_import == "default":
+            self.action_import_default_algo()
 
         return {}
 
@@ -327,7 +326,7 @@ class SyncDataExec(models.Model):
                 }
             )
             subtype_note = self.env.ref("mail.mt_note")
-            message = self.env["mail.message"].create(
+            self.env["mail.message"].create(
                 [
                     {
                         "model": rec._name,
@@ -605,68 +604,9 @@ class SyncDataExec(models.Model):
                     field_name = header_config[index_column][1]
 
                 field_type = self.env[model_name]._fields.get(field_name).type
-                record_values[field_name] = column_value
-                if field_type in ["date", "datetime"]:
-                    if type(column_value) != fields.datetime:
-                        self._transform_date(record_values, field_name)
-                elif field_type in ["boolean"]:
-                    if type(column_value) is str:
-                        record_values[field_name] = column_value.lower() in [
-                            "o",
-                            "y",
-                            "yes",
-                            "oui",
-                            "true",
-                        ]
-                elif field_type in ["integer"]:
-                    if type(column_value) == str:
-                        if column_value:
-                            # keep only char for int
-                            column_value_int = re.sub(
-                                r"[^\d-]", "", column_value
-                            ).replace(",", ".")
-                            if (
-                                column_value.replace(" ", "")
-                                != column_value_int
-                            ):
-                                _logger.error(
-                                    f"Detect int {column_value_int} from char {column_value}"
-                                )
-                            record_values[field_name] = (
-                                int(column_value_int)
-                                if column_value_int
-                                else 0
-                            )
-                        else:
-                            record_values[field_name] = 0
-                elif field_type in ["float", "monetary"]:
-                    if type(column_value) == str:
-                        column_value = column_value.replace("$", "")
-                        if column_value:
-                            # keep only char for float
-                            column_value_float = re.sub(
-                                r"[^\d,.-]", "", column_value
-                            ).replace(",", ".")
-                            if (
-                                column_value.replace(" ", "")
-                                != column_value_float
-                            ):
-                                _logger.error(
-                                    f"Detect float {column_value_float} from char {column_value}"
-                                )
-                            record_values[field_name] = (
-                                float(column_value_float)
-                                if column_value_float
-                                else 0.0
-                            )
-                        else:
-                            record_values[field_name] = 0.0
-                elif field_type in ["char", "text"]:
-                    if type(column_value) != str:
-                        if column_value:
-                            record_values[field_name] = str(column_value)
-                        else:
-                            record_values[field_name] = ""
+                record_values[field_name] = self._convert_field_value(
+                    record_values, field_name, field_type, column_value
+                )
 
             model_record_search = [
                 (a, "=", record_values[a]) for a in sync_fields
@@ -723,7 +663,7 @@ class SyncDataExec(models.Model):
             rec.time_execution_extract_start = fields.Datetime.now()
             if not sync_data_transform_value:
                 sync_data_transform_value = {}
-            if "context_name" not in sync_data_transform_value.keys():
+            if "context_name" not in sync_data_transform_value:
                 if self.context_name:
                     sync_data_transform_value["context_name"] = (
                         self.context_name
@@ -771,6 +711,54 @@ class SyncDataExec(models.Model):
             "res_id": copied_record.id,
             "target": "current",
         }
+
+    def _convert_field_value(self, record_values, field_name, field_type, value):
+        """Convert a raw cell value to the appropriate Odoo field type."""
+        if field_type in ("date", "datetime"):
+            record_values[field_name] = value
+            if not isinstance(value, fields.datetime):
+                self._transform_date(record_values, field_name)
+            return record_values[field_name]
+        if field_type == "boolean":
+            if isinstance(value, str):
+                return value.lower() in ("o", "y", "yes", "oui", "true")
+            return value
+        if field_type == "integer":
+            return self._parse_integer(value)
+        if field_type in ("float", "monetary"):
+            return self._parse_float(value)
+        if field_type in ("char", "text"):
+            if not isinstance(value, str):
+                return str(value) if value else ""
+            return value
+        return value
+
+    def _parse_integer(self, value):
+        """Parse a string value into an integer, stripping non-numeric chars."""
+        if not isinstance(value, str):
+            return value
+        if not value:
+            return 0
+        cleaned = re.sub(r"[^\d-]", "", value).replace(",", ".")
+        if value.replace(" ", "") != cleaned:
+            _logger.error(
+                f"Detect int {cleaned} from char {value}"
+            )
+        return int(cleaned) if cleaned else 0
+
+    def _parse_float(self, value):
+        """Parse a string value into a float, stripping currency symbols."""
+        if not isinstance(value, str):
+            return value
+        value = value.replace("$", "")
+        if not value:
+            return 0.0
+        cleaned = re.sub(r"[^\d,.-]", "", value).replace(",", ".")
+        if value.replace(" ", "") != cleaned:
+            _logger.error(
+                f"Detect float {cleaned} from char {value}"
+            )
+        return float(cleaned) if cleaned else 0.0
 
     FRENCH_MONTHS = {
         "janv": 1,
