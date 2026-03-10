@@ -2,7 +2,7 @@ import hashlib
 import json
 import logging
 
-from odoo import _, api, conf, fields, models
+from odoo import api, conf, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -130,22 +130,22 @@ class SyncDataTransform(models.Model):
         for rec in self:
             rec.mail_activity_count = len(rec.mail_activity_ids)
 
-    def action_link(self, ctx=None):
-        self.action_transform_algo(ctx=ctx, do_link=True)
+    def action_link(self):
+        self.action_transform_algo(do_link=True)
 
-    def action_write_all(self, ctx=None):
+    def action_write_all(self):
         for rec in self:
             rec.sync_data_transform_exec_ids.action_write_modification()
             rec.data_was_wrote = True
 
-    def action_transform_algo(self, ctx=None, do_link=False):
+    def action_transform_algo(self, do_link=False):
         self._set_start_execution_time()
         if "queue_job" in conf.server_wide_modules:
-            self.with_delay().action_transform(ctx=ctx, do_link=do_link)
+            self.with_delay().action_transform(do_link=do_link)
             self.is_transforming = True
             status = {}
         else:
-            status = self.action_transform(ctx=ctx, do_link=do_link)
+            status = self.action_transform(do_link=do_link)
             self._set_end_execution_time()
         return status
 
@@ -159,7 +159,7 @@ class SyncDataTransform(models.Model):
             if not rec.time_execution_transform_start:
                 rec.time_execution_transform_start = fields.Datetime.now()
 
-    def action_transform(self, ctx=None, do_link=False):
+    def action_transform(self, do_link=False):
         for rec in self:
             if rec.context_name != "default":
                 continue
@@ -212,7 +212,6 @@ class SyncDataTransform(models.Model):
                         bind_config,
                         bind_field_reverse,
                         do_link=link_only,
-                        do_update=rec.do_update,
                     )
 
     def update_bind_transform(
@@ -222,7 +221,6 @@ class SyncDataTransform(models.Model):
         bind_config,
         bind_field_reverse,
         do_link=False,
-        do_update=False,
     ):
         transform_exec_batch = []
 
@@ -322,12 +320,14 @@ class SyncDataTransform(models.Model):
             update_value = None
 
             if ttype == "many2one":
-                rec_name = self.env[model_key]._rec_name
-                found = self.env[model_key].search([(rec_name, "=", value)])
+                associate_model = target_field.comodel_name
+                rec_name = self.env[associate_model]._rec_name
+                found = self.env[associate_model].search(
+                    [(rec_name, "=", value)]
+                )
                 if found:
                     update_value = found.id
                 else:
-                    associate_model = target_field.comodel_name
                     associate_key = (
                         f"{associate_model}.create.{rec_name}.{value}"
                     )
@@ -500,12 +500,13 @@ class SyncDataTransform(models.Model):
         self.ensure_one()
         record_name = str(project_number)
         if not model_id:
-            model_value[model_id._rec_name] = record_name
+            rec_name = self.env[model_key]._rec_name
+            model_value[rec_name] = record_name
 
             modification_json = json.dumps(model_value)
             transform_depends = list(set(transform_depends))
             associate_key = (
-                f"{model_key}.create.{model_id._rec_name}.{record_name}"
+                f"{model_key}.create.{rec_name}.{record_name}"
             )
             note = "Create bind_field_model"
             transform_exec_id = self._add_transform(

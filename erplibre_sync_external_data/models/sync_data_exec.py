@@ -289,15 +289,13 @@ class SyncDataExec(models.Model):
             if not rec.file:
                 raise ValidationError("Missing file")
             # TODO depend from erplibre_sync_external_data_spreadsheet, maybe merge modules
-            # Add file
-            decode_raw = base64.b64decode(rec.file)
-            encode_raw = base64.b64encode(rec.file)
-            mimetype = guess_mimetype(decode_raw)
+            raw_data = base64.b64decode(rec.file)
+            mimetype = guess_mimetype(raw_data)
             # TODO how can retrieve original name
             attachment_id = self.env["ir.attachment"].create(
                 {
                     "name": "default_file.xlsx",
-                    "datas": encode_raw,
+                    "datas": rec.file,
                     "res_model": rec._name,
                     "res_id": rec.id,
                     "mimetype": mimetype,
@@ -318,7 +316,7 @@ class SyncDataExec(models.Model):
                 ]
             )
 
-            filepath_byte = BytesIO(base64.b64decode(rec.file))
+            filepath_byte = BytesIO(raw_data)
             for sync_model_id in rec.sync_model_ids:
                 rec.extract_automated_excel(
                     filepath_byte,
@@ -473,8 +471,10 @@ class SyncDataExec(models.Model):
 
                     if len(header_config) <= item_row_i:
                         _logger.warning(
-                            f"Got difference header, missing index {item_row_i} '{header_config}', and '{parsed_headers}' "
-                            f"check filepath '{filepath}' filetype '{file_name_type}'"
+                            "Got difference header, missing index %s '%s', and '%s' "
+                            "check filepath '%s' filetype '%s'",
+                            item_row_i, header_config, parsed_headers,
+                            filepath, file_name_type,
                         )
                         has_different_header = True
                     elif (
@@ -482,8 +482,10 @@ class SyncDataExec(models.Model):
                         and not is_other_header
                     ):
                         _logger.warning(
-                            f"Got difference header '{item_row_transform}' and '{header_config[item_row_i][0]}', "
-                            f"check filepath '{filepath}' filetype '{file_name_type}'"
+                            "Got difference header '%s' and '%s', "
+                            "check filepath '%s' filetype '%s'",
+                            item_row_transform, header_config[item_row_i][0],
+                            filepath, file_name_type,
                         )
                         has_different_header = True
                     if is_other_header:
@@ -571,7 +573,8 @@ class SyncDataExec(models.Model):
 
         if has_different_header and not data_lines:
             _logger.error(
-                f"Wrong header file '{file_name_type}', expected header '{expected_headers}' and got '{parsed_headers}'"
+                "Wrong header file '%s', expected header '%s' and got '%s'",
+                file_name_type, expected_headers, parsed_headers,
             )
             return
         if ignore_last_line:
@@ -629,7 +632,7 @@ class SyncDataExec(models.Model):
                 r for r in model_record_id if r.file_no_line == file_no_line
             ]
             if len(matching) != 1:
-                raise Exception(
+                raise ValidationError(
                     f"Cannot resolve duplicate, check "
                     f"{[r.id for r in model_record_id]} of {file_name_type}"
                 )
@@ -748,7 +751,7 @@ class SyncDataExec(models.Model):
             return 0
         cleaned = re.sub(r"[^\d-]", "", value)
         if value.replace(" ", "") != cleaned:
-            _logger.error(f"Detect int {cleaned} from char {value}")
+            _logger.error("Detect int %s from char %s", cleaned, value)
         return int(cleaned) if cleaned else 0
 
     def _parse_float(self, value):
@@ -760,7 +763,7 @@ class SyncDataExec(models.Model):
             return 0.0
         cleaned = re.sub(r"[^\d,.-]", "", value).replace(",", ".")
         if value.replace(" ", "") != cleaned:
-            _logger.error(f"Detect float {cleaned} from char {value}")
+            _logger.error("Detect float %s from char %s", cleaned, value)
         return float(cleaned) if cleaned else 0.0
 
     FRENCH_MONTHS = {
@@ -833,7 +836,7 @@ class SyncDataExec(models.Model):
                 continue
 
         record_data[key] = False
-        _logger.error(f"Cannot parse data to date '{data}'")
+        _logger.error("Cannot parse data to date '%s'", data)
 
     def transform_datetime(self, user_datetime):
         """Convert a date to a UTC datetime string using the user's timezone."""
