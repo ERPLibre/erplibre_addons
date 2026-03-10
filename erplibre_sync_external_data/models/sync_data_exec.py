@@ -5,7 +5,7 @@ import json
 import logging
 import re
 from collections import defaultdict
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from io import BytesIO
 
 import pytz
@@ -15,7 +15,7 @@ from odoo.exceptions import ValidationError
 from odoo.tools.mimetypes import guess_mimetype
 
 try:
-    # Odoo 18 tourne sous Py>=3.10; openpyxl est la lib la plus sûre pour .xlsx
+    # openpyxl is the safest lib for .xlsx on Odoo 18 (Python >= 3.10)
     import openpyxl
 except Exception as e:
     openpyxl = None
@@ -52,13 +52,13 @@ class SyncDataExec(models.Model):
         "sync.data.transform",
         string="Transformation",
         readonly=True,
-        help="Dernière feuille de transformation",
+        help="Latest transformation sheet",
         tracking=True,
     )
 
     what_import = fields.Selection(
         selection=[("default", "Default")],
-        string="Quoi importer",
+        string="What to import",
         default="default",
         tracking=True,
     )
@@ -166,7 +166,7 @@ class SyncDataExec(models.Model):
                 subject=subject,
                 message_type="comment",
                 subtype_xmlid="mail.mt_comment",
-                partner_ids=partners.ids,  # optionnel
+                partner_ids=partners.ids,
             )
 
     @api.depends("what_import", "time_execution_extract_end")
@@ -226,7 +226,7 @@ class SyncDataExec(models.Model):
                 )
 
     def _format_duration_fr(self, seconds):
-        """Retourne une durée lisible en français à partir d'un nombre de secondes."""
+        """Return a human-readable duration string from a number of seconds."""
         if not seconds or seconds < 0:
             return _("0 seconde")
 
@@ -237,7 +237,6 @@ class SyncDataExec(models.Model):
         parts = []
 
         if days:
-            # Les chaînes English seront traduites en FR via les .po
             parts.append(_("%d day(s)") % days)
         if hours:
             parts.append(_("%d hour(s)") % hours)
@@ -306,7 +305,6 @@ class SyncDataExec(models.Model):
             if rec.what_import == "default":
                 rec.action_import_default_algo()
 
-        # Edit me
         return {}
 
     def action_import_default_algo(self):
@@ -334,7 +332,7 @@ class SyncDataExec(models.Model):
                     {
                         "model": rec._name,
                         "res_id": rec.id,
-                        "body": "Fichier ajouté automatiquement.",
+                        "body": _("File added automatically."),
                         "message_type": "comment",
                         "subtype_id": subtype_note.id,
                         "author_id": self.env.user.partner_id.id,
@@ -369,9 +367,7 @@ class SyncDataExec(models.Model):
 
         metadata = json.loads(sync_model_id.spreadsheet_extraction_metadata)
         header_config = metadata.get("header", [])
-        header_config_ext = header_config + [
-            ("File no line", "file_no_line")
-        ]
+        header_config_ext = header_config + [("File no line", "file_no_line")]
         expected_headers = [a[0] for a in header_config]
         index_line_header = metadata.get("index_line_header", 0)
         nb_line_header = metadata.get("nb_line_header", 1)
@@ -392,15 +388,11 @@ class SyncDataExec(models.Model):
         # repeat_column will ignore the line when need repetition and will move data to next line
         repeat_column = option_level.get("repeat_column", [])
         # duplicate_column_when_empty will replicate the value when empty, like buffering
-        duplicate_columns = option_level.get(
-            "duplicate_column_when_empty", []
-        )
+        duplicate_columns = option_level.get("duplicate_column_when_empty", [])
         buffer_duplicate_column_when_empty = [None] * len(header_config)
 
         sync_header_indices = [
-            i
-            for i, a in enumerate(header_config_ext)
-            if a[1] in sync_fields
+            i for i, a in enumerate(header_config_ext) if a[1] in sync_fields
         ]
 
         if filetype == "xlsx":
@@ -432,8 +424,6 @@ class SyncDataExec(models.Model):
 
         finish_read_header = False
         for row in reader:
-            # if has_different_header:
-            #     break
             index += 1
             if index_line_header > index or (
                 index_last_line > 0 and index > index_last_line
@@ -480,9 +470,6 @@ class SyncDataExec(models.Model):
                         for a in row
                     ]
                 for item_row_i, item_row in enumerate(row_values):
-                    # if not item_row:
-                    #     _logger.error(f"Missing row for file {filepath}")
-                    #     continue
                     item_row_transform = item_row.strip()
 
                     if len(header_config) <= item_row_i:
@@ -524,7 +511,6 @@ class SyncDataExec(models.Model):
                         continue
                     if index_cell >= len(header_config):
                         continue
-                    # if parsed_headers[index_cell] ==
                     value_mapping = {}
                     if len(header_config[index_cell]) > 2:
                         value_mapping = header_config[index_cell][2]
@@ -581,9 +567,7 @@ class SyncDataExec(models.Model):
                         else:
                             if last_repeat_column_data:
                                 for i in repeat_column:
-                                    row_values[i] = last_repeat_column_data[
-                                        i
-                                    ]
+                                    row_values[i] = last_repeat_column_data[i]
                                 data_lines.append(row_values)
                             else:
                                 _logger.warning(
@@ -762,9 +746,6 @@ class SyncDataExec(models.Model):
             rec.action_send_message_notification()
             rec.write(
                 {
-                    # "detected_rows": detected,
-                    # "imported_rows": imported,
-                    # "notes": notes,
                     "time_execution_extract_end": fields.Datetime.now(),
                     "state": "summary",
                 }
@@ -791,151 +772,91 @@ class SyncDataExec(models.Model):
             "target": "current",
         }
 
+    FRENCH_MONTHS = {
+        "janv": 1,
+        "jan": 1,
+        "févr": 2,
+        "fevr": 2,
+        "fév": 2,
+        "mars": 3,
+        "avr": 4,
+        "mai": 5,
+        "juin": 6,
+        "juil": 7,
+        "jul": 7,
+        "août": 8,
+        "aout": 8,
+        "aoû": 8,
+        "sept": 9,
+        "oct": 10,
+        "nov": 11,
+        "déc": 12,
+        "dec": 12,
+    }
+
     def _transform_date(self, record_data, key):
         data = record_data.get(key)
-        if type(data) is int:
-            # TODO support month
-            data = datetime.strptime(str(data), "%Y").date()
-            record_data[key] = data
-        elif type(data) is str:
+        if data is None or isinstance(data, date):
+            return
+        if isinstance(data, int):
+            record_data[key] = datetime.strptime(str(data), "%Y").date()
+            return
+        if not isinstance(data, str) or not data:
+            record_data[key] = False
+            return
+
+        sep = "/" if "/" in data else "-" if "-" in data else None
+        if not sep:
+            record_data[key] = False
+            return
+
+        # Try standard formats first
+        formats = [
+            f"%d{sep}%m{sep}%Y",
+            f"%Y{sep}%m{sep}%d",
+            f"%d{sep}%b{sep}%y",
+            f"%d{sep}%B{sep}%y",
+        ]
+        for fmt in formats:
             try:
-                if "/" in data:
-                    data = datetime.strptime(data, "%d/%m/%Y").date()
-                    record_data[key] = data
-                elif "-" in data:
-                    data = datetime.strptime(data, "%d-%m-%Y").date()
-                    record_data[key] = data
-                else:
-                    # TODO show this error
-                    record_data[key] = False
-            except Exception as e:
-                try:
-                    if "/" in data:
-                        data = datetime.strptime(data, "%Y/%m/%d").date()
-                        record_data[key] = data
-                    elif "-" in data:
-                        data = datetime.strptime(data, "%Y-%m-%d").date()
-                        record_data[key] = data
-                    else:
-                        # TODO show this error
-                        record_data[key] = False
-                except Exception as e:
-                    try:
-                        if "/" in data:
-                            data = datetime.strptime(data, "%d/%b/%y").date()
-                            record_data[key] = data
-                        elif "-" in data:
-                            data = datetime.strptime(data, "%d-%b-%y").date()
-                            record_data[key] = data
-                        else:
-                            # TODO show this error
-                            record_data[key] = False
-                    except Exception as e:
-                        try:
-                            if "/" in data:
-                                data = datetime.strptime(
-                                    data, "%d/%B/%y"
-                                ).date()
-                                record_data[key] = data
-                            elif "-" in data:
-                                data = datetime.strptime(
-                                    data, "%d-%B-%y"
-                                ).date()
-                                record_data[key] = data
-                            else:
-                                # TODO show this error
-                                record_data[key] = False
-                        except Exception as e:
-                            MOIS = {
-                                "janv": 1,
-                                "jan": 1,
-                                "févr": 2,
-                                "fevr": 2,
-                                "fév": 2,
-                                "mars": 3,
-                                "avr": 4,
-                                "mai": 5,
-                                "juin": 6,
-                                "juil": 7,
-                                "jul": 7,
-                                "août": 8,
-                                "aout": 8,
-                                "aoû": 8,
-                                "sept": 9,
-                                "oct": 10,
-                                "nov": 11,
-                                "déc": 12,
-                                "dec": 12,
-                            }
-                            for month_key, month_value in MOIS.items():
-                                data = data.lower().replace(
-                                    month_key, str(month_value)
-                                )
-                            try:
-                                if "/" in data:
-                                    data = datetime.strptime(
-                                        data, "%d/%m/%y"
-                                    ).date()
-                                    record_data[key] = data
-                                elif "-" in data:
-                                    data = datetime.strptime(
-                                        data, "%d-%m-%y"
-                                    ).date()
-                                    record_data[key] = data
-                                else:
-                                    # TODO show this error
-                                    record_data[key] = False
-                            except Exception as e:
-                                try:
-                                    if "/" in data:
-                                        data = datetime.strptime(
-                                            data, "%m/%d/%y"
-                                        ).date()
-                                        record_data[key] = data
-                                    elif "-" in data:
-                                        data = datetime.strptime(
-                                            data, "%m-%d-%y"
-                                        ).date()
-                                        record_data[key] = data
-                                    else:
-                                        # TODO show this error
-                                        record_data[key] = False
-                                except Exception as e:
-                                    try:
-                                        if "/" in data:
-                                            data = datetime.strptime(
-                                                data, "%m/%d/%Y"
-                                            ).date()
-                                            record_data[key] = data
-                                        elif "-" in data:
-                                            data = datetime.strptime(
-                                                data, "%m-%d-%Y"
-                                            ).date()
-                                            record_data[key] = data
-                                        else:
-                                            # TODO show this error
-                                            record_data[key] = False
-                                    except Exception as e:
-                                        record_data[key] = False
-                                        _logger.error(
-                                            f"Cannot parse data to date '{data}'"
-                                        )
+                record_data[key] = datetime.strptime(data, fmt).date()
+                return
+            except (ValueError, TypeError):
+                continue
+
+        # Replace French month abbreviations and retry
+        normalized = data.lower()
+        for month_abbr, month_num in self.FRENCH_MONTHS.items():
+            normalized = normalized.replace(month_abbr, str(month_num))
+
+        short_long_formats = [
+            f"%d{sep}%m{sep}%y",
+            f"%m{sep}%d{sep}%y",
+            f"%m{sep}%d{sep}%Y",
+        ]
+        for fmt in short_long_formats:
+            try:
+                record_data[key] = datetime.strptime(normalized, fmt).date()
+                return
+            except (ValueError, TypeError):
+                continue
+
+        record_data[key] = False
+        _logger.error(f"Cannot parse data to date '{data}'")
 
     def transform_datetime(self, user_datetime):
         if user_datetime:
             tz_name = (
                 self.env.user.tz or "America/Toronto"
-            )  # évite un offset fixe -4/-5
+            )  # avoid fixed -4/-5 offset
             tz = pytz.timezone(tz_name)
 
-            # date_debut est un Date => choisir une heure locale (ici 00:00)
+            # input is a Date, pick midnight as local time
             dt_local = datetime.combine(user_datetime, time(0, 0, 0))
-            dt_local = tz.localize(
-                dt_local
-            )  # rend l'heure "aware" (avec le TZ)
+            dt_local = tz.localize(dt_local)  # make the time timezone-aware
             dt_utc = dt_local.astimezone(
                 pytz.UTC
-            )  # convertit en UTC pour stockage
+            )  # convert to UTC for storage
 
             return fields.Datetime.to_string(dt_utc)
         else:

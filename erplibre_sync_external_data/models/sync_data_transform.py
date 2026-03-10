@@ -1,11 +1,8 @@
 import hashlib
 import json
 import logging
-import os
-from datetime import date, datetime
 
 from odoo import _, api, conf, fields, models
-from odoo.addons.queue_job.delay import chain, group
 
 _logger = logging.getLogger(__name__)
 
@@ -152,7 +149,6 @@ class SyncDataTransform(models.Model):
     def action_transform_algo(self, ctx=None, do_link=False):
         self._set_start_execution_time()
         if "queue_job" in conf.server_wide_modules:
-            # chain(self.action_transform(ctx=ctx, do_link=do_link), self._set_end_execution_time())
             self.with_delay().action_transform(ctx=ctx, do_link=do_link)
             self.is_transforming = True
             status = {}
@@ -172,7 +168,6 @@ class SyncDataTransform(models.Model):
                 rec.time_execution_transform_start = fields.Datetime.now()
 
     def action_transform(self, ctx=None, do_link=False):
-        # status = super().action_transform(ctx=ctx, do_link=do_link)
         for rec in self:
             if not rec.context_name in [
                 "default",
@@ -187,7 +182,6 @@ class SyncDataTransform(models.Model):
             sync_data_exec_id = self.env["sync.data.exec"].search(
                 [("transform_id", "=", rec.id)], limit=1
             )
-            # Doing project.project
             for sync_model_id in sync_model_ids:
                 _logger.info(sync_model_id.model_name)
                 metadata = sync_model_id.spreadsheet_extraction_metadata
@@ -256,9 +250,6 @@ class SyncDataTransform(models.Model):
         do_update=False,
     ):
         transform_exec_batch = []
-        # crm_team_id = self.env["crm.team"].search(
-        #     [("name", "=", CST_CRM_LEAD_TEAM)]
-        # )
 
         bind_field_model = bind_config.get("bind_field_model")
         if not bind_field_model:
@@ -328,12 +319,9 @@ class SyncDataTransform(models.Model):
                         need_link = getattr(mirror_id, bind_field_reverse)
                         if not need_link and model_id:
                             mirror_id.write({bind_field_reverse: model_id})
-                            # setattr(mirror_id, bind_field_reverse, model_id.id)
 
         if transform_exec_batch:
-            self.env["sync.data.transform.exec"].create(
-                transform_exec_batch
-            )
+            self.env["sync.data.transform.exec"].create(transform_exec_batch)
 
     def _bind_transform(
         self,
@@ -355,8 +343,6 @@ class SyncDataTransform(models.Model):
                     f"Cannot find field '{field_name_target}' into model '{model_key}'."
                 )
             value = getattr(mirror_id, field_name_mirror)
-            # Check target type, to change if got relation
-            # ttype = mirror_id._fields.get(field_name_mirror).type
             ttype = target_field.type
 
             if ttype == "many2one":
@@ -373,7 +359,6 @@ class SyncDataTransform(models.Model):
                 if update_value:
                     update_value = update_value.id
                 else:
-                    # associate_model = model_key
                     associate_model = target_field.comodel_name
                     associate_key = (
                         f"{associate_model}.create.{rec_name}.{value}"
@@ -390,36 +375,6 @@ class SyncDataTransform(models.Model):
                         ]
                     )
                     if not parent_sync_data_transform_exec_id:
-                        # TODO support creation transformation
-                        modification_json = json.dumps({rec_name: value})
-                        #
-                        # transform_exec_values = {
-                        #     "to_model_name": associate_model,
-                        #     "sync_data_transform_id": self.id,
-                        #     "from_model_name": model_key,
-                        #     "note": "Create bind_field_model relation",
-                        #     "modification": modification_json,
-                        #     "method": "create",
-                        #     "associate_key": associate_key,
-                        # }
-                        # dependency_links.append(
-                        #     (
-                        #         4,
-                        #         parent_sync_data_transform_exec_id.id,
-                        #     )
-                        # )
-                        # self._add_transform(
-                        #     ttype.base_field.comodel_name,
-                        #     model_key,
-                        #     modification_json,
-                        #     associate_key,
-                        #     dependency_links,
-                        #     transform_depends,
-                        #     ttype,
-                        #     values_to_insert,
-                        #     model_value,
-                        #     key,
-                        # )
                         update_value = 0
                     else:
                         update_value = (
@@ -432,7 +387,10 @@ class SyncDataTransform(models.Model):
                             )
                         )
             elif ttype in ["many2many", "one2many"]:
-                print("todo")
+                _logger.warning(
+                    "many2many/one2many binding not yet implemented for field '%s'",
+                    field_name_target,
+                )
             else:
                 update_value = value
             if update_value:
@@ -442,7 +400,10 @@ class SyncDataTransform(models.Model):
             ttype = self.env[model_key]._fields.get(key)
             if ttype.type in ["many2one", "many2many", "one2many"]:
                 if ttype.type in ["many2many", "one2many"]:
-                    print("TODO")
+                    _logger.warning(
+                        "many2many/one2many default field not fully implemented for field '%s'",
+                        key,
+                    )
                 related_model = self.env[ttype.base_field.comodel_name]
                 values_to_insert = []
                 if type(value) is list:
@@ -475,7 +436,9 @@ class SyncDataTransform(models.Model):
                             vvalue_name = vvalue.get(related_model._rec_name)
                             modification_value = vvalue
                         else:
-                            modification_value = {related_model._rec_name: vvalue}
+                            modification_value = {
+                                related_model._rec_name: vvalue
+                            }
                             vvalue_name = vvalue
                         modification_json = json.dumps(modification_value)
 
@@ -501,7 +464,9 @@ class SyncDataTransform(models.Model):
                         elif ttype.type in ["many2one"]:
                             model_value[key] = value_id.id
                         elif ttype.type in ["one2many"]:
-                            print("todo")
+                            _logger.warning(
+                                "one2many write-back not yet implemented"
+                            )
                         else:
                             model_value[key] = value_id
                 if values_to_insert:
@@ -529,7 +494,6 @@ class SyncDataTransform(models.Model):
         transform_exec_values = {
             "to_model_name": to_model_name,
             "sync_data_transform_id": self.id,
-            # "from_id_ref": ticket_id.id,
             "from_model_name": from_model_name,
             "note": note,
             "modification": modification_json,
@@ -578,10 +542,11 @@ class SyncDataTransform(models.Model):
             if ttype.type in ["many2many"]:
                 values_to_insert.append((4, replace_key))
             elif ttype.type in ["many2one"]:
-                # model_value[key] = value_id.id
                 model_value[key] = replace_key
             elif ttype.type in ["one2many"]:
-                print("TODO")
+                _logger.warning(
+                    "one2many not yet implemented in _add_transform"
+                )
         return transform_exec_id
 
     def _bind_transform_model(
@@ -599,7 +564,6 @@ class SyncDataTransform(models.Model):
     ):
         self.ensure_one()
         record_name = f"{project_number}"
-        # record_name = f"{project_number} {model_value.get(CST_model_model_FIELD_model_NUMBER)}"
         if not model_id:
             model_value[model_id._rec_name] = record_name
 
@@ -636,8 +600,10 @@ class SyncDataTransform(models.Model):
                 }
             )
         else:
-            # TODO update model
-            print("update")
+            _logger.info(
+                "Model update for '%s' - skipped (not yet implemented)",
+                project_number,
+            )
 
     @api.depends(
         "time_execution_transform_start", "time_execution_transform_end"

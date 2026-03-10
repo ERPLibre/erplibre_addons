@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import fields, models
 
 
 class SyncDataTransformFilterSearch(models.Model):
@@ -10,10 +10,6 @@ class SyncDataTransformFilterSearch(models.Model):
     active = fields.Boolean(default=True)
 
     sequence = fields.Integer(default=10)
-
-    # pattern_string = fields.Text(default="")
-    #
-    # pattern_value = fields.Text(default="")
 
     def action_generate_all(self, keys=None):
         if not keys:

@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 
 from odoo import _, api, fields, models
 
