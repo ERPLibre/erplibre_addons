@@ -121,31 +121,26 @@ class SyncDataExec(models.Model):
         group_sync_id = self.env.ref(
             "erplibre_sync_external_data.group_erplibre_sync_external_data_exec_notify"
         )
-        if partner_ids:
-            partner_ids += group_sync_id.users.mapped("partner_id").ids
-        else:
-            partner_ids = group_sync_id.users.mapped("partner_id").ids
+        group_partner_ids = group_sync_id.users.mapped("partner_id").ids
+        partner_ids = (partner_ids or []) + group_partner_ids
 
-        return super(SyncDataExec, self).message_subscribe(
+        return super().message_subscribe(
             partner_ids=partner_ids, subtype_ids=subtype_ids
         )
 
     def action_send_message_notification(self):
+        mail_template = self.env.ref(
+            "erplibre_sync_external_data.mail_template_erplibre_sync_external_data_notif_change"
+        )
         for rec in self:
             if not (
                 rec.send_message_force
                 or (
                     rec.send_message_at_create_or_modify_sync
-                    and any(
-                        [rec.sync_data_create_ids, rec.sync_data_write_ids]
-                    )
+                    and (rec.sync_data_create_ids or rec.sync_data_write_ids)
                 )
             ):
                 continue
-
-            mail_template = self.env.ref(
-                "erplibre_sync_external_data.mail_template_erplibre_sync_external_data_notif_change"
-            )
 
             partners = rec.message_partner_ids
             partners -= self.env.user.partner_id
@@ -339,6 +334,41 @@ class SyncDataExec(models.Model):
                 "Install it with: pip install openpyxl"
             )
 
+    @staticmethod
+    def _extract_cell_value(cell, is_excel):
+        """Extract a typed value from a single cell."""
+        if not is_excel:
+            return cell
+        if isinstance(cell.value, float) and cell.number_format == "0":
+            return int(cell.value)
+        if cell.number_format == "mm-dd-yy" and cell.base_date:
+            return cell.base_date
+        return cell.value
+
+    @staticmethod
+    def _extract_header_values(row, is_excel):
+        """Extract cleaned header values from a row."""
+        if is_excel:
+            values = []
+            for cell in row:
+                if cell.value is None:
+                    values.append("")
+                else:
+                    values.append(
+                        cell.value.strip()
+                        .replace("\n", " ")
+                        .replace("\t", " ")
+                    )
+            return values
+        return [
+            a.lstrip("\ufeff")
+            .strip()
+            .strip('"')
+            .replace("\n", "")
+            .replace("\t", "")
+            for a in row
+        ]
+
     def _open_file_reader(self, filepath, filetype, sheet_name, index):
         """Open a file and return (reader, is_excel, index) or (None, False, index) on error."""
         if filetype == "xlsx":
@@ -437,28 +467,7 @@ class SyncDataExec(models.Model):
                 <= index_line_header + nb_line_header - 1
             ):
 
-                if is_excel:
-                    row_values = []
-                    for a in row:
-                        if a.value is None:
-                            txt = ""
-                        else:
-                            txt = (
-                                a.value.strip()
-                                .replace("\n", " ")
-                                .replace("\t", " ")
-                            )
-                        row_values.append(txt)
-                else:
-                    # Some csv has problem with header '""'
-                    row_values = [
-                        a.lstrip("\ufeff")
-                        .strip()
-                        .strip('"')
-                        .replace("\n", "")
-                        .replace("\t", "")
-                        for a in row
-                    ]
+                row_values = self._extract_header_values(row, is_excel)
                 for item_row_i, item_row in enumerate(row_values):
                     item_row_transform = item_row.strip()
 
@@ -504,21 +513,7 @@ class SyncDataExec(models.Model):
                     value_mapping = {}
                     if len(header_config[index_cell]) > 2:
                         value_mapping = header_config[index_cell][2]
-                    if is_excel:
-                        if (
-                            isinstance(cell_sheet.value, float)
-                            and cell_sheet.number_format == "0"
-                        ):
-                            value = int(cell_sheet.value)
-                        elif (
-                            cell_sheet.number_format == "mm-dd-yy"
-                            and cell_sheet.base_date
-                        ):
-                            value = cell_sheet.base_date
-                        else:
-                            value = cell_sheet.value
-                    else:
-                        value = cell_sheet
+                    value = self._extract_cell_value(cell_sheet, is_excel)
                     if value in ignore_data:
                         value = False
                     if value_mapping:
@@ -583,68 +578,80 @@ class SyncDataExec(models.Model):
         if ignore_last_line:
             data_lines = data_lines[:-ignore_last_line]
         for line in data_lines:
-            record_values = {}
-            field_value_file_no_line = -1
-            for index_column, column_value in enumerate(line):
-                if index_column == len(line) - 1:
-                    field_name = "file_no_line"
-                    field_value_file_no_line = column_value
-                else:
-                    field_name = header_config[index_column][1]
-
-                field_type = self.env[model_name]._fields.get(field_name).type
-                record_values[field_name] = self._convert_field_value(
-                    record_values, field_name, field_type, column_value
-                )
-
-            model_record_search = [
-                (a, "=", record_values[a]) for a in sync_fields
-            ]
-
-            model_record_id = self.env[model_name].search(model_record_search)
-
-            if len(model_record_id) > 1:
-                _logger.warning(
-                    f"Find multiple record with index {sync_fields}"
-                )
-                matching_records = [
-                    a
-                    for a in model_record_id
-                    if a.file_no_line == field_value_file_no_line
-                ]
-                if len(matching_records) > 1 or not matching_records:
-                    raise Exception(
-                        f"Cannot compute duplicate field, check {[a.id for a in model_record_id]} of {file_name_type}"
-                    )
-                model_record_id = matching_records[0]
-
-            if not model_record_id:
-                model_record_id = self.env[model_name].create([record_values])
-                sync_data_create_value = {
-                    "res_model": model_name,
-                    "res_id": model_record_id.id,
-                    "sync_data_exec_id": self.id,
-                }
-                self.env["sync.data.create"].create([sync_data_create_value])
-            else:
-                model_record_id.write(record_values)
-
-            # Memorize modification for tracking
+            record_values, file_no_line = self._parse_data_line(
+                line, header_config, model_name
+            )
+            model_record_id = self._sync_record(
+                model_name, record_values, sync_fields, file_no_line, file_name_type
+            )
             model_data_to_track[model_name].append(model_record_id.id)
 
-        # Detect tracking
-        if model_data_to_track:
-            self.env.cr.commit()
-            for model_name, res_ids in model_data_to_track.items():
-                tracking_vals = self.env["mail.tracking.value"].search(
-                    [
-                        ("mail_message_id.model", "=", model_name),
-                        ("mail_message_id.res_id", "in", res_ids),
-                        ("id", ">", last_id_tracking),
-                    ]
+        self._link_tracking_values(model_data_to_track, last_id_tracking)
+
+    def _parse_data_line(self, line, header_config, model_name):
+        """Parse a data line into a record dict and file_no_line value."""
+        record_values = {}
+        file_no_line = -1
+        for index_column, column_value in enumerate(line):
+            if index_column == len(line) - 1:
+                field_name = "file_no_line"
+                file_no_line = column_value
+            else:
+                field_name = header_config[index_column][1]
+            field_type = self.env[model_name]._fields.get(field_name).type
+            record_values[field_name] = self._convert_field_value(
+                record_values, field_name, field_type, column_value
+            )
+        return record_values, file_no_line
+
+    def _sync_record(self, model_name, record_values, sync_fields, file_no_line, file_name_type):
+        """Find or create a record, updating if it already exists."""
+        search_domain = [
+            (field, "=", record_values[field]) for field in sync_fields
+        ]
+        model_record_id = self.env[model_name].search(search_domain)
+
+        if len(model_record_id) > 1:
+            _logger.warning(
+                "Found multiple records with index %s", sync_fields
+            )
+            matching = [
+                r for r in model_record_id
+                if r.file_no_line == file_no_line
+            ]
+            if len(matching) != 1:
+                raise Exception(
+                    f"Cannot resolve duplicate, check "
+                    f"{[r.id for r in model_record_id]} of {file_name_type}"
                 )
-                if tracking_vals:
-                    tracking_vals.sync_data_exec_id = self.id
+            model_record_id = matching[0]
+
+        if not model_record_id:
+            model_record_id = self.env[model_name].create([record_values])
+            self.env["sync.data.create"].create([{
+                "res_model": model_name,
+                "res_id": model_record_id.id,
+                "sync_data_exec_id": self.id,
+            }])
+        else:
+            model_record_id.write(record_values)
+        return model_record_id
+
+    def _link_tracking_values(self, model_data_to_track, last_id_tracking):
+        """Link mail.tracking.value records to this sync execution."""
+        if not model_data_to_track:
+            return
+        self.env.cr.commit()
+        for tracked_model, res_ids in model_data_to_track.items():
+            tracking_vals = self.env["mail.tracking.value"].search(
+                [
+                    ("mail_message_id.model", "=", tracked_model),
+                    ("mail_message_id.res_id", "in", res_ids),
+                    ("id", ">", last_id_tracking),
+                ]
+            )
+            if tracking_vals:
+                tracking_vals.sync_data_exec_id = self.id
 
     def action_process_transform(self, sync_data_transform_value: dict = None):
         self.ensure_one()
