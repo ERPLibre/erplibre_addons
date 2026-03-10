@@ -1,12 +1,9 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
-import logging
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from odoo import fields
 from odoo.tests.common import TransactionCase
-
-_logger = logging.getLogger(__name__)
 
 
 class TestTransformDate(TransactionCase):

@@ -610,7 +610,13 @@ class SyncDataExec(models.Model):
                 file_no_line = column_value
             else:
                 field_name = header_config[index_column][1]
-            field_type = self.env[model_name]._fields.get(field_name).type
+            field_obj = self.env[model_name]._fields.get(field_name)
+            if not field_obj:
+                raise ValidationError(
+                    f"Field '{field_name}' not found on model"
+                    f" '{model_name}'"
+                )
+            field_type = field_obj.type
             record_values[field_name] = self._convert_field_value(
                 record_values, field_name, field_type, column_value
             )

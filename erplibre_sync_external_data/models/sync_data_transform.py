@@ -351,6 +351,12 @@ class SyncDataTransform(models.Model):
         for key, value in default_fields.items():
             # Support magic value with computing
             default_field = self.env[model_key]._fields.get(key)
+            if not default_field:
+                _logger.warning(
+                    "Field '%s' not found on model '%s', skipping",
+                    key, model_key,
+                )
+                continue
             if default_field.type in ("many2one", "many2many", "one2many"):
                 if default_field.type != "many2one":
                     _logger.warning(

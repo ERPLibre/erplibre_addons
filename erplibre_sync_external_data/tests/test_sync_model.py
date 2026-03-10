@@ -1,11 +1,8 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
 import json
-import logging
 
 from odoo.tests.common import TransactionCase
-
-_logger = logging.getLogger(__name__)
 
 
 class TestSyncModel(TransactionCase):

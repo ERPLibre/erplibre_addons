@@ -11,38 +11,21 @@ class SyncDataTransformFilterSearch(models.Model):
 
     sequence = fields.Integer(default=10)
 
+    SEPARATORS = ("-%s", " -%s", " %s", "%s", "/%s", " : %s", ": %s", " # %s", "# %s")
+
     def action_generate_all(self, keys=None):
         if not keys:
             return
-        patterns = []
-        str_key = "#%s"
-        patterns.append(str_key)
+        patterns = ["#%s"]
         for key_s in keys:
-            str_key = f"{key_s}-%s"
-            patterns.append(str_key)
-            str_key = f"{key_s} -%s"
-            patterns.append(str_key)
-            str_key = f"{key_s} %s"
-            patterns.append(str_key)
-            str_key = f"{key_s}%s"
-            patterns.append(str_key)
-            str_key = f"{key_s}/%s"
-            patterns.append(str_key)
-            str_key = f"{key_s} : %s"
-            patterns.append(str_key)
-            str_key = f"{key_s}: %s"
-            patterns.append(str_key)
-            str_key = f"{key_s} # %s"
-            patterns.append(str_key)
-            str_key = f"{key_s}# %s"
-            patterns.append(str_key)
-        patterns_to_create = []
-        for str_key in patterns:
-            filter_search_id = self.env[
-                "sync.data.transform.filter_search"
-            ].search([("name", "=", str_key)])
-            if not filter_search_id:
-                patterns_to_create.append({"name": str_key})
+            patterns.extend(f"{key_s}{sep}" for sep in self.SEPARATORS)
+        existing = self.env[
+            "sync.data.transform.filter_search"
+        ].search([("name", "in", patterns)])
+        existing_names = set(existing.mapped("name"))
+        patterns_to_create = [
+            {"name": p} for p in patterns if p not in existing_names
+        ]
         if patterns_to_create:
             self.env["sync.data.transform.filter_search"].create(
                 patterns_to_create
