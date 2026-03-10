@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-import getpass
 import json
 import logging
 import os
@@ -2236,7 +2235,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             with self.working_system_id.ssh_connection():
                 pass
         except Exception:
-            pass
+            _logger.debug(
+                "SSH connection test failed for %s@%s",
+                self.ssh_user,
+                self.ssh_host,
+                exc_info=True,
+            )
         return self._reopen_self()
 
     def action_git_commit(self):

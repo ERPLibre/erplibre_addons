@@ -11,7 +11,7 @@ import uuid
 
 from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
-from odoo import _, api, exceptions, fields, models, tools
+from odoo import _, api, exceptions, fields, models
 
 with open(".odoo-version", "r") as f:
     odoo_version = f.readline()
