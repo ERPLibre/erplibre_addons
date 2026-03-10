@@ -116,27 +116,19 @@ class SyncDataTransform(models.Model):
     @api.depends("sync_data_transform_exec_ids")
     def _compute_sync_data_transform_exec_count(self):
         for rec in self:
-            if rec.sync_data_transform_exec_ids:
-                rec.sync_data_transform_exec_count = len(
-                    rec.sync_data_transform_exec_ids
-                )
-            else:
-                rec.sync_data_transform_exec_count = 0
+            rec.sync_data_transform_exec_count = len(
+                rec.sync_data_transform_exec_ids
+            )
 
     @api.depends("context_name")
     def _compute_name(self):
         for rec in self:
-            rec.name = ""
-            if rec.context_name:
-                rec.name = rec.context_name
+            rec.name = rec.context_name or ""
 
     @api.depends("mail_activity_ids")
     def _compute_mail_activity_count(self):
         for rec in self:
-            if rec.mail_activity_ids:
-                rec.mail_activity_count = len(rec.mail_activity_ids)
-            else:
-                rec.mail_activity_count = 0
+            rec.mail_activity_count = len(rec.mail_activity_ids)
 
     def action_link(self, ctx=None):
         self.action_transform_algo(ctx=ctx, do_link=True)
@@ -389,12 +381,12 @@ class SyncDataTransform(models.Model):
                     )
                 related_model = self.env[ttype.base_field.comodel_name]
                 values_to_insert = []
-                if type(value) is list:
+                if isinstance(value, list):
                     search_values = value
                 else:
                     search_values = [value]
                 for vvalue in search_values:
-                    if type(vvalue) is dict:
+                    if isinstance(vvalue, dict):
                         value_id = related_model.search(
                             [
                                 (
@@ -415,7 +407,7 @@ class SyncDataTransform(models.Model):
                             ]
                         )
                     if not value_id:
-                        if type(vvalue) is dict:
+                        if isinstance(vvalue, dict):
                             vvalue_name = vvalue.get(related_model._rec_name)
                             modification_value = vvalue
                         else:
@@ -592,41 +584,18 @@ class SyncDataTransform(models.Model):
         "time_execution_transform_start", "time_execution_transform_end"
     )
     def _compute_time_duration_extract(self):
+        sync_data_exec = self.env["sync.data.exec"]
         for rec in self:
+            duration, label = sync_data_exec._compute_duration(
+                rec.time_execution_transform_start,
+                rec.time_execution_transform_end,
+            )
             if (
                 not rec.time_execution_transform_start
-                and not rec.time_execution_transform_end
+                and rec.time_execution_transform_end
             ):
-                rec.time_duration_extract = 0
-                rec.time_duration_extract_fr = _("Not running")
-            elif (
-                rec.time_execution_transform_start
-                and not rec.time_execution_transform_end
-            ):
-                rec.time_duration_extract = 0
-                rec.time_duration_extract_fr = _("Running")
-            else:
-                if (
-                    not rec.time_execution_transform_start
-                    and rec.time_execution_transform_end
-                ):
-                    # Strange case...
-                    rec.time_execution_transform_start = (
-                        rec.time_execution_transform_end
-                    )
-                if (
+                rec.time_execution_transform_start = (
                     rec.time_execution_transform_end
-                    < rec.time_execution_transform_start
-                ):
-                    duration_seconds = 0
-                else:
-                    delta = (
-                        rec.time_execution_transform_end
-                        - rec.time_execution_transform_start
-                    )
-                    duration_seconds = int(delta.total_seconds())
-
-                rec.time_duration_extract = float(duration_seconds)
-                rec.time_duration_extract_fr = self.env[
-                    "sync.data.exec"
-                ]._format_duration_fr(duration_seconds)
+                )
+            rec.time_duration_extract = duration
+            rec.time_duration_extract_fr = label

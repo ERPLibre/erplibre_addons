@@ -187,43 +187,31 @@ class SyncDataExec(models.Model):
     @api.depends("time_execution_extract_start", "time_execution_extract_end")
     def _compute_time_duration_extract(self):
         for rec in self:
+            duration, label = rec._compute_duration(
+                rec.time_execution_extract_start,
+                rec.time_execution_extract_end,
+            )
             if (
                 not rec.time_execution_extract_start
-                and not rec.time_execution_extract_end
+                and rec.time_execution_extract_end
             ):
-                rec.time_duration_extract = 0
-                rec.time_duration_extract_fr = _("Not running")
-            elif (
-                rec.time_execution_extract_start
-                and not rec.time_execution_extract_end
-            ):
-                rec.time_duration_extract = 0
-                rec.time_duration_extract_fr = _("Running")
-            else:
-                if (
-                    not rec.time_execution_extract_start
-                    and rec.time_execution_extract_end
-                ):
-                    # Strange case...
-                    rec.time_execution_extract_start = (
-                        rec.time_execution_extract_end
-                    )
-                if (
+                rec.time_execution_extract_start = (
                     rec.time_execution_extract_end
-                    < rec.time_execution_extract_start
-                ):
-                    duration_seconds = 0
-                else:
-                    delta = (
-                        rec.time_execution_extract_end
-                        - rec.time_execution_extract_start
-                    )
-                    duration_seconds = int(delta.total_seconds())
-
-                rec.time_duration_extract = float(duration_seconds)
-                rec.time_duration_extract_fr = rec._format_duration_fr(
-                    duration_seconds
                 )
+            rec.time_duration_extract = duration
+            rec.time_duration_extract_fr = label
+
+    def _compute_duration(self, start, end):
+        """Compute duration in seconds and a human-readable label."""
+        if not start and not end:
+            return 0, _("Not running")
+        if start and not end:
+            return 0, _("Running")
+        if not start or end < start:
+            return 0, self._format_duration_fr(0)
+        delta = end - start
+        seconds = int(delta.total_seconds())
+        return float(seconds), self._format_duration_fr(seconds)
 
     def _format_duration_fr(self, seconds):
         """Return a human-readable duration string from a number of seconds."""
@@ -257,33 +245,28 @@ class SyncDataExec(models.Model):
             else:
                 rec.action_process_sync_data()
 
+    REVERT_FIELD_MAP = {
+        "date": "old_value_datetime",
+        "datetime": "old_value_datetime",
+        "int": "old_value_integer",
+        "float": "old_value_float",
+        "monetary": "old_value_float",
+        "char": "old_value_char",
+        "text": "old_value_text",
+    }
+
     def action_revert_data(self):
         for rec in self:
             for diff_id in rec.sync_data_write_ids:
-                rec_id = self.env[diff_id.model].browse(diff_id.res_id)
-                if diff_id.field_id.ttype in ["date", "datetime"]:
+                old_value_field = self.REVERT_FIELD_MAP.get(
+                    diff_id.field_id.ttype
+                )
+                if old_value_field:
+                    rec_id = self.env[diff_id.model].browse(diff_id.res_id)
                     setattr(
                         rec_id,
                         diff_id.field_id.name,
-                        diff_id.old_value_datetime,
-                    )
-                elif diff_id.field_id.ttype in ["int"]:
-                    setattr(
-                        rec_id,
-                        diff_id.field_id.name,
-                        diff_id.old_value_integer,
-                    )
-                elif diff_id.field_id.ttype in ["float", "monetary"]:
-                    setattr(
-                        rec_id, diff_id.field_id.name, diff_id.old_value_float
-                    )
-                elif diff_id.field_id.ttype in ["char"]:
-                    setattr(
-                        rec_id, diff_id.field_id.name, diff_id.old_value_char
-                    )
-                elif diff_id.field_id.ttype in ["text"]:
-                    setattr(
-                        rec_id, diff_id.field_id.name, diff_id.old_value_text
+                        getattr(diff_id, old_value_field),
                     )
 
     def action_process_transform_async(self):
@@ -407,7 +390,7 @@ class SyncDataExec(models.Model):
             reader = ws.iter_rows()
         elif filetype == "csv":
             index -= 1
-            if type(filepath) is str:
+            if isinstance(filepath, str):
                 reader = []
                 # It's a path
                 with open(filepath, newline="", encoding="utf-8") as f:
@@ -515,7 +498,7 @@ class SyncDataExec(models.Model):
                         value_mapping = header_config[index_cell][2]
                     if is_excel:
                         if (
-                            type(cell_sheet.value) == float
+                            isinstance(cell_sheet.value, float)
                             and cell_sheet.number_format == "0"
                         ):
                             value = int(cell_sheet.value)
@@ -659,25 +642,21 @@ class SyncDataExec(models.Model):
 
     def action_process_transform(self, sync_data_transform_value: dict = None):
         self.ensure_one()
-        for rec in self:
-            rec.time_execution_extract_start = fields.Datetime.now()
-            if not sync_data_transform_value:
-                sync_data_transform_value = {}
-            if "context_name" not in sync_data_transform_value:
-                if self.context_name:
-                    sync_data_transform_value["context_name"] = (
-                        self.context_name
-                    )
-                else:
-                    sync_data_transform_value["context_name"] = "default"
-
-            sync_data_transform_value["sync_model_ids"] = [
-                (6, 0, rec.sync_model_ids.ids)
-            ]
-            rec.transform_id = self.env["sync.data.transform"].create(
-                [sync_data_transform_value]
+        self.time_execution_extract_start = fields.Datetime.now()
+        if not sync_data_transform_value:
+            sync_data_transform_value = {}
+        if "context_name" not in sync_data_transform_value:
+            sync_data_transform_value["context_name"] = (
+                self.context_name or "default"
             )
-            rec.transform_id.action_transform_algo()
+
+        sync_data_transform_value["sync_model_ids"] = [
+            (6, 0, self.sync_model_ids.ids)
+        ]
+        self.transform_id = self.env["sync.data.transform"].create(
+            [sync_data_transform_value]
+        )
+        self.transform_id.action_transform_algo()
         return {}
 
     def end_time_execution(self):

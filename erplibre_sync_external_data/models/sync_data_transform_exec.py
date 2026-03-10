@@ -1,7 +1,8 @@
 import json
 import logging
+import os
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -100,12 +101,11 @@ class SyncDataTransformExec(models.Model):
 
     def action_set_no_match(self):
         self.ensure_one()
-        for rec in self:
-            if rec.sync_data_transform_id.default_option_no_match:
-                rec.modification = (
-                    rec.sync_data_transform_id.default_option_no_match
-                )
-                rec.has_no_match = True
+        if self.sync_data_transform_id.default_option_no_match:
+            self.modification = (
+                self.sync_data_transform_id.default_option_no_match
+            )
+            self.has_no_match = True
 
     def action_write_modification(self):
         for rec in self:
@@ -128,7 +128,7 @@ class SyncDataTransformExec(models.Model):
                     key_type = key_field.type
                     if (
                         key_type in ["many2one", "many2many"]
-                        and type(value) is str
+                        and isinstance(value, str)
                     ):
                         # Create if not existing, search by rec_name
                         key_class = self.env[key_field.comodel_name]
