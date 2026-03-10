@@ -15,39 +15,39 @@ class SyncDataTransformFilterSearch(models.Model):
     #
     # pattern_value = fields.Text(default="")
 
-    def action_generate_all(self, lst_key=None):
-        if not lst_key:
+    def action_generate_all(self, keys=None):
+        if not keys:
             return
-        lst_str_key = []
+        patterns = []
         str_key = "#%s"
-        lst_str_key.append(str_key)
-        for key_s in lst_key:
+        patterns.append(str_key)
+        for key_s in keys:
             str_key = f"{key_s}-%s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s} -%s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s} %s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s}%s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s}/%s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s} : %s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s}: %s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s} # %s"
-            lst_str_key.append(str_key)
+            patterns.append(str_key)
             str_key = f"{key_s}# %s"
-            lst_str_key.append(str_key)
-        lst_str_key_create = []
-        for str_key in lst_str_key:
+            patterns.append(str_key)
+        patterns_to_create = []
+        for str_key in patterns:
             filter_search_id = self.env[
                 "sync.data.transform.filter_search"
             ].search([("name", "=", str_key)])
             if not filter_search_id:
-                lst_str_key_create.append({"name": str_key})
-        if lst_str_key_create:
+                patterns_to_create.append({"name": str_key})
+        if patterns_to_create:
             self.env["sync.data.transform.filter_search"].create(
-                lst_str_key_create
+                patterns_to_create
             )

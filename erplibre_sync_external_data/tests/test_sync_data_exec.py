@@ -30,9 +30,9 @@ class TestTransformDate(TransactionCase):
 
     def _call_transform(self, value):
         """Helper: call _transform_date and return the parsed result."""
-        dct = {"test_date": value}
-        self.exec_rec._transform_date(dct, "test_date")
-        return dct["test_date"]
+        data = {"test_date": value}
+        self.exec_rec._transform_date(data, "test_date")
+        return data["test_date"]
 
     # ------------------------------------------------------------------
     # Integer input (year only)
@@ -183,22 +183,22 @@ class TestTransformDate(TransactionCase):
 
     def test_date_none_no_crash(self):
         """None value should not modify the dict or crash."""
-        dct = {"test_date": None}
-        self.exec_rec._transform_date(dct, "test_date")
-        self.assertIsNone(dct["test_date"])
+        data = {"test_date": None}
+        self.exec_rec._transform_date(data, "test_date")
+        self.assertIsNone(data["test_date"])
 
     def test_date_already_date_no_crash(self):
         """If the value is already a date object, it should not be touched."""
         original = date(2024, 6, 15)
-        dct = {"test_date": original}
-        self.exec_rec._transform_date(dct, "test_date")
-        self.assertEqual(dct["test_date"], original)
+        data = {"test_date": original}
+        self.exec_rec._transform_date(data, "test_date")
+        self.assertEqual(data["test_date"], original)
 
     def test_date_missing_key(self):
         """Key not present in dict should not crash."""
-        dct = {}
-        self.exec_rec._transform_date(dct, "missing_key")
-        self.assertIsNone(dct.get("missing_key"))
+        data = {}
+        self.exec_rec._transform_date(data, "missing_key")
+        self.assertIsNone(data.get("missing_key"))
 
 
 class TestTransformDatetime(TransactionCase):

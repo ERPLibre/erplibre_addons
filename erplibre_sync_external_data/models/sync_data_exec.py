@@ -357,10 +357,10 @@ class SyncDataExec(models.Model):
             .search([], order="id desc", limit=1)
             .id
         )
-        dct_model_data_to_track = defaultdict(list)
+        model_data_to_track = defaultdict(list)
         index = 0
-        lst_got_header = []
-        lst_line = []
+        parsed_headers = []
+        data_lines = []
         last_repeat_column_data = []
         has_different_header = False
 
@@ -368,17 +368,17 @@ class SyncDataExec(models.Model):
         model_name = sync_model_id.model_name
 
         metadata = json.loads(sync_model_id.spreadsheet_extraction_metadata)
-        lst_header_json = metadata.get("header", [])
-        lst_header_json_extend = lst_header_json + [
+        header_config = metadata.get("header", [])
+        header_config_ext = header_config + [
             ("File no line", "file_no_line")
         ]
-        lst_expected_header = [a[0] for a in lst_header_json]
+        expected_headers = [a[0] for a in header_config]
         index_line_header = metadata.get("index_line_header", 0)
         nb_line_header = metadata.get("nb_line_header", 1)
         callback_init_read_header = metadata.get(
             "callback_init_read_header", None
         )
-        lst_sync_field = metadata.get("sync", [])
+        sync_fields = metadata.get("sync", [])
         ignore_last_line = metadata.get("ignore_last_line", 0)
         index_last_line = metadata.get("index_last_line", 0)
         ignore_data = metadata.get("ignore_data", [])
@@ -392,15 +392,15 @@ class SyncDataExec(models.Model):
         # repeat_column will ignore the line when need repetition and will move data to next line
         repeat_column = option_level.get("repeat_column", [])
         # duplicate_column_when_empty will replicate the value when empty, like buffering
-        lst_duplicate_column_when_empty = option_level.get(
+        duplicate_columns = option_level.get(
             "duplicate_column_when_empty", []
         )
-        buffer_duplicate_column_when_empty = [None] * len(lst_header_json)
+        buffer_duplicate_column_when_empty = [None] * len(header_config)
 
-        lst_index_sync_header = [
+        sync_header_indices = [
             i
-            for i, a in enumerate(lst_header_json_extend)
-            if a[1] in lst_sync_field
+            for i, a in enumerate(header_config_ext)
+            if a[1] in sync_fields
         ]
 
         if filetype == "xlsx":
@@ -420,8 +420,8 @@ class SyncDataExec(models.Model):
                 reader = []
                 # It's a path
                 with open(filepath, newline="", encoding="utf-8") as f:
-                    lst_line_csv_reader = csv.reader(f)
-                    for row in lst_line_csv_reader:
+                    csv_lines = csv.reader(f)
+                    for row in csv_lines:
                         reader.append(list(row))
             else:
                 text_stream = io.TextIOWrapper(filepath, encoding="utf-8")
@@ -440,7 +440,7 @@ class SyncDataExec(models.Model):
             ):
                 continue
             if ignore_validation_header:
-                lst_got_header = lst_expected_header
+                parsed_headers = expected_headers
 
             if (
                 index_line_header
@@ -458,7 +458,7 @@ class SyncDataExec(models.Model):
             ):
 
                 if is_excel:
-                    lst_row_text = []
+                    row_values = []
                     for a in row:
                         if a.value is None:
                             txt = ""
@@ -468,10 +468,10 @@ class SyncDataExec(models.Model):
                                 .replace("\n", " ")
                                 .replace("\t", " ")
                             )
-                        lst_row_text.append(txt)
+                        row_values.append(txt)
                 else:
                     # Some csv has problem with header '""'
-                    lst_row_text = [
+                    row_values = [
                         a.lstrip("\ufeff")
                         .strip()
                         .strip('"')
@@ -479,55 +479,55 @@ class SyncDataExec(models.Model):
                         .replace("\t", "")
                         for a in row
                     ]
-                for item_row_i, item_row in enumerate(lst_row_text):
+                for item_row_i, item_row in enumerate(row_values):
                     # if not item_row:
                     #     _logger.error(f"Missing row for file {filepath}")
                     #     continue
                     item_row_transform = item_row.strip()
 
-                    if len(lst_header_json) <= item_row_i:
+                    if len(header_config) <= item_row_i:
                         _logger.warning(
-                            f"Got difference header, missing index {item_row_i} '{lst_header_json}', and '{lst_got_header}' "
+                            f"Got difference header, missing index {item_row_i} '{header_config}', and '{parsed_headers}' "
                             f"check filepath '{filepath}' filetype '{file_name_type}'"
                         )
                         has_different_header = True
                     elif (
-                        item_row_transform != lst_header_json[item_row_i][0]
+                        item_row_transform != header_config[item_row_i][0]
                         and not is_other_header
                     ):
                         _logger.warning(
-                            f"Got difference header '{item_row_transform}' and '{lst_header_json[item_row_i][0]}', "
+                            f"Got difference header '{item_row_transform}' and '{header_config[item_row_i][0]}', "
                             f"check filepath '{filepath}' filetype '{file_name_type}'"
                         )
                         has_different_header = True
                     if is_other_header:
                         # Append if multiple header
-                        if len(lst_got_header) > item_row_i:
-                            lst_got_header[
+                        if len(parsed_headers) > item_row_i:
+                            parsed_headers[
                                 item_row_i
                             ] += f" {item_row_transform}"
                     else:
-                        lst_got_header.append(item_row_transform)
+                        parsed_headers.append(item_row_transform)
             elif index > index_line_header:
                 if not finish_read_header and callback_init_read_header:
                     cb_init_read_header = getattr(
                         self, callback_init_read_header
                     )
                     if cb_init_read_header:
-                        lst_got_header = cb_init_read_header(
-                            lst_got_header, lst_expected_header
+                        parsed_headers = cb_init_read_header(
+                            parsed_headers, expected_headers
                         )
                 finish_read_header = True
-                lst_row_text = []
+                row_values = []
                 for index_cell, cell_sheet in enumerate(row):
-                    if index_cell >= len(lst_got_header):
+                    if index_cell >= len(parsed_headers):
                         continue
-                    if index_cell >= len(lst_header_json):
+                    if index_cell >= len(header_config):
                         continue
-                    # if lst_got_header[index_cell] ==
-                    dct_mapping_value = {}
-                    if len(lst_header_json[index_cell]) > 2:
-                        dct_mapping_value = lst_header_json[index_cell][2]
+                    # if parsed_headers[index_cell] ==
+                    value_mapping = {}
+                    if len(header_config[index_cell]) > 2:
+                        value_mapping = header_config[index_cell][2]
                     if is_excel:
                         if (
                             type(cell_sheet.value) == float
@@ -545,28 +545,28 @@ class SyncDataExec(models.Model):
                         value = cell_sheet
                     if value in ignore_data:
                         value = False
-                    if dct_mapping_value:
-                        new_value = dct_mapping_value.get(value)
+                    if value_mapping:
+                        new_value = value_mapping.get(value)
                         if new_value:
                             value = new_value
-                    lst_row_text.append(value)
+                    row_values.append(value)
                 if any(
-                    lst_row_text[1:]
+                    row_values[1:]
                 ):  # TODO it's not a generic check, or don't use repeat, maybe need from index_sync_header
-                    lst_row_text.append(index)
-                    if lst_duplicate_column_when_empty:
-                        for index_duplicate in lst_duplicate_column_when_empty:
-                            if 0 > index_duplicate < len(lst_row_text):
+                    row_values.append(index)
+                    if duplicate_columns:
+                        for index_duplicate in duplicate_columns:
+                            if 0 > index_duplicate < len(row_values):
                                 raise ValidationError(
-                                    f"Check your configuration, duplicate_column_when_empty {lst_duplicate_column_when_empty}, index is wrong with values."
+                                    f"Check your configuration, duplicate_column_when_empty {duplicate_columns}, index is wrong with values."
                                 )
-                            value = lst_row_text[index_duplicate]
+                            value = row_values[index_duplicate]
                             if value:
                                 buffer_duplicate_column_when_empty[
                                     index_duplicate
                                 ] = value
                             else:
-                                lst_row_text[index_duplicate] = (
+                                row_values[index_duplicate] = (
                                     buffer_duplicate_column_when_empty[
                                         index_duplicate
                                     ]
@@ -574,60 +574,60 @@ class SyncDataExec(models.Model):
                     # Support repeat column
                     if repeat_column:
                         detect_column_repeat = [
-                            lst_row_text[a] for a in repeat_column
+                            row_values[a] for a in repeat_column
                         ]
                         if any(detect_column_repeat):
-                            last_repeat_column_data = lst_row_text
+                            last_repeat_column_data = row_values
                         else:
                             if last_repeat_column_data:
                                 for i in repeat_column:
-                                    lst_row_text[i] = last_repeat_column_data[
+                                    row_values[i] = last_repeat_column_data[
                                         i
                                     ]
-                                lst_line.append(lst_row_text)
+                                data_lines.append(row_values)
                             else:
                                 _logger.warning(
                                     "Missing information from repeat column option."
                                 )
                     else:
-                        if lst_sync_field:
+                        if sync_fields:
                             # Validate sync value exist
-                            lst_value_to_check_sync = [
-                                lst_row_text[a] for a in lst_index_sync_header
+                            sync_check_values = [
+                                row_values[a] for a in sync_header_indices
                             ]
                             # TODO support [0], because it's false
-                            if any(lst_value_to_check_sync):
-                                lst_line.append(lst_row_text)
+                            if any(sync_check_values):
+                                data_lines.append(row_values)
                         else:
-                            lst_line.append(lst_row_text)
+                            data_lines.append(row_values)
 
-        if has_different_header and not lst_line:
+        if has_different_header and not data_lines:
             _logger.error(
-                f"Wrong header file '{file_name_type}', expected header '{lst_expected_header}' and got '{lst_got_header}'"
+                f"Wrong header file '{file_name_type}', expected header '{expected_headers}' and got '{parsed_headers}'"
             )
             return
         if ignore_last_line:
-            lst_line = lst_line[: -1 * ignore_last_line]
-        lst_value = []
-        for line in lst_line:
-            dct_value = {}
-            lst_value.append(dct_value)
+            data_lines = data_lines[: -1 * ignore_last_line]
+        parsed_rows = []
+        for line in data_lines:
+            record_values = {}
+            parsed_rows.append(record_values)
             field_value_file_no_line = -1
             for index_column, column_value in enumerate(line):
                 if index_column == len(line) - 1:
                     field_name = "file_no_line"
                     field_value_file_no_line = column_value
                 else:
-                    field_name = lst_header_json[index_column][1]
+                    field_name = header_config[index_column][1]
 
                 field_type = self.env[model_name]._fields.get(field_name).type
-                dct_value[field_name] = column_value
+                record_values[field_name] = column_value
                 if field_type in ["date", "datetime"]:
                     if type(column_value) != fields.datetime:
-                        self._transform_date(dct_value, field_name)
+                        self._transform_date(record_values, field_name)
                 elif field_type in ["boolean"]:
                     if type(column_value) is str:
-                        dct_value[field_name] = column_value.lower() in [
+                        record_values[field_name] = column_value.lower() in [
                             "o",
                             "y",
                             "yes",
@@ -648,13 +648,13 @@ class SyncDataExec(models.Model):
                                 _logger.error(
                                     f"Detect int {column_value_int} from char {column_value}"
                                 )
-                            dct_value[field_name] = (
+                            record_values[field_name] = (
                                 int(column_value_int)
                                 if column_value_int
                                 else 0
                             )
                         else:
-                            dct_value[field_name] = 0
+                            record_values[field_name] = 0
                 elif field_type in ["float", "monetary"]:
                     if type(column_value) == str:
                         column_value = column_value.replace("$", "")
@@ -670,43 +670,43 @@ class SyncDataExec(models.Model):
                                 _logger.error(
                                     f"Detect float {column_value_float} from char {column_value}"
                                 )
-                            dct_value[field_name] = (
+                            record_values[field_name] = (
                                 float(column_value_float)
                                 if column_value_float
                                 else 0.0
                             )
                         else:
-                            dct_value[field_name] = 0.0
+                            record_values[field_name] = 0.0
                 elif field_type in ["char", "text"]:
                     if type(column_value) != str:
                         if column_value:
-                            dct_value[field_name] = str(column_value)
+                            record_values[field_name] = str(column_value)
                         else:
-                            dct_value[field_name] = ""
+                            record_values[field_name] = ""
 
             model_record_search = [
-                (a, "=", dct_value[a]) for a in lst_sync_field
+                (a, "=", record_values[a]) for a in sync_fields
             ]
 
             model_record_id = self.env[model_name].search(model_record_search)
 
             if len(model_record_id) > 1:
                 _logger.warning(
-                    f"Find multiple record with index {lst_sync_field}"
+                    f"Find multiple record with index {sync_fields}"
                 )
-                lst_model_record_id = [
+                matching_records = [
                     a
                     for a in model_record_id
                     if a.file_no_line == field_value_file_no_line
                 ]
-                if len(lst_model_record_id) > 1 or not lst_model_record_id:
+                if len(matching_records) > 1 or not matching_records:
                     raise Exception(
                         f"Cannot compute duplicate field, check {[a.id for a in model_record_id]} of {file_name_type}"
                     )
-                model_record_id = lst_model_record_id[0]
+                model_record_id = matching_records[0]
 
             if not model_record_id:
-                model_record_id = self.env[model_name].create([dct_value])
+                model_record_id = self.env[model_name].create([record_values])
                 sync_data_create_value = {
                     "res_model": model_name,
                     "res_id": model_record_id.id,
@@ -714,19 +714,19 @@ class SyncDataExec(models.Model):
                 }
                 self.env["sync.data.create"].create([sync_data_create_value])
             else:
-                model_record_id.write(dct_value)
+                model_record_id.write(record_values)
 
             # Memorize modification for tracking
-            dct_model_data_to_track[model_name].append(model_record_id.id)
+            model_data_to_track[model_name].append(model_record_id.id)
 
         # Detect tracking
-        if dct_model_data_to_track:
+        if model_data_to_track:
             self.env.cr.commit()
-            for model_name, lst_res_id in dct_model_data_to_track.items():
+            for model_name, res_ids in model_data_to_track.items():
                 tracking_vals = self.env["mail.tracking.value"].search(
                     [
                         ("mail_message_id.model", "=", model_name),
-                        ("mail_message_id.res_id", "in", lst_res_id),
+                        ("mail_message_id.res_id", "in", res_ids),
                         ("id", ">", last_id_tracking),
                     ]
                 )
@@ -791,60 +791,60 @@ class SyncDataExec(models.Model):
             "target": "current",
         }
 
-    def _transform_date(self, dct_data, key):
-        data = dct_data.get(key)
+    def _transform_date(self, record_data, key):
+        data = record_data.get(key)
         if type(data) is int:
             # TODO support month
             data = datetime.strptime(str(data), "%Y").date()
-            dct_data[key] = data
+            record_data[key] = data
         elif type(data) is str:
             try:
                 if "/" in data:
                     data = datetime.strptime(data, "%d/%m/%Y").date()
-                    dct_data[key] = data
+                    record_data[key] = data
                 elif "-" in data:
                     data = datetime.strptime(data, "%d-%m-%Y").date()
-                    dct_data[key] = data
+                    record_data[key] = data
                 else:
                     # TODO show this error
-                    dct_data[key] = False
+                    record_data[key] = False
             except Exception as e:
                 try:
                     if "/" in data:
                         data = datetime.strptime(data, "%Y/%m/%d").date()
-                        dct_data[key] = data
+                        record_data[key] = data
                     elif "-" in data:
                         data = datetime.strptime(data, "%Y-%m-%d").date()
-                        dct_data[key] = data
+                        record_data[key] = data
                     else:
                         # TODO show this error
-                        dct_data[key] = False
+                        record_data[key] = False
                 except Exception as e:
                     try:
                         if "/" in data:
                             data = datetime.strptime(data, "%d/%b/%y").date()
-                            dct_data[key] = data
+                            record_data[key] = data
                         elif "-" in data:
                             data = datetime.strptime(data, "%d-%b-%y").date()
-                            dct_data[key] = data
+                            record_data[key] = data
                         else:
                             # TODO show this error
-                            dct_data[key] = False
+                            record_data[key] = False
                     except Exception as e:
                         try:
                             if "/" in data:
                                 data = datetime.strptime(
                                     data, "%d/%B/%y"
                                 ).date()
-                                dct_data[key] = data
+                                record_data[key] = data
                             elif "-" in data:
                                 data = datetime.strptime(
                                     data, "%d-%B-%y"
                                 ).date()
-                                dct_data[key] = data
+                                record_data[key] = data
                             else:
                                 # TODO show this error
-                                dct_data[key] = False
+                                record_data[key] = False
                         except Exception as e:
                             MOIS = {
                                 "janv": 1,
@@ -876,47 +876,47 @@ class SyncDataExec(models.Model):
                                     data = datetime.strptime(
                                         data, "%d/%m/%y"
                                     ).date()
-                                    dct_data[key] = data
+                                    record_data[key] = data
                                 elif "-" in data:
                                     data = datetime.strptime(
                                         data, "%d-%m-%y"
                                     ).date()
-                                    dct_data[key] = data
+                                    record_data[key] = data
                                 else:
                                     # TODO show this error
-                                    dct_data[key] = False
+                                    record_data[key] = False
                             except Exception as e:
                                 try:
                                     if "/" in data:
                                         data = datetime.strptime(
                                             data, "%m/%d/%y"
                                         ).date()
-                                        dct_data[key] = data
+                                        record_data[key] = data
                                     elif "-" in data:
                                         data = datetime.strptime(
                                             data, "%m-%d-%y"
                                         ).date()
-                                        dct_data[key] = data
+                                        record_data[key] = data
                                     else:
                                         # TODO show this error
-                                        dct_data[key] = False
+                                        record_data[key] = False
                                 except Exception as e:
                                     try:
                                         if "/" in data:
                                             data = datetime.strptime(
                                                 data, "%m/%d/%Y"
                                             ).date()
-                                            dct_data[key] = data
+                                            record_data[key] = data
                                         elif "-" in data:
                                             data = datetime.strptime(
                                                 data, "%m-%d-%Y"
                                             ).date()
-                                            dct_data[key] = data
+                                            record_data[key] = data
                                         else:
                                             # TODO show this error
-                                            dct_data[key] = False
+                                            record_data[key] = False
                                     except Exception as e:
-                                        dct_data[key] = False
+                                        record_data[key] = False
                                         _logger.error(
                                             f"Cannot parse data to date '{data}'"
                                         )

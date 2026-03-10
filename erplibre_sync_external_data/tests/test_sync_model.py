@@ -117,7 +117,7 @@ class TestSyncDataTransformFilterSearch(TransactionCase):
         initial_count = self.env[
             "sync.data.transform.filter_search"
         ].search_count([])
-        rec.action_generate_all(lst_key=["PRJ"])
+        rec.action_generate_all(keys=["PRJ"])
         new_count = self.env[
             "sync.data.transform.filter_search"
         ].search_count([])
@@ -127,11 +127,11 @@ class TestSyncDataTransformFilterSearch(TransactionCase):
         rec = self.env["sync.data.transform.filter_search"].create(
             {"name": "test"}
         )
-        rec.action_generate_all(lst_key=["DUP"])
+        rec.action_generate_all(keys=["DUP"])
         count_after_first = self.env[
             "sync.data.transform.filter_search"
         ].search_count([])
-        rec.action_generate_all(lst_key=["DUP"])
+        rec.action_generate_all(keys=["DUP"])
         count_after_second = self.env[
             "sync.data.transform.filter_search"
         ].search_count([])

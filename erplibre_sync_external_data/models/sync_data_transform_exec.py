@@ -120,11 +120,11 @@ class SyncDataTransformExec(models.Model):
                             '"' + depend_id.id_depend_name + '"',
                             str(depend_id.to_id_ref),
                         )
-                dct_value = json.loads(str_value)
+                parsed_values = json.loads(str_value)
                 res_class = self.env[rec.to_model_name]
 
                 # Transform value
-                for key, value in dct_value.items():
+                for key, value in parsed_values.items():
                     key_field = res_class._fields[key]
                     key_type = key_field.type
                     if (
@@ -140,10 +140,10 @@ class SyncDataTransformExec(models.Model):
                             value_transform = key_class.create(
                                 [{key_class._rec_name: value}]
                             )
-                        dct_value[key] = value_transform.id
+                        parsed_values[key] = value_transform.id
 
                 if rec.method == "create":
-                    to_id_ref = res_class.create(dct_value)
+                    to_id_ref = res_class.create(parsed_values)
                     rec.to_id_ref = to_id_ref.id
                 elif rec.method == "write":
                     if not rec.to_id_ref:
@@ -151,5 +151,5 @@ class SyncDataTransformExec(models.Model):
                             f"Cannot write model '{rec.from_model_name}'"
                         )
                     else:
-                        res_class.browse(rec.to_id_ref).write(dct_value)
+                        res_class.browse(rec.to_id_ref).write(parsed_values)
                 rec.modification_done = True

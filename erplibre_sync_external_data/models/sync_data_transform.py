@@ -194,18 +194,18 @@ class SyncDataTransform(models.Model):
                 if not metadata:
                     continue
                 metadata = json.loads(metadata)
-                lst_bind = metadata.get("bind")
-                if not lst_bind:
+                bindings = metadata.get("bind")
+                if not bindings:
                     continue
 
-                for dct_bind in lst_bind:
-                    ignore = dct_bind.get("ignore")
+                for bind_config in bindings:
+                    ignore = bind_config.get("ignore")
                     if ignore:
                         continue
-                    link_only = dct_bind.get("link_only")
+                    link_only = bind_config.get("link_only")
                     if link_only and not do_link:
                         continue
-                    bind_field_reverse = dct_bind.get("bind_field_reverse")
+                    bind_field_reverse = bind_config.get("bind_field_reverse")
                     if not bind_field_reverse:
                         continue
 
@@ -214,25 +214,25 @@ class SyncDataTransform(models.Model):
                         sync_model_id.model_name
                     ].search([(bind_field_reverse, "=", False)])
 
-                    lst_id_sync_data_create = [
+                    created_ids = [
                         a.res_id
                         for a in sync_data_exec_id.sync_data_create_ids
                         if a.res_model == sync_model_id.model_name
                     ]
                     sync_model_mirror_create_ids = self.env[
                         sync_model_id.model_name
-                    ].browse(lst_id_sync_data_create)
+                    ].browse(created_ids)
 
-                    lst_id_sync_data_write = [
+                    written_ids = [
                         a.res_id
                         for a in sync_data_exec_id.sync_data_write_ids
                         if a.res_model == sync_model_id.model_name
                     ]
                     sync_model_mirror_write_ids = self.env[
                         sync_model_id.model_name
-                    ].browse(lst_id_sync_data_write)
+                    ].browse(written_ids)
 
-                    method_call = dct_bind.get("method_call")
+                    method_call = bind_config.get("method_call")
                     if not method_call:
                         cb = rec.update_bind_transform
                     else:
@@ -240,7 +240,7 @@ class SyncDataTransform(models.Model):
                     cb(
                         sync_model_mirror_create_ids,
                         sync_model_id.model_name,
-                        dct_bind,
+                        bind_config,
                         bind_field_reverse,
                         do_link=link_only,
                         do_update=rec.do_update,
@@ -250,45 +250,45 @@ class SyncDataTransform(models.Model):
         self,
         mirror_ids,
         model_name,
-        dct_bind,
+        bind_config,
         bind_field_reverse,
         do_link=False,
         do_update=False,
     ):
-        lst_sync_data_transform_exec_value = []
+        transform_exec_batch = []
         # crm_team_id = self.env["crm.team"].search(
         #     [("name", "=", CST_CRM_LEAD_TEAM)]
         # )
 
-        dct_bind_field_model = dct_bind.get("bind_field_model")
-        if not dct_bind_field_model:
+        bind_field_model = bind_config.get("bind_field_model")
+        if not bind_field_model:
             return
 
-        for model_key, dct_bind_model in dct_bind_field_model.items():
-            lst_bind_model = dct_bind_model.get("lst_bind")
+        for model_key, bind_model_config in bind_field_model.items():
+            bind_fields = bind_model_config.get("bindings")
 
-            if not lst_bind_model:
+            if not bind_fields:
                 return
-            dct_default_field = dct_bind_model.get("default_field", {})
+            default_fields = bind_model_config.get("default_field", {})
 
-            bind_condition = dct_bind.get("bind_condition")
+            bind_condition = bind_config.get("bind_condition")
             if bind_condition:
                 mirror_ids = mirror_ids.search(bind_condition)
 
-            bind_group_by = dct_bind.get("bind_group_by")
+            bind_group_by = bind_config.get("bind_group_by")
             if bind_group_by:
-                dct_mirror_group = mirror_ids.grouped(bind_group_by[0])
+                mirror_groups = mirror_ids.grouped(bind_group_by[0])
             else:
-                dct_mirror_group = {None: mirror_ids}
+                mirror_groups = {None: mirror_ids}
 
             for rec in self:
-                model_field_name = lst_bind_model[0][0]
-                model_sync_name = lst_bind_model[0][1]
-                for key, lst_value in dct_mirror_group.items():
-                    for mirror_id in lst_value:
+                model_field_name = bind_fields[0][0]
+                model_sync_name = bind_fields[0][1]
+                for key, search_values in mirror_groups.items():
+                    for mirror_id in search_values:
                         model_value = {}
-                        numero_projet = getattr(mirror_id, model_sync_name)
-                        if not numero_projet:
+                        project_number = getattr(mirror_id, model_sync_name)
+                        if not project_number:
                             continue
                         # Support model
                         model_id = self.env[model_key].search(
@@ -296,33 +296,33 @@ class SyncDataTransform(models.Model):
                                 (
                                     model_field_name,
                                     "=",
-                                    numero_projet,
+                                    project_number,
                                 )
                             ]
                         )
 
                         # TODO option to create directly data without transformation
                         if not do_link:
-                            lst_transform_depend, lst_depends = (
+                            transform_depends, dependency_links = (
                                 rec._bind_transform(
-                                    lst_bind_model,
+                                    bind_fields,
                                     mirror_id,
                                     model_key,
                                     model_value,
-                                    dct_default_field,
+                                    default_fields,
                                 )
                             )
                             rec._bind_transform_model(
-                                numero_projet,
+                                project_number,
                                 mirror_id,
                                 model_id,
                                 model_name,
                                 model_value,
-                                lst_transform_depend,
+                                transform_depends,
                                 model_key,
-                                lst_depends,
+                                dependency_links,
                                 bind_field_reverse,
-                                lst_sync_data_transform_exec_value,
+                                transform_exec_batch,
                             )
 
                         need_link = getattr(mirror_id, bind_field_reverse)
@@ -330,23 +330,23 @@ class SyncDataTransform(models.Model):
                             mirror_id.write({bind_field_reverse: model_id})
                             # setattr(mirror_id, bind_field_reverse, model_id.id)
 
-        if lst_sync_data_transform_exec_value:
+        if transform_exec_batch:
             self.env["sync.data.transform.exec"].create(
-                lst_sync_data_transform_exec_value
+                transform_exec_batch
             )
 
     def _bind_transform(
         self,
-        lst_bind_model,
+        bind_fields,
         mirror_id,
         model_key,
         model_value,
-        dct_default_field,
+        default_fields,
     ):
         self.ensure_one()
-        lst_transform_depend = []
-        lst_depends = []
-        for set_bind in lst_bind_model:
+        transform_depends = []
+        dependency_links = []
+        for set_bind in bind_fields:
             field_name_target = set_bind[0]
             field_name_mirror = set_bind[1]
             target_field = self.env[model_key]._fields.get(field_name_target)
@@ -402,7 +402,7 @@ class SyncDataTransform(models.Model):
                         #     "method": "create",
                         #     "associate_key": associate_key,
                         # }
-                        # lst_depends.append(
+                        # dependency_links.append(
                         #     (
                         #         4,
                         #         parent_sync_data_transform_exec_id.id,
@@ -413,10 +413,10 @@ class SyncDataTransform(models.Model):
                         #     model_key,
                         #     modification_json,
                         #     associate_key,
-                        #     lst_depends,
-                        #     lst_transform_depend,
+                        #     dependency_links,
+                        #     transform_depends,
                         #     ttype,
-                        #     lst_value_insert,
+                        #     values_to_insert,
                         #     model_value,
                         #     key,
                         # )
@@ -425,7 +425,7 @@ class SyncDataTransform(models.Model):
                         update_value = (
                             parent_sync_data_transform_exec_id.id_depend_name
                         )
-                        lst_depends.append(
+                        dependency_links.append(
                             (
                                 4,
                                 parent_sync_data_transform_exec_id.id,
@@ -437,34 +437,34 @@ class SyncDataTransform(models.Model):
                 update_value = value
             if update_value:
                 model_value[field_name_target] = update_value
-        for key, value in dct_default_field.items():
+        for key, value in default_fields.items():
             # Support magic value with computing
             ttype = self.env[model_key]._fields.get(key)
             if ttype.type in ["many2one", "many2many", "one2many"]:
                 if ttype.type in ["many2many", "one2many"]:
                     print("TODO")
-                CLS_ttype = self.env[ttype.base_field.comodel_name]
-                lst_value_insert = []
+                related_model = self.env[ttype.base_field.comodel_name]
+                values_to_insert = []
                 if type(value) is list:
-                    lst_value = value
+                    search_values = value
                 else:
-                    lst_value = [value]
-                for vvalue in lst_value:
+                    search_values = [value]
+                for vvalue in search_values:
                     if type(vvalue) is dict:
-                        value_id = CLS_ttype.search(
+                        value_id = related_model.search(
                             [
                                 (
-                                    CLS_ttype._rec_name,
+                                    related_model._rec_name,
                                     "=",
-                                    vvalue.get(CLS_ttype._rec_name),
+                                    vvalue.get(related_model._rec_name),
                                 )
                             ]
                         )
                     else:
-                        value_id = CLS_ttype.search(
+                        value_id = related_model.search(
                             [
                                 (
-                                    CLS_ttype._rec_name,
+                                    related_model._rec_name,
                                     "=",
                                     vvalue,
                                 )
@@ -472,44 +472,44 @@ class SyncDataTransform(models.Model):
                         )
                     if not value_id:
                         if type(vvalue) is dict:
-                            vvalue_name = vvalue.get(CLS_ttype._rec_name)
+                            vvalue_name = vvalue.get(related_model._rec_name)
                             modification_value = vvalue
                         else:
-                            modification_value = {CLS_ttype._rec_name: vvalue}
+                            modification_value = {related_model._rec_name: vvalue}
                             vvalue_name = vvalue
                         modification_json = json.dumps(modification_value)
 
-                        associate_key = f"{ttype.base_field.comodel_name}.create.{CLS_ttype._rec_name}.{vvalue_name}"
+                        associate_key = f"{ttype.base_field.comodel_name}.create.{related_model._rec_name}.{vvalue_name}"
                         note = "Create bind_field_model sub transform"
                         self._add_transform(
                             ttype.base_field.comodel_name,
                             model_key,
                             modification_json,
                             associate_key,
-                            lst_depends,
-                            lst_transform_depend,
+                            dependency_links,
+                            transform_depends,
                             note,
                             ttype,
-                            lst_value_insert,
+                            values_to_insert,
                             model_value,
                             key,
                         )
                     else:
                         if ttype.type in ["many2many"]:
                             for value_id_id in value_id:
-                                lst_value_insert.append((4, value_id_id.id))
+                                values_to_insert.append((4, value_id_id.id))
                         elif ttype.type in ["many2one"]:
                             model_value[key] = value_id.id
                         elif ttype.type in ["one2many"]:
                             print("todo")
                         else:
                             model_value[key] = value_id
-                if lst_value_insert:
-                    model_value[key] = lst_value_insert
+                if values_to_insert:
+                    model_value[key] = values_to_insert
             else:
                 model_value[key] = value
 
-        return lst_transform_depend, lst_depends
+        return transform_depends, dependency_links
 
     def _add_transform(
         self,
@@ -517,11 +517,11 @@ class SyncDataTransform(models.Model):
         from_model_name,
         modification_json,
         associate_key,
-        lst_depends,
-        lst_transform_depend,
+        dependency_links,
+        transform_depends,
         note,
         ttype=None,
-        lst_value_insert=None,
+        values_to_insert=None,
         model_value=None,
         key=None,
         mode_b=False,
@@ -536,8 +536,8 @@ class SyncDataTransform(models.Model):
             "method": "create",
             "associate_key": associate_key,
         }
-        if lst_depends:
-            transform_exec_values["depend_ids"] = lst_depends
+        if dependency_links:
+            transform_exec_values["depend_ids"] = dependency_links
 
         hash_transform = hashlib.sha256(
             json.dumps(transform_exec_values).encode()
@@ -561,9 +561,9 @@ class SyncDataTransform(models.Model):
 
         if not transform_exec_id:
             # TODO need for all?
-            if lst_transform_depend and mode_b:
+            if transform_depends and mode_b:
                 transform_exec_values["depend_ids"] = [
-                    (6, 0, lst_transform_depend)
+                    (6, 0, transform_depends)
                 ]
             transform_exec_values["hash_generic_value"] = hash_transform
             transform_exec_id = self.env["sync.data.transform.exec"].create(
@@ -573,10 +573,10 @@ class SyncDataTransform(models.Model):
         if not mode_b:
             replace_key = transform_exec_id.id_depend_name
 
-            lst_transform_depend.append(transform_exec_id.id)
+            transform_depends.append(transform_exec_id.id)
 
             if ttype.type in ["many2many"]:
-                lst_value_insert.append((4, replace_key))
+                values_to_insert.append((4, replace_key))
             elif ttype.type in ["many2one"]:
                 # model_value[key] = value_id.id
                 model_value[key] = replace_key
@@ -586,25 +586,25 @@ class SyncDataTransform(models.Model):
 
     def _bind_transform_model(
         self,
-        numero_projet,
+        project_number,
         mirror_id,
         model_id,
         model_name,
         model_value,
-        lst_transform_depend,
+        transform_depends,
         model_key,
-        lst_depends,
+        dependency_links,
         bind_field_reverse,
-        lst_sync_data_transform_exec_value,
+        transform_exec_batch,
     ):
         self.ensure_one()
-        record_name = f"{numero_projet}"
-        # record_name = f"{numero_projet} {model_value.get(CST_model_model_FIELD_model_NUMBER)}"
+        record_name = f"{project_number}"
+        # record_name = f"{project_number} {model_value.get(CST_model_model_FIELD_model_NUMBER)}"
         if not model_id:
             model_value[model_id._rec_name] = record_name
 
             modification_json = json.dumps(model_value)
-            lst_transform_depend = list(set(lst_transform_depend))
+            transform_depends = list(set(transform_depends))
             associate_key = (
                 f"{model_key}.create.{model_id._rec_name}.{record_name}"
             )
@@ -614,8 +614,8 @@ class SyncDataTransform(models.Model):
                 model_name,
                 modification_json,
                 associate_key,
-                lst_depends,
-                lst_transform_depend,
+                dependency_links,
+                transform_depends,
                 note,
                 mode_b=True,
             )
@@ -623,7 +623,7 @@ class SyncDataTransform(models.Model):
             modification_json = json.dumps(
                 {bind_field_reverse: transform_exec_id.id_depend_name}
             )
-            lst_sync_data_transform_exec_value.append(
+            transform_exec_batch.append(
                 {
                     "to_model_name": model_name,
                     "to_id_ref": mirror_id.id,
