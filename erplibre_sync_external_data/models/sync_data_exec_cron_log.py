@@ -1,8 +1,4 @@
-import logging
-
-from odoo import _, api, fields, models
-
-_logger = logging.getLogger(__name__)
+from odoo import fields, models
 
 
 class SyncDataExecCronLog(models.Model):

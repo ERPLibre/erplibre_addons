@@ -232,7 +232,7 @@ class SyncDataTransform(models.Model):
             bind_fields = bind_model_config.get("bindings")
 
             if not bind_fields:
-                return
+                continue
             default_fields = bind_model_config.get("default_field", {})
 
             bind_condition = bind_config.get("bind_condition")
@@ -350,14 +350,15 @@ class SyncDataTransform(models.Model):
                 model_value[field_name_target] = update_value
         for key, value in default_fields.items():
             # Support magic value with computing
-            ttype = self.env[model_key]._fields.get(key)
-            if ttype.type in ("many2one", "many2many", "one2many"):
-                if ttype.type != "many2one":
+            default_field = self.env[model_key]._fields.get(key)
+            if default_field.type in ("many2one", "many2many", "one2many"):
+                if default_field.type != "many2one":
                     _logger.warning(
                         "many2many/one2many default field not fully implemented for field '%s'",
                         key,
                     )
-                related_model = self.env[ttype.base_field.comodel_name]
+                comodel_name = default_field.base_field.comodel_name
+                related_model = self.env[comodel_name]
                 values_to_insert = []
                 search_values = value if isinstance(value, list) else [value]
                 for vvalue in search_values:
@@ -377,28 +378,28 @@ class SyncDataTransform(models.Model):
                             }
                         modification_json = json.dumps(modification_value)
 
-                        associate_key = f"{ttype.base_field.comodel_name}.create.{related_model._rec_name}.{search_name}"
+                        associate_key = f"{comodel_name}.create.{related_model._rec_name}.{search_name}"
                         note = "Create bind_field_model sub transform"
                         self._add_transform(
-                            ttype.base_field.comodel_name,
+                            comodel_name,
                             model_key,
                             modification_json,
                             associate_key,
                             dependency_links,
                             transform_depends,
                             note,
-                            ttype,
+                            default_field,
                             values_to_insert,
                             model_value,
                             key,
                         )
                     else:
-                        if ttype.type == "many2many":
+                        if default_field.type == "many2many":
                             for value_id_id in value_id:
                                 values_to_insert.append((4, value_id_id.id))
-                        elif ttype.type == "many2one":
+                        elif default_field.type == "many2one":
                             model_value[key] = value_id.id
-                        elif ttype.type == "one2many":
+                        elif default_field.type == "one2many":
                             _logger.warning(
                                 "one2many write-back not yet implemented"
                             )
@@ -420,7 +421,7 @@ class SyncDataTransform(models.Model):
         dependency_links,
         transform_depends,
         note,
-        ttype=None,
+        target_field=None,
         values_to_insert=None,
         model_value=None,
         key=None,
@@ -474,11 +475,11 @@ class SyncDataTransform(models.Model):
 
             transform_depends.append(transform_exec_id.id)
 
-            if ttype.type == "many2many":
+            if target_field.type == "many2many":
                 values_to_insert.append((4, replace_key))
-            elif ttype.type == "many2one":
+            elif target_field.type == "many2one":
                 model_value[key] = replace_key
-            elif ttype.type == "one2many":
+            elif target_field.type == "one2many":
                 _logger.warning(
                     "one2many not yet implemented in _add_transform"
                 )
@@ -505,9 +506,7 @@ class SyncDataTransform(models.Model):
 
             modification_json = json.dumps(model_value)
             transform_depends = list(set(transform_depends))
-            associate_key = (
-                f"{model_key}.create.{rec_name}.{record_name}"
-            )
+            associate_key = f"{model_key}.create.{rec_name}.{record_name}"
             note = "Create bind_field_model"
             transform_exec_id = self._add_transform(
                 model_key,

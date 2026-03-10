@@ -146,7 +146,8 @@ class SyncDataTransformExec(models.Model):
                 elif rec.method == "write":
                     if not rec.to_id_ref:
                         _logger.error(
-                            f"Cannot write model '{rec.from_model_name}'"
+                            "Cannot write model '%s'",
+                            rec.from_model_name,
                         )
                     else:
                         res_class.browse(rec.to_id_ref).write(parsed_values)

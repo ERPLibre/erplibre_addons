@@ -6,7 +6,6 @@ import logging
 import re
 from collections import defaultdict
 from datetime import date, datetime, time
-from io import BytesIO
 
 import pytz
 from markupsafe import Markup
@@ -316,7 +315,7 @@ class SyncDataExec(models.Model):
                 ]
             )
 
-            filepath_byte = BytesIO(raw_data)
+            filepath_byte = io.BytesIO(raw_data)
             for sync_model_id in rec.sync_model_ids:
                 rec.extract_automated_excel(
                     filepath_byte,
@@ -473,8 +472,11 @@ class SyncDataExec(models.Model):
                         _logger.warning(
                             "Got difference header, missing index %s '%s', and '%s' "
                             "check filepath '%s' filetype '%s'",
-                            item_row_i, header_config, parsed_headers,
-                            filepath, file_name_type,
+                            item_row_i,
+                            header_config,
+                            parsed_headers,
+                            filepath,
+                            file_name_type,
                         )
                         has_different_header = True
                     elif (
@@ -484,8 +486,10 @@ class SyncDataExec(models.Model):
                         _logger.warning(
                             "Got difference header '%s' and '%s', "
                             "check filepath '%s' filetype '%s'",
-                            item_row_transform, header_config[item_row_i][0],
-                            filepath, file_name_type,
+                            item_row_transform,
+                            header_config[item_row_i][0],
+                            filepath,
+                            file_name_type,
                         )
                         has_different_header = True
                     if is_other_header:
@@ -574,7 +578,9 @@ class SyncDataExec(models.Model):
         if has_different_header and not data_lines:
             _logger.error(
                 "Wrong header file '%s', expected header '%s' and got '%s'",
-                file_name_type, expected_headers, parsed_headers,
+                file_name_type,
+                expected_headers,
+                parsed_headers,
             )
             return
         if ignore_last_line:
@@ -703,7 +709,7 @@ class SyncDataExec(models.Model):
         for rec in self:
             rec.create_count = len(rec.sync_data_create_ids)
             rec.modif_count = len(rec.sync_data_write_ids)
-            rec.has_modification = rec.modif_count or rec.create_count
+            rec.has_modification = bool(rec.modif_count or rec.create_count)
 
     def action_copy(self):
         self.ensure_one()
