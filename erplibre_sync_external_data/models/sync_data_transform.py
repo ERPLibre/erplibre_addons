@@ -387,37 +387,22 @@ class SyncDataTransform(models.Model):
                     search_values = [value]
                 for vvalue in search_values:
                     if isinstance(vvalue, dict):
-                        value_id = related_model.search(
-                            [
-                                (
-                                    related_model._rec_name,
-                                    "=",
-                                    vvalue.get(related_model._rec_name),
-                                )
-                            ]
-                        )
+                        search_name = vvalue.get(related_model._rec_name)
                     else:
-                        value_id = related_model.search(
-                            [
-                                (
-                                    related_model._rec_name,
-                                    "=",
-                                    vvalue,
-                                )
-                            ]
-                        )
+                        search_name = vvalue
+                    value_id = related_model.search(
+                        [(related_model._rec_name, "=", search_name)]
+                    )
                     if not value_id:
                         if isinstance(vvalue, dict):
-                            vvalue_name = vvalue.get(related_model._rec_name)
                             modification_value = vvalue
                         else:
                             modification_value = {
                                 related_model._rec_name: vvalue
                             }
-                            vvalue_name = vvalue
                         modification_json = json.dumps(modification_value)
 
-                        associate_key = f"{ttype.base_field.comodel_name}.create.{related_model._rec_name}.{vvalue_name}"
+                        associate_key = f"{ttype.base_field.comodel_name}.create.{related_model._rec_name}.{search_name}"
                         note = "Create bind_field_model sub transform"
                         self._add_transform(
                             ttype.base_field.comodel_name,
@@ -433,12 +418,12 @@ class SyncDataTransform(models.Model):
                             key,
                         )
                     else:
-                        if ttype.type in ["many2many"]:
+                        if ttype.type == "many2many":
                             for value_id_id in value_id:
                                 values_to_insert.append((4, value_id_id.id))
-                        elif ttype.type in ["many2one"]:
+                        elif ttype.type == "many2one":
                             model_value[key] = value_id.id
-                        elif ttype.type in ["one2many"]:
+                        elif ttype.type == "one2many":
                             _logger.warning(
                                 "one2many write-back not yet implemented"
                             )
@@ -514,11 +499,11 @@ class SyncDataTransform(models.Model):
 
             transform_depends.append(transform_exec_id.id)
 
-            if ttype.type in ["many2many"]:
+            if ttype.type == "many2many":
                 values_to_insert.append((4, replace_key))
-            elif ttype.type in ["many2one"]:
+            elif ttype.type == "many2one":
                 model_value[key] = replace_key
-            elif ttype.type in ["one2many"]:
+            elif ttype.type == "one2many":
                 _logger.warning(
                     "one2many not yet implemented in _add_transform"
                 )
@@ -538,7 +523,7 @@ class SyncDataTransform(models.Model):
         transform_exec_batch,
     ):
         self.ensure_one()
-        record_name = f"{project_number}"
+        record_name = str(project_number)
         if not model_id:
             model_value[model_id._rec_name] = record_name
 

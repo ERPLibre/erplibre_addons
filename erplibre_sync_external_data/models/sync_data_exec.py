@@ -17,7 +17,7 @@ from odoo.tools.mimetypes import guess_mimetype
 try:
     # openpyxl is the safest lib for .xlsx on Odoo 18 (Python >= 3.10)
     import openpyxl
-except Exception as e:
+except ImportError:
     openpyxl = None
 _logger = logging.getLogger(__name__)
 
@@ -331,7 +331,41 @@ class SyncDataExec(models.Model):
                 )
             rec.end_time_execution()
 
-    def extract_automated_excel(self, filepath, sync_model_id, is_excel=False):
+    @staticmethod
+    def _ensure_openpyxl():
+        if openpyxl is None:
+            raise ImportError(
+                "openpyxl is required to process .xlsx files. "
+                "Install it with: pip install openpyxl"
+            )
+
+    def _open_file_reader(self, filepath, filetype, sheet_name, index):
+        """Open a file and return (reader, is_excel, index) or (None, False, index) on error."""
+        if filetype == "xlsx":
+            self._ensure_openpyxl()
+            wb = openpyxl.load_workbook(filepath, data_only=True)
+            if not wb.sheetnames:
+                raise ValueError("Missing sheet from xlsx file.")
+            if sheet_name in wb.sheetnames:
+                ws = wb[sheet_name]
+            else:
+                ws = wb[wb.sheetnames[0]]
+            return ws.iter_rows(), True, index
+        if filetype == "csv":
+            index -= 1
+            if isinstance(filepath, str):
+                reader = []
+                with open(filepath, newline="", encoding="utf-8") as f:
+                    for row in csv.reader(f):
+                        reader.append(list(row))
+            else:
+                text_stream = io.TextIOWrapper(filepath, encoding="utf-8")
+                reader = csv.reader(text_stream)
+            return reader, False, index
+        _logger.error("Unsupported filetype '%s'", filetype)
+        return None, False, index
+
+    def extract_automated_excel(self, filepath, sync_model_id):
         last_id_tracking = (
             self.env["mail.tracking.value"]
             .search([], order="id desc", limit=1)
@@ -377,31 +411,10 @@ class SyncDataExec(models.Model):
             i for i, a in enumerate(header_config_ext) if a[1] in sync_fields
         ]
 
-        if filetype == "xlsx":
-            is_excel = True
-            self._ensure_openpyxl()
-            wb = openpyxl.load_workbook(filepath, data_only=True)
-            if not wb.sheetnames:
-                raise ValueError("Missing sheet from xlsx file.")
-            if sheet_name in wb.sheetnames:
-                ws = wb[sheet_name]
-            else:
-                ws = wb[wb.sheetnames[0]]
-            reader = ws.iter_rows()
-        elif filetype == "csv":
-            index -= 1
-            if isinstance(filepath, str):
-                reader = []
-                # It's a path
-                with open(filepath, newline="", encoding="utf-8") as f:
-                    csv_lines = csv.reader(f)
-                    for row in csv_lines:
-                        reader.append(list(row))
-            else:
-                text_stream = io.TextIOWrapper(filepath, encoding="utf-8")
-                reader = csv.reader(text_stream)
-        else:
-            _logger.error("Unsupported filetype")
+        reader, is_excel, index = self._open_file_reader(
+            filepath, filetype, sheet_name, index
+        )
+        if reader is None:
             return
 
         finish_read_header = False
@@ -414,14 +427,9 @@ class SyncDataExec(models.Model):
             if ignore_validation_header:
                 parsed_headers = expected_headers
 
-            if (
-                index_line_header
-                < index
-                <= index_line_header + nb_line_header - 1
-            ):
-                is_other_header = True
-            else:
-                is_other_header = False
+            is_other_header = (
+                index_line_header < index <= index_line_header + nb_line_header - 1
+            )
 
             if (
                 index_line_header
@@ -573,11 +581,9 @@ class SyncDataExec(models.Model):
             )
             return
         if ignore_last_line:
-            data_lines = data_lines[: -1 * ignore_last_line]
-        parsed_rows = []
+            data_lines = data_lines[:-ignore_last_line]
         for line in data_lines:
             record_values = {}
-            parsed_rows.append(record_values)
             field_value_file_no_line = -1
             for index_column, column_value in enumerate(line):
                 if index_column == len(line) - 1:

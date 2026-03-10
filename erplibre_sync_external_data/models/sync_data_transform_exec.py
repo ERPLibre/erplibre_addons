@@ -90,14 +90,14 @@ class SyncDataTransformExec(models.Model):
     )
     def _compute_name(self):
         for rec in self:
-            name = ""
+            parts = []
             if rec.method:
-                name += rec.method + " "
+                parts.append(rec.method)
             if rec.from_model_name:
-                name += f"{rec.from_model_name}:{rec.from_id_ref} "
+                parts.append(f"{rec.from_model_name}:{rec.from_id_ref}")
             if rec.to_model_name:
-                name += f"{rec.to_model_name}:{rec.to_id_ref} "
-            rec.name = name.strip()
+                parts.append(f"{rec.to_model_name}:{rec.to_id_ref}")
+            rec.name = " ".join(parts)
 
     def action_set_no_match(self):
         self.ensure_one()
