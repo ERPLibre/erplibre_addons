@@ -126,9 +126,8 @@ class SyncDataTransformExec(models.Model):
                 for key, value in parsed_values.items():
                     key_field = res_class._fields[key]
                     key_type = key_field.type
-                    if (
-                        key_type in ["many2one", "many2many"]
-                        and isinstance(value, str)
+                    if key_type in ("many2one", "many2many") and isinstance(
+                        value, str
                     ):
                         # Create if not existing, search by rec_name
                         key_class = self.env[key_field.comodel_name]

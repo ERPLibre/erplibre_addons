@@ -319,49 +319,27 @@ class SyncDataTransform(models.Model):
                 )
             value = getattr(mirror_id, field_name_mirror)
             ttype = target_field.type
+            update_value = None
 
             if ttype == "many2one":
                 rec_name = self.env[model_key]._rec_name
-                update_value = self.env[model_key].search(
-                    [
-                        (
-                            rec_name,
-                            "=",
-                            value,
-                        )
-                    ]
-                )
-                if update_value:
-                    update_value = update_value.id
+                found = self.env[model_key].search([(rec_name, "=", value)])
+                if found:
+                    update_value = found.id
                 else:
                     associate_model = target_field.comodel_name
                     associate_key = (
                         f"{associate_model}.create.{rec_name}.{value}"
                     )
-                    parent_sync_data_transform_exec_id = self.env[
-                        "sync.data.transform.exec"
-                    ].search(
-                        [
-                            (
-                                "associate_key",
-                                "=",
-                                associate_key,
-                            )
-                        ]
+                    parent_exec = self.env["sync.data.transform.exec"].search(
+                        [("associate_key", "=", associate_key)]
                     )
-                    if not parent_sync_data_transform_exec_id:
+                    if not parent_exec:
                         update_value = 0
                     else:
-                        update_value = (
-                            parent_sync_data_transform_exec_id.id_depend_name
-                        )
-                        dependency_links.append(
-                            (
-                                4,
-                                parent_sync_data_transform_exec_id.id,
-                            )
-                        )
-            elif ttype in ["many2many", "one2many"]:
+                        update_value = parent_exec.id_depend_name
+                        dependency_links.append((4, parent_exec.id))
+            elif ttype in ("many2many", "one2many"):
                 _logger.warning(
                     "many2many/one2many binding not yet implemented for field '%s'",
                     field_name_target,
@@ -373,18 +351,15 @@ class SyncDataTransform(models.Model):
         for key, value in default_fields.items():
             # Support magic value with computing
             ttype = self.env[model_key]._fields.get(key)
-            if ttype.type in ["many2one", "many2many", "one2many"]:
-                if ttype.type in ["many2many", "one2many"]:
+            if ttype.type in ("many2one", "many2many", "one2many"):
+                if ttype.type != "many2one":
                     _logger.warning(
                         "many2many/one2many default field not fully implemented for field '%s'",
                         key,
                     )
                 related_model = self.env[ttype.base_field.comodel_name]
                 values_to_insert = []
-                if isinstance(value, list):
-                    search_values = value
-                else:
-                    search_values = [value]
+                search_values = value if isinstance(value, list) else [value]
                 for vvalue in search_values:
                     if isinstance(vvalue, dict):
                         search_name = vvalue.get(related_model._rec_name)

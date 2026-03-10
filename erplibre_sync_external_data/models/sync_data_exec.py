@@ -417,9 +417,7 @@ class SyncDataExec(models.Model):
         expected_headers = [a[0] for a in header_config]
         index_line_header = metadata.get("index_line_header", 0)
         nb_line_header = metadata.get("nb_line_header", 1)
-        callback_init_read_header = metadata.get(
-            "callback_init_read_header", None
-        )
+        callback_init_read_header = metadata.get("callback_init_read_header")
         sync_fields = metadata.get("sync", [])
         ignore_last_line = metadata.get("ignore_last_line", 0)
         index_last_line = metadata.get("index_last_line", 0)
@@ -458,7 +456,9 @@ class SyncDataExec(models.Model):
                 parsed_headers = expected_headers
 
             is_other_header = (
-                index_line_header < index <= index_line_header + nb_line_header - 1
+                index_line_header
+                < index
+                <= index_line_header + nb_line_header - 1
             )
 
             if (
@@ -505,11 +505,10 @@ class SyncDataExec(models.Model):
                         )
                 finish_read_header = True
                 row_values = []
+                max_cell_index = min(len(parsed_headers), len(header_config))
                 for index_cell, cell_sheet in enumerate(row):
-                    if index_cell >= len(parsed_headers):
-                        continue
-                    if index_cell >= len(header_config):
-                        continue
+                    if index_cell >= max_cell_index:
+                        break
                     value_mapping = {}
                     if len(header_config[index_cell]) > 2:
                         value_mapping = header_config[index_cell][2]
@@ -527,7 +526,7 @@ class SyncDataExec(models.Model):
                     row_values.append(index)
                     if duplicate_columns:
                         for index_duplicate in duplicate_columns:
-                            if 0 > index_duplicate < len(row_values):
+                            if not (0 <= index_duplicate < len(row_values)):
                                 raise ValidationError(
                                     f"Check your configuration, duplicate_column_when_empty {duplicate_columns}, index is wrong with values."
                                 )
@@ -582,7 +581,11 @@ class SyncDataExec(models.Model):
                 line, header_config, model_name
             )
             model_record_id = self._sync_record(
-                model_name, record_values, sync_fields, file_no_line, file_name_type
+                model_name,
+                record_values,
+                sync_fields,
+                file_no_line,
+                file_name_type,
             )
             model_data_to_track[model_name].append(model_record_id.id)
 
@@ -604,7 +607,14 @@ class SyncDataExec(models.Model):
             )
         return record_values, file_no_line
 
-    def _sync_record(self, model_name, record_values, sync_fields, file_no_line, file_name_type):
+    def _sync_record(
+        self,
+        model_name,
+        record_values,
+        sync_fields,
+        file_no_line,
+        file_name_type,
+    ):
         """Find or create a record, updating if it already exists."""
         search_domain = [
             (field, "=", record_values[field]) for field in sync_fields
@@ -616,8 +626,7 @@ class SyncDataExec(models.Model):
                 "Found multiple records with index %s", sync_fields
             )
             matching = [
-                r for r in model_record_id
-                if r.file_no_line == file_no_line
+                r for r in model_record_id if r.file_no_line == file_no_line
             ]
             if len(matching) != 1:
                 raise Exception(
@@ -628,11 +637,15 @@ class SyncDataExec(models.Model):
 
         if not model_record_id:
             model_record_id = self.env[model_name].create([record_values])
-            self.env["sync.data.create"].create([{
-                "res_model": model_name,
-                "res_id": model_record_id.id,
-                "sync_data_exec_id": self.id,
-            }])
+            self.env["sync.data.create"].create(
+                [
+                    {
+                        "res_model": model_name,
+                        "res_id": model_record_id.id,
+                        "sync_data_exec_id": self.id,
+                    }
+                ]
+            )
         else:
             model_record_id.write(record_values)
         return model_record_id
@@ -704,7 +717,9 @@ class SyncDataExec(models.Model):
             "target": "current",
         }
 
-    def _convert_field_value(self, record_values, field_name, field_type, value):
+    def _convert_field_value(
+        self, record_values, field_name, field_type, value
+    ):
         """Convert a raw cell value to the appropriate Odoo field type."""
         if field_type in ("date", "datetime"):
             record_values[field_name] = value
@@ -731,11 +746,9 @@ class SyncDataExec(models.Model):
             return value
         if not value:
             return 0
-        cleaned = re.sub(r"[^\d-]", "", value).replace(",", ".")
+        cleaned = re.sub(r"[^\d-]", "", value)
         if value.replace(" ", "") != cleaned:
-            _logger.error(
-                f"Detect int {cleaned} from char {value}"
-            )
+            _logger.error(f"Detect int {cleaned} from char {value}")
         return int(cleaned) if cleaned else 0
 
     def _parse_float(self, value):
@@ -747,9 +760,7 @@ class SyncDataExec(models.Model):
             return 0.0
         cleaned = re.sub(r"[^\d,.-]", "", value).replace(",", ".")
         if value.replace(" ", "") != cleaned:
-            _logger.error(
-                f"Detect float {cleaned} from char {value}"
-            )
+            _logger.error(f"Detect float {cleaned} from char {value}")
         return float(cleaned) if cleaned else 0.0
 
     FRENCH_MONTHS = {
@@ -825,19 +836,11 @@ class SyncDataExec(models.Model):
         _logger.error(f"Cannot parse data to date '{data}'")
 
     def transform_datetime(self, user_datetime):
-        if user_datetime:
-            tz_name = (
-                self.env.user.tz or "America/Toronto"
-            )  # avoid fixed -4/-5 offset
-            tz = pytz.timezone(tz_name)
-
-            # input is a Date, pick midnight as local time
-            dt_local = datetime.combine(user_datetime, time(0, 0, 0))
-            dt_local = tz.localize(dt_local)  # make the time timezone-aware
-            dt_utc = dt_local.astimezone(
-                pytz.UTC
-            )  # convert to UTC for storage
-
-            return fields.Datetime.to_string(dt_utc)
-        else:
+        """Convert a date to a UTC datetime string using the user's timezone."""
+        if not user_datetime:
             return user_datetime
+        tz_name = self.env.user.tz or "America/Toronto"
+        tz = pytz.timezone(tz_name)
+        dt_local = tz.localize(datetime.combine(user_datetime, time.min))
+        dt_utc = dt_local.astimezone(pytz.UTC)
+        return fields.Datetime.to_string(dt_utc)
