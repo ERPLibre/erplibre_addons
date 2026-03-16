@@ -1,7 +1,7 @@
-import json
 import logging
 import os
 
+import orjson
 from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ class SyncDataTransformExec(models.Model):
                             '"' + depend_id.id_depend_name + '"',
                             str(depend_id.to_id_ref),
                         )
-                parsed_values = json.loads(str_value)
+                parsed_values = orjson.loads(str_value)
                 res_class = self.env[rec.to_model_name]
 
                 # Transform value

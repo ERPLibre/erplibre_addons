@@ -1,7 +1,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
-import json
-
+import orjson
 from odoo.tests.common import TransactionCase
 
 
@@ -31,10 +30,10 @@ class TestSyncModel(TransactionCase):
             {
                 "name": "Test With Metadata",
                 "model_name": "res.partner",
-                "spreadsheet_extraction_metadata": json.dumps(metadata),
+                "spreadsheet_extraction_metadata": orjson.dumps(metadata),
             }
         )
-        loaded = json.loads(rec.spreadsheet_extraction_metadata)
+        loaded = orjson.loads(rec.spreadsheet_extraction_metadata)
         self.assertEqual(loaded["filetype"], "csv")
         self.assertEqual(len(loaded["header"]), 2)
 
@@ -115,9 +114,9 @@ class TestSyncDataTransformFilterSearch(TransactionCase):
             "sync.data.transform.filter_search"
         ].search_count([])
         rec.action_generate_all(keys=["PRJ"])
-        new_count = self.env[
-            "sync.data.transform.filter_search"
-        ].search_count([])
+        new_count = self.env["sync.data.transform.filter_search"].search_count(
+            []
+        )
         self.assertGreater(new_count, initial_count)
 
     def test_action_generate_all_no_duplicates(self):

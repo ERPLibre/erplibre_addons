@@ -1,12 +1,12 @@
 import base64
 import csv
 import io
-import json
 import logging
 import re
 from collections import defaultdict
 from datetime import date, datetime, time
 
+import orjson
 import pytz
 from markupsafe import Markup
 from odoo import _, api, conf, fields, models
@@ -80,6 +80,10 @@ class SyncDataExec(models.Model):
         comodel_name="mail.tracking.value",
         inverse_name="sync_data_exec_id",
         domain=[("field_id.name", "!=", "file_no_line")],
+    )
+
+    force_add_create_when_existing = fields.Boolean(
+        string="Force add creation when data exist"
     )
 
     send_message_at_create_or_modify_sync = fields.Boolean(
@@ -408,7 +412,7 @@ class SyncDataExec(models.Model):
         file_name_type = sync_model_id.name
         model_name = sync_model_id.model_name
 
-        metadata = json.loads(sync_model_id.spreadsheet_extraction_metadata)
+        metadata = orjson.loads(sync_model_id.spreadsheet_extraction_metadata)
         header_config = metadata.get("header", [])
         header_config_ext = header_config + [("File no line", "file_no_line")]
         expected_headers = [a[0] for a in header_config]
@@ -715,7 +719,9 @@ class SyncDataExec(models.Model):
         for rec in self:
             rec.create_count = len(rec.sync_data_create_ids)
             rec.modif_count = len(rec.sync_data_write_ids)
-            rec.has_modification = bool(rec.modif_count or rec.create_count)
+            rec.has_modification = bool(
+                rec.modif_count or rec.create_count or rec.transform_id
+            )
 
     def action_copy(self):
         self.ensure_one()

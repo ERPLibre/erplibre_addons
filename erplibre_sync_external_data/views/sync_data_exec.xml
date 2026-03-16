@@ -97,6 +97,9 @@
                                     class="btn-primary"
                                 />
                             </group>
+                            <group name="memory" string="Memory">
+                                <field name="force_add_create_when_existing" />
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

@@ -1,7 +1,7 @@
 import hashlib
-import json
 import logging
 
+import orjson
 from odoo import api, conf, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -176,7 +176,7 @@ class SyncDataTransform(models.Model):
                 metadata = sync_model_id.spreadsheet_extraction_metadata
                 if not metadata:
                     continue
-                metadata = json.loads(metadata)
+                metadata = orjson.loads(metadata)
                 bindings = metadata.get("bind")
                 if not bindings:
                     continue
@@ -354,7 +354,8 @@ class SyncDataTransform(models.Model):
             if not default_field:
                 _logger.warning(
                     "Field '%s' not found on model '%s', skipping",
-                    key, model_key,
+                    key,
+                    model_key,
                 )
                 continue
             if default_field.type in ("many2one", "many2many", "one2many"):
@@ -382,7 +383,7 @@ class SyncDataTransform(models.Model):
                             modification_value = {
                                 related_model._rec_name: vvalue
                             }
-                        modification_json = json.dumps(modification_value)
+                        modification_json = orjson.dumps(modification_value)
 
                         associate_key = f"{comodel_name}.create.{related_model._rec_name}.{search_name}"
                         note = "Create bind_field_model sub transform"
@@ -446,7 +447,7 @@ class SyncDataTransform(models.Model):
             transform_exec_values["depend_ids"] = dependency_links
 
         hash_transform = hashlib.sha256(
-            json.dumps(transform_exec_values).encode()
+            orjson.dumps(transform_exec_values).encode()
         ).hexdigest()
         transform_exec_id = self.env["sync.data.transform.exec"].search(
             [
@@ -510,7 +511,7 @@ class SyncDataTransform(models.Model):
             rec_name = self.env[model_key]._rec_name
             model_value[rec_name] = record_name
 
-            modification_json = json.dumps(model_value)
+            modification_json = orjson.dumps(model_value)
             transform_depends = list(set(transform_depends))
             associate_key = f"{model_key}.create.{rec_name}.{record_name}"
             note = "Create bind_field_model"
@@ -525,7 +526,7 @@ class SyncDataTransform(models.Model):
                 mode_b=True,
             )
 
-            modification_json = json.dumps(
+            modification_json = orjson.dumps(
                 {bind_field_reverse: transform_exec_id.id_depend_name}
             )
             transform_exec_batch.append(
