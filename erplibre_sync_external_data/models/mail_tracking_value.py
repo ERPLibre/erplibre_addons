@@ -8,7 +8,9 @@ class MailTracking(models.Model):
 
     res_model = fields.Char(related="mail_message_id.model")
 
-    res_id = fields.Many2oneReference(related="mail_message_id.res_id")
+    res_id = fields.Many2oneReference(
+        related="mail_message_id.res_id", model_field="res_model"
+    )
 
     res_id_integer = fields.Integer(compute="_compute_res_id_integer")
 

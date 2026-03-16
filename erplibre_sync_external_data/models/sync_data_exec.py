@@ -673,7 +673,7 @@ class SyncDataExec(models.Model):
         for tracked_model, res_ids in model_data_to_track.items():
             tracking_vals = self.env["mail.tracking.value"].search(
                 [
-                    ("mail_message_id.model", "=", tracked_model),
+                    ("mail_message_id.res_model", "=", tracked_model),
                     ("mail_message_id.res_id", "in", res_ids),
                     ("id", ">", last_id_tracking),
                 ]
