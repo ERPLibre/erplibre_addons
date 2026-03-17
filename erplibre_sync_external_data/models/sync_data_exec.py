@@ -861,3 +861,20 @@ class SyncDataExec(models.Model):
         dt_local = tz.localize(datetime.combine(user_datetime, time.min))
         dt_utc = dt_local.astimezone(pytz.UTC)
         return fields.Datetime.to_string(dt_utc)
+
+    def add_unique_transform_exec(self, transform_value):
+        res_id = self.env["sync.data.transform.exec"].search(
+            [
+                ("to_model_name", "=", transform_value.get("to_model_name")),
+                (
+                    "sync_data_transform_id",
+                    "=",
+                    transform_value.get("sync_data_transform_id"),
+                ),
+                ("method", "=", transform_value.get("method")),
+                ("modification", "=", transform_value.get("modification")),
+                ("to_id_ref", "=", transform_value.get("to_id_ref")),
+            ]
+        )
+        if not res_id:
+            self.env["sync.data.transform.exec"].create(transform_value)
