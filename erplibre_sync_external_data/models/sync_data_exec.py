@@ -82,10 +82,6 @@ class SyncDataExec(models.Model):
         domain=[("field_id.name", "!=", "file_no_line")],
     )
 
-    force_add_create_when_existing = fields.Boolean(
-        string="Force add creation when data exist"
-    )
-
     send_message_at_create_or_modify_sync = fields.Boolean(
         string="Send notification at change", default=True
     )
