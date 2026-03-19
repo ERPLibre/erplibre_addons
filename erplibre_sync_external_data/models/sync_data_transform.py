@@ -12,7 +12,9 @@ class SyncDataTransform(models.Model):
     _description = "sync_data_transform"
     _inherit = ["mail.activity.mixin", "mail.thread"]
 
-    name = fields.Char(tracking=True, compute="_compute_name", store=True)
+    name = fields.Char(
+        tracking=True, compute="_compute_name", store=True, readonly=False
+    )
 
     context_name = fields.Selection(
         selection=[("default", "Default")],

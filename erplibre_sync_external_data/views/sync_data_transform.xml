@@ -73,7 +73,7 @@
                                         class="btn-warning"
                                         icon="fa-play"
                                         optional="hide"
-                                        invisible="has_no_match or modification_done"
+                                        invisible="has_no_match or modification_done or modification_disable"
                                     />
                                     <button
                                         name="action_write_modification"
@@ -82,7 +82,7 @@
                                         class="btn-success"
                                         icon="fa-play"
                                         optional="hide"
-                                        invisible="modification_done"
+                                        invisible="modification_done or modification_disable"
                                     />
                                 </list>
                             </field>

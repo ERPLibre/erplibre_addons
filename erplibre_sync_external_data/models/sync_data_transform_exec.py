@@ -51,6 +51,8 @@ class SyncDataTransformExec(models.Model):
 
     has_no_match = fields.Boolean(readonly=True)
 
+    modification_disable = fields.Boolean()
+
     need_review = fields.Boolean()
 
     msg_review = fields.Html()

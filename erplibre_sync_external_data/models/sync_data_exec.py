@@ -88,11 +88,9 @@ class SyncDataExec(models.Model):
 
     send_message_force = fields.Boolean(string="Force Send notification")
 
-    time_execution_extract_start = fields.Datetime(
-        readonly=True, tracking=True
-    )
+    time_execution_extract_start = fields.Datetime(tracking=True)
 
-    time_execution_extract_end = fields.Datetime(readonly=True, tracking=True)
+    time_execution_extract_end = fields.Datetime(tracking=True)
 
     time_duration_extract = fields.Float(
         compute="_compute_time_duration_extract", store=True, tracking=True

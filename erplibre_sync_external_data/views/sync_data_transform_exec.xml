@@ -12,14 +12,14 @@
                         string="Set no match"
                         class="btn-warning"
                         icon="fa-play"
-                        invisible="has_no_match or modification_done"
+                        invisible="has_no_match or modification_done or modification_disable"
                     />
                     <button
                         string="Apply modification"
                         name="action_write_modification"
                         type="object"
                         class="btn-success"
-                        invisible="modification_done"
+                        invisible="modification_done or modification_disable"
                     />
                 </header>
                 <sheet>
@@ -48,6 +48,7 @@
                             <group string="Modification">
                                 <field name="modification" />
                                 <field name="modification_done" />
+                                <field name="modification_disable" />
                             </group>
                         </group>
                         <group string="Association">
@@ -124,7 +125,7 @@
                     string="Set no match"
                     class="btn-warning"
                     icon="fa-play"
-                    invisible="has_no_match or modification_done"
+                    invisible="has_no_match or modification_done or modification_disable"
                 />
                 <button
                     name="action_write_modification"
@@ -132,7 +133,7 @@
                     string="Apply modification"
                     class="btn-success"
                     icon="fa-play"
-                    invisible="modification_done"
+                    invisible="modification_done or modification_disable"
                 />
             </list>
         </field>
@@ -163,7 +164,7 @@
                     string="Set no match"
                     class="btn-warning"
                     icon="fa-play"
-                    invisible="has_no_match or modification_done"
+                    invisible="has_no_match or modification_done or modification_disable"
                 />
                 <button
                     name="action_write_modification"
@@ -171,7 +172,7 @@
                     string="Apply modification"
                     class="btn-success"
                     icon="fa-play"
-                    invisible="modification_done"
+                    invisible="modification_done or modification_disable"
                 />
             </list>
         </field>
