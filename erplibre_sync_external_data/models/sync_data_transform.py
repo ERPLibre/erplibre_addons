@@ -132,22 +132,22 @@ class SyncDataTransform(models.Model):
         for rec in self:
             rec.mail_activity_count = len(rec.mail_activity_ids)
 
-    def action_link(self):
-        self.action_transform_algo(do_link=True)
+    def action_link(self, ctx=None):
+        self.action_transform_algo(ctx=None, do_link=True)
 
-    def action_write_all(self):
+    def action_write_all(self, ctx=None):
         for rec in self:
             rec.sync_data_transform_exec_ids.action_write_modification()
             rec.data_was_wrote = True
 
-    def action_transform_algo(self, do_link=False):
+    def action_transform_algo(self, ctx=None, do_link=False):
         self._set_start_execution_time()
         if "queue_job" in conf.server_wide_modules:
-            self.with_delay().action_transform(do_link=do_link)
+            self.with_delay().action_transform(ctx=None, do_link=do_link)
             self.is_transforming = True
             status = {}
         else:
-            status = self.action_transform(do_link=do_link)
+            status = self.action_transform(ctx=None, do_link=do_link)
             self._set_end_execution_time()
         return status
 
@@ -161,7 +161,7 @@ class SyncDataTransform(models.Model):
             if not rec.time_execution_transform_start:
                 rec.time_execution_transform_start = fields.Datetime.now()
 
-    def action_transform(self, do_link=False):
+    def action_transform(self, ctx=None, do_link=False):
         for rec in self:
             if rec.context_name != "default":
                 continue
