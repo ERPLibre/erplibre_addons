@@ -233,7 +233,10 @@ class SyncDataExec(models.Model):
             if not rec:
                 continue
             if "queue_job" in conf.server_wide_modules:
-                rec.with_delay().action_process_sync_data()
+                description = rec.what_import
+                rec.with_delay(
+                    description=description, max_retries=-1
+                ).action_process_sync_data()
             else:
                 rec.action_process_sync_data()
 
@@ -671,8 +674,8 @@ class SyncDataExec(models.Model):
         for tracked_model, res_ids in model_data_to_track.items():
             tracking_vals = self.env["mail.tracking.value"].search(
                 [
-                    ("mail_message_id.res_model", "=", tracked_model),
-                    ("mail_message_id.res_id", "in", res_ids),
+                    ("res_model", "=", tracked_model),
+                    ("res_id", "in", res_ids),
                     ("id", ">", last_id_tracking),
                 ]
             )
