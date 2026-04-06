@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <!-- Queue Job Channel -->
-    <record id="job_channel_sync_data_transform" model="queue.job.channel">
-        <field name="name">sync_data_transform</field>
-        <field name="parent_id" ref="queue_job.channel_root" />
+    <!-- Job Functions -->
+    <record id="job_function_action_process_sync_data" model="queue.job.function">
+        <field name="model_id" ref="erplibre_sync_external_data.model_sync_data_exec" />
+        <field name="method">action_process_sync_data</field>
+        <field name="allow_commit" eval="True"/>
     </record>
 
-    <!-- Job Functions -->
     <record id="job_function_action_transform" model="queue.job.function">
         <field name="model_id" ref="erplibre_sync_external_data.model_sync_data_transform" />
         <field name="method">action_transform</field>
