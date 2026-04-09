@@ -4,6 +4,7 @@ from odoo import api, fields, models
 class SyncDataCreate(models.Model):
     _name = "sync.data.create"
     _description = "Create data from sync.data.exec"
+    _order = "id desc"
 
     name = fields.Char(compute="_compute_name")
 

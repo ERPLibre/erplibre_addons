@@ -11,6 +11,7 @@ class SyncDataTransform(models.Model):
     _name = "sync.data.transform"
     _description = "sync_data_transform"
     _inherit = ["mail.activity.mixin", "mail.thread"]
+    _order = "id desc"
 
     name = fields.Char(
         tracking=True, compute="_compute_name", store=True, readonly=False

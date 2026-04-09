@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 class SyncDataTransformExec(models.Model):
     _name = "sync.data.transform.exec"
     _description = "sync_data_transform_exec"
-    _order = "id"
+    _order = "id desc"
 
     name = fields.Char(compute="_compute_name", store=True)
 
