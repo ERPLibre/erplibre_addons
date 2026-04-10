@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Onglet Claude Code dans le formulaire de tâche projet -->
+    <record id="view_task_form_claude_code" model="ir.ui.view">
+        <field name="name">project.task.form.claude.code</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Claude Code" name="claude_code">
+
+                    <!-- Configuration de l'agent -->
+                    <group string="Configuration" col="2">
+                        <group>
+                            <field name="claude_workspace" />
+                            <field name="claude_module_name" />
+                        </group>
+                        <group>
+                            <field name="claude_working_dir" />
+                            <field
+                                name="claude_status"
+                                widget="badge"
+                                decoration-muted="claude_status == 'draft'"
+                                decoration-info="claude_status == 'running'"
+                                decoration-success="claude_status == 'done'"
+                                decoration-danger="claude_status == 'error'"
+                            />
+                            <field
+                                name="claude_session_id"
+                                invisible="not claude_session_id"
+                            />
+                        </group>
+                    </group>
+
+                    <!-- Boutons d'action -->
+                    <div class="o_claude_actions mb-3 mt-1">
+                        <button
+                            name="action_start_claude"
+                            type="object"
+                            string="Démarrer Claude Code"
+                            class="btn btn-primary me-2"
+                            invisible="claude_status == 'running'"
+                            icon="fa-play"
+                        />
+                        <button
+                            name="action_stop_claude"
+                            type="object"
+                            string="Arrêter"
+                            class="btn btn-danger me-2"
+                            invisible="claude_status != 'running'"
+                            icon="fa-stop"
+                        />
+                        <button
+                            name="action_refresh_output"
+                            type="object"
+                            string="Rafraîchir"
+                            class="btn btn-secondary"
+                            invisible="claude_status not in ('running', 'done', 'error')"
+                            icon="fa-refresh"
+                        />
+                    </div>
+
+                    <!-- Output de l'agent Claude -->
+                    <field
+                        name="claude_output"
+                        widget="text"
+                        placeholder="L'output de l'agent Claude Code apparaîtra ici après le démarrage…"
+                        class="o_claude_output"
+                        readonly="1"
+                        nolabel="1"
+                    />
+
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
