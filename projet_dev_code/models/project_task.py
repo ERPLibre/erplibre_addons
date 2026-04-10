@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
 # © 2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+#
+# NOTE — asyncio dans Odoo 18
+# ─────────────────────────────────────────────────────────────────────────────
+# L'agent Claude tourne dans un thread daemon Python ordinaire créé avec
+# threading.Thread.  Dans ce thread, asyncio.run() est appelé : il crée un
+# event loop *indépendant* propre au thread, sans interférer avec le thread
+# principal d'Odoo.
+#
+# • Mode dev (--workers 0) : pas de gevent → fonctionne sans restriction.
+# • Workers gunicorn threadés : idem.
+# • Workers gevent (--workers N) : gevent monkey-patche les primitives I/O du
+#   processus principal, mais les threads daemon créés *après* le fork ne sont
+#   pas gérés par gevent.  Le SDK claude-agent-sdk communique avec le sous-
+#   processus `claude` via des pipes POSIX (pas de réseau), donc le monkey-
+#   patching des sockets n'affecte pas l'exécution.  Testé fonctionnel sur
+#   Python 3.12 / gevent 23+.
+# ─────────────────────────────────────────────────────────────────────────────
 import asyncio
 import logging
 import threading
@@ -17,6 +34,10 @@ _HTML_TAG_RE = re_compile(r"<[^>]+>")
 # Thread-safe stop signals: task_id -> threading.Event
 _STOP_EVENTS: dict = {}
 _STOP_EVENTS_LOCK = threading.Lock()
+
+# Paramètres ir.config_parameter
+_PARAM_API_KEY = "projet_dev_code.anthropic_api_key"
+_PARAM_CLI_PATH = "projet_dev_code.cli_path"
 
 
 class ProjectTask(models.Model):
@@ -85,6 +106,11 @@ class ProjectTask(models.Model):
                 },
             }
 
+        # Lire les paramètres de configuration
+        get_param = self.env["ir.config_parameter"].sudo().get_param
+        api_key = get_param(_PARAM_API_KEY, default="")
+        cli_path = get_param(_PARAM_CLI_PATH, default="")
+
         # Enregistrer un nouvel événement d'arrêt pour cette tâche
         with _STOP_EVENTS_LOCK:
             _STOP_EVENTS[self.id] = threading.Event()
@@ -92,9 +118,7 @@ class ProjectTask(models.Model):
         self.write(
             {
                 "claude_status": "running",
-                "claude_output": _(
-                    "Démarrage de l'agent Claude Code…\n"
-                ),
+                "claude_output": _("Démarrage de l'agent Claude Code…\n"),
                 "claude_session_id": False,
             }
         )
@@ -106,7 +130,7 @@ class ProjectTask(models.Model):
 
         thread = threading.Thread(
             target=_run_claude_in_thread,
-            args=(task_id, dbname, prompt, cwd),
+            args=(task_id, dbname, prompt, cwd, api_key, cli_path),
             name=f"claude-task-{task_id}",
             daemon=True,
         )
@@ -145,7 +169,6 @@ class ProjectTask(models.Model):
         lines.append(f"\n## Tâche : {task_name}")
 
         description = self.description or ""
-        # Supprimer les balises HTML
         description = _HTML_TAG_RE.sub(" ", description)
         description = unescape(description).strip()
         if description:
@@ -157,10 +180,17 @@ class ProjectTask(models.Model):
 # ── Fonctions de thread (hors classe ORM) ─────────────────────────────────────
 
 
-def _run_claude_in_thread(task_id: int, dbname: str, prompt: str, cwd: str):
-    """Point d'entrée du thread d'arrière-plan."""
+def _run_claude_in_thread(
+    task_id: int,
+    dbname: str,
+    prompt: str,
+    cwd: str,
+    api_key: str,
+    cli_path: str,
+):
+    """Point d'entrée du thread daemon d'arrière-plan."""
     try:
-        asyncio.run(_run_claude_async(task_id, dbname, prompt, cwd))
+        asyncio.run(_run_claude_async(task_id, dbname, prompt, cwd, api_key, cli_path))
     except Exception:
         _logger.exception(
             "Erreur non gérée dans le thread Claude (task %s)", task_id
@@ -168,7 +198,12 @@ def _run_claude_in_thread(task_id: int, dbname: str, prompt: str, cwd: str):
 
 
 async def _run_claude_async(
-    task_id: int, dbname: str, prompt: str, cwd: str
+    task_id: int,
+    dbname: str,
+    prompt: str,
+    cwd: str,
+    api_key: str,
+    cli_path: str,
 ):
     """Exécuter l'agent Claude Code via le SDK asynchrone."""
     try:
@@ -178,8 +213,9 @@ async def _run_claude_async(
             task_id,
             dbname,
             output=(
-                "Erreur : le module 'claude-agent-sdk' n'est pas installé.\n"
-                "Exécutez dans le venv Odoo 18 :\n"
+                "Erreur : le module 'claude-agent-sdk' n'est pas installé.\n\n"
+                "Installez-le dans le venv Odoo 18 :\n"
+                "  source .venv.odoo18/bin/activate\n"
                 "  pip install claude-agent-sdk\n"
             ),
             status="error",
@@ -189,10 +225,31 @@ async def _run_claude_async(
     with _STOP_EVENTS_LOCK:
         stop_event = _STOP_EVENTS.get(task_id)
 
-    options = ClaudeAgentOptions(
-        permission_mode="acceptEdits",
-        cwd=cwd,
-    )
+    # Construction des variables d'environnement
+    env: dict = {}
+    if api_key:
+        env["ANTHROPIC_API_KEY"] = api_key
+
+    # Options de l'agent
+    kwargs: dict = {
+        "permission_mode": "acceptEdits",
+        "cwd": cwd,
+        "env": env,
+    }
+    # cli_path est un paramètre optionnel de ClaudeAgentOptions
+    if cli_path:
+        kwargs["cli_path"] = cli_path
+
+    try:
+        options = ClaudeAgentOptions(**kwargs)
+    except TypeError:
+        # Fallback si cli_path n'est pas supporté par cette version du SDK
+        kwargs.pop("cli_path", None)
+        options = ClaudeAgentOptions(**kwargs)
+        if cli_path:
+            _logger.warning(
+                "claude-agent-sdk: cli_path ignoré (paramètre non supporté)"
+            )
 
     output_chunks: list[str] = []
 
@@ -209,9 +266,7 @@ async def _run_claude_async(
                 return
 
             # AssistantMessage : contient des blocs de texte
-            if hasattr(message, "content") and isinstance(
-                message.content, list
-            ):
+            if hasattr(message, "content") and isinstance(message.content, list):
                 for block in message.content:
                     if hasattr(block, "text") and isinstance(block.text, str):
                         output_chunks.append(block.text)
@@ -222,16 +277,14 @@ async def _run_claude_async(
                     status="running",
                 )
 
-            # ResultMessage : résultat final
-            elif hasattr(message, "is_error") and hasattr(
-                message, "session_id"
-            ):
+            # ResultMessage : résultat final (is_error + session_id)
+            elif hasattr(message, "is_error") and hasattr(message, "session_id"):
                 final_output = "\n".join(output_chunks)
                 if getattr(message, "result", None):
                     final_output += f"\n\n---\nRésultat : {message.result}"
                 cost = getattr(message, "total_cost_usd", None)
                 if cost is not None:
-                    final_output += f"\nCoût : ${cost:.4f}"
+                    final_output += f"\nCoût : ${cost:.4f} USD"
                 status = "error" if message.is_error else "done"
                 _update_task_db(
                     task_id,
@@ -268,8 +321,8 @@ def _update_task_db(
     """
     Mettre à jour les champs Claude de la tâche depuis un thread d'arrière-plan.
 
-    Utilise un curseur indépendant pour ne pas interférer avec la transaction
-    principale d'Odoo.
+    Utilise un curseur indépendant (odoo.registry) pour ne pas interférer
+    avec les transactions ORM du thread principal.
     """
     try:
         registry = odoo.registry(dbname)
@@ -283,6 +336,6 @@ def _update_task_db(
             env["project.task"].browse(task_id).write(vals)
     except Exception:
         _logger.exception(
-            "Impossible de mettre à jour la tâche %s dans la base de données",
+            "Impossible de mettre à jour la tâche %s en base de données",
             task_id,
         )

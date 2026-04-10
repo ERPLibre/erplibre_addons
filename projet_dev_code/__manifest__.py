@@ -19,6 +19,7 @@
     """,
     "depends": ["project"],
     "data": [
+        "views/res_config_settings_views.xml",
         "views/project_task_views.xml",
     ],
     "assets": {

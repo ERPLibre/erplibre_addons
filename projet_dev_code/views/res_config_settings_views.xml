@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Section Claude Code dans les paramètres Projet -->
+    <record id="res_config_settings_view_form_claude" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.claude</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="60" />
+        <field name="inherit_id" ref="project.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='analytic']" position="after">
+                <block title="Claude Code" name="claude_code">
+                    <setting
+                        string="Clé API Anthropic"
+                        help="Clé secrète pour accéder aux modèles Anthropic Claude."
+                    >
+                        <field
+                            name="claude_anthropic_api_key"
+                            password="True"
+                            widget="char"
+                        />
+                    </setting>
+                    <setting
+                        string="Chemin du binaire Claude"
+                        help="Laisser vide si 'claude' est accessible dans le PATH du serveur."
+                    >
+                        <field name="claude_cli_path" />
+                        <div class="text-muted mt4">
+                            Vérifiez avec :
+                            <code>which claude</code>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
