@@ -17,6 +17,9 @@
         - Affichage en temps réel de l'output Claude
         - Bouton d'arrêt de l'agent
     """,
+    "external_dependencies": {
+        "python": ["claude_agent_sdk"],
+    },
     "depends": ["project"],
     "data": [
         "views/res_config_settings_views.xml",
