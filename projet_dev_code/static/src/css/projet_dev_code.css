@@ -1,0 +1,22 @@
+/* Output terminal Claude Code */
+.o_claude_output textarea,
+.o_claude_output .o_field_text {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", "Monaco", monospace;
+    font-size: 12px;
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 6px;
+    padding: 12px 16px;
+    min-height: 300px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.o_claude_actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
