@@ -15,7 +15,10 @@ class TestProjetDevCodeFields(ProjetDevCodeCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.task = cls._make_task(name="Test Task")
+        # _make_task is an instance method — create directly in setUpClass
+        cls.task = cls.env["project.task"].create(
+            {"name": "Test Task", "project_id": cls.project.id}
+        )
 
     def test_default_status_is_draft(self):
         self.assertEqual(self.task.claude_status, "draft")
