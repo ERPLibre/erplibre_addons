@@ -17,6 +17,8 @@ SYNC_METADATA = {
         ["Opportunité", "opportunity_name"],
         ["Montant", "amount"],
         ["Date prévue", "expected_date"],
+        # file_no_line is intentionally absent: the extraction engine appends it
+        # automatically as ("File no line", "file_no_line") for every sync.
     ],
     "sync": ["project_code"],
     "bind": [

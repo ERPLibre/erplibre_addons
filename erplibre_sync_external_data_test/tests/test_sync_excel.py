@@ -63,10 +63,8 @@ class TestExcelSingleLine(SyncTestBase):
 
     def test_excel_same_data_as_csv(self):
         """Excel and CSV must produce identical mirror field values."""
-        from .common import load_file_b64 as lf
-
         sync_model_csv = self._make_sync_model(filetype="csv")
-        se_csv = self._make_sync_exec(sync_model_csv, lf("test_single.csv"))
+        se_csv = self._make_sync_exec(sync_model_csv, load_file_b64("test_single.csv"))
         se_csv.action_process_sync_data()
 
         se_xlsx = self._make_sync_exec(self.sync_model, self.file_b64)
@@ -129,10 +127,8 @@ class TestExcelMultiLine(SyncTestBase):
 
     def test_excel_multi_same_as_csv_multi(self):
         """Excel multi and CSV multi must produce the same project codes."""
-        from .common import load_file_b64 as lf
-
         sync_model_csv = self._make_sync_model(filetype="csv")
-        se_csv = self._make_sync_exec(sync_model_csv, lf("test_multi.csv"))
+        se_csv = self._make_sync_exec(sync_model_csv, load_file_b64("test_multi.csv"))
         se_csv.action_process_sync_data()
 
         se_xlsx = self._make_sync_exec(self.sync_model, self.file_b64)

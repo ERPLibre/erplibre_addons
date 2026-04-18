@@ -1,8 +1,4 @@
-import logging
-
 from odoo import models
-
-_logger = logging.getLogger(__name__)
 
 
 class SyncDataTransform(models.Model):
@@ -32,17 +28,13 @@ class SyncDataTransform(models.Model):
     def _test_get_or_create_partner(self, entry):
         if entry.partner_id:
             return entry.partner_id
-        domain = (
-            [("email", "=", entry.client_email)]
-            if entry.client_email
-            else [("name", "=", entry.client_name)]
+        partner = self.env["res.partner"].search(
+            [("email", "=", entry.client_email)], limit=1
         )
-        partner = self.env["res.partner"].search(domain, limit=1)
         if not partner:
-            vals = {"name": entry.client_name}
-            if entry.client_email:
-                vals["email"] = entry.client_email
-            partner = self.env["res.partner"].create(vals)
+            partner = self.env["res.partner"].create(
+                {"name": entry.client_name, "email": entry.client_email}
+            )
         return partner
 
     def _test_create_lead(self, entry, partner):
