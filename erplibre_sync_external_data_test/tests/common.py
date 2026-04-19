@@ -42,6 +42,27 @@ class SyncTestBase(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.mirror_model = "erplibre.sync.test.entry"
+        cls._ensure_sale_journal()
+
+    @classmethod
+    def _ensure_sale_journal(cls):
+        if cls.env["account.journal"].search(
+            [("type", "=", "sale"), ("company_id", "=", cls.env.company.id)], limit=1
+        ):
+            return
+        # Fresh DB without demo data has no chart of accounts; create the minimum
+        # needed so account.move.create() can find a sale journal.
+        revenue_account = cls.env["account.account"].create(
+            {"name": "Revenue", "code": "TST4000", "account_type": "income"}
+        )
+        cls.env["account.journal"].create(
+            {
+                "name": "Customer Invoices (test)",
+                "code": "STEST",
+                "type": "sale",
+                "default_account_id": revenue_account.id,
+            }
+        )
 
     def setUp(self):
         super().setUp()
