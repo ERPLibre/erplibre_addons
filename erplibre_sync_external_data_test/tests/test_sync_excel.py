@@ -67,7 +67,7 @@ class TestExcelSingleLine(SyncTestBase):
         se.action_process_sync_data()
         entry = self._entries_from(se)
         self.assertEqual(entry.client_name, "Acme Corp")
-        self.assertEqual(entry.client_email, "contact@acme.com")
+        self.assertEqual(entry.client_email, "acme@example.com")
         self.assertAlmostEqual(entry.amount, 50000.0, places=2)
 
 
