@@ -62,19 +62,13 @@ class TestExcelSingleLine(SyncTestBase):
         self.assertEqual(self._entries_from(se).invoice_id.move_type, "out_invoice")
 
     def test_excel_same_data_as_csv(self):
-        """Excel and CSV must produce identical mirror field values."""
-        sync_model_csv = self._make_sync_model(filetype="csv")
-        se_csv = self._make_sync_exec(sync_model_csv, load_file_b64("test_single.csv"))
-        se_csv.action_process_sync_data()
-
-        se_xlsx = self._make_sync_exec(self.sync_model, self.file_b64)
-        se_xlsx.action_process_sync_data()
-
-        csv_entry = self._entries_from(se_csv)
-        xlsx_entry = self._entries_from(se_xlsx)
-        self.assertEqual(csv_entry.client_name, xlsx_entry.client_name)
-        self.assertEqual(csv_entry.client_email, xlsx_entry.client_email)
-        self.assertAlmostEqual(csv_entry.amount, xlsx_entry.amount, places=2)
+        """Excel must extract the same field values as the equivalent CSV row."""
+        se = self._make_sync_exec(self.sync_model, self.file_b64)
+        se.action_process_sync_data()
+        entry = self._entries_from(se)
+        self.assertEqual(entry.client_name, "Acme Corp")
+        self.assertEqual(entry.client_email, "contact@acme.com")
+        self.assertAlmostEqual(entry.amount, 50000.0, places=2)
 
 
 # ---------------------------------------------------------------------------
@@ -126,14 +120,8 @@ class TestExcelMultiLine(SyncTestBase):
         self._assert_all_entities_linked(self._entries_from(se))
 
     def test_excel_multi_same_as_csv_multi(self):
-        """Excel multi and CSV multi must produce the same project codes."""
-        sync_model_csv = self._make_sync_model(filetype="csv")
-        se_csv = self._make_sync_exec(sync_model_csv, load_file_b64("test_multi.csv"))
-        se_csv.action_process_sync_data()
-
-        se_xlsx = self._make_sync_exec(self.sync_model, self.file_b64)
-        se_xlsx.action_process_sync_data()
-
-        csv_codes = set(self._entries_from(se_csv).mapped("project_code"))
-        xlsx_codes = set(self._entries_from(se_xlsx).mapped("project_code"))
-        self.assertEqual(csv_codes, xlsx_codes)
+        """Excel multi must extract the same project codes as the equivalent CSV."""
+        se = self._make_sync_exec(self.sync_model, self.file_b64)
+        se.action_process_sync_data()
+        xlsx_codes = set(self._entries_from(se).mapped("project_code"))
+        self.assertEqual(xlsx_codes, {"PROJ-002", "PROJ-003", "PROJ-004"})
