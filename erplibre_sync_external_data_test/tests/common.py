@@ -43,6 +43,13 @@ class SyncTestBase(TransactionCase):
         super().setUpClass()
         cls.mirror_model = "erplibre.sync.test.entry"
 
+    def setUp(self):
+        super().setUp()
+        # _link_tracking_values in the parent module calls env.cr.commit()
+        # which is forbidden inside TransactionCase (raises AssertionError).
+        # Replace with no-op for test isolation.
+        self.env.cr.commit = lambda: None
+
     def _make_sync_model(self, filetype, sheet_name=""):
         metadata = dict(SYNC_METADATA)
         metadata["filetype"] = filetype
