@@ -8,7 +8,7 @@ from odoo.tests.common import TransactionCase
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 SYNC_METADATA = {
-    "index_line_header": 1,
+    "index_line_header": 0,
     "nb_line_header": 1,
     "header": [
         ["Code projet", "project_code"],
@@ -46,6 +46,8 @@ class SyncTestBase(TransactionCase):
     def _make_sync_model(self, filetype, sheet_name=""):
         metadata = dict(SYNC_METADATA)
         metadata["filetype"] = filetype
+        # xlsx uses 1-based row numbering; CSV uses 0-based (engine applies index -= 1)
+        metadata["index_line_header"] = 1 if filetype == "xlsx" else 0
         if sheet_name:
             metadata["sheet_name"] = sheet_name
         return self.env["sync.model"].create(
