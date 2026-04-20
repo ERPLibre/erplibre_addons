@@ -1,18 +1,10 @@
-import base64
-import logging
-from datetime import datetime, time
-from io import BytesIO
-
-import pytz
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError
-
-_logger = logging.getLogger(__name__)
+from odoo import api, fields, models
 
 
 class SyncDataCreate(models.Model):
     _name = "sync.data.create"
     _description = "Create data from sync.data.exec"
+    _order = "id desc"
 
     name = fields.Char(compute="_compute_name")
 

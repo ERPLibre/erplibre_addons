@@ -1,8 +1,8 @@
-import json
 import logging
 import os
 
-from odoo import _, api, fields, models
+import orjson
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 class SyncDataTransformExec(models.Model):
     _name = "sync.data.transform.exec"
     _description = "sync_data_transform_exec"
-    _order = "id"
+    _order = "id desc"
 
     name = fields.Char(compute="_compute_name", store=True)
 
@@ -51,6 +51,8 @@ class SyncDataTransformExec(models.Model):
 
     has_no_match = fields.Boolean(readonly=True)
 
+    modification_disable = fields.Boolean()
+
     need_review = fields.Boolean()
 
     msg_review = fields.Html()
@@ -90,23 +92,22 @@ class SyncDataTransformExec(models.Model):
     )
     def _compute_name(self):
         for rec in self:
-            name = ""
+            parts = []
             if rec.method:
-                name += rec.method + " "
+                parts.append(rec.method)
             if rec.from_model_name:
-                name += f"{rec.from_model_name}:{rec.from_id_ref} "
+                parts.append(f"{rec.from_model_name}:{rec.from_id_ref}")
             if rec.to_model_name:
-                name += f"{rec.to_model_name}:{rec.to_id_ref} "
-            rec.name = name.strip()
+                parts.append(f"{rec.to_model_name}:{rec.to_id_ref}")
+            rec.name = " ".join(parts)
 
     def action_set_no_match(self):
         self.ensure_one()
-        for rec in self:
-            if rec.sync_data_transform_id.default_option_no_match:
-                rec.modification = (
-                    rec.sync_data_transform_id.default_option_no_match
-                )
-                rec.has_no_match = True
+        if self.sync_data_transform_id.default_option_no_match:
+            self.modification = (
+                self.sync_data_transform_id.default_option_no_match
+            )
+            self.has_no_match = True
 
     def action_write_modification(self):
         for rec in self:
@@ -120,16 +121,15 @@ class SyncDataTransformExec(models.Model):
                             '"' + depend_id.id_depend_name + '"',
                             str(depend_id.to_id_ref),
                         )
-                dct_value = json.loads(str_value)
+                parsed_values = orjson.loads(str_value)
                 res_class = self.env[rec.to_model_name]
 
                 # Transform value
-                for key, value in dct_value.items():
+                for key, value in parsed_values.items():
                     key_field = res_class._fields[key]
                     key_type = key_field.type
-                    if (
-                        key_type in ["many2one", "many2many"]
-                        and type(value) is str
+                    if key_type in ("many2one", "many2many") and isinstance(
+                        value, str
                     ):
                         # Create if not existing, search by rec_name
                         key_class = self.env[key_field.comodel_name]
@@ -140,16 +140,17 @@ class SyncDataTransformExec(models.Model):
                             value_transform = key_class.create(
                                 [{key_class._rec_name: value}]
                             )
-                        dct_value[key] = value_transform.id
+                        parsed_values[key] = value_transform.id
 
                 if rec.method == "create":
-                    to_id_ref = res_class.create(dct_value)
+                    to_id_ref = res_class.create(parsed_values)
                     rec.to_id_ref = to_id_ref.id
                 elif rec.method == "write":
                     if not rec.to_id_ref:
                         _logger.error(
-                            f"Cannot write model '{rec.from_model_name}'"
+                            "Cannot write model '%s'",
+                            rec.from_model_name,
                         )
                     else:
-                        res_class.browse(rec.to_id_ref).write(dct_value)
+                        res_class.browse(rec.to_id_ref).write(parsed_values)
                 rec.modification_done = True

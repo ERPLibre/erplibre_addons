@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import fields, models
 
 
 class SyncDataTransformFilterSearch(models.Model):
@@ -11,43 +11,22 @@ class SyncDataTransformFilterSearch(models.Model):
 
     sequence = fields.Integer(default=10)
 
-    # pattern_string = fields.Text(default="")
-    #
-    # pattern_value = fields.Text(default="")
+    SEPARATORS = ("-%s", " -%s", " %s", "%s", "/%s", " : %s", ": %s", " # %s", "# %s")
 
-    def action_generate_all(self, lst_key=None):
-        if not lst_key:
+    def action_generate_all(self, keys=None):
+        if not keys:
             return
-        lst_str_key = []
-        str_key = "#%s"
-        lst_str_key.append(str_key)
-        for key_s in lst_key:
-            str_key = f"{key_s}-%s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s} -%s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s} %s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s}%s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s}/%s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s} : %s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s}: %s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s} # %s"
-            lst_str_key.append(str_key)
-            str_key = f"{key_s}# %s"
-            lst_str_key.append(str_key)
-        lst_str_key_create = []
-        for str_key in lst_str_key:
-            filter_search_id = self.env[
-                "sync.data.transform.filter_search"
-            ].search([("name", "=", str_key)])
-            if not filter_search_id:
-                lst_str_key_create.append({"name": str_key})
-        if lst_str_key_create:
+        patterns = ["#%s"]
+        for key_s in keys:
+            patterns.extend(f"{key_s}{sep}" for sep in self.SEPARATORS)
+        existing = self.env[
+            "sync.data.transform.filter_search"
+        ].search([("name", "in", patterns)])
+        existing_names = set(existing.mapped("name"))
+        patterns_to_create = [
+            {"name": p} for p in patterns if p not in existing_names
+        ]
+        if patterns_to_create:
             self.env["sync.data.transform.filter_search"].create(
-                lst_str_key_create
+                patterns_to_create
             )

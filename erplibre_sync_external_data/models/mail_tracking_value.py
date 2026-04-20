@@ -1,13 +1,4 @@
-import base64
-import logging
-from datetime import datetime, time
-from io import BytesIO
-
-import pytz
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError
-
-_logger = logging.getLogger(__name__)
+from odoo import api, fields, models
 
 
 class MailTracking(models.Model):
@@ -17,7 +8,9 @@ class MailTracking(models.Model):
 
     res_model = fields.Char(related="mail_message_id.model")
 
-    res_id = fields.Many2oneReference(related="mail_message_id.res_id")
+    res_id = fields.Many2oneReference(
+        related="mail_message_id.res_id", model_field="res_model"
+    )
 
     res_id_integer = fields.Integer(compute="_compute_res_id_integer")
 

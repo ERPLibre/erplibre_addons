@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Queue Job Channel -->
+    <record id="job_channel_sync_data_transform" model="queue.job.channel">
+        <field name="name">sync_data_transform</field>
+        <field name="parent_id" ref="queue_job.channel_root" />
+    </record>
+</odoo>

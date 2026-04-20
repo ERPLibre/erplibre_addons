@@ -246,6 +246,11 @@
                     string="Start date"
                     context="{'group_by': 'time_execution_extract_start'}"
                 />
+                <filter
+                    name="group_what_import"
+                    string="What import"
+                    context="{'group_by': 'what_import'}"
+                />
             </search>
         </field>
     </record>
@@ -254,6 +259,6 @@
         <field name="name">Data exec</field>
         <field name="res_model">sync.data.exec</field>
         <field name="view_mode">kanban,pivot,list,graph,form,activity</field>
-        <field name="context">{'search_default_has_modification': 1}</field>
+        <field name="context">{'search_default_has_modification': 1, 'search_default_group_what_import': 1}</field>
     </record>
 </odoo>

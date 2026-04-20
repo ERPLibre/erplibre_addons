@@ -21,8 +21,6 @@
                         </h1>
                     </div>
                     <group>
-                        <!--                        <field name="pattern_string" />-->
-                        <!--                        <field name="pattern_value" />-->
                         <field name="sequence" />
                     </group>
                 </sheet>
@@ -36,8 +34,6 @@
         <field name="arch" type="xml">
             <graph string="Sync data transform filter search">
                 <field name="name" type="row" />
-                <!--                <field name="pattern_string" type="row" />-->
-                <!--                <field name="pattern_value" type="row" />-->
                 <field name="sequence" type="measure" />
             </graph>
         </field>
@@ -49,8 +45,6 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
-                <!--                <field name="pattern_string" />-->
-                <!--                <field name="pattern_value" />-->
                 <field name="sequence" />
                 <templates>
                     <t t-name="card">
@@ -62,16 +56,6 @@
                                             <field name="name" />
                                         </strong>
                                     </li>
-                                    <!--                                    <li class="mb4">-->
-                                    <!--                                        <strong>-->
-                                    <!--                                            <field name="pattern_string" />-->
-                                    <!--                                        </strong>-->
-                                    <!--                                    </li>-->
-                                    <!--                                    <li class="mb4">-->
-                                    <!--                                        <strong>-->
-                                    <!--                                            <field name="pattern_value" />-->
-                                    <!--                                        </strong>-->
-                                    <!--                                    </li>-->
                                     <li class="mb4">
                                         <strong>
                                             <field name="sequence" />
@@ -92,8 +76,6 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name" />
-                <!--                <field name="pattern_string" />-->
-                <!--                <field name="pattern_value" />-->
                 <field name="sequence" />
             </list>
         </field>
@@ -105,8 +87,6 @@
         <field name="arch" type="xml">
             <pivot string="Sync data transform filter search">
                 <field name="name" type="row" />
-                <!--                <field name="pattern_string" type="row" />-->
-                <!--                <field name="pattern_value" type="row" />-->
                 <field name="sequence" type="measure" />
             </pivot>
         </field>
@@ -118,8 +98,6 @@
         <field name="arch" type="xml">
             <search string="Sync data transform filter search">
                 <field name="name" string="" />
-                <!--                <field name="pattern_string" string="" />-->
-                <!--                <field name="pattern_value" string="" />-->
                 <filter
                     domain="[('active','=',False)]"
                     name="Inactive"
