@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_cg_model_view_form" model="ir.ui.view">
+        <field name="name">devops_cg_model_form</field>
+        <field name="inherit_id" ref="erplibre_devops.devops_cg_model_view_form" />
+        <field name="model">devops.cg.model</field>
+        <field name="arch" type="xml">
+            <page name="page_information" position="after">
+                <page string="Sync external">
+                    <group>
+                        <group>
+                            <field name="enable_sync_external" />
+                            <field name="sync_external_file_type" invisible="not enable_sync_external" />
+                            <field name="sync_external_index_line_header" invisible="not enable_sync_external" />
+                            <field
+                                name="sync_external_sheet_name"
+                                invisible="not enable_sync_external or sync_external_file_type != 'xlsx'"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

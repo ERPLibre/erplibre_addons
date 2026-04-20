@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="module_category_erplibre_sync_external_data" model="ir.module.category">
+        <field name="name">ERPLibre Sync external data</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="group_erplibre_sync_external_data_exec_notify" model="res.groups">
+        <field name="name">Sync external data: notifications</field>
+        <field name="category_id" ref="module_category_erplibre_sync_external_data" />
+    </record>
+</odoo>

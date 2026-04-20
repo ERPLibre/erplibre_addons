@@ -1,0 +1,24 @@
+<odoo>
+    <record id="mail_template_erplibre_sync_external_data_notif_change" model="mail.template">
+        <field name="name">Sync external data notification change</field>
+        <field name="model_id" ref="model_sync_data_exec" />
+        <field name="subject">Changement détecté sur document ({{ object.display_name }})</field>
+        <field name="email_from">{{(user.email_formatted or '')|safe}}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour,</p>
+<p>Voici le rapport : <b><t t-esc="object.name"/></b></p>
+<p>Nouvelle information : <t t-esc="object.create_count"/></p>
+<p>Modification : <t t-esc="object.modif_count"/></p>
+<br />
+<footer>
+    <p>
+        <a t-attf-href="{{ object.get_base_url() }}/odoo/action-erplibre_sync_external_data.sync_data_exec_data_exec_action_window/{{ object.id }}"
+        target="_blank"
+        style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+            Sync external data
+        </a>
+    </p>
+</footer>
+    ]]></field>
+    </record>
+</odoo>

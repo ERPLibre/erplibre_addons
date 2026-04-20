@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_data_transform_view_form" model="ir.ui.view">
+        <field name="name">sync_data_transform_form</field>
+        <field name="model">sync.data.transform</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <header>
+                    <button string="Transformer" name="action_transform_algo" type="object" class="btn-primary" />
+                    <button string="Créer des liens" name="action_link" type="object" class="btn-primary" />
+                    <button
+                        string="Write all records"
+                        name="action_write_all"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not has_data_to_write"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_transform_exec" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="sync_data_transform_exec_count" widget="statinfo" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="time_execution_transform_end" />
+                        <field name="time_execution_transform_start" />
+                        <field name="time_duration_extract" />
+                        <field name="time_duration_extract_fr" />
+                        <field name="context_name" />
+                        <field name="filter_search_ids" widget="many2many_tags" />
+                        <field name="do_update" />
+                    </group>
+                    <group string="Activity">
+                        <field name="mail_activity_default_user_id" />
+                        <field name="mail_activity_ids" />
+                        <field name="mail_activity_count" />
+                    </group>
+                    <group name="operation_option" string="Operation Option">
+                        <field name="enable_default_option_no_match" />
+                        <field name="default_option_no_match" invisible="not enable_default_option_no_match" />
+                    </group>
+                    <notebook>
+                        <page name="create" string="Create">
+                            <field name="sync_data_transform_exec_ids">
+                                <list string="Tracking Value" create="0" delete="0">
+                                    <field name="name" />
+                                    <field name="from_id_ref" optional="show" />
+                                    <field name="from_model_name" optional="show" />
+                                    <field name="to_model_name" optional="show" />
+                                    <field name="to_id_ref" optional="show" />
+                                    <field name="depend_ids" widget="many2many_tags" optional="hide" />
+                                    <field name="id_depend_name" optional="hide" />
+                                    <field name="hash_generic_value" optional="hide" />
+                                    <field name="associate_key" optional="hide" />
+                                    <field name="method" optional="show" />
+                                    <field name="modification" optional="show" />
+                                    <field name="modification_done" optional="show" />
+                                    <field name="note" optional="show" />
+                                    <field name="need_review" optional="show" />
+                                    <field name="msg_review_reason" optional="show" />
+                                    <field name="msg_review" optional="show" />
+                                    <button
+                                        name="action_set_no_match"
+                                        type="object"
+                                        string="Set no match"
+                                        class="btn-warning"
+                                        icon="fa-play"
+                                        optional="hide"
+                                        invisible="has_no_match or modification_done"
+                                    />
+                                    <button
+                                        name="action_write_modification"
+                                        type="object"
+                                        string="Write modification"
+                                        class="btn-success"
+                                        icon="fa-play"
+                                        optional="hide"
+                                        invisible="modification_done"
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_view_graph" model="ir.ui.view">
+        <field name="name">sync_data_transform_graph</field>
+        <field name="model">sync.data.transform</field>
+        <field name="arch" type="xml">
+            <graph string="Sync data transform">
+                <field name="name" type="row" />
+                <field name="time_execution_transform_end" type="row" />
+                <field name="time_execution_transform_start" type="row" />
+                <field name="context_name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_view_kanban" model="ir.ui.view">
+        <field name="name">sync_data_transform_kanban</field>
+        <field name="model">sync.data.transform</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="time_execution_transform_end" />
+                <field name="time_execution_transform_start" />
+                <field name="context_name" />
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="time_execution_transform_end" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="time_execution_transform_start" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="context_name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_view_list" model="ir.ui.view">
+        <field name="name">sync_data_transform_list</field>
+        <field name="model">sync.data.transform</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="time_execution_transform_end" />
+                <field name="time_execution_transform_start" />
+                <field name="context_name" />
+            </list>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_view_pivot" model="ir.ui.view">
+        <field name="name">sync_data_transform_pivot</field>
+        <field name="model">sync.data.transform</field>
+        <field name="arch" type="xml">
+            <pivot string="Sync data transform">
+                <field name="name" type="row" />
+                <field name="time_execution_transform_end" type="row" />
+                <field name="time_execution_transform_start" type="row" />
+                <field name="context_name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_view_search" model="ir.ui.view">
+        <field name="name">sync_data_transform_search</field>
+        <field name="model">sync.data.transform</field>
+        <field name="arch" type="xml">
+            <search string="Sync data transform">
+                <field name="name" string="" />
+                <field name="context_name" string="Context name" />
+                <filter
+                    name="group_by_date_time_execution_transform_end"
+                    string="Execution transform end"
+                    context="{'group_by': 'time_execution_transform_end'}"
+                />
+                <filter
+                    name="group_by_date_time_execution_transform_start"
+                    string="Execution transform start"
+                    context="{'group_by': 'time_execution_transform_start'}"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="sync_data_transform_data_transform_action_window" model="ir.actions.act_window">
+        <field name="name">Data transform</field>
+        <field name="res_model">sync.data.transform</field>
+        <field name="view_mode">kanban,pivot,list,graph,form</field>
+    </record>
+</odoo>

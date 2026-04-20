@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_data_exec_view_form" model="ir.ui.view">
+        <field name="name">sync_data_exec_form</field>
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <form string="Import Excel">
+                <header>
+                    <button
+                        string="Analyser"
+                        name="action_process_sync_data"
+                        type="object"
+                        class="btn-primary"
+                        invisible='state != "upload" or not what_import or has_error'
+                    />
+                    <button
+                        string="Opérer"
+                        name="action_process_transform"
+                        type="object"
+                        class="btn-primary"
+                        invisible="transform_id"
+                    />
+                    <button
+                        string="Opérer"
+                        name="action_process_transform"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="not transform_id"
+                    />
+                    <button string="Recommencer" name="action_copy" type="object" class="btn-primary" />
+                    <button string="Revert" name="action_revert_data" type="object" class="oe_stat_button" />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="what_import" />
+                        <field name="sync_model_ids" widget="many2many_tags" />
+                    </group>
+                    <group name="info" string="Info">
+                        <field name="time_execution_extract_start" />
+                        <field name="time_execution_extract_end" />
+                        <field name="time_duration_extract" />
+                        <field name="time_duration_extract_fr" />
+                    </group>
+                    <!-- Étape 1: Upload -->
+                    <group name="import_info" string="Information pour un seul fichier" invisible="state != 'upload'" />
+
+                    <!-- Étape 2: Résumé -->
+                    <group name="result" invisible='state != "summary"' string="Résultat">
+                        <group name="import_result" />
+
+                        <group>
+                            <field name="notes" readonly="1" widget="html" />
+                        </group>
+                    </group>
+                    <group invisible="not has_error">
+                        <field name="has_error" />
+                        <field name="has_error_msg" />
+                    </group>
+                    <group name="modification" string="Statistiques">
+                        <field name="create_count" invisible="not has_modification" />
+                        <field name="modif_count" invisible="not has_modification" />
+                        <field name="transform_id" />
+                    </group>
+                    <notebook>
+                        <page name="create" string="Create" invisible='state != "summary"'>
+                            <field name="sync_data_create_ids" />
+                        </page>
+                        <page name="tracking" string="Tracking" invisible='state != "summary"'>
+                            <field name="sync_data_write_ids">
+                                <list string="Tracking Value" create="0" delete="0">
+                                    <field name="field_id" />
+                                    <field name="res_model" />
+                                    <field name="res_id" />
+                                    <field name="res_id_integer" />
+                                    <field name="old_value_integer" />
+                                    <field name="old_value_float" />
+                                    <field name="old_value_char" />
+                                    <field name="old_value_text" />
+                                    <field name="old_value_datetime" />
+                                    <field name="new_value_integer" />
+                                    <field name="new_value_float" />
+                                    <field name="new_value_char" />
+                                    <field name="new_value_text" />
+                                    <field name="new_value_datetime" />
+                                    <field name="mail_message_id" />
+                                </list>
+                            </field>
+                        </page>
+                        <page name="page_configuration" string="Configuration">
+                            <group name="notification" string="Notification">
+                                <field name="send_message_at_create_or_modify_sync" />
+                                <field name="send_message_force" />
+                                <button
+                                    string="Forcer envoie notification d'un changement"
+                                    name="action_send_message_notification"
+                                    type="object"
+                                    class="btn-primary"
+                                />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="sync_data_exec_view_graph" model="ir.ui.view">
+        <field name="name">sync_data_exec_graph</field>
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <graph string="Sync data exec">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="sync_data_exec_view_kanban" model="ir.ui.view">
+        <field name="name">sync_data_exec_kanban</field>
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="what_import" />
+                <field name="time_duration_extract_fr" />
+                <field name="time_execution_extract_end" />
+                <field name="create_count" />
+                <field name="modif_count" />
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="what_import" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li class="mb4">
+                                        <strong style="color:green">
+                                            <field name="create_count" />
+                                        </strong>
+                                        -
+                                        <strong style="color:blue">
+                                            <field name="modif_count" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="o_kanban_record_subtitle">
+                                <i
+                                    class="fa fa-clock-o"
+                                    title="Durée d'exécution"
+                                    aria-label="Durée d'exécution"
+                                    style="margin-right:4px;"
+                                />
+                                <field name="time_duration_extract_fr" />
+                            </div>
+                            <t t-if="record.time_execution_extract_end.raw_value">
+                                <div
+                                    class="o_kanban_record_subtitle"
+                                    title="Fin d'exécution"
+                                    style="display:flex; align-items:center;"
+                                >
+                                    <i
+                                        class="fa fa-flag-checkered"
+                                        aria-label="Fin d'exécution"
+                                        style="margin-right:4px;"
+                                    />
+                                    <field name="time_execution_extract_end" widget="datetime" />
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="o_kanban_record_subtitle" title="Toujours en cours">
+                                    <i class="fa fa-spinner fa-spin" aria-label="En cours" style="margin-right:4px;" />
+                                    <span>En cours…</span>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="sync_data_exec_view_list" model="ir.ui.view">
+        <field name="name">sync_data_exec_list</field>
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="has_error" />
+                <field name="has_error_msg" />
+                <field name="notes" />
+                <field name="state" />
+                <field name="time_duration_extract" />
+                <field name="time_duration_extract_fr" />
+                <field name="time_execution_extract_end" />
+                <field name="time_execution_extract_start" />
+                <field name="what_import" />
+            </list>
+        </field>
+    </record>
+
+    <record id="sync_data_exec_view_pivot" model="ir.ui.view">
+        <field name="name">sync_data_exec_pivot</field>
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <pivot string="Sync data exec">
+                <field name="name" type="row" />
+                <field name="has_error" type="row" />
+                <field name="has_error_msg" type="row" />
+                <field name="notes" type="row" />
+                <field name="state" type="row" />
+                <field name="time_duration_extract" type="measure" />
+                <field name="time_duration_extract_fr" type="row" />
+                <field name="time_execution_extract_end" type="row" />
+                <field name="time_execution_extract_start" type="row" />
+                <field name="what_import" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="sync_data_exec_view_search" model="ir.ui.view">
+        <field name="name">sync_data_exec_search</field>
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <search string="Sync data exec">
+                <field name="name" string="Name" />
+                <field name="has_error_msg" string="Has error message" />
+                <field name="notes" string="Notes" />
+                <field name="state" string="State" />
+                <field name="time_duration_extract_fr" string="Time duration" />
+                <field name="what_import" string="Quoi importer" />
+                <filter domain="[('has_error','=',True)]" name="has_error" string="Has error" />
+                <filter domain="[('has_modification','=',True)]" name="has_modification" string="Has modification" />
+                <filter
+                    name="group_by_date_time_execution_extract_end"
+                    string="End date"
+                    context="{'group_by': 'time_execution_extract_end'}"
+                />
+                <filter
+                    name="group_by_date_time_execution_extract_start"
+                    string="Start date"
+                    context="{'group_by': 'time_execution_extract_start'}"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="sync_data_exec_data_exec_action_window" model="ir.actions.act_window">
+        <field name="name">Data exec</field>
+        <field name="res_model">sync.data.exec</field>
+        <field name="view_mode">kanban,pivot,list,graph,form,activity</field>
+        <field name="context">{'search_default_has_modification': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,942 @@
+import base64
+import csv
+import io
+import json
+import logging
+import re
+from collections import defaultdict
+from datetime import date, datetime, time, timedelta
+from io import BytesIO
+
+import pytz
+from markupsafe import Markup
+from odoo import _, api, conf, fields, models
+from odoo.exceptions import ValidationError
+from odoo.tools.mimetypes import guess_mimetype
+
+try:
+    # Odoo 18 tourne sous Py>=3.10; openpyxl est la lib la plus sûre pour .xlsx
+    import openpyxl
+except Exception as e:
+    openpyxl = None
+_logger = logging.getLogger(__name__)
+
+
+class SyncDataExec(models.Model):
+    _name = "sync.data.exec"
+    _description = "Synchronisation with Excel"
+    _inherit = ["mail.activity.mixin", "mail.thread"]
+    _order = "id desc"
+
+    name = fields.Char(compute="_compute_name", tracking=True)
+
+    state = fields.Selection(
+        [
+            ("upload", "Téléversement"),
+            ("summary", "Résumé"),
+        ],
+        default="upload",
+        required=True,
+        tracking=True,
+    )
+
+    notes = fields.Html(string="Notes", readonly=True, tracking=True)
+
+    sync_model_ids = fields.Many2many(
+        "sync.model",
+        string="Template sync",
+        tracking=True,
+    )
+
+    transform_id = fields.Many2one(
+        "sync.data.transform",
+        string="Transformation",
+        readonly=True,
+        help="Dernière feuille de transformation",
+        tracking=True,
+    )
+
+    what_import = fields.Selection(
+        selection=[("default", "Default")],
+        string="Quoi importer",
+        default="default",
+        tracking=True,
+    )
+
+    context_name = fields.Selection(
+        selection=[], string="Context name", tracking=True
+    )
+
+    has_modification = fields.Boolean(tracking=True)
+
+    modif_count = fields.Integer(tracking=True, readonly=True)
+
+    create_count = fields.Integer(tracking=True, readonly=True)
+
+    has_error = fields.Boolean(tracking=True)
+
+    has_error_msg = fields.Text(tracking=True)
+
+    sync_data_write_ids = fields.One2many(
+        comodel_name="mail.tracking.value",
+        inverse_name="sync_data_exec_id",
+        domain=[("field_id.name", "!=", "file_no_line")],
+    )
+
+    send_message_at_create_or_modify_sync = fields.Boolean(
+        string="Send notification at change", default=True
+    )
+
+    send_message_force = fields.Boolean(string="Force Send notification")
+
+    time_execution_extract_start = fields.Datetime(
+        readonly=True, tracking=True
+    )
+
+    time_execution_extract_end = fields.Datetime(readonly=True, tracking=True)
+
+    time_duration_extract = fields.Float(
+        compute="_compute_time_duration_extract", store=True, tracking=True
+    )
+
+    time_duration_extract_fr = fields.Char(
+        compute="_compute_time_duration_extract", store=True, tracking=True
+    )
+
+    sync_data_create_ids = fields.One2many(
+        comodel_name="sync.data.create",
+        inverse_name="sync_data_exec_id",
+        tracking=True,
+    )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super().create(vals_list)
+
+        res.message_subscribe()
+
+        return res
+
+    def message_subscribe(self, partner_ids=None, subtype_ids=None):
+        group_sync_id = self.env.ref(
+            "erplibre_sync_external_data.group_erplibre_sync_external_data_exec_notify"
+        )
+        if partner_ids:
+            partner_ids += group_sync_id.users.mapped("partner_id").ids
+        else:
+            partner_ids = group_sync_id.users.mapped("partner_id").ids
+
+        return super(SyncDataExec, self).message_subscribe(
+            partner_ids=partner_ids, subtype_ids=subtype_ids
+        )
+
+    def action_send_message_notification(self):
+        for rec in self:
+            if not (
+                rec.send_message_force
+                or (
+                    rec.send_message_at_create_or_modify_sync
+                    and any(
+                        [rec.sync_data_create_ids, rec.sync_data_write_ids]
+                    )
+                )
+            ):
+                continue
+
+            mail_template = self.env.ref(
+                "erplibre_sync_external_data.mail_template_erplibre_sync_external_data_notif_change"
+            )
+
+            partners = rec.message_partner_ids
+            partners -= self.env.user.partner_id
+            partners = partners.filtered(lambda p: p.email)
+
+            if not partners:
+                continue
+            body_html = mail_template._render_field(
+                "body_html", [rec.id], compute_lang=True
+            )[rec.id]
+            body_html = Markup(body_html)
+            subject = mail_template._render_field(
+                "subject", rec.ids, compute_lang=True
+            )[rec.id]
+
+            rec.message_post(
+                body=body_html,
+                subject=subject,
+                message_type="comment",
+                subtype_xmlid="mail.mt_comment",
+                partner_ids=partners.ids,  # optionnel
+            )
+
+    @api.depends("what_import", "time_execution_extract_end")
+    def _compute_name(self):
+        for rec in self:
+            if rec.what_import:
+                selection = dict(self._fields["what_import"].selection)
+                selection_name = (
+                    selection.get(rec.what_import) or rec.what_import
+                )
+                if rec.time_execution_extract_end:
+                    rec.name = f"{selection_name} - {rec.time_execution_extract_end} UDT"
+                else:
+                    rec.name = selection_name
+            else:
+                rec.name = False
+
+    @api.depends("time_execution_extract_start", "time_execution_extract_end")
+    def _compute_time_duration_extract(self):
+        for rec in self:
+            if (
+                not rec.time_execution_extract_start
+                and not rec.time_execution_extract_end
+            ):
+                rec.time_duration_extract = 0
+                rec.time_duration_extract_fr = _("Not running")
+            elif (
+                rec.time_execution_extract_start
+                and not rec.time_execution_extract_end
+            ):
+                rec.time_duration_extract = 0
+                rec.time_duration_extract_fr = _("Running")
+            else:
+                if (
+                    not rec.time_execution_extract_start
+                    and rec.time_execution_extract_end
+                ):
+                    # Strange case...
+                    rec.time_execution_extract_start = (
+                        rec.time_execution_extract_end
+                    )
+                if (
+                    rec.time_execution_extract_end
+                    < rec.time_execution_extract_start
+                ):
+                    duration_seconds = 0
+                else:
+                    delta = (
+                        rec.time_execution_extract_end
+                        - rec.time_execution_extract_start
+                    )
+                    duration_seconds = int(delta.total_seconds())
+
+                rec.time_duration_extract = float(duration_seconds)
+                rec.time_duration_extract_fr = rec._format_duration_fr(
+                    duration_seconds
+                )
+
+    def _format_duration_fr(self, seconds):
+        """Retourne une durée lisible en français à partir d'un nombre de secondes."""
+        if not seconds or seconds < 0:
+            return _("0 seconde")
+
+        days, rem = divmod(seconds, 86400)
+        hours, rem = divmod(rem, 3600)
+        minutes, seconds = divmod(rem, 60)
+
+        parts = []
+
+        if days:
+            # Les chaînes English seront traduites en FR via les .po
+            parts.append(_("%d day(s)") % days)
+        if hours:
+            parts.append(_("%d hour(s)") % hours)
+        if minutes:
+            parts.append(_("%d minute(s)") % minutes)
+        if seconds:
+            parts.append(_("%d second(s)") % seconds)
+
+        return ", ".join(parts) if parts else _("0 second")
+
+    def action_process_sync_data_async(self):
+        for rec in self:
+            rec = rec.exists()
+            if not rec:
+                continue
+            if "queue_job" in conf.server_wide_modules:
+                rec.with_delay().action_process_sync_data()
+            else:
+                rec.action_process_sync_data()
+
+    def action_revert_data(self):
+        for rec in self:
+            for diff_id in rec.sync_data_write_ids:
+                rec_id = self.env[diff_id.model].browse(diff_id.res_id)
+                if diff_id.field_id.ttype in ["date", "datetime"]:
+                    setattr(
+                        rec_id,
+                        diff_id.field_id.name,
+                        diff_id.old_value_datetime,
+                    )
+                elif diff_id.field_id.ttype in ["int"]:
+                    setattr(
+                        rec_id,
+                        diff_id.field_id.name,
+                        diff_id.old_value_integer,
+                    )
+                elif diff_id.field_id.ttype in ["float", "monetary"]:
+                    setattr(
+                        rec_id, diff_id.field_id.name, diff_id.old_value_float
+                    )
+                elif diff_id.field_id.ttype in ["char"]:
+                    setattr(
+                        rec_id, diff_id.field_id.name, diff_id.old_value_char
+                    )
+                elif diff_id.field_id.ttype in ["text"]:
+                    setattr(
+                        rec_id, diff_id.field_id.name, diff_id.old_value_text
+                    )
+
+    def action_process_transform_async(self):
+        for rec in self:
+            rec = rec.exists()
+            if not rec:
+                continue
+            if "queue_job" in conf.server_wide_modules:
+                rec.with_delay().action_process_transform({})
+            else:
+                rec.action_process_transform({})
+
+    def action_process_sync_data(self):
+        self.ensure_one()
+        for rec in self:
+            if not rec.time_execution_extract_start:
+                rec.time_execution_extract_start = fields.Datetime.now()
+
+            if rec.what_import == "default":
+                rec.action_import_default_algo()
+
+        # Edit me
+        return {}
+
+    def action_import_default_algo(self):
+        for rec in self:
+            if not rec.file:
+                raise ValidationError("Missing file")
+            # TODO depend from erplibre_sync_external_data_spreadsheet, maybe merge modules
+            # Add file
+            decode_raw = base64.b64decode(rec.file)
+            encode_raw = base64.b64encode(rec.file)
+            mimetype = guess_mimetype(decode_raw)
+            # TODO how can retrieve original name
+            attachment_id = self.env["ir.attachment"].create(
+                {
+                    "name": "default_file.xlsx",
+                    "datas": encode_raw,
+                    "res_model": rec._name,
+                    "res_id": rec.id,
+                    "mimetype": mimetype,
+                }
+            )
+            subtype_note = self.env.ref("mail.mt_note")
+            message = self.env["mail.message"].create(
+                [
+                    {
+                        "model": rec._name,
+                        "res_id": rec.id,
+                        "body": "Fichier ajouté automatiquement.",
+                        "message_type": "comment",
+                        "subtype_id": subtype_note.id,
+                        "author_id": self.env.user.partner_id.id,
+                        "attachment_ids": attachment_id.ids,
+                    }
+                ]
+            )
+
+            filepath_byte = BytesIO(base64.b64decode(rec.file))
+            for sync_model_id in rec.sync_model_ids:
+                rec.extract_automated_excel(
+                    filepath_byte,
+                    sync_model_id,
+                )
+            rec.end_time_execution()
+
+    def extract_automated_excel(self, filepath, sync_model_id, is_excel=False):
+        last_id_tracking = (
+            self.env["mail.tracking.value"]
+            .search([], order="id desc", limit=1)
+            .id
+        )
+        dct_model_data_to_track = defaultdict(list)
+        index = 0
+        lst_got_header = []
+        lst_line = []
+        last_repeat_column_data = []
+        has_different_header = False
+
+        file_name_type = sync_model_id.name
+        model_name = sync_model_id.model_name
+
+        metadata = json.loads(sync_model_id.spreadsheet_extraction_metadata)
+        lst_header_json = metadata.get("header", [])
+        lst_header_json_extend = lst_header_json + [
+            ("File no line", "file_no_line")
+        ]
+        lst_expected_header = [a[0] for a in lst_header_json]
+        index_line_header = metadata.get("index_line_header", 0)
+        nb_line_header = metadata.get("nb_line_header", 1)
+        callback_init_read_header = metadata.get(
+            "callback_init_read_header", None
+        )
+        lst_sync_field = metadata.get("sync", [])
+        ignore_last_line = metadata.get("ignore_last_line", 0)
+        index_last_line = metadata.get("index_last_line", 0)
+        ignore_data = metadata.get("ignore_data", [])
+        ignore_validation_header = metadata.get(
+            "ignore_validation_header", False
+        )
+        sheet_name = metadata.get("sheet_name", "")
+        filetype = metadata.get("filetype", "")
+
+        option_level = metadata.get("option_level", {})
+        # repeat_column will ignore the line when need repetition and will move data to next line
+        repeat_column = option_level.get("repeat_column", [])
+        # duplicate_column_when_empty will replicate the value when empty, like buffering
+        lst_duplicate_column_when_empty = option_level.get(
+            "duplicate_column_when_empty", []
+        )
+        buffer_duplicate_column_when_empty = [None] * len(lst_header_json)
+
+        lst_index_sync_header = [
+            i
+            for i, a in enumerate(lst_header_json_extend)
+            if a[1] in lst_sync_field
+        ]
+
+        if filetype == "xlsx":
+            is_excel = True
+            self._ensure_openpyxl()
+            wb = openpyxl.load_workbook(filepath, data_only=True)
+            if not wb.sheetnames:
+                raise ValueError("Missing sheet from xlsx file.")
+            if sheet_name in wb.sheetnames:
+                ws = wb[sheet_name]
+            else:
+                ws = wb[wb.sheetnames[0]]
+            reader = ws.iter_rows()
+        elif filetype == "csv":
+            index -= 1
+            if type(filepath) is str:
+                reader = []
+                # It's a path
+                with open(filepath, newline="", encoding="utf-8") as f:
+                    lst_line_csv_reader = csv.reader(f)
+                    for row in lst_line_csv_reader:
+                        reader.append(list(row))
+            else:
+                text_stream = io.TextIOWrapper(filepath, encoding="utf-8")
+                reader = csv.reader(text_stream)
+        else:
+            _logger.error("Unsupported filetype")
+            return
+
+        finish_read_header = False
+        for row in reader:
+            # if has_different_header:
+            #     break
+            index += 1
+            if index_line_header > index or (
+                index_last_line > 0 and index > index_last_line
+            ):
+                continue
+            if ignore_validation_header:
+                lst_got_header = lst_expected_header
+
+            if (
+                index_line_header
+                < index
+                <= index_line_header + nb_line_header - 1
+            ):
+                is_other_header = True
+            else:
+                is_other_header = False
+
+            if (
+                index_line_header
+                <= index
+                <= index_line_header + nb_line_header - 1
+            ):
+
+                if is_excel:
+                    lst_row_text = []
+                    for a in row:
+                        if a.value is None:
+                            txt = ""
+                        else:
+                            txt = (
+                                a.value.strip()
+                                .replace("\n", " ")
+                                .replace("\t", " ")
+                            )
+                        lst_row_text.append(txt)
+                else:
+                    # Some csv has problem with header '""'
+                    lst_row_text = [
+                        a.lstrip("\ufeff")
+                        .strip()
+                        .strip('"')
+                        .replace("\n", "")
+                        .replace("\t", "")
+                        for a in row
+                    ]
+                for item_row_i, item_row in enumerate(lst_row_text):
+                    # if not item_row:
+                    #     _logger.error(f"Missing row for file {filepath}")
+                    #     continue
+                    item_row_transform = item_row.strip()
+
+                    if len(lst_header_json) <= item_row_i:
+                        _logger.warning(
+                            f"Got difference header, missing index {item_row_i} '{lst_header_json}', and '{lst_got_header}' "
+                            f"check filepath '{filepath}' filetype '{file_name_type}'"
+                        )
+                        has_different_header = True
+                    elif (
+                        item_row_transform != lst_header_json[item_row_i][0]
+                        and not is_other_header
+                    ):
+                        _logger.warning(
+                            f"Got difference header '{item_row_transform}' and '{lst_header_json[item_row_i][0]}', "
+                            f"check filepath '{filepath}' filetype '{file_name_type}'"
+                        )
+                        has_different_header = True
+                    if is_other_header:
+                        # Append if multiple header
+                        if len(lst_got_header) > item_row_i:
+                            lst_got_header[
+                                item_row_i
+                            ] += f" {item_row_transform}"
+                    else:
+                        lst_got_header.append(item_row_transform)
+            elif index > index_line_header:
+                if not finish_read_header and callback_init_read_header:
+                    cb_init_read_header = getattr(
+                        self, callback_init_read_header
+                    )
+                    if cb_init_read_header:
+                        lst_got_header = cb_init_read_header(
+                            lst_got_header, lst_expected_header
+                        )
+                finish_read_header = True
+                lst_row_text = []
+                for index_cell, cell_sheet in enumerate(row):
+                    if index_cell >= len(lst_got_header):
+                        continue
+                    if index_cell >= len(lst_header_json):
+                        continue
+                    # if lst_got_header[index_cell] ==
+                    dct_mapping_value = {}
+                    if len(lst_header_json[index_cell]) > 2:
+                        dct_mapping_value = lst_header_json[index_cell][2]
+                    if is_excel:
+                        if (
+                            type(cell_sheet.value) == float
+                            and cell_sheet.number_format == "0"
+                        ):
+                            value = int(cell_sheet.value)
+                        elif (
+                            cell_sheet.number_format == "mm-dd-yy"
+                            and cell_sheet.base_date
+                        ):
+                            value = cell_sheet.base_date
+                        else:
+                            value = cell_sheet.value
+                    else:
+                        value = cell_sheet
+                    if value in ignore_data:
+                        value = False
+                    if dct_mapping_value:
+                        new_value = dct_mapping_value.get(value)
+                        if new_value:
+                            value = new_value
+                    lst_row_text.append(value)
+                if any(
+                    lst_row_text[1:]
+                ):  # TODO it's not a generic check, or don't use repeat, maybe need from index_sync_header
+                    lst_row_text.append(index)
+                    if lst_duplicate_column_when_empty:
+                        for index_duplicate in lst_duplicate_column_when_empty:
+                            if 0 > index_duplicate < len(lst_row_text):
+                                raise ValidationError(
+                                    f"Check your configuration, duplicate_column_when_empty {lst_duplicate_column_when_empty}, index is wrong with values."
+                                )
+                            value = lst_row_text[index_duplicate]
+                            if value:
+                                buffer_duplicate_column_when_empty[
+                                    index_duplicate
+                                ] = value
+                            else:
+                                lst_row_text[index_duplicate] = (
+                                    buffer_duplicate_column_when_empty[
+                                        index_duplicate
+                                    ]
+                                )
+                    # Support repeat column
+                    if repeat_column:
+                        detect_column_repeat = [
+                            lst_row_text[a] for a in repeat_column
+                        ]
+                        if any(detect_column_repeat):
+                            last_repeat_column_data = lst_row_text
+                        else:
+                            if last_repeat_column_data:
+                                for i in repeat_column:
+                                    lst_row_text[i] = last_repeat_column_data[
+                                        i
+                                    ]
+                                lst_line.append(lst_row_text)
+                            else:
+                                _logger.warning(
+                                    "Missing information from repeat column option."
+                                )
+                    else:
+                        if lst_sync_field:
+                            # Validate sync value exist
+                            lst_value_to_check_sync = [
+                                lst_row_text[a] for a in lst_index_sync_header
+                            ]
+                            # TODO support [0], because it's false
+                            if any(lst_value_to_check_sync):
+                                lst_line.append(lst_row_text)
+                        else:
+                            lst_line.append(lst_row_text)
+
+        if has_different_header and not lst_line:
+            _logger.error(
+                f"Wrong header file '{file_name_type}', expected header '{lst_expected_header}' and got '{lst_got_header}'"
+            )
+            return
+        if ignore_last_line:
+            lst_line = lst_line[: -1 * ignore_last_line]
+        lst_value = []
+        for line in lst_line:
+            dct_value = {}
+            lst_value.append(dct_value)
+            field_value_file_no_line = -1
+            for index_column, column_value in enumerate(line):
+                if index_column == len(line) - 1:
+                    field_name = "file_no_line"
+                    field_value_file_no_line = column_value
+                else:
+                    field_name = lst_header_json[index_column][1]
+
+                field_type = self.env[model_name]._fields.get(field_name).type
+                dct_value[field_name] = column_value
+                if field_type in ["date", "datetime"]:
+                    if type(column_value) != fields.datetime:
+                        self._transform_date(dct_value, field_name)
+                elif field_type in ["boolean"]:
+                    if type(column_value) is str:
+                        dct_value[field_name] = column_value.lower() in [
+                            "o",
+                            "y",
+                            "yes",
+                            "oui",
+                            "true",
+                        ]
+                elif field_type in ["integer"]:
+                    if type(column_value) == str:
+                        if column_value:
+                            # keep only char for int
+                            column_value_int = re.sub(
+                                r"[^\d-]", "", column_value
+                            ).replace(",", ".")
+                            if (
+                                column_value.replace(" ", "")
+                                != column_value_int
+                            ):
+                                _logger.error(
+                                    f"Detect int {column_value_int} from char {column_value}"
+                                )
+                            dct_value[field_name] = (
+                                int(column_value_int)
+                                if column_value_int
+                                else 0
+                            )
+                        else:
+                            dct_value[field_name] = 0
+                elif field_type in ["float", "monetary"]:
+                    if type(column_value) == str:
+                        column_value = column_value.replace("$", "")
+                        if column_value:
+                            # keep only char for float
+                            column_value_float = re.sub(
+                                r"[^\d,.-]", "", column_value
+                            ).replace(",", ".")
+                            if (
+                                column_value.replace(" ", "")
+                                != column_value_float
+                            ):
+                                _logger.error(
+                                    f"Detect float {column_value_float} from char {column_value}"
+                                )
+                            dct_value[field_name] = (
+                                float(column_value_float)
+                                if column_value_float
+                                else 0.0
+                            )
+                        else:
+                            dct_value[field_name] = 0.0
+                elif field_type in ["char", "text"]:
+                    if type(column_value) != str:
+                        if column_value:
+                            dct_value[field_name] = str(column_value)
+                        else:
+                            dct_value[field_name] = ""
+
+            model_record_search = [
+                (a, "=", dct_value[a]) for a in lst_sync_field
+            ]
+
+            model_record_id = self.env[model_name].search(model_record_search)
+
+            if len(model_record_id) > 1:
+                _logger.warning(
+                    f"Find multiple record with index {lst_sync_field}"
+                )
+                lst_model_record_id = [
+                    a
+                    for a in model_record_id
+                    if a.file_no_line == field_value_file_no_line
+                ]
+                if len(lst_model_record_id) > 1 or not lst_model_record_id:
+                    raise Exception(
+                        f"Cannot compute duplicate field, check {[a.id for a in model_record_id]} of {file_name_type}"
+                    )
+                model_record_id = lst_model_record_id[0]
+
+            if not model_record_id:
+                model_record_id = self.env[model_name].create([dct_value])
+                sync_data_create_value = {
+                    "res_model": model_name,
+                    "res_id": model_record_id.id,
+                    "sync_data_exec_id": self.id,
+                }
+                self.env["sync.data.create"].create([sync_data_create_value])
+            else:
+                model_record_id.write(dct_value)
+
+            # Memorize modification for tracking
+            dct_model_data_to_track[model_name].append(model_record_id.id)
+
+        # Detect tracking
+        if dct_model_data_to_track:
+            self.env.cr.commit()
+            for model_name, lst_res_id in dct_model_data_to_track.items():
+                tracking_vals = self.env["mail.tracking.value"].search(
+                    [
+                        ("mail_message_id.model", "=", model_name),
+                        ("mail_message_id.res_id", "in", lst_res_id),
+                        ("id", ">", last_id_tracking),
+                    ]
+                )
+                if tracking_vals:
+                    tracking_vals.sync_data_exec_id = self.id
+
+    def action_process_transform(self, sync_data_transform_value: dict = None):
+        self.ensure_one()
+        for rec in self:
+            rec.time_execution_extract_start = fields.Datetime.now()
+            if not sync_data_transform_value:
+                sync_data_transform_value = {}
+            if "context_name" not in sync_data_transform_value.keys():
+                if self.context_name:
+                    sync_data_transform_value["context_name"] = (
+                        self.context_name
+                    )
+                else:
+                    sync_data_transform_value["context_name"] = "default"
+
+            sync_data_transform_value["sync_model_ids"] = [
+                (6, 0, rec.sync_model_ids.ids)
+            ]
+            rec.transform_id = self.env["sync.data.transform"].create(
+                [sync_data_transform_value]
+            )
+            rec.transform_id.action_transform_algo()
+        return {}
+
+    def end_time_execution(self):
+        for rec in self:
+            rec.update_modification_value()
+            rec.action_send_message_notification()
+            rec.write(
+                {
+                    # "detected_rows": detected,
+                    # "imported_rows": imported,
+                    # "notes": notes,
+                    "time_execution_extract_end": fields.Datetime.now(),
+                    "state": "summary",
+                }
+            )
+
+    def update_modification_value(self):
+        for rec in self:
+            rec.create_count = len(rec.sync_data_create_ids)
+            rec.modif_count = len(rec.sync_data_write_ids)
+            rec.has_modification = rec.modif_count or rec.create_count
+
+    def action_copy(self):
+        self.ensure_one()
+
+        copied_record = self.copy()
+        copied_record.has_error = False
+        copied_record.has_error_msg = False
+        copied_record.action_process_sync_data()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": self._name,
+            "view_mode": "form",
+            "res_id": copied_record.id,
+            "target": "current",
+        }
+
+    def _transform_date(self, dct_data, key):
+        data = dct_data.get(key)
+        if type(data) is int:
+            # TODO support month
+            data = datetime.strptime(str(data), "%Y").date()
+            dct_data[key] = data
+        elif type(data) is str:
+            try:
+                if "/" in data:
+                    data = datetime.strptime(data, "%d/%m/%Y").date()
+                    dct_data[key] = data
+                elif "-" in data:
+                    data = datetime.strptime(data, "%d-%m-%Y").date()
+                    dct_data[key] = data
+                else:
+                    # TODO show this error
+                    dct_data[key] = False
+            except Exception as e:
+                try:
+                    if "/" in data:
+                        data = datetime.strptime(data, "%Y/%m/%d").date()
+                        dct_data[key] = data
+                    elif "-" in data:
+                        data = datetime.strptime(data, "%Y-%m-%d").date()
+                        dct_data[key] = data
+                    else:
+                        # TODO show this error
+                        dct_data[key] = False
+                except Exception as e:
+                    try:
+                        if "/" in data:
+                            data = datetime.strptime(data, "%d/%b/%y").date()
+                            dct_data[key] = data
+                        elif "-" in data:
+                            data = datetime.strptime(data, "%d-%b-%y").date()
+                            dct_data[key] = data
+                        else:
+                            # TODO show this error
+                            dct_data[key] = False
+                    except Exception as e:
+                        try:
+                            if "/" in data:
+                                data = datetime.strptime(
+                                    data, "%d/%B/%y"
+                                ).date()
+                                dct_data[key] = data
+                            elif "-" in data:
+                                data = datetime.strptime(
+                                    data, "%d-%B-%y"
+                                ).date()
+                                dct_data[key] = data
+                            else:
+                                # TODO show this error
+                                dct_data[key] = False
+                        except Exception as e:
+                            MOIS = {
+                                "janv": 1,
+                                "jan": 1,
+                                "févr": 2,
+                                "fevr": 2,
+                                "fév": 2,
+                                "mars": 3,
+                                "avr": 4,
+                                "mai": 5,
+                                "juin": 6,
+                                "juil": 7,
+                                "jul": 7,
+                                "août": 8,
+                                "aout": 8,
+                                "aoû": 8,
+                                "sept": 9,
+                                "oct": 10,
+                                "nov": 11,
+                                "déc": 12,
+                                "dec": 12,
+                            }
+                            for month_key, month_value in MOIS.items():
+                                data = data.lower().replace(
+                                    month_key, str(month_value)
+                                )
+                            try:
+                                if "/" in data:
+                                    data = datetime.strptime(
+                                        data, "%d/%m/%y"
+                                    ).date()
+                                    dct_data[key] = data
+                                elif "-" in data:
+                                    data = datetime.strptime(
+                                        data, "%d-%m-%y"
+                                    ).date()
+                                    dct_data[key] = data
+                                else:
+                                    # TODO show this error
+                                    dct_data[key] = False
+                            except Exception as e:
+                                try:
+                                    if "/" in data:
+                                        data = datetime.strptime(
+                                            data, "%m/%d/%y"
+                                        ).date()
+                                        dct_data[key] = data
+                                    elif "-" in data:
+                                        data = datetime.strptime(
+                                            data, "%m-%d-%y"
+                                        ).date()
+                                        dct_data[key] = data
+                                    else:
+                                        # TODO show this error
+                                        dct_data[key] = False
+                                except Exception as e:
+                                    try:
+                                        if "/" in data:
+                                            data = datetime.strptime(
+                                                data, "%m/%d/%Y"
+                                            ).date()
+                                            dct_data[key] = data
+                                        elif "-" in data:
+                                            data = datetime.strptime(
+                                                data, "%m-%d-%Y"
+                                            ).date()
+                                            dct_data[key] = data
+                                        else:
+                                            # TODO show this error
+                                            dct_data[key] = False
+                                    except Exception as e:
+                                        dct_data[key] = False
+                                        _logger.error(
+                                            f"Cannot parse data to date '{data}'"
+                                        )
+
+    def transform_datetime(self, user_datetime):
+        if user_datetime:
+            tz_name = (
+                self.env.user.tz or "America/Toronto"
+            )  # évite un offset fixe -4/-5
+            tz = pytz.timezone(tz_name)
+
+            # date_debut est un Date => choisir une heure locale (ici 00:00)
+            dt_local = datetime.combine(user_datetime, time(0, 0, 0))
+            dt_local = tz.localize(
+                dt_local
+            )  # rend l'heure "aware" (avec le TZ)
+            dt_utc = dt_local.astimezone(
+                pytz.UTC
+            )  # convertit en UTC pour stockage
+
+            return fields.Datetime.to_string(dt_utc)
+        else:
+            return user_datetime
