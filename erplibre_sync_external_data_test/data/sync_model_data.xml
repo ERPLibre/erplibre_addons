@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_model_test_entry_csv" model="sync.model">
+        <field name="name">Test Sync Entry CSV</field>
+        <field name="model_name">erplibre.sync.test.entry</field>
+        <field name="spreadsheet_extraction_metadata">{"filetype": "csv", "index_line_header": 0, "nb_line_header": 1, "header": [["Code projet", "project_code"], ["Nom client", "client_name"], ["Courriel client", "client_email"], ["Opportunité", "opportunity_name"], ["Montant", "amount"], ["Date prévue", "expected_date"]], "sync": ["project_code"], "bind": [{"bind_field_reverse": "crm_lead_id", "method_call": "action_transform_test_entries", "order_lines": [{"product_name": "Services conseil", "qty": 10, "price_unit": 150.0}, {"product_name": "Formation", "qty": 2, "price_unit": 500.0}]}]}</field>
+    </record>
+
+    <record id="sync_model_test_entry_xlsx" model="sync.model">
+        <field name="name">Test Sync Entry XLSX</field>
+        <field name="model_name">erplibre.sync.test.entry</field>
+        <field name="spreadsheet_extraction_metadata">{"filetype": "xlsx", "index_line_header": 1, "nb_line_header": 1, "sheet_name": "Données", "header": [["Code projet", "project_code"], ["Nom client", "client_name"], ["Courriel client", "client_email"], ["Opportunité", "opportunity_name"], ["Montant", "amount"], ["Date prévue", "expected_date"]], "sync": ["project_code"], "bind": [{"bind_field_reverse": "crm_lead_id", "method_call": "action_transform_test_entries", "order_lines": [{"product_name": "Services conseil", "qty": 10, "price_unit": 150.0}, {"product_name": "Formation", "qty": 2, "price_unit": 500.0}]}]}</field>
+    </record>
+</odoo>
