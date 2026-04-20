@@ -158,7 +158,7 @@ class DevopsIdeBreakpoint(models.Model):
             if log_all:
                 try:
                     return [int(a) for a in log_all.split("\n")]
-                except:
+                except ValueError:
                     raise Exception(f"Wrong output command : {cmd}\n{log_all}")
 
     def get_breakpoint_info(self, ws, new_project_id=None, condition=None):
