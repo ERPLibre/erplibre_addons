@@ -692,8 +692,17 @@ class SyncDataExec(models.Model):
                 self.context_name or "default"
             )
 
+        if self.sync_model_ids:
+            sync_model_ids = self.sync_model_ids
+        else:
+            sync_model_name = list(
+                set([a.res_model for a in self.sync_data_create_ids])
+            )
+            sync_model_ids = self.env["sync.model"].search(
+                [("model_name", "=", sync_model_name)]
+            )
         sync_data_transform_value["sync_model_ids"] = [
-            (6, 0, self.sync_model_ids.ids)
+            (6, 0, sync_model_ids.ids)
         ]
         self.transform_id = self.env["sync.data.transform"].create(
             [sync_data_transform_value]

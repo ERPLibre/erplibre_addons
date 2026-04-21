@@ -1,4 +1,5 @@
 import hashlib
+import json
 import logging
 
 import orjson
@@ -169,7 +170,9 @@ class SyncDataTransform(models.Model):
             rec.action_transform_default(rec.sync_model_ids, do_link)
         return {}
 
-    def action_transform_default(self, sync_model_ids, do_link):
+    def action_transform_default(
+        self, sync_model_ids, do_link, force_all_data=False
+    ):
         for rec in self:
             sync_data_exec_id = self.env["sync.data.exec"].search(
                 [("transform_id", "=", rec.id)], limit=1
@@ -195,27 +198,34 @@ class SyncDataTransform(models.Model):
                     if not bind_field_reverse:
                         continue
 
-                    created_ids = [
-                        a.res_id
-                        for a in sync_data_exec_id.sync_data_create_ids
-                        if a.res_model == sync_model_id.model_name
-                    ]
-                    sync_model_mirror_create_ids = self.env[
-                        sync_model_id.model_name
-                    ].browse(created_ids)
+                    sync_model_mirror_create_ids = None
+                    if force_all_data:
+                        sync_model_mirror_create_ids = self.env[
+                            sync_model_id.model_name
+                        ].search([])
+                    elif sync_data_exec_id:
+                        created_ids = [
+                            a.res_id
+                            for a in sync_data_exec_id.sync_data_create_ids
+                            if a.res_model == sync_model_id.model_name
+                        ]
+                        sync_model_mirror_create_ids = self.env[
+                            sync_model_id.model_name
+                        ].browse(created_ids)
 
-                    method_call = bind_config.get("method_call")
-                    if not method_call:
-                        cb = rec.update_bind_transform
-                    else:
-                        cb = getattr(rec, method_call)
-                    cb(
-                        sync_model_mirror_create_ids,
-                        sync_model_id.model_name,
-                        bind_config,
-                        bind_field_reverse,
-                        do_link=link_only,
-                    )
+                    if sync_model_mirror_create_ids:
+                        method_call = bind_config.get("method_call")
+                        if not method_call:
+                            cb = rec.update_bind_transform
+                        else:
+                            cb = getattr(rec, method_call)
+                        cb(
+                            sync_model_mirror_create_ids,
+                            sync_model_id.model_name,
+                            bind_config,
+                            bind_field_reverse,
+                            do_link=link_only,
+                        )
 
     def _transform_find_or_create(self, model_name, domain, vals):
         """Find existing record matching domain, or create it with vals."""
@@ -239,7 +249,7 @@ class SyncDataTransform(models.Model):
             return
 
         for model_key, bind_model_config in bind_field_model.items():
-            bind_fields = bind_model_config.get("bindings")
+            bind_fields = bind_model_config.get("lst_bind")
 
             if not bind_fields:
                 continue
@@ -457,7 +467,7 @@ class SyncDataTransform(models.Model):
             transform_exec_values["depend_ids"] = dependency_links
 
         hash_transform = hashlib.sha256(
-            orjson.dumps(transform_exec_values).encode()
+            json.dumps(transform_exec_values).encode()
         ).hexdigest()
         transform_exec_id = self.env["sync.data.transform.exec"].search(
             [
@@ -521,7 +531,7 @@ class SyncDataTransform(models.Model):
             rec_name = self.env[model_key]._rec_name
             model_value[rec_name] = record_name
 
-            modification_json = orjson.dumps(model_value)
+            modification_json = json.dumps(model_value)
             transform_depends = list(set(transform_depends))
             associate_key = f"{model_key}.create.{rec_name}.{record_name}"
             note = "Create bind_field_model"
