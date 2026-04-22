@@ -224,6 +224,7 @@ class SyncDataTransform(models.Model):
                             sync_model_id.model_name,
                             bind_config,
                             bind_field_reverse,
+                            metadata,
                             do_link=link_only,
                         )
 
@@ -240,6 +241,7 @@ class SyncDataTransform(models.Model):
         model_name,
         bind_config,
         bind_field_reverse,
+        metadata,
         do_link=False,
     ):
         transform_exec_batch = []
@@ -247,12 +249,17 @@ class SyncDataTransform(models.Model):
         bind_field_model = bind_config.get("bind_field_model")
         if not bind_field_model:
             return
+        sync_field = metadata.get("sync")
 
         for model_key, bind_model_config in bind_field_model.items():
-            bind_fields = bind_model_config.get("lst_bind")
+            bind_fields = bind_model_config.get("binding")
 
             if not bind_fields:
                 continue
+            model_sync_field_data = [
+                a for a in bind_fields if a.get("mirror_field") in sync_field
+            ]
+
             default_fields = bind_model_config.get("default_field", {})
             rec_name = bind_model_config.get("rec_name", None)
 
@@ -266,26 +273,32 @@ class SyncDataTransform(models.Model):
             else:
                 mirror_groups = {None: mirror_ids}
 
-            for rec in self:
-                model_field_name = bind_fields[0][0]
-                model_sync_name = bind_fields[0][1]
-                for key, search_values in mirror_groups.items():
-                    for mirror_id in search_values:
-                        model_value = {}
-                        project_number = getattr(mirror_id, model_sync_name)
-                        if not project_number:
-                            continue
-                        # Support model
-                        model_id = self.env[model_key].search(
-                            [
-                                (
-                                    model_field_name,
-                                    "=",
-                                    project_number,
-                                )
-                            ]
+            for key, search_values in mirror_groups.items():
+                for mirror_id in search_values:
+                    model_condition = []
+                    unique_name = ""
+                    for field_sync_field_data in model_sync_field_data:
+                        field_value = getattr(
+                            mirror_id,
+                            field_sync_field_data.get("mirror_field"),
                         )
-
+                        if not field_value:
+                            continue
+                        field_name = field_sync_field_data.get("field_name")
+                        if type(field_name) is str:
+                            model_condition.append(
+                                (
+                                    field_sync_field_data.get("field_name"),
+                                    "=",
+                                    field_value,
+                                )
+                            )
+                        unique_name += field_value + " "
+                    unique_name = unique_name.strip()
+                    # Support model
+                    model_id = self.env[model_key].search(model_condition)
+                    for rec in self:
+                        model_value = {}
                         # TODO option to create directly data without transformation
                         if not do_link:
                             transform_depends, dependency_links = (
@@ -298,7 +311,7 @@ class SyncDataTransform(models.Model):
                                 )
                             )
                             rec._bind_transform_model(
-                                project_number,
+                                unique_name,
                                 mirror_id,
                                 model_id,
                                 model_name,
@@ -330,8 +343,9 @@ class SyncDataTransform(models.Model):
         transform_depends = []
         dependency_links = []
         for set_bind in bind_fields:
-            field_name_target = set_bind[0]
-            field_name_mirror = set_bind[1]
+            field_name_target = set_bind.get("field_name")
+            search_field_name = set_bind.get("search_field_name")
+            field_name_mirror = set_bind.get("mirror_field")
             target_field = self.env[model_key]._fields.get(field_name_target)
             if not target_field:
                 raise ValueError(
@@ -343,15 +357,16 @@ class SyncDataTransform(models.Model):
 
             if ttype == "many2one":
                 associate_model = target_field.comodel_name
-                rec_name = self.env[associate_model]._rec_name
+                if not search_field_name:
+                    search_field_name = self.env[associate_model]._rec_name
                 found = self.env[associate_model].search(
-                    [(rec_name, "=", value)]
+                    [(search_field_name, "=", value)]
                 )
                 if found:
                     update_value = found.id
                 else:
                     associate_key = (
-                        f"{associate_model}.create.{rec_name}.{value}"
+                        f"{associate_model}.create.{search_field_name}.{value}"
                     )
                     parent_exec = self.env["sync.data.transform.exec"].search(
                         [
