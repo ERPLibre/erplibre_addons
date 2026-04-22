@@ -195,8 +195,8 @@ class SyncDataTransform(models.Model):
                     if link_only and not do_link:
                         continue
                     bind_field_reverse = bind_config.get("bind_field_reverse")
-                    if not bind_field_reverse:
-                        continue
+                    # if not bind_field_reverse:
+                    #     continue
 
                     sync_model_mirror_create_ids = None
                     if force_all_data:
@@ -254,6 +254,7 @@ class SyncDataTransform(models.Model):
             if not bind_fields:
                 continue
             default_fields = bind_model_config.get("default_field", {})
+            rec_name = bind_model_config.get("rec_name", None)
 
             bind_condition = bind_config.get("bind_condition")
             if bind_condition:
@@ -307,11 +308,12 @@ class SyncDataTransform(models.Model):
                                 dependency_links,
                                 bind_field_reverse,
                                 transform_exec_batch,
+                                rec_name,
                             )
-
-                        need_link = getattr(mirror_id, bind_field_reverse)
-                        if not need_link and model_id:
-                            mirror_id.write({bind_field_reverse: model_id})
+                        if bind_field_reverse:
+                            need_link = getattr(mirror_id, bind_field_reverse)
+                            if not need_link and model_id:
+                                mirror_id.write({bind_field_reverse: model_id})
 
         if transform_exec_batch:
             self.env["sync.data.transform.exec"].create(transform_exec_batch)
@@ -352,7 +354,10 @@ class SyncDataTransform(models.Model):
                         f"{associate_model}.create.{rec_name}.{value}"
                     )
                     parent_exec = self.env["sync.data.transform.exec"].search(
-                        [("associate_key", "=", associate_key)]
+                        [
+                            ("associate_key", "=", associate_key),
+                            ("sync_data_transform_id", "=", self.id),
+                        ]
                     )
                     if not parent_exec:
                         update_value = 0
@@ -379,11 +384,11 @@ class SyncDataTransform(models.Model):
                 )
                 continue
             if default_field.type in ("many2one", "many2many", "one2many"):
-                if default_field.type != "many2one":
-                    _logger.warning(
-                        "many2many/one2many default field not fully implemented for field '%s'",
-                        key,
-                    )
+                # if default_field.type != "many2one":
+                #     _logger.warning(
+                #         "many2many/one2many default field not fully implemented for field '%s'",
+                #         key,
+                #     )
                 comodel_name = default_field.base_field.comodel_name
                 related_model = self.env[comodel_name]
                 values_to_insert = []
@@ -471,6 +476,7 @@ class SyncDataTransform(models.Model):
         ).hexdigest()
         transform_exec_id = self.env["sync.data.transform.exec"].search(
             [
+                "&",
                 "|",
                 (
                     "hash_generic_value",
@@ -482,6 +488,7 @@ class SyncDataTransform(models.Model):
                     "=",
                     associate_key,
                 ),
+                ("sync_data_transform_id", "=", self.id),
             ],
             limit=1,
         )
@@ -524,16 +531,33 @@ class SyncDataTransform(models.Model):
         dependency_links,
         bind_field_reverse,
         transform_exec_batch,
+        rec_name,
     ):
         self.ensure_one()
-        record_name = str(project_number)
         if not model_id:
-            rec_name = self.env[model_key]._rec_name
-            model_value[rec_name] = record_name
+            rec_field_name = self.env[model_key]._rec_name
+            rec_name_value = None
+            if type(rec_name) is str:
+                rec_name_value = getattr(mirror_id, rec_name)
+            elif type(rec_name) is dict:
+                lst_value_rec_name = [
+                    getattr(mirror_id, a) for a in rec_name.get("vars")
+                ]
+                rec_name_value = rec_name.get("string") % tuple(
+                    lst_value_rec_name
+                )
+
+            if rec_name_value:
+                model_value[rec_field_name] = rec_name_value
 
             modification_json = json.dumps(model_value)
             transform_depends = list(set(transform_depends))
-            associate_key = f"{model_key}.create.{rec_name}.{record_name}"
+            if rec_name_value:
+                associate_key = (
+                    f"{model_key}.create.{rec_name}.{rec_name_value}"
+                )
+            else:
+                associate_key = f"{model_key}.create.{rec_name}"
             note = "Create bind_field_model"
             transform_exec_id = self._add_transform(
                 model_key,
@@ -545,22 +569,22 @@ class SyncDataTransform(models.Model):
                 note,
                 mode_b=True,
             )
-
-            modification_json = orjson.dumps(
-                {bind_field_reverse: transform_exec_id.id_depend_name}
-            )
-            transform_exec_batch.append(
-                {
-                    "to_model_name": model_name,
-                    "to_id_ref": mirror_id.id,
-                    "sync_data_transform_id": self.id,
-                    "from_id_ref": model_id.id,
-                    "from_model_name": model_key,
-                    "depend_ids": [(6, 0, transform_exec_id.ids)],
-                    "modification": modification_json,
-                    "method": "write",
-                }
-            )
+            if bind_field_reverse:
+                modification_json = json.dumps(
+                    {bind_field_reverse: transform_exec_id.id_depend_name}
+                )
+                transform_exec_batch.append(
+                    {
+                        "to_model_name": model_name,
+                        "to_id_ref": mirror_id.id,
+                        "sync_data_transform_id": self.id,
+                        "from_id_ref": model_id.id,
+                        "from_model_name": model_key,
+                        "depend_ids": [(6, 0, transform_exec_id.ids)],
+                        "modification": modification_json,
+                        "method": "write",
+                    }
+                )
         else:
             _logger.info(
                 "Model update for '%s' - skipped (not yet implemented)",
