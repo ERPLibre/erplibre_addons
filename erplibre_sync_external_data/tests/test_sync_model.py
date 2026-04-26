@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
-import orjson
+import json
+
 from odoo.tests.common import TransactionCase
 
 
@@ -30,10 +31,18 @@ class TestSyncModel(TransactionCase):
             {
                 "name": "Test With Metadata",
                 "model_name": "res.partner",
-                "spreadsheet_extraction_metadata": orjson.dumps(metadata),
+                "spreadsheet_extraction_metadata": json.dumps(
+                    metadata,
+                    default=self.env[
+                        "sync.data.transform"
+                    ].json_default_serializer,
+                ),
             }
         )
-        loaded = orjson.loads(rec.spreadsheet_extraction_metadata)
+        loaded = json.loads(
+            rec.spreadsheet_extraction_metadata,
+            default=self.env["sync.data.transform"].json_object_hook,
+        )
         self.assertEqual(loaded["filetype"], "csv")
         self.assertEqual(len(loaded["header"]), 2)
 

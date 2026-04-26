@@ -1,12 +1,12 @@
 import base64
 import csv
 import io
+import json
 import logging
 import re
 from collections import defaultdict
 from datetime import date, datetime, time
 
-import orjson
 import pytz
 from markupsafe import Markup
 from odoo import _, api, conf, fields, models
@@ -409,7 +409,10 @@ class SyncDataExec(models.Model):
         file_name_type = sync_model_id.name
         model_name = sync_model_id.model_name
 
-        metadata = orjson.loads(sync_model_id.spreadsheet_extraction_metadata)
+        metadata = json.loads(
+            sync_model_id.spreadsheet_extraction_metadata,
+            default=self.env["sync.data.transform"].json_object_hook,
+        )
         header_config = metadata.get("header", [])
         header_config_ext = header_config + [("File no line", "file_no_line")]
         expected_headers = [a[0] for a in header_config]

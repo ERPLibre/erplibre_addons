@@ -1,8 +1,11 @@
+import base64
 import hashlib
 import json
 import logging
+import uuid
+from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 
-import orjson
 from odoo import api, conf, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -182,7 +185,9 @@ class SyncDataTransform(models.Model):
                 metadata = sync_model_id.spreadsheet_extraction_metadata
                 if not metadata:
                     continue
-                metadata = orjson.loads(metadata)
+                metadata = json.loads(
+                    metadata, object_hook=self.json_object_hook
+                )
                 bindings = metadata.get("bind")
                 if not bindings:
                     continue
@@ -250,18 +255,28 @@ class SyncDataTransform(models.Model):
         if not bind_field_model:
             return
         sync_field = metadata.get("sync")
+        sync_by_mirror_field = bind_config.get("sync_by_mirror_field")
+        sync_by_dest_field = bind_config.get("sync_by_dest_field")
+        if sync_by_mirror_field:
+            sync_field = sync_by_mirror_field
 
         for model_key, bind_model_config in bind_field_model.items():
             bind_fields = bind_model_config.get("binding")
 
             if not bind_fields:
                 continue
-            model_sync_field_data = [
-                a for a in bind_fields if a.get("mirror_field") in sync_field
-            ]
+
+            model_sync_field_data = []
+            for a in bind_fields:
+                if a.get("is_sync"):
+                    model_sync_field_data = [a]
+                    break
+                if a.get("mirror_field") in sync_field:
+                    model_sync_field_data.append(a)
 
             default_fields = bind_model_config.get("default_field", {})
             rec_name = bind_model_config.get("rec_name", None)
+            no_rec_name = bind_model_config.get("no_rec_name", False)
 
             bind_condition = bind_config.get("bind_condition")
             if bind_condition:
@@ -322,6 +337,8 @@ class SyncDataTransform(models.Model):
                                 bind_field_reverse,
                                 transform_exec_batch,
                                 rec_name,
+                                no_rec_name,
+                                sync_by_dest_field,
                             )
                         if bind_field_reverse:
                             need_link = getattr(mirror_id, bind_field_reverse)
@@ -345,6 +362,7 @@ class SyncDataTransform(models.Model):
         for set_bind in bind_fields:
             field_name_target = set_bind.get("field_name")
             search_field_name = set_bind.get("search_field_name")
+            compute_field = set_bind.get("compute_field")
             field_name_mirror = set_bind.get("mirror_field")
             target_field = self.env[model_key]._fields.get(field_name_target)
             if not target_field:
@@ -357,11 +375,15 @@ class SyncDataTransform(models.Model):
 
             if ttype == "many2one":
                 associate_model = target_field.comodel_name
-                if not search_field_name:
-                    search_field_name = self.env[associate_model]._rec_name
-                found = self.env[associate_model].search(
-                    [(search_field_name, "=", value)]
-                )
+                if compute_field:
+                    cb_to_found = getattr(self, compute_field)
+                    found = cb_to_found(value, associate_model, mirror_id)
+                else:
+                    if not search_field_name:
+                        search_field_name = self.env[associate_model]._rec_name
+                    found = self.env[associate_model].search(
+                        [(search_field_name, "=", value)]
+                    )
                 if found:
                     update_value = found.id
                 else:
@@ -423,7 +445,10 @@ class SyncDataTransform(models.Model):
                             modification_value = {
                                 related_model._rec_name: vvalue
                             }
-                        modification_json = orjson.dumps(modification_value)
+                        modification_json = json.dumps(
+                            modification_value,
+                            default=self.json_default_serializer,
+                        )
 
                         associate_key = f"{comodel_name}.create.{related_model._rec_name}.{search_name}"
                         note = "Create bind_field_model sub transform"
@@ -487,7 +512,9 @@ class SyncDataTransform(models.Model):
             transform_exec_values["depend_ids"] = dependency_links
 
         hash_transform = hashlib.sha256(
-            json.dumps(transform_exec_values).encode()
+            json.dumps(
+                transform_exec_values, default=self.json_default_serializer
+            ).encode()
         ).hexdigest()
         transform_exec_id = self.env["sync.data.transform.exec"].search(
             [
@@ -547,31 +574,55 @@ class SyncDataTransform(models.Model):
         bind_field_reverse,
         transform_exec_batch,
         rec_name,
+        no_rec_name,
+        sync_by_dest_field,
     ):
         self.ensure_one()
         if not model_id:
-            rec_field_name = self.env[model_key]._rec_name
-            rec_name_value = None
-            if type(rec_name) is str:
-                rec_name_value = getattr(mirror_id, rec_name)
-            elif type(rec_name) is dict:
-                lst_value_rec_name = [
-                    getattr(mirror_id, a) for a in rec_name.get("vars")
-                ]
-                rec_name_value = rec_name.get("string") % tuple(
-                    lst_value_rec_name
-                )
-
-            if rec_name_value:
-                model_value[rec_field_name] = rec_name_value
-
-            modification_json = json.dumps(model_value)
-            transform_depends = list(set(transform_depends))
-            if rec_name_value:
-                associate_key = (
-                    f"{model_key}.create.{rec_name}.{rec_name_value}"
+            if no_rec_name:
+                # TODO how validate duplicate information?
+                rec_name_value = uuid.uuid4().hex
+            elif rec_name is None and sync_by_dest_field:
+                rec_name_value = " ".join(
+                    [model_value.get(a) for a in sync_by_dest_field]
                 )
             else:
+                rec_field_name = self.env[model_key]._rec_name
+                rec_name_value = None
+                if type(rec_name) is str:
+                    rec_name_value = getattr(mirror_id, rec_name)
+                elif type(rec_name) is dict:
+                    lst_value_rec_name = [
+                        getattr(mirror_id, a) for a in rec_name.get("vars")
+                    ]
+                    rec_name_value = rec_name.get("string") % tuple(
+                        lst_value_rec_name
+                    )
+
+                if rec_name_value:
+                    model_value[rec_field_name] = rec_name_value
+
+            modification_json = json.dumps(
+                model_value, default=self.json_default_serializer
+            )
+            transform_depends = list(set(transform_depends))
+            if rec_name_value:
+                field_associate_rec_name = ""
+                if rec_name is None:
+                    if not sync_by_dest_field:
+                        _logger.error(
+                            f"Cannot find rec_name or field associate name to create associate_key for value '{rec_name_value}', model key '{model_key}'"
+                        )
+                    else:
+                        field_associate_rec_name = sync_by_dest_field[0]
+                else:
+                    field_associate_rec_name = rec_name
+                associate_key = f"{model_key}.create.{field_associate_rec_name}.{rec_name_value}"
+            else:
+                if not rec_name:
+                    _logger.warning(
+                        f"rec_name is not defined on model '{model_key}' '{model_name}', this can cause ignore transform execution.\n{model_value}"
+                    )
                 associate_key = f"{model_key}.create.{rec_name}"
             note = "Create bind_field_model"
             transform_exec_id = self._add_transform(
@@ -586,7 +637,8 @@ class SyncDataTransform(models.Model):
             )
             if bind_field_reverse:
                 modification_json = json.dumps(
-                    {bind_field_reverse: transform_exec_id.id_depend_name}
+                    {bind_field_reverse: transform_exec_id.id_depend_name},
+                    default=self.json_default_serializer,
                 )
                 transform_exec_batch.append(
                     {
@@ -625,3 +677,33 @@ class SyncDataTransform(models.Model):
                 )
             rec.time_duration_extract = duration
             rec.time_duration_extract_fr = label
+
+    def json_default_serializer(self, obj):
+        if isinstance(obj, datetime):
+            return {"__datetime__": obj.isoformat()}
+        if isinstance(obj, date):
+            return {"__date__": obj.isoformat()}
+        if isinstance(obj, time):
+            return {"__time__": obj.isoformat()}
+        if isinstance(obj, timedelta):
+            return {"__timedelta__": obj.total_seconds()}
+        if isinstance(obj, Decimal):
+            return {"__decimal__": str(obj)}
+        if isinstance(obj, bytes):
+            return {"__bytes__": base64.b64encode(obj).decode("ascii")}
+        raise TypeError(f"Type {type(obj)} not serializable: {obj!r}")
+
+    def json_object_hook(self, dct):
+        if "__datetime__" in dct:
+            return fields.Datetime.from_string(dct["__datetime__"])
+        if "__date__" in dct:
+            return fields.Date.from_string(dct["__date__"])
+        if "__time__" in dct:
+            return time.fromisoformat(dct["__time__"])
+        if "__timedelta__" in dct:
+            return timedelta(seconds=dct["__timedelta__"])
+        if "__decimal__" in dct:
+            return Decimal(dct["__decimal__"])
+        if "__bytes__" in dct:
+            return base64.b64decode(dct["__bytes__"])
+        return dct

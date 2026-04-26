@@ -212,6 +212,7 @@
                         context="{'group_by': 'msg_review_reason'}"
                     />
                     <filter string="Msg Review" name="group_by_msg_review" context="{'group_by': 'msg_review'}" />
+                    <filter name="group_to_model_name" string="To model" context="{'group_by': 'to_model_name'}" />
                 </group>
             </search>
         </field>
