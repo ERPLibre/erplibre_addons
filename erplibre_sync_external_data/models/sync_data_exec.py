@@ -100,6 +100,18 @@ class SyncDataExec(models.Model):
         compute="_compute_time_duration_extract", store=True, tracking=True
     )
 
+    time_execution_transform_start = fields.Datetime(tracking=True)
+
+    time_execution_transform_end = fields.Datetime(tracking=True)
+
+    time_duration_transform = fields.Float(
+        compute="_compute_time_duration_transform", store=True, tracking=True
+    )
+
+    time_duration_transform_fr = fields.Char(
+        compute="_compute_time_duration_transform", store=True, tracking=True
+    )
+
     sync_data_create_ids = fields.One2many(
         comodel_name="sync.data.create",
         inverse_name="sync_data_exec_id",
@@ -193,6 +205,25 @@ class SyncDataExec(models.Model):
             rec.time_duration_extract = duration
             rec.time_duration_extract_fr = label
 
+    @api.depends(
+        "time_execution_transform_start", "time_execution_transform_end"
+    )
+    def _compute_time_duration_transform(self):
+        for rec in self:
+            duration, label = rec._compute_duration(
+                rec.time_execution_transform_start,
+                rec.time_execution_transform_end,
+            )
+            if (
+                not rec.time_execution_transform_start
+                and rec.time_execution_transform_end
+            ):
+                rec.time_execution_transform_start = (
+                    rec.time_execution_transform_end
+                )
+            rec.time_duration_transform = duration
+            rec.time_duration_transform_fr = label
+
     def _compute_duration(self, start, end):
         """Compute duration in seconds and a human-readable label."""
         if not start and not end:
@@ -269,6 +300,14 @@ class SyncDataExec(models.Model):
             rec = rec.exists()
             if not rec:
                 continue
+            if "queue_job" in conf.server_wide_modules:
+                rec.with_delay().action_process_transform({})
+            else:
+                rec.action_process_transform({})
+
+    def action_create_transform(self):
+        rec = self.exists()
+        if rec:
             if "queue_job" in conf.server_wide_modules:
                 rec.with_delay().action_process_transform({})
             else:
@@ -686,8 +725,7 @@ class SyncDataExec(models.Model):
                 tracking_vals.sync_data_exec_id = self.id
 
     def action_process_transform(self, sync_data_transform_value: dict = None):
-        self.ensure_one()
-        self.time_execution_extract_start = fields.Datetime.now()
+        self.time_execution_transform_start = fields.Datetime.now()
         if not sync_data_transform_value:
             sync_data_transform_value = {}
         if "context_name" not in sync_data_transform_value:
@@ -698,12 +736,19 @@ class SyncDataExec(models.Model):
         if self.sync_model_ids:
             sync_model_ids = self.sync_model_ids
         else:
-            sync_model_name = list(
-                set([a.res_model for a in self.sync_data_create_ids])
+            groups = self.env["sync.data.create"].read_group(
+                domain=[("id", "in", self.sync_data_create_ids.ids)],
+                fields=["res_model"],
+                groupby=["res_model"],
             )
-            sync_model_ids = self.env["sync.model"].search(
-                [("model_name", "in", sync_model_name)]
-            )
+            sync_model_name = [g["res_model"] for g in groups]
+
+            if sync_model_name:
+                sync_model_ids = self.env["sync.model"].search(
+                    [("model_name", "in", sync_model_name)]
+                )
+            else:
+                sync_model_ids = self.env["sync.model"]
         sync_data_transform_value["sync_model_ids"] = [
             (6, 0, sync_model_ids.ids)
         ]
@@ -711,6 +756,7 @@ class SyncDataExec(models.Model):
             [sync_data_transform_value]
         )
         self.transform_id.action_transform_algo()
+        self.time_execution_transform_end = fields.Datetime.now()
         return {}
 
     def end_time_execution(self):

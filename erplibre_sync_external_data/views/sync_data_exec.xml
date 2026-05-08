@@ -36,10 +36,18 @@
                         <field name="sync_model_ids" widget="many2many_tags" />
                     </group>
                     <group name="info" string="Info">
-                        <field name="time_execution_extract_start" />
-                        <field name="time_execution_extract_end" />
-                        <field name="time_duration_extract" />
-                        <field name="time_duration_extract_fr" />
+                        <group name="group_extract_time_execution" string="Extract time execution">
+                            <field name="time_execution_extract_start" />
+                            <field name="time_execution_extract_end" />
+                            <field name="time_duration_extract" />
+                            <field name="time_duration_extract_fr" />
+                        </group>
+                        <group name="group_transform_time_execution" string="Transform time execution">
+                            <field name="time_execution_transform_start" />
+                            <field name="time_execution_transform_end" />
+                            <field name="time_duration_transform" />
+                            <field name="time_duration_transform_fr" />
+                        </group>
                     </group>
                     <!-- Étape 1: Upload -->
                     <group name="import_info" string="Information pour un seul fichier" invisible="state != 'upload'" />
@@ -246,11 +254,7 @@
                     string="Start date"
                     context="{'group_by': 'time_execution_extract_start'}"
                 />
-                <filter
-                    name="group_what_import"
-                    string="What import"
-                    context="{'group_by': 'what_import'}"
-                />
+                <filter name="group_what_import" string="What import" context="{'group_by': 'what_import'}" />
             </search>
         </field>
     </record>
@@ -260,5 +264,19 @@
         <field name="res_model">sync.data.exec</field>
         <field name="view_mode">kanban,pivot,list,graph,form,activity</field>
         <field name="context">{'search_default_has_modification': 1, 'search_default_group_what_import': 1}</field>
+    </record>
+
+    <record id="sync_data_exec_action_create_transform" model="ir.actions.server">
+        <field name="name">Créer une transformation</field>
+        <field name="model_id" ref="model_sync_data_exec" />
+        <field name="binding_model_id" ref="model_sync_data_exec" />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <!-- prettier-ignore-start -->
+        <field name="code">
+if records:
+    records.action_create_transform()
+        </field>
+        <!-- prettier-ignore-end -->
     </record>
 </odoo>

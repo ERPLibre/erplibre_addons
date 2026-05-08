@@ -177,8 +177,8 @@ class SyncDataTransform(models.Model):
         self, sync_model_ids, do_link, force_all_data=False
     ):
         for rec in self:
-            sync_data_exec_id = self.env["sync.data.exec"].search(
-                [("transform_id", "=", rec.id)], limit=1
+            sync_data_exec_ids = self.env["sync.data.exec"].search(
+                [("transform_id", "=", rec.id)]
             )
             for sync_model_id in sync_model_ids:
                 _logger.info(sync_model_id.model_name)
@@ -208,12 +208,19 @@ class SyncDataTransform(models.Model):
                         sync_model_mirror_create_ids = self.env[
                             sync_model_id.model_name
                         ].search([])
-                    elif sync_data_exec_id:
-                        created_ids = [
-                            a.res_id
-                            for a in sync_data_exec_id.sync_data_create_ids
-                            if a.res_model == sync_model_id.model_name
-                        ]
+                    elif sync_data_exec_ids:
+                        data = self.env["sync.data.create"].search_read(
+                            domain=[
+                                (
+                                    "id",
+                                    "in",
+                                    sync_data_exec_ids.sync_data_create_ids.ids,
+                                ),
+                                ("res_model", "=", sync_model_id.model_name),
+                            ],
+                            fields=["res_id"],
+                        )
+                        created_ids = [d["res_id"] for d in data]
                         sync_model_mirror_create_ids = self.env[
                             sync_model_id.model_name
                         ].browse(created_ids)

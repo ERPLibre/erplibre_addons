@@ -13,8 +13,10 @@
                         </h1>
                     </div>
                     <group>
+                        <field name="sequence" />
                         <field name="model_name" />
                         <field name="scenario" />
+                        <field name="description" />
                         <field name="spreadsheet_extraction_metadata" widget="ace" />
                     </group>
                 </sheet>
@@ -85,10 +87,12 @@
         <field name="model">sync.model</field>
         <field name="arch" type="xml">
             <list>
+                <field name="sequence" widget="handle" />
                 <field name="name" />
+                <field name="description" optional="hide" />
                 <field name="model_name" />
                 <field name="scenario" />
-                <field name="spreadsheet_extraction_metadata" />
+                <field name="spreadsheet_extraction_metadata" optional="hide" />
             </list>
         </field>
     </record>

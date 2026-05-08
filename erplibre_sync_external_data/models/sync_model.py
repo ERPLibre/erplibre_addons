@@ -7,8 +7,16 @@ class SyncModel(models.Model):
         "Synchronisation model data to guide the sync and transform."
     )
     _inherit = ["mail.activity.mixin", "mail.thread"]
+    _order = "sequence, name, id"
 
     name = fields.Char(tracking=True)
+
+    description = fields.Text(
+        string="Description",
+        tracking=True,
+    )
+
+    sequence = fields.Integer(tracking=True, default=10)
 
     model_name = fields.Char(tracking=True)
 
