@@ -142,7 +142,21 @@ class SyncDataTransform(models.Model):
 
     def action_write_all(self, ctx=None):
         for rec in self:
-            rec.sync_data_transform_exec_ids.action_write_modification()
+            # Threat list without depend
+            transform_exec_without_depend_ids = (
+                rec.sync_data_transform_exec_ids.filtered(
+                    lambda r: "#REPLACE." not in r.modification
+                )
+            )
+            transform_exec_with_depend_ids = (
+                rec.sync_data_transform_exec_ids.filtered(
+                    lambda r: "#REPLACE." in r.modification
+                )
+            )
+
+            transform_exec_without_depend_ids.action_write_modification()
+            transform_exec_with_depend_ids.action_write_modification()
+
             rec.data_was_wrote = True
 
     def action_transform_algo(self, ctx=None, do_link=False):
@@ -299,6 +313,8 @@ class SyncDataTransform(models.Model):
                 for mirror_id in search_values:
                     model_condition = []
                     unique_name = ""
+                    suffix_associate_key = ""
+                    lst_suffix_associate_key = []
                     for field_sync_field_data in model_sync_field_data:
                         field_value = getattr(
                             mirror_id,
@@ -316,6 +332,9 @@ class SyncDataTransform(models.Model):
                                 )
                             )
                         unique_name += field_value + " "
+                        lst_suffix_associate_key.append(field_name)
+                        lst_suffix_associate_key.append(field_value)
+                    suffix_associate_key = ".".join(lst_suffix_associate_key)
                     unique_name = unique_name.strip()
                     # Support model
                     model_id = self.env[model_key].search(model_condition)
@@ -346,6 +365,7 @@ class SyncDataTransform(models.Model):
                                 rec_name,
                                 no_rec_name,
                                 sync_by_dest_field,
+                                suffix_associate_key,
                             )
                         if bind_field_reverse:
                             need_link = getattr(mirror_id, bind_field_reverse)
@@ -457,6 +477,10 @@ class SyncDataTransform(models.Model):
                             default=self.json_default_serializer,
                         )
 
+                        # TODO wrong associate, use sync field
+                        # Check associate_key = (
+                        #                         f"{associate_model}.create.{search_field_name}.{value}"
+                        #                     )
                         associate_key = f"{comodel_name}.create.{related_model._rec_name}.{search_name}"
                         note = "Create bind_field_model sub transform"
                         self._add_transform(
@@ -506,12 +530,21 @@ class SyncDataTransform(models.Model):
         key=None,
         mode_b=False,
     ):
+        data_modification_update = json.loads(
+            modification_json,
+            object_hook=self.json_object_hook,
+        )
+        modification_history = json.dumps(
+            {"modification": [data_modification_update]},
+            default=self.json_default_serializer,
+        )
         transform_exec_values = {
             "to_model_name": to_model_name,
             "sync_data_transform_id": self.id,
             "from_model_name": from_model_name,
             "note": note,
             "modification": modification_json,
+            "modification_history": modification_history,
             "method": "create",
             "associate_key": associate_key,
         }
@@ -552,6 +585,35 @@ class SyncDataTransform(models.Model):
             transform_exec_id = self.env["sync.data.transform.exec"].create(
                 [transform_exec_values]
             )
+        else:
+            data_modification = json.loads(
+                transform_exec_id.modification,
+                object_hook=self.json_object_hook,
+            )
+            data_modification_history = json.loads(
+                transform_exec_id.modification_history,
+                object_hook=self.json_object_hook,
+            )
+
+            # Do update
+            data_modification.update(data_modification_update)
+            data_modification_history["modification"].append(data_modification)
+
+            modification = json.dumps(
+                data_modification, default=self.json_default_serializer
+            )
+            modification_history = json.dumps(
+                data_modification_history, default=self.json_default_serializer
+            )
+            transform_exec_values_modification = {
+                "modification": modification,
+                "modification_history": modification_history,
+            }
+            if dependency_links:
+                transform_exec_values_modification["depend_ids"] = (
+                    dependency_links
+                )
+            transform_exec_id.write(transform_exec_values_modification)
 
         if not mode_b:
             replace_key = transform_exec_id.id_depend_name
@@ -583,6 +645,7 @@ class SyncDataTransform(models.Model):
         rec_name,
         no_rec_name,
         sync_by_dest_field,
+        suffix_associate_key,
     ):
         self.ensure_one()
         if not model_id:
@@ -613,24 +676,7 @@ class SyncDataTransform(models.Model):
                 model_value, default=self.json_default_serializer
             )
             transform_depends = list(set(transform_depends))
-            if rec_name_value:
-                field_associate_rec_name = ""
-                if rec_name is None:
-                    if not sync_by_dest_field:
-                        _logger.error(
-                            f"Cannot find rec_name or field associate name to create associate_key for value '{rec_name_value}', model key '{model_key}'"
-                        )
-                    else:
-                        field_associate_rec_name = sync_by_dest_field[0]
-                else:
-                    field_associate_rec_name = rec_name
-                associate_key = f"{model_key}.create.{field_associate_rec_name}.{rec_name_value}"
-            else:
-                if not rec_name:
-                    _logger.warning(
-                        f"rec_name is not defined on model '{model_key}' '{model_name}', this can cause ignore transform execution.\n{model_value}"
-                    )
-                associate_key = f"{model_key}.create.{rec_name}"
+            associate_key = f"{model_key}.create.{suffix_associate_key}"
             note = "Create bind_field_model"
             transform_exec_id = self._add_transform(
                 model_key,

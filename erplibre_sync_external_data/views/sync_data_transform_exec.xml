@@ -49,6 +49,7 @@
                                 <field name="modification" />
                                 <field name="modification_done" />
                                 <field name="modification_disable" />
+                                <field name="modification_history" />
                             </group>
                         </group>
                         <group string="Association">
@@ -109,10 +110,12 @@
                 <field name="sync_data_transform_id" optional="show" />
                 <field name="from_id_ref" optional="show" />
                 <field name="from_model_name" optional="show" />
+                <field name="id_depend_name" optional="hide" />
                 <field name="depend_ids" optional="show" widget="many2many_tags" />
                 <field name="to_model_name" optional="show" />
                 <field name="to_id_ref" optional="show" />
                 <field name="modification" optional="show" />
+                <field name="modification_history" optional="hide" />
                 <field name="modification_done" optional="show" />
                 <field name="note" optional="show" />
                 <field name="need_review" optional="show" />
@@ -148,10 +151,12 @@
                 <field name="sync_data_transform_id" optional="show" />
                 <field name="from_id_ref" optional="show" />
                 <field name="from_model_name" optional="show" />
+                <field name="id_depend_name" optional="hide" />
                 <field name="depend_ids" optional="show" widget="many2many_tags" />
                 <field name="to_model_name" optional="show" />
                 <field name="to_id_ref" optional="show" />
                 <field name="modification" optional="show" />
+                <field name="modification_history" optional="hide" />
                 <field name="modification_done" optional="show" />
                 <field name="note" optional="show" />
                 <field name="need_review" optional="show" />
@@ -194,6 +199,7 @@
         <field name="arch" type="xml">
             <search string="Sync data transform exec">
                 <field name="name" string="Name" />
+                <field name="modification" string="Modification" />
                 <field name="note" string="Note" />
                 <field name="msg_review" string="Review" />
                 <field name="msg_review_reason" string="Review reason" />

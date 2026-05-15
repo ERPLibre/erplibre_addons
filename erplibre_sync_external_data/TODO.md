@@ -101,7 +101,6 @@ ignorés avec un `_logger.warning`. Une `UserError` explicite ou une documentati
 Cas concernés :
 - `many2many`/`one2many` binding dans `_bind_transform`
 - `one2many` write-back dans `action_write_modification`
-- Mise à jour de record existant dans `_bind_transform_model`
 
 ---
 

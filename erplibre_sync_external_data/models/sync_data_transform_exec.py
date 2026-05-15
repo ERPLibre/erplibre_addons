@@ -47,6 +47,8 @@ class SyncDataTransformExec(models.Model):
 
     modification = fields.Text()
 
+    modification_history = fields.Text()
+
     modification_done = fields.Boolean(readonly=True)
 
     has_no_match = fields.Boolean(readonly=True)
