@@ -450,8 +450,9 @@ class SyncDataExec(models.Model):
 
         metadata = json.loads(
             sync_model_id.spreadsheet_extraction_metadata,
-            default=self.env["sync.data.transform"].json_object_hook,
+            object_hook=self.env["sync.data.transform"].json_object_hook,
         )
+
         header_config = metadata.get("header", [])
         header_config_ext = header_config + [("File no line", "file_no_line")]
         expected_headers = [a[0] for a in header_config]
@@ -653,6 +654,8 @@ class SyncDataExec(models.Model):
                 file_no_line = column_value
             else:
                 field_name = header_config[index_column][1]
+            if not field_name:
+                continue
             field_obj = self.env[model_name]._fields.get(field_name)
             if not field_obj:
                 raise ValidationError(
@@ -800,7 +803,7 @@ class SyncDataExec(models.Model):
         """Convert a raw cell value to the appropriate Odoo field type."""
         if field_type in ("date", "datetime"):
             record_values[field_name] = value
-            if not isinstance(value, fields.datetime):
+            if not isinstance(value, fields.datetime) and value is not False:
                 self._transform_date(record_values, field_name)
             return record_values[field_name]
         if field_type == "boolean":
