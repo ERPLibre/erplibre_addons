@@ -757,6 +757,7 @@ class SyncDataExec(models.Model):
         )
         self.transform_id.action_transform_algo()
         self.time_execution_transform_end = fields.Datetime.now()
+        self.transform_id.create_mail_activity()
         return {}
 
     def end_time_execution(self):
@@ -931,7 +932,11 @@ class SyncDataExec(models.Model):
                     transform_value.get("sync_data_transform_id"),
                 ),
                 ("method", "=", transform_value.get("method")),
-                ("modification", "=", transform_value.get("modification")),
+                (
+                    "modification_text",
+                    "=",
+                    transform_value.get("modification_text"),
+                ),
                 ("to_id_ref", "=", transform_value.get("to_id_ref")),
             ]
         )

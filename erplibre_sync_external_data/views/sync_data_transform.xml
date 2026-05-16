@@ -29,8 +29,8 @@
                         </h1>
                     </div>
                     <group>
-                        <field name="time_execution_transform_end" />
                         <field name="time_execution_transform_start" />
+                        <field name="time_execution_transform_end" />
                         <field name="time_duration_extract" />
                         <field name="time_duration_extract_fr" />
                         <field name="context_name" />
@@ -38,7 +38,7 @@
                         <field name="do_update" />
                     </group>
                     <group string="Activity">
-                        <field name="mail_activity_default_user_id" />
+                        <field name="mail_activity_default_user_ids" widget="many2many_tags" />
                         <field name="mail_activity_ids" />
                         <field name="mail_activity_count" />
                     </group>
@@ -60,7 +60,7 @@
                                     <field name="hash_generic_value" optional="hide" />
                                     <field name="associate_key" optional="hide" />
                                     <field name="method" optional="show" />
-                                    <field name="modification" optional="show" />
+                                    <field name="modification_text" optional="show" />
                                     <field name="modification_done" optional="show" />
                                     <field name="note" optional="show" />
                                     <field name="need_review" optional="show" />
@@ -101,8 +101,8 @@
         <field name="arch" type="xml">
             <graph string="Sync data transform">
                 <field name="name" type="row" />
-                <field name="time_execution_transform_end" type="row" />
                 <field name="time_execution_transform_start" type="row" />
+                <field name="time_execution_transform_end" type="row" />
                 <field name="context_name" type="row" />
             </graph>
         </field>
@@ -114,8 +114,8 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
-                <field name="time_execution_transform_end" />
                 <field name="time_execution_transform_start" />
+                <field name="time_execution_transform_end" />
                 <field name="context_name" />
                 <templates>
                     <t t-name="card">
@@ -129,12 +129,12 @@
                                     </li>
                                     <li class="mb4">
                                         <strong>
-                                            <field name="time_execution_transform_end" />
+                                            <field name="time_execution_transform_start" />
                                         </strong>
                                     </li>
                                     <li class="mb4">
                                         <strong>
-                                            <field name="time_execution_transform_start" />
+                                            <field name="time_execution_transform_end" />
                                         </strong>
                                     </li>
                                     <li class="mb4">
@@ -157,8 +157,8 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name" />
-                <field name="time_execution_transform_end" />
                 <field name="time_execution_transform_start" />
+                <field name="time_execution_transform_end" />
                 <field name="context_name" />
             </list>
         </field>
@@ -170,8 +170,8 @@
         <field name="arch" type="xml">
             <pivot string="Sync data transform">
                 <field name="name" type="row" />
-                <field name="time_execution_transform_end" type="row" />
                 <field name="time_execution_transform_start" type="row" />
+                <field name="time_execution_transform_end" type="row" />
                 <field name="context_name" type="row" />
             </pivot>
         </field>
@@ -185,20 +185,16 @@
                 <field name="name" string="" />
                 <field name="context_name" string="Context name" />
                 <filter
-                    name="group_by_date_time_execution_transform_end"
-                    string="Execution transform end"
-                    context="{'group_by': 'time_execution_transform_end'}"
-                />
-                <filter
                     name="group_by_date_time_execution_transform_start"
                     string="Execution transform start"
                     context="{'group_by': 'time_execution_transform_start'}"
                 />
-                 <filter
-                    name="group_context_name"
-                    string="Context name"
-                    context="{'group_by': 'context_name'}"
+                <filter
+                    name="group_by_date_time_execution_transform_end"
+                    string="Execution transform end"
+                    context="{'group_by': 'time_execution_transform_end'}"
                 />
+                <filter name="group_context_name" string="Context name" context="{'group_by': 'context_name'}" />
             </search>
         </field>
     </record>

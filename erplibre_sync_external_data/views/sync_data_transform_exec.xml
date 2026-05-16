@@ -46,7 +46,8 @@
                                 <field name="to_id_ref" />
                             </group>
                             <group string="Modification">
-                                <field name="modification" />
+                                <field name="modification_text" />
+                                <field name="modification_json" />
                                 <field name="modification_done" />
                                 <field name="modification_disable" />
                                 <field name="modification_history" />
@@ -114,7 +115,8 @@
                 <field name="depend_ids" optional="show" widget="many2many_tags" />
                 <field name="to_model_name" optional="show" />
                 <field name="to_id_ref" optional="show" />
-                <field name="modification" optional="show" />
+                <field name="modification_text" optional="show" />
+                <field name="modification_json" optional="hide" />
                 <field name="modification_history" optional="hide" />
                 <field name="modification_done" optional="show" />
                 <field name="note" optional="show" />
@@ -155,7 +157,8 @@
                 <field name="depend_ids" optional="show" widget="many2many_tags" />
                 <field name="to_model_name" optional="show" />
                 <field name="to_id_ref" optional="show" />
-                <field name="modification" optional="show" />
+                <field name="modification_text" optional="show" />
+                <field name="modification_json" optional="hide" />
                 <field name="modification_history" optional="hide" />
                 <field name="modification_done" optional="show" />
                 <field name="note" optional="show" />
@@ -199,7 +202,7 @@
         <field name="arch" type="xml">
             <search string="Sync data transform exec">
                 <field name="name" string="Name" />
-                <field name="modification" string="Modification" />
+                <field name="modification_text" string="Modification" />
                 <field name="note" string="Note" />
                 <field name="msg_review" string="Review" />
                 <field name="msg_review_reason" string="Review reason" />

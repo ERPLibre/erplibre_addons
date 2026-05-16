@@ -67,7 +67,7 @@ class TestSyncDataTransform(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": transform.id,
                 "method": "create",
-                "modification": '{"name": "Test"}',
+                "modification_text": '{"name": "Test"}',
             }
         )
         transform.invalidate_recordset()
@@ -86,7 +86,7 @@ class TestSyncDataTransform(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": transform.id,
                 "method": "create",
-                "modification": '{"name": "Test"}',
+                "modification_text": '{"name": "Test"}',
             }
         )
         transform.invalidate_recordset()
@@ -105,7 +105,7 @@ class TestSyncDataTransform(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": transform.id,
                 "method": "create",
-                "modification": '{"name": "Test"}',
+                "modification_text": '{"name": "Test"}',
             }
         )
         transform.invalidate_recordset()
@@ -193,7 +193,7 @@ class TestSyncDataTransformExec(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": self.transform.id,
                 "method": "create",
-                "modification": '{"name": "Test Partner"}',
+                "modification_text": '{"name": "Test Partner"}',
             }
         )
         self.assertTrue(exec_rec.id)
@@ -206,7 +206,7 @@ class TestSyncDataTransformExec(TransactionCase):
                 "from_model_name": "sync.model",
                 "sync_data_transform_id": self.transform.id,
                 "method": "create",
-                "modification": '{"name": "Test"}',
+                "modification_text": '{"name": "Test"}',
             }
         )
         self.assertIn("create", exec_rec.name)
@@ -219,7 +219,7 @@ class TestSyncDataTransformExec(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": self.transform.id,
                 "method": "create",
-                "modification": '{"name": "Test"}',
+                "modification_text": '{"name": "Test"}',
             }
         )
         self.assertTrue(exec_rec.id_depend_name)
@@ -231,7 +231,7 @@ class TestSyncDataTransformExec(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": self.transform.id,
                 "method": "create",
-                "modification": '{"name": "Test Write Modif Partner"}',
+                "modification_text": '{"name": "Test Write Modif Partner"}',
             }
         )
         self.assertFalse(exec_rec.modification_done)
@@ -242,16 +242,14 @@ class TestSyncDataTransformExec(TransactionCase):
         self.assertEqual(partner.name, "Test Write Modif Partner")
 
     def test_action_write_modification_write(self):
-        partner = self.env["res.partner"].create(
-            {"name": "Original Name"}
-        )
+        partner = self.env["res.partner"].create({"name": "Original Name"})
         exec_rec = self.env["sync.data.transform.exec"].create(
             {
                 "to_model_name": "res.partner",
                 "to_id_ref": partner.id,
                 "sync_data_transform_id": self.transform.id,
                 "method": "write",
-                "modification": '{"name": "Updated Name"}',
+                "modification_text": '{"name": "Updated Name"}',
             }
         )
         exec_rec.action_write_modification()
@@ -266,9 +264,9 @@ class TestSyncDataTransformExec(TransactionCase):
                 "to_model_name": "res.partner",
                 "sync_data_transform_id": self.transform.id,
                 "method": "create",
-                "modification": '{"name": "Test"}',
+                "modification_text": '{"name": "Test"}',
             }
         )
         exec_rec.action_set_no_match()
         self.assertTrue(exec_rec.has_no_match)
-        self.assertEqual(exec_rec.modification, '{"name": "No Match"}')
+        self.assertEqual(exec_rec.modification_text, '{"name": "No Match"}')

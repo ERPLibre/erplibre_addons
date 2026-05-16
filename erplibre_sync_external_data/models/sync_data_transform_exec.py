@@ -45,7 +45,9 @@ class SyncDataTransformExec(models.Model):
 
     note = fields.Html()
 
-    modification = fields.Text()
+    modification_text = fields.Text()
+
+    modification_json = fields.Json(default=lambda self: {})
 
     modification_history = fields.Text()
 
@@ -85,6 +87,41 @@ class SyncDataTransformExec(models.Model):
         help="Help child dependency to find his parent."
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super().create(vals_list)
+        # test
+        # has_to_check = res.filtered(lambda a: "#REPLACE." in a.modification)
+        # has_error = res.filtered(
+        #     lambda a: "#REPLACE." in a.modification and not a.depend_ids
+        # )
+        for rec in res:
+            if rec.modification_json and not rec.modification_text:
+                rec.modification_text = json.dumps(
+                    rec.modification_json,
+                    default=self.env[
+                        "sync.data.transform"
+                    ].json_default_serializer,
+                )
+        return res
+
+    #
+    # def write(self, vals):
+    #     res = super().write(vals)
+    #     # has_to_check = self.filtered(lambda a: "#REPLACE." in a.modification)
+    #     # has_error = self.filtered(
+    #     #     lambda a: "#REPLACE." in a.modification and not a.depend_ids
+    #     # )
+    #     for rec in self:
+    #         if rec.modification_json:
+    #             rec.modification_text = json.dumps(
+    #                 rec.modification_json,
+    #                 default=self.env[
+    #                     "sync.data.transform"
+    #                 ].json_default_serializer,
+    #             )
+    #     return res
+
     @api.depends(
         "method",
         "to_model_name",
@@ -106,15 +143,15 @@ class SyncDataTransformExec(models.Model):
     def action_set_no_match(self):
         self.ensure_one()
         if self.sync_data_transform_id.default_option_no_match:
-            self.modification = (
+            self.modification_text = (
                 self.sync_data_transform_id.default_option_no_match
             )
             self.has_no_match = True
 
     def action_write_modification(self):
         for rec in self:
-            if rec.modification and not rec.modification_done:
-                str_value = rec.modification
+            if rec.modification_text and not rec.modification_done:
+                str_value = rec.modification_text
                 if rec.depend_ids:
                     for depend_id in rec.depend_ids:
                         if not depend_id.modification_done:
@@ -133,21 +170,23 @@ class SyncDataTransformExec(models.Model):
 
                 # Transform value
                 for key, value in parsed_values.items():
-                    key_field = res_class._fields[key]
-                    key_type = key_field.type
-                    if key_type in ("many2one", "many2many") and isinstance(
-                        value, str
-                    ):
-                        # Create if not existing, search by rec_name
-                        key_class = self.env[key_field.comodel_name]
-                        value_transform = key_class.search(
-                            [(key_class._rec_name, "=", value)], limit=1
-                        )
-                        if not value_transform:
-                            value_transform = key_class.create(
-                                [{key_class._rec_name: value}]
+                    if isinstance(value, str):
+                        key_field = res_class._fields[key]
+                        key_type = key_field.type
+                        if key_type in (
+                            "many2one",
+                            "many2many",
+                        ) and isinstance(value, str):
+                            # Create if not existing, search by rec_name
+                            key_class = self.env[key_field.comodel_name]
+                            value_transform = key_class.search(
+                                [(key_class._rec_name, "=", value)], limit=1
                             )
-                        parsed_values[key] = value_transform.id
+                            if not value_transform:
+                                value_transform = key_class.create(
+                                    [{key_class._rec_name: value}]
+                                )
+                            parsed_values[key] = value_transform.id
 
                 if rec.method == "create":
                     to_id_ref = res_class.create(parsed_values)

@@ -86,7 +86,7 @@ class SyncDataTransform(models.Model):
                 and not rec.data_was_wrote
             )
 
-    mail_activity_default_user_id = fields.Many2one(
+    mail_activity_default_user_ids = fields.Many2many(
         comodel_name="res.users",
         string="User",
     )
@@ -145,12 +145,12 @@ class SyncDataTransform(models.Model):
             # Threat list without depend
             transform_exec_without_depend_ids = (
                 rec.sync_data_transform_exec_ids.filtered(
-                    lambda r: "#REPLACE." not in r.modification
+                    lambda r: "#REPLACE." not in r.modification_text
                 )
             )
             transform_exec_with_depend_ids = (
                 rec.sync_data_transform_exec_ids.filtered(
-                    lambda r: "#REPLACE." in r.modification
+                    lambda r: "#REPLACE." in r.modification_text
                 )
             )
 
@@ -185,6 +185,7 @@ class SyncDataTransform(models.Model):
             if rec.context_name != "default":
                 continue
             rec.action_transform_default(rec.sync_model_ids, do_link)
+
         return {}
 
     def action_transform_default(
@@ -543,7 +544,7 @@ class SyncDataTransform(models.Model):
             "sync_data_transform_id": self.id,
             "from_model_name": from_model_name,
             "note": note,
-            "modification": modification_json,
+            "modification_text": modification_json,
             "modification_history": modification_history,
             "method": "create",
             "associate_key": associate_key,
@@ -587,7 +588,7 @@ class SyncDataTransform(models.Model):
             )
         else:
             data_modification = json.loads(
-                transform_exec_id.modification,
+                transform_exec_id.modification_text,
                 object_hook=self.json_object_hook,
             )
             data_modification_history = json.loads(
@@ -606,7 +607,7 @@ class SyncDataTransform(models.Model):
                 data_modification_history, default=self.json_default_serializer
             )
             transform_exec_values_modification = {
-                "modification": modification,
+                "modification_text": modification,
                 "modification_history": modification_history,
             }
             if dependency_links:
@@ -701,7 +702,7 @@ class SyncDataTransform(models.Model):
                         "from_id_ref": model_id.id,
                         "from_model_name": model_key,
                         "depend_ids": [(6, 0, transform_exec_id.ids)],
-                        "modification": modification_json,
+                        "modification_text": modification_json,
                         "method": "write",
                     }
                 )
@@ -760,3 +761,21 @@ class SyncDataTransform(models.Model):
         if "__bytes__" in dct:
             return base64.b64decode(dct["__bytes__"])
         return dct
+
+    def create_mail_activity(self):
+        for rec in self:
+            # TODO validate sync_data_transform_exec_ids is not resolve
+            if rec.sync_data_transform_exec_ids:
+                mail_activity_ids = self.env["mail.activity"]
+                # Create activity
+                activity_type = self.env.ref("mail.mail_activity_data_todo")
+                summary = "Validation à effectuer"
+                for user_id in rec.mail_activity_default_user_ids:
+                    mail_activity_id = rec.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        user_id=user_id.id,
+                        summary=summary,
+                    )
+                    mail_activity_ids += mail_activity_id
+                if mail_activity_ids:
+                    rec.mail_activity_ids = [(6, 0, mail_activity_ids.ids)]
