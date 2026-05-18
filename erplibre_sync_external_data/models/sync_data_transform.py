@@ -350,6 +350,7 @@ class SyncDataTransform(models.Model):
                                     model_key,
                                     model_value,
                                     default_fields,
+                                    model_id,
                                 )
                             )
                             rec._bind_transform_model(
@@ -368,7 +369,10 @@ class SyncDataTransform(models.Model):
                                 sync_by_dest_field,
                                 suffix_associate_key,
                             )
-                        if bind_field_reverse:
+                        # Create link to mirror from data if exist
+                        if bind_field_reverse and hasattr(
+                            mirror_id, "bind_field_reverse"
+                        ):
                             need_link = getattr(mirror_id, bind_field_reverse)
                             if not need_link and model_id:
                                 mirror_id.write({bind_field_reverse: model_id})
@@ -383,6 +387,7 @@ class SyncDataTransform(models.Model):
         model_key,
         model_value,
         default_fields,
+        model_id,
     ):
         self.ensure_one()
         transform_depends = []
@@ -425,7 +430,7 @@ class SyncDataTransform(models.Model):
                         ]
                     )
                     if not parent_exec:
-                        update_value = 0
+                        update_value = None
                     else:
                         update_value = parent_exec.id_depend_name
                         dependency_links.append((4, parent_exec.id))
@@ -435,8 +440,13 @@ class SyncDataTransform(models.Model):
                     field_name_target,
                 )
             else:
-                update_value = value
-            if update_value:
+                if model_id:
+                    # Support write
+                    if getattr(model_id, field_name_target) != value:
+                        update_value = value
+                else:
+                    update_value = value
+            if update_value is not None:
                 model_value[field_name_target] = update_value
         for key, value in default_fields.items():
             # Support magic value with computing
@@ -499,10 +509,27 @@ class SyncDataTransform(models.Model):
                         )
                     else:
                         if default_field.type == "many2many":
-                            for value_id_id in value_id:
-                                values_to_insert.append((4, value_id_id.id))
+                            if model_id:
+                                # TODO support to unlinks old value
+                                for id_to_validate in value_id.ids:
+                                    if (
+                                        id_to_validate
+                                        not in getattr(model_id, key).ids
+                                    ):
+                                        values_to_insert.append(
+                                            (4, id_to_validate)
+                                        )
+                            else:
+                                for value_id_id in value_id:
+                                    values_to_insert.append(
+                                        (4, value_id_id.id)
+                                    )
                         elif default_field.type == "many2one":
-                            model_value[key] = value_id.id
+                            if model_id:
+                                if getattr(model_id, key).ids != value_id.ids:
+                                    model_value[key] = value_id.id
+                            else:
+                                model_value[key] = value_id.id
                         elif default_field.type == "one2many":
                             _logger.warning(
                                 "one2many write-back not yet implemented"
@@ -512,7 +539,12 @@ class SyncDataTransform(models.Model):
                 if values_to_insert:
                     model_value[key] = values_to_insert
             else:
-                model_value[key] = value
+                if model_id:
+                    # Support write
+                    if getattr(model_id, key) != value:
+                        model_value[key] = value
+                else:
+                    model_value[key] = value
 
         return transform_depends, dependency_links
 
@@ -525,6 +557,7 @@ class SyncDataTransform(models.Model):
         dependency_links,
         transform_depends,
         note,
+        model_id=None,
         target_field=None,
         values_to_insert=None,
         model_value=None,
@@ -546,9 +579,11 @@ class SyncDataTransform(models.Model):
             "note": note,
             "modification_text": modification_json,
             "modification_history": modification_history,
-            "method": "create",
+            "method": "create" if not model_id else "write",
             "associate_key": associate_key,
         }
+        if model_id:
+            transform_exec_values["to_id_ref"] = model_id.id
         if dependency_links:
             transform_exec_values["depend_ids"] = dependency_links
 
@@ -648,6 +683,8 @@ class SyncDataTransform(models.Model):
         sync_by_dest_field,
         suffix_associate_key,
     ):
+        if not model_value:
+            return
         self.ensure_one()
         if not model_id:
             if no_rec_name:
@@ -673,43 +710,43 @@ class SyncDataTransform(models.Model):
                 if rec_name_value:
                     model_value[rec_field_name] = rec_name_value
 
-            modification_json = json.dumps(
-                model_value, default=self.json_default_serializer
-            )
-            transform_depends = list(set(transform_depends))
+        modification_json = json.dumps(
+            model_value, default=self.json_default_serializer
+        )
+        transform_depends = list(set(transform_depends))
+        if not model_id:
             associate_key = f"{model_key}.create.{suffix_associate_key}"
             note = "Create bind_field_model"
-            transform_exec_id = self._add_transform(
-                model_key,
-                model_name,
-                modification_json,
-                associate_key,
-                dependency_links,
-                transform_depends,
-                note,
-                mode_b=True,
-            )
-            if bind_field_reverse:
-                modification_json = json.dumps(
-                    {bind_field_reverse: transform_exec_id.id_depend_name},
-                    default=self.json_default_serializer,
-                )
-                transform_exec_batch.append(
-                    {
-                        "to_model_name": model_name,
-                        "to_id_ref": mirror_id.id,
-                        "sync_data_transform_id": self.id,
-                        "from_id_ref": model_id.id,
-                        "from_model_name": model_key,
-                        "depend_ids": [(6, 0, transform_exec_id.ids)],
-                        "modification_text": modification_json,
-                        "method": "write",
-                    }
-                )
         else:
-            _logger.info(
-                "Model update for '%s' - skipped (not yet implemented)",
-                project_number,
+            associate_key = f"{model_key}.write.{suffix_associate_key}"
+            note = "Write bind_field_model"
+        transform_exec_id = self._add_transform(
+            model_key,
+            model_name,
+            modification_json,
+            associate_key,
+            dependency_links,
+            transform_depends,
+            note,
+            model_id=model_id,
+            mode_b=True,
+        )
+        if not model_id and bind_field_reverse:
+            modification_json = json.dumps(
+                {bind_field_reverse: transform_exec_id.id_depend_name},
+                default=self.json_default_serializer,
+            )
+            transform_exec_batch.append(
+                {
+                    "to_model_name": model_name,
+                    "to_id_ref": mirror_id.id,
+                    "sync_data_transform_id": self.id,
+                    "from_id_ref": model_id.id,
+                    "from_model_name": model_key,
+                    "depend_ids": [(6, 0, transform_exec_id.ids)],
+                    "modification_text": modification_json,
+                    "method": "write",
+                }
             )
 
     @api.depends(

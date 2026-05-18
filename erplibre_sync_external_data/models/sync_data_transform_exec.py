@@ -47,6 +47,8 @@ class SyncDataTransformExec(models.Model):
 
     modification_text = fields.Text()
 
+    modification_text_change = fields.Text()
+
     modification_json = fields.Json(default=lambda self: {})
 
     modification_history = fields.Text()
@@ -198,5 +200,13 @@ class SyncDataTransformExec(models.Model):
                             rec.from_model_name,
                         )
                     else:
+                        parsed_values_copy = parsed_values.copy()
                         res_class.browse(rec.to_id_ref).write(parsed_values)
+                        if parsed_values_copy != parsed_values:
+                            rec.modification_text_change = json.dumps(
+                                parsed_values,
+                                default=self.env[
+                                    "sync.data.transform"
+                                ].json_default_serializer,
+                            )
                 rec.modification_done = True

@@ -47,6 +47,7 @@
                             </group>
                             <group string="Modification">
                                 <field name="modification_text" />
+                                <field name="modification_text_change" />
                                 <field name="modification_json" />
                                 <field name="modification_done" />
                                 <field name="modification_disable" />
@@ -116,6 +117,7 @@
                 <field name="to_model_name" optional="show" />
                 <field name="to_id_ref" optional="show" />
                 <field name="modification_text" optional="show" />
+                <field name="modification_text_change" optional="hide" />
                 <field name="modification_json" optional="hide" />
                 <field name="modification_history" optional="hide" />
                 <field name="modification_done" optional="show" />
@@ -158,6 +160,7 @@
                 <field name="to_model_name" optional="show" />
                 <field name="to_id_ref" optional="show" />
                 <field name="modification_text" optional="show" />
+                <field name="modification_text_change" optional="hide" />
                 <field name="modification_json" optional="hide" />
                 <field name="modification_history" optional="hide" />
                 <field name="modification_done" optional="show" />
