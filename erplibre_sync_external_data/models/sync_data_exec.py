@@ -523,7 +523,8 @@ class SyncDataExec(models.Model):
                             file_name_type,
                         )
                         has_different_header = True
-                    elif (
+
+                    if (
                         item_row_transform != header_config[item_row_i][0]
                         and not is_other_header
                     ):
@@ -536,6 +537,7 @@ class SyncDataExec(models.Model):
                             file_name_type,
                         )
                         has_different_header = True
+
                     if is_other_header:
                         # Append if multiple header
                         if len(parsed_headers) > item_row_i:
