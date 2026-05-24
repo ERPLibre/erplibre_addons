@@ -314,7 +314,6 @@ class SyncDataTransform(models.Model):
                 for mirror_id in search_values:
                     model_condition = []
                     unique_name = ""
-                    suffix_associate_key = ""
                     lst_suffix_associate_key = []
                     for field_sync_field_data in model_sync_field_data:
                         field_value = getattr(
@@ -332,9 +331,9 @@ class SyncDataTransform(models.Model):
                                     field_value,
                                 )
                             )
-                        unique_name += field_value + " "
-                        lst_suffix_associate_key.append(field_name)
-                        lst_suffix_associate_key.append(field_value)
+                        unique_name += f"{field_value} "
+                        lst_suffix_associate_key.append(str(field_name))
+                        lst_suffix_associate_key.append(str(field_value))
                     suffix_associate_key = ".".join(lst_suffix_associate_key)
                     unique_name = unique_name.strip()
                     # Support model
