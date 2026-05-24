@@ -95,6 +95,7 @@
                         </page>
                         <page name="page_log" string="Log">
                             <group>
+                                <field name="detect_execution_error" />
                                 <field name="has_error_msg" />
                             </group>
                         </page>

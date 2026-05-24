@@ -72,6 +72,10 @@ class SyncDataExec(models.Model):
 
     create_count = fields.Integer(tracking=True, readonly=True)
 
+    detect_execution_error = fields.Boolean(
+        help="Search detection error from output selenium", tracking=True
+    )
+
     has_error = fields.Boolean(tracking=True)
 
     has_error_msg = fields.Text(tracking=True)
