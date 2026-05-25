@@ -1,11 +1,12 @@
 import base64
 import csv
+import datetime
 import io
 import json
 import logging
 import re
+import time
 from collections import defaultdict
-from datetime import date, datetime, time
 
 import pytz
 from markupsafe import Markup
@@ -114,6 +115,10 @@ class SyncDataExec(models.Model):
 
     time_duration_transform_fr = fields.Char(
         compute="_compute_time_duration_transform", store=True, tracking=True
+    )
+
+    time_sleep_before_execution = fields.Integer(
+        help="Will sleep this time before execute sync"
     )
 
     sync_data_create_ids = fields.One2many(
@@ -319,6 +324,10 @@ class SyncDataExec(models.Model):
 
     def action_process_sync_data(self):
         self.ensure_one()
+
+        if self.time_sleep_before_execution:
+            time.sleep(self.time_sleep_before_execution)
+
         if not self.time_execution_extract_start:
             self.time_execution_extract_start = fields.Datetime.now()
 
@@ -566,6 +575,7 @@ class SyncDataExec(models.Model):
                     if index_cell >= max_cell_index:
                         break
                     value_mapping = {}
+                    # TODO use dict.get("mapping_value")
                     if len(header_config[index_cell]) > 2:
                         value_mapping = header_config[index_cell][2]
                     value = self._extract_cell_value(cell_sheet, is_excel)
@@ -873,10 +883,12 @@ class SyncDataExec(models.Model):
 
     def _transform_date(self, record_data, key):
         data = record_data.get(key)
-        if data is None or isinstance(data, date):
+        if data is None or isinstance(data, datetime.date):
             return
         if isinstance(data, int):
-            record_data[key] = datetime.strptime(str(data), "%Y").date()
+            record_data[key] = datetime.datetime.strptime(
+                str(data), "%Y"
+            ).date()
             return
         if not isinstance(data, str) or not data:
             record_data[key] = False
@@ -896,7 +908,7 @@ class SyncDataExec(models.Model):
         ]
         for fmt in formats:
             try:
-                record_data[key] = datetime.strptime(data, fmt).date()
+                record_data[key] = datetime.datetime.strptime(data, fmt).date()
                 return
             except (ValueError, TypeError):
                 continue
@@ -913,7 +925,9 @@ class SyncDataExec(models.Model):
         ]
         for fmt in short_long_formats:
             try:
-                record_data[key] = datetime.strptime(normalized, fmt).date()
+                record_data[key] = datetime.datetime.strptime(
+                    normalized, fmt
+                ).date()
                 return
             except (ValueError, TypeError):
                 continue
@@ -927,7 +941,9 @@ class SyncDataExec(models.Model):
             return user_datetime
         tz_name = self.env.user.tz or "America/Toronto"
         tz = pytz.timezone(tz_name)
-        dt_local = tz.localize(datetime.combine(user_datetime, time.min))
+        dt_local = tz.localize(
+            datetime.datetime.combine(user_datetime, datetime.time.min)
+        )
         dt_utc = dt_local.astimezone(pytz.UTC)
         return fields.Datetime.to_string(dt_utc)
 

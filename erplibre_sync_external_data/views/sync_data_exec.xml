@@ -48,6 +48,9 @@
                             <field name="time_duration_transform" />
                             <field name="time_duration_transform_fr" />
                         </group>
+                        <group name="group_time_info" string="Information other time">
+                            <field name="time_sleep_before_execution" />
+                        </group>
                     </group>
                     <!-- Étape 1: Upload -->
                     <group name="import_info" string="Information pour un seul fichier" invisible="state != 'upload'" />
