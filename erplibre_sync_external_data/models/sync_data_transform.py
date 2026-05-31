@@ -278,7 +278,6 @@ class SyncDataTransform(models.Model):
             return
         sync_field = metadata.get("sync")
         sync_by_mirror_field = bind_config.get("sync_by_mirror_field")
-        sync_by_dest_field = bind_config.get("sync_by_dest_field")
         if sync_by_mirror_field:
             sync_field = sync_by_mirror_field
 
@@ -298,7 +297,6 @@ class SyncDataTransform(models.Model):
 
             default_fields = bind_model_config.get("default_field", {})
             rec_name = bind_model_config.get("rec_name", None)
-            no_rec_name = bind_model_config.get("no_rec_name", False)
 
             bind_condition = bind_config.get("bind_condition")
             if bind_condition:
@@ -313,7 +311,6 @@ class SyncDataTransform(models.Model):
             for key, search_values in mirror_groups.items():
                 for mirror_id in search_values:
                     model_condition = []
-                    unique_name = ""
                     lst_suffix_associate_key = []
                     for field_sync_field_data in model_sync_field_data:
                         field_value = getattr(
@@ -331,11 +328,9 @@ class SyncDataTransform(models.Model):
                                     field_value,
                                 )
                             )
-                        unique_name += f"{field_value} "
                         lst_suffix_associate_key.append(str(field_name))
                         lst_suffix_associate_key.append(str(field_value))
                     suffix_associate_key = ".".join(lst_suffix_associate_key)
-                    unique_name = unique_name.strip()
                     # Support model
                     model_id = self.env[model_key].search(model_condition)
                     for rec in self:
@@ -353,7 +348,6 @@ class SyncDataTransform(models.Model):
                                 )
                             )
                             rec._bind_transform_model(
-                                unique_name,
                                 mirror_id,
                                 model_id,
                                 model_name,
@@ -364,8 +358,6 @@ class SyncDataTransform(models.Model):
                                 bind_field_reverse,
                                 transform_exec_batch,
                                 rec_name,
-                                no_rec_name,
-                                sync_by_dest_field,
                                 suffix_associate_key,
                             )
                         # Create link to mirror from data if exist
@@ -441,8 +433,15 @@ class SyncDataTransform(models.Model):
             else:
                 if model_id:
                     # Support write
-                    if getattr(model_id, field_name_target) != value:
-                        update_value = value
+                    if (
+                        type(getattr(model_id, field_name_target)) is str
+                        and type(value) is not str
+                    ):
+                        str_value = str(value)
+                    else:
+                        str_value = value
+                    if getattr(model_id, field_name_target) != str_value:
+                        update_value = str_value
                 else:
                     update_value = value
             if update_value is not None:
@@ -667,7 +666,6 @@ class SyncDataTransform(models.Model):
 
     def _bind_transform_model(
         self,
-        project_number,
         mirror_id,
         model_id,
         model_name,
@@ -678,36 +676,26 @@ class SyncDataTransform(models.Model):
         bind_field_reverse,
         transform_exec_batch,
         rec_name,
-        no_rec_name,
-        sync_by_dest_field,
         suffix_associate_key,
     ):
         if not model_value:
             return
         self.ensure_one()
         if not model_id:
-            if no_rec_name:
-                # TODO how validate duplicate information?
-                rec_name_value = uuid.uuid4().hex
-            elif rec_name is None and sync_by_dest_field:
-                rec_name_value = " ".join(
-                    [model_value.get(a) for a in sync_by_dest_field]
+            rec_field_name = self.env[model_key]._rec_name
+            rec_name_value = None
+            if type(rec_name) is str:
+                rec_name_value = getattr(mirror_id, rec_name)
+            elif type(rec_name) is dict:
+                lst_value_rec_name = [
+                    getattr(mirror_id, a) for a in rec_name.get("vars")
+                ]
+                rec_name_value = rec_name.get("string") % tuple(
+                    lst_value_rec_name
                 )
-            else:
-                rec_field_name = self.env[model_key]._rec_name
-                rec_name_value = None
-                if type(rec_name) is str:
-                    rec_name_value = getattr(mirror_id, rec_name)
-                elif type(rec_name) is dict:
-                    lst_value_rec_name = [
-                        getattr(mirror_id, a) for a in rec_name.get("vars")
-                    ]
-                    rec_name_value = rec_name.get("string") % tuple(
-                        lst_value_rec_name
-                    )
 
-                if rec_name_value:
-                    model_value[rec_field_name] = rec_name_value
+            if rec_name_value:
+                model_value[rec_field_name] = rec_name_value
 
         modification_json = json.dumps(
             model_value, default=self.json_default_serializer
@@ -730,11 +718,17 @@ class SyncDataTransform(models.Model):
             model_id=model_id,
             mode_b=True,
         )
-        if not model_id and bind_field_reverse:
-            modification_json = json.dumps(
-                {bind_field_reverse: transform_exec_id.id_depend_name},
-                default=self.json_default_serializer,
-            )
+        if bind_field_reverse:
+            if not model_id:
+                modification_json = json.dumps(
+                    {bind_field_reverse: transform_exec_id.id_depend_name},
+                    default=self.json_default_serializer,
+                )
+            else:
+                modification_json = json.dumps(
+                    {bind_field_reverse: model_id.id},
+                    default=self.json_default_serializer,
+                )
             transform_exec_batch.append(
                 {
                     "to_model_name": model_name,
