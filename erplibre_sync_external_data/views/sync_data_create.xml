@@ -119,6 +119,7 @@
                         name="groupby_sync_data_exec"
                         context="{'group_by':'sync_data_exec_id'}"
                     />
+                    <filter string="Model" name="groupby_model" context="{'group_by':'res_model'}" />
                 </group>
                 <searchpanel>
                     <field name="sync_data_exec_id" string="Sync Data Exec" icon="fa-th-list" />

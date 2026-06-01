@@ -17,6 +17,7 @@
         "data/queue_job_channel.xml",
         "data/queue_job_function.xml",
         "views/sync_data_create.xml",
+        "views/mail_tracking_value.xml",
         "views/sync_data_exec.xml",
         "views/sync_data_exec_cron_log.xml",
         "views/sync_data_transform.xml",

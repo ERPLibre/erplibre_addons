@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_data_write_view_list" model="ir.ui.view">
+        <field name="name">sync_data_write_view_list</field>
+        <field name="model">mail.tracking.value</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sync_data_exec_id" />
+                <field name="field_id" />
+                <field name="res_model" />
+                <field name="res_id" />
+                <field name="res_id_integer" />
+                <field name="old_value_integer" />
+                <field name="old_value_float" />
+                <field name="old_value_char" />
+                <field name="old_value_text" />
+                <field name="old_value_datetime" />
+                <field name="new_value_integer" />
+                <field name="new_value_float" />
+                <field name="new_value_char" />
+                <field name="new_value_text" />
+                <field name="new_value_datetime" />
+                <field name="mail_message_id" />
+            </list>
+        </field>
+    </record>
+
+    <record id="mail_tracking_value_view_search" model="ir.ui.view">
+        <field name="name">mail.tracking.value.search</field>
+        <field name="model">mail.tracking.value</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="field_id" />
+                <field name="res_model" />
+                <field name="res_id" />
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_by_field" string="Fields" context="{'group_by': 'field_id'}" />
+                    <filter name="group_by_res_model" string="Model" context="{'group_by': 'res_model'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

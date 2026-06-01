@@ -31,6 +31,14 @@
                     <button string="Revert" name="action_revert_data" type="object" class="oe_stat_button" />
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_sync_create_exec" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="create_count" widget="statinfo" />
+                        </button>
+                        <button name="action_open_sync_write_exec" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="modif_count" widget="statinfo" />
+                        </button>
+                    </div>
                     <group>
                         <field name="what_import" />
                         <field name="sync_model_ids" widget="many2many_tags" />
@@ -208,7 +216,6 @@
             <list>
                 <field name="name" />
                 <field name="has_error" />
-                <field name="has_error_msg" />
                 <field name="notes" />
                 <field name="state" />
                 <field name="time_duration_extract" />
