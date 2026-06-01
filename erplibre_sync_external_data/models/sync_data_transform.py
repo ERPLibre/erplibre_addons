@@ -284,8 +284,8 @@ class SyncDataTransform(models.Model):
         for model_key, bind_model_config in bind_field_model.items():
             bind_fields = bind_model_config.get("binding")
 
-            if not bind_fields:
-                continue
+            # if not bind_fields:
+            #     continue
 
             model_sync_field_data = []
             for a in bind_fields:
@@ -362,6 +362,7 @@ class SyncDataTransform(models.Model):
                                 )
                             if bind_field_reverse:
                                 # Create reference mirror to record
+                                modification_json = None
                                 if not model_id:
                                     modification_json = json.dumps(
                                         {
@@ -369,25 +370,30 @@ class SyncDataTransform(models.Model):
                                         },
                                         default=self.json_default_serializer,
                                     )
-                                else:
+                                elif not getattr(
+                                    mirror_id, bind_field_reverse
+                                ):
                                     modification_json = json.dumps(
                                         {bind_field_reverse: model_id.id},
                                         default=self.json_default_serializer,
                                     )
-                                transform_values = {
-                                    "to_model_name": model_name,
-                                    "to_id_ref": mirror_id.id,
-                                    "sync_data_transform_id": self.id,
-                                    "from_id_ref": model_id.id,
-                                    "from_model_name": model_key,
-                                    "modification_text": modification_json,
-                                    "method": "write",
-                                }
-                                if transform_exec_id:
-                                    transform_values["depend_ids"] = [
-                                        (6, 0, transform_exec_id.ids)
-                                    ]
-                                transform_exec_batch.append(transform_values)
+                                if modification_json:
+                                    transform_values = {
+                                        "to_model_name": model_name,
+                                        "to_id_ref": mirror_id.id,
+                                        "sync_data_transform_id": self.id,
+                                        "from_id_ref": model_id.id,
+                                        "from_model_name": model_key,
+                                        "modification_text": modification_json,
+                                        "method": "write",
+                                    }
+                                    if transform_exec_id:
+                                        transform_values["depend_ids"] = [
+                                            (6, 0, transform_exec_id.ids)
+                                        ]
+                                    transform_exec_batch.append(
+                                        transform_values
+                                    )
 
                         # Create link to mirror from data if exist
                         if bind_field_reverse and hasattr(
