@@ -338,7 +338,7 @@ class SyncDataTransform(models.Model):
                         # TODO option to create directly data without transformation
                         if not do_link:
                             transform_depends, dependency_links = (
-                                rec._bind_transform(
+                                rec._bind_transform_match_record(
                                     bind_fields,
                                     mirror_id,
                                     model_key,
@@ -347,19 +347,48 @@ class SyncDataTransform(models.Model):
                                     model_id,
                                 )
                             )
-                            rec._bind_transform_model(
-                                mirror_id,
-                                model_id,
-                                model_name,
-                                model_value,
-                                transform_depends,
-                                model_key,
-                                dependency_links,
-                                bind_field_reverse,
-                                transform_exec_batch,
-                                rec_name,
-                                suffix_associate_key,
-                            )
+                            transform_exec_id = None
+                            if model_value:
+                                transform_exec_id = rec._bind_transform_model(
+                                    mirror_id,
+                                    model_id,
+                                    model_name,
+                                    model_value,
+                                    transform_depends,
+                                    model_key,
+                                    dependency_links,
+                                    rec_name,
+                                    suffix_associate_key,
+                                )
+                            if bind_field_reverse:
+                                # Create reference mirror to record
+                                if not model_id:
+                                    modification_json = json.dumps(
+                                        {
+                                            bind_field_reverse: transform_exec_id.id_depend_name
+                                        },
+                                        default=self.json_default_serializer,
+                                    )
+                                else:
+                                    modification_json = json.dumps(
+                                        {bind_field_reverse: model_id.id},
+                                        default=self.json_default_serializer,
+                                    )
+                                transform_values = {
+                                    "to_model_name": model_name,
+                                    "to_id_ref": mirror_id.id,
+                                    "sync_data_transform_id": self.id,
+                                    "from_id_ref": model_id.id,
+                                    "from_model_name": model_key,
+                                    "modification_text": modification_json,
+                                    "method": "write",
+                                }
+                                if transform_exec_id:
+                                    transform_values["depend_ids"] = [
+                                        (6, 0, transform_exec_id.ids)
+                                    ]
+                                transform_exec_batch.append(transform_values)
+
                         # Create link to mirror from data if exist
                         if bind_field_reverse and hasattr(
                             mirror_id, "bind_field_reverse"
@@ -371,7 +400,7 @@ class SyncDataTransform(models.Model):
         if transform_exec_batch:
             self.env["sync.data.transform.exec"].create(transform_exec_batch)
 
-    def _bind_transform(
+    def _bind_transform_match_record(
         self,
         bind_fields,
         mirror_id,
@@ -673,13 +702,9 @@ class SyncDataTransform(models.Model):
         transform_depends,
         model_key,
         dependency_links,
-        bind_field_reverse,
-        transform_exec_batch,
         rec_name,
         suffix_associate_key,
     ):
-        if not model_value:
-            return
         self.ensure_one()
         if not model_id:
             rec_field_name = self.env[model_key]._rec_name
@@ -718,29 +743,7 @@ class SyncDataTransform(models.Model):
             model_id=model_id,
             mode_b=True,
         )
-        if bind_field_reverse:
-            if not model_id:
-                modification_json = json.dumps(
-                    {bind_field_reverse: transform_exec_id.id_depend_name},
-                    default=self.json_default_serializer,
-                )
-            else:
-                modification_json = json.dumps(
-                    {bind_field_reverse: model_id.id},
-                    default=self.json_default_serializer,
-                )
-            transform_exec_batch.append(
-                {
-                    "to_model_name": model_name,
-                    "to_id_ref": mirror_id.id,
-                    "sync_data_transform_id": self.id,
-                    "from_id_ref": model_id.id,
-                    "from_model_name": model_key,
-                    "depend_ids": [(6, 0, transform_exec_id.ids)],
-                    "modification_text": modification_json,
-                    "method": "write",
-                }
-            )
+        return transform_exec_id
 
     @api.depends(
         "time_execution_transform_start", "time_execution_transform_end"
