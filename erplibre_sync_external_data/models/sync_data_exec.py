@@ -342,10 +342,16 @@ class SyncDataExec(models.Model):
             "type": "ir.actions.act_window",
             "name": "Sync exec create",
             "res_model": "sync.data.create",
-            "view_mode": "list",
-            "view_id": self.env.ref(
-                "erplibre_sync_external_data.sync_data_create_view_list"
-            ).id,
+            "view_mode": "list,form",
+            "views": [
+                (
+                    self.env.ref(
+                        "erplibre_sync_external_data.sync_data_create_view_list"
+                    ).id,
+                    "list",
+                ),
+                (False, "form"),
+            ],
             "domain": [("sync_data_exec_id", "=", self.id)],
             "context": {
                 "default_sync_data_exec_id": self.id,
@@ -358,10 +364,16 @@ class SyncDataExec(models.Model):
             "type": "ir.actions.act_window",
             "name": "Sync exec write",
             "res_model": "mail.tracking.value",
-            "view_mode": "list",
-            "view_id": self.env.ref(
-                "erplibre_sync_external_data.sync_data_write_view_list"
-            ).id,
+            "view_mode": "list, form",
+            "views": [
+                (
+                    self.env.ref(
+                        "erplibre_sync_external_data.sync_data_write_view_list"
+                    ).id,
+                    "list",
+                ),
+                (False, "form"),
+            ],
             "domain": [("sync_data_exec_id", "=", self.id)],
             "context": {
                 "default_sync_data_exec_id": self.id,
