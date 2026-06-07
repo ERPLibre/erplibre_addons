@@ -116,6 +116,12 @@
         "views/erplibre_mode_version_erplibre.xml",
         "views/menu.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "erplibre_devops/static/src/systray/my_systray.js",
+            "erplibre_devops/static/src/systray/my_systray.xml",
+        ],
+    },
     "installable": True,
     "post_init_hook": "post_init_hook",
 }
