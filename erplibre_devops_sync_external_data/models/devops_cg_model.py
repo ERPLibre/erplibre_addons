@@ -25,6 +25,13 @@ class DevopsCgModel(models.Model):
         readonly=False,
     )
 
+    # sync_external_skip = fields.Integer(
+    #     help="Indicate the line number of header. Default 0 for CSV, and 1 for Excel",
+    #     compute="_compute_index_line_header",
+    #     store=True,
+    #     readonly=False,
+    # )
+
     sync_external_sheet_name = fields.Char(help="Can be Sheet0 or Sheet1")
 
     @api.depends("sync_external_file_type")

@@ -2,6 +2,7 @@ import base64
 import csv
 import datetime
 import io
+import itertools
 import json
 import logging
 import re
@@ -463,31 +464,55 @@ class SyncDataExec(models.Model):
             for a in row
         ]
 
-    def _open_file_reader(self, filepath, filetype, sheet_name, index):
+    def _open_file_reader(
+        self, filepath, filetype, sheet_name, index, index_line_header=0
+    ):
         """Open a file and return (reader, is_excel, index) or (None, False, index) on error."""
         if filetype == "xlsx":
             self._ensure_openpyxl()
             wb = openpyxl.load_workbook(filepath, data_only=True)
             if not wb.sheetnames:
                 raise ValueError("Missing sheet from xlsx file.")
+
             if sheet_name in wb.sheetnames:
-                ws = wb[sheet_name]
+                sheets = wb[sheet_name]
+                rows = sheets.iter_rows()
             else:
-                ws = wb[wb.sheetnames[0]]
-            return ws.iter_rows(), True, index
+                # sheets = [wb[wb.sheetnames[0]]]
+                sheets = [wb[name] for name in wb.sheetnames]
+                rows = self._chain_sheets(sheets, index_line_header)
+            return rows, True, index
         if filetype == "csv":
             index -= 1
             if isinstance(filepath, str):
-                reader = []
-                with open(filepath, newline="", encoding="utf-8") as f:
-                    for row in csv.reader(f):
-                        reader.append(list(row))
+                reader = self._iter_csv_path(filepath)
             else:
                 text_stream = io.TextIOWrapper(filepath, encoding="utf-8")
                 reader = csv.reader(text_stream)
             return reader, False, index
         _logger.error("Unsupported filetype '%s'", filetype)
         return None, False, index
+
+    @staticmethod
+    def _iter_csv_path(filepath):
+        """Yield CSV rows lazily, keeping the file open only while iterating."""
+        with open(filepath, newline="", encoding="utf-8") as f:
+            for row in csv.reader(f):
+                yield row
+
+    @staticmethod
+    def _chain_sheets(sheets, index_line_header=0):
+        """Chain rows from multiple sheets.
+
+        The first sheet is returned as-is (header included). For the following
+        sheets, the first `index_line_header` rows are skipped to drop their
+        header.
+        """
+        for i, ws in enumerate(sheets):
+            rows = ws.iter_rows()
+            if i > 0 and index_line_header:
+                rows = itertools.islice(rows, index_line_header, None)
+            yield from rows
 
     def extract_automated_excel(self, filepath, sync_model_id):
         last_id_tracking = (
@@ -538,7 +563,7 @@ class SyncDataExec(models.Model):
         ]
 
         reader, is_excel, index = self._open_file_reader(
-            filepath, filetype, sheet_name, index
+            filepath, filetype, sheet_name, index, index_line_header
         )
         if reader is None:
             return
@@ -566,8 +591,12 @@ class SyncDataExec(models.Model):
             ):
 
                 row_values = self._extract_header_values(row, is_excel)
+                if not any(row_values):
+                    continue
                 for item_row_i, item_row in enumerate(row_values):
                     item_row_transform = item_row.strip()
+                    if not item_row_transform:
+                        continue
 
                     if len(header_config) <= item_row_i:
                         _logger.warning(
@@ -580,7 +609,6 @@ class SyncDataExec(models.Model):
                             file_name_type,
                         )
                         has_different_header = True
-
                     if (
                         item_row_transform != header_config[item_row_i][0]
                         and not is_other_header
@@ -871,16 +899,16 @@ class SyncDataExec(models.Model):
                 return value.lower() in ("o", "y", "yes", "oui", "true")
             return value
         if field_type == "integer":
-            return self._parse_integer(value)
+            return self._parse_integer(value, field_name)
         if field_type in ("float", "monetary"):
-            return self._parse_float(value)
+            return self._parse_float(value, field_name)
         if field_type in ("char", "text"):
             if not isinstance(value, str):
                 return str(value) if value else ""
             return value
         return value
 
-    def _parse_integer(self, value):
+    def _parse_integer(self, value, field_name):
         """Parse a string value into an integer, stripping non-numeric chars."""
         if not isinstance(value, str):
             return value
@@ -888,10 +916,17 @@ class SyncDataExec(models.Model):
             return 0
         cleaned = re.sub(r"[^\d-]", "", value)
         if value.replace(" ", "") != cleaned:
-            _logger.error("Detect int %s from char %s", cleaned, value)
-        return int(cleaned) if cleaned else 0
+            _logger.error(
+                "Detect int '%s' from char '%s' from field name '%s'",
+                cleaned,
+                value,
+                field_name,
+            )
+        if cleaned.isdigit():
+            return int(cleaned) if cleaned else 0
+        return value
 
-    def _parse_float(self, value):
+    def _parse_float(self, value, field_name):
         """Parse a string value into a float, stripping currency symbols."""
         if not isinstance(value, str):
             return value
@@ -899,8 +934,13 @@ class SyncDataExec(models.Model):
         if not value:
             return 0.0
         cleaned = re.sub(r"[^\d,.-]", "", value).replace(",", ".")
-        if value.replace(" ", "") != cleaned:
-            _logger.error("Detect float %s from char %s", cleaned, value)
+        if value.replace(" ", "").replace(",", ".") != cleaned:
+            _logger.error(
+                "Detect float '%s' from char '%s' from field name '%s'",
+                cleaned,
+                value,
+                field_name,
+            )
         return float(cleaned) if cleaned else 0.0
 
     FRENCH_MONTHS = {

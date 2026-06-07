@@ -559,7 +559,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     model_fast_creation_field_separator = fields.Selection(
         string="Field separator fast creation",
-        default=";",
+        default="\t",
         selection=[
             ("\t", "tab"),
             (";", ";"),
@@ -1207,6 +1207,12 @@ class DevopsPlanActionWizard(models.TransientModel):
     def action_enable_model_fast_creation(self):
         for rec in self:
             rec.model_fast_creation_enabled = True
+        # install module erplibre_sync_external_data
+        module = self.env["ir.module.module"].search(
+            [("name", "=", "erplibre_sync_external_data")], limit=1
+        )
+        if module and module.state not in ("installed", "to upgrade"):
+            module.button_immediate_install()
         return self._reopen_self()
 
     def action_model_fast_creation(self):
@@ -2435,7 +2441,32 @@ class DevopsPlanActionWizard(models.TransientModel):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - Enable all tracking"
         ) as wp_id:
+            # Enable tracking and activity for each model
             for cg_model_id in self.model_ids:
                 cg_model_id.is_activity = True
                 cg_model_id.is_all_tracking = True
+        return self._reopen_self()
+
+    def action_optimisation_field(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Enable all tracking"
+        ) as wp_id:
+            # Clean french char from field name
+            for cg_model_id in self.model_ids:
+                for field_id in cg_model_id.field_ids:
+                    field_name = field_id.name
+                    field_name_formated = (
+                        field_name.replace("_l_", "_")
+                        .replace("_d_", "_")
+                        .replace("_du_", "_")
+                        .replace("_le_", "_")
+                    )
+                    if field_name_formated != field_name:
+                        field_id.name = field_name_formated
+
+                cg_model_id.is_activity = True
+                cg_model_id.is_all_tracking = True
+
         return self._reopen_self()
