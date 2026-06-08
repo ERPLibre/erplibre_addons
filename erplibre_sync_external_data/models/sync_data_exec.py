@@ -562,6 +562,12 @@ class SyncDataExec(models.Model):
             i for i, a in enumerate(header_config_ext) if a[1] in sync_fields
         ]
 
+        if not sync_header_indices and sync_fields:
+            _logger.error(
+                f"sync_fields '{sync_fields}' cannot be find from fields list."
+            )
+            return
+
         reader, is_excel, index = self._open_file_reader(
             filepath, filetype, sheet_name, index, index_line_header
         )
