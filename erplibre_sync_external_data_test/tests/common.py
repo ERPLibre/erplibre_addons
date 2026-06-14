@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import base64
 import os
+from unittest import mock
 
 import orjson
 from odoo.tests.common import TransactionCase
@@ -59,7 +60,8 @@ class SyncTestBase(TransactionCase):
     @classmethod
     def _ensure_sale_journal(cls):
         if cls.env["account.journal"].search(
-            [("type", "=", "sale"), ("company_id", "=", cls.env.company.id)], limit=1
+            [("type", "=", "sale"), ("company_id", "=", cls.env.company.id)],
+            limit=1,
         ):
             return
         # Fresh DB without demo data has no chart of accounts; create the minimum
@@ -78,10 +80,27 @@ class SyncTestBase(TransactionCase):
 
     def setUp(self):
         super().setUp()
+        # server_wide_modules includes queue_job, so action_transform_algo
+        # enqueues the transform via with_delay() and the job never runs
+        # inside a TransactionCase. Force synchronous execution so the
+        # transform phase runs inline and its created records are asserted.
+        self.env = self.env(
+            context=dict(self.env.context, queue_job__no_delay=True)
+        )
         # _link_tracking_values in the parent module calls env.cr.commit()
         # which is forbidden inside TransactionCase (raises AssertionError).
         # Replace with no-op for test isolation.
         self.env.cr.commit = lambda: None
+        # crm.lead._compute_email_state validates email deliverability via a
+        # live DNS MX lookup (mail.tools.mail_validation.mail_validate ->
+        # flanker), which hangs in an offline test environment. Patch it so the
+        # transform tests (which create crm.lead with emails) stay hermetic.
+        mail_validate_patcher = mock.patch(
+            "odoo.addons.mail.tools.mail_validation.mail_validate",
+            return_value=True,
+        )
+        mail_validate_patcher.start()
+        self.addCleanup(mail_validate_patcher.stop)
 
     def _make_sync_model(self, filetype, sheet_name=""):
         metadata = dict(SYNC_METADATA)
@@ -94,7 +113,9 @@ class SyncTestBase(TransactionCase):
             {
                 "name": f"Test {filetype.upper()}",
                 "model_name": self.mirror_model,
-                "spreadsheet_extraction_metadata": orjson.dumps(metadata).decode(),
+                "spreadsheet_extraction_metadata": orjson.dumps(
+                    metadata
+                ).decode(),
             }
         )
 
@@ -114,12 +135,19 @@ class SyncTestBase(TransactionCase):
 
     def _assert_all_entities_linked(self, entries):
         for entry in entries:
-            self.assertTrue(entry.partner_id, f"{entry.project_code}: missing partner")
+            self.assertTrue(
+                entry.partner_id, f"{entry.project_code}: missing partner"
+            )
             self.assertTrue(
                 entry.crm_lead_id, f"{entry.project_code}: missing crm.lead"
             )
             self.assertTrue(
-                entry.sale_order_id, f"{entry.project_code}: missing sale.order"
+                entry.sale_order_id,
+                f"{entry.project_code}: missing sale.order",
             )
-            self.assertTrue(entry.project_id, f"{entry.project_code}: missing project")
-            self.assertTrue(entry.invoice_id, f"{entry.project_code}: missing invoice")
+            self.assertTrue(
+                entry.project_id, f"{entry.project_code}: missing project"
+            )
+            self.assertTrue(
+                entry.invoice_id, f"{entry.project_code}: missing invoice"
+            )

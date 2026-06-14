@@ -20,6 +20,7 @@
         "code_generator_theme_website",
         "code_generator_website_leaflet",
         "code_generator_website_snippet",
+        "erplibre_sync_external_data",
         "mail",
         "multi_step_wizard",
         "queue_job",

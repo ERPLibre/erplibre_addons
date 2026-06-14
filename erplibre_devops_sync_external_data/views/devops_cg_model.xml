@@ -12,10 +12,38 @@
                             <field name="enable_sync_external" />
                             <field name="sync_external_file_type" invisible="not enable_sync_external" />
                             <field name="sync_external_index_line_header" invisible="not enable_sync_external" />
+                            <field name="sync_external_nb_line_header" invisible="not enable_sync_external" />
                             <field
                                 name="sync_external_sheet_name"
                                 invisible="not enable_sync_external or sync_external_file_type != 'xlsx'"
                             />
+                            <field name="sync_external_scenario" invisible="not enable_sync_external" />
+                            <field name="sync_external_context_name" invisible="not enable_sync_external" />
+                            <field name="sync_external_description" invisible="not enable_sync_external" />
+                            <field name="sync_external_ignore_data" invisible="not enable_sync_external" />
+                        </group>
+                    </group>
+                    <group string="Bindings" invisible="not enable_sync_external">
+                        <field name="sync_external_bind_ids" nolabel="1" colspan="2" />
+                    </group>
+                    <group string="Transform / linking" invisible="not enable_sync_external">
+                        <group>
+                            <field name="sync_external_transform_context" />
+                            <field
+                                name="sync_external_transform_context_label"
+                                invisible="not sync_external_transform_context"
+                            />
+                            <field name="sync_external_no_match_json" invisible="not sync_external_transform_context" />
+                            <field name="sync_external_enable_queue_job" />
+                        </group>
+                        <group>
+                            <field name="sync_external_enable_cron" />
+                            <field
+                                name="sync_external_cron_interval_number"
+                                invisible="not sync_external_enable_cron"
+                            />
+                            <field name="sync_external_cron_interval_type" invisible="not sync_external_enable_cron" />
+                            <field name="sync_external_cron_code" invisible="not sync_external_enable_cron" />
                         </group>
                     </group>
                 </page>

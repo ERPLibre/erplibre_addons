@@ -1205,14 +1205,13 @@ class DevopsPlanActionWizard(models.TransientModel):
         return self._reopen_self()
 
     def action_enable_model_fast_creation(self):
+        # erplibre_sync_external_data (and its auto_install bridge
+        # erplibre_devops_sync_external_data, which provides the external-sync
+        # wizard field) are base dependencies of erplibre_devops, so the field
+        # already exists in the loaded view. This button only flips the flag;
+        # the fast-creation group reveals without a manual page refresh.
         for rec in self:
             rec.model_fast_creation_enabled = True
-        # install module erplibre_sync_external_data
-        module = self.env["ir.module.module"].search(
-            [("name", "=", "erplibre_sync_external_data")], limit=1
-        )
-        if module and module.state not in ("installed", "to upgrade"):
-            module.button_immediate_install()
         return self._reopen_self()
 
     def action_model_fast_creation(self):

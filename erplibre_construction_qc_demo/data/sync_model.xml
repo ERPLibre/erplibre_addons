@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="sync_model_construction_doc_soumission" model="sync.model">
+        <field name="name">construction_doc_soumission</field>
+        <field name="model_name">construction.doc_soumission</field>
+        <!-- prettier-ignore-start -->
+        <field name="spreadsheet_extraction_metadata">
+{
+    "index_line_header": 1,
+    "nb_line_header": 1,
+    "header": [
+        ["Numéro soumission", "numero_soumission"],
+        ["Nom chantier", "nom_chantier"],
+        ["Code projet", "code_projet"],
+        ["Entrepreneur", "entrepreneur_name"],
+        ["Montant", "montant"],
+        ["Date soumission", "date_soumission"],
+        ["Statut", "statut"],
+        ["Actif", "actif", {"Oui": true, "Non": false}],
+        ["Coordonnées", "coordonnees_gps"]
+    ],
+    "ignore_validation_header": false,
+    "ignore_data": [],
+    "filetype": "xlsx",
+    "sync": ["numero_soumission"],
+    "sheet_name": "Soumissions",
+    "bind": [
+        {
+            "bind_field_reverse": "project_id",
+            "bind_field_model": {
+                "project.project": {
+                    "rec_name": {"string": "%s - %s", "vars": ["code_projet", "nom_chantier"]},
+                    "binding": [
+                        {"field_name": "no_chantier", "mirror_field": "code_projet", "is_sync": true}
+                    ],
+                    "default_field": {"is_chantier": true}
+                }
+            }
+        }
+    ]
+}
+        </field>
+        <!-- prettier-ignore-end -->
+    </record>
+
+    <record id="sync_model_construction_doc_facture" model="sync.model">
+        <field name="name">construction_doc_facture</field>
+        <field name="model_name">construction.doc_facture</field>
+        <!-- prettier-ignore-start -->
+        <field name="spreadsheet_extraction_metadata">
+{
+    "index_line_header": 0,
+    "nb_line_header": 1,
+    "header": [
+        ["No facture", "no_facture"],
+        ["Numéro soumission", "numero_soumission"],
+        ["Date échéance", "date_echeance"],
+        ["Montant payé", "montant_paye"],
+        ["Fournisseur", "fournisseur"]
+    ],
+    "ignore_validation_header": false,
+    "ignore_data": [],
+    "filetype": "csv",
+    "sync": ["no_facture"],
+    "bind": []
+}
+        </field>
+        <!-- prettier-ignore-end -->
+    </record>
+
+    <record id="sync_model_construction_doc_devis" model="sync.model">
+        <field name="name">construction_doc_devis</field>
+        <field name="model_name">construction.doc_devis</field>
+        <!-- prettier-ignore-start -->
+        <field name="spreadsheet_extraction_metadata">
+{
+    "index_line_header": 0,
+    "nb_line_header": 1,
+    "header": [
+        ["Numéro devis", "numero_devis"],
+        ["Nom chantier", "nom_chantier"],
+        ["Client", "client_name"],
+        ["Courriel", "client_email"],
+        ["Montant", "montant"]
+    ],
+    "ignore_validation_header": false,
+    "ignore_data": [],
+    "filetype": "csv",
+    "sync": ["numero_devis"],
+    "bind": [
+        {
+            "bind_field_reverse": "crm_lead_id",
+            "method_call": "action_transform_construction_devis",
+            "order_lines": [
+                {"product_name": "Excavation", "qty": 1, "price_unit": 5000.0},
+                {"product_name": "Coffrage", "qty": 3, "price_unit": 1200.0}
+            ]
+        }
+    ]
+}
+        </field>
+        <!-- prettier-ignore-end -->
+    </record>
+
+    <record id="sync_model_construction_doc_intervenant" model="sync.model">
+        <field name="name">construction_doc_intervenant</field>
+        <field name="model_name">construction.doc_intervenant</field>
+        <!-- prettier-ignore-start -->
+        <field name="spreadsheet_extraction_metadata">
+{
+    "index_line_header": 0,
+    "nb_line_header": 1,
+    "header": [
+        ["Nom", "nom"],
+        ["Courriel", "courriel"],
+        ["Rôle", "role"],
+        ["Type", "type_label"]
+    ],
+    "ignore_validation_header": false,
+    "ignore_data": [],
+    "filetype": "csv",
+    "sync": ["courriel"],
+    "bind": [
+        {
+            "bind_field_reverse": "partner_id",
+            "method_call": "action_transform_construction_intervenant"
+        }
+    ]
+}
+        </field>
+        <!-- prettier-ignore-end -->
+    </record>
+</odoo>

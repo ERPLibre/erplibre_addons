@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_cg_sync_bind_view_list" model="ir.ui.view">
+        <field name="name">devops_cg_sync_bind_list</field>
+        <field name="model">devops.cg.sync.bind</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle" />
+                <field name="target_model" />
+                <field name="target_model_other" optional="hide" />
+                <field name="bind_field_reverse" />
+                <field name="method_call" />
+            </list>
+        </field>
+    </record>
+
+    <record id="devops_cg_sync_bind_view_form" model="ir.ui.view">
+        <field name="name">devops_cg_sync_bind_form</field>
+        <field name="model">devops.cg.sync.bind</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="target_model" />
+                            <field
+                                name="target_model_other"
+                                invisible="target_model != 'other'"
+                                required="target_model == 'other'"
+                            />
+                            <field name="bind_field_reverse" />
+                            <field name="method_call" />
+                        </group>
+                        <group>
+                            <field name="rec_name_mode" invisible="method_call" />
+                            <field name="rec_name_field" invisible="method_call or rec_name_mode != 'field'" />
+                            <field name="rec_name_format" invisible="method_call or rec_name_mode != 'format'" />
+                            <field name="rec_name_vars" invisible="method_call or rec_name_mode != 'format'" />
+                            <field name="link_only" />
+                            <field name="ignore" />
+                        </group>
+                    </group>
+                    <group string="Advanced">
+                        <field name="bind_condition" />
+                        <field name="bind_group_by" />
+                        <field name="sync_by_mirror_field" />
+                        <field name="method_extra_json" invisible="not method_call" />
+                    </group>
+                    <notebook invisible="method_call">
+                        <page string="Field bindings">
+                            <field name="binding_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="field_name" />
+                                    <field name="mirror_field_id" domain="[('model_id', '=', parent.model_id)]" />
+                                    <field name="is_sync" />
+                                    <field name="search_field_name" />
+                                    <field name="compute_field" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Default values">
+                            <field name="default_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="key" />
+                                    <field name="value_type" />
+                                    <field name="value" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

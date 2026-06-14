@@ -64,12 +64,15 @@ class DevopsPlanActionWizard(models.TransientModel):
         self, field_id, dct_field, is_first_run=False
     ):
         super()._generate_from_json_field(field_id, dct_field)
-        csv_header_name = dct_field.get("csv_header_name")
-        if csv_header_name:
-            field_id.sync_external_associate_header_name = csv_header_name
         field_id.enable_sync_external = (
             self.model_fast_creation_field_enable_external_sync
         )
-        field_id.sync_external_associate_header_name = dct_field.get("string")
+        # Header label: prefer an explicit csv_header_name, else the field's
+        # string. Never clobber it with an empty value (B2).
+        header_name = dct_field.get("csv_header_name") or dct_field.get(
+            "string"
+        )
+        if header_name:
+            field_id.sync_external_associate_header_name = header_name
         if is_first_run:
             field_id.sync_external_is_primary = True

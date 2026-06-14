@@ -6,7 +6,13 @@ class SyncDataTransform(models.Model):
     _inherit = "sync.data.transform"
 
     def action_transform_test_entries(
-        self, mirror_ids, model_name, bind_config, bind_field_reverse, do_link=False
+        self,
+        mirror_ids,
+        model_name,
+        bind_config,
+        bind_field_reverse,
+        metadata,
+        do_link=False,
     ):
         order_lines_cfg = bind_config.get("order_lines", [])
         for entry in mirror_ids:
@@ -40,7 +46,11 @@ class SyncDataTransform(models.Model):
         return self._transform_find_or_create(
             "product.product",
             [("name", "=", product_name)],
-            {"name": product_name, "type": "service", "list_price": price_unit},
+            {
+                "name": product_name,
+                "type": "service",
+                "list_price": price_unit,
+            },
         )
 
     def _test_create_lead(self, entry, partner):
@@ -54,7 +64,9 @@ class SyncDataTransform(models.Model):
             vals["date_deadline"] = entry.expected_date
         return self.env["crm.lead"].create(vals)
 
-    def _test_create_sale_order(self, entry, partner, lead, order_lines_cfg=None):
+    def _test_create_sale_order(
+        self, entry, partner, lead, order_lines_cfg=None
+    ):
         vals = {
             "partner_id": partner.id,
             "client_order_ref": entry.project_code,

@@ -25,3 +25,8 @@ class DevopsPlanCg(models.Model):
                 code_generator_id.devops_cg_model_ids = [
                     (6, 0, model_sync_external_data_ids.ids)
                 ]
+                if any(
+                    m.sync_external_enable_queue_job
+                    for m in model_sync_external_data_ids
+                ):
+                    code_generator_id.add_module_dependency("queue_job")

@@ -12,6 +12,7 @@
                 <group invisible="not enable_sync_external">
                     <field name="sync_external_is_primary" />
                     <field name="sync_external_associate_header_name" />
+                    <field name="sync_external_value_map" />
                 </group>
             </group>
         </field>

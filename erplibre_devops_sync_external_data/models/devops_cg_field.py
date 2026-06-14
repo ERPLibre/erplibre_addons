@@ -20,3 +20,11 @@ class DevopsCgField(models.Model):
     sync_external_associate_header_name = fields.Char(
         help="CSV header name, will be associate for migration sync external"
     )
+
+    sync_external_value_map = fields.Text(
+        help=(
+            "Optional JSON object mapping raw cell values to replacements for"
+            ' this column, e.g. {"oui": true, "non": false}. Emitted as the'
+            " 3rd element of the header entry."
+        )
+    )

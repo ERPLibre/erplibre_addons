@@ -16,7 +16,9 @@
         "erplibre_sync_external_data",
     ],
     "data": [
+        "security/ir.model.access.csv",
         "views/devops_cg_field.xml",
+        "views/devops_cg_sync_bind.xml",
         "views/devops_cg_model.xml",
         "wizards/devops_plan_action_wizard.xml",
     ],
