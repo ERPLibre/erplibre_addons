@@ -490,7 +490,9 @@ class SyncDataExec(models.Model):
                 text_stream = io.TextIOWrapper(filepath, encoding="utf-8")
                 reader = csv.reader(text_stream)
             return reader, False, index
-        _logger.error("Unsupported filetype '%s'", filetype)
+        msg_error = "Unsupported filetype '%s'" % filetype
+        self.has_error_msg += "\n" + msg_error + "\n"
+        _logger.error(msg_error)
         return None, False, index
 
     @staticmethod
@@ -563,9 +565,11 @@ class SyncDataExec(models.Model):
         ]
 
         if not sync_header_indices and sync_fields:
-            _logger.error(
+            msg_error = (
                 f"sync_fields '{sync_fields}' cannot be find from fields list."
             )
+            self.has_error_msg += "\n" + msg_error + "\n"
+            _logger.error(msg_error)
             return
 
         reader, is_excel, index = self._open_file_reader(
@@ -605,28 +609,34 @@ class SyncDataExec(models.Model):
                         continue
 
                     if len(header_config) <= item_row_i:
-                        _logger.warning(
-                            "Got difference header, missing index %s '%s', and '%s' "
-                            "check filepath '%s' filetype '%s'",
-                            item_row_i,
-                            header_config,
-                            parsed_headers,
-                            filepath,
-                            file_name_type,
+                        msg_warning = (
+                            "Got difference header, missing index %s '%s', and '%s'\nCheck filepath '%s' filetype '%s'"
+                            % (
+                                item_row_i,
+                                header_config,
+                                parsed_headers,
+                                filepath,
+                                file_name_type,
+                            )
                         )
+                        self.has_error_msg += "\n" + msg_warning + "\n"
+                        _logger.warning(msg_warning)
                         has_different_header = True
                     if (
                         item_row_transform != header_config[item_row_i][0]
                         and not is_other_header
                     ):
-                        _logger.warning(
-                            "Got difference header '%s' and '%s', "
-                            "check filepath '%s' filetype '%s'",
-                            item_row_transform,
-                            header_config[item_row_i][0],
-                            filepath,
-                            file_name_type,
+                        msg_warning = (
+                            "Got difference header, expect '%s' and got '%s'\nCheck filepath '%s' filetype '%s'"
+                            % (
+                                item_row_transform,
+                                header_config[item_row_i][0],
+                                filepath,
+                                file_name_type,
+                            )
                         )
+                        self.has_error_msg += "\n" + msg_warning + "\n"
+                        _logger.warning(msg_warning)
                         has_different_header = True
 
                     if is_other_header:
@@ -698,9 +708,9 @@ class SyncDataExec(models.Model):
                                     row_values[i] = last_repeat_column_data[i]
                                 data_lines.append(row_values)
                             else:
-                                _logger.warning(
-                                    "Missing information from repeat column option."
-                                )
+                                msg_warning = "Missing information from repeat column option."
+                                self.has_error_msg += "\n" + msg_warning + "\n"
+                                _logger.warning(msg_warning)
                     else:
                         if sync_fields:
                             # Validate sync value exist
@@ -714,12 +724,12 @@ class SyncDataExec(models.Model):
                             data_lines.append(row_values)
 
         if has_different_header and not data_lines:
-            _logger.error(
-                "Wrong header file '%s', expected header '%s' and got '%s'",
-                file_name_type,
-                expected_headers,
-                parsed_headers,
+            msg_error = (
+                "Wrong header file '%s', expected header '%s' and got '%s'"
+                % (file_name_type, expected_headers, parsed_headers)
             )
+            self.has_error_msg += "\n" + msg_error + "\n"
+            _logger.error(msg_error)
             return
         if ignore_last_line:
             data_lines = data_lines[:-ignore_last_line]
@@ -777,9 +787,9 @@ class SyncDataExec(models.Model):
         model_record_id = self.env[model_name].search(search_domain)
 
         if len(model_record_id) > 1:
-            _logger.warning(
-                "Found multiple records with index %s", sync_fields
-            )
+            msg_warning = "Found multiple records with index %s" % sync_fields
+            self.has_error_msg += "\n" + msg_warning + "\n"
+            _logger.warning(msg_warning)
             matching = [
                 r for r in model_record_id if r.file_no_line == file_no_line
             ]
@@ -922,12 +932,12 @@ class SyncDataExec(models.Model):
             return 0
         cleaned = re.sub(r"[^\d-]", "", value)
         if value.replace(" ", "") != cleaned:
-            _logger.error(
-                "Detect int '%s' from char '%s' from field name '%s'",
-                cleaned,
-                value,
-                field_name,
+            msg_error = (
+                "Detect int '%s' from char '%s' from field name '%s'"
+                % (cleaned, value, field_name)
             )
+            self.has_error_msg += "\n" + msg_error + "\n"
+            _logger.error(msg_error)
         if cleaned.isdigit():
             return int(cleaned) if cleaned else 0
         return value
@@ -941,12 +951,12 @@ class SyncDataExec(models.Model):
             return 0.0
         cleaned = re.sub(r"[^\d,.-]", "", value).replace(",", ".")
         if value.replace(" ", "").replace(",", ".") != cleaned:
-            _logger.error(
-                "Detect float '%s' from char '%s' from field name '%s'",
-                cleaned,
-                value,
-                field_name,
+            msg_error = (
+                "Detect float '%s' from char '%s' from field name '%s'"
+                % (cleaned, value, field_name)
             )
+            self.has_error_msg += "\n" + msg_error + "\n"
+            _logger.error(msg_error)
         return float(cleaned) if cleaned else 0.0
 
     FRENCH_MONTHS = {
@@ -1023,7 +1033,9 @@ class SyncDataExec(models.Model):
                 continue
 
         record_data[key] = False
-        _logger.error("Cannot parse data to date '%s'", data)
+        msg_error = "Cannot parse data to date '%s'" % data
+        self.has_error_msg += "\n" + msg_error + "\n"
+        _logger.error(msg_error)
 
     def transform_datetime(self, user_datetime):
         """Convert a date to a UTC datetime string using the user's timezone."""

@@ -16,6 +16,8 @@ class SyncModel(models.Model):
         tracking=True,
     )
 
+    active = fields.Boolean(tracking=True, default=True)
+
     sequence = fields.Integer(tracking=True, default=10)
 
     model_name = fields.Char(tracking=True)
