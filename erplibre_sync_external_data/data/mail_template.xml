@@ -21,4 +21,29 @@
 </footer>
     ]]></field>
     </record>
+    <record id="mail_template_erplibre_sync_external_data_error_detected" model="mail.template">
+        <field name="name">Sync external data error detected</field>
+        <field name="model_id" ref="model_sync_data_exec" />
+        <field name="subject">Error détecté sur document ({{ object.display_name }})</field>
+        <field name="email_from">{{(user.email_formatted or '')|safe}}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour,</p>
+<p>Voici le rapport : <b><t t-esc="object.name"/></b></p>
+<p>Détection d'erreur ❌, voir fin du log : <br />
+    <blockquote style="white-space: pre-wrap;">
+        <t t-out="'\n'.join((object.has_error_msg or '').split('\n')[-20:])"/>
+    </blockquote>
+</p>
+<br />
+<footer>
+    <p>
+        <a t-attf-href="{{ object.get_base_url() }}/odoo/action-erplibre_sync_external_data.sync_data_exec_data_exec_action_window/{{ object.id }}"
+        target="_blank"
+        style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+            Sync external data
+        </a>
+    </p>
+</footer>
+    ]]></field>
+    </record>
 </odoo>

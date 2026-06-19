@@ -148,7 +148,10 @@ class SyncDataExec(models.Model):
         )
 
     def action_send_message_notification(self):
-        mail_template = self.env.ref(
+        mail_template_error_detected = self.env.ref(
+            "erplibre_sync_external_data.mail_template_erplibre_sync_external_data_error_detected"
+        )
+        mail_template_notif_change = self.env.ref(
             "erplibre_sync_external_data.mail_template_erplibre_sync_external_data_notif_change"
         )
         for rec in self:
@@ -167,11 +170,40 @@ class SyncDataExec(models.Model):
 
             if not partners:
                 continue
-            body_html = mail_template._render_field(
+            # Notif detected
+            body_html = mail_template_notif_change._render_field(
                 "body_html", [rec.id], compute_lang=True
             )[rec.id]
             body_html = Markup(body_html)
-            subject = mail_template._render_field(
+            subject = mail_template_notif_change._render_field(
+                "subject", rec.ids, compute_lang=True
+            )[rec.id]
+
+            rec.message_post(
+                body=body_html,
+                subject=subject,
+                message_type="comment",
+                # subtype_xmlid="mail.mt_comment",
+                partner_ids=partners.ids,
+            )
+
+        for rec in self:
+            if not rec.has_error:
+                continue
+
+            partners = rec.message_partner_ids
+            partners -= self.env.user.partner_id
+            partners = partners.filtered(lambda p: p.email)
+
+            if not partners:
+                continue
+
+            # Error detected
+            body_html = mail_template_error_detected._render_field(
+                "body_html", [rec.id], compute_lang=True
+            )[rec.id]
+            body_html = Markup(body_html)
+            subject = mail_template_error_detected._render_field(
                 "subject", rec.ids, compute_lang=True
             )[rec.id]
 
@@ -492,6 +524,7 @@ class SyncDataExec(models.Model):
             return reader, False, index
         msg_error = "Unsupported filetype '%s'" % filetype
         self.has_error_msg += "\n" + msg_error + "\n"
+        self.has_error = True
         _logger.error(msg_error)
         return None, False, index
 
@@ -569,6 +602,7 @@ class SyncDataExec(models.Model):
                 f"sync_fields '{sync_fields}' cannot be find from fields list."
             )
             self.has_error_msg += "\n" + msg_error + "\n"
+            self.has_error = True
             _logger.error(msg_error)
             return
 
@@ -620,7 +654,8 @@ class SyncDataExec(models.Model):
                             )
                         )
                         self.has_error_msg += "\n" + msg_warning + "\n"
-                        _logger.warning(msg_warning)
+                        _logger.error(msg_warning)
+                        self.has_error = True
                         has_different_header = True
                     if (
                         item_row_transform != header_config[item_row_i][0]
@@ -636,7 +671,8 @@ class SyncDataExec(models.Model):
                             )
                         )
                         self.has_error_msg += "\n" + msg_warning + "\n"
-                        _logger.warning(msg_warning)
+                        self.has_error = True
+                        _logger.error(msg_warning)
                         has_different_header = True
 
                     if is_other_header:
@@ -710,7 +746,8 @@ class SyncDataExec(models.Model):
                             else:
                                 msg_warning = "Missing information from repeat column option."
                                 self.has_error_msg += "\n" + msg_warning + "\n"
-                                _logger.warning(msg_warning)
+                                self.has_error = True
+                                _logger.error(msg_warning)
                     else:
                         if sync_fields:
                             # Validate sync value exist
@@ -729,6 +766,7 @@ class SyncDataExec(models.Model):
                 % (file_name_type, expected_headers, parsed_headers)
             )
             self.has_error_msg += "\n" + msg_error + "\n"
+            self.has_error = True
             _logger.error(msg_error)
             return
         if ignore_last_line:
@@ -937,6 +975,7 @@ class SyncDataExec(models.Model):
                 % (cleaned, value, field_name)
             )
             self.has_error_msg += "\n" + msg_error + "\n"
+            self.has_error = True
             _logger.error(msg_error)
         if cleaned.isdigit():
             return int(cleaned) if cleaned else 0
@@ -956,6 +995,7 @@ class SyncDataExec(models.Model):
                 % (cleaned, value, field_name)
             )
             self.has_error_msg += "\n" + msg_error + "\n"
+            self.has_error = True
             _logger.error(msg_error)
         return float(cleaned) if cleaned else 0.0
 
@@ -1034,6 +1074,7 @@ class SyncDataExec(models.Model):
 
         record_data[key] = False
         msg_error = "Cannot parse data to date '%s'" % data
+        self.has_error = True
         self.has_error_msg += "\n" + msg_error + "\n"
         _logger.error(msg_error)
 
