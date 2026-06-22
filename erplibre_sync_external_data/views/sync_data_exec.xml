@@ -39,7 +39,12 @@
                             <field name="modif_count" widget="statinfo" />
                         </button>
                     </div>
-                    <widget name="web_ribbon" title="Erreur" bg_color="text-bg-danger" invisible="not has_error" />
+                    <widget
+                        name="web_ribbon"
+                        title="Erreur"
+                        bg_color="text-bg-danger"
+                        invisible="not has_error and not detect_execution_error"
+                    />
                     <group>
                         <field name="what_import" />
                         <field name="sync_model_ids" widget="many2many_tags" />
@@ -72,8 +77,9 @@
                             <field name="notes" readonly="1" widget="html" />
                         </group>
                     </group>
-                    <group invisible="not has_error">
+                    <group string="Error">
                         <field name="has_error" />
+                        <field name="detect_execution_error" />
                     </group>
                     <group name="modification" string="Statistiques">
                         <field name="create_count" invisible="not has_modification" />
@@ -152,12 +158,13 @@
                 <field name="create_count" />
                 <field name="modif_count" />
                 <field name="has_error" />
+                <field name="detect_execution_error" />
                 <templates>
                     <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <i
-                                    t-if="record.has_error.raw_value"
+                                    t-if="record.has_error.raw_value or record.detect_execution_error.raw_value"
                                     class="fa fa-exclamation-triangle text-danger"
                                     title="Erreur détectée"
                                     role="img"
@@ -266,7 +273,11 @@
                 <field name="state" string="State" />
                 <field name="time_duration_extract_fr" string="Time duration" />
                 <field name="what_import" string="Quoi importer" />
-                <filter domain="[('has_error','=',True)]" name="has_error" string="Has error" />
+                <filter
+                    domain="['|',('has_error','=',True),('detect_execution_error','=',True)]"
+                    name="has_error"
+                    string="Has error"
+                />
                 <filter domain="[('has_modification','=',True)]" name="has_modification" string="Has modification" />
                 <filter
                     name="group_by_date_time_execution_extract_end"
