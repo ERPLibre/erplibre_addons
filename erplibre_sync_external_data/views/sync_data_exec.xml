@@ -279,6 +279,12 @@
                     string="Has error"
                 />
                 <filter domain="[('has_modification','=',True)]" name="has_modification" string="Has modification" />
+                <filter domain="[('transform_id','!=',False)]" name="has_transformation" string="Has transformation" />
+                <filter
+                    domain="[('transform_id','=',False)]"
+                    name="without_transformation"
+                    string="Without transformation"
+                />
                 <filter
                     name="group_by_date_time_execution_extract_end"
                     string="End date"
