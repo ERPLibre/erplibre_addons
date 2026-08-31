@@ -6,4 +6,5 @@ from . import (
     event_raffle_config,
     event_raffle_draw,
     event_raffle_participant,
+    res_partner,
 )

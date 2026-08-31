@@ -449,3 +449,69 @@ class TestRaffleWizard(TransactionCase):
         )
         with self.assertRaises(UserError):
             self._run_wizard("survey_only")
+
+
+class TestRaffleDrawPrize(TransactionCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.partner = cls.env["res.partner"].create({"name": "Winner P"})
+        cls.raffle = cls.env["event.raffle"].create({"name": "R"})
+        cls.participant = cls.env["event.raffle.participant"].create(
+            {
+                "raffle_id": cls.raffle.id,
+                "name": "Winner P",
+                "partner_id": cls.partner.id,
+            }
+        )
+
+    def _draw(self, **kw):
+        vals = {
+            "raffle_id": self.raffle.id,
+            "winner_participant_id": self.participant.id,
+            "winner_name": "Winner P",
+        }
+        vals.update(kw)
+        return self.env["event.raffle.draw"].create(vals)
+
+    def test_partner_is_carried_over_from_the_participant(self):
+        self.assertEqual(self._draw().partner_id, self.partner)
+
+    def test_dating_the_hand_over_marks_it_received_on_write(self):
+        draw = self._draw()
+        self.assertFalse(draw.prize_received)
+        draw.write({"prize_received_date": "2026-02-01 12:00:00"})
+        self.assertTrue(draw.prize_received)
+
+    def test_dating_the_hand_over_marks_it_received_on_create(self):
+        draw = self._draw(prize_received_date="2026-02-01 12:00:00")
+        self.assertTrue(draw.prize_received)
+
+    def test_the_flag_stays_hand_editable_without_a_date(self):
+        draw = self._draw()
+        draw.prize_received = True
+        self.assertTrue(draw.prize_received)
+        self.assertFalse(draw.prize_received_date)
+
+    def test_onchange_ticks_the_flag_in_the_form(self):
+        draw = self._draw()
+        draw.prize_received_date = "2026-02-01 12:00:00"
+        draw._onchange_prize_received_date()
+        self.assertTrue(draw.prize_received)
+
+    def test_partner_counts_and_lists_its_wins(self):
+        self.assertEqual(self.partner.raffle_win_count, 0)
+        draw = self._draw()
+        self.partner.invalidate_recordset(["raffle_win_count"])
+        self.assertEqual(self.partner.raffle_win_count, 1)
+        self.assertEqual(self.partner.raffle_draw_ids, draw)
+        action = self.partner.action_view_raffle_wins()
+        self.assertEqual(action["res_model"], "event.raffle.draw")
+
+    def test_the_winner_filter_domain_selects_only_winners(self):
+        other = self.env["res.partner"].create({"name": "No Win"})
+        self._draw()
+        domain = [("raffle_draw_ids.winner_participant_id", "!=", False)]
+        found = self.env["res.partner"].search(domain)
+        self.assertIn(self.partner, found)
+        self.assertNotIn(other, found)

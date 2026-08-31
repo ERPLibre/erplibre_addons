@@ -27,8 +27,45 @@ class EventRaffleDraw(models.Model):
     )
     winner_name = fields.Char(string="Winner Name", tracking=True)
     winner_email = fields.Char(string="Winner Email")
+    partner_id = fields.Many2one(
+        "res.partner",
+        string="Contact",
+        related="winner_participant_id.partner_id",
+        store=True,
+        index=True,
+        help="Contact gagnant, repris du participant. Stocké pour que la "
+        "fiche contact puisse lister ses tirages sans parcourir les "
+        "participants.",
+    )
     is_absent = fields.Boolean(string="Absent", default=False, tracking=True)
     date = fields.Datetime(string="Date", default=fields.Datetime.now)
+    comment = fields.Text(string="Comment")
+    prize_received = fields.Boolean(
+        string="Prize Received",
+        default=False,
+        tracking=True,
+    )
+    prize_received_date = fields.Datetime(string="Prize Received Date")
+
+    @api.onchange("prize_received_date")
+    def _onchange_prize_received_date(self):
+        # Dating the hand-over says it happened. The flag stays editable on
+        # its own, and emptying the date deliberately leaves it alone: only
+        # the person who ticked it knows whether the prize came back.
+        if self.prize_received_date:
+            self.prize_received = True
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("prize_received_date"):
+                vals["prize_received"] = True
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if vals.get("prize_received_date"):
+            vals["prize_received"] = True
+        return super().write(vals)
 
     @api.depends("sequence", "winner_name")
     def _compute_name(self):

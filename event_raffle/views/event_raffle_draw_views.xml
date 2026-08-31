@@ -9,8 +9,16 @@
                 <field name="raffle_id"/>
                 <field name="winner_name"/>
                 <field name="prize"/>
+                <field name="prize_received"/>
+                <field name="prize_received_date"/>
+                <field name="comment"/>
                 <field name="is_absent"/>
                 <field name="date"/>
+                <field name="name" optional="hide"/>
+                <field name="partner_id" optional="hide"/>
+                <field name="winner_participant_id" optional="hide"/>
+                <field name="winner_email" optional="hide"/>
+                <field name="prize_description" optional="hide"/>
             </list>
         </field>
     </record>
@@ -35,13 +43,21 @@
                             <field name="sequence"/>
                             <field name="winner_name"/>
                             <field name="winner_email"/>
+                            <field name="winner_participant_id"/>
+                            <field name="partner_id"/>
                             <field name="is_absent"/>
                         </group>
                         <group>
                             <field name="prize"/>
                             <field name="prize_description"/>
                             <field name="date"/>
+                            <field name="prize_received"/>
+                            <field name="prize_received_date"/>
                         </group>
+                    </group>
+                    <group string="Commentaire">
+                        <field name="comment" nolabel="1"
+                               placeholder="Remise du prix, coordonnées, suivi..."/>
                     </group>
                 </sheet>
                 <chatter/>
