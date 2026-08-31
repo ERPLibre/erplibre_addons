@@ -211,6 +211,23 @@ class RaffleUi:
             time.sleep(0.5)
         raise RuntimeError("Tux ratio attribute never set")
 
+    def canvas_box_vs_buffer(self):
+        """Check that the drawing buffer does not drive the layout.
+
+        Writes an absurd ratio into the canvas attributes and reads back its
+        laid-out height. If the height follows, the
+        ResizeObserver -> setSize -> layout loop is open again and the canvas
+        can grow without end (only its height, since its width is definite).
+        """
+        return self.d.execute_script(
+            "const c = document.querySelector('.o_raffle_wheel canvas');"
+            "const w0 = c.width, h0 = c.height, before = c.clientHeight;"
+            "c.width = 100; c.height = 4000;"
+            "const after = c.clientHeight;"
+            "c.width = w0; c.height = h0;"
+            "return [before, after];"
+        )
+
     def eligible_count(self):
         txt = self.d.find_element(
             By.CSS_SELECTOR, ".o_raffle_wheel .o_raffle_count"
@@ -323,6 +340,23 @@ def run(args):
                 f"Tux ratio {ratio:.3f} outside "
                 f"[{TUX_RATIO_MIN}, {TUX_RATIO_MAX}]"
             )
+
+        # Scenario 1b - the canvas must be sized by the layout, never by its
+        # own drawing buffer (embedded form view, where no ancestor supplies
+        # a height).
+        before, after = ui.canvas_box_vs_buffer()
+        print(f"Scenario 1b: canvas height {before} -> {after} px")
+        if before != after:
+            failures.append(
+                f"canvas height follows its drawing buffer "
+                f"({before} -> {after} px): resize loop is open"
+            )
+        # The probe writes into the live drawing buffer; when the loop IS open
+        # it also leaves a runaway growing. Reopen the form so what follows
+        # starts from a clean canvas instead of reporting the fallout twice.
+        ui.open_action(
+            ids["raffle_action"], ids["raffle_id"], ".o_raffle_wheel canvas"
+        )
 
         # Scenario 2 - go fullscreen (Tux visible) and run four draws,
         # one per animation in the rotation.

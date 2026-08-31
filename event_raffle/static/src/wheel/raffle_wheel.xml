@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates xml:space="preserve">
     <t t-name="event_raffle.RaffleWheel">
-        <div class="o_raffle_wheel o_action"
-             t-att-class="'o_raffle_' + state.theme">
+        <!-- `o_action` is what makes Odoo give the fullscreen client action its
+             height (.o_action_manager > .o_action). On the embedded widget it
+             cannot match that rule, but it DOES match a descendant rule in
+             action_dialog.scss, which then overrides our own height. So carry
+             it only where it is meant to work. -->
+        <div class="o_raffle_wheel"
+             t-att-class="'o_raffle_' + state.theme
+                          + (isFullscreen ? ' o_action' : '')">
             <div class="o_raffle_lasers" t-if="state.theme === 'rave'">
                 <span/><span/><span/><span/><span/>
                 <span/><span/><span/><span/><span/>
