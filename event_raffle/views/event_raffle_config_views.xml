@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="event_raffle_config_view_form" model="ir.ui.view">
+        <field name="name">event.raffle.config.form</field>
+        <field name="model">event.raffle.config</field>
+        <field name="arch" type="xml">
+            <form string="Paramètres du tirage" create="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Paramètres par défaut des tirages</h1>
+                    </div>
+                    <group>
+                        <group string="Roue">
+                            <field name="default_theme"/>
+                            <field name="default_remove_winner"/>
+                            <field name="default_spin_duration"/>
+                            <field name="default_spin_turns"/>
+                        </group>
+                        <group string="Célébration &amp; animation">
+                            <field name="default_winner_celebration"/>
+                            <field name="default_show_fireworks"/>
+                            <field name="default_show_tux"/>
+                            <field name="default_belly_logo"/>
+                            <field name="default_tux_animation"/>
+                            <field name="default_flag_text"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">
+                        Ces valeurs sont appliquées par défaut à la création
+                        d'un nouveau tirage.
+                    </p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_event_raffle_config" model="ir.actions.act_window">
+        <field name="name">Paramètres par défaut</field>
+        <field name="res_model">event.raffle.config</field>
+        <field name="view_mode">form</field>
+        <field name="res_id" ref="raffle_config_singleton"/>
+        <field name="target">current</field>
+    </record>
+</odoo>
