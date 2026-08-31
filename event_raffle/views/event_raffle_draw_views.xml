@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="event_raffle_draw_view_list" model="ir.ui.view">
+        <field name="name">event.raffle.draw.list</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="arch" type="xml">
+            <list string="Gagnants">
+                <field name="sequence"/>
+                <field name="raffle_id"/>
+                <field name="winner_name"/>
+                <field name="prize"/>
+                <field name="is_absent"/>
+                <field name="date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_draw_view_form" model="ir.ui.view">
+        <field name="name">event.raffle.draw.form</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="arch" type="xml">
+            <form string="Tir">
+                <header>
+                    <button name="action_mark_absent" type="object"
+                            string="Marquer absent" class="btn-secondary"
+                            invisible="is_absent"/>
+                    <button name="action_mark_present" type="object"
+                            string="Marquer présent" class="btn-secondary"
+                            invisible="not is_absent"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="raffle_id"/>
+                            <field name="sequence"/>
+                            <field name="winner_name"/>
+                            <field name="winner_email"/>
+                            <field name="is_absent"/>
+                        </group>
+                        <group>
+                            <field name="prize"/>
+                            <field name="prize_description"/>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+</odoo>
