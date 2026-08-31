@@ -18,6 +18,7 @@
         "views/event_raffle_actions.xml",
         "views/event_raffle_config_views.xml",
         "views/event_event_views.xml",
+        "views/res_partner_views.xml",
         "views/event_raffle_menus.xml",
     ],
     "assets": {
