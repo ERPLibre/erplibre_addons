@@ -14,6 +14,44 @@ const TUX_HEIGHT_FRACTION = 0.33;
 const REST_ARM_X = 0.3;
 const REST_ARM_Z = 0.5;
 
+// Beyond 2 the extra device pixels are invisible on a spinning wheel and only
+// cost memory: a projector at dpr 3 asks for nine times the drawing buffer.
+const MAX_PIXEL_RATIO = 2;
+
+// What drawing buffer to allocate for a canvas measured at `width` x `height`
+// CSS px. Pure, and exported, because this is the whole of the sizing policy
+// that _resize() applies and the only part of it worth testing:
+//  - a canvas not laid out yet (0x0) gives null: skipped rather than given an
+//    invented size, whose aspect ratio would be wrong. The ResizeObserver
+//    calls back as soon as there is a real size to use.
+//  - `runaway` marks a height nobody could look at -- one viewport and a bit.
+//    Reaching it means some stylesheet has put the canvas back into its own
+//    height computation (see the backstop in _resize()). The limit is set on
+//    the symptom, not on the GPU: a runaway adds a few pixels per frame, so a
+//    ceiling of several thousand px takes half a minute to reach and by then
+//    the wheel has long scrolled out of sight.
+//  - the pixel ratio is capped so the buffer stays inside the GPU's maximum
+//    texture size (8192 with software WebGL): past it the context is lost and
+//    nothing renders at all.
+export function computeCanvasSize({
+    width, height, viewportHeight, devicePixelRatio, maxTextureSize,
+}) {
+    const w = Math.round(width);
+    const measuredHeight = Math.round(height);
+    if (!(w >= 1) || !(measuredHeight >= 1)) {
+        return null;
+    }
+    const maxH = Math.max(1200, Math.round((viewportHeight || 0) * 1.2));
+    const runaway = measuredHeight > maxH;
+    const h = runaway ? maxH : measuredHeight;
+    const pixelRatio = Math.min(
+        devicePixelRatio || 1,
+        MAX_PIXEL_RATIO,
+        (maxTextureSize || 4096) / Math.max(w, h)
+    );
+    return { w, h, measuredHeight, pixelRatio, runaway };
+}
+
 // The wheel texture is drawn on a canvas and applied to a CircleGeometry with
 // the default flipY, which MIRRORS the angular direction: segment `index`
 // (canvas arc [index*seg, (index+1)*seg]) ends up centered at mesh-local angle
@@ -722,6 +760,12 @@ export class RaffleScene {
         this._animProps = [];
         this.tuxBase = null;
         this._ro = null;
+        // Last size applied to the renderer, in CSS px, and its pixel
+        // ratio (see _resize()).
+        this._sizeW = 0;
+        this._sizeH = 0;
+        this._sizePixelRatio = 0;
+        this._sizeWarned = false;
         this.theme = "light";
         this.tuxHalfWidth = 0.5;
         this._contentMinX = -WHEEL_RADIUS;
@@ -791,14 +835,57 @@ export class RaffleScene {
     }
 
     _aspect() {
-        return (this.canvas.clientWidth || 1) /
-            (this.canvas.clientHeight || 1);
+        // Ratio of the size actually applied to the renderer rather than a
+        // fresh DOM read: it keeps the framing and the projection matrix in
+        // agreement, and avoids a forced reflow inside the observer below.
+        return this._sizeH ? this._sizeW / this._sizeH : 1;
     }
 
+    // The canvas is measured here and its drawing buffer (the width/height
+    // ATTRIBUTES, since setSize is called with updateStyle=false) is written
+    // from that measurement, while the ResizeObserver watches the very same
+    // element. Writing only on a real change keeps that loop at zero gain.
     _resize() {
-        const w = this.canvas.clientWidth || 800;
-        const h = this.canvas.clientHeight || 600;
-        this.renderer.setPixelRatio(window.devicePixelRatio || 1);
+        const caps = this.renderer.capabilities || {};
+        const size = computeCanvasSize({
+            width: this.canvas.clientWidth,
+            height: this.canvas.clientHeight,
+            viewportHeight: window.innerHeight,
+            devicePixelRatio: window.devicePixelRatio,
+            maxTextureSize: caps.maxTextureSize,
+        });
+        if (!size) return;
+        const { w, h, pixelRatio } = size;
+        // Backstop, never expected to fire. Keeping the canvas out of its own
+        // height computation is the stylesheet's job (`.o_raffle_canvas` has a
+        // definite `flex-basis` precisely so the drawing buffer written below
+        // can never come back as a layout input). If another stylesheet ever
+        // reopens that loop, pin the box from here so the evening is not lost
+        // to a blank wheel, and say so once instead of failing in silence.
+        if (size.runaway && !this._sizeWarned) {
+            this._sizeWarned = true;
+            console.warn(
+                `event_raffle: canvas mesuré ${w}x${size.measuredHeight} px, ` +
+                `ramené à ${h} px — une feuille de style réinjecte la taille ` +
+                `du canvas dans la mise en page.`
+            );
+            const style = this.canvas.style;
+            style.setProperty("flex", "1 1 0", "important");
+            style.setProperty("min-height", "0", "important");
+            style.setProperty("height", "auto", "important");
+        }
+        // Idempotent: with nothing to change we write nothing, so the
+        // ResizeObserver above is not woken again by our own write. The pixel
+        // ratio is part of the comparison so that dragging the window to a
+        // screen of another density still redraws sharp.
+        if (w === this._sizeW && h === this._sizeH &&
+                pixelRatio === this._sizePixelRatio) {
+            return;
+        }
+        this._sizeW = w;
+        this._sizeH = h;
+        this._sizePixelRatio = pixelRatio;
+        this.renderer.setPixelRatio(pixelRatio);
         this.renderer.setSize(w, h, false);
         if (this.camera) {
             this.camera.aspect = w / h;
@@ -1924,5 +2011,9 @@ export class RaffleScene {
         }
         disposeTree(this.scene);
         this.renderer.dispose();
+        // r128's dispose() does not release the WebGL context; without this
+        // every remount (record navigation, fullscreen round trip) leaves one
+        // alive and the browser starts dropping the oldest after ~16.
+        this.renderer.forceContextLoss();
     }
 }

@@ -8,12 +8,16 @@ depend on the repo's `script/selenium` framework.
 
 1. **Tux size** — opens the raffle form and asserts the Tux/wheel height ratio
    (`data-tux-wheel-ratio` on the canvas) stays within **25%–40%**.
-2. **Draws + animations** — in fullscreen, runs one draw per Tux animation
+2. **Canvas sizing** — writes an absurd ratio into the canvas `width`/`height`
+   attributes and checks its laid-out height does **not** follow. If it does,
+   the drawing buffer is feeding the layout again and the canvas grows without
+   end in the embedded form view — the wheel then never appears.
+3. **Draws + animations** — in fullscreen, runs one draw per Tux animation
    (`peace`, `jump`, `flag`, `dance` — the rotation order), checking a winner is
    shown and the eligible pool shrinks (winner removal).
-3. **Persistence** — verifies the `event.raffle.draw` records via XML-RPC.
-4. **Winners smart button** — opens the event and checks the "Winners" list.
-5. **Mark absent** — marks a winner absent and verifies it stays out of the pool.
+4. **Persistence** — verifies the `event.raffle.draw` records via XML-RPC.
+5. **Winners smart button** — opens the event and checks the "Winners" list.
+6. **Mark absent** — marks a winner absent and verifies it stays out of the pool.
 
 A screenshot is saved at each step (see `--screenshot-dir`), including the four
 animations, so the wheel/Tux/flag rendering can be inspected visually.

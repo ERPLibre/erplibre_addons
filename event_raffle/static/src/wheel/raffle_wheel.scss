@@ -7,6 +7,19 @@
     height: 100%;
     min-height: 480px;
 
+    // Embedded form widget: nothing between .o_content and here declares a
+    // height, so the `height: 100%` above resolves to auto. Give it a real
+    // one; the fullscreen client action already gets its own from Odoo's
+    // `.o_action_manager > .o_action` rule.
+    // 2/1 is the shape the panel has always had -- it came from the default
+    // 300x150 canvas bitmap, which is what the old sizing ended up copying.
+    // Declared here it survives, and it no longer depends on the bitmap.
+    .o_widget_raffle_wheel > & {
+        aspect-ratio: 2 / 1;
+        height: auto;
+        max-height: 80vh;
+    }
+
     .o_raffle_toolbar {
         display: flex;
         align-items: center;
@@ -61,10 +74,16 @@
         }
     }
 
+    // The drawing buffer (the canvas width/height ATTRIBUTES) must never feed
+    // layout back: `flex: 1 1 0` is a DEFINITE basis, so the canvas is sized
+    // from the container's free space and its intrinsic size is never read.
+    // `min-height: 0` switches off the automatic minimum size, which would
+    // otherwise let that intrinsic size back in as a floor. No `height: 100%`:
+    // it is unresolvable in a form sheet and was the other way back in.
     .o_raffle_canvas {
-        flex: 1 1 auto;
+        flex: 1 1 0;
+        min-height: 0;
         width: 100%;
-        height: 100%;
         display: block;
         position: relative;
         z-index: 2;
