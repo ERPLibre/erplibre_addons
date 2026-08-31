@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-17 10:58+0000\n"
+"POT-Creation-Date: 2026-08-31 09:10+0000\n"
 "PO-Revision-Date: 2026-07-17 10:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -31,6 +31,12 @@ msgstr "Nb éligibles"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__participant_count
 msgid "# Participants"
 msgstr "Nb de participants"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_res_partner__raffle_win_count
+#: model:ir.model.fields,field_description:event_raffle.field_res_users__raffle_win_count
+msgid "# Raffle Wins"
+msgstr "Nb de tirages gagnés"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_event__raffle_count
@@ -78,6 +84,27 @@ msgid "Activity Type Icon"
 msgstr "Icône du type d'activité"
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__show_tux
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_show_tux
+msgid "Afficher le pingouin Tux à côté de la roue (caché par défaut)."
+msgstr "Afficher le pingouin Tux à côté de la roue (caché par défaut)."
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__ai_bridge_info
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__ai_bridge_info
+msgid "Ai Bridge Info"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__tux_animation
+msgid ""
+"Animation Tux joue avant chaque tir. 'Rotate' alterne entre toutes les "
+"animations disponibles."
+msgstr ""
+"Animation Tux joue avant chaque tir. 'Rotate' alterne entre toutes les "
+"animations disponibles."
+
+#. module: event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_start_wizard_form
 msgid "Annuler"
 msgstr "Annuler"
@@ -95,15 +122,66 @@ msgid "Aucun participant éligible pour le tirage."
 msgstr "Aucun participant éligible pour le tirage."
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__belly_logo
+msgid "Belly Logo"
+msgstr "Logo sur le ventre"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__pointer_angle__180
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_pointer_angle__180
+msgid "Bottom (180°)"
+msgstr "Bas (180°)"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__candles
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__candles
+msgid "Candles (Tux dances)"
+msgstr "Chandelles (Tux danse)"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid ""
+"Ces valeurs sont appliquées par défaut à la création\n"
+"                        d'un nouveau tirage."
+msgstr ""
+"Ces valeurs sont appliquées par défaut à la création\n"
+"                        d'un nouveau tirage."
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__comment
+msgid "Comment"
+msgstr "Commentaire"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
+msgid "Commentaire"
+msgstr "Commentaire"
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__company_id
 msgid "Company"
 msgstr "Société"
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__confetti
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__confetti
+msgid "Confetti cannon"
+msgstr "Canon à confettis"
+
+#. module: event_raffle
+#: model:ir.model,name:event_raffle.model_res_partner
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__partner_id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__partner_id
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_participant__source__partner
 msgid "Contact"
 msgstr "Contact"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__partner_id
+msgid ""
+"Contact gagnant, repris du participant. Stocké pour que la fiche contact "
+"puisse lister ses tirages sans parcourir les participants."
+msgstr "Contact gagnant, repris du participant. Stocké pour que la fiche contact puisse lister ses tirages sans parcourir les participants."
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__context_note
@@ -136,9 +214,99 @@ msgid "Created on"
 msgstr "Créé le"
 
 #. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid "Célébration & animation"
+msgstr "Célébration & animation"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__dance
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__dance
+msgid "Dance"
+msgstr "Danse"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__dark
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__dark
+msgid "Dark"
+msgstr "Sombre"
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__date
 msgid "Date"
 msgstr "Date"
+
+#. module: event_raffle
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "Date :"
+msgstr "Date :"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_belly_logo
+msgid "Default Belly Logo"
+msgstr "Logo sur le ventre par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_flag_text
+msgid "Default Flag Text"
+msgstr "Texte du drapeau par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_pointer_angle
+msgid "Default Pointer Angle"
+msgstr "Position de la flèche par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_remove_winner
+msgid "Default Remove Winner"
+msgstr "Retirer le gagnant par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_show_fireworks
+msgid "Default Show Fireworks"
+msgstr "Feux d'artifice par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_show_tux
+msgid "Default Show Penguin (Tux)"
+msgstr "Afficher le pingouin (Tux) par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_spin_duration
+msgid "Default Spin Duration (s)"
+msgstr "Durée de rotation par défaut (s)"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_spin_turns
+msgid "Default Spin Turns"
+msgstr "Nombre de tours par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_theme
+msgid "Default Theme"
+msgstr "Thème par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_tux_animation
+msgid "Default Tux Animation"
+msgstr "Animation Tux par défaut"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_winner_celebration
+msgid "Default Winner Celebration"
+msgstr "Célébration par défaut"
+
+#. module: event_raffle
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "Description :"
+msgstr "Description :"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__diabolo
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__diabolo
+msgid "Diabolo juggling"
+msgstr "Jonglage de diabolo"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__display_name
@@ -198,6 +366,15 @@ msgid "Démarrer un tirage"
 msgstr "Démarrer un tirage"
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__winner_celebration
+msgid ""
+"Effet joué à l'annonce d'un gagnant. 'Random' en choisit un au hasard à "
+"chaque tir."
+msgstr ""
+"Effet joué à l'annonce d'un gagnant. 'Random' en choisit un au hasard à "
+"chaque tir."
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__eligible
 msgid "Eligible"
 msgstr "Éligible"
@@ -220,9 +397,31 @@ msgid "Event Raffle"
 msgstr "Tirage d'événement"
 
 #. module: event_raffle
+#: model:ir.model,name:event_raffle.model_event_raffle_config
+msgid "Event Raffle Default Settings"
+msgstr "Paramètres par défaut du tirage"
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__excluded
 msgid "Excluded"
 msgstr "Exclu"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__fireworks
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__fireworks
+msgid "Fireworks cannon"
+msgstr "Canon à feux d'artifice"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__flag_text
+msgid "Flag Text"
+msgstr "Texte du drapeau"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__belly_logo__fleur_de_lys
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_belly_logo__fleur_de_lys
+msgid "Fleur-de-lys (Québec)"
+msgstr "Fleur-de-lys (Québec)"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_follower_ids
@@ -241,6 +440,18 @@ msgstr "Abonnés (Partenaires)"
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome, p. ex. fa-tasks"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__flag
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__flag
+msgid "Free software flag"
+msgstr "Drapeau du logiciel libre"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_partner_view_form_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_partner_view_search_raffle
+msgid "Gagnant tirage"
+msgstr "Gagnant tirage"
 
 #. module: event_raffle
 #: model:ir.actions.act_window,name:event_raffle.action_event_raffle_draw
@@ -267,6 +478,12 @@ msgstr "A un message"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__won
 msgid "Has Won"
 msgstr "A gagné"
+
+#. module: event_raffle
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "Historique des gagnants ("
+msgstr "Historique des gagnants ("
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__id
@@ -298,7 +515,9 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__message_has_error
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__message_has_sms_error
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__message_has_error
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 "Si cette case est cochée, certains messages ont une erreur de livraison."
@@ -313,6 +532,21 @@ msgstr "En cours"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_is_follower
 msgid "Is Follower"
 msgstr "Est abonné"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__jump
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__jump
+msgid "Jump with a smile"
+msgstr "Saut avec sourire"
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_start_wizard.py:0
+msgid ""
+"L'événement « %s » n'a pas de question de questionnaire : aucun inscrit ne "
+"peut avoir rempli le sondage. Ajoutez une question, ou choisissez un autre "
+"type de participants."
+msgstr "L'événement « %s » n'a pas de question de questionnaire : aucun inscrit ne peut avoir rempli le sondage. Ajoutez une question, ou choisissez un autre type de participants."
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__write_uid
@@ -333,10 +567,45 @@ msgid "Last Updated on"
 msgstr "Dernière mise à jour le"
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__pointer_angle__-90
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_pointer_angle__-90
+msgid "Left (-90°)"
+msgstr "Gauche (-90°)"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__light
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__light
+msgid "Light"
+msgstr "Clair"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__linux
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__linux
+msgid "Linux techno (dark)"
+msgstr "Linux techno (sombre)"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__linux_light
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__linux_light
+msgid "Linux techno (light)"
+msgstr "Linux techno (clair)"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__belly_logo
+msgid "Logo affiché sur le ventre de Tux (aucun par défaut)."
+msgstr "Logo affiché sur le ventre de Tux (aucun par défaut)."
+
+#. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "Lot (optionnel)"
 msgstr "Lot (optionnel)"
+
+#. module: event_raffle
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "Lot :"
+msgstr "Lot :"
 
 #. module: event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
@@ -375,6 +644,12 @@ msgid "Name"
 msgstr "Nom"
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__activity_calendar_event_id
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__activity_date_deadline
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__activity_date_deadline
 msgid "Next Activity Deadline"
@@ -396,6 +671,12 @@ msgstr "Type de la prochaine activité"
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__spin_turns
 msgid "Nombre de tours complets avant l'atterrissage."
 msgstr "Nombre de tours complets avant l'atterrissage."
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__belly_logo__none
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_belly_logo__none
+msgid "None"
+msgstr "Aucun"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_needaction_counter
@@ -422,6 +703,27 @@ msgid "Number of messages with delivery error"
 msgstr "Nombre de messages avec une erreur de livraison"
 
 #. module: event_raffle
+#: model:ir.ui.menu,name:event_raffle.menu_event_raffle_config
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+msgid "Paramètres"
+msgstr "Paramètres"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid "Paramètres du tirage"
+msgstr "Paramètres du tirage"
+
+#. module: event_raffle
+#: model:ir.actions.act_window,name:event_raffle.action_event_raffle_config
+msgid "Paramètres par défaut"
+msgstr "Paramètres par défaut"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid "Paramètres par défaut des tirages"
+msgstr "Paramètres par défaut des tirages"
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__participant_ids
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__copy_strategy
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
@@ -429,10 +731,34 @@ msgid "Participants"
 msgstr "Participants"
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__peace
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__peace
+msgid "Peace"
+msgstr "Signe de paix"
+
+#. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "Plein écran"
 msgstr "Plein écran"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__pointer_angle
+msgid "Pointer Angle"
+msgstr "Position de la flèche"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__pointer_angle
+msgid ""
+"Position de la flèche sur la roue, en degrés dans le sens horaire depuis le "
+"haut : 0 en haut, 90 à droite, 180 en bas, -90 à gauche. Le gagnant s'arrête"
+" sous la flèche."
+msgstr "Position de la flèche sur la roue, en degrés dans le sens horaire depuis le haut : 0 en haut, 90 à droite, 180 en bas, -90 à gauche. Le gagnant s'arrête sous la flèche."
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__present
+msgid "Present"
+msgstr "Présent"
 
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__present_only
@@ -450,10 +776,39 @@ msgid "Prize Description"
 msgstr "Description du lot"
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__prize_received
+msgid "Prize Received"
+msgstr "Prix réceptionné"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__prize_received_date
+msgid "Prize Received Date"
+msgstr "Date prix réceptionné"
+
+#. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "Prochain tirage"
 msgstr "Prochain tirage"
+
+#. module: event_raffle
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "Présent :"
+msgstr "Présent :"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_start_wizard__copy_strategy
+msgid ""
+"Qui entre dans le tirage. Les deux choix « sondage » ne gardent que les "
+"inscrits ayant répondu au questionnaire d'inscription de l'événement."
+msgstr "Qui entre dans le tirage. Les deux choix « sondage » ne gardent que les inscrits ayant répondu au questionnaire d'inscription de l'événement."
+
+#. module: event_raffle
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "Quitter le plein écran"
+msgstr "Quitter le plein écran"
 
 #. module: event_raffle
 #. odoo-python
@@ -480,10 +835,36 @@ msgstr "Participant au tirage"
 
 #. module: event_raffle
 #. odoo-python
+#: code:addons/event_raffle/models/res_partner.py:0
+#: model:ir.model.fields,field_description:event_raffle.field_res_partner__raffle_draw_ids
+#: model:ir.model.fields,field_description:event_raffle.field_res_users__raffle_draw_ids
+msgid "Raffle Wins"
+msgstr "Tirages gagnés"
+
+#. module: event_raffle
+#. odoo-python
 #: code:addons/event_raffle/models/event_event.py:0
 #: model:ir.model.fields,field_description:event_raffle.field_event_event__raffle_ids
 msgid "Raffles"
 msgstr "Tirages"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__random
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__random
+msgid "Random (any of the below)"
+msgstr "Aléatoire (une des suivantes)"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__rating_ids
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__rave
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__rave
+msgid "Rave (lasers)"
+msgstr "Rave (lasers)"
 
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__registered_and_present
@@ -495,6 +876,11 @@ msgstr "Inscrits et présents"
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_participant__source__registration
 msgid "Registration"
 msgstr "Inscription"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
+msgid "Remise du prix, coordonnées, suivi..."
+msgstr "Remise du prix, coordonnées, suivi..."
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__remove_winner
@@ -509,9 +895,48 @@ msgid "Responsible User"
 msgstr "Utilisateur responsable"
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__remove_winner
+msgid "Retire le gagnant du pool au prochain tir."
+msgstr "Retire le gagnant du pool au prochain tir."
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__pointer_angle__90
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_pointer_angle__90
+msgid "Right (90°)"
+msgstr "Droite (90°)"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__rotate
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__rotate
+msgid "Rotate (cycle through all)"
+msgstr "Rotation (alterne toutes)"
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid "Roue"
+msgstr "Roue"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_has_sms_error
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__spectacle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__spectacle
+msgid "Show (spotlights)"
+msgstr "Spectacle (projecteurs)"
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__show_fireworks
 msgid "Show Fireworks"
 msgstr "Afficher les feux d'artifice"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__show_tux
+msgid "Show Penguin (Tux)"
+msgstr "Afficher le pingouin (Tux)"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__source
@@ -559,6 +984,41 @@ msgstr ""
 "Planifiée : activités futures."
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__survey_and_present
+msgid "Survey filled and present"
+msgstr "Sondage rempli et présent"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__survey_only
+msgid "Survey filled only"
+msgstr "Sondage rempli seulement"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__flag_text
+msgid ""
+"Texte du drapeau (animation 'flag'). Une ligne au hasard est affichée à "
+"chaque tir."
+msgstr ""
+"Texte du drapeau (animation 'flag'). Une ligne au hasard est affichée à "
+"chaque tir."
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__theatre
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__theatre
+msgid "Theater (gold & angels)"
+msgstr "Théâtre (dorures & anges)"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__theme
+msgid "Theme"
+msgstr "Thème"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__theme
+msgid "Thème visuel de la roue."
+msgstr "Thème visuel de la roue."
+
+#. module: event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
 msgid "Tir"
 msgstr "Tir"
@@ -594,6 +1054,12 @@ msgid "Tirs"
 msgstr "Tirs"
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__pointer_angle__0
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_pointer_angle__0
+msgid "Top (0°)"
+msgstr "Haut (0°)"
+
+#. module: event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
 msgid "Tout exclure"
 msgstr "Tout exclure"
@@ -604,10 +1070,26 @@ msgid "Tout inclure"
 msgstr "Tout inclure"
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__trumpet
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__trumpet
+msgid "Trumpet fanfare"
+msgstr "Fanfare de trompette"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__tux_animation
+msgid "Tux Animation"
+msgstr "Animation Tux"
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__activity_exception_decoration
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr "Type de l'activité d'exception sur l'enregistrement."
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+msgid "Vive le logiciel libre"
+msgstr "Vive le logiciel libre"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__website_message_ids
@@ -625,6 +1107,11 @@ msgstr "Historique de communication du site web"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__winner_participant_id
 msgid "Winner"
 msgstr "Gagnant"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__winner_celebration
+msgid "Winner Celebration"
+msgstr "Célébration du gagnant"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__winner_email
@@ -655,313 +1142,16 @@ msgid "Winners"
 msgstr "Gagnants"
 
 #. module: event_raffle
-#: model:ir.model.fields,help:event_raffle.field_event_raffle__tux_animation
-msgid ""
-"Animation Tux joue avant chaque tir. 'Rotate' alterne entre toutes les "
-"animations disponibles."
-msgstr ""
-"Animation Tux joue avant chaque tir. 'Rotate' alterne entre toutes les "
-"animations disponibles."
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__dance
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__dance
-msgid "Dance"
-msgstr "Danse"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__flag
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__flag
-msgid "Free software flag"
-msgstr "Drapeau du logiciel libre"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__jump
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__jump
-msgid "Jump with a smile"
-msgstr "Saut avec sourire"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__peace
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__peace
-msgid "Peace"
-msgstr "Signe de paix"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__rotate
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__rotate
-msgid "Rotate (cycle through all)"
-msgstr "Rotation (alterne toutes)"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__tux_animation
-msgid "Tux Animation"
-msgstr "Animation Tux"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__flag_text
-msgid "Flag Text"
-msgstr "Texte du drapeau"
-
-#. module: event_raffle
-#: model:ir.ui.menu,name:event_raffle.menu_event_raffle_config
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
-msgid "Paramètres"
-msgstr "Paramètres"
+#. odoo-javascript
+#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
+msgid "non présent"
+msgstr "non présent"
 
 #. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Quitter le plein écran"
-msgstr "Quitter le plein écran"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Rafraîchir"
-msgstr "Rafraîchir"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Rafraîchir la roue"
-msgstr "Rafraîchir la roue"
-
-#. module: event_raffle
-#: model:ir.model.fields,help:event_raffle.field_event_raffle__flag_text
-msgid ""
-"Texte du drapeau (animation 'flag'). Une ligne au hasard est affichée à "
-"chaque tir."
-msgstr ""
-"Texte du drapeau (animation 'flag'). Une ligne au hasard est affichée à "
-"chaque tir."
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
-msgid "Vive le logiciel libre"
-msgstr "Vive le logiciel libre"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Absent :"
-msgstr "Absent :"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Courriel :"
-msgstr "Courriel :"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__dark
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__dark
-msgid "Dark"
-msgstr "Sombre"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Date :"
-msgstr "Date :"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Description :"
-msgstr "Description :"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__light
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__light
-msgid "Light"
-msgstr "Clair"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Lot :"
-msgstr "Lot :"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__theme
-msgid "Theme"
-msgstr "Thème"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "absent"
-msgstr "absent"
-
-#. module: event_raffle
-#. odoo-javascript
-#: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Historique des gagnants ("
-msgstr "Historique des gagnants ("
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__linux
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__linux
-msgid "Linux techno"
-msgstr "Linux techno"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__spectacle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__spectacle
-msgid "Show (spotlights)"
-msgstr "Spectacle (projecteurs)"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__theatre
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__theatre
-msgid "Theater (gold & angels)"
-msgstr "Théâtre (dorures & anges)"
-
-#. module: event_raffle
-#: model:ir.model.fields,help:event_raffle.field_event_raffle__theme
-msgid "Thème visuel de la roue."
-msgstr "Thème visuel de la roue."
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__candles
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__candles
-msgid "Candles (Tux dances)"
-msgstr "Chandelles (Tux danse)"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__confetti
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__confetti
-msgid "Confetti cannon"
-msgstr "Canon à confettis"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__diabolo
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__diabolo
-msgid "Diabolo juggling"
-msgstr "Jonglage de diabolo"
-
-#. module: event_raffle
-#: model:ir.model.fields,help:event_raffle.field_event_raffle__winner_celebration
-msgid ""
-"Effet joué à l'annonce d'un gagnant. 'Random' en choisit un au hasard à "
-"chaque tir."
-msgstr ""
-"Effet joué à l'annonce d'un gagnant. 'Random' en choisit un au hasard à "
-"chaque tir."
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__fireworks
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__fireworks
-msgid "Fireworks cannon"
-msgstr "Canon à feux d'artifice"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__random
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__random
-msgid "Random (any of the below)"
-msgstr "Aléatoire (une des suivantes)"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__trumpet
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__trumpet
-msgid "Trumpet fanfare"
-msgstr "Fanfare de trompette"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__winner_celebration
-msgid "Winner Celebration"
-msgstr "Célébration du gagnant"
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid ""
-"Ces valeurs sont appliquées par défaut à la création\n"
-"                        d'un nouveau tirage."
-msgstr ""
-"Ces valeurs sont appliquées par défaut à la création\n"
-"                        d'un nouveau tirage."
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid "Célébration & animation"
-msgstr "Célébration & animation"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_flag_text
-msgid "Default Flag Text"
-msgstr "Texte du drapeau par défaut"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_remove_winner
-msgid "Default Remove Winner"
-msgstr "Retirer le gagnant par défaut"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_show_fireworks
-msgid "Default Show Fireworks"
-msgstr "Feux d'artifice par défaut"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_spin_duration
-msgid "Default Spin Duration (s)"
-msgstr "Durée de rotation par défaut (s)"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_spin_turns
-msgid "Default Spin Turns"
-msgstr "Nombre de tours par défaut"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_theme
-msgid "Default Theme"
-msgstr "Thème par défaut"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_tux_animation
-msgid "Default Tux Animation"
-msgstr "Animation Tux par défaut"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_winner_celebration
-msgid "Default Winner Celebration"
-msgstr "Célébration par défaut"
-
-#. module: event_raffle
-#: model:ir.model,name:event_raffle.model_event_raffle_config
-msgid "Event Raffle Default Settings"
-msgstr "Paramètres par défaut du tirage"
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid "Paramètres du tirage"
-msgstr "Paramètres du tirage"
-
-#. module: event_raffle
-#: model:ir.actions.act_window,name:event_raffle.action_event_raffle_config
-msgid "Paramètres par défaut"
-msgstr "Paramètres par défaut"
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid "Paramètres par défaut des tirages"
-msgstr "Paramètres par défaut des tirages"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__rave
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__rave
-msgid "Rave (lasers)"
-msgstr "Rave (lasers)"
-
-#. module: event_raffle
-#: model:ir.model.fields,help:event_raffle.field_event_raffle__remove_winner
-msgid "Retire le gagnant du pool au prochain tir."
-msgstr "Retire le gagnant du pool au prochain tir."
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid "Roue"
-msgstr "Roue"
+msgid "raffle@tux: ~"
+msgstr "raffle@tux: ~"
 
 #. module: event_raffle
 #. odoo-javascript
@@ -974,21 +1164,3 @@ msgstr "Éligibles :"
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "🎉 Gagnant :"
 msgstr "🎉 Gagnant :"
-
-#~ msgid "All, then filter"
-#~ msgstr "Tous, puis filtrer"
-
-#~ msgid "Retire le gagnant du pool pour le prochain tir."
-#~ msgstr "Retire le gagnant du pool pour le prochain tir."
-
-#~ msgid "Éligibles:"
-#~ msgstr "Éligibles :"
-
-#~ msgid "🎉 Gagnant:"
-#~ msgstr "🎉 Gagnant :"
-
-#~ msgid "Historique des gagnants"
-#~ msgstr "Historique des gagnants"
-
-#~ msgid "Thème clair ou sombre de la roue."
-#~ msgstr "Thème clair ou sombre de la roue."
