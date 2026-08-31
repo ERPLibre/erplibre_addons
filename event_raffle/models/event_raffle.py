@@ -4,6 +4,7 @@ import random
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import sql
 
 THEME_SELECTION = [
     ("light", "Light"),
@@ -33,6 +34,14 @@ BELLY_LOGO_SELECTION = [
     ("none", "None"),
     ("fleur_de_lys", "Fleur-de-lys (Québec)"),
 ]
+# Where the pointer sits on the rim, in degrees CLOCKWISE FROM THE TOP, the
+# way a clock face reads. The winning segment stops under it wherever it is.
+POINTER_ANGLE_SELECTION = [
+    ("0", "Top (0°)"),
+    ("90", "Right (90°)"),
+    ("180", "Bottom (180°)"),
+    ("-90", "Left (-90°)"),
+]
 
 
 def _default(field, fallback):
@@ -42,7 +51,20 @@ def _default(field, fallback):
         cfg = self.env.ref(
             "event_raffle.raffle_config_singleton", raise_if_not_found=False
         )
-        return getattr(cfg, field) if cfg else fallback
+        if not cfg:
+            return fallback
+        # Adding a field to an already-installed database calls this from
+        # _init_column(), to fill the new column on the rows already there.
+        # event.raffle is auto-init'd before event.raffle.config -- class
+        # registration order, which event_raffle_config.py importing this
+        # module pins -- so the twin column on the singleton may not exist
+        # in database yet, and reading it would abort the upgrade. Only
+        # while loading: once the registry is ready this costs nothing.
+        if not self.env.registry.ready and not sql.column_exists(
+            self.env.cr, cfg._table, field
+        ):
+            return fallback
+        return getattr(cfg, field)
 
     return getter
 
@@ -108,6 +130,15 @@ class EventRaffle(models.Model):
         string="Spin Turns",
         default=_default("default_spin_turns", 5),
         help="Nombre de tours complets avant l'atterrissage.",
+    )
+    pointer_angle = fields.Selection(
+        POINTER_ANGLE_SELECTION,
+        string="Pointer Angle",
+        default=_default("default_pointer_angle", "0"),
+        required=True,
+        help="Position de la flèche sur la roue, en degrés dans le sens "
+        "horaire depuis le haut : 0 en haut, 90 à droite, 180 en bas, "
+        "-90 à gauche. Le gagnant s'arrête sous la flèche.",
     )
     show_fireworks = fields.Boolean(
         string="Show Fireworks",
@@ -199,6 +230,7 @@ class EventRaffle(models.Model):
             "remove_winner": self.remove_winner,
             "spin_duration": self.spin_duration,
             "spin_turns": self.spin_turns,
+            "pointer_angle": self.pointer_angle,
             "show_fireworks": self.show_fireworks,
             "show_tux": self.show_tux,
             "belly_logo": self.belly_logo,

@@ -5,6 +5,7 @@ from odoo import fields, models
 from .event_raffle import (
     BELLY_LOGO_SELECTION,
     CELEBRATION_SELECTION,
+    POINTER_ANGLE_SELECTION,
     THEME_SELECTION,
     TUX_ANIMATION_SELECTION,
 )
@@ -59,6 +60,12 @@ class EventRaffleConfig(models.Model):
     default_spin_turns = fields.Integer(
         string="Default Spin Turns",
         default=5,
+    )
+    default_pointer_angle = fields.Selection(
+        POINTER_ANGLE_SELECTION,
+        string="Default Pointer Angle",
+        default="0",
+        required=True,
     )
     default_flag_text = fields.Text(
         string="Default Flag Text",

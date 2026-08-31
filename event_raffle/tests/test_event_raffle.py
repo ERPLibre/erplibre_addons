@@ -29,6 +29,8 @@ class TestEventRaffle(TransactionCase):
         self.assertEqual(self.raffle.spin_duration, 6.0)
         self.assertEqual(self.raffle.spin_turns, 5)
         self.assertTrue(self.raffle.show_fireworks)
+        # The pointer sits at the top unless the raffle says otherwise.
+        self.assertEqual(self.raffle.pointer_angle, "0")
 
     def test_participant_eligible_default(self):
         p = self._add_participant("Alice")
@@ -179,6 +181,7 @@ class TestEventRaffle(TransactionCase):
         self.assertEqual(data["flag_text"], "Vive le logiciel libre")
         self.assertEqual(data["theme"], "light")
         self.assertEqual(data["winner_celebration"], "candles")
+        self.assertEqual(data["pointer_angle"], "0")
         self.assertEqual(data["history"], [])
         self.assertFalse(data["last_winner"])
         # Tux is hidden by default.
