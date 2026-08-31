@@ -15,6 +15,7 @@
                             <field name="default_remove_winner"/>
                             <field name="default_spin_duration"/>
                             <field name="default_spin_turns"/>
+                            <field name="default_pointer_angle"/>
                         </group>
                         <group string="Célébration &amp; animation">
                             <field name="default_winner_celebration"/>

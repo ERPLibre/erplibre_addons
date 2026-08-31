@@ -69,6 +69,7 @@
                                 <field name="remove_winner"/>
                                 <field name="spin_duration"/>
                                 <field name="spin_turns"/>
+                                <field name="pointer_angle"/>
                                 <field name="show_fireworks"/>
                                 <field name="show_tux"/>
                                 <field name="belly_logo" invisible="not show_tux"/>

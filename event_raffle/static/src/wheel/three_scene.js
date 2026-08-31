@@ -4,6 +4,11 @@ const TAU = Math.PI * 2;
 
 // Wheel disc radius (world units); its height (diameter) is 2 * WHEEL_RADIUS.
 const WHEEL_RADIUS = 2;
+// The pointer cone pivots just outside the rim and is 0.5 long, so it reaches
+// about 0.6 past the rim. Both are needed wherever it sits: the pivot to place
+// it, the reach to keep it inside the camera frame and clear of Tux.
+const POINTER_PIVOT = WHEEL_RADIUS + 0.28;
+const POINTER_REACH = WHEEL_RADIUS + 0.6;
 // Tux is normalized so its height stays within 25%-40% of the wheel height.
 // 0.33 sits in the middle of that band.
 const TUX_HEIGHT_FRACTION = 0.33;
@@ -52,25 +57,39 @@ export function computeCanvasSize({
     return { w, h, measuredHeight, pixelRatio, runaway };
 }
 
+// Where the pointer sits, as a world angle in radians, from the raffle's
+// `pointer_angle` setting. That setting is DEGREES CLOCKWISE FROM THE TOP, the
+// way a clock face reads: 0 up, 90 right, 180 down, -90 left. World angles run
+// counter-clockwise from +X, which is why the sign flips.
+export function pointerWorldAngle(deg) {
+    return Math.PI / 2 - ((Number(deg) || 0) * Math.PI) / 180;
+}
+
 // The wheel texture is drawn on a canvas and applied to a CircleGeometry with
 // the default flipY, which MIRRORS the angular direction: segment `index`
 // (canvas arc [index*seg, (index+1)*seg]) ends up centered at mesh-local angle
-// -(index + 0.5) * seg. The pointer sits at the TOP of the wheel (+Y, i.e.
-// world angle π/2). To bring segment `index` under the pointer the wheel must
-// rotate by R such that  -(index+0.5)*seg + R ≡ π/2, i.e.
-// R = π/2 + (index+0.5)*seg  (plus `turns` full turns for the spin effect).
-export function computeTargetAngle(index, total, turns) {
+// -(index + 0.5) * seg. To bring segment `index` under a pointer sitting at
+// world angle φ the wheel must rotate by R such that
+// -(index+0.5)*seg + R ≡ φ, i.e. R = φ + (index+0.5)*seg  (plus `turns` full
+// turns for the spin effect). φ defaults to π/2, the top of the wheel.
+export function computeTargetAngle(
+    index, total, turns, pointerAngle = Math.PI / 2
+) {
     const seg = TAU / total;
-    return turns * TAU + Math.PI / 2 + (index + 0.5) * seg;
+    return turns * TAU + pointerAngle + (index + 0.5) * seg;
 }
 
 // Absolute wheel rotation to reach after a spin: congruent (mod 2π) to the
-// angle that puts segment `index` under the top pointer, and at least `turns`
+// angle that puts segment `index` under the pointer, and at least `turns`
 // full turns forward from `startRotation` (so the animation always spins
 // forward regardless of accumulated rotation).
-export function computeAbsoluteTarget(startRotation, index, total, turns) {
+export function computeAbsoluteTarget(
+    startRotation, index, total, turns, pointerAngle = Math.PI / 2
+) {
     const TAU = Math.PI * 2;
-    const landing = ((computeTargetAngle(index, total, turns) % TAU) + TAU) % TAU;
+    const landing =
+        ((computeTargetAngle(index, total, turns, pointerAngle) % TAU) + TAU) %
+        TAU;
     const startMod = ((startRotation % TAU) + TAU) % TAU;
     let target = startRotation - startMod + landing;
     while (target < startRotation + turns * TAU) {
@@ -774,6 +793,8 @@ export class RaffleScene {
         this._tuxVisible = true; // hidden by default via setTuxVisible()
         this._spinning = false;
         this._flapVel = 0;
+        // Pointer world angle; π/2 is the top. setPointerAngle() moves it.
+        this._pointerAngle = Math.PI / 2;
         this.renderer = new THREE.WebGLRenderer({
             canvas, antialias: true, alpha: true,
         });
@@ -807,16 +828,14 @@ export class RaffleScene {
         // pins at each segment boundary (rotate with the wheel)
         this.pinsGroup = new THREE.Group();
         this.scene.add(this.pinsGroup);
-        // pointer / flapper (top) - color adapts to the theme
+        // pointer / flapper - color adapts to the theme, position to the
+        // raffle's pointer_angle (top by default)
         this.pointerMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
         this.pointer = new THREE.Mesh(
             new THREE.ConeGeometry(0.16, 0.5, 16), this.pointerMat
         );
-        this.pointerPivotY = WHEEL_RADIUS + 0.28;
-        this.pointer.position.set(0, this.pointerPivotY, 0.15);
-        this.pointerZBase = Math.PI;
-        this.pointer.rotation.z = this.pointerZBase;
         this.scene.add(this.pointer);
+        this._placePointer();
         // tux placeholder (procedural until glb loads)
         this.tux = buildProceduralTux();
         this.scene.add(this.tux);
@@ -903,6 +922,34 @@ export class RaffleScene {
         this._fitCamera();
     }
 
+    // Move the pointer around the rim. `deg` is the raffle's pointer_angle:
+    // degrees clockwise from the top, so 0 up, 90 right, 180 down, -90 left.
+    // The wheel lands the winner under wherever it now sits, Tux steps aside
+    // if it came to his side, and the camera reframes to keep it visible.
+    setPointerAngle(deg) {
+        const angle = pointerWorldAngle(deg);
+        if (angle === this._pointerAngle) return;
+        this._pointerAngle = angle;
+        this._placePointer();
+        if (this.tux) this._placeTux(this.tux);
+        this._fitCamera();
+    }
+
+    // Seat the cone on the rim at the pointer angle, apex toward the centre.
+    // A cone points +Y by default (world angle π/2), so aiming it inwards --
+    // along φ + π -- is a rotation of φ + π/2 about Z. The flapper deflection
+    // in _updateFlapper() is applied on top of that base.
+    _placePointer() {
+        if (!this.pointer) return;
+        const a = this._pointerAngle;
+        this.pointer.position.set(
+            Math.cos(a) * POINTER_PIVOT, Math.sin(a) * POINTER_PIVOT, 0.15
+        );
+        this.pointerZBase = a + Math.PI / 2;
+        this.pointer.rotation.z = this.pointerZBase;
+        this._flapVel = 0;
+    }
+
     // Add / remove a logo on Tux's belly (a child of the Tux group, so it
     // follows every move). Only "fleur_de_lys" is supported for now.
     setBellyLogo(logo) {
@@ -944,6 +991,12 @@ export class RaffleScene {
             minX = Math.min(minX, -(WHEEL_RADIUS + 1.45));
             maxX = WHEEL_RADIUS + 1.45;
         }
+        // The pointer sticks out past the rim wherever it sits, so it is the
+        // frame's business on whichever side that is -- not the top only.
+        const ptrX = Math.cos(this._pointerAngle) * POINTER_REACH;
+        const ptrY = Math.sin(this._pointerAngle) * POINTER_REACH;
+        minX = Math.min(minX, ptrX);
+        maxX = Math.max(maxX, ptrX);
         if (this._isLinuxTheme) {
             // Reserve empty space on the LEFT for the background terminal, so
             // the wheel + penguin shift to the right half of the canvas and
@@ -951,8 +1004,8 @@ export class RaffleScene {
             minX -= (maxX - minX) * 0.85;
         }
         // a little headroom below for Tux's feet and the wheel's wooden rim
-        const minY = -WHEEL_RADIUS - 0.3;
-        const maxY = WHEEL_RADIUS + 0.6; // include the pointer
+        const minY = Math.min(-WHEEL_RADIUS - 0.3, ptrY);
+        const maxY = Math.max(WHEEL_RADIUS + 0.25, ptrY);
         const cx = (minX + maxX) / 2;
         const cy = (minY + maxY) / 2;
         const halfW = (maxX - minX) / 2;
@@ -1012,14 +1065,16 @@ export class RaffleScene {
     }
 
     // Rotate the pins with the wheel and deflect the flapper as a pin nears
-    // the top pointer (rides over the peg, then rests in the gap).
+    // the pointer (rides over the peg, then rests in the gap). A pin sits
+    // under the pointer when (rotation - pointer angle) is a whole number of
+    // segments, so the pointer angle is what the phase is measured against.
     _updateFlapper() {
         if (!this.pointer) return;
         this.pinsGroup.rotation.z = this.rotation;
         if (this._spinning) {
             const n = this.pinCount || this.segCount || 1;
             const seg = TAU / n;
-            const d = (this.rotation - Math.PI / 2) / seg;
+            const d = (this.rotation - this._pointerAngle) / seg;
             const frac = d - Math.floor(d);
             const nearest = Math.min(frac, 1 - frac);
             const closeness = 1 - nearest / 0.5;
@@ -1054,10 +1109,13 @@ export class RaffleScene {
         box = new THREE.Box3().setFromObject(obj);
         size = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
-        const gap = 0.3;
         // Stand Tux just outside the wheel on its side (right for the Linux
         // theme, left otherwise), feet on -WHEEL_RADIUS.
         const side = this._tuxSide || -1;
+        // When the pointer has been moved to Tux's side it occupies that gap,
+        // so step him out past its tip instead of letting the cone cross him.
+        const ptrX = Math.cos(this._pointerAngle) * POINTER_REACH;
+        const gap = 0.3 + Math.max(0, side * ptrX - WHEEL_RADIUS);
         obj.position.x =
             side * (WHEEL_RADIUS + size.x / 2 + gap) - center.x;
         obj.position.y = -WHEEL_RADIUS - box.min.y;
@@ -1888,7 +1946,9 @@ export class RaffleScene {
 
     spinTo(index, total, { durationS = 6, turns = 5 } = {}) {
         const start = this.rotation;
-        const target = computeAbsoluteTarget(start, index, total, turns);
+        const target = computeAbsoluteTarget(
+            start, index, total, turns, this._pointerAngle
+        );
         const t0 = performance.now();
         const dur = durationS * 1000;
         this._spinning = true;

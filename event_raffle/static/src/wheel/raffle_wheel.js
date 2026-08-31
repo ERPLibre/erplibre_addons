@@ -73,7 +73,9 @@ export class RaffleWheel extends Component {
                     : nextProps.record
                     ? nextProps.record.resId
                     : undefined;
-            if (nextId && nextId !== this._loadedId) {
+            // Not mid-spin: retargeting the scene under a running spin stops
+            // the wheel on the wrong name (see reload()).
+            if (nextId && nextId !== this._loadedId && !this.state.spinning) {
                 this.reload();
             }
         });
@@ -149,6 +151,15 @@ export class RaffleWheel extends Component {
         );
         this.data = data;
         this._loadedId = this.raffleId;
+        // A spin that started while the call above was in flight has already
+        // frozen where it will stop, for the pointer as it stood then. Moving
+        // the pointer (or the names) now would leave the wheel resting on one
+        // name while the banner announces another. Drop the signature so the
+        // reload at the end of spin() applies what is skipped here.
+        if (this.state.spinning) {
+            this._sig = null;
+            return;
+        }
         // Skip visible updates when nothing changed (avoids needless redraws
         // when the observer fires on unrelated form edits).
         const sig = JSON.stringify([
@@ -158,6 +169,7 @@ export class RaffleWheel extends Component {
             data.can_draw_next,
             data.show_tux,
             data.belly_logo,
+            data.pointer_angle,
             (data.history || []).map((h) => [h.id, h.is_absent]),
         ]);
         if (sig === this._sig) {
@@ -170,6 +182,9 @@ export class RaffleWheel extends Component {
         this.state.drawCount = data.draw_count;
         this.state.history = data.history || [];
         if (this.scene) {
+            // Before setTuxVisible/_placeTux: the pointer angle decides how
+            // much room Tux needs beside the wheel.
+            this.scene.setPointerAngle(data.pointer_angle);
             this.scene.setTuxVisible(data.show_tux);
             this.scene.setBellyLogo(data.belly_logo);
             this.scene.setTheme(data.theme);
