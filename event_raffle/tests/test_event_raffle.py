@@ -1,5 +1,6 @@
 # Copyright 2026 TechnoLibre - Mathieu Benoit
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
 
@@ -371,3 +372,80 @@ class TestRaffleWizard(TransactionCase):
             wizard.action_start()["res_id"]
         )
         self.assertEqual(raffle.participant_count, 2)
+
+    # ---- survey strategies ------------------------------------------------
+    # "Filled the survey" means answering a question the attendee actually
+    # types into. Odoo puts Name / Email / Phone questions on every event and
+    # the registration form answers those on its own, so they are not proof
+    # of anything and the strategies must ignore them.
+
+    def _add_survey_question(self, title="Distro préférée ?"):
+        return self.env["event.question"].create(
+            {
+                "event_id": self.event.id,
+                "title": title,
+                "question_type": "text_box",
+            }
+        )
+
+    def _answer(self, reg, question, text="Debian"):
+        return self.env["event.registration.answer"].create(
+            {
+                "registration_id": reg.id,
+                "question_id": question.id,
+                "value_text_box": text,
+            }
+        )
+
+    def test_survey_only_keeps_answered_whatever_the_state(self):
+        q = self._add_survey_question()
+        self._answer(self.reg_open, q)
+        self._answer(self.reg_done, q)
+        raffle = self._run_wizard("survey_only")
+        self.assertEqual(
+            raffle.participant_ids.mapped("name"),
+            ["Reg Open", "Reg Present"],
+        )
+
+    def test_survey_only_drops_the_unanswered(self):
+        q = self._add_survey_question()
+        self._answer(self.reg_open, q)
+        raffle = self._run_wizard("survey_only")
+        self.assertEqual(raffle.participant_ids.mapped("name"), ["Reg Open"])
+
+    def test_survey_and_present_demands_both(self):
+        q = self._add_survey_question()
+        # answered, but only registered: out.
+        self._answer(self.reg_open, q)
+        self.assertEqual(
+            self._run_wizard("survey_and_present").participant_count, 0
+        )
+        # the attended one answers too: in.
+        self._answer(self.reg_done, q)
+        raffle = self._run_wizard("survey_and_present")
+        self.assertEqual(
+            raffle.participant_ids.mapped("name"), ["Reg Present"]
+        )
+
+    def test_survey_ignores_the_default_identity_questions(self):
+        identity = self.event.question_ids.filtered(
+            lambda q: q.question_type in ("name", "email", "phone")
+        )
+        self.assertTrue(
+            identity, "event should carry Odoo's default questions"
+        )
+        self._add_survey_question()
+        self._answer(self.reg_done, identity[0], text="Reg Present")
+        self.assertEqual(self._run_wizard("survey_only").participant_count, 0)
+
+    def test_survey_strategy_without_a_survey_question_raises(self):
+        # The event carries only the default identity questions, so the
+        # strategy could never match anyone: say so instead of building an
+        # empty raffle.
+        self.assertFalse(
+            self.event.question_ids.filtered(
+                lambda q: q.question_type in ("simple_choice", "text_box")
+            )
+        )
+        with self.assertRaises(UserError):
+            self._run_wizard("survey_only")

@@ -1,6 +1,13 @@
 # Copyright 2026 TechnoLibre - Mathieu Benoit
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields, models
+from odoo.exceptions import UserError
+
+# Odoo puts a Name, an Email and a Phone question on every event by default,
+# and the registration form answers those by itself. An answer to one proves
+# nothing about the survey, so only the question types an attendee actually
+# fills in count as "survey answered".
+SURVEY_QUESTION_TYPES = ("simple_choice", "text_box")
 
 
 class EventRaffleStartWizard(models.TransientModel):
@@ -18,19 +25,62 @@ class EventRaffleStartWizard(models.TransientModel):
         [
             ("present_only", "Present only (attended)"),
             ("registered_and_present", "Registered and present"),
+            ("survey_only", "Survey filled only"),
+            ("survey_and_present", "Survey filled and present"),
         ],
         string="Participants",
         default="present_only",
         required=True,
+        help="Qui entre dans le tirage. Les deux choix « sondage » ne "
+        "gardent que les inscrits ayant répondu au questionnaire "
+        "d'inscription de l'événement.",
     )
     context_note = fields.Text(string="Context")
     remove_winner = fields.Boolean(string="Remove Winner", default=True)
 
     def _registration_domain_states(self):
         self.ensure_one()
-        if self.copy_strategy == "present_only":
+        if self.copy_strategy in ("present_only", "survey_and_present"):
             return ["done"]
         return ["open", "done"]
+
+    def _requires_survey(self):
+        self.ensure_one()
+        return self.copy_strategy in ("survey_only", "survey_and_present")
+
+    def _survey_questions(self):
+        """The event's real survey questions, identity fields excluded."""
+        self.ensure_one()
+        return self.event_id.question_ids.filtered(
+            lambda q: q.question_type in SURVEY_QUESTION_TYPES
+        )
+
+    def _filter_survey_answered(self, regs):
+        """Keep the registrations carrying at least one survey answer.
+
+        One query for the whole set, and the order of `regs` is preserved so
+        the de-duplication in _copy_participants keeps behaving the same way.
+        """
+        self.ensure_one()
+        questions = self._survey_questions()
+        if not questions:
+            raise UserError(
+                _(
+                    "L'événement « %s » n'a pas de question de "
+                    "questionnaire : aucun inscrit ne peut avoir rempli le "
+                    "sondage. Ajoutez une question, ou choisissez un autre "
+                    "type de participants."
+                )
+                % self.event_id.name
+            )
+        answers = self.env["event.registration.answer"].search(
+            [
+                ("registration_id", "in", regs.ids),
+                ("question_id", "in", questions.ids),
+            ]
+        )
+        answered_ids = set(answers.registration_id.ids)
+        return regs.filtered(lambda r: r.id in answered_ids)
 
     def _copy_participants(self, raffle):
         self.ensure_one()
@@ -38,6 +88,8 @@ class EventRaffleStartWizard(models.TransientModel):
         regs = self.event_id.registration_ids.filtered(
             lambda r: r.state in states
         )
+        if self._requires_survey():
+            regs = self._filter_survey_answered(regs)
         seen = set()
         Participant = self.env["event.raffle.participant"]
         participant_vals = []
