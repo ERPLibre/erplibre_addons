@@ -123,14 +123,92 @@ class ErplibreSmsController(http.Controller):
             else:
                 ignored += 1
 
-        if applied and gateway.alarm_active:
+        # Les evenements d'appel voyagent dans le MEME rapport, sous une cle
+        # distincte : meme signature, meme anti-rejeu, un seul aller-retour.
+        calls_applied, calls_created = self._apply_call_events(
+            payload.get("calls") or [], gateway
+        )
+
+        if (applied or calls_applied) and gateway.alarm_active:
             # Le telephone envoie a nouveau : la panne est terminee.
             gateway._clear_alarm()
 
         return request.make_json_response({
             "ok": True, "applied": applied, "ignored": ignored,
             "unknown": unknown, "malformed": malformed,
+            "calls_applied": calls_applied, "calls_created": calls_created,
         })
+
+    # ------------------------------------------------------------------
+    def _apply_call_events(self, events, gateway):
+        """Applique les evenements d'appel, en creant ceux qu'on decouvre.
+
+        Un appel compose a la main sur le telephone n'existe pas encore cote
+        serveur : c'est le rapport qui le fait naitre. On ne le refuse donc
+        pas comme « inconnu », contrairement a un SMS — un SMS inconnu serait
+        un rejeu ou une erreur, un appel inconnu est simplement un appel que
+        personne n'avait demande.
+        """
+        Call = request.env["erplibre.mobile.call"].sudo()
+        applied = created = 0
+        for event in events:
+            uuid = event.get("uuid")
+            if not uuid:
+                continue
+            try:
+                seq = int(event.get("seq"))
+            except (TypeError, ValueError):
+                seq = 0
+            if seq <= 0:
+                continue
+
+            appel = Call.search([("call_uuid", "=", uuid)], limit=1)
+            if not appel:
+                numero = (event.get("number") or "").strip()
+                if not numero:
+                    continue
+                appel = Call.create({
+                    "call_uuid": uuid,
+                    "number": numero,
+                    "direction": "in" if event.get("direction") == "in" else "out",
+                    "source": event.get("source") or "manual",
+                    "company_id": gateway.company_id.id,
+                    "gateway_id": gateway.id,
+                    "device_id": gateway.device_id,
+                    "state": "queued",
+                })
+                created += 1
+                # A la NAISSANCE de l'appel, pas a sa fin : l'interet d'afficher
+                # la fiche de l'appelant est de l'avoir sous les yeux pendant
+                # qu'il parle, pas apres avoir raccroche.
+                appel._announce_incoming()
+
+            horodatage = None
+            if event.get("at"):
+                try:
+                    horodatage = fields.Datetime.to_datetime(
+                        fields.Datetime.now().fromtimestamp(int(event["at"]))
+                    )
+                except (TypeError, ValueError, OSError):
+                    horodatage = None
+
+            duree = event.get("duration")
+            if duree is not None:
+                try:
+                    duree = int(duree)
+                except (TypeError, ValueError):
+                    duree = None
+
+            if appel._apply_event(
+                event.get("state"),
+                seq=seq,
+                at=horodatage,
+                duration=duree,
+                duration_source=event.get("duration_source"),
+                reason=event.get("reason"),
+            ):
+                applied += 1
+        return applied, created
 
     # ------------------------------------------------------------------
     @http.route("/erplibre_sms/poll", type="http", auth="public", methods=["POST"], csrf=False)
@@ -163,6 +241,17 @@ class ErplibreSmsController(http.Controller):
                 len(dispatches), gateway.device_id,
             )
 
+        # Les appels voyagent par le MEME echange que les SMS : un telephone
+        # qui ne tient qu'une conversation a la fois n'a aucun besoin d'un
+        # second canal, et en ajouter un doublerait la surface a authentifier.
+        calls = request.env["erplibre.mobile.call"].sudo()._claim_pending(gateway)
+        if calls:
+            _logger.info(
+                "erplibre_mobile_gateway: %s appel(s) remis a la"
+                " passerelle %s",
+                len(calls), gateway.device_id,
+            )
+
         return request.make_json_response({
             "ok": True,
             "server_time": int(time.time()),
@@ -172,6 +261,7 @@ class ErplibreSmsController(http.Controller):
             "segments_per_minute": gateway.segments_per_minute,
             "expires": int(deadline.timestamp()) if deadline else 0,
             "groups": groups,
+            "calls": calls._payload(),
         })
 
     # ------------------------------------------------------------------

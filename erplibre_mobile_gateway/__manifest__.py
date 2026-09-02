@@ -55,6 +55,13 @@ Le module est donc construit autour de la détection de panne :
         "mail",
     ],
     "external_dependencies": {"python": ["requests"]},
+    "assets": {
+        "web.assets_backend": [
+            "erplibre_mobile_gateway/static/src/services/*.js",
+            "erplibre_mobile_gateway/static/src/systray/*.js",
+            "erplibre_mobile_gateway/static/src/systray/*.xml",
+        ],
+    },
     "data": [
         "security/erplibre_mobile_gateway_security.xml",
         "security/ir.model.access.csv",
@@ -62,6 +69,7 @@ Le module est donc construit autour de la détection de panne :
         "data/ir_cron_data.xml",
         "views/erplibre_sms_gateway_views.xml",
         "views/erplibre_sms_dispatch_views.xml",
+        "views/erplibre_mobile_call_views.xml",
         "views/erplibre_sms_inbound_views.xml",
         "views/sms_composer_views.xml",
         "views/res_config_settings_views.xml",

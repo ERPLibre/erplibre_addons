@@ -12,6 +12,13 @@
               action="action_erplibre_sms_dispatch"
               sequence="10"/>
 
+    <menuitem id="menu_erplibre_mobile_call"
+              name="Appels"
+              parent="menu_erplibre_sms_root"
+              action="action_erplibre_mobile_call"
+              sequence="25"
+              groups="erplibre_mobile_gateway.group_erplibre_sms_send"/>
+
     <menuitem id="menu_erplibre_sms_dispatch_problem"
               name="SMS non partis"
               parent="menu_erplibre_sms_root"

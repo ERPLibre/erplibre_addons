@@ -6,3 +6,5 @@ access_dispatch_manager,erplibre.sms.dispatch.manager,model_erplibre_sms_dispatc
 access_inbound_send,erplibre.sms.inbound.send,model_erplibre_sms_inbound,group_erplibre_sms_send,1,0,0,0
 access_inbound_manager,erplibre.sms.inbound.manager,model_erplibre_sms_inbound,group_erplibre_sms_manager,1,1,0,1
 access_nonce_manager,erplibre.sms.nonce.manager,model_erplibre_sms_nonce,base.group_system,1,1,1,1
+access_call_send,erplibre.mobile.call.send,model_erplibre_mobile_call,group_erplibre_sms_send,1,0,1,0
+access_call_manager,erplibre.mobile.call.manager,model_erplibre_mobile_call,group_erplibre_sms_manager,1,1,1,1
