@@ -18,6 +18,12 @@
               action="action_erplibre_sms_dispatch_problem"
               sequence="20"/>
 
+    <menuitem id="menu_erplibre_sms_inbound"
+              name="SMS recus"
+              parent="menu_erplibre_sms_root"
+              action="action_erplibre_sms_inbound"
+              sequence="30"/>
+
     <menuitem id="menu_erplibre_sms_config"
               name="Configuration"
               parent="menu_erplibre_sms_root"

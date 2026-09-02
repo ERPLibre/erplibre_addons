@@ -173,3 +173,24 @@ class ErplibreSmsController(http.Controller):
             "expires": int(deadline.timestamp()) if deadline else 0,
             "groups": groups,
         })
+
+    # ------------------------------------------------------------------
+    @http.route("/erplibre_sms/inbound", type="http", auth="public", methods=["POST"], csrf=False)
+    def inbound(self, **kwargs):
+        """SMS recus par le telephone, dont les desabonnements."""
+        authenticated, error = self._authenticate()
+        if error:
+            return error
+        payload, gateway = authenticated
+
+        inbound_model = request.env["erplibre.sms.inbound"].sudo()
+        recorded, opt_outs = 0, 0
+        for message in payload.get("messages") or []:
+            record = inbound_model._record(gateway, message)
+            if record:
+                recorded += 1
+                if record.is_opt_out:
+                    opt_outs += 1
+        return request.make_json_response({
+            "ok": True, "recorded": recorded, "opt_outs": opt_outs,
+        })

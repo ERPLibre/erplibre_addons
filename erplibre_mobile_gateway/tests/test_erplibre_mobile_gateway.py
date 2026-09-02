@@ -329,6 +329,46 @@ class TestErplibreSmsGuards(TransactionCase):
 
 
 @tagged("post_install", "-at_install")
+class TestErplibreSmsInbound(TransactionCase):
+
+    def setUp(self):
+        super().setUp()
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.env.company.id,
+        })
+
+    def test_stop_feeds_blacklist(self):
+        record = self.env["erplibre.sms.inbound"]._record(self.gateway, {
+            "id": "in-0001", "from": "+15145559999", "body": "STOP", "at": 1754300000,
+        })
+        self.assertTrue(record.is_opt_out)
+        self.assertTrue(record.blacklist_id)
+        self.assertTrue(record.blacklist_id.active)
+
+    def test_french_keyword_recognised(self):
+        for keyword in ("ARRET", "arrêt", "Desabonnement", "stop"):
+            self.env["erplibre.sms.inbound"].search([]).unlink()
+            record = self.env["erplibre.sms.inbound"]._record(self.gateway, {
+                "id": "in-" + keyword, "from": "+15145559998", "body": keyword,
+            })
+            self.assertTrue(record.is_opt_out, keyword)
+
+    def test_ordinary_reply_is_not_opt_out(self):
+        record = self.env["erplibre.sms.inbound"]._record(self.gateway, {
+            "id": "in-0002", "from": "+15145559997",
+            "body": "Merci, je serai là",
+        })
+        self.assertFalse(record.is_opt_out)
+        self.assertFalse(record.blacklist_id)
+
+    def test_duplicate_ignored(self):
+        payload = {"id": "in-0003", "from": "+15145559996", "body": "STOP"}
+        self.assertTrue(self.env["erplibre.sms.inbound"]._record(self.gateway, payload))
+        self.assertFalse(self.env["erplibre.sms.inbound"]._record(self.gateway, payload))
+
+
+@tagged("post_install", "-at_install")
 class TestErplibreSmsNonce(TransactionCase):
 
     def test_single_use(self):

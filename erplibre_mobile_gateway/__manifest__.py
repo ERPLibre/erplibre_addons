@@ -62,6 +62,7 @@ Le module est donc construit autour de la détection de panne :
         "data/ir_cron_data.xml",
         "views/erplibre_sms_gateway_views.xml",
         "views/erplibre_sms_dispatch_views.xml",
+        "views/erplibre_sms_inbound_views.xml",
         "views/sms_composer_views.xml",
         "views/res_config_settings_views.xml",
         "views/menus.xml",

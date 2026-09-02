@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_erplibre_sms_inbound_list" model="ir.ui.view">
+        <field name="name">erplibre.sms.inbound.list</field>
+        <field name="model">erplibre.sms.inbound</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-warning="is_opt_out">
+                <field name="received_at"/>
+                <field name="number"/>
+                <field name="partner_id" optional="show"/>
+                <field name="body"/>
+                <field name="is_opt_out"/>
+                <field name="blacklist_id" optional="show"/>
+                <field name="gateway_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_erplibre_sms_inbound_form" model="ir.ui.view">
+        <field name="name">erplibre.sms.inbound.form</field>
+        <field name="model">erplibre.sms.inbound</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="number"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="received_at"/>
+                            <field name="partner_id"/>
+                            <field name="gateway_id"/>
+                            <field name="device_id"/>
+                        </group>
+                        <group>
+                            <field name="is_opt_out"/>
+                            <field name="blacklist_id"/>
+                            <field name="external_id"/>
+                        </group>
+                    </group>
+                    <field name="body" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_erplibre_sms_inbound" model="ir.actions.act_window">
+        <field name="name">SMS recus</field>
+        <field name="res_model">erplibre.sms.inbound</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun SMS recu</p>
+            <p>
+                Les reponses arrivees sur la carte SIM de la passerelle. Les
+                messages commencant par STOP ou ARRET ajoutent automatiquement le
+                numero a la liste noire : ce journal est la piece justificative
+                du traitement, exige dans les dix jours ouvrables par la loi
+                canadienne anti-pourriel.
+            </p>
+        </field>
+    </record>
+
+</odoo>
