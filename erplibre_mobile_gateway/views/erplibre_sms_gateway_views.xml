@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_erplibre_sms_gateway_list" model="ir.ui.view">
+        <field name="name">erplibre.sms.gateway.list</field>
+        <field name="model">erplibre.sms.gateway</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="alarm_active" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="last_poll_at"/>
+                <field name="sms_permission_ok"/>
+                <field name="sim_ready"/>
+                <field name="battery_percent" widget="percentage_pie" optional="show"/>
+                <field name="outbox_pending" optional="show"/>
+                <field name="alarm_reason" optional="show"/>
+                <field name="alarm_active" column_invisible="1"/>
+                <field name="active" column_invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_erplibre_sms_gateway_form" model="ir.ui.view">
+        <field name="name">erplibre.sms.gateway.form</field>
+        <field name="model">erplibre.sms.gateway</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="En alerte" bg_color="text-bg-danger"
+                            invisible="not alarm_active"/>
+                    <widget name="web_ribbon" title="Archive" bg_color="text-bg-secondary"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Passerelle du studio"/></h1>
+                    </div>
+                    <group>
+                        <group string="Etat rapporte par le telephone">
+                            <field name="last_poll_at"/>
+                            <field name="silence_seconds"/>
+                            <field name="sms_permission_ok"/>
+                            <field name="sim_ready"/>
+                            <field name="outbox_pending"/>
+                            <field name="battery_percent"/>
+                            <field name="battery_charging"/>
+                            <field name="app_version"/>
+                            <field name="doze_exempt"/>
+                            <field name="exact_alarms"/>
+                            <field name="pacing_degraded" invisible="1"/>
+                            <field name="is_healthy"/>
+                        </group>
+                        <group string="Alerte">
+                            <field name="alarm_active"/>
+                            <field name="alarm_since" invisible="not alarm_active"/>
+                            <field name="alarm_reason" invisible="not alarm_active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Interrogation" name="polling">
+                            <group>
+                                <group string="Rythme">
+                                    <field name="poll_interval_seconds"/>
+                                    <field name="redelivery_seconds"/>
+                                    <field name="max_jobs_per_poll"/>
+                                </group>
+                                <group string="Appareil">
+                                    <field name="device_id"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    <field name="active"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                Le telephone <strong>interroge</strong> ce serveur en HTTPS
+                                sortant : Odoo n'a jamais besoin de le joindre. L'appareil peut
+                                donc etre derriere une IP dynamique et un NAT d'operateur, sans
+                                tunnel, sans port ouvert et sans infrastructure intermediaire.
+                                <br/>
+                                L'intervalle est la <strong>latence maximale d'une alerte</strong> :
+                                a 60 secondes, une annulation saisie a 18 h 00 part au plus tard
+                                a 18 h 01. Le rythme est pilote par le serveur, donc modifiable
+                                ici sans toucher au telephone.
+                            </div>
+                        </page>
+                        <page string="Garde-fous" name="limits">
+                            <group>
+                                <group string="Volume">
+                                    <field name="max_recipients_per_send"/>
+                                    <field name="segments_per_minute"/>
+                                    <field name="send_deadline_seconds"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                Android bloque a <strong>30 segments par minute et par
+                                application</strong> (verifie dans les sources AOSP,
+                                <code>SmsUsageMonitor.java</code>), en comptant les
+                                <em>segments</em> et non les messages. Au-dela, un dialogue
+                                systeme apparait sur le telephone : sur un appareil que
+                                personne ne regarde, cela signifie que rien ne part. Un message
+                                francais accentue occupe deux segments par destinataire, donc
+                                un groupe de 40 personnes prend environ trois minutes et demie.
+                            </div>
+                        </page>
+                        <page string="Autorisations et escalade" name="escalation">
+                            <group>
+                                <field name="allowed_user_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                            </group>
+                            <group string="Canal d'escalade independant">
+                                <field name="alarm_webhook_url" placeholder="https://..."/>
+                            </group>
+                            <div class="alert alert-danger" role="alert">
+                                Sans canal d'escalade independant, l'alerte de panne part par
+                                courriel — c'est-a-dire par le canal meme dont l'insuffisance
+                                justifiait cette passerelle. Un canal d'urgence dont le
+                                detecteur de panne est le canal qu'il remplace n'a pas de
+                                detecteur de panne.
+                            </div>
+                        </page>
+                        <page string="Dernier etat brut" name="raw">
+                            <field name="last_status_json" widget="ace" options="{'mode': 'json'}"
+                                   readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_erplibre_sms_gateway" model="ir.actions.act_window">
+        <field name="name">Passerelles SMS</field>
+        <field name="res_model">erplibre.sms.gateway</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Declarez la passerelle du studio</p>
+            <p>
+                Une passerelle correspond a un telephone Android executant
+                l'application ERPLibre, qui interroge ce serveur et envoie les SMS
+                par sa propre carte SIM.
+            </p>
+        </field>
+    </record>
+
+</odoo>

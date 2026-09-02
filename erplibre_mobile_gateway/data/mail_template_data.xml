@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_template_gateway_down" model="mail.template">
+        <field name="name">Passerelle mobile hors service</field>
+        <field name="model_id" ref="model_erplibre_sms_gateway"/>
+        <field name="subject">La passerelle SMS « {{ object.name }} » ne repond plus</field>
+        <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="description">Avertit qu'aucun SMS ne peut plus partir.</field>
+        <field name="body_html" type="html">
+<div style="margin:0px;padding:0px;font-size:13px;">
+    <p>Bonjour,</p>
+    <p>
+        La passerelle SMS <strong t-out="object.name">Passerelle du studio</strong>
+        ne repond plus depuis
+        <strong t-out="object.alarm_since or '-'">-</strong>.
+    </p>
+    <p>Motif rapporte : <em t-out="object.alarm_reason or '-'">-</em></p>
+    <p>
+        <strong>Consequence immediate : aucun SMS ne part.</strong>
+        Les avis d'annulation et de retard doivent etre transmis par un autre
+        moyen jusqu'a remise en service.
+    </p>
+    <p>Verifications, dans cet ordre :</p>
+    <ol>
+        <li>le telephone est-il allume, charge et connecte au reseau du studio ?</li>
+        <li>l'application ERPLibre y est-elle ouverte, et la passerelle demarree ?</li>
+        <li>la permission d'envoi de SMS est-elle toujours accordee ?
+            Android la revoque apres quelques mois sans usage.</li>
+        <li>la carte SIM a-t-elle encore un forfait actif ?</li>
+    </ol>
+    <p style="color:#875A7B;">
+        Ce courriel est envoye par le canal que la passerelle SMS etait censee
+        completer. S'il est votre seule alerte, configurez un canal d'escalade
+        independant sur la fiche de la passerelle.
+    </p>
+</div>
+        </field>
+        <field name="lang">{{ object.company_id.partner_id.lang }}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</odoo>

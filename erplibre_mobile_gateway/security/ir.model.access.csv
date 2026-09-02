@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gateway_send,erplibre.sms.gateway.send,model_erplibre_sms_gateway,group_erplibre_sms_send,1,0,0,0
+access_gateway_manager,erplibre.sms.gateway.manager,model_erplibre_sms_gateway,group_erplibre_sms_manager,1,1,1,1
+access_dispatch_send,erplibre.sms.dispatch.send,model_erplibre_sms_dispatch,group_erplibre_sms_send,1,0,0,0
+access_dispatch_manager,erplibre.sms.dispatch.manager,model_erplibre_sms_dispatch,group_erplibre_sms_manager,1,1,0,0
+access_nonce_manager,erplibre.sms.nonce.manager,model_erplibre_sms_nonce,base.group_system,1,1,1,1

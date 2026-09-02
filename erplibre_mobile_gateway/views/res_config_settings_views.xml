@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- On se greffe dans le bloc de reglages SMS existant, comme le fait le
+         module coeur `sms` lui-meme (setting id="sms"). Passer par le bloc
+         « Integrations » de base_setup serait plus fragile : son ancre est un
+         attribut `name`, pas un `id`. -->
+    <record id="res_config_settings_view_form_erplibre_sms" model="ir.ui.view">
+        <field name="name">res.config.settings.form.erplibre.sms</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sms.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <setting id="sms" position="inside">
+                <div class="content-group mt-2"
+                     invisible="sms_provider != 'erplibre'">
+                    <div class="row mb-2">
+                        <label for="erplibre_sms_daily_quota" class="col-lg-6 o_light_label"/>
+                        <field name="erplibre_sms_daily_quota"/>
+                    </div>
+                    <div class="row mb-2">
+                        <label for="erplibre_sms_secret_present" class="col-lg-6 o_light_label"/>
+                        <field name="erplibre_sms_secret_present" readonly="1"/>
+                    </div>
+                    <div class="alert alert-warning mt-2" role="alert"
+                         invisible="erplibre_sms_secret_present">
+                        La variable d'environnement <code>ERPLIBRE_SMS_HMAC_SECRET</code>
+                        est absente du processus Odoo : la passerelle ne pourra ni recevoir
+                        ni rapporter. Ajoutez-la a l'<code>EnvironmentFile</code> du service
+                        systemd, avec des droits 0600. Ne la mettez pas en base de donnees :
+                        le code de ce module est publie sous AGPL-3, et une cle en base part
+                        dans les sauvegardes.
+                    </div>
+                    <button name="%(erplibre_mobile_gateway.action_erplibre_sms_gateway)d"
+                            type="action" string="Configurer les passerelles"
+                            class="btn-link" icon="oi-arrow-right"/>
+                </div>
+            </setting>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_erplibre_sms_dispatch_list" model="ir.ui.view">
+        <field name="name">erplibre.sms.dispatch.list</field>
+        <field name="model">erplibre.sms.dispatch</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="state in ['failed', 'expired']"
+                  decoration-success="state == 'delivered'"
+                  decoration-muted="state == 'queued'">
+                <field name="requested_at"/>
+                <field name="number"/>
+                <field name="partner_id" optional="show"/>
+                <field name="body" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'delivered'"
+                       decoration-danger="state in ['failed', 'expired']"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state in ['queued', 'published']"/>
+                <field name="encoding" optional="show"/>
+                <field name="segments_total" sum="Segments" optional="show"/>
+                <field name="requested_by_uid" optional="show"/>
+                <field name="android_code" optional="hide"/>
+                <field name="failure_reason" optional="hide"/>
+                <field name="gateway_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_erplibre_sms_dispatch_form" model="ir.ui.view">
+        <field name="name">erplibre.sms.dispatch.form</field>
+        <field name="model">erplibre.sms.dispatch</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="number"/></h1>
+                    </div>
+                    <group>
+                        <group string="Suivi">
+                            <field name="state"/>
+                            <field name="report_seq"/>
+                            <field name="published_at"/>
+                            <field name="send_deadline"/>
+                            <field name="submitted_at"/>
+                            <field name="delivered_at"/>
+                            <field name="ended_at"/>
+                        </group>
+                        <group string="Contexte">
+                            <field name="partner_id"/>
+                            <field name="requested_by_uid"/>
+                            <field name="requested_at"/>
+                            <field name="gateway_id"/>
+                            <field name="device_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Message">
+                            <field name="encoding"/>
+                            <field name="segments_total"/>
+                            <field name="sms_uuid"/>
+                            <field name="batch_id"/>
+                        </group>
+                        <group string="Diagnostic" invisible="state not in ['failed', 'expired']">
+                            <field name="android_code"/>
+                            <field name="failure_reason"/>
+                        </group>
+                    </group>
+                    <field name="body" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_erplibre_sms_dispatch_search" model="ir.ui.view">
+        <field name="name">erplibre.sms.dispatch.search</field>
+        <field name="model">erplibre.sms.dispatch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="body"/>
+                <field name="requested_by_uid"/>
+                <field name="android_code"/>
+                <separator/>
+                <filter name="filter_pending" string="En attente"
+                        domain="[('state', 'in', ['queued', 'published'])]"/>
+                <filter name="filter_problem" string="En echec ou expires"
+                        domain="[('state', 'in', ['failed', 'expired'])]"/>
+                <filter name="filter_delivered" string="Recus"
+                        domain="[('state', '=', 'delivered')]"/>
+                <separator/>
+                <filter name="filter_today" string="Aujourd'hui"
+                        domain="[('requested_at', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_state" string="Etat" context="{'group_by': 'state'}"/>
+                    <filter name="group_user" string="Demandeur" context="{'group_by': 'requested_by_uid'}"/>
+                    <filter name="group_gateway" string="Passerelle" context="{'group_by': 'gateway_id'}"/>
+                    <filter name="group_day" string="Jour" context="{'group_by': 'requested_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_erplibre_sms_dispatch" model="ir.actions.act_window">
+        <field name="name">Envois SMS</field>
+        <field name="res_model">erplibre.sms.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_erplibre_sms_dispatch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun SMS envoye pour le moment</p>
+            <p>
+                Chaque envoi confie a la passerelle est suivi ici, avec son
+                demandeur et son etat reel. Ce registre survit a la suppression
+                des SMS par Odoo, qui les efface des qu'ils sont partis.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_erplibre_sms_dispatch_problem" model="ir.actions.act_window">
+        <field name="name">SMS non partis</field>
+        <field name="res_model">erplibre.sms.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ['failed', 'expired'])]</field>
+        <field name="search_view_id" ref="view_erplibre_sms_dispatch_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_erplibre_sms" model="ir.module.category">
+        <field name="name">Passerelle mobile</field>
+        <field name="description">Envoi de SMS par une passerelle mobile auto-hebergee.</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- Le droit d'envoi est volontairement separe du droit de configuration :
+         un SMS coute de l'argent, engage l'organisme au regard de la LCAP, et
+         un envoi de masse accidentel ne se rattrape pas. -->
+    <record id="group_erplibre_sms_send" model="res.groups">
+        <field name="name">Envoi</field>
+        <field name="category_id" ref="module_category_erplibre_sms"/>
+        <field name="comment">Peut envoyer des SMS par la passerelle et consulter le suivi des envois.</field>
+    </record>
+
+    <record id="group_erplibre_sms_manager" model="res.groups">
+        <field name="name">Configuration</field>
+        <field name="category_id" ref="module_category_erplibre_sms"/>
+        <field name="implied_ids" eval="[(4, ref('group_erplibre_sms_send'))]"/>
+        <field name="comment">Configure la passerelle, les plafonds et les canaux d'escalade.</field>
+    </record>
+
+    <record id="group_erplibre_sms_manager" model="res.groups">
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- Cloisonnement par societe sur les deux modeles portant company_id. -->
+    <record id="rule_erplibre_sms_gateway_company" model="ir.rule">
+        <field name="name">Passerelle mobile : multi-societes</field>
+        <field name="model_id" ref="model_erplibre_sms_gateway"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="rule_erplibre_sms_dispatch_company" model="ir.rule">
+        <field name="name">Envois SMS : multi-societes</field>
+        <field name="model_id" ref="model_erplibre_sms_dispatch"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+</odoo>
