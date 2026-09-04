@@ -344,20 +344,9 @@ class ErplibreMobileCall(models.Model):
             if modele == "res.partner":
                 self.partner_id = res_id
 
-        groupe = self.env.ref(
-            "erplibre_mobile_gateway.group_erplibre_sms_send",
-            raise_if_not_found=False,
+        destinataires = self.gateway_id._destinataires_notification(
+            self.company_id
         )
-        destinataires = self.env["res.users"]
-        if groupe:
-            destinataires = self.env["res.users"].search(
-                [
-                    ("groups_id", "in", groupe.ids),
-                    ("company_ids", "in", self.company_id.ids),
-                    ("active", "=", True),
-                    ("share", "=", False),
-                ]
-            )
 
         if not destinataires:
             # Une annonce qui n'atteint personne est un echec silencieux : le

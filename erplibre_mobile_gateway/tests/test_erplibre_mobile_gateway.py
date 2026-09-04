@@ -715,3 +715,116 @@ class TestErplibreSmsMateriel(TransactionCase):
         self.assertTrue(self.telephone.montre_cadencement)
         self.assertFalse(self.modem.montre_batterie)
         self.assertFalse(self.modem.montre_cadencement)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsEntrantVu(TransactionCase):
+    """Un SMS entrant que personne ne voit est un SMS perdu.
+
+    Deux facons de le perdre, et elles se cumulent : ne pas le rattacher au
+    contact, et le deposer dans un fil que personne ne suit.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.company.id,
+        })
+        self.contact = self.env["res.partner"].create({
+            "name": "Correspondant de test",
+            # Format humain : c'est celui que produisent la saisie et le
+            # formatage d'Odoo, et celui sur lequel l'egalite echouait.
+            "phone": "514 555-0142",
+        })
+        # Un utilisateur BIEN A NOUS, actif et dans le groupe d'envoi.
+        # `self.env.user` ne convient pas : les tests tournent sous OdooBot,
+        # qui est archive — et un utilisateur archive est ecarte des
+        # destinataires, a juste titre.
+        # `base.group_user` est INDISPENSABLE : sans lui l'utilisateur est
+        # externe, `share` vaut vrai, et il est ecarte des destinataires.
+        self.lecteur = self.env["res.users"].create({
+            "name": "Lecteur de SMS",
+            "login": "lecteur-sms-test",
+            "groups_id": [(4, self.env.ref("base.group_user").id),
+                          (4, self.env.ref(
+                              "erplibre_mobile_gateway.group_erplibre_sms_send"
+                          ).id)],
+        })
+        self.gateway.notify_user_ids = self.lecteur
+
+    def _recevoir(self, corps="Bonjour", numero="+15145550142", ident="in-1"):
+        return self.env["erplibre.sms.inbound"]._record(self.gateway, {
+            "id": ident, "from": numero, "body": corps,
+        })
+
+    def test_le_contact_est_retrouve_malgre_le_format(self):
+        """« 514 555-0142 » et « +15145550142 » designent la meme personne."""
+        recu = self._recevoir()
+        self.assertEqual(recu.partner_id, self.contact)
+
+    def test_le_message_arrive_dans_le_fil_du_contact(self):
+        avant = len(self.contact.message_ids)
+        recu = self._recevoir(corps="Je serai en retard")
+        self.assertGreater(len(self.contact.message_ids), avant)
+        self.assertIn("Je serai en retard", self.contact.message_ids[0].body)
+        self.assertTrue(recu.partner_id)
+
+    def test_quelquun_est_nomme_destinataire(self):
+        """Sans destinataire, le message se depose dans un fil non suivi."""
+        self._recevoir()
+        message = self.contact.message_ids[0]
+        self.assertTrue(message.partner_ids)
+        self.assertIn(self.lecteur.partner_id, message.partner_ids)
+
+    def test_un_numero_inconnu_se_pose_sur_la_passerelle(self):
+        """Faute de contact, il faut bien que le message soit quelque part."""
+        avant = len(self.gateway.message_ids)
+        recu = self._recevoir(numero="+15145559999", ident="in-inconnu")
+        self.assertFalse(recu.partner_id)
+        self.assertGreater(len(self.gateway.message_ids), avant)
+
+    def test_un_desabonnement_se_dit_comme_tel(self):
+        recu = self._recevoir(corps="STOP", ident="in-stop")
+        self.assertTrue(recu.is_opt_out)
+        self.assertIn("esabonnement", self.contact.message_ids[0].body)
+
+    def test_la_liste_explicite_lemporte_sur_le_groupe(self):
+        """Nomme, on prend ceux-la ; vide, on prend le groupe d'envoi."""
+        hors_groupe = self.env["res.users"].create({
+            "name": "Sans le groupe", "login": "temoin-notification",
+            "groups_id": [(4, self.env.ref("base.group_user").id)],
+        })
+        self.gateway.notify_user_ids = hors_groupe
+        self.assertEqual(
+            self.gateway._destinataires_notification(), hors_groupe
+        )
+        self.gateway.notify_user_ids = False
+        par_le_groupe = self.gateway._destinataires_notification()
+        self.assertIn(self.lecteur, par_le_groupe)
+        self.assertNotIn(hors_groupe, par_le_groupe)
+
+    def test_un_utilisateur_archive_nest_pas_un_destinataire(self):
+        """Le prevenir reviendrait a ne prevenir personne, sans le dire."""
+        dormeur = self.env["res.users"].create({
+            "name": "Parti", "login": "temoin-archive", "active": False,
+            "groups_id": [(4, self.env.ref("base.group_user").id)],
+        })
+        self.gateway.notify_user_ids = dormeur
+        self.assertFalse(self.gateway._destinataires_notification())
+
+    def test_les_appels_et_les_sms_previennent_les_memes_gens(self):
+        """Deux regles pour un meme evenement finiraient par se contredire."""
+        appel = self.env["erplibre.mobile.call"].create({
+            "call_uuid": "uuid-notif-1",
+            "number": "+15145550142",
+            "direction": "in",
+            "company_id": self.company.id,
+            "gateway_id": self.gateway.id,
+            "state": "queued",
+        })
+        self.assertEqual(
+            appel.gateway_id._destinataires_notification(appel.company_id),
+            self.gateway._destinataires_notification(),
+        )

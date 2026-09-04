@@ -63,9 +63,7 @@ class ErplibreSmsInbound(models.Model):
             except (TypeError, ValueError, OSError):
                 pass
 
-        partner = self.env["res.partner"].sudo().search(
-            ["|", ("phone", "=", number), ("mobile", "=", number)], limit=1
-        ) if number else self.env["res.partner"]
+        partner = self._rapprocher(number)
 
         first_word = body.strip().split()[0].lower().strip(".,!;:") if body.strip() else ""
         is_opt_out = first_word in OPT_OUT_KEYWORDS
@@ -88,9 +86,69 @@ class ErplibreSmsInbound(models.Model):
             record.blacklist_id = blacklist
             _logger.info("erplibre_mobile_gateway: %s ajoute a la liste noire SMS", number)
 
-        if partner:
-            partner.sudo().message_post(
-                body=_("SMS recu du %(number)s : %(body)s", number=number, body=body),
-                message_type="comment",
-            )
+        record._notifier(gateway)
         return record
+
+    @api.model
+    def _rapprocher(self, number):
+        """Le correspondant, rapproche sur les CHIFFRES du numero.
+
+        La comparaison de chaines echouait des que la fiche portait un format
+        different de celui que presente le reseau : « 514 555-0142 » stocke
+        contre « +15145550142 » recu designent la meme personne, et l'egalite
+        les separait. Le message arrivait alors sans contact, sur un numero
+        que personne ne reconnait.
+
+        Le rapprochement est confie a `base_phone`, comme pour les appels
+        entrants : deux regles pour un meme numero finiraient par se
+        contredire, et le contact serait trouve par le telephone mais pas par
+        le SMS.
+        """
+        Partner = self.env["res.partner"]
+        chiffres = "".join(c for c in (number or "") if c.isdigit())
+        if not chiffres:
+            return Partner
+        try:
+            trouve = self.env["phone.common"].get_record_from_phone_number(chiffres)
+        except Exception as exc:  # noqa: BLE001 - un SMS ne se perd pas pour ca
+            _logger.warning(
+                "erplibre_mobile_gateway: rapprochement impossible : %s", exc
+            )
+            return Partner
+        if trouve and trouve[0] == "res.partner":
+            return Partner.browse(trouve[1])
+        return Partner
+
+    def _notifier(self, gateway):
+        """Pose le message la ou quelqu'un le verra, et previent ce quelqu'un.
+
+        Un SMS entrant ecrit dans une table que personne n'ouvre est un
+        message perdu : il faut le lire pour repondre, et un desabonnement
+        engage l'organisme. On le publie donc dans le fil du contact — ou
+        dans celui de la passerelle quand le numero est inconnu, faute de
+        meilleur endroit — en NOMMANT les destinataires : sans eux, le message
+        se depose dans un fil que personne ne suit.
+        """
+        self.ensure_one()
+        destinataires = gateway._destinataires_notification()
+        cible = self.partner_id or gateway
+        if not cible or not destinataires:
+            _logger.warning(
+                "erplibre_mobile_gateway: SMS de %s recu et annonce a"
+                " PERSONNE — aucun utilisateur interne dans le groupe"
+                " « Passerelle mobile / Envoi », ou aucune passerelle.",
+                self.number,
+            )
+            return False
+        titre = _("Desabonnement recu par SMS") if self.is_opt_out else _("SMS recu")
+        corps = _(
+            "%(titre)s du %(number)s : %(body)s",
+            titre=titre, number=self.number, body=self.body or "",
+        )
+        cible.sudo().message_post(
+            body=corps,
+            partner_ids=destinataires.partner_id.ids,
+            message_type="comment",
+            subtype_xmlid="mail.mt_comment",
+        )
+        return True

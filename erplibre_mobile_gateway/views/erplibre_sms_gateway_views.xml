@@ -119,6 +119,8 @@
                             <group>
                                 <field name="allowed_user_ids" widget="many2many_tags"
                                        options="{'no_create': True}"/>
+                                <field name="notify_user_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
                             </group>
                             <group string="Canal d'escalade independant">
                                 <field name="alarm_webhook_url" placeholder="https://..."/>

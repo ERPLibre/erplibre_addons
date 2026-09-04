@@ -210,6 +210,13 @@ class ErplibreSmsGateway(models.Model):
              "detecteur de panne.",
     )
 
+    notify_user_ids = fields.Many2many(
+        "res.users", "erplibre_sms_gateway_notify_rel", "gateway_id", "user_id",
+        string="Utilisateurs prevenus",
+        help="Qui voit arriver un SMS ou un appel entrant. Vide = tous les "
+             "membres du groupe « Passerelle mobile / Envoi » de la societe.",
+    )
+
     allowed_user_ids = fields.Many2many(
         "res.users", "erplibre_sms_gateway_user_rel", "gateway_id", "user_id",
         string="Utilisateurs autorises a envoyer",
@@ -420,6 +427,50 @@ class ErplibreSmsGateway(models.Model):
                 {"u": dispatch.sms_uuid, "n": dispatch.number}
             )
         return [{"body": body, "to": recipients} for body, recipients in grouped.items()]
+
+    def _destinataires_notification(self, company=None):
+        """Les utilisateurs internes a prevenir d'un evenement entrant.
+
+        La liste explicite l'emporte ; vide, ce sont les membres du groupe
+        d'envoi de la societe. Prevenir tout le monde diffuserait un numero de
+        telephone et le texte d'un message a quiconque a un compte, alors que
+        savoir qui ecrit est une information de travail.
+
+        Accepte une societe pour les cas ou la passerelle est inconnue : un
+        appel compose a la main nait sans fiche, et il faut quand meme
+        l'annoncer.
+
+        Une liste NOMMEE dont tout le monde est parti rend un ensemble vide,
+        et non le groupe entier. La lire sans `active_test` est ce qui permet
+        de faire la difference entre « personne n'a ete choisi » et « ceux
+        qu'on avait choisis sont archives » : retomber sur le groupe enverrait
+        le texte d'un message a des gens que personne n'a designes, et
+        l'appelant dit deja qu'une annonce sans destinataire est une panne.
+        """
+        passerelle = self[:1]
+        societe = passerelle.company_id or company or self.env.company
+        nommes = passerelle.with_context(active_test=False).notify_user_ids
+        if nommes:
+            vivants = nommes.filtered("active")
+            if not vivants:
+                _logger.warning(
+                    "erplibre_mobile_gateway: la passerelle %s ne nomme que"
+                    " des utilisateurs archives : plus personne n'est"
+                    " prevenu.", passerelle.display_name,
+                )
+            return vivants
+        groupe = self.env.ref(
+            "erplibre_mobile_gateway.group_erplibre_sms_send",
+            raise_if_not_found=False,
+        )
+        if not groupe:
+            return self.env["res.users"]
+        return self.env["res.users"].search([
+            ("groups_id", "in", groupe.ids),
+            ("company_ids", "in", societe.ids),
+            ("active", "=", True),
+            ("share", "=", False),
+        ])
 
     # ------------------------------------------------------------------
     # Vivacite et alertes
