@@ -92,9 +92,7 @@ class PhoneCommon(models.AbstractModel):
             # Un autre connecteur est actif : on ne s'impose pas.
             return result
 
-        gateway = self.env["erplibre.sms.gateway"].search(
-            [("company_id", "=", company.id), ("active", "=", True)], limit=1
-        )
+        gateway = self.env["erplibre.sms.gateway"]._for_company(company)
         if not gateway:
             raise UserError(
                 _(

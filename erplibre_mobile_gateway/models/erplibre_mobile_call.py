@@ -246,12 +246,11 @@ class ErplibreMobileCall(models.Model):
 
         passerelle = self.gateway_id
         if not passerelle or not passerelle.active:
-            passerelle = self.env["erplibre.sms.gateway"].search(
-                [
-                    ("company_id", "=", self.company_id.id),
-                    ("active", "=", True),
-                ],
-                limit=1,
+            # Meme resolution que l'envoi : rejouer un appel par une autre
+            # passerelle que celle qui envoie le ferait partir depuis un
+            # numero que le correspondant ne reconnait pas.
+            passerelle = self.env["erplibre.sms.gateway"]._for_company(
+                self.company_id
             )
         if not passerelle:
             raise UserError(
