@@ -4,7 +4,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from odoo import fields
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
 from ..tools import signature
@@ -499,3 +499,126 @@ class TestErplibreSmsPolling(TransactionCase):
     def test_poll_interval_floor(self):
         with self.assertRaises(UserError):
             self.gateway.poll_interval_seconds = 5
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsGatewayChoice(TransactionCase):
+    """Quelle passerelle envoie, quand il y en a plus d'une.
+
+    Tant qu'il n'y en avait qu'une, `search(limit=1)` la designait toujours.
+    Des qu'un second materiel existe, ce tri devient un tirage : ces tests
+    fixent la regle qui le remplace.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.company.sms_provider = "erplibre"
+        # Une passerelle laissee par une autre demonstration gagnerait le tri
+        # par `sequence, id` et repondrait a la place de celles du test. La
+        # transaction est annulee en fin de test : rien n'est desactive
+        # durablement.
+        self.env["erplibre.sms.gateway"].search(
+            [("company_id", "=", self.company.id)]
+        ).write({"active": False})
+        self.company.erplibre_gateway_id = False
+        Gateway = self.env["erplibre.sms.gateway"]
+        self.premiere = Gateway.create({
+            "name": "Passerelle A",
+            "company_id": self.company.id,
+            "sequence": 10,
+        })
+        self.seconde = Gateway.create({
+            "name": "Passerelle B",
+            "company_id": self.company.id,
+            "sequence": 20,
+        })
+
+    def _resoudre(self):
+        return self.env["erplibre.sms.gateway"]._for_company(self.company)
+
+    def test_sans_choix_la_sequence_decide(self):
+        """L'ancien comportement survit : sans choix, la premiere active."""
+        self.assertEqual(self._resoudre(), self.premiere)
+
+    def test_le_choix_explicite_bat_la_sequence(self):
+        self.company.erplibre_gateway_id = self.seconde
+        self.assertEqual(self._resoudre(), self.seconde)
+
+    def test_une_passerelle_choisie_puis_archivee_ne_se_remplace_pas(self):
+        """Substituer ferait partir le message depuis un autre numero."""
+        self.company.erplibre_gateway_id = self.seconde
+        self.seconde.active = False
+        self.assertFalse(self._resoudre())
+
+    def test_le_refus_dit_lequel_des_deux_problemes(self):
+        """« Aucune » et « celle choisie ne va plus » ne se reparent pas pareil."""
+        api = self.company._get_sms_api_class()(self.env)
+        lot = [{"content": "Cours annule",
+                "numbers": [{"number": "+15145550142", "uuid": "uuid-choix-1"}]}]
+
+        self.company.erplibre_gateway_id = self.seconde
+        self.seconde.active = False
+        self.assertEqual(
+            api._send_sms_batch(lot)[0]["state"], "gateway_inactive"
+        )
+
+        self.company.erplibre_gateway_id = False
+        (self.premiere | self.seconde).write({"active": False})
+        self.assertEqual(
+            api._send_sms_batch(lot)[0]["state"], "gateway_missing"
+        )
+
+    def test_les_deux_etats_sont_traduits_et_classes(self):
+        """Un etat sans message ni type d'echec ressortirait en « inconnu »."""
+        api = self.company._get_sms_api_class()(self.env)
+        for etat in ("gateway_missing", "gateway_inactive"):
+            self.assertIn(etat, api._get_sms_api_error_messages())
+            self.assertIn(etat, api.PROVIDER_TO_SMS_FAILURE_TYPE)
+
+    def test_une_passerelle_etrangere_est_refusee_a_la_configuration(self):
+        """Refuser au reglage ce que l'envoi refuserait plus tard, sans cause visible."""
+        autre = self.env["res.company"].create({"name": "Autre organisme"})
+        etrangere = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle d'ailleurs",
+            "company_id": autre.id,
+        })
+        with self.assertRaises(ValidationError):
+            self.company.erplibre_gateway_id = etrangere
+
+    def test_le_compositeur_montre_la_passerelle_choisie(self):
+        self.company.erplibre_gateway_id = self.seconde
+        composer = self.env["sms.composer"].create({
+            "body": "Cours annule",
+            "composition_mode": "numbers",
+            "numbers": "+15145550142",
+        })
+        self.assertEqual(composer.erplibre_gateway_id, self.seconde)
+
+    def test_une_seule_passerelle_porte_la_marque(self):
+        self.company.erplibre_gateway_id = self.seconde
+        self.assertFalse(self.premiere.is_company_default)
+        self.assertTrue(self.seconde.is_company_default)
+
+    def test_le_bouton_pose_le_choix_et_refuse_une_archivee(self):
+        self.seconde.action_set_as_company_default()
+        self.assertEqual(self.company.erplibre_gateway_id, self.seconde)
+        self.premiere.active = False
+        with self.assertRaises(UserError):
+            self.premiere.action_set_as_company_default()
+
+    def test_le_cron_dexpiration_alerte_la_passerelle_choisie(self):
+        """Un envoi orphelin retombe sur la MEME passerelle que l'envoi aurait prise."""
+        self.company.erplibre_gateway_id = self.seconde
+        self.env["erplibre.sms.dispatch"].create({
+            "sms_uuid": "uuid-orphelin-choix",
+            "number": "+15145550142",
+            "body": "Cours annule",
+            "company_id": self.company.id,
+            "state": "queued",
+            "send_deadline": fields.Datetime.now() - timedelta(seconds=60),
+        })
+        self.env["erplibre.sms.dispatch"]._cron_expire_stale()
+        self.assertTrue(self.seconde.alarm_active)
+        self.assertFalse(self.premiere.alarm_active)
+

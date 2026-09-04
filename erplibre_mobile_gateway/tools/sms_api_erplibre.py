@@ -58,6 +58,7 @@ class SmsApiErplibre(SmsApiBase):
 
     PROVIDER_TO_SMS_FAILURE_TYPE = SmsApiBase.PROVIDER_TO_SMS_FAILURE_TYPE | {
         "gateway_missing": "sms_acc",
+        "gateway_inactive": "sms_acc",
         "gateway_down": "sms_server",
         "blacklisted": "sms_blacklist",
         "quota_exceeded": "sms_credit",
@@ -67,6 +68,11 @@ class SmsApiErplibre(SmsApiBase):
         messages = super()._get_sms_api_error_messages()
         messages.update({
             "gateway_missing": _("Aucune passerelle SMS n'est configuree pour cette societe."),
+            "gateway_inactive": _(
+                "La passerelle choisie pour cette societe est archivee ou "
+                "appartient a une autre societe. Aucune autre n'a ete prise a "
+                "sa place : le message serait parti depuis un autre numero."
+            ),
             "gateway_down": _("La demande n'a pas pu etre publiee vers la passerelle SMS."),
             "blacklisted": _("Ce numero s'est desabonne des SMS."),
             "quota_exceeded": _("Le quota quotidien de SMS de la passerelle est atteint."),
@@ -74,9 +80,8 @@ class SmsApiErplibre(SmsApiBase):
         return messages
 
     def _get_gateway(self):
-        return self.env["erplibre.sms.gateway"].search(
-            [("company_id", "=", self.company.id), ("active", "=", True)], limit=1
-        )
+        """Voir `erplibre.sms.gateway._for_company` : la regle vit la-bas."""
+        return self.env["erplibre.sms.gateway"]._for_company(self.company)
 
     def _send_sms_batch(self, messages, delivery_reports_url=False):
         """Met le lot en file, en attente que le telephone vienne le chercher.
@@ -104,8 +109,20 @@ class SmsApiErplibre(SmsApiBase):
             for number in message["numbers"]
         ]
         if not gateway:
-            _logger.error("erplibre_mobile_gateway: aucune passerelle active pour %s", self.company.display_name)
-            return [{"uuid": item["uuid"], "state": "gateway_missing"} for item in flat]
+            # Distinguer « aucune » de « celle qu'on a choisie ne repond plus
+            # aux conditions » : la premiere se repare en creant une
+            # passerelle, la seconde en corrigeant un choix. Un seul message
+            # pour les deux enverrait chercher au mauvais endroit.
+            etat = (
+                "gateway_inactive"
+                if self.company.erplibre_gateway_id
+                else "gateway_missing"
+            )
+            _logger.error(
+                "erplibre_mobile_gateway: aucune passerelle utilisable pour %s (%s)",
+                self.company.display_name, etat,
+            )
+            return [{"uuid": item["uuid"], "state": etat} for item in flat]
 
         blacklist = set(
             self.env["phone.blacklist"].sudo().search([

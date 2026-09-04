@@ -12,6 +12,14 @@
             <setting id="sms" position="inside">
                 <div class="content-group mt-2"
                      invisible="sms_provider != 'erplibre'">
+                    <field name="company_id" invisible="1"/>
+                    <div class="row mb-2">
+                        <label for="erplibre_gateway_id" class="col-lg-6 o_light_label"/>
+                        <field name="erplibre_gateway_id"
+                               domain="[('company_id', '=', company_id)]"
+                               options="{'no_create': True}"
+                               placeholder="Premiere active, par sequence"/>
+                    </div>
                     <div class="row mb-2">
                         <label for="erplibre_sms_daily_quota" class="col-lg-6 o_light_label"/>
                         <field name="erplibre_sms_daily_quota"/>

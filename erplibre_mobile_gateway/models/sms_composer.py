@@ -23,8 +23,12 @@ class SmsComposer(models.TransientModel):
     _inherit = "sms.composer"
 
     erplibre_gateway_id = fields.Many2one(
-        "erplibre.sms.gateway", compute="_compute_erplibre_gateway_id",
-        help="Passerelle qui traitera cet envoi, si la societe est configuree ainsi.",
+        "erplibre.sms.gateway", "Passerelle",
+        compute="_compute_erplibre_gateway_id",
+        help="Materiel qui traitera cet envoi. Il se choisit dans les reglages "
+             "de la societe, pas ici : le compositeur cree des `sms.sms` que le "
+             "cron d'envoi reprend dans une autre transaction, ou un choix pris "
+             "a l'ecran ne serait plus lisible.",
     )
     erplibre_estimate = fields.Char(
         "Estimation", compute="_compute_erplibre_estimate",
@@ -37,9 +41,7 @@ class SmsComposer(models.TransientModel):
             company = composer.env.company
             gateway = self.env["erplibre.sms.gateway"]
             if company.sms_provider == "erplibre":
-                gateway = gateway.search(
-                    [("company_id", "=", company.id), ("active", "=", True)], limit=1
-                )
+                gateway = gateway._for_company(company)
             composer.erplibre_gateway_id = gateway
 
     @api.depends("body", "recipient_valid_count", "erplibre_gateway_id")

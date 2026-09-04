@@ -7,6 +7,14 @@ from ..tools import signature
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
+    erplibre_gateway_id = fields.Many2one(
+        "erplibre.sms.gateway",
+        "Passerelle mobile",
+        related="company_id.erplibre_gateway_id",
+        readonly=False,
+        help="Materiel qui envoie les SMS. Vide = la premiere passerelle "
+             "active par sequence, ce qui suffit tant qu'il n'y en a qu'une.",
+    )
     erplibre_sms_daily_quota = fields.Integer(
         "Quota quotidien de SMS",
         config_parameter="erplibre_mobile_gateway.daily_quota",

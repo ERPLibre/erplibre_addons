@@ -279,8 +279,7 @@ class ErplibreSmsDispatch(models.Model):
         # alerte le telephone SAIN d'un autre organisme — et une alerte bloque
         # tous ses envois. La societe, elle, est toujours connue (`company_id`
         # est requis) : on retombe donc sur la passerelle que cette societe
-        # aurait utilisee, avec la meme regle que l'envoi (premiere active par
-        # `sequence, id`).
+        # aurait utilisee, par la MEME resolution que l'envoi.
         cibles = {}
 
         def viser(passerelle, envois):
@@ -302,17 +301,14 @@ class ErplibreSmsDispatch(models.Model):
             concernes = orphelins.filtered(
                 lambda d, s=societe: d.company_id == s
             )
-            passerelle = self.env["erplibre.sms.gateway"].search(
-                [("company_id", "=", societe.id), ("active", "=", True)],
-                limit=1,
-            )
+            passerelle = self.env["erplibre.sms.gateway"]._for_company(societe)
             if not passerelle:
                 # Rien a alerter : le dire, plutot que de choisir une
                 # passerelle etrangere pour avoir l'air d'agir.
                 _logger.warning(
                     "erplibre_mobile_gateway: %s envois expires sans"
-                    " passerelle pour %s, et aucune passerelle active dans"
-                    " cette societe : aucune alerte levee.",
+                    " passerelle pour %s, et aucune passerelle utilisable"
+                    " dans cette societe : aucune alerte levee.",
                     len(concernes),
                     societe.display_name,
                 )

@@ -157,6 +157,13 @@ class ErplibreSmsGateway(models.Model):
     is_healthy = fields.Boolean("En bonne sante", compute="_compute_is_healthy")
     dispatch_count = fields.Integer("Envois suivis", compute="_compute_dispatch_count")
     silence_seconds = fields.Integer("Silence (secondes)", compute="_compute_is_healthy")
+    is_company_default = fields.Boolean(
+        "Envoie pour la societe",
+        compute="_compute_is_company_default",
+        help="Vrai pour la passerelle que la societe utilise reellement. Sans "
+             "choix explicite dans les reglages, c'est la premiere active par "
+             "sequence.",
+    )
 
     _sql_constraints = [
         ("device_id_unique", "unique(device_id)", "Cet identifiant d'appareil est deja utilise."),
@@ -176,6 +183,25 @@ class ErplibreSmsGateway(models.Model):
                 and gateway.sms_permission_ok
                 and gateway.sim_ready
             )
+
+    @api.depends("company_id.erplibre_gateway_id", "active", "sequence")
+    def _compute_is_company_default(self):
+        """Dit LAQUELLE envoie, a l'endroit ou on les compare.
+
+        Non stocke : la valeur depend du choix de la societe et de l'ordre des
+        AUTRES passerelles, que rien ne peut declarer en dependance. Une
+        societe en compte quelques-unes, le recalcul a chaque lecture ne coute
+        rien.
+        """
+        retenue = {}
+        for gateway in self:
+            societe = gateway.company_id
+            if not societe:
+                gateway.is_company_default = False
+                continue
+            if societe.id not in retenue:
+                retenue[societe.id] = self._for_company(societe)
+            gateway.is_company_default = gateway == retenue[societe.id]
 
     def _compute_dispatch_count(self):
         counts = dict(self.env["erplibre.sms.dispatch"]._read_group(
@@ -203,6 +229,62 @@ class ErplibreSmsGateway(models.Model):
                     "latence utile : la limite de debit d'Android impose de toute "
                     "facon plusieurs minutes pour un groupe."
                 ))
+
+    # ------------------------------------------------------------------
+    # Resolution
+    # ------------------------------------------------------------------
+    @api.model
+    def _for_company(self, company):
+        """La passerelle qui envoie pour cette societe, ou un ensemble vide.
+
+        Point de resolution UNIQUE : l'envoi, le compositeur et le repli du
+        cron d'expiration passent tous par ici. Trois regles separees
+        finiraient par diverger, et un message partirait alors par un materiel
+        pendant que l'alerte de sa panne se poserait sur un autre.
+
+        Le choix explicite de la societe l'emporte. Sans choix, on retombe sur
+        la premiere active par `sequence, id` : c'etait la seule regle avant
+        que le choix existe, et elle reste juste tant qu'il n'y a qu'une
+        passerelle.
+
+        Une passerelle choisie mais archivee ne se remplace PAS en silence.
+        Substituer l'autre materiel ferait partir le message depuis une autre
+        carte SIM, donc depuis un autre numero : le destinataire le voit,
+        repond a ce numero-la, et personne ne l'avait demande. Un refus visible
+        vaut mieux qu'un envoi juste en apparence.
+        """
+        if not company:
+            return self.browse()
+        choisie = company.erplibre_gateway_id
+        if choisie:
+            if choisie.active and choisie.company_id == company:
+                return choisie
+            _logger.error(
+                "erplibre_mobile_gateway: la passerelle choisie par %s est "
+                "inutilisable (archivee ou d'une autre societe) ; aucune "
+                "substitution n'est faite.", company.display_name,
+            )
+            return self.browse()
+        return self.search(
+            [("company_id", "=", company.id), ("active", "=", True)], limit=1
+        )
+
+    def action_set_as_company_default(self):
+        """Fait de cette passerelle celle qui envoie, pour sa societe.
+
+        Le choix se pose sur la societe et non sur la passerelle : deux
+        passerelles marquees ne voudraient rien dire, et l'unicite est gratuite
+        quand elle est portee par un seul champ. Reserve a l'administration --
+        le bouton est masque ailleurs -- parce qu'il ecrit sur `res.company`.
+        """
+        self.ensure_one()
+        if not self.active:
+            raise UserError(_(
+                "Une passerelle archivee n'envoie rien. Reactivez-la avant "
+                "de la choisir."
+            ))
+        self.company_id.erplibre_gateway_id = self.id
+        return True
 
     # ------------------------------------------------------------------
     # Remise des travaux
