@@ -26,11 +26,53 @@ ESCALATION_TIMEOUT = 5
 ANDROID_SEGMENTS_PER_MINUTE = 30
 DEFAULT_SEGMENTS_PER_MINUTE = 24
 
+#: Ce qui distingue un materiel d'un autre, et rien de plus.
+#:
+#: Le module a d'abord ete ecrit pour un telephone Android, et jugeait donc
+#: TOUTE passerelle sur des criteres Android : dispense d'economie de batterie,
+#: alarmes exactes, niveau de batterie, plafond de debit par application.
+#: Applique a un modem USB, ce jugement est faux de bout en bout — il n'a rien
+#: de tout cela, et se serait affiche « cadencement degrade », batterie a zero,
+#: brise a trente segments par minute pour une limite qui ne le concerne pas.
+#:
+#: Chaque entree ne dit donc que les traits qui CHANGENT selon l'appareil. Ce
+#: qui ne change pas — interroger, envoyer, rendre compte — n'a pas a figurer
+#: ici, et l'ajout d'un troisieme materiel ne devrait toucher que ce
+#: dictionnaire.
+MATERIELS = {
+    "mobile": {
+        "libelle": "Telephone Android",
+        # Doze et alarmes exactes : deux reglages du systeme, sans equivalent
+        # ailleurs, qui font glisser les reveils quand ils manquent.
+        "cadencement_systeme": True,
+        "batterie": True,
+        # Plafond impose par l'appareil, en segments par minute. 0 = aucun.
+        "plafond_segments": ANDROID_SEGMENTS_PER_MINUTE,
+        "sans_envoi": ("La permission d'envoi de SMS n'est plus accordee sur "
+                       "le telephone."),
+        "sans_sim": "La carte SIM du telephone n'est pas prete.",
+    },
+    "modem": {
+        "libelle": "Modem USB",
+        "cadencement_systeme": False,
+        "batterie": False,
+        "plafond_segments": 0,
+        "sans_envoi": "L'agent ne peut plus commander le modem.",
+        "sans_sim": "La carte SIM du modem n'est pas enregistree au reseau.",
+    },
+}
+
+MATERIEL_DEFAUT = "mobile"
+
 
 class ErplibreSmsGateway(models.Model):
-    """Une passerelle = un telephone Android qui envoie les SMS.
+    """Une passerelle = un appareil qui envoie les SMS par sa propre carte SIM.
 
-    Le telephone INTERROGE le serveur en HTTPS sortant : Odoo n'a jamais besoin
+    Un telephone Android ou un modem USB : voir `MATERIELS` pour ce qui les
+    distingue, qui tient en quatre traits. Le PROTOCOLE, lui, est le meme —
+    rien dans les trois routes n'est propre a Android.
+
+    L'appareil INTERROGE le serveur en HTTPS sortant : Odoo n'a jamais besoin
     de le joindre. C'est ce qui rend l'architecture insensible a une IP
     dynamique, a un NAT d'operateur, et supprime toute infrastructure
     intermediaire.
@@ -42,6 +84,13 @@ class ErplibreSmsGateway(models.Model):
     _order = "sequence, id"
 
     name = fields.Char("Nom", required=True, default="Passerelle du studio")
+    kind = fields.Selection(
+        [(cle, trait["libelle"]) for cle, trait in MATERIELS.items()],
+        "Materiel", required=True, default=MATERIEL_DEFAUT,
+        help="Decide des criteres de sante appliques a cette passerelle. Un "
+             "modem juge sur les criteres d'un telephone se declare en panne "
+             "sans l'etre.",
+    )
     sequence = fields.Integer("Sequence", default=10)
     active = fields.Boolean("Actif", default=True)
     company_id = fields.Many2one(
@@ -50,20 +99,20 @@ class ErplibreSmsGateway(models.Model):
     device_id = fields.Char(
         "Identifiant de l'appareil", required=True, copy=False,
         default=lambda self: secrets.token_hex(8),
-        help="Identifiant que le telephone presente a chaque interrogation.",
+        help="Identifiant que l'appareil presente a chaque interrogation.",
     )
 
     # -- Rythme d'interrogation ----------------------------------------
     poll_interval_seconds = fields.Integer(
         "Intervalle d'interrogation (secondes)", default=60,
-        help="Rythme auquel le telephone demande s'il y a des SMS a envoyer. "
+        help="Rythme auquel l'appareil demande s'il y a des SMS a envoyer. "
              "C'est la latence maximale d'une alerte : a 60 secondes, une "
              "annulation saisie a 18 h 00 part au plus tard a 18 h 01.",
     )
     redelivery_seconds = fields.Integer(
         "Delai avant nouvelle offre (secondes)", default=300,
-        help="Un SMS remis au telephone mais jamais confirme est reproposé apres "
-             "ce delai. C'est ce qui rattrape un telephone mort entre la "
+        help="Un SMS remis a l'appareil mais jamais confirme est reproposé apres "
+             "ce delai. C'est ce qui rattrape un appareil mort entre la "
              "reception et l'enregistrement du travail.",
     )
     last_poll_at = fields.Datetime("Derniere interrogation", readonly=True, index=True)
@@ -77,8 +126,9 @@ class ErplibreSmsGateway(models.Model):
     )
     segments_per_minute = fields.Integer(
         "Segments par minute", default=DEFAULT_SEGMENTS_PER_MINUTE,
-        help="Consigne d'etalement transmise au telephone. Android bloque a 30 "
-             "segments par minute et par application ; on garde une marge.",
+        help="Consigne d'etalement transmise a l'appareil. Android bloque a 30 "
+             "segments par minute et par application ; on garde une marge. Un "
+             "modem n'a pas ce plafond, et le sien vient du reseau.",
     )
     send_deadline_seconds = fields.Integer(
         "Echeance d'envoi (secondes)", default=900,
@@ -93,9 +143,14 @@ class ErplibreSmsGateway(models.Model):
 
     # -- Etat rapporte par le telephone --------------------------------
     last_status_json = fields.Text("Dernier etat rapporte", readonly=True)
-    sms_permission_ok = fields.Boolean("Permission SEND_SMS accordee", readonly=True)
+    sms_permission_ok = fields.Boolean(
+        "Envoi autorise par l'appareil", readonly=True,
+        help="Sous Android, la permission SEND_SMS. Pour un modem, la capacite "
+             "de l'agent a le commander. Dans les deux cas : cet appareil "
+             "peut-il, en ce moment, remettre un SMS au reseau.",
+    )
     sim_ready = fields.Boolean("Carte SIM prete", readonly=True)
-    outbox_pending = fields.Integer("En attente sur le telephone", readonly=True)
+    outbox_pending = fields.Integer("En attente sur l'appareil", readonly=True)
     battery_percent = fields.Integer("Batterie (%)", readonly=True)
     battery_charging = fields.Boolean("En charge", readonly=True)
     app_version = fields.Char("Version de l'application", readonly=True)
@@ -126,13 +181,20 @@ class ErplibreSmsGateway(models.Model):
         help="Vrai des qu'un des deux reglages de cadencement manque.",
     )
 
-    @api.depends("doze_exempt", "exact_alarms", "last_poll_at")
+    @api.depends("doze_exempt", "exact_alarms", "last_poll_at", "kind")
     def _compute_pacing_degraded(self):
         for record in self:
-            # Tant que le telephone n'a jamais parle, on ne sait rien : ne pas
+            # Tant que l'appareil n'a jamais parle, on ne sait rien : ne pas
             # afficher un probleme de cadencement la ou il n'y a qu'un silence.
-            record.pacing_degraded = bool(record.last_poll_at) and not (
-                record.doze_exempt and record.exact_alarms
+            #
+            # Et ne le juger que la ou le systeme peut le degrader : un
+            # processus sur un hote n'a ni Doze ni permission d'alarme a
+            # demander, et l'y declarer degrade signalerait une panne qui ne
+            # peut pas s'y produire.
+            record.pacing_degraded = (
+                bool(record.last_poll_at)
+                and record._trait("cadencement_systeme")
+                and not (record.doze_exempt and record.exact_alarms)
             )
 
     alarm_active = fields.Boolean("En alerte", readonly=True, index=True)
@@ -157,6 +219,8 @@ class ErplibreSmsGateway(models.Model):
     is_healthy = fields.Boolean("En bonne sante", compute="_compute_is_healthy")
     dispatch_count = fields.Integer("Envois suivis", compute="_compute_dispatch_count")
     silence_seconds = fields.Integer("Silence (secondes)", compute="_compute_is_healthy")
+    montre_batterie = fields.Boolean(compute="_compute_traits_affiches")
+    montre_cadencement = fields.Boolean(compute="_compute_traits_affiches")
     is_company_default = fields.Boolean(
         "Envoie pour la societe",
         compute="_compute_is_company_default",
@@ -184,6 +248,29 @@ class ErplibreSmsGateway(models.Model):
                 and gateway.sim_ready
             )
 
+    @api.depends("kind")
+    def _compute_traits_affiches(self):
+        """Ce que la fiche a le droit de montrer, decide par le materiel.
+
+        La vue interroge ces deux champs plutot que de comparer `kind` a une
+        valeur ecrite en dur : un troisieme materiel ne doit toucher que
+        `MATERIELS`, pas le XML.
+        """
+        for gateway in self:
+            gateway.montre_batterie = gateway._trait("batterie")
+            gateway.montre_cadencement = gateway._trait("cadencement_systeme")
+
+    def _trait(self, nom):
+        """Un trait du materiel de cette passerelle.
+
+        Retombe sur le materiel par defaut plutot que de lever : un
+        enregistrement dont le champ serait vide — importe, ou cree par du code
+        anterieur a ce champ — doit rester lisible.
+        """
+        self.ensure_one()
+        defaut = MATERIELS[MATERIEL_DEFAUT]
+        return MATERIELS.get(self.kind or MATERIEL_DEFAUT, defaut)[nom]
+
     @api.depends("company_id.erplibre_gateway_id", "active", "sequence")
     def _compute_is_company_default(self):
         """Dit LAQUELLE envoie, a l'endroit ou on les compare.
@@ -210,14 +297,20 @@ class ErplibreSmsGateway(models.Model):
         for gateway in self:
             gateway.dispatch_count = counts.get(gateway, 0)
 
-    @api.constrains("segments_per_minute")
+    @api.constrains("segments_per_minute", "kind")
     def _check_segments_per_minute(self):
+        """N'oppose a l'appareil que le plafond que l'appareil impose.
+
+        Celui d'Android vient de son systeme, pas du reseau : le refuser a un
+        modem le briderait pour une raison qui ne le concerne pas.
+        """
         for gateway in self:
-            if gateway.segments_per_minute > ANDROID_SEGMENTS_PER_MINUTE:
+            plafond = gateway._trait("plafond_segments")
+            if plafond and gateway.segments_per_minute > plafond:
                 raise UserError(_(
                     "Android bloque a %(limit)s segments par minute et par application. "
                     "Au-dela, un dialogue systeme apparait sur le telephone et les "
-                    "messages ne partent pas.", limit=ANDROID_SEGMENTS_PER_MINUTE,
+                    "messages ne partent pas.", limit=plafond,
                 ))
 
     @api.constrains("poll_interval_seconds")
@@ -225,9 +318,9 @@ class ErplibreSmsGateway(models.Model):
         for gateway in self:
             if gateway.poll_interval_seconds < 15:
                 raise UserError(_(
-                    "Un intervalle sous 15 secondes noie le serveur sans gagner de "
-                    "latence utile : la limite de debit d'Android impose de toute "
-                    "facon plusieurs minutes pour un groupe."
+                    "Un intervalle sous 15 secondes noie le serveur sans gagner "
+                    "de latence utile : l'envoi d'un groupe prend de toute facon "
+                    "plusieurs minutes."
                 ))
 
     # ------------------------------------------------------------------
@@ -346,23 +439,54 @@ class ErplibreSmsGateway(models.Model):
             "sms_permission_ok": bool(status.get("sms_permission")),
             "sim_ready": bool(status.get("sim_ready")),
             "outbox_pending": int(status.get("outbox_pending") or 0),
-            "battery_percent": int(status.get("battery") or 0),
-            "battery_charging": bool(status.get("charging")),
             "app_version": status.get("app_version") or False,
-            "doze_exempt": bool(status.get("doze_exempt")),
-            "exact_alarms": bool(status.get("exact_alarms")),
         }
+        # Ce qu'un materiel ne connait pas est remis a neutre plutot que laisse
+        # tel quel : une fiche passee de telephone a modem afficherait sinon la
+        # derniere batterie relevee, pour un appareil qui n'en a pas.
+        batterie = self._trait("batterie")
+        values["battery_percent"] = int(status.get("battery") or 0) if batterie else 0
+        values["battery_charging"] = bool(status.get("charging")) if batterie else False
+        cadence = self._trait("cadencement_systeme")
+        values["doze_exempt"] = bool(status.get("doze_exempt")) if cadence else False
+        values["exact_alarms"] = bool(status.get("exact_alarms")) if cadence else False
+
         self.sudo().write(values)
-        # Une permission revoquee ou une SIM absente est une panne, meme si le
-        # telephone parle : il parle pour dire qu'il ne peut pas envoyer.
+        self._verifier_le_materiel(status.get("kind"))
+        # Un envoi devenu impossible ou une SIM absente est une panne, meme si
+        # l'appareil parle : il parle pour dire qu'il ne peut pas envoyer.
         if not values["sms_permission_ok"]:
-            self.sudo()._raise_alarm(
-                _("La permission d'envoi de SMS n'est plus accordee sur le telephone.")
-            )
+            self.sudo()._raise_alarm(self._trait("sans_envoi"))
         elif not values["sim_ready"]:
-            self.sudo()._raise_alarm(_("La carte SIM du telephone n'est pas prete."))
+            self.sudo()._raise_alarm(self._trait("sans_sim"))
         elif self.alarm_active:
             self.sudo()._clear_alarm()
+        return True
+
+    def _verifier_le_materiel(self, declare):
+        """Signale une fiche qui ne decrit pas l'appareil qui interroge.
+
+        Le materiel se choisit a la main : rien n'empeche de laisser
+        « telephone » sur une fiche qu'un modem interroge, et la passerelle
+        serait alors jugee sur des criteres qui ne la concernent pas. On le dit
+        une fois, dans le fil de discussion, sans rien changer d'autorite — une
+        fiche qui se reecrirait toute seule serait pire que le desaccord.
+        """
+        self.ensure_one()
+        if not declare or declare == self.kind or declare not in MATERIELS:
+            return False
+        _logger.warning(
+            "erplibre_mobile_gateway: la passerelle %s est declaree %r et "
+            "interrogee par un appareil qui se dit %r",
+            self.device_id, self.kind, declare,
+        )
+        self.sudo().message_post(body=_(
+            "L'appareil qui interroge se declare « %(declare)s », alors que "
+            "cette fiche porte « %(fiche)s ». Les criteres de sante appliques "
+            "ne sont pas les siens.",
+            declare=MATERIELS[declare]["libelle"],
+            fiche=self._trait("libelle"),
+        ))
         return True
 
     def _raise_alarm(self, reason):

@@ -622,3 +622,96 @@ class TestErplibreSmsGatewayChoice(TransactionCase):
         self.assertTrue(self.seconde.alarm_active)
         self.assertFalse(self.premiere.alarm_active)
 
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsMateriel(TransactionCase):
+    """Un modem juge sur les criteres d'un telephone se declare en panne.
+
+    Doze, alarmes exactes, batterie, plafond de trente segments par minute :
+    quatre choses qu'un modem USB n'a pas, et sur lesquelles le module jugeait
+    tout le monde.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        Gateway = self.env["erplibre.sms.gateway"]
+        self.telephone = Gateway.create({
+            "name": "Telephone de test",
+            "company_id": self.company.id,
+            "kind": "mobile",
+        })
+        self.modem = Gateway.create({
+            "name": "Modem de test",
+            "company_id": self.company.id,
+            "kind": "modem",
+        })
+
+    def test_le_materiel_par_defaut_est_le_telephone(self):
+        """Les fiches d'avant ce champ ne doivent pas changer de comportement."""
+        sans_choix = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle sans materiel",
+            "company_id": self.company.id,
+        })
+        self.assertEqual(sans_choix.kind, "mobile")
+
+    def test_le_cadencement_nest_juge_que_la_ou_le_systeme_le_degrade(self):
+        etat = {"sms_permission": True, "sim_ready": True}
+        self.telephone._record_poll(etat)
+        self.modem._record_poll(etat)
+        self.assertTrue(self.telephone.pacing_degraded)
+        self.assertFalse(self.modem.pacing_degraded,
+                         "un modem n'a ni Doze ni permission d'alarme")
+
+    def test_le_plafond_dandroid_ne_bride_pas_le_modem(self):
+        with self.assertRaises(UserError):
+            self.telephone.segments_per_minute = 60
+        self.modem.segments_per_minute = 60
+        self.assertEqual(self.modem.segments_per_minute, 60)
+
+    def test_lalarme_nomme_le_materiel_quon_a_devant_soi(self):
+        etat = {"sms_permission": False, "sim_ready": True}
+        self.telephone._record_poll(etat)
+        self.modem._record_poll(etat)
+        self.assertIn("telephone", self.telephone.alarm_reason.lower())
+        self.assertIn("modem", self.modem.alarm_reason.lower())
+
+    def test_ce_quun_materiel_na_pas_nest_pas_retenu(self):
+        """Une fiche passee au modem ne doit pas garder la derniere batterie."""
+        self.modem.write({"battery_percent": 42, "doze_exempt": True})
+        self.modem._record_poll({
+            "sms_permission": True, "sim_ready": True,
+            "battery": 88, "doze_exempt": True, "exact_alarms": True,
+        })
+        self.assertEqual(self.modem.battery_percent, 0)
+        self.assertFalse(self.modem.doze_exempt)
+
+    def test_un_telephone_retient_ce_quil_rapporte(self):
+        self.telephone._record_poll({
+            "sms_permission": True, "sim_ready": True,
+            "battery": 88, "doze_exempt": True, "exact_alarms": True,
+        })
+        self.assertEqual(self.telephone.battery_percent, 88)
+        self.assertTrue(self.telephone.pacing_degraded is False)
+
+    def test_un_desaccord_de_materiel_se_dit_sans_rien_reecrire(self):
+        avant = len(self.telephone.message_ids)
+        self.telephone._record_poll({
+            "sms_permission": True, "sim_ready": True, "kind": "modem",
+        })
+        self.assertEqual(self.telephone.kind, "mobile",
+                         "une fiche qui se reecrit seule est pire que le desaccord")
+        self.assertGreater(len(self.telephone.message_ids), avant)
+
+    def test_un_materiel_accorde_ne_dit_rien(self):
+        avant = len(self.modem.message_ids)
+        self.modem._record_poll({
+            "sms_permission": True, "sim_ready": True, "kind": "modem",
+        })
+        self.assertEqual(len(self.modem.message_ids), avant)
+
+    def test_la_fiche_ne_montre_que_ce_qui_existe(self):
+        self.assertTrue(self.telephone.montre_batterie)
+        self.assertTrue(self.telephone.montre_cadencement)
+        self.assertFalse(self.modem.montre_batterie)
+        self.assertFalse(self.modem.montre_cadencement)

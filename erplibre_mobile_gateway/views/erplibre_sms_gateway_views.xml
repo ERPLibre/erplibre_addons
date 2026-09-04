@@ -9,11 +9,12 @@
                   decoration-bf="is_company_default">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="kind"/>
                 <field name="is_company_default" string="Envoie" readonly="1"/>
                 <field name="last_poll_at"/>
                 <field name="sms_permission_ok"/>
                 <field name="sim_ready"/>
-                <field name="battery_percent" widget="percentage_pie" optional="show"/>
+                <field name="battery_percent" widget="percentage_pie" optional="hide"/>
                 <field name="outbox_pending" optional="show"/>
                 <field name="alarm_reason" optional="show"/>
                 <field name="alarm_active" column_invisible="1"/>
@@ -43,19 +44,22 @@
                     <div class="oe_title">
                         <label for="name"/>
                         <h1><field name="name" placeholder="Passerelle du studio"/></h1>
+                        <field name="kind" widget="radio" options="{'horizontal': True}"/>
                     </div>
+                    <field name="montre_batterie" invisible="1"/>
+                    <field name="montre_cadencement" invisible="1"/>
                     <group>
-                        <group string="Etat rapporte par le telephone">
+                        <group string="Etat rapporte par l'appareil">
                             <field name="last_poll_at"/>
                             <field name="silence_seconds"/>
                             <field name="sms_permission_ok"/>
                             <field name="sim_ready"/>
                             <field name="outbox_pending"/>
-                            <field name="battery_percent"/>
-                            <field name="battery_charging"/>
+                            <field name="battery_percent" invisible="not montre_batterie"/>
+                            <field name="battery_charging" invisible="not montre_batterie"/>
                             <field name="app_version"/>
-                            <field name="doze_exempt"/>
-                            <field name="exact_alarms"/>
+                            <field name="doze_exempt" invisible="not montre_cadencement"/>
+                            <field name="exact_alarms" invisible="not montre_cadencement"/>
                             <field name="pacing_degraded" invisible="1"/>
                             <field name="is_healthy"/>
                             <field name="is_company_default"/>
