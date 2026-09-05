@@ -22,10 +22,15 @@ Ce module :
   avant de laisser ``voip_oca`` faire son essai d'origine ;
 * rattache a l'installation les appels deja enregistres, sans quoi l'historique
   resterait vide jusqu'au prochain appel ;
-* montre dans le panneau d'appel les echanges precedents avec le meme
-  correspondant, contact d'abord et numero a defaut ;
+* montre les echanges precedents avec le meme correspondant — appels et SMS,
+  chacun repliable — contact d'abord et numero a defaut ;
 * offre de creer la fiche quand le numero est inconnu, puis rattache l'appel en
-  cours a la fiche qui vient d'etre creee.
+  cours a la fiche qui vient d'etre creee ;
+* ouvre le compositeur de SMS depuis l'appel comme depuis la fiche.
+
+L'historique se voit aux TROIS moments ou il sert, et non au seul ou un appel
+existe : pendant l'appel, apres avoir raccroche, et pendant qu'on compose un
+numero — c'est la qu'on decide d'appeler ou d'ecrire.
 """,
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",

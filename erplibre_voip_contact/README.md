@@ -19,11 +19,19 @@ La conséquence n'est pas cosmétique :
 |---|---|
 | Rapprochement | Par les **chiffres**, la seule comparaison qui survive au formatage. L'essai d'origine de `voip_oca` reste tenté ensuite. |
 | Reprise | À l'installation, les appels déjà enregistrés sont rattachés : sans cela l'historique resterait vide jusqu'au prochain appel. |
-| Historique | Le panneau d'appel montre les échanges précédents avec le même correspondant — par contact d'abord, par numéro à défaut. |
+| Historique | Les échanges précédents avec le même correspondant — **appels et SMS**, chacun repliable par un chevron. Par contact d'abord, par numéro à défaut. |
+| Trois moments | L'historique appartient au correspondant, pas à l'appel : il se voit pendant l'appel, **après avoir raccroché**, et **pendant qu'on compose un numéro**. |
+| SMS | Un bouton ouvre le compositeur — rattaché à la fiche quand elle existe, au numéro brut sinon. |
 | Fiche inconnue | Un bouton crée la fiche, puis rattache l'appel **en cours** à ce qui vient d'être créé. |
 
-L'historique est borné à l'utilisateur courant, comme la liste de l'onglet des
-appels : le panneau ne montre pas ce qu'un collègue a reçu.
+L'historique **des appels** est borné à l'utilisateur courant, comme la liste de
+l'onglet des appels. Celui **des SMS** ne l'est pas : un SMS est un échange de
+l'organisation avec la personne, et celui qu'un collègue a envoyé hier explique
+précisément l'appel d'aujourd'hui.
+
+Pendant la composition, rien n'est proposé sous **7 chiffres** : le
+rapprochement compare des fins de numéro, et « 514 » se termine comme la moitié
+du carnet.
 
 ## Deux fiches, un numéro
 

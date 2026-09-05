@@ -6,6 +6,7 @@ Les numeros de ces essais sont INVENTES, dans la plage 555-01xx reservee a la
 fiction. Un numero pris dans le parc figerait pour toujours une donnee reelle
 dans un fichier suivi par le depot.
 """
+from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
@@ -21,6 +22,7 @@ class TestVoipContact(TransactionCase):
             {"name": "Fournisseur", "mobile": "+1 514-555-0177"}
         )
         cls.appels = cls.env["voip.call"]
+        cls.contacts = cls.env["res.partner"]
 
     def _appel(self, numero, **valeurs):
         donnees = {"phone_number": numero, "type_call": "outgoing"}
@@ -63,12 +65,12 @@ class TestVoipContact(TransactionCase):
         self.contact.phone = "+1 514-555-0143"
         ancien = self._appel("15145550143")
         courant = self._appel("15145550142")
-        historique = self.appels.historique_du_correspondant(
+        historique = self.contacts.historique_correspondant(
             phone_number=courant.phone_number,
             partner_id=self.contact.id,
-            exclude_id=courant.id,
+            exclude_call_id=courant.id,
         )
-        self.assertEqual([ligne["id"] for ligne in historique], [ancien.id])
+        self.assertEqual([l["id"] for l in historique["appels"]], [ancien.id])
 
     def test_l_historique_d_un_inconnu_suit_les_chiffres(self):
         """Sans fiche, deux ecritures du meme numero restent le meme appelant.
@@ -78,20 +80,20 @@ class TestVoipContact(TransactionCase):
         """
         ancien = self._appel("+1 514-555-0199")
         courant = self._appel("15145550199")
-        historique = self.appels.historique_du_correspondant(
-            phone_number=courant.phone_number, exclude_id=courant.id
+        historique = self.contacts.historique_correspondant(
+            phone_number=courant.phone_number, exclude_call_id=courant.id
         )
-        self.assertEqual([ligne["id"] for ligne in historique], [ancien.id])
+        self.assertEqual([l["id"] for l in historique["appels"]], [ancien.id])
 
     def test_l_historique_ecarte_l_appel_en_cours(self):
         """Le panneau montre deja l'appel en cours au-dessus de la liste."""
         courant = self._appel("15145550142")
-        historique = self.appels.historique_du_correspondant(
+        historique = self.contacts.historique_correspondant(
             phone_number=courant.phone_number,
             partner_id=self.contact.id,
-            exclude_id=courant.id,
+            exclude_call_id=courant.id,
         )
-        self.assertEqual(historique, [])
+        self.assertEqual(historique["appels"], [])
 
     def test_une_fiche_creee_pendant_l_appel_est_rattachee(self):
         """Le rapprochement a lieu a la CREATION de l'appel, deja passee.
@@ -141,3 +143,70 @@ class TestVoipContact(TransactionCase):
         """Le cas exact du bogue : ni numero, ni contact."""
         with self.assertRaises(UserError):
             self._appel(False)
+
+    def _sms_envoye(self, numero, texte, partner=None):
+        return self.env["erplibre.sms.dispatch"].create(
+            {
+                "sms_uuid": "essai-%s" % texte,
+                "number": numero,
+                "body": texte,
+                "partner_id": partner and partner.id,
+                "company_id": self.env.company.id,
+            }
+        )
+
+    def _sms_recu(self, numero, texte, partner=None):
+        return self.env["erplibre.sms.inbound"].create(
+            {
+                "number": numero,
+                "body": texte,
+                "partner_id": partner and partner.id,
+                "received_at": fields.Datetime.now(),
+            }
+        )
+
+    def test_l_historique_reunit_les_sms_des_deux_sens(self):
+        """Une conversation se lit dans les deux sens ou pas du tout.
+
+        Ne montrer que les envois laisserait croire qu'on n'a jamais eu de
+        reponse, ce qui est l'inverse de ce que l'historique sert a savoir.
+        """
+        self._sms_envoye("15145550142", "Cours annule", self.contact)
+        self._sms_recu("15145550142", "Bien recu", self.contact)
+        historique = self.contacts.historique_correspondant(partner_id=self.contact.id)
+        self.assertEqual(sorted(l["sens"] for l in historique["sms"]), ["in", "out"])
+
+    def test_les_sms_ne_sont_pas_bornes_a_un_utilisateur(self):
+        """Un SMS est un echange de l'organisation avec la personne.
+
+        Contrairement aux appels : celui qu'un collegue a envoye hier explique
+        precisement l'appel d'aujourd'hui.
+        """
+        autre = self.env["res.users"].create(
+            {
+                "name": "Collegue",
+                "login": "collegue_essai",
+            }
+        )
+        self._sms_envoye("15145550142", "Envoye par un collegue", self.contact)
+        historique = self.contacts.with_user(self.env.user).historique_correspondant(
+            partner_id=self.contact.id
+        )
+        self.assertTrue(historique["sms"], "l'envoi d'un collegue a disparu")
+        self.assertTrue(autre.exists())
+
+    def test_les_sms_se_retrouvent_par_les_chiffres(self):
+        """Un SMS recu d'un numero sans fiche reste retrouvable."""
+        self._sms_recu("+1 514-555-0199", "Bonjour")
+        historique = self.contacts.historique_correspondant(phone_number="15145550199")
+        self.assertEqual(len(historique["sms"]), 1)
+
+    def test_un_numero_trop_court_ne_propose_rien(self):
+        """Le rapprochement compare des FINS de numero.
+
+        « 514 » se termine comme la moitie du carnet : proposer cet
+        historique-la pendant la composition desinforme au lieu d'aider.
+        """
+        self._sms_recu("15145550142", "Bonjour", self.contact)
+        historique = self.contacts.historique_correspondant(phone_number="514")
+        self.assertEqual(historique, {"appels": [], "sms": []})

@@ -22,10 +22,6 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-#: Combien d'appels passes le panneau montre. Au-dela, l'onglet des appels est
-#: a un clic, et un panneau de softphone n'a pas la hauteur d'un journal.
-LIMITE_HISTORIQUE = 8
-
 
 class VoipCall(models.Model):
     _inherit = "voip.call"
@@ -109,59 +105,3 @@ class VoipCall(models.Model):
             if partenaire:
                 self.partner_id = partenaire
         return self.format_call()
-
-    @api.model
-    def historique_du_correspondant(
-        self, phone_number=False, partner_id=False, exclude_id=False, limit=None
-    ):
-        """Les appels precedents avec le meme correspondant.
-
-        Le CONTACT prime sur le numero : quelqu'un qui appelle tantot de son
-        mobile tantot d'un poste fixe reste une seule personne, et son
-        historique doit reunir les deux. Sans contact, on se rabat sur les
-        chiffres du numero.
-
-        La liste est bornee a l'utilisateur courant, comme celle de l'onglet
-        des appels : le panneau ne montre pas ce qu'un collegue a recu.
-        """
-        limite = limit or LIMITE_HISTORIQUE
-        domaine = [("user_id", "=", self.env.uid)]
-        if exclude_id:
-            domaine.append(("id", "!=", exclude_id))
-        if partner_id:
-            domaine.append(("partner_id", "=", partner_id))
-        else:
-            identifiants = self._appels_par_chiffres(phone_number, limite, exclude_id)
-            if not identifiants:
-                return []
-            domaine.append(("id", "in", identifiants))
-        appels = self.search(domaine, limit=limite, order="create_date DESC")
-        return [appel.format_call() for appel in appels]
-
-    @api.model
-    def _appels_par_chiffres(self, numero, limite, exclude_id=False):
-        """Les ids des appels dont le numero se termine par les memes chiffres.
-
-        `regexp_replace` retire tout ce qui n'est pas un chiffre des DEUX
-        cotes : c'est la seule comparaison qui survive au formatage, un meme
-        numero s'ecrivant avec ou sans indicatif, tirets ou parentheses.
-
-        La comparaison porte sur la FIN, dont la longueur est celle que la
-        societe declare : un numero compose sans indicatif regional et le meme
-        numero stocke au format international ne partagent que leur fin.
-        """
-        chiffres = "".join(c for c in str(numero or "") if c.isdigit())
-        if not chiffres:
-            return []
-        longueur = self.env.company.number_of_digits_to_match_from_end or 8
-        fin = chiffres[-longueur:] if len(chiffres) >= longueur else chiffres
-        # La requete SQL ne voit pas le cache de l'ORM : sans ce vidage,
-        # un appel cree dans la meme transaction resterait invisible.
-        self.env.flush_all()
-        self.env.cr.execute(
-            "SELECT id FROM voip_call WHERE user_id = %s AND id != %s AND "
-            "regexp_replace(phone_number, '[^0-9]', '', 'g') LIKE %s "
-            "ORDER BY create_date DESC LIMIT %s",
-            (self.env.uid, exclude_id or 0, "%" + fin, limite),
-        )
-        return [ligne[0] for ligne in self.env.cr.fetchall()]
