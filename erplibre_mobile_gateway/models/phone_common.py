@@ -44,6 +44,11 @@ class PhoneCommon(models.AbstractModel):
         d'echec, on repasse la main a l'implementation d'origine plutot que de
         la remplacer : elle connait des modeles que celle-ci ignore.
         """
+        # Le rapprochement se fait en SQL, ici comme dans l'implementation
+        # d'origine, et le SQL ne voit pas le cache de l'ORM : un numero
+        # ecrit dans la meme transaction que la recherche resterait
+        # introuvable, et la fiche serait annoncee comme inconnue.
+        self.env.flush_all()
         chiffres = "".join(c for c in str(presented_number or "") if c.isdigit())
         if chiffres:
             longueur = self.env.company.number_of_digits_to_match_from_end or 8
