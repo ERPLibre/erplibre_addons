@@ -48,8 +48,9 @@ MATERIELS = {
         "batterie": True,
         # Plafond impose par l'appareil, en segments par minute. 0 = aucun.
         "plafond_segments": ANDROID_SEGMENTS_PER_MINUTE,
-        "sans_envoi": ("La permission d'envoi de SMS n'est plus accordee sur "
-                       "le telephone."),
+        "sans_envoi": (
+            "La permission d'envoi de SMS n'est plus accordee sur " "le telephone."
+        ),
         "sans_sim": "La carte SIM du telephone n'est pas prete.",
     },
     "modem": {
@@ -86,10 +87,12 @@ class ErplibreSmsGateway(models.Model):
     name = fields.Char("Nom", required=True, default="Passerelle du studio")
     kind = fields.Selection(
         [(cle, trait["libelle"]) for cle, trait in MATERIELS.items()],
-        "Materiel", required=True, default=MATERIEL_DEFAUT,
+        "Materiel",
+        required=True,
+        default=MATERIEL_DEFAUT,
         help="Decide des criteres de sante appliques a cette passerelle. Un "
-             "modem juge sur les criteres d'un telephone se declare en panne "
-             "sans l'etre.",
+        "modem juge sur les criteres d'un telephone se declare en panne "
+        "sans l'etre.",
     )
     sequence = fields.Integer("Sequence", default=10)
     active = fields.Boolean("Actif", default=True)
@@ -97,57 +100,66 @@ class ErplibreSmsGateway(models.Model):
         "res.company", "Societe", required=True, default=lambda self: self.env.company
     )
     device_id = fields.Char(
-        "Identifiant de l'appareil", required=True, copy=False,
+        "Identifiant de l'appareil",
+        required=True,
+        copy=False,
         default=lambda self: secrets.token_hex(8),
         help="Identifiant que l'appareil presente a chaque interrogation.",
     )
 
     # -- Rythme d'interrogation ----------------------------------------
     poll_interval_seconds = fields.Integer(
-        "Intervalle d'interrogation (secondes)", default=60,
+        "Intervalle d'interrogation (secondes)",
+        default=60,
         help="Rythme auquel l'appareil demande s'il y a des SMS a envoyer. "
-             "C'est la latence maximale d'une alerte : a 60 secondes, une "
-             "annulation saisie a 18 h 00 part au plus tard a 18 h 01.",
+        "C'est la latence maximale d'une alerte : a 60 secondes, une "
+        "annulation saisie a 18 h 00 part au plus tard a 18 h 01.",
     )
     redelivery_seconds = fields.Integer(
-        "Delai avant nouvelle offre (secondes)", default=300,
+        "Delai avant nouvelle offre (secondes)",
+        default=300,
         help="Un SMS remis a l'appareil mais jamais confirme est reproposé apres "
-             "ce delai. C'est ce qui rattrape un appareil mort entre la "
-             "reception et l'enregistrement du travail.",
+        "ce delai. C'est ce qui rattrape un appareil mort entre la "
+        "reception et l'enregistrement du travail.",
     )
     last_poll_at = fields.Datetime("Derniere interrogation", readonly=True, index=True)
 
     # -- Garde-fous ----------------------------------------------------
     max_recipients_per_send = fields.Integer(
-        "Destinataires maximum par envoi", default=60,
+        "Destinataires maximum par envoi",
+        default=60,
         help="Refuse a la composition, pas a l'envoi : une erreur levee dans "
-             "l'API est avalee par `_process_queue` et ressort en « erreur "
-             "serveur », puis est reessayee.",
+        "l'API est avalee par `_process_queue` et ressort en « erreur "
+        "serveur », puis est reessayee.",
     )
     segments_per_minute = fields.Integer(
-        "Segments par minute", default=DEFAULT_SEGMENTS_PER_MINUTE,
+        "Segments par minute",
+        default=DEFAULT_SEGMENTS_PER_MINUTE,
         help="Consigne d'etalement transmise a l'appareil. Android bloque a 30 "
-             "segments par minute et par application ; on garde une marge. Un "
-             "modem n'a pas ce plafond, et le sien vient du reseau.",
+        "segments par minute et par application ; on garde une marge. Un "
+        "modem n'a pas ce plafond, et le sien vient du reseau.",
     )
     send_deadline_seconds = fields.Integer(
-        "Echeance d'envoi (secondes)", default=900,
+        "Echeance d'envoi (secondes)",
+        default=900,
         help="Au-dela, un envoi non confirme est declare expire et une alerte "
-             "est levee.",
+        "est levee.",
     )
     max_jobs_per_poll = fields.Integer(
-        "Travaux remis par interrogation", default=25,
+        "Travaux remis par interrogation",
+        default=25,
         help="Borne la taille d'une reponse. Le reste part a l'interrogation "
-             "suivante.",
+        "suivante.",
     )
 
     # -- Etat rapporte par le telephone --------------------------------
     last_status_json = fields.Text("Dernier etat rapporte", readonly=True)
     sms_permission_ok = fields.Boolean(
-        "Envoi autorise par l'appareil", readonly=True,
+        "Envoi autorise par l'appareil",
+        readonly=True,
         help="Sous Android, la permission SEND_SMS. Pour un modem, la capacite "
-             "de l'agent a le commander. Dans les deux cas : cet appareil "
-             "peut-il, en ce moment, remettre un SMS au reseau.",
+        "de l'agent a le commander. Dans les deux cas : cet appareil "
+        "peut-il, en ce moment, remettre un SMS au reseau.",
     )
     sim_ready = fields.Boolean("Carte SIM prete", readonly=True)
     outbox_pending = fields.Integer("En attente sur l'appareil", readonly=True)
@@ -203,41 +215,53 @@ class ErplibreSmsGateway(models.Model):
     alarm_webhook_url = fields.Char(
         "Point d'acces d'escalade independant",
         help="Appele quand la passerelle est declaree muette. C'est ici qu'on "
-             "branche un fournisseur de SMS payant. Sans lui, l'alerte de panne "
-             "part par courriel -- c'est-a-dire par le canal meme dont "
-             "l'insuffisance justifiait la passerelle. Un canal d'urgence dont "
-             "le detecteur de panne est le canal qu'il remplace n'a pas de "
-             "detecteur de panne.",
+        "branche un fournisseur de SMS payant. Sans lui, l'alerte de panne "
+        "part par courriel -- c'est-a-dire par le canal meme dont "
+        "l'insuffisance justifiait la passerelle. Un canal d'urgence dont "
+        "le detecteur de panne est le canal qu'il remplace n'a pas de "
+        "detecteur de panne.",
     )
 
     notify_user_ids = fields.Many2many(
-        "res.users", "erplibre_sms_gateway_notify_rel", "gateway_id", "user_id",
+        "res.users",
+        "erplibre_sms_gateway_notify_rel",
+        "gateway_id",
+        "user_id",
         string="Utilisateurs prevenus",
         help="Qui voit arriver un SMS ou un appel entrant. Vide = tous les "
-             "membres du groupe « Passerelle mobile / Envoi » de la societe.",
+        "membres du groupe « Passerelle mobile / Envoi » de la societe.",
     )
 
     allowed_user_ids = fields.Many2many(
-        "res.users", "erplibre_sms_gateway_user_rel", "gateway_id", "user_id",
+        "res.users",
+        "erplibre_sms_gateway_user_rel",
+        "gateway_id",
+        "user_id",
         string="Utilisateurs autorises a envoyer",
         help="Vide = tous les membres du groupe « Passerelle mobile / Envoi ».",
     )
 
     is_healthy = fields.Boolean("En bonne sante", compute="_compute_is_healthy")
     dispatch_count = fields.Integer("Envois suivis", compute="_compute_dispatch_count")
-    silence_seconds = fields.Integer("Silence (secondes)", compute="_compute_is_healthy")
+    silence_seconds = fields.Integer(
+        "Silence (secondes)", compute="_compute_is_healthy"
+    )
     montre_batterie = fields.Boolean(compute="_compute_traits_affiches")
     montre_cadencement = fields.Boolean(compute="_compute_traits_affiches")
     is_company_default = fields.Boolean(
         "Envoie pour la societe",
         compute="_compute_is_company_default",
         help="Vrai pour la passerelle que la societe utilise reellement. Sans "
-             "choix explicite dans les reglages, c'est la premiere active par "
-             "sequence.",
+        "choix explicite dans les reglages, c'est la premiere active par "
+        "sequence.",
     )
 
     _sql_constraints = [
-        ("device_id_unique", "unique(device_id)", "Cet identifiant d'appareil est deja utilise."),
+        (
+            "device_id_unique",
+            "unique(device_id)",
+            "Cet identifiant d'appareil est deja utilise.",
+        ),
     ]
 
     @api.depends("alarm_active", "last_poll_at", "sms_permission_ok", "sim_ready")
@@ -245,7 +269,9 @@ class ErplibreSmsGateway(models.Model):
         now = fields.Datetime.now()
         for gateway in self:
             if gateway.last_poll_at:
-                gateway.silence_seconds = int((now - gateway.last_poll_at).total_seconds())
+                gateway.silence_seconds = int(
+                    (now - gateway.last_poll_at).total_seconds()
+                )
             else:
                 gateway.silence_seconds = 0
             gateway.is_healthy = bool(
@@ -298,9 +324,13 @@ class ErplibreSmsGateway(models.Model):
             gateway.is_company_default = gateway == retenue[societe.id]
 
     def _compute_dispatch_count(self):
-        counts = dict(self.env["erplibre.sms.dispatch"]._read_group(
-            [("gateway_id", "in", self.ids)], ["gateway_id"], ["__count"],
-        ))
+        counts = dict(
+            self.env["erplibre.sms.dispatch"]._read_group(
+                [("gateway_id", "in", self.ids)],
+                ["gateway_id"],
+                ["__count"],
+            )
+        )
         for gateway in self:
             gateway.dispatch_count = counts.get(gateway, 0)
 
@@ -314,21 +344,26 @@ class ErplibreSmsGateway(models.Model):
         for gateway in self:
             plafond = gateway._trait("plafond_segments")
             if plafond and gateway.segments_per_minute > plafond:
-                raise UserError(_(
-                    "Android bloque a %(limit)s segments par minute et par application. "
-                    "Au-dela, un dialogue systeme apparait sur le telephone et les "
-                    "messages ne partent pas.", limit=plafond,
-                ))
+                raise UserError(
+                    _(
+                        "Android bloque a %(limit)s segments par minute et par application. "
+                        "Au-dela, un dialogue systeme apparait sur le telephone et les "
+                        "messages ne partent pas.",
+                        limit=plafond,
+                    )
+                )
 
     @api.constrains("poll_interval_seconds")
     def _check_poll_interval(self):
         for gateway in self:
             if gateway.poll_interval_seconds < 15:
-                raise UserError(_(
-                    "Un intervalle sous 15 secondes noie le serveur sans gagner "
-                    "de latence utile : l'envoi d'un groupe prend de toute facon "
-                    "plusieurs minutes."
-                ))
+                raise UserError(
+                    _(
+                        "Un intervalle sous 15 secondes noie le serveur sans gagner "
+                        "de latence utile : l'envoi d'un groupe prend de toute facon "
+                        "plusieurs minutes."
+                    )
+                )
 
     # ------------------------------------------------------------------
     # Resolution
@@ -362,7 +397,8 @@ class ErplibreSmsGateway(models.Model):
             _logger.error(
                 "erplibre_mobile_gateway: la passerelle choisie par %s est "
                 "inutilisable (archivee ou d'une autre societe) ; aucune "
-                "substitution n'est faite.", company.display_name,
+                "substitution n'est faite.",
+                company.display_name,
             )
             return self.browse()
         return self.search(
@@ -379,10 +415,12 @@ class ErplibreSmsGateway(models.Model):
         """
         self.ensure_one()
         if not self.active:
-            raise UserError(_(
-                "Une passerelle archivee n'envoie rien. Reactivez-la avant "
-                "de la choisir."
-            ))
+            raise UserError(
+                _(
+                    "Une passerelle archivee n'envoie rien. Reactivez-la avant "
+                    "de la choisir."
+                )
+            )
         self.company_id.erplibre_gateway_id = self.id
         return True
 
@@ -404,15 +442,21 @@ class ErplibreSmsGateway(models.Model):
         self.ensure_one()
         now = fields.Datetime.now()
         retry_before = now - timedelta(seconds=self.redelivery_seconds or 300)
-        dispatches = self.env["erplibre.sms.dispatch"].sudo().search(
-            [
-                ("gateway_id", "=", self.id),
-                "|",
-                ("state", "=", "queued"),
-                "&", ("state", "=", "published"), ("published_at", "<=", retry_before),
-            ],
-            order="requested_at asc",
-            limit=self.max_jobs_per_poll or 25,
+        dispatches = (
+            self.env["erplibre.sms.dispatch"]
+            .sudo()
+            .search(
+                [
+                    ("gateway_id", "=", self.id),
+                    "|",
+                    ("state", "=", "queued"),
+                    "&",
+                    ("state", "=", "published"),
+                    ("published_at", "<=", retry_before),
+                ],
+                order="requested_at asc",
+                limit=self.max_jobs_per_poll or 25,
+            )
         )
         if dispatches:
             dispatches.write({"state": "published", "published_at": now})
@@ -426,7 +470,9 @@ class ErplibreSmsGateway(models.Model):
             grouped.setdefault(dispatch.body or "", []).append(
                 {"u": dispatch.sms_uuid, "n": dispatch.number}
             )
-        return [{"body": body, "to": recipients} for body, recipients in grouped.items()]
+        return [
+            {"body": body, "to": recipients} for body, recipients in grouped.items()
+        ]
 
     def _destinataires_notification(self, company=None):
         """Les utilisateurs internes a prevenir d'un evenement entrant.
@@ -456,7 +502,8 @@ class ErplibreSmsGateway(models.Model):
                 _logger.warning(
                     "erplibre_mobile_gateway: la passerelle %s ne nomme que"
                     " des utilisateurs archives : plus personne n'est"
-                    " prevenu.", passerelle.display_name,
+                    " prevenu.",
+                    passerelle.display_name,
                 )
             return vivants
         groupe = self.env.ref(
@@ -465,12 +512,14 @@ class ErplibreSmsGateway(models.Model):
         )
         if not groupe:
             return self.env["res.users"]
-        return self.env["res.users"].search([
-            ("groups_id", "in", groupe.ids),
-            ("company_ids", "in", societe.ids),
-            ("active", "=", True),
-            ("share", "=", False),
-        ])
+        return self.env["res.users"].search(
+            [
+                ("groups_id", "in", groupe.ids),
+                ("company_ids", "in", societe.ids),
+                ("active", "=", True),
+                ("share", "=", False),
+            ]
+        )
 
     # ------------------------------------------------------------------
     # Vivacite et alertes
@@ -529,26 +578,115 @@ class ErplibreSmsGateway(models.Model):
         _logger.warning(
             "erplibre_mobile_gateway: la passerelle %s est declaree %r et "
             "interrogee par un appareil qui se dit %r",
-            self.device_id, self.kind, declare,
+            self.device_id,
+            self.kind,
+            declare,
         )
-        self.sudo().message_post(body=_(
-            "L'appareil qui interroge se declare « %(declare)s », alors que "
-            "cette fiche porte « %(fiche)s ». Les criteres de sante appliques "
-            "ne sont pas les siens.",
-            declare=MATERIELS[declare]["libelle"],
-            fiche=self._trait("libelle"),
-        ))
+        self.sudo().message_post(
+            body=_(
+                "L'appareil qui interroge se declare « %(declare)s », alors que "
+                "cette fiche porte « %(fiche)s ». Les criteres de sante appliques "
+                "ne sont pas les siens.",
+                declare=MATERIELS[declare]["libelle"],
+                fiche=self._trait("libelle"),
+            )
+        )
         return True
+
+    def action_reevaluer_alerte(self):
+        """Rejuge l'alerte sur l'etat courant, sans attendre l'agent.
+
+        Une alerte ne se leve toute seule qu'a la prochaine interrogation. Quand
+        l'appareil est reparti mais que son agent ne tourne pas encore, la fiche
+        reste rouge pour une raison qui n'existe plus, et rien ne permet de le
+        constater — sinon attendre.
+
+        Les memes criteres que l'interrogation et la surveillance, dans le meme
+        ORDRE : le silence d'abord, car un appareil muet rend tout le reste
+        perime. Rien n'est efface d'autorite ; ce qui tient encore est
+        simplement redit avec un motif a jour.
+        """
+        self.ensure_one()
+        maintenant = fields.Datetime.now()
+        if not self.last_poll_at:
+            motif = _("La passerelle n'a jamais interroge le serveur.")
+        else:
+            silence = (maintenant - self.last_poll_at).total_seconds()
+            grace = max((self.poll_interval_seconds or 60) * 3, 180)
+            if silence > grace:
+                motif = _(
+                    "Aucune interrogation depuis %(minutes)s minutes.",
+                    minutes=int(silence // 60),
+                )
+            elif not self.sms_permission_ok:
+                motif = self._trait("sans_envoi")
+            elif not self.sim_ready:
+                motif = self._trait("sans_sim")
+            else:
+                motif = ""
+
+        if motif:
+            self.sudo()._raise_alarm(motif)
+            titre, type_ = _("La passerelle est toujours en alerte"), "warning"
+            # Le motif est ecrit pour le MATERIEL DECLARE sur la fiche. Quand
+            # c'est un autre appareil qui interroge, il parle donc du mauvais :
+            # « la SIM du modem » pour un telephone dont la SIM est absente
+            # envoie chercher la panne la ou elle n'est pas. On nomme donc ce
+            # qui a repondu, sans quoi le motif seul induit en erreur.
+            message = motif
+            appareil = self._appareil_qui_interroge()
+            if appareil:
+                message = _(
+                    "%(motif)s\n\nCe motif decrit l'appareil qui interroge :"
+                    " %(appareil)s.",
+                    motif=motif,
+                    appareil=appareil,
+                )
+        else:
+            etait = self.alarm_active
+            self.sudo()._clear_alarm()
+            titre = _("Passerelle en service")
+            type_ = "success"
+            message = (
+                _("L'alerte est levee.")
+                if etait
+                else _("Aucune alerte n'etait active.")
+            )
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": titre,
+                "message": message,
+                "type": type_,
+                "sticky": False,
+            },
+        }
+
+    def _appareil_qui_interroge(self):
+        """Le modele de l'appareil du dernier releve, ou une chaine vide.
+
+        Il ne se deduit pas de la fiche : le materiel s'y choisit a la main, et
+        rien n'empeche qu'un autre appareil interroge la meme passerelle.
+        """
+        self.ensure_one()
+        try:
+            releve = json.loads(self.last_status_json or "{}")
+        except ValueError:
+            return ""
+        return releve.get("device_model") or ""
 
     def _raise_alarm(self, reason):
         self.ensure_one()
         if self.alarm_active and self.alarm_reason == reason:
             return True
-        self.write({
-            "alarm_active": True,
-            "alarm_since": self.alarm_since or fields.Datetime.now(),
-            "alarm_reason": reason[:256],
-        })
+        self.write(
+            {
+                "alarm_active": True,
+                "alarm_since": self.alarm_since or fields.Datetime.now(),
+                "alarm_reason": reason[:256],
+            }
+        )
         self.message_post(body=_("Passerelle mobile en alerte : %s", reason))
         self._escalate(reason)
         return True
@@ -556,7 +694,9 @@ class ErplibreSmsGateway(models.Model):
     def _clear_alarm(self):
         self.ensure_one()
         if self.alarm_active:
-            self.write({"alarm_active": False, "alarm_since": False, "alarm_reason": False})
+            self.write(
+                {"alarm_active": False, "alarm_since": False, "alarm_reason": False}
+            )
             self.message_post(body=_("Passerelle mobile revenue en service."))
         return True
 
@@ -567,17 +707,28 @@ class ErplibreSmsGateway(models.Model):
             try:
                 requests.post(
                     self.alarm_webhook_url,
-                    json={"gateway": self.name, "device": self.device_id, "reason": reason},
+                    json={
+                        "gateway": self.name,
+                        "device": self.device_id,
+                        "reason": reason,
+                    },
                     timeout=ESCALATION_TIMEOUT,
                 )
-            except Exception as exc:  # noqa: BLE001 - une escalade ne doit jamais propager
-                _logger.error("erplibre_mobile_gateway: escalade par point d'acces echouee : %s", exc)
+            except (
+                Exception
+            ) as exc:  # noqa: BLE001 - une escalade ne doit jamais propager
+                _logger.error(
+                    "erplibre_mobile_gateway: escalade par point d'acces echouee : %s",
+                    exc,
+                )
         else:
             _logger.error(
                 "erplibre_mobile_gateway: passerelle %s en alerte et AUCUN canal d'escalade "
                 "independant configure. L'alerte ne partira que par courriel, "
                 "c'est-a-dire par le canal que la passerelle etait censee "
-                "remplacer. Motif : %s", self.name, reason,
+                "remplacer. Motif : %s",
+                self.name,
+                reason,
             )
         return True
 
@@ -593,14 +744,18 @@ class ErplibreSmsGateway(models.Model):
         for gateway in self.search([]):
             grace = max((gateway.poll_interval_seconds or 60) * 3, 180)
             if not gateway.last_poll_at:
-                gateway._raise_alarm(_("La passerelle n'a jamais interroge le serveur."))
+                gateway._raise_alarm(
+                    _("La passerelle n'a jamais interroge le serveur.")
+                )
                 alarmed += 1
                 continue
             silence = (now - gateway.last_poll_at).total_seconds()
             if silence > grace:
-                gateway._raise_alarm(_(
-                    "Aucune interrogation depuis %(minutes)s minutes.",
-                    minutes=int(silence // 60),
-                ))
+                gateway._raise_alarm(
+                    _(
+                        "Aucune interrogation depuis %(minutes)s minutes.",
+                        minutes=int(silence // 60),
+                    )
+                )
                 alarmed += 1
         return alarmed
