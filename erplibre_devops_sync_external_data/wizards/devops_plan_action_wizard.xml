@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_plan_action_form" model="ir.ui.view">
+        <field name="name">devops.plan.action.form</field>
+        <field name="model">devops.plan.action.wizard</field>
+        <field name="inherit_id" ref="erplibre_devops.devops_plan_action_form" />
+        <field name="arch" type="xml">
+            <field name="model_fast_creation_field_example_value" position="after">
+                <field name="model_fast_creation_field_enable_external_sync" />
+            </field>
+        </field>
+    </record>
+</odoo>

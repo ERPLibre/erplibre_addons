@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_construction_doc_soumission_user,construction.doc_soumission user,model_construction_doc_soumission,base.group_user,1,1,1,1
+access_construction_doc_facture_user,construction.doc_facture user,model_construction_doc_facture,base.group_user,1,1,1,1
+access_construction_doc_devis_user,construction.doc_devis user,model_construction_doc_devis,base.group_user,1,1,1,1
+access_construction_doc_intervenant_user,construction.doc_intervenant user,model_construction_doc_intervenant,base.group_user,1,1,1,1

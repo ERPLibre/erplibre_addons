@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="erplibre_devops.MySystrayMenu">
+        <Dropdown>
+            <button class="dropdown-toggle o_no_caret btn o-dropdown--narrow" title="Mon menu" aria-label="Mon menu">
+                <i class="fa fa-bolt fa-lg" role="img" />
+            </button>
+            <t t-set-slot="content">
+                <DropdownItem onSelected="() => this.openWizard()">Ouvrir le wizard</DropdownItem>
+                <!--                <DropdownItem onSelected="() => this.openSomethingElse()">Autre action</DropdownItem>-->
+            </t>
+        </Dropdown>
+    </t>
+</templates>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sync_data_exec_view_form" model="ir.ui.view">
+        <field name="name">sync.data.exec.form</field>
+        <field name="inherit_id" ref="erplibre_sync_external_data.sync_data_exec_view_form" />
+        <field name="model">sync.data.exec</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='import_info']" position="inside">
+                <field name="file" filename="filename" required="1" />
+                <field name="filename" readonly="1" force_save="1" />
+                <!--                            <field name="sheet_index" />-->
+                <!--                            <field name="skip_header" />-->
+                <!--                            <field name="skip_nb_lines" />-->
+                <!--                            <field name="skip_end_nb_lines" />-->
+            </xpath>
+
+            <xpath expr="//group[@name='info']" position="before">
+                <group string="One spreadsheet">
+                    <field name="filename" readonly="1" />
+                    <field name="sheet_index" />
+                    <!--                            <field name="skip_header" readonly="1" />-->
+                    <field name="skip_nb_lines" />
+                    <field name="skip_end_nb_lines" />
+                </group>
+            </xpath>
+
+            <!--                        <group>-->
+            <!--                            <field name="detected_rows" readonly="1" />-->
+            <!--                            <field name="imported_rows" readonly="1" />-->
+            <!--                        </group>-->
+        </field>
+    </record>
+</odoo>

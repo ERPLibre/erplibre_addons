@@ -1,0 +1,13 @@
+Numéro devis,Nom chantier,Client,Courriel,Montant
+DEV-001,Réfection pont de la Rivière-aux-Cailloux,Ville de Boisclair,devis@ville-boisclair.example,180000.00
+DEV-002,Garderie des Trois-Pins,CPE Les Petits Castors,devis@cpe-petitscastors.example,72000.00
+DEV-003,Centre communautaire Boisclair,Ville de Boisclair,devis-loisirs@ville-boisclair.example,410000.00
+DEV-004,École primaire des Bouleaux,CSS des Grands-Pins,devis@css-grandspins.example,990000.00
+DEV-005,Aqueduc secteur Mont-Riant,Ville de Mont-Riant,devis-eau@ville-montriant.example,260000.00
+DEV-006,Caserne de pompiers secteur Est,Ville de Mont-Riant,devis-incendie@ville-montriant.example,610000.00
+DEV-007,Bibliothèque municipale Pierreville,Office municipal de Pierreville,devis@pierreville.example,355000.00
+DEV-008,Usine de traitement d'eau Verdoyante,Régie de l'Eau Verdoyante,devis@regie-verdoyante.example,2900000.00
+DEV-009,Parc municipal des Cèdres,Ville de Lac-Fictif,devis-parcs@ville-lacfictif.example,105000.00
+DEV-010,Réfection viaduc Autoroute 999,Réseau de transport Fictia,devis@transport-fictia.example,720000.00
+DEV-011,Piscine intérieure Aquaria,Ville de Boisclair,devis-sports@ville-boisclair.example,1300000.00
+DEV-012,Stationnement étagé Carrefour-Nord,Ville de Mont-Riant,devis-stationnement@ville-montriant.example,1750000.00

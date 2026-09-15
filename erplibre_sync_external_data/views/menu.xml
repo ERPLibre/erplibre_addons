@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--Root menu-->
+
+    <menuitem
+        id="erplibre_sync_external_data"
+        name="Sync External Data"
+        sequence="20"
+        web_icon="erplibre_sync_external_data,static/description/icon.png"
+    />
+
+    <!--Sub menu-->
+
+    <menuitem id="menu_sync" name="Sync" sequence="1" parent="erplibre_sync_external_data" />
+    <menuitem id="menu_transform" name="Transformation" sequence="2" parent="erplibre_sync_external_data" />
+    <menuitem id="menu_conf" name="Configuration" sequence="3" parent="erplibre_sync_external_data" />
+
+    <!--Child menu-->
+
+    <menuitem
+        id="data_exec"
+        name="Data exec"
+        action="sync_data_exec_data_exec_action_window"
+        sequence="1"
+        parent="menu_sync"
+    />
+
+    <menuitem
+        id="data_create"
+        name="Data create"
+        action="sync_data_create_data_create_action_window"
+        sequence="2"
+        parent="menu_sync"
+    />
+
+    <menuitem
+        id="data_transform"
+        name="Data transform"
+        action="sync_data_transform_data_transform_action_window"
+        sequence="10"
+        parent="menu_transform"
+    />
+
+    <menuitem
+        id="data_transform_exec"
+        name="Data transform exec"
+        action="sync_data_transform_exec_data_transform_exec_action_window"
+        sequence="11"
+        parent="menu_transform"
+    />
+
+    <menuitem id="metadata_group" name="Metadata" sequence="4" parent="menu_conf" />
+
+    <menuitem id="model" name="Model" action="sync_model_model_action_window" sequence="10" parent="metadata_group" />
+
+    <menuitem
+        id="data_exec_cron_log"
+        name="Data exec cron log"
+        action="sync_data_exec_cron_log_data_exec_cron_log_action_window"
+        sequence="15"
+        parent="menu_conf"
+    />
+
+    <menuitem
+        id="filter_search_menu"
+        name="Filter search"
+        sequence="5"
+        parent="menu_conf"
+        action="sync_data_transform_filter_search_data_transform_filter_search_action_window"
+    />
+</odoo>

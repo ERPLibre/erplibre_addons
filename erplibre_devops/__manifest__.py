@@ -20,6 +20,7 @@
         "code_generator_theme_website",
         "code_generator_website_leaflet",
         "code_generator_website_snippet",
+        "erplibre_sync_external_data",
         "mail",
         "multi_step_wizard",
         "queue_job",
@@ -116,6 +117,12 @@
         "views/erplibre_mode_version_erplibre.xml",
         "views/menu.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "erplibre_devops/static/src/systray/my_systray.js",
+            "erplibre_devops/static/src/systray/my_systray.xml",
+        ],
+    },
     "installable": True,
     "post_init_hook": "post_init_hook",
 }

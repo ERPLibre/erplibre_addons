@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-import getpass
 import json
 import logging
 import os
@@ -560,7 +559,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     model_fast_creation_field_separator = fields.Selection(
         string="Field separator fast creation",
-        default=";",
+        default="\t",
         selection=[
             ("\t", "tab"),
             (";", ";"),
@@ -1206,6 +1205,11 @@ class DevopsPlanActionWizard(models.TransientModel):
         return self._reopen_self()
 
     def action_enable_model_fast_creation(self):
+        # erplibre_sync_external_data (and its auto_install bridge
+        # erplibre_devops_sync_external_data, which provides the external-sync
+        # wizard field) are base dependencies of erplibre_devops, so the field
+        # already exists in the loaded view. This button only flips the flag;
+        # the fast-creation group reveals without a manual page refresh.
         for rec in self:
             rec.model_fast_creation_enabled = True
         return self._reopen_self()
@@ -2236,7 +2240,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             with self.working_system_id.ssh_connection():
                 pass
         except Exception:
-            pass
+            _logger.debug(
+                "SSH connection test failed for %s@%s",
+                self.ssh_user,
+                self.ssh_host,
+                exc_info=True,
+            )
         return self._reopen_self()
 
     def action_git_commit(self):
@@ -2431,7 +2440,32 @@ class DevopsPlanActionWizard(models.TransientModel):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - Enable all tracking"
         ) as wp_id:
+            # Enable tracking and activity for each model
             for cg_model_id in self.model_ids:
                 cg_model_id.is_activity = True
                 cg_model_id.is_all_tracking = True
+        return self._reopen_self()
+
+    def action_optimisation_field(self, ctx=None):
+        if ctx is None:
+            ctx = {}
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - Enable all tracking"
+        ) as wp_id:
+            # Clean french char from field name
+            for cg_model_id in self.model_ids:
+                for field_id in cg_model_id.field_ids:
+                    field_name = field_id.name
+                    field_name_formated = (
+                        field_name.replace("_l_", "_")
+                        .replace("_d_", "_")
+                        .replace("_du_", "_")
+                        .replace("_le_", "_")
+                    )
+                    if field_name_formated != field_name:
+                        field_id.name = field_name_formated
+
+                cg_model_id.is_activity = True
+                cg_model_id.is_all_tracking = True
+
         return self._reopen_self()

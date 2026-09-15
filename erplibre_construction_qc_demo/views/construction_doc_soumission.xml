@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="construction_doc_soumission_view_form" model="ir.ui.view">
+        <field name="name">construction_doc_soumission_form</field>
+        <field name="model">construction.doc_soumission</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="actif" class="oe_edit_only" />
+                        <h1>
+                            <field name="actif" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="code_projet" />
+                        <field name="coordonnees_gps" />
+                        <field name="date_soumission" />
+                        <field name="entrepreneur_name" />
+                        <field name="file_no_line" />
+                        <field name="latitude" />
+                        <field name="longitude" />
+                        <field name="montant" />
+                        <field name="nom_chantier" />
+                        <field name="numero_soumission" />
+                        <field name="project_id" />
+                        <field name="statut" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="construction_doc_soumission_view_list" model="ir.ui.view">
+        <field name="name">construction_doc_soumission_list</field>
+        <field name="model">construction.doc_soumission</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="actif" />
+                <field name="code_projet" />
+                <field name="coordonnees_gps" />
+                <field name="date_soumission" />
+                <field name="entrepreneur_name" />
+                <field name="file_no_line" />
+                <field name="latitude" />
+                <field name="longitude" />
+                <field name="montant" />
+                <field name="nom_chantier" />
+                <field name="numero_soumission" />
+                <field name="project_id" />
+                <field name="statut" />
+            </list>
+        </field>
+    </record>
+
+    <record id="construction_doc_soumission_view_search" model="ir.ui.view">
+        <field name="name">construction_doc_soumission_search</field>
+        <field name="model">construction.doc_soumission</field>
+        <field name="arch" type="xml">
+            <search string="Construction doc soumission">
+                <field name="code_projet" string="Code Projet" />
+                <field name="coordonnees_gps" string="Coordonnées GPS" />
+                <field name="entrepreneur_name" string="Entrepreneur" />
+                <field name="nom_chantier" string="Nom Chantier" />
+                <field name="numero_soumission" string="Numero Soumission" />
+                <field name="project_id" string="Chantier" />
+                <field name="statut" string="Statut" />
+                <filter domain="[('actif','=',True)]" name="actif" string="Actif" />
+                <filter
+                    name="group_by_date_date_soumission"
+                    string="Date Soumission"
+                    context="{'group_by': 'date_soumission'}"
+                />
+                <group expand="1" string="Group by">
+                    <filter string="Chantier" name="groupby_project" context="{'group_by':'project_id'}" />
+                </group>
+                <searchpanel>
+                    <field name="project_id" string="Chantier" icon="fa-th-list" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="construction_doc_soumission_doc_soumission_action_window" model="ir.actions.act_window">
+        <field name="name">Doc soumission</field>
+        <field name="res_model">construction.doc_soumission</field>
+    </record>
+</odoo>

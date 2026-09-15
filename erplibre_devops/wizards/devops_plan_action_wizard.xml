@@ -649,6 +649,12 @@
                             class="btn btn-secondary"
                         />
                         <button
+                            name="action_optimisation_field"
+                            string="Optimize field"
+                            type="object"
+                            class="btn btn-secondary"
+                        />
+                        <button
                             name="action_refresh_error"
                             string="Refresh error detection"
                             type="object"

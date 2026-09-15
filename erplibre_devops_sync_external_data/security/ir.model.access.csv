@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_devops_cg_sync_bind_user,devops.cg.sync.bind user,model_devops_cg_sync_bind,base.group_user,1,1,1,1
+access_devops_cg_sync_bind_field_user,devops.cg.sync.bind.field user,model_devops_cg_sync_bind_field,base.group_user,1,1,1,1
+access_devops_cg_sync_bind_default_user,devops.cg.sync.bind.default user,model_devops_cg_sync_bind_default,base.group_user,1,1,1,1

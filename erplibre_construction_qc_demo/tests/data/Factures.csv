@@ -1,0 +1,23 @@
+No facture,Numéro soumission,Date échéance,Montant payé,Fournisseur
+FAC-001,SOU-001,2026-07-15,12500.00,Béton Fortuna inc.
+FAC-002,SOU-001,2026-08-15,8000.00,Location Outilex
+FAC-003,SOU-002,2026-07-30,4200.00,Électricité Lumicom
+FAC-004,SOU-003,2026-08-01,15600.00,Pavage Méridien inc.
+FAC-005,SOU-004,2026-08-05,42000.00,Plomberie Cascade
+FAC-006,SOU-004,2026-09-05,38000.00,Électricité Lumicom
+FAC-007,SOU-005,2026-08-10,27500.00,Excavation Roche-Grise
+FAC-008,SOU-006,2026-08-12,110000.00,Acier Polaris inc.
+FAC-009,SOU-006,2026-09-12,95000.00,Béton Fortuna inc.
+FAC-010,SOU-008,2026-08-20,64000.00,Bâtiments Boréal ltée
+FAC-011,SOU-010,2026-08-22,18000.00,Pavage Méridien inc.
+FAC-012,SOU-010,2026-09-22,16500.00,Signalisation Vista
+FAC-013,SOU-011,2026-08-25,33000.00,Menuiserie Boréalis
+FAC-014,SOU-012,2026-08-28,250000.00,Excavation Roche-Grise
+FAC-015,SOU-012,2026-09-28,210000.00,Mécanique Vulcain
+FAC-016,SOU-013,2026-09-01,22000.00,Aménagements Verdic
+FAC-017,SOU-014,2026-09-03,72000.00,Acier Polaris inc.
+FAC-018,SOU-014,2026-10-03,68000.00,Constructions Aurora inc.
+FAC-019,SOU-015,2026-09-06,130000.00,Bâtiments Boréal ltée
+FAC-020,SOU-015,2026-10-06,120000.00,Plomberie Cascade
+FAC-021,SOU-006,2026-10-12,88000.00,Peinture Chromax
+FAC-022,SOU-004,2026-10-05,29000.00,Vitrerie Cristalin

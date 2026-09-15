@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+sync_data_create_access_user_types_/_internal_user,sync_data_create Access User types / Internal User,model_sync_data_create,base.group_user,1,1,1,1
+sync_data_exec_access_user_types_/_internal_user,sync_data_exec Access User types / Internal User,model_sync_data_exec,base.group_user,1,1,1,1
+sync_data_exec_cron_log_access_user_types_/_internal_user,sync_data_exec_cron_log Access User types / Internal User,model_sync_data_exec_cron_log,base.group_user,1,1,1,1
+sync_data_transform_access_user_types_/_internal_user,sync_data_transform Access User types / Internal User,model_sync_data_transform,base.group_user,1,1,1,1
+sync_data_transform_exec_access_user_types_/_internal_user,sync_data_transform_exec Access User types / Internal User,model_sync_data_transform_exec,base.group_user,1,1,1,1
+sync_model_access_user_types_/_internal_user,sync_model Access User types / Internal User,model_sync_model,base.group_user,1,1,1,1
+sync_data_transform_filter_search_access_user_types_/_internal_user,sync_data_transform_filter_search Access User types / Internal User,model_sync_data_transform_filter_search,base.group_user,1,1,1,1

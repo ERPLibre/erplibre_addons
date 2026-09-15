@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="construction_doc_facture_view_form" model="ir.ui.view">
+        <field name="name">construction_doc_facture_form</field>
+        <field name="model">construction.doc_facture</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="date_echeance" class="oe_edit_only" />
+                        <h1>
+                            <field name="date_echeance" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="file_no_line" />
+                        <field name="fournisseur" />
+                        <field name="montant_paye" />
+                        <field name="no_facture" />
+                        <field name="numero_soumission" />
+                        <field name="project_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="construction_doc_facture_view_list" model="ir.ui.view">
+        <field name="name">construction_doc_facture_list</field>
+        <field name="model">construction.doc_facture</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="date_echeance" />
+                <field name="file_no_line" />
+                <field name="fournisseur" />
+                <field name="montant_paye" />
+                <field name="no_facture" />
+                <field name="numero_soumission" />
+                <field name="project_id" />
+            </list>
+        </field>
+    </record>
+
+    <record id="construction_doc_facture_view_search" model="ir.ui.view">
+        <field name="name">construction_doc_facture_search</field>
+        <field name="model">construction.doc_facture</field>
+        <field name="arch" type="xml">
+            <search string="Construction doc facture">
+                <field name="fournisseur" string="Fournisseur" />
+                <field name="no_facture" string="No Facture" />
+                <field name="numero_soumission" string="Numero Soumission" />
+                <field name="project_id" string="Chantier" />
+                <filter
+                    name="group_by_date_date_echeance"
+                    string="Date Echeance"
+                    context="{'group_by': 'date_echeance'}"
+                />
+                <group expand="1" string="Group by">
+                    <filter string="Chantier" name="groupby_project" context="{'group_by':'project_id'}" />
+                </group>
+                <searchpanel>
+                    <field name="project_id" string="Chantier" icon="fa-th-list" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="construction_doc_facture_doc_facture_action_window" model="ir.actions.act_window">
+        <field name="name">Doc facture</field>
+        <field name="res_model">construction.doc_facture</field>
+    </record>
+</odoo>

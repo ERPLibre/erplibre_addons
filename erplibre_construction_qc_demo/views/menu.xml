@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem id="construction_qc" name="Construction Qc" sequence="20" />
+    <menuitem id="menu" name="Menu" sequence="1" parent="construction_qc" />
+    <menuitem
+        id="doc_devis"
+        name="Doc devis"
+        action="construction_doc_devis_doc_devis_action_window"
+        sequence="1"
+        parent="menu"
+    />
+    <menuitem
+        id="doc_facture"
+        name="Doc facture"
+        action="construction_doc_facture_doc_facture_action_window"
+        sequence="1"
+        parent="menu"
+    />
+    <menuitem
+        id="doc_intervenant"
+        name="Doc intervenant"
+        action="construction_doc_intervenant_doc_intervenant_action_window"
+        sequence="1"
+        parent="menu"
+    />
+    <menuitem
+        id="doc_soumission"
+        name="Doc soumission"
+        action="construction_doc_soumission_doc_soumission_action_window"
+        sequence="1"
+        parent="menu"
+    />
+</odoo>
