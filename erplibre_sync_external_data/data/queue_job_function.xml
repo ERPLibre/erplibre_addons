@@ -4,7 +4,6 @@
     <record id="job_function_action_process_sync_data" model="queue.job.function">
         <field name="model_id" ref="erplibre_sync_external_data.model_sync_data_exec" />
         <field name="method">action_process_sync_data</field>
-        <field name="allow_commit" eval="True"/>
     </record>
 
     <record id="job_function_action_transform" model="queue.job.function">
