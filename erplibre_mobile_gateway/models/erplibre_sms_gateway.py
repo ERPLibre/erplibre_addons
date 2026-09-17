@@ -162,6 +162,30 @@ class ErplibreSmsGateway(models.Model):
         "peut-il, en ce moment, remettre un SMS au reseau.",
     )
     sim_ready = fields.Boolean("Carte SIM prete", readonly=True)
+    # La boite vocale de l'OPERATEUR, lue sur la SIM par le service du modem.
+    # Le drapeau dit « au moins un message », jamais combien : le reseau peut
+    # laisser le compte a zero.
+    voicemail_waiting = fields.Boolean(
+        "Message dans la boite vocale",
+        readonly=True,
+        index=True,
+        help="Lu sur la carte SIM, dans le fichier ou le reseau inscrit qu'un "
+        "message attend chez l'operateur. Retombe quand la boite est videe.",
+    )
+    voicemail_since = fields.Datetime(
+        "Message signale depuis",
+        readonly=True,
+        help="Premiere lecture du drapeau leve. A une minute pres : le service "
+        "relit la SIM a cette cadence, et le drapeau lui-meme se leve une "
+        "vingtaine de secondes apres le depot.",
+    )
+    voicemail_checked_at = fields.Datetime(
+        "Boite vocale lue le",
+        readonly=True,
+        help="Derniere transmission du service. Seuls les changements sont "
+        "transmis : une date ancienne ne dit donc pas que la lecture a "
+        "cesse, seulement que rien n'a change depuis.",
+    )
     outbox_pending = fields.Integer("En attente sur l'appareil", readonly=True)
     battery_percent = fields.Integer("Batterie (%)", readonly=True)
     battery_charging = fields.Boolean("En charge", readonly=True)
@@ -662,6 +686,54 @@ class ErplibreSmsGateway(models.Model):
                 "sticky": False,
             },
         }
+
+    def _signaler_messagerie(self, attente, lu_le=None):
+        """Enregistre l'etat de la boite vocale et l'annonce quand il se leve.
+
+        Seule la LEVEE est annoncee aux destinataires : c'est elle qui demande
+        un geste. La retombee s'inscrit au fil sans nommer personne — prevenir
+        chacun qu'une boite a ete videe, par quelqu'un qui le sait deja,
+        noierait l'annonce qui compte.
+
+        Rend vrai quand l'etat a change.
+        """
+        self.ensure_one()
+        attente = bool(attente)
+        lu_le = lu_le or fields.Datetime.now()
+        change = attente != self.voicemail_waiting
+        valeurs = {"voicemail_checked_at": lu_le}
+        if change:
+            valeurs["voicemail_waiting"] = attente
+            valeurs["voicemail_since"] = lu_le if attente else False
+        self.sudo().write(valeurs)
+        if not change:
+            return False
+
+        if attente:
+            destinataires = self._destinataires_notification()
+            if not destinataires:
+                _logger.warning(
+                    "erplibre_mobile_gateway: message dans la boite vocale de"
+                    " %s annonce a PERSONNE — aucun destinataire designe.",
+                    self.display_name,
+                )
+            self.sudo().message_post(
+                body=_(
+                    "Un message attend dans la boite vocale de l'operateur. "
+                    "Il se consulte en appelant la messagerie ; le drapeau "
+                    "retombera une fois la boite videe."
+                ),
+                partner_ids=destinataires.partner_id.ids,
+                message_type="comment",
+                subtype_xmlid="mail.mt_comment",
+            )
+        else:
+            self.sudo().message_post(
+                body=_("La boite vocale de l'operateur est videe."),
+                message_type="notification",
+                subtype_xmlid="mail.mt_note",
+            )
+        return True
 
     def _appareil_qui_interroge(self):
         """Le modele de l'appareil du dernier releve, ou une chaine vide.

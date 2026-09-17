@@ -828,3 +828,61 @@ class TestErplibreSmsEntrantVu(TransactionCase):
             appel.gateway_id._destinataires_notification(appel.company_id),
             self.gateway._destinataires_notification(),
         )
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreVoicemail(TransactionCase):
+    """L'etat de la boite vocale de l'operateur, tel que le service le transmet."""
+
+    def setUp(self):
+        super().setUp()
+        self.prevenu = self.env["res.users"].create(
+            {"name": "Accueil", "login": "accueil_messagerie_essai"}
+        )
+        self.gateway = self.env["erplibre.sms.gateway"].create(
+            {
+                "name": "Modem de test",
+                "kind": "modem",
+                "device_id": "modem-essai-messagerie",
+                "company_id": self.env.company.id,
+                "notify_user_ids": [(6, 0, self.prevenu.ids)],
+            }
+        )
+
+    def _annonces(self):
+        return self.gateway.message_ids.filtered(
+            lambda m: self.prevenu.partner_id in m.partner_ids
+        )
+
+    def test_la_levee_est_annoncee_aux_destinataires(self):
+        """C'est la levee qui demande un geste : rappeler la messagerie."""
+        self.assertTrue(self.gateway._signaler_messagerie(True))
+        self.assertTrue(self.gateway.voicemail_waiting)
+        self.assertTrue(self.gateway.voicemail_since)
+        self.assertEqual(len(self._annonces()), 1)
+
+    def test_un_etat_inchange_ne_reannonce_rien(self):
+        """Le service renvoie l'etat a chaque demarrage : l'annoncer a chaque
+        fois ferait sonner la cloche pour un message deja connu."""
+        self.gateway._signaler_messagerie(True)
+        depuis = self.gateway.voicemail_since
+        self.assertFalse(self.gateway._signaler_messagerie(True))
+        self.assertEqual(len(self._annonces()), 1)
+        self.assertEqual(self.gateway.voicemail_since, depuis)
+
+    def test_la_retombee_s_inscrit_sans_prevenir_personne(self):
+        """Prevenir chacun qu'une boite a ete videe, par quelqu'un qui le sait
+        deja, noierait l'annonce qui compte."""
+        self.gateway._signaler_messagerie(True)
+        self.assertTrue(self.gateway._signaler_messagerie(False))
+        self.assertFalse(self.gateway.voicemail_waiting)
+        self.assertFalse(self.gateway.voicemail_since)
+        self.assertEqual(len(self._annonces()), 1)
+
+    def test_la_lecture_est_datee_meme_sans_changement(self):
+        """La date de lecture est ce qui rend le groupe visible sur la fiche :
+        une fiche jamais lue ne doit pas afficher « pas de message »."""
+        self.assertFalse(self.gateway.voicemail_checked_at)
+        self.gateway._signaler_messagerie(False)
+        self.assertTrue(self.gateway.voicemail_checked_at)
+        self.assertEqual(len(self._annonces()), 0)

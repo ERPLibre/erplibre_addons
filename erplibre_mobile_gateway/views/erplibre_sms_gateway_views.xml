@@ -14,6 +14,7 @@
                 <field name="last_poll_at"/>
                 <field name="sms_permission_ok"/>
                 <field name="sim_ready"/>
+                <field name="voicemail_waiting" optional="show"/>
                 <field name="battery_percent" widget="percentage_pie" optional="hide"/>
                 <field name="outbox_pending" optional="show"/>
                 <field name="alarm_reason" optional="show"/>
@@ -72,6 +73,15 @@
                             <field name="alarm_active"/>
                             <field name="alarm_since" invisible="not alarm_active"/>
                             <field name="alarm_reason" invisible="not alarm_active"/>
+                        </group>
+                        <!-- Invisible tant que rien n'a ete lu : une fiche de
+                             telephone Android n'a pas de drapeau a montrer, et
+                             un « non » vide laisserait croire a une boite vide. -->
+                        <group string="Boite vocale de l'operateur"
+                               invisible="not voicemail_checked_at">
+                            <field name="voicemail_waiting"/>
+                            <field name="voicemail_since" invisible="not voicemail_waiting"/>
+                            <field name="voicemail_checked_at"/>
                         </group>
                     </group>
                     <notebook>

@@ -284,3 +284,28 @@ class ErplibreSmsController(http.Controller):
         return request.make_json_response({
             "ok": True, "recorded": recorded, "opt_outs": opt_outs,
         })
+
+    # ------------------------------------------------------------------
+    @http.route(
+        "/erplibre_sms/voicemail",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+    )
+    def voicemail(self, **kwargs):
+        """Etat de la boite vocale de l'operateur, lu sur la SIM du modem.
+
+        Le service ne transmet que les changements, plus l'etat au demarrage :
+        la fiche porte donc l'etat courant sans interrogation periodique.
+        """
+        authenticated, error = self._authenticate()
+        if error:
+            return error
+        payload, gateway = authenticated
+        if "attente" not in payload:
+            return _fail(400, "missing attente")
+        change = gateway._signaler_messagerie(
+            payload.get("attente"), payload.get("lu_le") or None
+        )
+        return request.make_json_response({"ok": True, "changed": change})
