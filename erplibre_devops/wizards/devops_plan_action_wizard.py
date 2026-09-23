@@ -60,9 +60,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="Enable to install OS dependency, need git clone of project"
     )
 
-    depends_is_complete = fields.Boolean(
-        help="Will enable to view depends list."
-    )
+    depends_is_complete = fields.Boolean(help="Will enable to view depends list.")
 
     depends_to_install = fields.Char(
         string="Depends to install",
@@ -149,13 +147,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         ),
     )
 
-    instance_exec_text_id = fields.Many2one(
-        comodel_name="devops.instance.exec"
-    )
+    instance_exec_text_id = fields.Many2one(comodel_name="devops.instance.exec")
 
-    instance_exec_image_id = fields.Many2one(
-        comodel_name="devops.instance.exec"
-    )
+    instance_exec_image_id = fields.Many2one(comodel_name="devops.instance.exec")
 
     force_show_final = fields.Boolean(
         help="Will show final view without being in this state."
@@ -219,9 +213,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         required=True,
     )
 
-    working_module_name = fields.Char(
-        help="working_module_id or working_module_name"
-    )
+    working_module_name = fields.Char(help="working_module_id or working_module_name")
 
     working_module_path = fields.Char(
         help="Need it for new module, relative path from folder of workspace."
@@ -277,9 +269,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         compute="_compute_can_search_workspace", store=True
     )
 
-    ssh_user = fields.Char(
-        string="SSH user", help="New remote system ssh_user."
-    )
+    ssh_user = fields.Char(string="SSH user", help="New remote system ssh_user.")
 
     ssh_password = fields.Char(
         string="SSH password", help="New remote system ssh_password."
@@ -300,13 +290,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="New/Existing system",
     )
 
-    working_system_can_be_power_on = fields.Boolean(
-        related="working_system_id.is_vm"
-    )
+    working_system_can_be_power_on = fields.Boolean(related="working_system_id.is_vm")
 
-    working_system_status = fields.Boolean(
-        related="working_system_id.system_status"
-    )
+    working_system_status = fields.Boolean(related="working_system_id.system_status")
 
     working_cg_module_id = fields.Many2one(
         comodel_name="code.generator.module",
@@ -395,36 +381,31 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_snippet_generic_mdl = (
-        fields.Char(help="Feature for mode_view_snippet")
+    mode_view_snippet_template_generate_website_snippet_generic_mdl = fields.Char(
+        help="Feature for mode_view_snippet"
     )
 
-    mode_view_snippet_template_generate_website_snippet_ctrl_featur = (
-        fields.Selection(
-            selection=[
-                ("helloworld", "helloworld"),
-                ("model_show_item_individual", "Model show item individual"),
-                ("model_show_item_list", "Model show item list"),
-            ],
-            default="model_show_item_individual",
-            required=True,
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_snippet_ctrl_featur = fields.Selection(
+        selection=[
+            ("helloworld", "helloworld"),
+            ("model_show_item_individual", "Model show item individual"),
+            ("model_show_item_list", "Model show item list"),
+        ],
+        default="model_show_item_individual",
+        required=True,
+        help="Feature for mode_view_snippet",
     )
 
     config_uca_enable_export_data = fields.Boolean(
         default=False,
         help=(
-            "Will enable option nonmenclator in CG to export data associate to"
-            " models."
+            "Will enable option nonmenclator in CG to export data associate to models."
         ),
     )
 
-    mode_view_snippet_template_generate_website_enable_javascript = (
-        fields.Boolean(
-            default=True,
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_enable_javascript = fields.Boolean(
+        default=True,
+        help="Feature for mode_view_snippet",
     )
 
     instance_list_to_deploy = fields.Many2one(
@@ -450,9 +431,7 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     with_mistra_openorca = fields.Boolean(
-        help=(
-            "If true, force to use mistra openorca for generate text in french"
-        )
+        help=("If true, force to use mistra openorca for generate text in french")
     )
 
     instance_yaml = fields.Text(compute="_compute_instance_yaml")
@@ -468,27 +447,23 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     instance_path = fields.Char(default=_default_instance_path)
 
-    instance_last_exec_id = fields.Many2one(
-        comodel_name="devops.instance.exec"
-    )
+    instance_last_exec_id = fields.Many2one(comodel_name="devops.instance.exec")
 
     instance_type_ids = fields.Many2many(
         comodel_name="devops.instance.type",
         string="Types",
     )
 
-    mode_view_snippet_template_generate_website_snippet_type = (
-        fields.Selection(
-            selection=[
-                ("content", "Content"),
-                ("effect", "Effect"),
-                ("feature", "Feature"),
-                ("structure", "Structure"),
-            ],
-            default="effect",
-            required=True,
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_snippet_type = fields.Selection(
+        selection=[
+            ("content", "Content"),
+            ("effect", "Effect"),
+            ("feature", "Feature"),
+            ("structure", "Structure"),
+        ],
+        default="effect",
+        required=True,
+        help="Feature for mode_view_snippet",
     )
 
     use_external_cg = fields.Boolean(
@@ -507,9 +482,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="Force UcA only from feature use_existing_meta_module"
     )
 
-    uca_option_with_inherit = fields.Boolean(
-        help="UCA configuration - with inherit"
-    )
+    uca_option_with_inherit = fields.Boolean(help="UCA configuration - with inherit")
 
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
@@ -525,9 +498,7 @@ class DevopsPlanActionWizard(models.TransientModel):
     has_next = fields.Boolean(compute="_compute_has_next", store=True)
 
     force_generate = fields.Boolean(
-        help=(
-            "Ignore secure file edited, can overwrite this file and lost data."
-        )
+        help=("Ignore secure file edited, can overwrite this file and lost data.")
     )
 
     model_ids = fields.Many2many(
@@ -574,9 +545,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="Separate field name by ;, need to be same column of model_fast_creation_field_name",
     )
 
-    model_fast_creation_error = fields.Text(
-        string="Fast creation error", readonly=True
-    )
+    model_fast_creation_error = fields.Text(string="Fast creation error", readonly=True)
 
     image_db_selection = fields.Many2one(
         comodel_name="devops.db.image",
@@ -603,9 +572,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def _compute_has_next(self):
         for record in self:
-            record.has_next = getattr(
-                record, "state_exit_%s" % record.state, False
-            )
+            record.has_next = getattr(record, "state_exit_%s" % record.state, False)
 
     @api.depends("working_system_id")
     def _compute_is_update_system(self):
@@ -656,10 +623,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 str_odoo_version = f"odoo{odoo_version}"
 
             # Module
-            if (
-                rec.working_module_path_suggestion == "#"
-                and rec.working_module_path
-            ):
+            if rec.working_module_path_suggestion == "#" and rec.working_module_path:
                 rec.has_configured_path = True
                 rec.working_compute_module_path = rec.working_module_path
             if rec.working_module_path_suggestion != "#":
@@ -737,29 +701,21 @@ class DevopsPlanActionWizard(models.TransientModel):
                         rec.working_relative_folder,
                     )
                 else:
-                    rec.workspace_folder = (
-                        rec.working_erplibre_config_path_home_id.name
-                    )
+                    rec.workspace_folder = rec.working_erplibre_config_path_home_id.name
 
     @api.depends("system_method", "working_system_id")
     def _compute_is_new_or_exist_ssh(self):
         for rec in self:
             rec.is_new_or_exist_ssh = (
-                not rec.working_system_id
-                or rec.working_system_id.method == "ssh"
+                not rec.working_system_id or rec.working_system_id.method == "ssh"
             )
 
-    @api.depends(
-        "working_system_id", "system_ssh_connection_status", "system_method"
-    )
+    @api.depends("working_system_id", "system_ssh_connection_status", "system_method")
     def _compute_can_search_workspace(self):
         for rec in self:
             rec.can_search_workspace = False
             if rec.working_system_id:
-                if (
-                    rec.system_method == "ssh"
-                    and rec.system_ssh_connection_status
-                ):
+                if rec.system_method == "ssh" and rec.system_ssh_connection_status:
                     rec.can_search_workspace = True
                 elif rec.system_method == "local":
                     rec.can_search_workspace = True
@@ -837,9 +793,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_plan_project(self):
         self.state = "plan_project"
-        self.working_system_id = self.env.ref(
-            "erplibre_devops.devops_system_local"
-        ).id
+        self.working_system_id = self.env.ref("erplibre_devops.devops_system_local").id
         return self._reopen_self()
 
     def state_goto_code_module(self):
@@ -852,9 +806,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.template_name = "code_generator_template_erplibre_devops"
         return self.goto_autopoiese("erplibre_devops", ctx=ctx)
 
-    def state_goto_code_module_shortcut_autopoieses_code_generator(
-        self, ctx=None
-    ):
+    def state_goto_code_module_shortcut_autopoieses_code_generator(self, ctx=None):
         if ctx is None:
             ctx = {}
         self.working_project_name = "Autopoieses - code_generator"
@@ -875,9 +827,7 @@ class DevopsPlanActionWizard(models.TransientModel):
     ):
         if ctx is None:
             ctx = {}
-        self.working_project_name = (
-            "Autopoieses - code_generator_code_generator"
-        )
+        self.working_project_name = "Autopoieses - code_generator_code_generator"
         self.working_module_cg_path_suggestion = (
             "addons/TechnoLibre_odoo-code-generator-template"
         )
@@ -952,9 +902,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_i_new_instance(self):
         self.state = "i_new_instance"
-        self.working_system_id = self.env.ref(
-            "erplibre_devops.devops_system_local"
-        ).id
+        self.working_system_id = self.env.ref("erplibre_devops.devops_system_local").id
         return self._reopen_self()
 
     def state_goto_i_new_remote_system(self):
@@ -965,9 +913,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_i_local_system(self):
         self.state = "i_new_remote_system"
-        self.working_system_id = self.env.ref(
-            "erplibre_devops.devops_system_local"
-        ).id
+        self.working_system_id = self.env.ref("erplibre_devops.devops_system_local").id
         self.is_force_local_system = True
         self.system_name = self.working_system_id.name_overwrite
         return self._reopen_self()
@@ -1046,9 +992,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 if self.working_module_id
                 else self.working_module_name
             )
-            self.generate_new_model(
-                wp_id, module_name, "Existing module new model"
-            )
+            self.generate_new_model(wp_id, module_name, "Existing module new model")
             # finally
             self.state = "final"
 
@@ -1218,9 +1162,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 continue
             if rec.model_fast_creation_field_name:
                 # Feature to merge header
-                field_name_header = rec.model_fast_creation_field_name.strip(
-                    "\n"
-                )
+                field_name_header = rec.model_fast_creation_field_name.strip("\n")
                 if (
                     "\n" in field_name_header
                     and rec.model_fast_creation_field_separator != "\n"
@@ -1230,24 +1172,21 @@ class DevopsPlanActionWizard(models.TransientModel):
                         for a in field_name_header.split("\n")
                     ]
                     lst_field_name = [
-                        " ".join(chars).strip()
-                        for chars in zip(*lst_field_name_multi)
+                        " ".join(chars).strip() for chars in zip(*lst_field_name_multi)
                     ]
                 else:
                     lst_field_name = field_name_header.split(
                         rec.model_fast_creation_field_separator
                     )
-                lst_field_name = [
-                    a.strip() for a in lst_field_name if a.strip()
-                ]
+                lst_field_name = [a.strip() for a in lst_field_name if a.strip()]
                 # Check doublon
                 if len(set(lst_field_name)) != len(lst_field_name):
-                    rec.model_fast_creation_error = "Detect doublon into field name, validate all is unique."
+                    rec.model_fast_creation_error = (
+                        "Detect doublon into field name, validate all is unique."
+                    )
                     continue
                 # Extract value
-                data_per_line = (
-                    rec.model_fast_creation_field_example_value.split("\n")
-                )
+                data_per_line = rec.model_fast_creation_field_example_value.split("\n")
 
                 lst_index = [a for a in range(len(lst_field_name))]
                 lst_separate = [None] * len(lst_field_name)
@@ -1280,18 +1219,16 @@ class DevopsPlanActionWizard(models.TransientModel):
                     else:
                         lst_field_value.append(separate)
 
-                if lst_field_value and len(lst_field_value) != len(
-                    lst_field_name
-                ):
+                if lst_field_value and len(lst_field_value) != len(lst_field_name):
                     msg = (
                         f"The number '{len(lst_field_value)}' of item value is incoherent "
                         f"with item number '{len(lst_field_name)}' of field name."
                     )
                     for index in range(len(lst_field_value)):
-                        if index < len(lst_field_name) and index < len(
-                            lst_field_value
-                        ):
-                            msg += f"\n[{lst_field_name[index]}:{lst_field_value[index]}]"
+                        if index < len(lst_field_name) and index < len(lst_field_value):
+                            msg += (
+                                f"\n[{lst_field_name[index]}:{lst_field_value[index]}]"
+                            )
                     rec.model_fast_creation_error = msg
                     continue
             else:
@@ -1342,9 +1279,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - Open last generated module"
         ) as wp_id:
-            plan_cg_id = self.env["devops.plan.cg"].search(
-                [], limit=1, order="id desc"
-            )
+            plan_cg_id = self.env["devops.plan.cg"].search([], limit=1, order="id desc")
             self.working_module_name = plan_cg_id.devops_cg_module_ids[0].name
             if self.working_module_name:
                 self.action_code_module_autocomplete_module_path(ctx=ctx)
@@ -1390,8 +1325,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             path_module = exec_id.log_all.strip()
             if exec_id.exec_status == 2:
                 raise exceptions.UserError(
-                    f"The module '{module_name}' is duplicated :"
-                    f" \n{path_module}"
+                    f"The module '{module_name}' is duplicated : \n{path_module}"
                 )
             elif exec_id.exec_status:
                 # raise exceptions.UserError(f"Cannot find module '{module_name}'")
@@ -1410,9 +1344,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             # Check if exist in suggested path
             lst_suggest_path = [
                 a
-                for a, b in self._fields[
-                    "working_module_path_suggestion"
-                ].selection
+                for a, b in self._fields["working_module_path_suggestion"].selection
                 if a not in ["#"]
             ]
             if relative_path_module in lst_suggest_path:
@@ -1518,7 +1450,9 @@ class DevopsPlanActionWizard(models.TransientModel):
                     lst_has_error_model.append(True)
                     lst_model_error = model_id.has_error_msg.split("\n")
                     if len(lst_model_error) > 1:
-                        msg_model_error = f"Model '{model_id.name}': {'\n\t'.join(lst_model_error)}"
+                        msg_model_error = (
+                            f"Model '{model_id.name}': {'\n\t'.join(lst_model_error)}"
+                        )
                     else:
                         msg_model_error = (
                             f"Model '{model_id.name}': {lst_model_error[0]}"
@@ -1542,19 +1476,13 @@ class DevopsPlanActionWizard(models.TransientModel):
                     self.instance_exec_from_workspace_id.instance_name,
                 )
             else:
-                working_dir_path = os.path.join(
-                    self.instance_path, self.instance_name
-                )
-            file_docker_compose = os.path.join(
-                working_dir_path, "docker-compose.yml"
-            )
+                working_dir_path = os.path.join(self.instance_path, self.instance_name)
+            file_docker_compose = os.path.join(working_dir_path, "docker-compose.yml")
             # TODO implement workspace into this view
             result = self.root_workspace_id.execute(
                 cmd=f'mkdir -p "{working_dir_path}"'
             )
-            result = self.root_workspace_id.os_write_file(
-                file_docker_compose, yaml
-            )
+            result = self.root_workspace_id.os_write_file(file_docker_compose, yaml)
             # TODO ne pas copier toute la liste de type_ids, sélectionner ce qui est nécessaire
             # Le copier dans la liste par défaut à la copie, l'utilisateur pour l'enlever.
             inst_exec_value = {
@@ -1566,21 +1494,17 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "working_dir_path": working_dir_path,
                 "instance_name": self.instance_name,
             }
-            self.instance_last_exec_id = self.env[
-                "devops.instance.exec"
-            ].create([inst_exec_value])
+            self.instance_last_exec_id = self.env["devops.instance.exec"].create(
+                [inst_exec_value]
+            )
             self.instance_last_exec_id.start()
             if (
-                self.env.ref(
-                    "erplibre_devops.devops_instance_type_gen_text"
-                ).id
+                self.env.ref("erplibre_devops.devops_instance_type_gen_text").id
                 in self.instance_type_ids.ids
             ):
                 self.instance_exec_text_id = self.instance_last_exec_id.id
             if (
-                self.env.ref(
-                    "erplibre_devops.devops_instance_type_gen_image"
-                ).id
+                self.env.ref("erplibre_devops.devops_instance_type_gen_image").id
                 in self.instance_type_ids.ids
             ):
                 self.instance_exec_image_id = self.instance_last_exec_id.id
@@ -1608,22 +1532,16 @@ class DevopsPlanActionWizard(models.TransientModel):
     def instance_create_plan_project(self):
         ctx = {}
         if self.instance_exec_image_id:
-            ctx["default_instance_exec_image_id"] = (
-                self.instance_exec_image_id.id
-            )
+            ctx["default_instance_exec_image_id"] = self.instance_exec_image_id.id
         if self.instance_exec_text_id:
-            ctx["default_instance_exec_text_id"] = (
-                self.instance_exec_text_id.id
-            )
+            ctx["default_instance_exec_text_id"] = self.instance_exec_text_id.id
         return {
             "name": _("Create plan project."),
             "type": "ir.actions.act_window",
             "view_type": "form",
             "view_mode": "form",
             "res_model": "devops.plan.project",
-            "view_id": self.env.ref(
-                "erplibre_devops.devops_plan_project_view_form"
-            ).id,
+            "view_id": self.env.ref("erplibre_devops.devops_plan_project_view_form").id,
             "target": "_blank",
             "context": ctx,
         }
@@ -1680,9 +1598,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             relative_path_module_cg = relative_path_module
         else:
             if module_cg_path.startswith(wp_id.folder):
-                relative_path_module_cg = module_cg_path[
-                    len(wp_id.folder) + 1 :
-                ]
+                relative_path_module_cg = module_cg_path[len(wp_id.folder) + 1 :]
             else:
                 relative_path_module_cg = module_cg_path
         if not module_template_path:
@@ -1756,24 +1672,18 @@ class DevopsPlanActionWizard(models.TransientModel):
         # Support snippet
         if self.mode_view_snippet and self.mode_view_snippet != "no_snippet":
             plan_cg_value["mode_view_snippet"] = self.mode_view_snippet
-            plan_cg_value[
-                "mode_view_snippet_enable_template_website_snippet_view"
-            ] = self.mode_view_snippet_enable_template_website_snippet_view
+            plan_cg_value["mode_view_snippet_enable_template_website_snippet_view"] = (
+                self.mode_view_snippet_enable_template_website_snippet_view
+            )
             plan_cg_value[
                 "mode_view_snippet_template_generate_website_snippet_generic_mdl"
-            ] = (
-                self.mode_view_snippet_template_generate_website_snippet_generic_mdl
-            )
+            ] = self.mode_view_snippet_template_generate_website_snippet_generic_mdl
             plan_cg_value[
                 "mode_view_snippet_template_generate_website_snippet_ctrl_featur"
-            ] = (
-                self.mode_view_snippet_template_generate_website_snippet_ctrl_featur
-            )
+            ] = self.mode_view_snippet_template_generate_website_snippet_ctrl_featur
             plan_cg_value[
                 "mode_view_snippet_template_generate_website_enable_javascript"
-            ] = (
-                self.mode_view_snippet_template_generate_website_enable_javascript
-            )
+            ] = self.mode_view_snippet_template_generate_website_enable_javascript
             plan_cg_value[
                 "mode_view_snippet_template_generate_website_snippet_type"
             ] = self.mode_view_snippet_template_generate_website_snippet_type
@@ -1791,9 +1701,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             plan_cg_value["mode_view_portal_enable_delete"] = (
                 self.mode_view_portal_enable_delete
             )
-            plan_cg_value["mode_view_portal_models"] = (
-                self.mode_view_portal_models
-            )
+            plan_cg_value["mode_view_portal_models"] = self.mode_view_portal_models
         if self.code_generator_name:
             plan_cg_value["code_generator_name"] = self.code_generator_name
         if self.template_name:
@@ -1813,8 +1721,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_cg_writer_id = plan_cg_id.last_code_generator_writer.id
         # Format module
         cmd_format = (
-            "./script/maintenance/format.sh"
-            f" {relative_path_module}/{module_name}"
+            f"./script/maintenance/format.sh {relative_path_module}/{module_name}"
         )
         wp_id.execute(
             cmd=cmd_format,
@@ -1848,12 +1755,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         if model_to_remove_ids:
             for cg_model_id in model_to_remove_ids:
                 model_file_name = cg_model_id.name.replace(".", "_")
-                lst_default_file_rm.append(
-                    f"{module_name}/models/{model_file_name}.py"
-                )
-                lst_default_file_rm.append(
-                    f"{module_name}/views/{model_file_name}.xml"
-                )
+                lst_default_file_rm.append(f"{module_name}/models/{model_file_name}.py")
+                lst_default_file_rm.append(f"{module_name}/views/{model_file_name}.xml")
         cmd_git_rm = ";".join([f"git rm '{a}'" for a in lst_default_file_rm])
         cmd_git = ";".join([cmd_git_add, cmd_git_rm])
         if cmd_git:
@@ -1874,17 +1777,13 @@ class DevopsPlanActionWizard(models.TransientModel):
         # The file need to finish by }, or cut it and remove output execution
         last_pos_char = str_dct_model.rfind("}")
         if last_pos_char == -1:
-            _logger.error(
-                "Cannot detect JSON dict when searching class" " model."
-            )
+            _logger.error("Cannot detect JSON dict when searching class model.")
             # TODO You can stop execution here, but let crash later
             str_dct_model_complete = str_dct_model
             lst_logs_model = []
         else:
             str_dct_model_complete = str_dct_model[: last_pos_char + 1]
-            lst_logs_model = (
-                str_dct_model[last_pos_char + 1 :].strip().split("\n")
-            )
+            lst_logs_model = str_dct_model[last_pos_char + 1 :].strip().split("\n")
             # TODO show this log to action view
             lst_logs_model = [a.strip() for a in lst_logs_model if a.strip()]
             if lst_logs_model:
@@ -1993,13 +1892,9 @@ class DevopsPlanActionWizard(models.TransientModel):
                             relation_ref = dct_field.get("relation")
                             value_value["relation_ref"] = relation_ref
                     if "currency_field" in dct_field.keys():
-                        value_value["currency_field"] = dct_field.get(
-                            "currency_field"
-                        )
+                        value_value["currency_field"] = dct_field.get("currency_field")
                     if "compute_method" in dct_field.keys():
-                        value_value["compute"] = dct_field.get(
-                            "compute_method"
-                        )
+                        value_value["compute"] = dct_field.get("compute_method")
                     if "help" in dct_field.keys():
                         value_value["help"] = dct_field.get("help")
                     if "string" in dct_field.keys():
@@ -2009,15 +1904,11 @@ class DevopsPlanActionWizard(models.TransientModel):
                     if "precompute" in dct_field.keys():
                         value_value["precompute"] = dct_field.get("precompute")
                     if "related" in dct_field.keys():
-                        value_value["related_manual"] = dct_field.get(
-                            "related"
-                        )
+                        value_value["related_manual"] = dct_field.get("related")
                     if "sequence" in dct_field.keys():
                         value_value["sequence"] = dct_field.get("sequence")
 
-                    field_id = self.env["devops.cg.field"].create(
-                        [value_value]
-                    )
+                    field_id = self.env["devops.cg.field"].create([value_value])
                 self._generate_from_json_field(
                     field_id, dct_field, is_first_run=first_run
                 )
@@ -2035,9 +1926,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         # Need this for inherit module
         pass
 
-    def _generate_from_json_field(
-        self, field_id, dct_field, is_first_run=False
-    ):
+    def _generate_from_json_field(self, field_id, dct_field, is_first_run=False):
         # Need this for inherit module
         pass
 
@@ -2056,9 +1945,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if not self.working_system_id:
             # TODO manage this error
             return
-        self.working_system_id.execute_terminal_gui(
-            force_no_sshpass_no_arg=True
-        )
+        self.working_system_id.execute_terminal_gui(force_no_sshpass_no_arg=True)
         return self._reopen_self()
 
     def search_workspace_from_system(self):
@@ -2166,12 +2053,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_relative_folder = "erplibre_generate_docker"
         self.erplibre_mode = False
         mode_env_id = self.env.ref("erplibre_devops.erplibre_mode_env_dev")
-        mode_exec_id = self.env.ref(
-            "erplibre_devops.erplibre_mode_exec_terminal"
-        )
-        mode_source_id = self.env.ref(
-            "erplibre_devops.erplibre_mode_source_git"
-        )
+        mode_exec_id = self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
+        mode_source_id = self.env.ref("erplibre_devops.erplibre_mode_source_git")
         mode_version_base = "18.0"
         mode_version_erplibre = "erplibre_mode_version_erplibre_1_6_0"
         self.erplibre_mode = (
@@ -2374,8 +2257,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 lst_company_currency_id_field = [
                     a
                     for a in cg_model_id.field_ids
-                    if a.type == "many2one"
-                    and a.relation_manual == "res.currency"
+                    if a.type == "many2one" and a.relation_manual == "res.currency"
                 ]
                 if not lst_company_currency_id_field:
                     company_currency_id = self.env["devops.cg.field"].create(
@@ -2411,15 +2293,10 @@ class DevopsPlanActionWizard(models.TransientModel):
                             lst_company_currency_id_field_if_find[0]
                         )
                     else:
-                        lst_company_currency_id_field = (
-                            lst_company_currency_id_field[0]
-                        )
+                        lst_company_currency_id_field = lst_company_currency_id_field[0]
                 company_currency_id = lst_company_currency_id_field[0]
                 for field_id in cg_model_id.field_ids:
-                    if (
-                        field_id.type == "monetary"
-                        and not field_id.currency_field
-                    ):
+                    if field_id.type == "monetary" and not field_id.currency_field:
                         field_id.currency_field = company_currency_id.name
                 cg_model_id.is_method_compute_company_currency_id = True
             self.action_refresh_error()

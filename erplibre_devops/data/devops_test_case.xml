@@ -71,7 +71,10 @@
         <record id="devops_test_case_cg_code_generator_template_demo_internal_inherit" model="devops.test.case">
             <field name="name">Code generator template demo internal</field>
             <field name="test_plan_id" ref="devops_test_plan_cg" />
-            <field name="test_cb_method_cg_id" ref="devops_cg_test_case_code_generator_template_demo_internal_inherit" />
+            <field
+                name="test_cb_method_cg_id"
+                ref="devops_cg_test_case_code_generator_template_demo_internal_inherit"
+            />
         </record>
         <record id="devops_test_case_cg_code_generator_template_demo_sysadmin_cron" model="devops.test.case">
             <field name="name">Code generator template demo sysadmin cron</field>
@@ -81,7 +84,10 @@
         <record id="devops_test_case_cg_code_generator_export_website_attachments_test" model="devops.test.case">
             <field name="name">Code generator export website attachments test</field>
             <field name="test_plan_id" ref="devops_test_plan_cg" />
-            <field name="test_cb_method_cg_id" ref="devops_cg_test_case_code_generator_export_website_attachments_test" />
+            <field
+                name="test_cb_method_cg_id"
+                ref="devops_cg_test_case_code_generator_export_website_attachments_test"
+            />
         </record>
         <record id="devops_test_case_cg_code_generator_demo_generic_test" model="devops.test.case">
             <field name="name">Code generator demo generic test</field>

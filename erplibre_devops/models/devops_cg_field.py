@@ -20,9 +20,7 @@ class DevopsCgField(models.Model):
 
     help = fields.Char()
 
-    precompute = fields.Boolean(
-        help="Pre-compute field, associate with compute"
-    )
+    precompute = fields.Boolean(help="Pre-compute field, associate with compute")
 
     tracking = fields.Boolean(help="Enable tracking")
 
@@ -106,8 +104,7 @@ class DevopsCgField(models.Model):
     field_relation_manual = fields.Char(
         string="Inverse field manual",
         help=(
-            "inverse_name - Need for one2many to associate with many2one,"
-            " manual entry."
+            "inverse_name - Need for one2many to associate with many2one, manual entry."
         ),
     )
 
@@ -158,9 +155,7 @@ class DevopsCgField(models.Model):
                 has_relation = rec.relation or rec.relation_manual
                 has_field_relation = True
                 if rec.type == "one2many":
-                    has_field_relation = (
-                        rec.field_relation or rec.field_relation_manual
-                    )
+                    has_field_relation = rec.field_relation or rec.field_relation_manual
                 rec.has_error = not has_relation or not has_field_relation
                 rec.has_error_msg += f"Missing relation"
             elif rec.type == "monetary":

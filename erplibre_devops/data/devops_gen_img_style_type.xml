@@ -3,59 +3,118 @@
     <data noupdate="1">
         <record id="devops_gen_img_style_type_01" model="devops.gen.img.style_type">
             <field name="name">fantasypunk</field>
-            <field name="description">Le fantasypunk est un sous-genre de la fantasy qui combine des éléments de l'esthétique punk avec des environnements fantastiques. Dans le fantasypunk, on retrouve souvent des mondes imaginaires où la magie coexiste avec des technologies primitives ou avancées, et où les personnages peuvent être des rebelles, des marginaux ou des anti-héros. Les histoires fantasypunk explorent souvent des thèmes de rébellion contre l'autorité, de lutte des classes, et de défiance des normes établies, tout en conservant les éléments traditionnels de la fantasy tels que les quêtes héroïques, les créatures fantastiques et les mondes merveilleux.</field>
+            <field name="description">
+                Le fantasypunk est un sous-genre de la fantasy qui combine des éléments de l'esthétique punk avec des
+                environnements fantastiques. Dans le fantasypunk, on retrouve souvent des mondes imaginaires où la magie
+                coexiste avec des technologies primitives ou avancées, et où les personnages peuvent être des
+                rebelles, des marginaux ou des anti-héros. Les histoires fantasypunk explorent souvent des thèmes de
+                rébellion contre l'autorité, de lutte des classes, et de défiance des normes établies, tout en
+                conservant les éléments traditionnels de la fantasy tels que les quêtes héroïques, les créatures
+                fantastiques et les mondes merveilleux.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_02" model="devops.gen.img.style_type">
             <field name="name">cartoonpunk</field>
-            <field name="description">Le cartoonpunk est un sous-genre qui mélange des éléments de l'esthétique punk avec des thèmes et des styles empruntés aux dessins animés et à l'animation. Dans le cartoonpunk, on trouve souvent des mondes colorés et excentriques, peuplés de personnages exagérés et caricaturaux, ainsi que des éléments de technologie futuriste ou de science-fiction. Les histoires cartoonpunk peuvent être satiriques, humoristiques ou déjantées, et explorent souvent des thèmes tels que la société de consommation, la technologie, et la culture populaire, tout en mettant en avant un style visuel distinctif inspiré des dessins animés et des comics.</field>
+            <field name="description">
+                Le cartoonpunk est un sous-genre qui mélange des éléments de l'esthétique punk avec des thèmes et des
+                styles empruntés aux dessins animés et à l'animation. Dans le cartoonpunk, on trouve souvent des mondes
+                colorés et excentriques, peuplés de personnages exagérés et caricaturaux, ainsi que des éléments de
+                technologie futuriste ou de science-fiction. Les histoires cartoonpunk peuvent être
+                satiriques, humoristiques ou déjantées, et explorent souvent des thèmes tels que la société de
+                consommation, la technologie, et la culture populaire, tout en mettant en avant un style visuel
+                distinctif inspiré des dessins animés et des comics.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_03" model="devops.gen.img.style_type">
             <field name="name">cyberpunk</field>
-            <field name="description">Mélange de science-fiction dystopique avec des éléments de contre-culture et de technologie avancée. Exemples : "Neuromancer" de William Gibson, "Blade Runner" de Ridley Scott.</field>
+            <field name="description">
+                Mélange de science-fiction dystopique avec des éléments de contre-culture et de technologie
+                avancée. Exemples : "Neuromancer" de William Gibson, "Blade Runner" de Ridley Scott.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_04" model="devops.gen.img.style_type">
             <field name="name">steampunk</field>
-            <field name="description">Fusion de l'ère victorienne avec la technologie à vapeur et des éléments fantastiques ou futuristes. Exemples : "Léviathan" de Scott Westerfeld, "Wild Wild West" de Barry Sonnenfeld.</field>
+            <field name="description">
+                Fusion de l'ère victorienne avec la technologie à vapeur et des éléments fantastiques ou
+                futuristes. Exemples : "Léviathan" de Scott Westerfeld, "Wild Wild West" de Barry Sonnenfeld.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_05" model="devops.gen.img.style_type">
             <field name="name">dieselpunk</field>
-            <field name="description">Inspiré par l'esthétique et la technologie des années 1920 à 1950, avec une touche de dystopie ou d'uchronie. Exemples : "Sky Captain et le Monde de demain" de Kerry Conran, "Wolfenstein: The New Order" (jeu vidéo).</field>
+            <field name="description">
+                Inspiré par l'esthétique et la technologie des années 1920 à 1950, avec une touche de dystopie ou
+                d'uchronie. Exemples : "Sky Captain et le Monde de demain" de Kerry Conran, "Wolfenstein: The New
+                Order" (jeu vidéo).
+            </field>
         </record>
         <record id="devops_gen_img_style_type_06" model="devops.gen.img.style_type">
             <field name="name">atompunk</field>
-            <field name="description">Se déroulant généralement dans une réalité alternative des années 1940 à 1960, avec un accent sur la science-fiction rétro-futuriste et l'énergie nucléaire. Exemples : "Fallout" (série de jeux vidéo), "The Rocketeer" de Dave Stevens.</field>
+            <field name="description">
+                Se déroulant généralement dans une réalité alternative des années 1940 à 1960, avec un accent sur la
+                science-fiction rétro-futuriste et l'énergie nucléaire. Exemples : "Fallout" (série de jeux vidéo), "The
+                Rocketeer" de Dave Stevens.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_07" model="devops.gen.img.style_type">
             <field name="name">biopunk</field>
-            <field name="description">Exploration des implications sociales et éthiques des biotechnologies avancées, souvent dans un contexte dystopique. Exemples : "Oryx et Crake" de Margaret Atwood, "GATTACA" d'Andrew Niccol.</field>
+            <field name="description">
+                Exploration des implications sociales et éthiques des biotechnologies avancées, souvent dans un contexte
+                dystopique. Exemples : "Oryx et Crake" de Margaret Atwood, "GATTACA" d'Andrew Niccol.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_08" model="devops.gen.img.style_type">
             <field name="name">solarpunk</field>
-            <field name="description">Mettant en avant un avenir optimiste où les énergies renouvelables et les technologies durables ont transformé la société. Exemples : "Sunvault: Stories of Solarpunk &amp; Eco-Speculation" (anthologie), "The Ministry for the Future" de Kim Stanley Robinson.</field>
+            <field
+                name="description"
+            >Mettant en avant un avenir optimiste où les énergies renouvelables et les technologies durables ont transformé la société. Exemples : "Sunvault: Stories of Solarpunk &amp; Eco-Speculation" (anthologie), "The Ministry for the Future" de Kim Stanley Robinson.</field>
         </record>
         <record id="devops_gen_img_style_type_09" model="devops.gen.img.style_type">
             <field name="name">horreur</field>
-            <field name="description">Visant à provoquer la peur et le malaise chez le lecteur ou le spectateur, souvent en utilisant des éléments surnaturels ou des créatures monstrueuses. Exemples : "Dracula" de Bram Stoker, "The Exorcist" de William Peter Blatty.</field>
+            <field name="description">
+                Visant à provoquer la peur et le malaise chez le lecteur ou le spectateur, souvent en utilisant
+                des éléments surnaturels ou des créatures monstrueuses. Exemples : "Dracula" de Bram Stoker, "The
+                Exorcist" de William Peter Blatty.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_10" model="devops.gen.img.style_type">
             <field name="name">historique</field>
-            <field name="description">Se déroulant dans le passé, souvent en utilisant des événements historiques réels comme toile de fond pour des histoires fictives. Exemples : "Les Piliers de la Terre" de Ken Follett, "Gone with the Wind" de Margaret Mitchell.</field>
+            <field name="description">
+                Se déroulant dans le passé, souvent en utilisant des événements historiques réels comme toile de fond
+                pour des histoires fictives. Exemples : "Les Piliers de la Terre" de Ken Follett, "Gone with the
+                Wind" de Margaret Mitchell.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_11" model="devops.gen.img.style_type">
             <field name="name">science-fiction hard</field>
-            <field name="description">Se concentrant sur la rigueur scientifique et technologique, explorant souvent les implications réalistes des avancées scientifiques et technologiques. Exemples : "Rendez-vous avec Rama" d'Arthur C. Clarke, "The Martian" d'Andy Weir.</field>
+            <field name="description">
+                Se concentrant sur la rigueur scientifique et technologique, explorant souvent les implications
+                réalistes des avancées scientifiques et technologiques. Exemples : "Rendez-vous avec Rama" d'Arthur
+                C. Clarke, "The Martian" d'Andy Weir.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_12" model="devops.gen.img.style_type">
             <field name="name">space Opera</field>
-            <field name="description">Un sous-genre de la science-fiction caractérisé par des récits épiques se déroulant dans l'espace, mettant souvent en scène des voyages interstellaires, des civilisations extraterrestres et des conflits galactiques. Exemples : "Star Wars" de George Lucas, "Dune" de Frank Herbert.</field>
+            <field name="description">
+                Un sous-genre de la science-fiction caractérisé par des récits épiques se déroulant dans
+                l'espace, mettant souvent en scène des voyages interstellaires, des civilisations extraterrestres et des
+                conflits galactiques. Exemples : "Star Wars" de George Lucas, "Dune" de Frank Herbert.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_13" model="devops.gen.img.style_type">
             <field name="name">fantasy épique</field>
-            <field name="description">Caractérisée par des mondes imaginaires, des quêtes épiques, de la magie et des créatures fantastiques. Exemples : "Le Seigneur des Anneaux" de J.R.R. Tolkien, "Game of Thrones" de George R.R. Martin.</field>
+            <field name="description">
+                Caractérisée par des mondes imaginaires, des quêtes épiques, de la magie et des créatures
+                fantastiques. Exemples : "Le Seigneur des Anneaux" de J.R.R. Tolkien, "Game of Thrones" de George
+                R.R. Martin.
+            </field>
         </record>
         <record id="devops_gen_img_style_type_14" model="devops.gen.img.style_type">
             <field name="name">dystopie</field>
-            <field name="description">Se déroulant dans des sociétés oppressives ou dystopiques, souvent pour critiquer les excès du présent ou explorer les conséquences néfastes de certains choix politiques ou technologiques. Exemples : "1984" de George Orwell, "The Handmaid's Tale" de Margaret Atwood.</field>
+            <field name="description">
+                Se déroulant dans des sociétés oppressives ou dystopiques, souvent pour critiquer les excès du présent
+                ou explorer les conséquences néfastes de certains choix politiques ou
+                technologiques. Exemples : "1984" de George Orwell, "The Handmaid's Tale" de Margaret Atwood.
+            </field>
         </record>
     </data>
 </odoo>

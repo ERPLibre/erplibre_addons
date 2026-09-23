@@ -9,6 +9,7 @@ import os
 from urllib.parse import unquote, urlparse
 
 import requests
+
 from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -155,9 +156,7 @@ class DevopsOperateLocalai(models.Model):
                 if rec.feature == "generate_image":
                     rec.last_result_url = data.get("data")[0].get("url")
                     if rec.last_result_url:
-                        rec.create_attachment_from_path_or_url(
-                            rec.last_result_url
-                        )
+                        rec.create_attachment_from_path_or_url(rec.last_result_url)
                     rec.last_result = json_out
                     rec.last_result_message = False
                 elif rec.feature == "generate_text":
@@ -188,9 +187,7 @@ class DevopsOperateLocalai(models.Model):
                 raise Exception(f"Fichier introuvable: {filepath}")
 
             filename = filename or os.path.basename(filepath)
-            mimetype = (
-                mimetypes.guess_type(filename)[0] or "application/octet-stream"
-            )
+            mimetype = mimetypes.guess_type(filename)[0] or "application/octet-stream"
 
             with open(filepath, "rb") as f:
                 file_bytes = f.read()
@@ -209,8 +206,7 @@ class DevopsOperateLocalai(models.Model):
                 mimetype = mimetype.split(";")[0].strip()
             else:
                 mimetype = (
-                    mimetypes.guess_type(filename)[0]
-                    or "application/octet-stream"
+                    mimetypes.guess_type(filename)[0] or "application/octet-stream"
                 )
 
         # 3) Créer l'attachment Odoo
@@ -240,9 +236,7 @@ class DevopsOperateLocalai(models.Model):
                 str_detail_level = rec.gen_img_detail_level_id.name
                 prompt += f" – image {str_detail_level}"
             if rec.gen_img_light_ids:
-                str_light = " et ".join(
-                    [a.name for a in rec.gen_img_light_ids]
-                )
+                str_light = " et ".join([a.name for a in rec.gen_img_light_ids])
                 prompt += f" – style d'éclairage de type {str_light}"
             if rec.gen_img_style_artist_ids:
                 str_style_artist = " et de ".join(
@@ -255,9 +249,7 @@ class DevopsOperateLocalai(models.Model):
                 )
                 prompt += f" – style {str_style_type}"
             if rec.gen_img_texture_ids:
-                str_texture = " et ".join(
-                    [a.name for a in rec.gen_img_texture_ids]
-                )
+                str_texture = " et ".join([a.name for a in rec.gen_img_texture_ids])
                 prompt += f" – texture {str_texture}"
             rec.prompt_compute = prompt
 
@@ -284,8 +276,7 @@ class DevopsOperateLocalai(models.Model):
                 rec.cmd += ' -H "Content-Type:application/json"'
                 rec.cmd += (
                     ' -d "{ \\"prompt\\": \\"%s\\", \\"step\\": %s,'
-                    ' \\"size\\": \\"%s\\" }"'
-                    % (prompt, rec.step, rec.gen_img_size)
+                    ' \\"size\\": \\"%s\\" }"' % (prompt, rec.step, rec.gen_img_size)
                 )
             elif rec.feature == "generate_son":
                 rec.cmd = f"curl {rec.request_url}/tts"

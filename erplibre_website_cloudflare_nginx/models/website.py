@@ -41,9 +41,7 @@ class Website(models.Model):
         for rec in self:
             website_domain = rec.domain
             if not website_domain:
-                raise ValidationError(
-                    _("Need a domain to configure your DNS.")
-                )
+                raise ValidationError(_("Need a domain to configure your DNS."))
 
             url_extract = tldextract.extract(website_domain)
             domain_to_create = url_extract.fqdn
@@ -54,9 +52,7 @@ class Website(models.Model):
             # TODO do a validation the file is created
             path_to_check = f"/etc/nginx/sites-enabled/{domain_to_create}"
             if not os.path.exists(path_to_check):
-                _logger.error(
-                    f"Path not exist at nginx creation : '{path_to_check}'."
-                )
+                _logger.error(f"Path not exist at nginx creation : '{path_to_check}'.")
 
     def action_cloudflare_set_website_dns(self):
         cloudflare_enable = self.env["ir.config_parameter"].get_param(
@@ -77,9 +73,7 @@ class Website(models.Model):
         for rec in self:
             website_domain = rec.domain
             if not website_domain:
-                raise ValidationError(
-                    _("Need a domain to configure your DNS.")
-                )
+                raise ValidationError(_("Need a domain to configure your DNS."))
             if not cloudflare:
                 raise ValidationError(
                     _(

@@ -122,7 +122,7 @@ Mettre dans `config.conf`
 
 Obligatoire
 
-```server_wide_modules = base,web,queue_job```
+`server_wide_modules = base,web,queue_job`
 
 Facultatif
 

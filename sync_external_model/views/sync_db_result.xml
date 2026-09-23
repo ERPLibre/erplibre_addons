@@ -24,12 +24,14 @@
                     name="sync_local"
                     string="Sync local"
                     type="object"
-                    invisible="resolution not in ['solution_local', 'solution_remote_local'] or status in ['not_solvable', 'solved']"/>
+                    invisible="resolution not in ['solution_local', 'solution_remote_local'] or status in ['not_solvable', 'solved']"
+                />
                 <button
                     name="sync_remote"
                     string="Sync remote"
                     type="object"
-                    invisible="resolution not in ['solution_remote', 'solution_remote_local'] or status in ['not_solvable', 'solved']"/>
+                    invisible="resolution not in ['solution_remote', 'solution_remote_local'] or status in ['not_solvable', 'solved']"
+                />
             </list>
         </field>
     </record>

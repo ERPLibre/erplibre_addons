@@ -173,9 +173,7 @@ class SyncDB(models.Model):
                 rec.sync_host, protocol="jsonrpc+ssl", port=rec.sync_port
             )
         else:
-            odoo = odoorpc.ODOO(
-                rec.sync_host, protocol="jsonrpc", port=rec.sync_port
-            )
+            odoo = odoorpc.ODOO(rec.sync_host, protocol="jsonrpc", port=rec.sync_port)
         db_list = odoo.db.list()
         if not db_list:
             raise exceptions.UserError(
@@ -186,24 +184,17 @@ class SyncDB(models.Model):
             if len(db_list) == 1:
                 db = db_list[0]
             else:
-                raise exceptions.UserError(
-                    _("Please specify the database to sync.")
-                )
+                raise exceptions.UserError(_("Please specify the database to sync."))
         elif db not in db_list:
             raise exceptions.UserError(
-                _("The server {} has not database named {}.").format(
-                    self.sync_host, db
-                )
+                _("The server {} has not database named {}.").format(self.sync_host, db)
             )
 
         try:
             odoo.login(db, rec.sync_user, rec.sync_password)
         except Exception:
             raise exceptions.UserError(
-                _(
-                    "FAILED - wrong credentials, is it good user name or"
-                    " password?"
-                )
+                _("FAILED - wrong credentials, is it good user name or password?")
             )
         return odoo
 
@@ -254,9 +245,7 @@ class SyncDB(models.Model):
     ):
         dct_model = {}
         local_module = (
-            self.env["ir.module.module"]
-            .search([("name", "=", module_name)])
-            .exists()
+            self.env["ir.module.module"].search([("name", "=", module_name)]).exists()
         )
         if not local_module:
             self.env["sync.db.result"].create(
@@ -303,16 +292,12 @@ class SyncDB(models.Model):
                 )
                 for field_id in all_fields:
                     # remove field type compute
-                    if (
-                        not self.env[field_id.model]
-                        ._fields.get(field_id.name)
-                        .compute
-                    ):
+                    if not self.env[field_id.model]._fields.get(field_id.name).compute:
                         lst_all_fields.append(field_id)
                         if field_id.model in dct_model.keys():
-                            lst_field_to_add = dct_model[field_id.model][
-                                "fields"
-                            ]["lst"]
+                            lst_field_to_add = dct_model[field_id.model]["fields"][
+                                "lst"
+                            ]
                             lst_field_to_add.append(field_id.name)
                         else:
                             dct_model[field_id.model] = {
@@ -363,8 +348,7 @@ class SyncDB(models.Model):
             )
         elif local_module.latest_version != remote_module.latest_version:
             need_update = (
-                local_module.installed_version
-                == remote_module.installed_version
+                local_module.installed_version == remote_module.installed_version
             )
             value = {
                 "sync_db_id": rec.id,
@@ -386,10 +370,7 @@ class SyncDB(models.Model):
         # Validate model
         for model_name, model_value in dct_model.items():
             if model_name not in odoo.env:
-                key = (
-                    f"model_name {model_name} type_result"
-                    " missing_model source remote"
-                )
+                key = f"model_name {model_name} type_result missing_model source remote"
                 if key not in lst_existing_result:
                     lst_existing_result.append(key)
                     self.env["sync.db.result"].create(
@@ -427,9 +408,7 @@ class SyncDB(models.Model):
 
             for v_item in lst_v:
                 # Compare with id by default
-                local_item = (
-                    self.env[model_name].browse(v_item.get("id")).exists()
-                )
+                local_item = self.env[model_name].browse(v_item.get("id")).exists()
                 if not local_item:
                     self.env["sync.db.result"].create(
                         [
@@ -469,9 +448,7 @@ class SyncDB(models.Model):
 
                             remote_value = v_item.get(field_name)
                             field_type = (
-                                self.env[model_name]
-                                ._fields.get(field_name)
-                                .type
+                                self.env[model_name]._fields.get(field_name).type
                             )
 
                             if field_type == "one2many":
@@ -492,9 +469,7 @@ class SyncDB(models.Model):
                                                 "field_value_local": local_value.id,
                                                 "field_value_remote": remote_value,
                                                 "type_result": "diff_value",
-                                                "resolution": (
-                                                    "solution_remote_local"
-                                                ),
+                                                "resolution": ("solution_remote_local"),
                                             }
                                         ]
                                     )
@@ -516,9 +491,7 @@ class SyncDB(models.Model):
                                                 "record_id": v_item.get("id"),
                                                 "field_value_remote": remote_value,
                                                 "type_result": "diff_value",
-                                                "resolution": (
-                                                    "solution_remote_local"
-                                                ),
+                                                "resolution": ("solution_remote_local"),
                                             }
                                         ]
                                     )
@@ -579,9 +552,7 @@ class SyncDB(models.Model):
                     data = {}
                     lst_field = model_value.get("fields", {}).get("lst")
                     for field_name in lst_field:
-                        field_type = (
-                            self.env[model_name]._fields.get(field_name).type
-                        )
+                        field_type = self.env[model_name]._fields.get(field_name).type
                         if field_type == "one2many":
                             continue
 
@@ -590,9 +561,7 @@ class SyncDB(models.Model):
                             if v.id:
                                 data[field_name] = v.id
                         elif field_type in ("date", "datetime"):
-                            data[field_name] = (
-                                str(v) if v is not False else False
-                            )
+                            data[field_name] = str(v) if v is not False else False
                         elif field_type in ("one2many", "many2many"):
                             if v:
                                 data[field_name] = [(6, 0, v.ids)]

@@ -40,9 +40,7 @@ class DevopsCodeTodo(models.Model):
     )
 
     def open_file_ide(self):
-        ws_id = self.env["devops.workspace"].search(
-            [("is_me", "=", True)], limit=1
-        )
+        ws_id = self.env["devops.workspace"].search([("is_me", "=", True)], limit=1)
         if not ws_id:
             return
         for o_rec in self:
@@ -50,9 +48,7 @@ class DevopsCodeTodo(models.Model):
                 if o_rec.ide_breakpoint:
                     id_ide_breakpoint = o_rec.ide_breakpoint.id
                 else:
-                    bp_filename = os.path.join(
-                        o_rec.path_module, o_rec.filename
-                    )
+                    bp_filename = os.path.join(o_rec.path_module, o_rec.filename)
                     bp_value = {
                         "name": "breakpoint_exec",
                         "description": "TODO",

@@ -12,8 +12,7 @@ _logger = logging.getLogger(__name__)
 class DevopsExecBundle(models.Model):
     _name = "devops.exec.bundle"
     _description = (
-        "Bundle of execution process, package of multiple process to"
-        " regroup it."
+        "Bundle of execution process, package of multiple process to regroup it."
     )
 
     name = fields.Char(
@@ -144,4 +143,6 @@ class DevopsExecBundle(models.Model):
     @api.depends("exec_time_duration")
     def _compute_time_duration_result(self):
         for rec in self:
-            rec.time_duration_result = f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
+            rec.time_duration_result = (
+                f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
+            )

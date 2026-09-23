@@ -40,9 +40,7 @@ class DevopsPlanCg(models.Model):
         help="Force UcA only from feature use_existing_meta_module"
     )
 
-    uca_option_with_inherit = fields.Boolean(
-        help="UCA configuration - with inherit"
-    )
+    uca_option_with_inherit = fields.Boolean(help="UCA configuration - with inherit")
 
     code_generator_name = fields.Char()
 
@@ -136,8 +134,7 @@ class DevopsPlanCg(models.Model):
     config_uca_enable_export_data = fields.Boolean(
         default=False,
         help=(
-            "Will enable option nonmenclator in CG to export data associate to"
-            " models."
+            "Will enable option nonmenclator in CG to export data associate to models."
         ),
     )
 
@@ -212,40 +209,34 @@ class DevopsPlanCg(models.Model):
         help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_snippet_generic_mdl = (
-        fields.Char(help="Feature for mode_view_snippet")
+    mode_view_snippet_template_generate_website_snippet_generic_mdl = fields.Char(
+        help="Feature for mode_view_snippet"
     )
 
-    mode_view_snippet_template_generate_website_snippet_ctrl_featur = (
-        fields.Selection(
-            selection=[
-                ("helloworld", "helloworld"),
-                ("model_show_item_individual", "Model show item individual"),
-                ("model_show_item_list", "Model show item list"),
-            ],
-            default="model_show_item_individual",
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_snippet_ctrl_featur = fields.Selection(
+        selection=[
+            ("helloworld", "helloworld"),
+            ("model_show_item_individual", "Model show item individual"),
+            ("model_show_item_list", "Model show item list"),
+        ],
+        default="model_show_item_individual",
+        help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_enable_javascript = (
-        fields.Boolean(
-            default=True,
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_enable_javascript = fields.Boolean(
+        default=True,
+        help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_snippet_type = (
-        fields.Selection(
-            selection=[
-                ("content", "Content"),
-                ("effect", "Effect"),
-                ("feature", "Feature"),
-                ("structure", "Structure"),
-            ],
-            default="effect",
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_snippet_type = fields.Selection(
+        selection=[
+            ("content", "Content"),
+            ("effect", "Effect"),
+            ("feature", "Feature"),
+            ("structure", "Structure"),
+        ],
+        default="effect",
+        help="Feature for mode_view_snippet",
     )
 
     path_working_erplibre = fields.Char(default="/ERPLibre")
@@ -274,28 +265,19 @@ class DevopsPlanCg(models.Model):
         string="Last new project cg",
     )
 
-    last_code_generator_writer = fields.Many2one(
-        comodel_name="code.generator.writer"
-    )
+    last_code_generator_writer = fields.Many2one(comodel_name="code.generator.writer")
 
-    last_code_generator_module = fields.Many2one(
-        comodel_name="code.generator.module"
-    )
+    last_code_generator_module = fields.Many2one(comodel_name="code.generator.module")
 
     path_code_generator_to_generate = fields.Char(default="addons/addons")
 
     path_code_generator_to_generate_cg = fields.Char(default="addons/addons")
 
-    path_code_generator_to_generate_template = fields.Char(
-        default="addons/addons"
-    )
+    path_code_generator_to_generate_template = fields.Char(default="addons/addons")
 
     is_clear_before_cg_demo = fields.Boolean(
         default=True,
-        help=(
-            "When generate data demo for code generator, delete all data"
-            " before."
-        ),
+        help=("When generate data demo for code generator, delete all data before."),
     )
 
     def write(self, values):
@@ -318,9 +300,7 @@ class DevopsPlanCg(models.Model):
                                 model_id.devops_workspace_ids = [(3, rec.id)]
                             for field_id in model_id.field_ids:
                                 if rec in field_id.devops_workspace_ids:
-                                    field_id.devops_workspace_ids = [
-                                        (3, rec.id)
-                                    ]
+                                    field_id.devops_workspace_ids = [(3, rec.id)]
                 cg_adding_ids_i = list(
                     set(rec.devops_cg_ids.ids).difference(set(cg_before_ids_i))
                 )
@@ -334,9 +314,7 @@ class DevopsPlanCg(models.Model):
                                 model_id.devops_workspace_ids = [(4, rec.id)]
                             for field_id in model_id.field_ids:
                                 if rec not in field_id.devops_workspace_ids:
-                                    field_id.devops_workspace_ids = [
-                                        (4, rec.id)
-                                    ]
+                                    field_id.devops_workspace_ids = [(4, rec.id)]
         return status
 
     @api.depends("workspace_id")
@@ -377,10 +355,7 @@ class DevopsPlanCg(models.Model):
                     to_instance=True,
                 )
                 rec_ws.execute(
-                    cmd=(
-                        "./script/addons/install_addons_dev.sh"
-                        f" cg_uca {module_list}"
-                    ),
+                    cmd=(f"./script/addons/install_addons_dev.sh cg_uca {module_list}"),
                     folder=rec.path_working_erplibre,
                     to_instance=True,
                 )
@@ -404,10 +379,7 @@ class DevopsPlanCg(models.Model):
                     to_instance=True,
                 )
                 rec_ws.execute(
-                    cmd=(
-                        "./script/addons/install_addons_dev.sh"
-                        f" cg_ucb {module_list}"
-                    ),
+                    cmd=(f"./script/addons/install_addons_dev.sh cg_ucb {module_list}"),
                     folder=rec.path_working_erplibre,
                     to_instance=True,
                 )
@@ -490,9 +462,7 @@ class DevopsPlanCg(models.Model):
                                 rec.code_generator_name
                             )
                         if rec.template_name:
-                            dct_new_project["template_name"] = (
-                                rec.template_name
-                            )
+                            dct_new_project["template_name"] = rec.template_name
                         # extra_arg = ""
                         if model_conf:
                             dct_new_project["config"] = model_conf
@@ -505,9 +475,9 @@ class DevopsPlanCg(models.Model):
                                 [a.name for a in model_to_remove_ids]
                             )
                         if rec.use_external_cg:
-                            new_project_id = self.env[
-                                "devops.cg.new_project"
-                            ].create([dct_new_project])
+                            new_project_id = self.env["devops.cg.new_project"].create(
+                                [dct_new_project]
+                            )
                             if rec.last_new_project_cg:
                                 new_project_id.last_new_project = (
                                     rec.last_new_project_cg.id
@@ -560,26 +530,16 @@ class DevopsPlanCg(models.Model):
             value["post_init_hook_feature_code_generator"] = False
             value["uninstall_hook_feature_code_generator"] = False
 
-            value["hook_constant_code"] = (
-                f'module_id.name = "{module_id.name}"'
-            )
+            value["hook_constant_code"] = f'module_id.name = "{module_id.name}"'
 
-            code_generator_id = self.env["code.generator.module"].create(
-                [value]
-            )
+            code_generator_id = self.env["code.generator.module"].create([value])
             rec.last_code_generator_module = code_generator_id.id
 
             # lst_depend_module = ["mail", "portal", "website"]
             lst_depend_module = []
-            if (
-                rec.mode_view_snippet
-                and rec.mode_view_snippet == "enable_snippet"
-            ):
+            if rec.mode_view_snippet and rec.mode_view_snippet == "enable_snippet":
                 lst_depend_module.append("website")
-            if (
-                rec.mode_view_portal
-                and rec.mode_view_portal == "enable_portal"
-            ):
+            if rec.mode_view_portal and rec.mode_view_portal == "enable_portal":
                 lst_depend_module.append("portal")
             if lst_depend_module:
                 # Trim for unique item
@@ -593,21 +553,15 @@ class DevopsPlanCg(models.Model):
                 and rec.mode_view_portal_models
             ):
                 lst_portal_model = [
-                    a.strip()
-                    for a in rec.mode_view_portal_models.strip().split(";")
+                    a.strip() for a in rec.mode_view_portal_models.strip().split(";")
                 ]
             else:
                 lst_portal_model = []
-            model_ids = rec.devops_cg_model_ids.filtered(
-                lambda r: not r.is_to_remove
-            )
+            model_ids = rec.devops_cg_model_ids.filtered(lambda r: not r.is_to_remove)
             lst_one_2_many = []
             for model_model_id in model_ids:
                 lst_depend_model = None
-                if (
-                    lst_portal_model
-                    and model_model_id.name in lst_portal_model
-                ):
+                if lst_portal_model and model_model_id.name in lst_portal_model:
                     lst_depend_model = ["portal.mixin"]
 
                 # Filtered one2many to be apply at the end
@@ -643,9 +597,7 @@ class DevopsPlanCg(models.Model):
             for o2m_value in lst_one_2_many:
                 model_model = o2m_value.get("model_model")
                 dct_field = o2m_value.get("dct_field")
-                code_generator_id.add_update_model_one2many(
-                    model_model, dct_field
-                )
+                code_generator_id.add_update_model_one2many(model_model, dct_field)
 
             # Generate view
             # Action generate view
@@ -673,9 +625,9 @@ class DevopsPlanCg(models.Model):
                 )
 
             if not rec.mode_view_disable_generate_view:
-                wizard_view = self.env[
-                    "code.generator.generate.views.wizard"
-                ].create([value_view_wizard])
+                wizard_view = self.env["code.generator.generate.views.wizard"].create(
+                    [value_view_wizard]
+                )
 
                 wizard_view.button_generate_views()
 
@@ -693,9 +645,7 @@ class DevopsPlanCg(models.Model):
                 }
                 self.env["code.generator.snippet"].create([value_snippet])
 
-            self._update_inherit_before_code_generator_writer(
-                code_generator_id
-            )
+            self._update_inherit_before_code_generator_writer(code_generator_id)
 
             # Generate module
             value = {"code_generator_ids": code_generator_id.ids}
@@ -720,9 +670,7 @@ class DevopsPlanCg(models.Model):
 
     def action_git_commit(self):
         for rec in self:
-            with rec.workspace_id.devops_create_exec_bundle(
-                "CG git commit"
-            ) as rec_ws:
+            with rec.workspace_id.devops_create_exec_bundle("CG git commit") as rec_ws:
                 folder = os.path.join(
                     rec.path_working_erplibre,
                     rec.path_code_generator_to_generate,
@@ -802,9 +750,7 @@ class DevopsPlanCg(models.Model):
 
     def action_git_commit_all_generated_module(self):
         for rec in self:
-            with rec.workspace_id.devops_create_exec_bundle(
-                "CG commit all"
-            ) as rec_ws:
+            with rec.workspace_id.devops_create_exec_bundle("CG commit all") as rec_ws:
                 folder = os.path.join(
                     rec.path_working_erplibre,
                     rec.path_code_generator_to_generate,
@@ -933,25 +879,16 @@ class DevopsPlanCg(models.Model):
                                 module_id.devops_workspace_ids = [(4, rec.id)]
                             for model_id in module_id.model_ids:
                                 if rec not in model_id.devops_workspace_ids:
-                                    model_id.devops_workspace_ids = [
-                                        (4, rec.id)
-                                    ]
+                                    model_id.devops_workspace_ids = [(4, rec.id)]
                                 for field_id in model_id.field_ids:
-                                    if (
-                                        rec
-                                        not in field_id.devops_workspace_ids
-                                    ):
-                                        field_id.devops_workspace_ids = [
-                                            (4, rec.id)
-                                        ]
+                                    if rec not in field_id.devops_workspace_ids:
+                                        field_id.devops_workspace_ids = [(4, rec.id)]
 
                 rec.devops_cg_diff = diff
                 rec.devops_cg_status = status
                 rec.devops_cg_stat = stat
 
-    def workspace_remove_module(
-        self, module_name, path_to_remove, remove_module=True
-    ):
+    def workspace_remove_module(self, module_name, path_to_remove, remove_module=True):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(
                 "Workspace remove module"
@@ -1034,9 +971,7 @@ class DevopsPlanCg(models.Model):
                         ]
                     )
                     # Field
-                    cg_field_voiture_couleur_id = self.env[
-                        "devops.cg.field"
-                    ].create(
+                    cg_field_voiture_couleur_id = self.env["devops.cg.field"].create(
                         [
                             {
                                 "name": "couleur",
@@ -1208,8 +1143,7 @@ class DevopsPlanCg(models.Model):
                             {
                                 "name": "date_service_afficher",
                                 "help": (
-                                    "Date à laquelle l'offre de service sera"
-                                    " affiché."
+                                    "Date à laquelle l'offre de service sera affiché."
                                 ),
                                 "type": "date",
                                 "model_id": cg_model_offre_id.id,
@@ -1217,15 +1151,12 @@ class DevopsPlanCg(models.Model):
                             }
                         ]
                     )
-                    cg_field_offre_temps_estime_id = self.env[
-                        "devops.cg.field"
-                    ].create(
+                    cg_field_offre_temps_estime_id = self.env["devops.cg.field"].create(
                         [
                             {
                                 "name": "temp_estime",
                                 "help": (
-                                    "Temps estimé pour effectuer le service à"
-                                    " offrir."
+                                    "Temps estimé pour effectuer le service à offrir."
                                 ),
                                 "type": "float",
                                 "model_id": cg_model_offre_id.id,
@@ -1249,9 +1180,7 @@ class DevopsPlanCg(models.Model):
                             }
                         ]
                     )
-                    cg_field_demande_condition_id = self.env[
-                        "devops.cg.field"
-                    ].create(
+                    cg_field_demande_condition_id = self.env["devops.cg.field"].create(
                         [
                             {
                                 "name": "condition",
@@ -1385,8 +1314,8 @@ class DevopsPlanCg(models.Model):
                     ).id
                 # TODO create a copy of new project and not modify older version
                 # TODO next sentence is not useful if made a copy
-                rec.last_new_project_cg.devops_exec_bundle_id = (
-                    rec_ws._context.get("devops_exec_bundle")
+                rec.last_new_project_cg.devops_exec_bundle_id = rec_ws._context.get(
+                    "devops_exec_bundle"
                 )
                 rec.last_new_project_cg.action_new_project()
 

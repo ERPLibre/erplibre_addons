@@ -15,12 +15,8 @@ def post_init_hook(env):
     action_workspace_view = env.ref(
         "erplibre_devops.action_devops_check_workspace_conf_form"
     )
-    action_system_view = env.ref(
-        "erplibre_devops.action_devops_check_system_conf_form"
-    )
-    action_vm_view = env.ref(
-        "erplibre_devops.devops_deploy_vm_deploy_vm_action_window"
-    )
+    action_system_view = env.ref("erplibre_devops.action_devops_check_system_conf_form")
+    action_vm_view = env.ref("erplibre_devops.devops_deploy_vm_deploy_vm_action_window")
     arch = f"""
 <form string="Mon tableau de bord">
     <board style="2-1">

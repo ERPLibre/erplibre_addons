@@ -82,9 +82,7 @@ class DevopsDeployVm(models.Model):
         for rec in self:
             # TODO use default workspace from system for contexte dev
             if not rec.system_id:
-                _logger.warning(
-                    f"Missing system_id into devops.deploy.vm id {rec.id}"
-                )
+                _logger.warning(f"Missing system_id into devops.deploy.vm id {rec.id}")
                 continue
             if rec.provider == "VirtualBox":
                 cmd = f"vboxmanage startvm {rec.identifiant} --type gui"
@@ -126,8 +124,7 @@ class DevopsDeployVm(models.Model):
                         # Just open and close the connection
                         with system_vm_id.ssh_connection(timeout=max_timeout):
                             _logger.info(
-                                "Succeed to open system name"
-                                f" {system_vm_id.name}"
+                                f"Succeed to open system name {system_vm_id.name}"
                             )
                     except paramiko.AuthenticationException as e:
                         _logger.error(
@@ -136,18 +133,14 @@ class DevopsDeployVm(models.Model):
                         )
                         _logger.error(e)
                     except Exception as e:
-                        _logger.error(
-                            f"Fail to open system name {system_vm_id.name}"
-                        )
+                        _logger.error(f"Fail to open system name {system_vm_id.name}")
                         _logger.error(e)
 
     def action_stop_vm(self):
         for rec in self:
             # TODO use default workspace from system for contexte dev
             if not rec.system_id:
-                _logger.warning(
-                    f"Missing system_id into devops.deploy.vm id {rec.id}"
-                )
+                _logger.warning(f"Missing system_id into devops.deploy.vm id {rec.id}")
                 continue
             if rec.provider == "VirtualBox":
                 cmd = f"vboxmanage controlvm {rec.identifiant} poweroff"

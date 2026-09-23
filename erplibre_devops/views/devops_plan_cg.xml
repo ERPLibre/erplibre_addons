@@ -127,18 +127,18 @@
                                 type="object"
                                 class="oe_highlight"
                             />
-<!--                            <button-->
-<!--                                name="action_format_erplibre_devops"-->
-<!--                                string="Format module erplibre_devops"-->
-<!--                                type="object"-->
-<!--                                class="oe_highlight"-->
-<!--                            />-->
-<!--                            <button-->
-<!--                                name="action_update_erplibre_devops"-->
-<!--                                string="Update module erplibre_devops"-->
-<!--                                type="object"-->
-<!--                                class="oe_highlight"-->
-<!--                            />-->
+                            <!--                            <button-->
+                            <!--                                name="action_format_erplibre_devops"-->
+                            <!--                                string="Format module erplibre_devops"-->
+                            <!--                                type="object"-->
+                            <!--                                class="oe_highlight"-->
+                            <!--                            />-->
+                            <!--                            <button-->
+                            <!--                                name="action_update_erplibre_devops"-->
+                            <!--                                string="Update module erplibre_devops"-->
+                            <!--                                type="object"-->
+                            <!--                                class="oe_highlight"-->
+                            <!--                            />-->
                             <button
                                 name="workspace_CG_remove_module"
                                 string="Clear modules"
@@ -146,12 +146,12 @@
                                 class="oe_highlight"
                             />
                             <button name="action_git_commit" string="Git commit" type="object" class="oe_highlight" />
-<!--                            <button-->
-<!--                                name="action_cg_setup_pycharm_debug"-->
-<!--                                string="Setup Pycharm debug"-->
-<!--                                type="object"-->
-<!--                                class="oe_highlight"-->
-<!--                                invisible="not need_debugger_cg_erplibre_devops"/>-->
+                            <!--                            <button-->
+                            <!--                                name="action_cg_setup_pycharm_debug"-->
+                            <!--                                string="Setup Pycharm debug"-->
+                            <!--                                type="object"-->
+                            <!--                                class="oe_highlight"-->
+                            <!--                                invisible="not need_debugger_cg_erplibre_devops"/>-->
                         </group>
                     </group>
                     <group>

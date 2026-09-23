@@ -11,7 +11,6 @@ import uuid
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from odoo import _, api, fields, models
 from pptx import Presentation
 from pptx.chart.data import CategoryChartData, ChartData
 from pptx.dml.color import RGBColor
@@ -19,6 +18,8 @@ from pptx.enum.chart import XL_CHART_TYPE
 from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
+
+from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 

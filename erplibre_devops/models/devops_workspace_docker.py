@@ -8,6 +8,7 @@ import os
 import time
 
 import requests
+
 from odoo import _, api, exceptions, fields, models, tools
 
 _logger = logging.getLogger(__name__)
@@ -42,15 +43,10 @@ class DevopsWorkspaceDocker(models.Model):
 
     docker_version = fields.Char(default="technolibre/erplibre:1.5.0_c0c6f23")
 
-    docker_cmd_extra = fields.Char(
-        help="Extra command to share to odoo executable"
-    )
+    docker_cmd_extra = fields.Char(help="Extra command to share to odoo executable")
 
     docker_nb_proc = fields.Integer(
-        help=(
-            "Number of processor/thread, 0 if not behind a proxy, else 2 or"
-            " more."
-        )
+        help=("Number of processor/thread, 0 if not behind a proxy, else 2 or more.")
     )
 
     docker_config_gen_cg = fields.Boolean(
@@ -120,8 +116,20 @@ services:
       # See the volume section at the end of the file
       - erplibre_data_dir:/home/odoo/.local/share/Odoo
       - erplibre_conf:/etc/odoo
-{'      - ' + '''
-- '''.join([f'./{path}:{rec.workspace_id.path_working_erplibre}/{path}' for path in rec.workspace_id.path_code_generator_to_generate.split(";")]) if rec.workspace_id.path_code_generator_to_generate else ''}
+{
+                "      - "
+                + '''
+- '''.join(
+                    [
+                        f"./{path}:{rec.workspace_id.path_working_erplibre}/{path}"
+                        for path in rec.workspace_id.path_code_generator_to_generate.split(
+                            ";"
+                        )
+                    ]
+                )
+                if rec.workspace_id.path_code_generator_to_generate
+                else ""
+            }
     restart: always
 
   db:
@@ -187,7 +195,9 @@ volumes:
             if "admin_passwd" not in result:
                 result += "admin_passwd = admin\n"
             # TODO remove repo OCA_connector-jira
-            str_to_replace = f",{rec.workspace_id.path_working_erplibre}/addons/OCA_connector-jira"
+            str_to_replace = (
+                f",{rec.workspace_id.path_working_erplibre}/addons/OCA_connector-jira"
+            )
             if str_to_replace in result:
                 result = result.replace(str_to_replace, "")
                 has_change = True
@@ -203,9 +213,7 @@ volumes:
                     if rec.workspace_id.path_code_generator_to_generate:
                         str_path_gen = ",".join(
                             [
-                                os.path.join(
-                                    rec.workspace_id.path_working_erplibre, a
-                                )
+                                os.path.join(rec.workspace_id.path_working_erplibre, a)
                                 for a in rec.workspace_id.path_code_generator_to_generate.strip().split(
                                     ";"
                                 )
@@ -253,10 +261,7 @@ volumes:
                     lst_result = result.split("\n")
                     for i, a_result in enumerate(lst_result):
                         if a_result.startswith("addons_path = "):
-                            if (
-                                rec.docker_config_gen_cg
-                                and not rec.docker_config_cache
-                            ):
+                            if rec.docker_config_gen_cg and not rec.docker_config_cache:
                                 rec.docker_config_cache = a_result
                             lst_result[i] = addons_path
                             break
@@ -307,18 +312,13 @@ volumes:
     def action_docker_check_docker_ps(self):
         for rec in self:
             exec_id = rec.workspace_id.execute(
-                cmd=(
-                    f"cd {rec.workspace_id.folder};docker compose ps --format"
-                    " json"
-                )
+                cmd=(f"cd {rec.workspace_id.folder};docker compose ps --format json")
             )
             result = exec_id.log_all
             # rec.docker_compose_ps = f"\n{result}"
             rec.docker_is_running = bool(result)
             if rec.workspace_id.docker_compose_id:
-                rec.workspace_id.docker_compose_id.is_running = (
-                    rec.docker_is_running
-                )
+                rec.workspace_id.docker_compose_id.is_running = rec.docker_is_running
 
     def action_docker_logs(self):
         for rec in self:

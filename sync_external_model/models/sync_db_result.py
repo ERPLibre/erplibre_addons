@@ -141,9 +141,7 @@ class SyncDBResult(models.Model):
         if self and self[0]:
             odoo = self[0].sync_db_id.get_odoo(self[0].sync_db_id)
         if not odoo:
-            raise exceptions.UserError(
-                _(f"Cannot support get connexion to remote.")
-            )
+            raise exceptions.UserError(_(f"Cannot support get connexion to remote."))
 
         for rec in self:
             if rec.resolution not in [
@@ -164,17 +162,14 @@ class SyncDBResult(models.Model):
                     if create_id < rec.record_id:
                         # unlink and create until same id
                         _logger.debug(
-                            f"Unlink and recreate {create_id} to"
-                            f" {rec.record_id}"
+                            f"Unlink and recreate {create_id} to {rec.record_id}"
                         )
                         odoo.env[rec.model_name].unlink(create_id)
             elif rec.type_result == "module_not_installed":
                 Module = odoo.env["ir.module.module"]
                 module_id = Module.search([("name", "=", rec.data)])
                 if not module_id:
-                    raise exceptions.UserError(
-                        _(f"Module '{rec.data}' not existing.")
-                    )
+                    raise exceptions.UserError(_(f"Module '{rec.data}' not existing."))
                 module_check = Module.browse(module_id)
                 # Ignore if module already install, maybe installed manually after check sync
                 if not module_check.latest_version:
@@ -186,9 +181,7 @@ class SyncDBResult(models.Model):
                         )
                 rec.status = "solved"
             elif rec.type_result == "diff_value":
-                field_type = (
-                    self.env[rec.model_name]._fields.get(rec.field_name).type
-                )
+                field_type = self.env[rec.model_name]._fields.get(rec.field_name).type
                 rec.status = "solved"
                 v = rec.field_value_local
                 if field_type in ("many2many", "one2many"):

@@ -85,9 +85,7 @@ class DevopsCgTestCase(models.Model):
 
     search_class_module = fields.Char()
 
-    restore_db_image_name = fields.Char(
-        help="TODO use many2one from image db."
-    )
+    restore_db_image_name = fields.Char(help="TODO use many2one from image db.")
 
     file_to_restore_origin = fields.Boolean()
 
@@ -102,10 +100,7 @@ class DevopsCgTestCase(models.Model):
     run_mode = fields.Selection(
         selection=[("command", "Run command"), ("test_exec", "Run test exec")],
         default="command",
-        help=(
-            "Option 'command' to run a script or 'test_exec' to run test"
-            " script."
-        ),
+        help=("Option 'command' to run a script or 'test_exec' to run test script."),
     )
 
     type_test = fields.Selection(
@@ -123,8 +118,6 @@ class DevopsCgTestCase(models.Model):
         ),
     )
 
-    sequence_test = fields.Integer(
-        help="Can change sequence order to run test."
-    )
+    sequence_test = fields.Integer(help="Can change sequence order to run test.")
 
     note = fields.Text()

@@ -36,12 +36,10 @@ def post_init_hook(env):
         #     "erplibre_devops.devops_system_local"
         # ).get_local_system_ids(env)
 
-        with env.ref(
-            "erplibre_devops.devops_workspace_me"
-        ).devops_create_exec_bundle("Search system SSH") as rec:
-            system_ids = (
-                rec.system_id.action_search_system_id_from_ssh_config()
-            )
+        with env.ref("erplibre_devops.devops_workspace_me").devops_create_exec_bundle(
+            "Search system SSH"
+        ) as rec:
+            system_ids = rec.system_id.action_search_system_id_from_ssh_config()
 
             for system_id in system_ids:
                 system_id.job_action_search_all()

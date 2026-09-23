@@ -2,6 +2,7 @@
 # © 2021-2025 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from colorama import Fore, Style
+
 from odoo import _, api, fields, models
 
 # TODO duplicate code, use an external lib
@@ -82,9 +83,7 @@ class DevopsTestResult(models.Model):
 
     workspace_id = fields.Many2one(related="test_plan_exec_id.workspace_id")
 
-    has_devops_action = fields.Boolean(
-        related="test_case_exec_id.has_devops_action"
-    )
+    has_devops_action = fields.Boolean(related="test_case_exec_id.has_devops_action")
 
     @api.depends("log")
     def _compute_log_html(self):

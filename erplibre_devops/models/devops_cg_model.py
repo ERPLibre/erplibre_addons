@@ -31,10 +31,7 @@ class DevopsCgModel(models.Model):
     )
 
     is_to_remove = fields.Boolean(
-        help=(
-            "Active to tell the code generator to remove by refactoring this"
-            " model."
-        )
+        help=("Active to tell the code generator to remove by refactoring this model.")
     )
 
     is_inherit = fields.Boolean(help="If the model inherit another model.")

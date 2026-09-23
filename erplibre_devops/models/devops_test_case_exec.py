@@ -4,6 +4,7 @@
 import logging
 
 from colorama import Fore, Style
+
 from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -142,8 +143,7 @@ class DevopsTestCaseExec(models.Model):
                             {
                                 "name": f"Test breakpoint ID {bp_id.id}",
                                 "log": (
-                                    "Exception warning Breakpoint"
-                                    f" '{bp_id.name}' : {e}"
+                                    f"Exception warning Breakpoint '{bp_id.name}' : {e}"
                                 ),
                                 "is_finish": True,
                                 "is_pass": False,
@@ -255,9 +255,7 @@ class DevopsTestCaseExec(models.Model):
             "view_type": "form",
             "view_mode": "form",
             "res_model": "devops.plan.action.wizard",
-            "view_id": self.env.ref(
-                "erplibre_devops.devops_plan_action_form"
-            ).id,
+            "view_id": self.env.ref("erplibre_devops.devops_plan_action_form").id,
             "target": "new",
             "context": ctx,
         }

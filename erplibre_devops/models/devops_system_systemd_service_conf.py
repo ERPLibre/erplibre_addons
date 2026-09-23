@@ -29,6 +29,4 @@ class DevopsSystemSystemdServiceConf(models.Model):
     def _compute_analyse(self):
         for rec in self:
             if rec.file_content:
-                rec.is_erplibre_detected = (
-                    "erplibre" in rec.file_content.lower()
-                )
+                rec.is_erplibre_detected = "erplibre" in rec.file_content.lower()

@@ -74,9 +74,7 @@ class DevopsExecError(models.Model):
         selection=[("internal", "Internal"), ("execution", "Execution")]
     )
 
-    line_file_tb_detected = fields.Text(
-        help="Detected line to add breakpoint."
-    )
+    line_file_tb_detected = fields.Text(help="Detected line to add breakpoint.")
 
     devops_exec_id = fields.Many2one(
         comodel_name="devops.exec",
@@ -183,9 +181,7 @@ class DevopsExecError(models.Model):
 
     def action_debug_new_project(self, ctx=None):
         for rec in self:
-            np_ids = (
-                rec.parent_root_exec_bundle_id.devops_new_project_ids.exists()
-            )
+            np_ids = rec.parent_root_exec_bundle_id.devops_new_project_ids.exists()
             if np_ids:
                 np_id = np_ids[0]
             for np_id in np_ids:
@@ -208,9 +204,7 @@ class DevopsExecError(models.Model):
         for rec_o in self:
             with self.env.ref(
                 "erplibre_devops.devops_workspace_me"
-            ).devops_create_exec_bundle(
-                "Set configuration on error"
-            ) as rec_ws:
+            ).devops_create_exec_bundle("Set configuration on error") as rec_ws:
                 cmd = rec_o.devops_exec_id.cmd
 
                 if cmd.startswith("./script/addons/install_addons_dev.sh"):
@@ -236,9 +230,7 @@ class DevopsExecError(models.Model):
                 )
 
     def open_file_ide(self):
-        ws_id = self.env["devops.workspace"].search(
-            [("is_me", "=", True)], limit=1
-        )
+        ws_id = self.env["devops.workspace"].search([("is_me", "=", True)], limit=1)
         if not ws_id:
             return
         for o_rec in self:

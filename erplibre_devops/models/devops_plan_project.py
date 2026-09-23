@@ -139,10 +139,7 @@ class DevopsPlanProject(models.Model):
 
     result_list_aliment = fields.Text(
         tracking=True,
-        help=(
-            "List of aliment, by csv, separate by ;. Use header : name,"
-            " description"
-        ),
+        help=("List of aliment, by csv, separate by ;. Use header : name, description"),
     )
 
     result_one_pager_introduction = fields.Text(tracking=True)
@@ -167,9 +164,7 @@ class DevopsPlanProject(models.Model):
         tracking=True,
     )
 
-    @api.depends(
-        "society_name", "project_type", "type_context", "society_type"
-    )
+    @api.depends("society_name", "project_type", "type_context", "society_type")
     def _compute_name(self):
         for rec in self:
             rec.name = (
@@ -309,9 +304,7 @@ class DevopsPlanProject(models.Model):
                             "request_url": rec.instance_exec_text_id.url,
                             "temperature": rec.temperature,
                         }
-                        op_id = self.env["devops.operate.localai"].create(
-                            [op_value]
-                        )
+                        op_id = self.env["devops.operate.localai"].create([op_value])
                         op_id.execute_ia()
                         if op_id.last_result_message:
                             rec.result_one_pager_introduction = (
@@ -319,9 +312,7 @@ class DevopsPlanProject(models.Model):
                             )
                     result_1 = rec.result_one_pager_introduction
                     try:
-                        dct_formation = json.loads(
-                            rec.result_one_pager_introduction
-                        )
+                        dct_formation = json.loads(rec.result_one_pager_introduction)
                         lst_form = dct_formation.get("formation")
                         for dct_form in lst_form:
                             more = dct_form.get("more")
@@ -346,9 +337,7 @@ class DevopsPlanProject(models.Model):
                                 dct_form["more"] = op_id.last_result_message
 
                         for dct_form in lst_form:
-                            short_vulgarisation = dct_form.get(
-                                "short_vulgarisation"
-                            )
+                            short_vulgarisation = dct_form.get("short_vulgarisation")
                             if short_vulgarisation:
                                 continue
                             desc = dct_form.get("description")
@@ -406,9 +395,9 @@ class DevopsPlanProject(models.Model):
                                     )
                                 ],
                             }
-                            op_img_id = self.env[
-                                "devops.operate.localai"
-                            ].create([op_value])
+                            op_img_id = self.env["devops.operate.localai"].create(
+                                [op_value]
+                            )
                             op_img_id.execute_ia()
                             if op_img_id.last_result_url:
                                 dct_form["picture"] = op_img_id.last_result_url
@@ -423,9 +412,7 @@ class DevopsPlanProject(models.Model):
                         )
                     rec.result_one_pager_introduction = result_1
                     value = {"data": result_1, "title": rec.type_context}
-                    pptx_id = self.env["devops.plan.project.pptx"].create(
-                        [value]
-                    )
+                    pptx_id = self.env["devops.plan.project.pptx"].create([value])
                     pptx_id.execute()
                 continue
 
@@ -461,9 +448,7 @@ class DevopsPlanProject(models.Model):
                         "request_url": rec.instance_exec_text_id.url,
                         "temperature": rec.temperature,
                     }
-                    op_id = self.env["devops.operate.localai"].create(
-                        [op_value]
-                    )
+                    op_id = self.env["devops.operate.localai"].create([op_value])
                     op_id.execute_ia()
                     if op_id.last_result_message:
                         rec.result_one_pager_introduction = (
@@ -481,17 +466,13 @@ class DevopsPlanProject(models.Model):
                 op_value = {
                     "prompt": rec.question_list_aliment,
                     "feature": "generate_text",
-                    "system_id": self.env.ref(
-                        "erplibre_devops.devops_system_local"
-                    ).id,
+                    "system_id": self.env.ref("erplibre_devops.devops_system_local").id,
                     "request_url": rec.instance_exec_text_id.url,
                     "temperature": rec.temperature,
                 }
                 op_id = self.env["devops.operate.localai"].create([op_value])
                 op_id.execute_ia()
-                rec.result_list_aliment = op_id.last_result_message.replace(
-                    "\n", ""
-                )
+                rec.result_list_aliment = op_id.last_result_message.replace("\n", "")
 
             if not rec.result_one_pager_background_introduction:
                 if rec.instance_exec_image_id:
@@ -516,9 +497,7 @@ class DevopsPlanProject(models.Model):
                             )
                         ],
                     }
-                    op_img_id = self.env["devops.operate.localai"].create(
-                        [op_value]
-                    )
+                    op_img_id = self.env["devops.operate.localai"].create([op_value])
                     op_img_id.execute_ia()
                     rec.result_one_pager_background_introduction = (
                         op_img_id.last_result_url
@@ -539,15 +518,10 @@ class DevopsPlanProject(models.Model):
                     for dct_aliment in lst_aliment:
                         if not rec.question_list_aliment_image:
                             aliment_name = dct_aliment.get("name")
-                            aliment_description = dct_aliment.get(
-                                "description"
-                            )
-                            prompt = (
-                                rec.advance_aliment_template_repas_image
-                                % (
-                                    aliment_name,
-                                    aliment_description[:100],
-                                )
+                            aliment_description = dct_aliment.get("description")
+                            prompt = rec.advance_aliment_template_repas_image % (
+                                aliment_name,
+                                aliment_description[:100],
                             )
                             rec.question_list_aliment_image += f"{prompt}\n"
                         else:

@@ -3,55 +3,99 @@
     <data noupdate="1">
         <record id="devops_gen_img_style_artist_01" model="devops.gen.img.style_artist">
             <field name="name">M. C Escher</field>
-            <field name="description">Maurits Cornelis Escher était un artiste néerlandais connu pour ses œuvres d'art mathématiques et optiques. Ses dessins souvent impossibles et ses estampes gravées explorent des concepts tels que la géométrie, la perspective et la répétition.</field>
+            <field name="description">
+                Maurits Cornelis Escher était un artiste néerlandais connu pour ses œuvres d'art mathématiques et
+                optiques. Ses dessins souvent impossibles et ses estampes gravées explorent des concepts tels que la
+                géométrie, la perspective et la répétition.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_02" model="devops.gen.img.style_artist">
             <field name="name">H.R. Giger</field>
-            <field name="description">Hans Ruedi Giger était un artiste suisse célèbre pour son style sombre et futuriste, notamment ses créations biomécaniques. Il est surtout connu pour avoir conçu le design des créatures et des décors dans le film "Alien" de Ridley Scott.</field>
+            <field name="description">
+                Hans Ruedi Giger était un artiste suisse célèbre pour son style sombre et futuriste, notamment ses
+                créations biomécaniques. Il est surtout connu pour avoir conçu le design des créatures et des décors
+                dans le film "Alien" de Ridley Scott.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_03" model="devops.gen.img.style_artist">
             <field name="name">Enki Bilal</field>
-            <field name="description">Enki Bilal est un artiste et écrivain français d'origine serbe. Son travail est souvent associé à la bande dessinée et à l'illustration, et il est reconnu pour ses œuvres de science-fiction sombres et complexes, mêlant souvent des éléments politiques et sociaux.</field>
+            <field name="description">
+                Enki Bilal est un artiste et écrivain français d'origine serbe. Son travail est souvent associé à la
+                bande dessinée et à l'illustration, et il est reconnu pour ses œuvres de science-fiction sombres et
+                complexes, mêlant souvent des éléments politiques et sociaux.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_04" model="devops.gen.img.style_artist">
             <field name="name">Richard Corben</field>
-            <field name="description">Richard Corben était un artiste américain de bande dessinée et d'illustration. Il était connu pour son style distinctif et viscéral, utilisant souvent des techniques de couleur vives et des compositions dynamiques dans ses travaux de fantasy et d'horreur.</field>
+            <field name="description">
+                Richard Corben était un artiste américain de bande dessinée et d'illustration. Il était connu pour son
+                style distinctif et viscéral, utilisant souvent des techniques de couleur vives et des compositions
+                dynamiques dans ses travaux de fantasy et d'horreur.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_05" model="devops.gen.img.style_artist">
             <field name="name">Naoto Hattori</field>
-            <field name="description">Naoto Hattori est un artiste japonais dont le travail explore souvent des mondes imaginaires et des créatures fantastiques. Son style est caractérisé par des détails minutieux, des couleurs vibrantes et une esthétique onirique.</field>
+            <field name="description">
+                Naoto Hattori est un artiste japonais dont le travail explore souvent des mondes imaginaires et des
+                créatures fantastiques. Son style est caractérisé par des détails minutieux, des couleurs vibrantes et
+                une esthétique onirique.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_06" model="devops.gen.img.style_artist">
             <field name="name">Salvador Dalí</field>
-            <field name="description">Connu pour son style surréaliste distinctif, Dalí a créé des œuvres qui défient la logique et explorent les rêves et l'inconscient.</field>
+            <field name="description">
+                Connu pour son style surréaliste distinctif, Dalí a créé des œuvres qui défient la logique et explorent
+                les rêves et l'inconscient.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_07" model="devops.gen.img.style_artist">
             <field name="name">Frida Kahlo</field>
-            <field name="description">Célèbre pour ses autoportraits intenses et émotionnels, Kahlo a incorporé des éléments du surréalisme et a exploré des thèmes tels que la douleur, la féminité et l'identité mexicaine.</field>
+            <field name="description">
+                Célèbre pour ses autoportraits intenses et émotionnels, Kahlo a incorporé des éléments du surréalisme et
+                a exploré des thèmes tels que la douleur, la féminité et l'identité mexicaine.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_08" model="devops.gen.img.style_artist">
             <field name="name">Pablo Picasso</field>
-            <field name="description">L'un des artistes les plus influents du XXe siècle, Picasso a exploré divers styles artistiques, notamment le cubisme, le surréalisme et l'expressionnisme.</field>
+            <field name="description">
+                L'un des artistes les plus influents du XXe siècle, Picasso a exploré divers styles
+                artistiques, notamment le cubisme, le surréalisme et l'expressionnisme.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_09" model="devops.gen.img.style_artist">
             <field name="name">Vincent van Gogh</field>
-            <field name="description">Connu pour ses peintures expressives et émotionnelles, van Gogh a utilisé des couleurs vives et des coups de pinceau audacieux pour capturer ses émotions et son environnement.</field>
+            <field name="description">
+                Connu pour ses peintures expressives et émotionnelles, van Gogh a utilisé des couleurs vives et des
+                coups de pinceau audacieux pour capturer ses émotions et son environnement.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_10" model="devops.gen.img.style_artist">
             <field name="name">René Magritte</field>
-            <field name="description">Un artiste surréaliste belge célèbre pour ses peintures énigmatiques qui défient la logique et trompent souvent l'œil.</field>
+            <field name="description">
+                Un artiste surréaliste belge célèbre pour ses peintures énigmatiques qui défient la logique et trompent
+                souvent l'œil.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_11" model="devops.gen.img.style_artist">
             <field name="name">Hieronymus Bosch</field>
-            <field name="description">Un peintre néerlandais du XVe siècle connu pour ses œuvres fantastiques et souvent cauchemardesques, peuplées de créatures étranges et de paysages imaginaires.</field>
+            <field name="description">
+                Un peintre néerlandais du XVe siècle connu pour ses œuvres fantastiques et souvent
+                cauchemardesques, peuplées de créatures étranges et de paysages imaginaires.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_12" model="devops.gen.img.style_artist">
             <field name="name">Gustav Klimt</field>
-            <field name="description">Connu pour ses peintures symbolistes et ses décorations murales dorées, Klimt a exploré des thèmes tels que l'amour, la sexualité et la spiritualité dans son travail.</field>
+            <field name="description">
+                Connu pour ses peintures symbolistes et ses décorations murales dorées, Klimt a exploré des thèmes tels
+                que l'amour, la sexualité et la spiritualité dans son travail.
+            </field>
         </record>
         <record id="devops_gen_img_style_artist_13" model="devops.gen.img.style_artist">
             <field name="name">Joan Miró</field>
-            <field name="description">Un peintre, sculpteur et céramiste espagnol associé au mouvement surréaliste, Miró est connu pour ses compositions abstraites et ludiques, souvent inspirées par l'enfance et l'imagination.</field>
+            <field name="description">
+                Un peintre, sculpteur et céramiste espagnol associé au mouvement surréaliste, Miró est connu pour ses
+                compositions abstraites et ludiques, souvent inspirées par l'enfance et l'imagination.
+            </field>
         </record>
     </data>
 </odoo>

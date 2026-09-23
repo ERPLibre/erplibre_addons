@@ -45,9 +45,7 @@ class CrmLead(models.Model):
             .hexdigest()[:5]
             .replace("-", "")
         )
-        hashed_name = (
-            chr(ord("a") + random.randint(0, 25)) + hashed_name
-        ).lower()
+        hashed_name = (chr(ord("a") + random.randint(0, 25)) + hashed_name).lower()
 
         normalize_sub_domain = unicodedata.normalize("NFD", self.name.lower())
         website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)

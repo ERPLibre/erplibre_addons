@@ -8,6 +8,7 @@ import os
 import time
 
 import requests
+
 from odoo import _, api, exceptions, fields, models, tools
 
 _logger = logging.getLogger(__name__)

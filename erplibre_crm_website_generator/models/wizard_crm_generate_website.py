@@ -16,9 +16,7 @@ class CrmWebsiteGenerator(models.TransientModel):
     nb_website_to_generate = fields.Integer(
         default=1, help="Will generate more website plan."
     )
-    force_to_generate = fields.Boolean(
-        help="Will generate website immediately."
-    )
+    force_to_generate = fields.Boolean(help="Will generate website immediately.")
     use_generic_name = fields.Boolean(
         help="Will generate a random name, instead using crm leads name.",
     )
@@ -28,15 +26,13 @@ class CrmWebsiteGenerator(models.TransientModel):
     website_sub_domain_generated = fields.Char()
     website_domain = fields.Char(
         string="Website Domain",
-        default=lambda self: self.env["ir.config_parameter"]
-        .sudo()
-        .get_param(
-            "erplibre_crm_website_generator.website_generator_base_domain"
+        default=lambda self: (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("erplibre_crm_website_generator.website_generator_base_domain")
         ),
     )
-    website_url = fields.Char(
-        string="Website URL", compute="_compute_website_url"
-    )
+    website_url = fields.Char(string="Website URL", compute="_compute_website_url")
 
     def action_confirm_generate_website(self):
         self.ensure_one()
@@ -48,13 +44,10 @@ class CrmWebsiteGenerator(models.TransientModel):
         for i in range(self.nb_website_to_generate):
             prefix_domain = ""
             if self.nb_website_to_generate > 1:
-                prefix_domain = str(i + 1).zfill(
-                    len(str(self.nb_website_to_generate))
-                )
+                prefix_domain = str(i + 1).zfill(len(str(self.nb_website_to_generate)))
             website_generator_values = {
                 "lead_id": self.lead_id.id,
-                "company_id": self.lead_id.company_id.id
-                or self.env.company.id,
+                "company_id": self.lead_id.company_id.id or self.env.company.id,
                 "website_domain": self.website_domain,
                 "enable_custom_domain": not self.use_generic_name,
             }
@@ -62,9 +55,7 @@ class CrmWebsiteGenerator(models.TransientModel):
                 website_generator_values["name"] = (
                     self.website_name_generated + prefix_domain
                 )
-                website_sub_domain = (
-                    self.website_sub_domain_generated + prefix_domain
-                )
+                website_sub_domain = self.website_sub_domain_generated + prefix_domain
             else:
                 website_generator_values["name"] = self.website_name
                 website_sub_domain = self.website_sub_domain + prefix_domain
@@ -113,13 +104,9 @@ class CrmWebsiteGenerator(models.TransientModel):
         for rec in self:
             if rec.website_sub_domain and rec.website_domain:
                 actuel_url = (
-                    self.env["ir.config_parameter"]
-                    .sudo()
-                    .get_param("web.base.url")
+                    self.env["ir.config_parameter"].sudo().get_param("web.base.url")
                 )
-                http = (
-                    "https://" if actuel_url.startswith("https") else "http://"
-                )
+                http = "https://" if actuel_url.startswith("https") else "http://"
                 if self.use_generic_name:
                     website_sub_domain = rec.website_sub_domain_generated
                 else:
@@ -128,12 +115,8 @@ class CrmWebsiteGenerator(models.TransientModel):
                 normalize_sub_domain = unicodedata.normalize(
                     "NFD", website_sub_domain.lower()
                 )
-                website_sub_domain = re.sub(
-                    r"[^a-z]", "", normalize_sub_domain
-                )
+                website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)
 
-                rec.website_url = (
-                    f"{http}{website_sub_domain}.{rec.website_domain}"
-                )
+                rec.website_url = f"{http}{website_sub_domain}.{rec.website_domain}"
             else:
                 rec.website_url = ""

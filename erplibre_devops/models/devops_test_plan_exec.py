@@ -9,6 +9,7 @@ from datetime import timedelta
 
 import pytz
 from colorama import Fore, Style
+
 from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -64,10 +65,7 @@ class DevopsTestPlanExec(models.Model):
 
     execution_is_finished = fields.Boolean(
         readonly=True,
-        help=(
-            "Will be true when the test plan execution is finish to be"
-            " execute."
-        ),
+        help=("Will be true when the test plan execution is finish to be execute."),
     )
 
     exec_start_date = fields.Datetime(
@@ -197,12 +195,8 @@ class DevopsTestPlanExec(models.Model):
                     line_summary_end = rec.log_html.find(
                         "<br>Log file", line_summary_begin
                     )
-                    extract_summary = rec.log_html[
-                        line_summary_begin:line_summary_end
-                    ]
-                    rec.summary = (
-                        f'<p><span style="color: blue">{extract_summary}</p>'
-                    )
+                    extract_summary = rec.log_html[line_summary_begin:line_summary_end]
+                    rec.summary = f'<p><span style="color: blue">{extract_summary}</p>'
             else:
                 rec.log_html = False
 
@@ -232,9 +226,7 @@ class DevopsTestPlanExec(models.Model):
             else:
                 rec.global_success = False
 
-    def check_requirement_test_exec_cg(
-        self, rec_ws, test_case_exec_generic_async_id
-    ):
+    def check_requirement_test_exec_cg(self, rec_ws, test_case_exec_generic_async_id):
         exec_id = rec_ws.execute(
             cmd=f"odoo_bin.sh db --list",
             to_instance=True,
@@ -262,8 +254,7 @@ class DevopsTestPlanExec(models.Model):
                     [
                         {
                             "name": (
-                                "Cannot execute db restore test command to"
-                                " ERPLibre."
+                                "Cannot execute db restore test command to ERPLibre."
                             ),
                             "is_finish": True,
                             "is_pass": False,
@@ -282,8 +273,7 @@ class DevopsTestPlanExec(models.Model):
                     [
                         {
                             "name": (
-                                "Cannot execute db list second try command to"
-                                " ERPLibre."
+                                "Cannot execute db list second try command to ERPLibre."
                             ),
                             "is_finish": True,
                             "is_pass": False,
@@ -349,9 +339,7 @@ class DevopsTestPlanExec(models.Model):
                 )
             )
             if not lst_testcase:
-                raise exceptions.UserError(
-                    "Missing failed testcase to execute."
-                )
+                raise exceptions.UserError("Missing failed testcase to execute.")
             return {
                 "type": "ir.actions.act_window",
                 "res_model": self._name,
@@ -376,9 +364,7 @@ class DevopsTestPlanExec(models.Model):
                 if rec.execution_is_launched:
                     continue
                 if not rec.test_plan_id and not rec.test_case_ids:
-                    raise exceptions.UserError(
-                        "Missing test plan or test cases."
-                    )
+                    raise exceptions.UserError("Missing test plan or test cases.")
                 rec.execution_is_launched = True
                 test_case_ids = (
                     rec.test_plan_id.test_case_ids
@@ -386,9 +372,7 @@ class DevopsTestPlanExec(models.Model):
                     else rec.test_case_ids
                 )
                 for test_case_id in test_case_ids:
-                    test_case_exec_id = self.env[
-                        "devops.test.case.exec"
-                    ].create(
+                    test_case_exec_id = self.env["devops.test.case.exec"].create(
                         [
                             {
                                 "name": test_case_id.name,
@@ -435,9 +419,7 @@ class DevopsTestPlanExec(models.Model):
             lst_test = []
             test_plan_exec_id = None
             for test_case_exec_id, test_case_cg_id in lst_test_erplibre_async:
-                test_name = (
-                    test_case_exec_id.name.strip().replace(" ", "_").lower()
-                )
+                test_name = test_case_exec_id.name.strip().replace(" ", "_").lower()
                 test_plan_exec_id = test_case_exec_id.test_plan_exec_id
                 test_plan_id = test_case_exec_id.test_plan_exec_id.test_plan_id
                 test_case_id = test_case_exec_id.test_case_id
@@ -469,36 +451,26 @@ class DevopsTestPlanExec(models.Model):
                         continue
                 else:
                     model_test["run_test_exec"] = True
-                    model_test["path_module_check"] = (
-                        test_case_cg_id.path_module_check
-                    )
-                    model_test["run_in_sandbox"] = (
-                        test_plan_exec_id.run_in_sandbox
-                    )
+                    model_test["path_module_check"] = test_case_cg_id.path_module_check
+                    model_test["run_in_sandbox"] = test_plan_exec_id.run_in_sandbox
                     if test_case_cg_id.search_class_module:
                         model_test["search_class_module"] = (
                             test_case_cg_id.search_class_module
                         )
                     if test_case_cg_id.file_to_restore:
-                        model_test["file_to_restore"] = (
-                            test_case_cg_id.file_to_restore
-                        )
+                        model_test["file_to_restore"] = test_case_cg_id.file_to_restore
                     if test_case_cg_id.file_to_restore_origin:
                         model_test["file_to_restore_origin"] = (
                             test_case_cg_id.file_to_restore_origin
                         )
                     if test_case_cg_id.install_path:
-                        model_test["install_path"] = (
-                            test_case_cg_id.install_path
-                        )
+                        model_test["install_path"] = test_case_cg_id.install_path
                     if test_case_cg_id.restore_db_image_name:
                         model_test["restore_db_image_name"] = (
                             test_case_cg_id.restore_db_image_name
                         )
                     if test_case_cg_id.generated_path:
-                        model_test["generated_path"] = (
-                            test_case_cg_id.generated_path
-                        )
+                        model_test["generated_path"] = test_case_cg_id.generated_path
                     if test_case_cg_id.script_after_init_check:
                         model_test["script_after_init_check"] = (
                             test_case_cg_id.script_after_init_check
@@ -548,9 +520,7 @@ class DevopsTestPlanExec(models.Model):
                 if not status:
                     return
                 # TODO store this variable into test plan execution information
-                exec_id = rec_ws.execute(
-                    cmd=f"mkdir -p '{path_mkdir_log_external}'"
-                )
+                exec_id = rec_ws.execute(cmd=f"mkdir -p '{path_mkdir_log_external}'")
                 if exec_id.exec_status:
                     self.env["devops.test.result"].create(
                         [
@@ -606,9 +576,7 @@ class DevopsTestPlanExec(models.Model):
                     self.env["devops.test.result"].create(
                         [
                             {
-                                "name": (
-                                    f"Error execute run ERPLibre parallel test"
-                                ),
+                                "name": (f"Error execute run ERPLibre parallel test"),
                                 "log": exec_id.log_all.strip(),
                                 "is_finish": True,
                                 "is_pass": False,
@@ -620,11 +588,7 @@ class DevopsTestPlanExec(models.Model):
                     test_case_exec_id,
                     test_case_cg_id,
                 ) in lst_test_erplibre_async:
-                    test_name = (
-                        test_case_exec_id.name.strip()
-                        .replace(" ", "_")
-                        .lower()
-                    )
+                    test_name = test_case_exec_id.name.strip().replace(" ", "_").lower()
                     path_log = os.path.join(path_mkdir_log_external, test_name)
                     # TODO check file before exist, test «file log not exist»
                     exec_id = rec_ws.execute(
@@ -671,9 +635,7 @@ class DevopsTestPlanExec(models.Model):
                     self.env["devops.test.result"].create(
                         [
                             {
-                                "name": (
-                                    f"Test result '{test_name}' - {test_result}"
-                                ),
+                                "name": (f"Test result '{test_name}' - {test_result}"),
                                 "log": exec_id.log_all.strip(),
                                 "is_finish": True,
                                 "time_duration_seconds": time_exec_sec,

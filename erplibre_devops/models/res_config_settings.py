@@ -21,9 +21,7 @@ class ResConfigSettings(models.TransientModel):
         return selections
 
     def _system_use_search_cmd_selection(self):
-        selections = (
-            self.env["devops.system"]._fields["use_search_cmd"].selection
-        )
+        selections = self.env["devops.system"]._fields["use_search_cmd"].selection
         return selections
 
     # ----------------------------------------------------------
@@ -53,9 +51,7 @@ class ResConfigSettings(models.TransientModel):
     def set_values(self):
         res = super(ResConfigSettings, self).set_values()
         param = self.env["ir.config_parameter"].sudo()
-        param.set_param(
-            "erplibre_devops.default_terminal", self.default_terminal
-        )
+        param.set_param("erplibre_devops.default_terminal", self.default_terminal)
         param.set_param(
             "erplibre_devops.default_use_search_cmd",
             self.default_use_search_cmd,
@@ -89,9 +85,7 @@ class ResConfigSettings(models.TransientModel):
                 break
         if default_value:
             params.set_param("erplibre_devops.default_terminal", default_value)
-            for rec in self.env["devops.system"].search(
-                [("terminal", "=", False)]
-            ):
+            for rec in self.env["devops.system"].search([("terminal", "=", False)]):
                 rec.terminal = default_value
 
     def auto_select_use_search_cmd(self):
@@ -103,9 +97,7 @@ class ResConfigSettings(models.TransientModel):
                 default_value = key
                 break
         if default_value:
-            params.set_param(
-                "erplibre_devops.default_use_search_cmd", default_value
-            )
+            params.set_param("erplibre_devops.default_use_search_cmd", default_value)
             for rec in self.env["devops.system"].search(
                 [("use_search_cmd", "=", False)]
             ):

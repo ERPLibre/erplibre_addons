@@ -38,21 +38,15 @@ class ResConfigSettings(models.TransientModel):
         website_generator_base_domain = (
             self.env["ir.config_parameter"]
             .sudo()
-            .get_param(
-                "erplibre_crm_website_generator.website_generator_base_domain"
-            )
+            .get_param("erplibre_crm_website_generator.website_generator_base_domain")
         )
 
         if not website_generator_base_domain:
             website_url = (
-                self.env["ir.config_parameter"]
-                .sudo()
-                .get_param("web.base.url")
+                self.env["ir.config_parameter"].sudo().get_param("web.base.url")
             )
             url_extract = tldextract.extract(website_url)
-            website_generator_base_domain = (
-                url_extract.top_domain_under_public_suffix
-            )
+            website_generator_base_domain = url_extract.top_domain_under_public_suffix
 
         res.update(
             website_generator_base_domain=website_generator_base_domain,

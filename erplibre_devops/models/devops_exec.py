@@ -250,12 +250,12 @@ class DevopsExec(models.Model):
     @api.depends("exec_time_duration")
     def _compute_time_duration_result(self):
         for rec in self:
-            rec.time_duration_result = f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
+            rec.time_duration_result = (
+                f" {'{:0>8}'.format(str(timedelta(seconds=rec.exec_time_duration)))}"
+            )
 
     def open_file_ide(self):
-        ws_id = self.env["devops.workspace"].search(
-            [("is_me", "=", True)], limit=1
-        )
+        ws_id = self.env["devops.workspace"].search([("is_me", "=", True)], limit=1)
         if not ws_id:
             return
         for o_rec in self:
@@ -265,21 +265,15 @@ class DevopsExec(models.Model):
                 ).ide_pycharm.action_start_pycharm()
 
     def open_cmd_into_ide(self):
-        ws_id = self.env["devops.workspace"].search(
-            [("is_me", "=", True)], limit=1
-        )
+        ws_id = self.env["devops.workspace"].search([("is_me", "=", True)], limit=1)
         if not ws_id:
             return
         for o_rec in self:
-            with ws_id.devops_create_exec_bundle(
-                "Open cmd into IDE"
-            ) as rec_ws:
+            with ws_id.devops_create_exec_bundle("Open cmd into IDE") as rec_ws:
                 split_cmd = self.cmd.split(" ", 1)
                 cmd = split_cmd[0]
                 if not cmd.endswith(".py"):
-                    raise exceptions.UserError(
-                        _("CMD need to be a python file.")
-                    )
+                    raise exceptions.UserError(_("CMD need to be a python file."))
                 if len(split_cmd) > 1:
                     args = split_cmd[1]
                 else:

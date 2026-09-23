@@ -12,13 +12,15 @@
                         string="Generate Website"
                         type="object"
                         class="btn-primary"
-                        invisible="state == 'generated'"/>
+                        invisible="state == 'generated'"
+                    />
                     <button
                         name="action_generate_website"
                         string="Update Website"
                         type="object"
                         class="btn-primary"
-                        invisible="state != 'generated'"/>
+                        invisible="state != 'generated'"
+                    />
                 </header>
                 <sheet>
                     <div class="oe_title">

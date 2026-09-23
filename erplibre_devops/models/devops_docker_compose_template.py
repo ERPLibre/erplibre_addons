@@ -33,9 +33,7 @@ class DevopsDockerComposeTemplate(models.Model):
 
     with_mistra_openorca = fields.Boolean(
         default=False,
-        help=(
-            "If true, force to use mistra openorca for generate text in french"
-        ),
+        help=("If true, force to use mistra openorca for generate text in french"),
     )
 
     gpu_mode = fields.Selection(

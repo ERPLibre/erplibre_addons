@@ -105,9 +105,7 @@ class DevopsSystem(models.Model):
 
     ssh_jump_host = fields.Char(string="SSH JUMP Server")
 
-    username_login = fields.Char(
-        string="Username", compute="_compute_username_login"
-    )
+    username_login = fields.Char(string="Username", compute="_compute_username_login")
 
     ssh_jump_host_name = fields.Char(string="SSH JUMP HostName")
 
@@ -133,11 +131,7 @@ class DevopsSystem(models.Model):
             (
                 6,
                 0,
-                [
-                    self.env.ref(
-                        "erplibre_devops.erplibre_config_path_home_tmp"
-                    ).id
-                ],
+                [self.env.ref("erplibre_devops.erplibre_config_path_home_tmp").id],
             )
         ],
     )
@@ -179,9 +173,7 @@ class DevopsSystem(models.Model):
             default_config = ""
         if not default_config:
             cmd_output = "which find"
-            result, status = self._execute_process(
-                cmd_output, return_status=True
-            )
+            result, status = self._execute_process(cmd_output, return_status=True)
             if not status:
                 default_config = "find"
         return default_config
@@ -202,9 +194,11 @@ class DevopsSystem(models.Model):
             ),
             ("xterm", "Xterm"),
         ],
-        default=lambda self: self.env["ir.config_parameter"]
-        .sudo()
-        .get_param("erplibre_devops.default_terminal", False),
+        default=lambda self: (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("erplibre_devops.default_terminal", False)
+        ),
         help=(
             "xterm block the process, not gnome-terminal. xterm not work on"
             " osx, use osascript instead."
@@ -411,17 +405,11 @@ class DevopsSystem(models.Model):
     def action_init_system(self):
         for rec in self:
             try:
-                rec.path_home = rec.execute_with_result(
-                    "echo $HOME", None
-                ).strip()
+                rec.path_home = rec.execute_with_result("echo $HOME", None).strip()
 
-                rec.os_passwd = rec.execute_with_result(
-                    "cat /etc/passwd", None
-                ).strip()
+                rec.os_passwd = rec.execute_with_result("cat /etc/passwd", None).strip()
 
-                rec.os_group = rec.execute_with_result(
-                    "cat /etc/group", None
-                ).strip()
+                rec.os_group = rec.execute_with_result("cat /etc/group", None).strip()
             except Exception as e:
                 # TODO catch AuthenticationException exception
                 if rec.method == "ssh" and rec.ssh_user:
@@ -433,9 +421,9 @@ class DevopsSystem(models.Model):
                     )
             if rec.path_home:
                 # Display this home to plan action
-                path_home_id = self.env[
-                    "erplibre.config.path.home"
-                ].get_path_home_id(rec.path_home)
+                path_home_id = self.env["erplibre.config.path.home"].get_path_home_id(
+                    rec.path_home
+                )
                 # TODO validate not exist
                 rec.erplibre_config_path_home_ids = [(4, path_home_id.id)]
 
@@ -480,9 +468,7 @@ class DevopsSystem(models.Model):
                     limit=1,
                 )
                 if not devops_system_nginx_site_id:
-                    filepath = os.path.join(
-                        "/etc/nginx/sites-enabled", file_name
-                    )
+                    filepath = os.path.join("/etc/nginx/sites-enabled", file_name)
                     cmd = f'cat "{filepath}"'
                     file_content_before = rec.execute_with_result(cmd, None)
                     service_values = {
@@ -493,9 +479,7 @@ class DevopsSystem(models.Model):
                     }
                     lst_site_enable_values.append(service_values)
         if lst_site_enable_values:
-            self.env["devops.system.nginx.site.conf"].create(
-                lst_site_enable_values
-            )
+            self.env["devops.system.nginx.site.conf"].create(lst_site_enable_values)
 
     def action_search_systemd_conf(self):
         lst_systemd_values = []
@@ -511,9 +495,7 @@ class DevopsSystem(models.Model):
                 None,
                 return_status=True,
             )
-            for systemd_file_path in ls_file_systemd_service.strip().split(
-                "\n"
-            ):
+            for systemd_file_path in ls_file_systemd_service.strip().split("\n"):
                 if not systemd_file_path:
                     continue
                 cmd = f'cat "{systemd_file_path}"'
@@ -537,9 +519,7 @@ class DevopsSystem(models.Model):
                     lst_systemd_values.append(service_values)
 
         if lst_systemd_values:
-            self.env["devops.system.systemd.service.conf"].create(
-                lst_systemd_values
-            )
+            self.env["devops.system.systemd.service.conf"].create(lst_systemd_values)
 
     def action_search_postgresql_conf(self):
         lst_postgres_values = []
@@ -615,9 +595,7 @@ class DevopsSystem(models.Model):
 
             name = psql_version
 
-            devops_system_postgres_id = self.env[
-                "devops.system.postgres.conf"
-            ].search(
+            devops_system_postgres_id = self.env["devops.system.postgres.conf"].search(
                 [
                     ("system_id", "=", rec.id),
                     ("name", "=", name),
@@ -673,9 +651,7 @@ class DevopsSystem(models.Model):
 
             name = certbot_version
 
-            devops_system_certbot_id = self.env[
-                "devops.system.certbot.conf"
-            ].search(
+            devops_system_certbot_id = self.env["devops.system.certbot.conf"].search(
                 [
                     ("system_id", "=", rec.id),
                     ("name", "=", name),
@@ -750,9 +726,7 @@ class DevopsSystem(models.Model):
             lst_cloudflare_values.append(system_cloudflare_values)
 
         if lst_cloudflare_values:
-            self.env["devops.system.cloudflare.conf"].create(
-                lst_cloudflare_values
-            )
+            self.env["devops.system.cloudflare.conf"].create(lst_cloudflare_values)
 
     @api.depends("ssh_user", "method")
     def _compute_username_login(self):
@@ -804,30 +778,30 @@ class DevopsSystem(models.Model):
     @api.depends("docker_compose_ids", "docker_compose_ids.active")
     def _compute_docker_compose_count(self):
         for rec in self:
-            rec.docker_compose_count = self.env[
-                "devops.docker.compose"
-            ].search_count([("system_id", "=", rec.id)])
+            rec.docker_compose_count = self.env["devops.docker.compose"].search_count(
+                [("system_id", "=", rec.id)]
+            )
 
     @api.depends("docker_volume_ids", "docker_volume_ids.active")
     def _compute_docker_volume_count(self):
         for rec in self:
-            rec.docker_volume_count = self.env[
-                "devops.docker.volume"
-            ].search_count([("system_id", "=", rec.id)])
+            rec.docker_volume_count = self.env["devops.docker.volume"].search_count(
+                [("system_id", "=", rec.id)]
+            )
 
     @api.depends("docker_image_ids", "docker_image_ids.active")
     def _compute_docker_image_count(self):
         for rec in self:
-            rec.docker_image_count = self.env[
-                "devops.docker.image"
-            ].search_count([("system_ids", "in", [rec.id])])
+            rec.docker_image_count = self.env["devops.docker.image"].search_count(
+                [("system_ids", "in", [rec.id])]
+            )
 
     @api.depends("docker_network_ids", "docker_network_ids.active")
     def _compute_docker_network_count(self):
         for rec in self:
-            rec.docker_network_count = self.env[
-                "devops.docker.network"
-            ].search_count([("system_id", "=", rec.id)])
+            rec.docker_network_count = self.env["devops.docker.network"].search_count(
+                [("system_id", "=", rec.id)]
+            )
 
     @api.depends("docker_container_ids", "docker_container_ids.active")
     def _compute_docker_container_count(self):
@@ -930,9 +904,7 @@ class DevopsSystem(models.Model):
         for rec in self.filtered(lambda r: r.method == "ssh"):
             with rec.ssh_connection() as ssh_client:
                 if not rec.ssh_connection_status:
-                    _logger.error(
-                        "Ignore SSH command, ssh connection is down."
-                    )
+                    _logger.error("Ignore SSH command, ssh connection is down.")
                     continue
                 status = 0
                 return_status = True
@@ -1004,9 +976,7 @@ class DevopsSystem(models.Model):
                 if rec.terminal == "xterm":
                     cmd_output = f"xterm -e bash -c '{wrap_cmd}'"
                 elif rec.terminal == "gnome-terminal":
-                    cmd_output = (
-                        f"gnome-terminal --window -- bash -c '{wrap_cmd}'"
-                    )
+                    cmd_output = f"gnome-terminal --window -- bash -c '{wrap_cmd}'"
                 elif rec.terminal == "osascript":
                     wrap_cmd = wrap_cmd.replace('"', '\\"')
                     cmd_output = (
@@ -1021,8 +991,7 @@ class DevopsSystem(models.Model):
                     cmd_output = f"gnome-terminal --window -- bash"
                 elif rec.terminal == "osascript":
                     cmd_output = (
-                        f'osascript -e \'tell app "Terminal" to do script'
-                        f' "ls"\''
+                        f'osascript -e \'tell app "Terminal" to do script "ls"\''
                     )
             if cmd_output:
                 rec._execute_process(cmd_output)
@@ -1059,8 +1028,7 @@ class DevopsSystem(models.Model):
             if rec.ssh_public_host_key:
                 # TODO use public host key instead of ignore it
                 argument_ssh = (
-                    ' -o "UserKnownHostsFile=/dev/null" -o'
-                    ' "StrictHostKeyChecking=no"'
+                    ' -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no"'
                 )
             if folder:
                 cd_with_keep = str_keep_open if str_keep_open else ""
@@ -1102,9 +1070,7 @@ class DevopsSystem(models.Model):
         cmd_output = f'docker exec -u root {docker_name} /bin/bash -c "{cmd}"'
         if self.debug_command:
             print(cmd_output)
-        return self.execute_with_result(
-            cmd_output, folder, return_status=return_status
-        )
+        return self.execute_with_result(cmd_output, folder, return_status=return_status)
 
     def action_ssh_test_connection(self):
         """Check if the SSH settings are correct."""
@@ -1137,9 +1103,7 @@ class DevopsSystem(models.Model):
             cli.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
             if public_host_key_b64:
-                key = paramiko.RSAKey(
-                    data=base64.b64decode(public_host_key_b64)
-                )
+                key = paramiko.RSAKey(data=base64.b64decode(public_host_key_b64))
                 cli.get_host_keys().add(
                     hostname=hostname_for_key, keytype="ssh-rsa", key=key
                 )
@@ -1229,32 +1193,26 @@ class DevopsSystem(models.Model):
         for rec in self:
             # 1. Check if is installed
             cmd = "which docker"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             rec.docker_is_installed = status == 0
             if rec.docker_is_installed:
                 # 2. Get version
                 # Docker version
                 cmd = "docker version"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     rec.docker_version = out
                 cmd = "docker version -f json"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     try:
                         dct_docker_version = json.loads(out)
-                        docker_client_version = dct_docker_version.get(
-                            "Client"
-                        ).get("Version")
-                        docker_server_version = dct_docker_version.get(
-                            "Server"
-                        ).get("Version")
+                        docker_client_version = dct_docker_version.get("Client").get(
+                            "Version"
+                        )
+                        docker_server_version = dct_docker_version.get("Server").get(
+                            "Version"
+                        )
                         if docker_client_version != docker_server_version:
                             _logger.warning(
                                 f"System {rec.name} has docker client version"
@@ -1267,9 +1225,7 @@ class DevopsSystem(models.Model):
                         #  system cannot support sudo command for now
                         _logger.warning(e)
                 cmd = "docker compose version"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     rec.docker_compose_version = out
                 # Docker system info
@@ -1279,9 +1235,7 @@ class DevopsSystem(models.Model):
                 # )
                 # 3. Check status, else force start it
                 cmd = "docker info"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 # Don't force start docker, will be difficult when launch on multiple system
                 # if status != 0:
                 #     # Suppose got error :
@@ -1301,29 +1255,21 @@ class DevopsSystem(models.Model):
                 # 4. Metric system
                 # TODO maybe move this into action_check_docker_advance
                 cmd = "docker system df"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     rec.docker_system_df = out
                 cmd = "docker stats -a --no-stream"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     rec.docker_stats = out
                 cmd = "docker stats -a --no-stream --format json"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     total_memory_usage = 0.0
                     for stat_line in out.splitlines():
                         dct_docker_stat = json.loads(stat_line)
                         mem_usage = (
-                            dct_docker_stat.get("MemUsage")
-                            .split("/")[0]
-                            .strip()
+                            dct_docker_stat.get("MemUsage").split("/")[0].strip()
                         )
                         if mem_usage == "0B":
                             # Ignore
@@ -1331,9 +1277,7 @@ class DevopsSystem(models.Model):
                         elif mem_usage.endswith("KiB"):
                             total_memory_usage += float(mem_usage[:-3]) * 1024
                         elif mem_usage.endswith("MiB"):
-                            total_memory_usage += (
-                                float(mem_usage[:-3]) * 1024 * 1024
-                            )
+                            total_memory_usage += float(mem_usage[:-3]) * 1024 * 1024
                         elif mem_usage.endswith("GiB"):
                             total_memory_usage += (
                                 float(mem_usage[:-3]) * 1024 * 1024 * 1024
@@ -1342,8 +1286,7 @@ class DevopsSystem(models.Model):
                             total_memory_usage += float(mem_usage[:-1])
                         else:
                             _logger.error(
-                                "Cannot support docker check MemUsage :"
-                                f" {mem_usage}"
+                                f"Cannot support docker check MemUsage : {mem_usage}"
                             )
                     unit_count_kilo = 0
                     lst_unit_str = [
@@ -1407,9 +1350,7 @@ class DevopsSystem(models.Model):
 
             # 1. Compose
             cmd = "docker compose ls --format json"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             if status != 0:
                 continue
             lst_compose = json.loads(out)
@@ -1437,32 +1378,26 @@ class DevopsSystem(models.Model):
                     # )
                     # if status == 0:
                     #     deploy_image_value["history_full"] = out
-                    docker_compose_id = self.env[
-                        "devops.docker.compose"
-                    ].create([compose_value])
+                    docker_compose_id = self.env["devops.docker.compose"].create(
+                        [compose_value]
+                    )
                 dct_compose_name_id[compose_name] = docker_compose_id
 
             # 2. Volume
             cmd = "docker volume ls -q"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             if status != 0:
                 continue
             lst_volume = out.splitlines()
             if lst_volume:
                 str_volumes = " ".join(lst_volume)
                 cmd = f"docker volume inspect {str_volumes}"
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
                 if status == 0:
                     lst_volume_inspect = json.loads(out)
                     for volume_inspect in lst_volume_inspect:
                         volume_name = volume_inspect.get("Name")
-                        docker_volume_id = self.env[
-                            "devops.docker.volume"
-                        ].search(
+                        docker_volume_id = self.env["devops.docker.volume"].search(
                             [
                                 ("name", "=", volume_name),
                                 ("system_id", "=", rec.id),
@@ -1474,9 +1409,7 @@ class DevopsSystem(models.Model):
                                 "name": volume_name,
                                 "system_id": rec.id,
                                 "mountpoint": volume_inspect.get("Mountpoint"),
-                                "created_at_date": volume_inspect.get(
-                                    "CreatedAt"
-                                ),
+                                "created_at_date": volume_inspect.get("CreatedAt"),
                                 "driver": volume_inspect.get("Driver"),
                             }
                             # Associate docker compose with docker volume
@@ -1493,19 +1426,15 @@ class DevopsSystem(models.Model):
                                     compose_id = dct_compose_name_id.get(
                                         docker_compose_project_name
                                     )
-                                    deploy_volume_value["compose_id"] = (
-                                        compose_id.id
-                                    )
-                            docker_volume_id = self.env[
-                                "devops.docker.volume"
-                            ].create([deploy_volume_value])
+                                    deploy_volume_value["compose_id"] = compose_id.id
+                            docker_volume_id = self.env["devops.docker.volume"].create(
+                                [deploy_volume_value]
+                            )
                         dct_volume_name_id[volume_name] = docker_volume_id
             # 3. Image
             # cmd = "docker container ls --no-trunc -a --format json"
             cmd = "docker image ls -a --no-trunc --format json"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             # TODO cmd 1 : docker image history hash
             # cmd 2 : docker image inspect hash
             if status != 0:
@@ -1516,10 +1445,7 @@ class DevopsSystem(models.Model):
                 id_image = dct_image.get("ID")
                 str_ignore_id_image = "sha256:"
                 id_short_image = (
-                    id_image[
-                        len(str_ignore_id_image) : 12
-                        + len(str_ignore_id_image)
-                    ]
+                    id_image[len(str_ignore_id_image) : 12 + len(str_ignore_id_image)]
                     if id_image.startswith(str_ignore_id_image)
                     else id_image[:12]
                 )
@@ -1542,15 +1468,11 @@ class DevopsSystem(models.Model):
                         "repository": dct_image.get("Repository"),
                     }
                     cmd = f"docker image history {id_image}"
-                    out, status = rec.execute_with_result(
-                        cmd, None, return_status=True
-                    )
+                    out, status = rec.execute_with_result(cmd, None, return_status=True)
                     if status == 0:
                         deploy_image_value["history_full"] = out
                     cmd = f"docker image inspect {id_image}"
-                    out, status = rec.execute_with_result(
-                        cmd, None, return_status=True
-                    )
+                    out, status = rec.execute_with_result(cmd, None, return_status=True)
                     if status == 0:
                         deploy_image_value["inspect_full"] = out
                     docker_image_id = self.env["devops.docker.image"].create(
@@ -1565,9 +1487,7 @@ class DevopsSystem(models.Model):
                 dct_image_name_id[docker_image_id.name] = docker_image_id
             # 4. Network
             cmd = "docker network ls --no-trunc --format json"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             if status != 0:
                 continue
             lst_json_network = out.splitlines()
@@ -1596,31 +1516,23 @@ class DevopsSystem(models.Model):
                         "scope": dct_network.get("Scope"),
                     }
                     cmd = f"docker network inspect {id_network} -v"
-                    out, status = rec.execute_with_result(
-                        cmd, None, return_status=True
-                    )
+                    out, status = rec.execute_with_result(cmd, None, return_status=True)
                     if status == 0:
                         network_value["inspect_full"] = out
-                    docker_network_id = self.env[
-                        "devops.docker.network"
-                    ].create([network_value])
-                    dct_network_name_id[docker_network_id.name] = (
-                        docker_network_id
+                    docker_network_id = self.env["devops.docker.network"].create(
+                        [network_value]
                     )
+                    dct_network_name_id[docker_network_id.name] = docker_network_id
             # 5. Container
             cmd = "docker container ls --no-trunc -a --format json"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             if status != 0:
                 continue
             lst_json_container = out.splitlines()
             for json_container in lst_json_container:
                 dct_container = json.loads(json_container)
                 id_container = dct_container.get("ID")
-                docker_container_id = self.env[
-                    "devops.docker.container"
-                ].search(
+                docker_container_id = self.env["devops.docker.container"].search(
                     [
                         ("id_container", "=", id_container),
                     ],
@@ -1655,24 +1567,18 @@ class DevopsSystem(models.Model):
                     lst_mount = volume_key.split(",")
                     if lst_mount:
                         lst_match_key = list(
-                            set(dct_volume_name_id).intersection(
-                                set(lst_mount)
-                            )
+                            set(dct_volume_name_id).intersection(set(lst_mount))
                         )
                         lst_id_volume_ids = [
                             dct_volume_name_id.get(a).id for a in lst_match_key
                         ]
                         if lst_id_volume_ids:
-                            container_value["volume_ids"] = [
-                                (6, 0, lst_id_volume_ids)
-                            ]
+                            container_value["volume_ids"] = [(6, 0, lst_id_volume_ids)]
                     # TODO associate mount_id with workspace_id and with addons_path
                     # TODO create addons_path like erplibre_config_path_home_ids from system, but for workspace
                     # TODO long with diff/logs
                     cmd = f"docker container inspect {id_container}"
-                    out, status = rec.execute_with_result(
-                        cmd, None, return_status=True
-                    )
+                    out, status = rec.execute_with_result(cmd, None, return_status=True)
                     if status == 0:
                         container_value["inspect_full"] = out
                         dct_container_inspect = json.loads(out)[0]
@@ -1682,9 +1588,7 @@ class DevopsSystem(models.Model):
                             .get("com.docker.compose.project", False)
                         )
                         if compose_key:
-                            compose_id = dct_compose_name_id.get(
-                                compose_key, False
-                            )
+                            compose_id = dct_compose_name_id.get(compose_key, False)
                             if compose_id:
                                 container_value["compose_id"] = compose_id.id
                     # str_labels = dct_container.get("Labels")
@@ -1696,9 +1600,9 @@ class DevopsSystem(models.Model):
                     # if compose_id:
                     #     container_value["compose_id"] = compose_id.id
 
-                    docker_container_id = self.env[
-                        "devops.docker.container"
-                    ].create([container_value])
+                    docker_container_id = self.env["devops.docker.container"].create(
+                        [container_value]
+                    )
 
                 dct_container_name_id[id_container] = docker_container_id
             for compose_id in dct_compose_name_id.values():
@@ -1825,9 +1729,7 @@ class DevopsSystem(models.Model):
 
     def action_install_minimal_system(self):
         for rec in self:
-            cmd_dev = (
-                "git make curl parallel tree htop" " tig build-essential wget"
-            )
+            cmd_dev = "git make curl parallel tree htop tig build-essential wget"
             full_cmd = f"sudo apt update;sudo apt install -y {cmd_dev}"
             out = rec.execute_terminal_gui(
                 cmd=f'echo \\"{full_cmd}\\";{full_cmd}',
@@ -1868,10 +1770,7 @@ class DevopsSystem(models.Model):
 
     def action_show_security_ssh_keygen(self):
         for rec in self:
-            cmd = (
-                'for key in ~/.ssh/id_*; do ssh-keygen -l -f "${key}"; done |'
-                " uniq"
-            )
+            cmd = 'for key in ~/.ssh/id_*; do ssh-keygen -l -f "${key}"; done | uniq'
             log = rec.execute_with_result(cmd, None).strip()
             msg = (
                 "Security good : 1. No DSA, 2. RSA key size >= 3072, 3. Better"
@@ -1888,9 +1787,7 @@ class DevopsSystem(models.Model):
             # VirtualBox
             dct_vm_identifiant = {}
             cmd = "vboxmanage list runningvms"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             lst_identifiant_running = []
             out = out.strip()
             if not status and out:
@@ -1910,9 +1807,7 @@ class DevopsSystem(models.Model):
                     lst_identifiant_running.append(key)
 
             cmd = "vboxmanage list vms"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             out = out.strip()
             if not status and out:
                 for vm_config_short in out.split("\n"):
@@ -1952,15 +1847,11 @@ class DevopsSystem(models.Model):
                             "vm_id": vm_id.id,
                             "is_running": True,
                         }
-                        vm_exec_id = self.env["devops.deploy.vm.exec"].create(
-                            [value]
-                        )
+                        vm_exec_id = self.env["devops.deploy.vm.exec"].create([value])
                         vm_id.vm_exec_last_id = vm_exec_id.id
 
                     cmd = f"VBoxManage showvminfo {vm_id.identifiant}"
-                    out, status = rec.execute_with_result(
-                        cmd, None, return_status=True
-                    )
+                    out, status = rec.execute_with_result(cmd, None, return_status=True)
                     out = out.strip()
                     if not status and out:
                         # Extract Description
@@ -1970,9 +1861,7 @@ class DevopsSystem(models.Model):
                         idx_desc = out.find(key_desc)
                         idx_guest = out.find(key_guest)
                         if idx_desc >= 0 and idx_guest >= 0:
-                            desc_str = out[
-                                idx_desc + len(key_desc) : idx_guest
-                            ].strip()
+                            desc_str = out[idx_desc + len(key_desc) : idx_guest].strip()
                             if desc_str:
                                 vm_id.vm_description_json = desc_str
                                 # Search datastructure {} from Description
@@ -2039,9 +1928,7 @@ class DevopsSystem(models.Model):
         for rec in self:
             # Qemu
             cmd = "dconf read /org/virt-manager/virt-manager/connections/uris"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
+            out, status = rec.execute_with_result(cmd, None, return_status=True)
             if status:
                 continue
             out_strip = out.strip()
@@ -2054,17 +1941,11 @@ class DevopsSystem(models.Model):
             lst_qemu_conf = ast.literal_eval(out_strip)
             for qemu_conf in lst_qemu_conf:
                 cmd = f'virsh -c "{qemu_conf}" list --all'
-                out, status = rec.execute_with_result(
-                    cmd, None, return_status=True
-                )
+                out, status = rec.execute_with_result(cmd, None, return_status=True)
 
                 for qemu_vm_line in out.strip().split("\n")[2:]:
-                    key, other_string = qemu_vm_line.strip().split(
-                        " ", maxsplit=1
-                    )
-                    vm_name, other_string = other_string.strip().split(
-                        " ", maxsplit=1
-                    )
+                    key, other_string = qemu_vm_line.strip().split(" ", maxsplit=1)
+                    vm_name, other_string = other_string.strip().split(" ", maxsplit=1)
                     state_name = other_string.strip()
                     # Search if exist before create
                     vm_id = self.env["devops.deploy.vm"].search(
@@ -2091,13 +1972,15 @@ class DevopsSystem(models.Model):
                                 "vm_id": vm_id.id,
                                 "is_running": True,
                             }
-                            vm_exec_id = self.env[
-                                "devops.deploy.vm.exec"
-                            ].create([value])
+                            vm_exec_id = self.env["devops.deploy.vm.exec"].create(
+                                [value]
+                            )
                             vm_id.vm_exec_last_id = vm_exec_id.id
 
                         # Search ip
-                        cmd = f'virsh -c "{qemu_conf}" domifaddr {vm_name} --source agent'
+                        cmd = (
+                            f'virsh -c "{qemu_conf}" domifaddr {vm_name} --source agent'
+                        )
                         out, status = rec.execute_with_result(
                             cmd, None, return_status=True
                         )
@@ -2111,9 +1994,7 @@ class DevopsSystem(models.Model):
                                     "-"
                                 }:  # ignore la ligne "-----"
                                     continue
-                                if line.lower().startswith(
-                                    "nom "
-                                ):  # ignore l’entête
+                                if line.lower().startswith("nom "):  # ignore l’entête
                                     continue
 
                                 m = row_re.match(line)
@@ -2137,16 +2018,11 @@ class DevopsSystem(models.Model):
                                         "cidr": str(net),
                                     }
                                 )
-                                if (
-                                    str(net.ip) != "127.0.0.1"
-                                    and net.ip.version == 4
-                                ):
+                                if str(net.ip) != "127.0.0.1" and net.ip.version == 4:
                                     first_ip_not_local = str(net.ip)
                             if first_ip_not_local:
                                 # Associate ip with system
-                                system_vm_id = self.env[
-                                    "devops.system"
-                                ].search(
+                                system_vm_id = self.env["devops.system"].search(
                                     [
                                         (
                                             "ssh_host",
@@ -2173,8 +2049,8 @@ class DevopsSystem(models.Model):
                                     m_dict.get("created"),
                                     "%Y-%m-%d %H:%M:%S %z",
                                 )
-                                datetime_snapshot_naive = (
-                                    datetime_snapshot.replace(tzinfo=None)
+                                datetime_snapshot_naive = datetime_snapshot.replace(
+                                    tzinfo=None
                                 )
                                 vm_snapshot_id = self.env[
                                     "devops.deploy.vm.snapshot"
@@ -2243,9 +2119,7 @@ class DevopsSystem(models.Model):
                 # raise ValueError(
                 #     f"Cannot execute command search '{rec.use_search_cmd}'"
                 # )
-                _logger.error(
-                    f"Cannot execute command search '{rec.use_search_cmd}'"
-                )
+                _logger.error(f"Cannot execute command search '{rec.use_search_cmd}'")
                 return
             if rec.use_search_cmd == "locate":
                 # Validate word ERPLibre is into .erplibre-version
@@ -2262,9 +2136,7 @@ class DevopsSystem(models.Model):
                 )
             out_default_git = rec.execute_with_result(cmd, None).strip()
             if out_default_git:
-                lst_dir_git = [
-                    os.path.dirname(a) for a in out_default_git.split("\n")
-                ]
+                lst_dir_git = [os.path.dirname(a) for a in out_default_git.split("\n")]
             else:
                 lst_dir_git = []
             if rec.use_search_cmd == "locate":
@@ -2284,9 +2156,7 @@ class DevopsSystem(models.Model):
                 lst_dir_docker = [
                     os.path.dirname(a) for a in out_docker_compose.split("\n")
                 ]
-                lst_dir_docker = list(
-                    set(lst_dir_docker).difference(set(lst_dir_git))
-                )
+                lst_dir_docker = list(set(lst_dir_docker).difference(set(lst_dir_git)))
             else:
                 lst_dir_docker = []
             # if out:
@@ -2325,9 +2195,7 @@ class DevopsSystem(models.Model):
                     "folder": dir_name,
                     "system_id": rec.id,
                 }
-                mode_env_id = self.env.ref(
-                    "erplibre_devops.erplibre_mode_env_dev"
-                )
+                mode_env_id = self.env.ref("erplibre_devops.erplibre_mode_env_dev")
                 mode_exec_id = self.env.ref(
                     "erplibre_devops.erplibre_mode_exec_terminal"
                 )
@@ -2352,12 +2220,8 @@ class DevopsSystem(models.Model):
 
                 # TODO this code is duplicate from devops_workspace.py
                 erplibre_version = ""
-                erplibre_version_path = os.path.join(
-                    dir_name, ".erplibre-version"
-                )
-                erplibre_version_path_exist = rec.os_path_exists(
-                    erplibre_version_path
-                )
+                erplibre_version_path = os.path.join(dir_name, ".erplibre-version")
+                erplibre_version_path_exist = rec.os_path_exists(erplibre_version_path)
                 if erplibre_version_path_exist:
                     erplibre_version = rec.execute_with_result(
                         f"cat .erplibre-version",
@@ -2400,9 +2264,7 @@ class DevopsSystem(models.Model):
                     regex = r'revision="([^"]+)"'
                     result = re.search(regex, mode_version_base_raw)
                     mode_version_base = result.group(1) if result else None
-                    _logger.debug(
-                        f"Find mode version base {mode_version_base}"
-                    )
+                    _logger.debug(f"Find mode version base {mode_version_base}")
 
                 erplibre_mode = self.env["erplibre.mode"].get_mode(
                     mode_env_id,
@@ -2431,42 +2293,30 @@ class DevopsSystem(models.Model):
                     "folder": dir_name,
                     "system_id": rec.id,
                 }
-                mode_exec_id = self.env.ref(
-                    "erplibre_devops.erplibre_mode_exec_docker"
-                )
+                mode_exec_id = self.env.ref("erplibre_devops.erplibre_mode_exec_docker")
                 mode_source_id = self.env.ref(
                     "erplibre_devops.erplibre_mode_source_docker"
                 )
                 # TODO cannot find odoo version from a simple docker-compose, need more information from docker image
                 mode_version_base = "18.0"
                 key_version = "/erplibre:"
-                cmd = (
-                    f'grep "image:" ./docker-compose.yml |grep "{key_version}"'
-                )
-                out_docker_compose_file = rec.execute_with_result(
-                    cmd, dir_name
-                ).strip()
+                cmd = f'grep "image:" ./docker-compose.yml |grep "{key_version}"'
+                out_docker_compose_file = rec.execute_with_result(cmd, dir_name).strip()
                 if not out_docker_compose_file:
                     _logger.warning(
-                        "Cannot find erplibre version into docker compose"
-                        f" {dir_name}"
+                        f"Cannot find erplibre version into docker compose {dir_name}"
                     )
                     continue
                 image_version = out_docker_compose_file[
                     out_docker_compose_file.find("image: ") + len("image: ") :
                 ]
                 docker_version = out_docker_compose_file[
-                    out_docker_compose_file.find(key_version)
-                    + len(key_version) :
+                    out_docker_compose_file.find(key_version) + len(key_version) :
                 ]
                 if "_" in docker_version:
-                    mode_env_id = self.env.ref(
-                        "erplibre_devops.erplibre_mode_env_dev"
-                    )
+                    mode_env_id = self.env.ref("erplibre_devops.erplibre_mode_env_dev")
                 else:
-                    mode_env_id = self.env.ref(
-                        "erplibre_devops.erplibre_mode_env_prod"
-                    )
+                    mode_env_id = self.env.ref("erplibre_devops.erplibre_mode_env_prod")
 
                 erplibre_mode = self.env["erplibre.mode"].get_mode(
                     mode_env_id,
@@ -2506,9 +2356,7 @@ class DevopsSystem(models.Model):
             ):
                 continue
             if not rec.path_home:
-                _logger.warning(
-                    f'Missing path_home from system "{rec}" "{rec.name}".'
-                )
+                _logger.warning(f'Missing path_home from system "{rec}" "{rec.name}".')
                 continue
             config_path = os.path.join(rec.path_home, ".ssh/config")
             config_path_exist = rec.os_path_exists(config_path)
@@ -2575,17 +2423,11 @@ class DevopsSystem(models.Model):
                 if proxy_jump_system_id:
                     value["ssh_jump"] = True
                     value["ssh_jump_user"] = proxy_jump_system_id.ssh_user
-                    value["ssh_jump_password"] = (
-                        proxy_jump_system_id.ssh_password
-                    )
+                    value["ssh_jump_password"] = proxy_jump_system_id.ssh_password
                     value["ssh_jump_port"] = proxy_jump_system_id.ssh_port
                     value["ssh_jump_host"] = proxy_jump_system_id.ssh_host
-                    value["ssh_jump_host_name"] = (
-                        proxy_jump_system_id.ssh_host_name
-                    )
-                    value["ssh_jump_private_key"] = (
-                        proxy_jump_system_id.ssh_private_key
-                    )
+                    value["ssh_jump_host_name"] = proxy_jump_system_id.ssh_host_name
+                    value["ssh_jump_private_key"] = proxy_jump_system_id.ssh_private_key
                     value["ssh_jump_public_host_key"] = (
                         proxy_jump_system_id.ssh_public_host_key
                     )

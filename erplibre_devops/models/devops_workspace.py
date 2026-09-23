@@ -14,6 +14,7 @@ import traceback
 from contextlib import contextmanager
 
 import requests
+
 from odoo import _, api, exceptions, fields, models, service, tools
 
 _logger = logging.getLogger(__name__)
@@ -281,9 +282,7 @@ class DevopsWorkspace(models.Model):
         comodel_name="erplibre.mode.exec", related="erplibre_mode.mode_exec"
     )
 
-    system_method = fields.Selection(
-        related="system_id.method", string="Method"
-    )
+    system_method = fields.Selection(related="system_id.method", string="Method")
 
     # TODO move it to erplibre.mode
     is_conflict_mode_exec = fields.Boolean(
@@ -374,9 +373,7 @@ class DevopsWorkspace(models.Model):
             config_id = self.env["erplibre.config.path.home"].get_path_home_id(
                 os.path.dirname(rec_id.folder)
             )
-            rec_id.system_id.erplibre_config_path_home_ids = [
-                (4, config_id.id)
-            ]
+            rec_id.system_id.erplibre_config_path_home_ids = [(4, config_id.id)]
         return rec_ids
 
     @api.model
@@ -445,13 +442,9 @@ class DevopsWorkspace(models.Model):
             if rec.erplibre_mode:
                 rec.is_conflict_mode_exec = (
                     rec.erplibre_mode.mode_source
-                    == self.env.ref(
-                        "erplibre_devops.erplibre_mode_source_docker"
-                    )
+                    == self.env.ref("erplibre_devops.erplibre_mode_source_docker")
                     and rec.erplibre_mode.mode_exec
-                    != self.env.ref(
-                        "erplibre_devops.erplibre_mode_exec_docker"
-                    )
+                    != self.env.ref("erplibre_devops.erplibre_mode_exec_docker")
                 )
 
     @api.depends("plan_cg_ids.path_code_generator_to_generate")
@@ -479,9 +472,7 @@ class DevopsWorkspace(models.Model):
             # localhost = "127.0.0.1"
             localhost = "localhost"
             url_host = (
-                rec.system_id.ssh_host
-                if rec.system_id.method == "ssh"
-                else localhost
+                rec.system_id.ssh_host if rec.system_id.method == "ssh" else localhost
             )
             rec.url_instance = f"http://{url_host}:{rec.port_http}"
             rec.url_instance_database_manager = (
@@ -495,9 +486,7 @@ class DevopsWorkspace(models.Model):
                 [("devops_workspace", "=", rec.id)]
             )
 
-    @api.depends(
-        "devops_test_plan_exec_ids", "devops_test_plan_exec_ids.active"
-    )
+    @api.depends("devops_test_plan_exec_ids", "devops_test_plan_exec_ids.active")
     def _compute_devops_test_plan_exec_count(self):
         for rec in self:
             rec.devops_test_plan_exec_count = self.env[
@@ -507,16 +496,16 @@ class DevopsWorkspace(models.Model):
     @api.depends("devops_code_todo_ids", "devops_code_todo_ids.active")
     def _compute_devops_code_todo_count(self):
         for rec in self:
-            rec.devops_code_todo_count = self.env[
-                "devops.code.todo"
-            ].search_count([("workspace_id", "=", rec.id)])
+            rec.devops_code_todo_count = self.env["devops.code.todo"].search_count(
+                [("workspace_id", "=", rec.id)]
+            )
 
     @api.depends("devops_test_result_ids", "devops_test_result_ids.active")
     def _compute_devops_test_result_count(self):
         for rec in self:
-            rec.devops_test_result_count = self.env[
-                "devops.test.result"
-            ].search_count([("workspace_id", "=", rec.id)])
+            rec.devops_test_result_count = self.env["devops.test.result"].search_count(
+                [("workspace_id", "=", rec.id)]
+            )
 
     @api.depends("plan_cg_ids", "plan_cg_ids.active")
     def _compute_plan_cg_count(self):
@@ -528,16 +517,16 @@ class DevopsWorkspace(models.Model):
     @api.depends("devops_exec_error_ids", "devops_exec_error_ids.active")
     def _compute_devops_exec_error_count(self):
         for rec in self:
-            rec.devops_exec_error_count = self.env[
-                "devops.exec.error"
-            ].search_count([("devops_workspace", "=", rec.id)])
+            rec.devops_exec_error_count = self.env["devops.exec.error"].search_count(
+                [("devops_workspace", "=", rec.id)]
+            )
 
     @api.depends("devops_exec_bundle_ids", "devops_exec_bundle_ids.active")
     def _compute_devops_exec_bundle_count(self):
         for rec in self:
-            rec.devops_exec_bundle_count = self.env[
-                "devops.exec.bundle"
-            ].search_count([("devops_workspace", "=", rec.id)])
+            rec.devops_exec_bundle_count = self.env["devops.exec.bundle"].search_count(
+                [("devops_workspace", "=", rec.id)]
+            )
             rec.devops_exec_bundle_root_count = self.env[
                 "devops.exec.bundle"
             ].search_count(
@@ -547,9 +536,9 @@ class DevopsWorkspace(models.Model):
     @api.depends("new_project_ids", "new_project_ids.active")
     def _compute_new_project_count(self):
         for rec in self:
-            rec.new_project_count = self.env[
-                "devops.cg.new_project"
-            ].search_count([("devops_workspace", "=", rec.id)])
+            rec.new_project_count = self.env["devops.cg.new_project"].search_count(
+                [("devops_workspace", "=", rec.id)]
+            )
 
     def action_open_workspace_pycharm(self):
         for rec_o in self:
@@ -582,9 +571,7 @@ class DevopsWorkspace(models.Model):
 
     def action_format_erplibre_devops(self):
         for rec_o in self:
-            with rec_o.devops_create_exec_bundle(
-                "Format ERPLibre DevOps"
-            ) as rec:
+            with rec_o.devops_create_exec_bundle("Format ERPLibre DevOps") as rec:
                 rec.execute(
                     cmd=(
                         "./script/maintenance/format.sh"
@@ -594,9 +581,7 @@ class DevopsWorkspace(models.Model):
 
     def action_update_erplibre_devops(self):
         for rec_o in self:
-            with rec_o.devops_create_exec_bundle(
-                "Update ERPLibre DevOps"
-            ) as rec:
+            with rec_o.devops_create_exec_bundle("Update ERPLibre DevOps") as rec:
                 # TODO change db_name from this db
                 rec.execute(
                     cmd=(
@@ -615,8 +600,7 @@ class DevopsWorkspace(models.Model):
                 ]:
                     last_cmd = rec.workspace_docker_id.docker_cmd_extra
                     rec.workspace_docker_id.docker_cmd_extra = (
-                        f"-d {rec.db_name} -i {str_module_list} -u"
-                        f" {str_module_list}"
+                        f"-d {rec.db_name} -i {str_module_list} -u {str_module_list}"
                     )
                     # TODO option install continuous or stop execution.
                     # TODO Use install continuous in production, else stop execution for dev
@@ -658,9 +642,9 @@ class DevopsWorkspace(models.Model):
                         )
                     else:
                         cmd = f"nautilus {rec.folder}"
-                    self.env.ref(
-                        "erplibre_devops.devops_workspace_me"
-                    ).with_context(rec.env.context).execute(cmd=cmd)
+                    self.env.ref("erplibre_devops.devops_workspace_me").with_context(
+                        rec.env.context
+                    ).execute(cmd=cmd)
 
     @api.model
     def action_check_all(self):
@@ -717,9 +701,7 @@ class DevopsWorkspace(models.Model):
 
     def action_install_me_workspace(self):
         for rec_o in self:
-            with rec_o.devops_create_exec_bundle(
-                "Install ME workspace"
-            ) as rec:
+            with rec_o.devops_create_exec_bundle("Install ME workspace") as rec:
                 # Set same BD of this instance
                 rec.db_name = self.env.cr.dbname
                 # Detect the mode exec of this instance
@@ -764,12 +746,9 @@ class DevopsWorkspace(models.Model):
                         "queue_job"
                     )
                     cmd = (
-                        "./script/addons/install_addons.sh"
-                        f" {rec.db_name} {module_list}"
+                        f"./script/addons/install_addons.sh {rec.db_name} {module_list}"
                     )
-                    exec_id = rec.execute(
-                        cmd=cmd, folder=rec.path_working_erplibre
-                    )
+                    exec_id = rec.execute(cmd=cmd, folder=rec.path_working_erplibre)
 
     def action_restore_db_image(self):
         for rec_o in self:
@@ -789,9 +768,7 @@ class DevopsWorkspace(models.Model):
                             f"./script/addons/install_addons.sh {rec.db_name} base;"
                         )
 
-                    exec_id = rec.execute(
-                        cmd=cmd, folder=rec.path_working_erplibre
-                    )
+                    exec_id = rec.execute(cmd=cmd, folder=rec.path_working_erplibre)
                     rec.log_workspace = f"\n{exec_id.log_all}"
                 elif rec.erplibre_mode.mode_exec in [
                     self.env.ref("erplibre_devops.erplibre_mode_exec_docker")
@@ -802,9 +779,7 @@ class DevopsWorkspace(models.Model):
                     url_drop = f"{rec.url_instance}/web/database/drop"
                     if not rec.image_db_selection:
                         # TODO create stage, need a stage ready to restore
-                        raise exceptions.UserError(
-                            _("Error, need field db_selection")
-                        )
+                        raise exceptions.UserError(_("Error, need field db_selection"))
                     rec.db_is_restored = False
                     backup_file_path = rec.image_db_selection.path
                     session = requests.Session()
@@ -821,8 +796,7 @@ class DevopsWorkspace(models.Model):
                         _logger.info(database_list)
                     else:
                         _logger.error(
-                            "Restore image response error"
-                            f" {response.status_code}"
+                            f"Restore image response error {response.status_code}"
                         )
                         continue
 
@@ -862,8 +836,7 @@ class DevopsWorkspace(models.Model):
                                 # database_list = response.json()
                                 # print(database_list)
                                 _logger.info(
-                                    "Seconde essaie, le drop a été envoyé avec"
-                                    " succès."
+                                    "Seconde essaie, le drop a été envoyé avec succès."
                                 )
                             else:
                                 _logger.error(
@@ -899,8 +872,7 @@ class DevopsWorkspace(models.Model):
                             response = session.post(url_restore, files=files)
                         if response.status_code == 200:
                             _logger.info(
-                                "Le fichier de restauration a été envoyé avec"
-                                " succès."
+                                "Le fichier de restauration a été envoyé avec succès."
                             )
                             rec.db_is_restored = True
                         else:
@@ -1012,9 +984,7 @@ class DevopsWorkspace(models.Model):
     def action_open_local_view(self, ctx=None, url_instance=None):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Open local view") as rec:
-                str_url_instance = (
-                    url_instance if url_instance else rec.url_instance
-                )
+                str_url_instance = url_instance if url_instance else rec.url_instance
                 self.env.ref("erplibre_devops.devops_workspace_me").execute(
                     cmd=(
                         "source"
@@ -1070,9 +1040,7 @@ class DevopsWorkspace(models.Model):
                 )
                 if exec_id.log_all:
                     lines = [
-                        a
-                        for a in exec_id.log_all.split("\n")
-                        if a.startswith("p")
+                        a for a in exec_id.log_all.split("\n") if a.startswith("p")
                     ]
                     if len(lines) > 1:
                         _logger.warning(
@@ -1104,9 +1072,7 @@ class DevopsWorkspace(models.Model):
                 ]:
                     # TODO this can be move to erplibre_mode
                     if rec.erplibre_mode.mode_exec in [
-                        self.env.ref(
-                            "erplibre_devops.erplibre_mode_exec_docker"
-                        )
+                        self.env.ref("erplibre_devops.erplibre_mode_exec_docker")
                     ]:
                         rec.path_working_erplibre = "/ERPLibre"
                     else:
@@ -1115,7 +1081,9 @@ class DevopsWorkspace(models.Model):
                     if rec.git_branch:
                         branch_str = f" -b {rec.git_branch}"
                     elif rec.erplibre_mode.mode_version_erplibre:
-                        branch_str = f" -b {rec.erplibre_mode.mode_version_erplibre.value}"
+                        branch_str = (
+                            f" -b {rec.erplibre_mode.mode_version_erplibre.value}"
+                        )
                     folder_basename = os.path.basename(rec.folder)
                     git_arg = f"{branch_str} {folder_basename}"
 
@@ -1146,18 +1114,14 @@ class DevopsWorkspace(models.Model):
                                 folder=rec.folder,
                                 force_open_terminal=True,
                                 to_instance=bool(
-                                    self.env.context.get(
-                                        "force_reinstall_workspace"
-                                    )
+                                    self.env.context.get("force_reinstall_workspace")
                                 ),
                                 error_on_status=True,
                             )
                             # TODO need feature to wait gnome-terminal is close and can continue
                             return
                     else:
-                        _logger.info(
-                            f'Git project already exist for "{rec.folder}"'
-                        )
+                        _logger.info(f'Git project already exist for "{rec.folder}"')
                         # Check branch
                         if self.env.context.get("force_reinstall_workspace"):
                             if (
@@ -1171,10 +1135,7 @@ class DevopsWorkspace(models.Model):
                                 branch_str = ""
 
                             exec_id = rec.execute(
-                                cmd=(
-                                    "git fetch --all;git checkout"
-                                    f" {branch_str}"
-                                ),
+                                cmd=(f"git fetch --all;git checkout {branch_str}"),
                                 folder=rec.folder,
                                 force_open_terminal=True,
                             )
@@ -1192,16 +1153,13 @@ class DevopsWorkspace(models.Model):
                     if is_first_install or self.env.context.get(
                         "force_reinstall_workspace"
                     ):
-
                         # TODO implement debug with step and open with open-terminal async
                         if rec.select_installation == "odoo_workspace":
                             exec_id = rec.execute(
                                 cmd=f"make install_odoo_18",
                                 folder=rec.folder,
                                 to_instance=bool(
-                                    self.env.context.get(
-                                        "force_reinstall_workspace"
-                                    )
+                                    self.env.context.get("force_reinstall_workspace")
                                 ),
                                 error_on_status=False,
                             )
@@ -1210,9 +1168,7 @@ class DevopsWorkspace(models.Model):
                                 cmd=f"make install_erplibre",
                                 folder=rec.folder,
                                 to_instance=bool(
-                                    self.env.context.get(
-                                        "force_reinstall_workspace"
-                                    )
+                                    self.env.context.get("force_reinstall_workspace")
                                 ),
                                 error_on_status=False,
                             )
@@ -1265,9 +1221,7 @@ class DevopsWorkspace(models.Model):
                         f"cat .odoo-version",
                         rec.folder,
                     ).strip()
-                    folder_odoo = os.path.join(
-                        rec.folder, f"odoo{odoo_version}"
-                    )
+                    folder_odoo = os.path.join(rec.folder, f"odoo{odoo_version}")
                     rec.folder_odoo_version = folder_odoo
                 else:
                     rec.folder_odoo_version = False
@@ -1303,19 +1257,14 @@ class DevopsWorkspace(models.Model):
                     self.env.ref("erplibre_devops.erplibre_mode_source_docker")
                 ]:
                     is_detect_docker_compose = False
-                    exec_id = rec.execute(
-                        cmd=f"ls {rec.folder}", error_on_status=False
-                    )
+                    exec_id = rec.execute(cmd=f"ls {rec.folder}", error_on_status=False)
                     lst_file = exec_id.log_all.strip().split("\n")
                     if "docker-compose.yml" in lst_file:
                         # TODO try to reuse
-                        _logger.info(
-                            "detect docker-compose.yml, please read it"
-                        )
+                        _logger.info("detect docker-compose.yml, please read it")
                         is_detect_docker_compose = True
                     rec.is_installed = (
-                        rec.os_path_exists(rec.folder)
-                        and is_detect_docker_compose
+                        rec.os_path_exists(rec.folder) and is_detect_docker_compose
                     )
                 # TODO now, robot is this branch, but find another way to identify it
                 rec.is_robot = (
@@ -1332,9 +1281,7 @@ class DevopsWorkspace(models.Model):
             with rec_o.devops_create_exec_bundle("Search config conf") as rec:
                 # TODO default config file over docker is /etc/odoo/odoo.conf
                 default_filepath_config = "config.conf"
-                if not rec.os_path_exists(
-                    default_filepath_config, to_instance=True
-                ):
+                if not rec.os_path_exists(default_filepath_config, to_instance=True):
                     continue
                 content_file = rec.os_read_file(
                     default_filepath_config, to_instance=True
@@ -1344,9 +1291,7 @@ class DevopsWorkspace(models.Model):
                     "file_content": content_file,
                     "workspace_id": rec.id,
                 }
-                config_conf_id = self.env[
-                    "devops.workspace.config.conf"
-                ].search(
+                config_conf_id = self.env["devops.workspace.config.conf"].search(
                     [
                         ("name", "=", default_filepath_config),
                         ("file_content", "=", content_file),
@@ -1369,9 +1314,7 @@ class DevopsWorkspace(models.Model):
                     to_instance=True,
                 )
                 ref_makefile_content = exec_mk_ref_id.log_all
-                exec_mk_now_id = rec.execute(
-                    cmd=f"cat Makefile", to_instance=True
-                )
+                exec_mk_now_id = rec.execute(cmd=f"cat Makefile", to_instance=True)
                 now_makefile_content = exec_mk_now_id.log_all
 
                 lst_ref = rec.get_lst_target_makefile(ref_makefile_content)
@@ -1390,9 +1333,7 @@ class DevopsWorkspace(models.Model):
     def action_add_makefile(self):
         for rec_o in self:
             with rec_o.devops_create_exec_bundle("Update makefile") as rec:
-                exec_mk_now_id = rec.execute(
-                    cmd=f"cat Makefile", to_instance=True
-                )
+                exec_mk_now_id = rec.execute(cmd=f"cat Makefile", to_instance=True)
                 now_makefile_content = exec_mk_now_id.log_all
 
                 lst_now = rec.get_lst_target_makefile(now_makefile_content)
@@ -1459,14 +1400,10 @@ class DevopsWorkspace(models.Model):
             devops_exec_bundle_id = None
             if devops_exec_bundle:
                 devops_exec_bundle_id = (
-                    self.env["devops.exec.bundle"]
-                    .browse(devops_exec_bundle)
-                    .exists()
+                    self.env["devops.exec.bundle"].browse(devops_exec_bundle).exists()
                 )
                 devops_exec_value["devops_exec_bundle_id"] = devops_exec_bundle
-            id_devops_cg_new_project = self.env.context.get(
-                "devops_cg_new_project"
-            )
+            id_devops_cg_new_project = self.env.context.get("devops_cg_new_project")
             if id_devops_cg_new_project:
                 devops_exec_value["new_project_id"] = id_devops_cg_new_project
 
@@ -1498,8 +1435,7 @@ class DevopsWorkspace(models.Model):
                         filename = folder_path[len(ws_me.folder) + 1 :]
                     else:
                         _logger.error(
-                            "Cannot find workspace for this folder :"
-                            f" {folder_path}"
+                            f"Cannot find workspace for this folder : {folder_path}"
                         )
 
                 line_number = int(lst_tb[1][5:])
@@ -1514,9 +1450,7 @@ class DevopsWorkspace(models.Model):
                         keyword = lst_keyword[1].strip()
                 bp_value = {
                     "name": "breakpoint_exec",
-                    "description": (
-                        "Breakpoint generate when create an execution."
-                    ),
+                    "description": ("Breakpoint generate when create an execution."),
                     "filename": filename,
                     "no_line": line_number,
                     "keyword": keyword,
@@ -1564,9 +1498,7 @@ class DevopsWorkspace(models.Model):
             devops_exec.exec_stop_date = fields.Datetime.now()
             if out is not False and out.strip():
                 devops_exec.log_stdout = out.strip()
-                rec.find_exec_error_from_log(
-                    out, devops_exec, devops_exec_bundle_id
-                )
+                rec.find_exec_error_from_log(out, devops_exec, devops_exec_bundle_id)
                 devops_exec.compute_error()
             if status:
                 devops_exec.exec_status = int(status)
@@ -1613,9 +1545,7 @@ class DevopsWorkspace(models.Model):
         return result.log_all
 
     @api.model
-    def find_exec_error_from_log(
-        self, log, devops_exec, devops_exec_bundle_id
-    ):
+    def find_exec_error_from_log(self, log, devops_exec, devops_exec_bundle_id):
         # nb_error_estimate = log.count("During handling of the above exception, another exception occurred:")
         if not devops_exec_bundle_id:
             raise exceptions.UserError(
@@ -1658,15 +1588,13 @@ class DevopsWorkspace(models.Model):
 
         if index_last_traceback <= index_first_traceback:
             raise Exception(
-                "Cannot find exception, but an exception is detected. TODO"
-                " debug it."
+                "Cannot find exception, but an exception is detected. TODO debug it."
             )
 
         parent_root_id = devops_exec_bundle_id.get_parent_root()
         escaped_tb_all = log[index_first_traceback:index_last_traceback]
         lst_escaped_tb = escaped_tb_all.split(
-            "During handling of the above exception, another exception"
-            " occurred:"
+            "During handling of the above exception, another exception occurred:"
         )
         for escaped_tb in lst_escaped_tb:
             escaped_tb = escaped_tb.strip()
@@ -1705,9 +1633,7 @@ class DevopsWorkspace(models.Model):
 
     def action_pre_install_workspace(self):
         for rec_o in self:
-            with rec_o.devops_create_exec_bundle(
-                "Pre install workspace"
-            ) as rec:
+            with rec_o.devops_create_exec_bundle("Pre install workspace") as rec:
                 # Directory must exist
                 # TODO make test to validate if remove next line, permission root the project /tmp/project/addons root
                 addons_path = os.path.join(
@@ -1723,9 +1649,7 @@ class DevopsWorkspace(models.Model):
         self, ctx=None, default_port_http=8069, default_port_longpolling=8072
     ):
         for rec_o in self:
-            with rec_o.devops_create_exec_bundle(
-                "Network change port default"
-            ) as rec:
+            with rec_o.devops_create_exec_bundle("Network change port default") as rec:
                 rec.port_http = default_port_http
                 rec.port_longpolling = default_port_longpolling
 
@@ -1734,9 +1658,7 @@ class DevopsWorkspace(models.Model):
     ):
         # Choose 2 sequence
         for rec_o in self:
-            with rec_o.devops_create_exec_bundle(
-                "Network change port random"
-            ) as rec:
+            with rec_o.devops_create_exec_bundle("Network change port random") as rec:
                 # port_1
                 while rec.check_port_is_open(
                     rec, rec.system_id.iterator_port_generator
@@ -1790,11 +1712,7 @@ sock.close()
             (
                 6,
                 0,
-                [
-                    a.partner_id.id
-                    for a in self.message_follower_ids
-                    if a.partner_id
-                ],
+                [a.partner_id.id for a in self.message_follower_ids if a.partner_id],
             )
         ]
         # channel_ids = [
@@ -1834,9 +1752,9 @@ sock.close()
             if devops_exec_id:
                 error_value["devops_exec_id"] = devops_exec_id.id
             if parent_root_id.devops_new_project_ids.exists():
-                error_value["new_project_id"] = (
-                    parent_root_id.devops_new_project_ids[0].id
-                )
+                error_value["new_project_id"] = parent_root_id.devops_new_project_ids[
+                    0
+                ].id
                 error_value["stage_new_project_id"] = (
                     parent_root_id.devops_new_project_ids[0].stage_id.id
                 )
@@ -1851,9 +1769,7 @@ sock.close()
             #     error_value["channel_ids"] = channel_ids
             if rec._context.get("devops_workspace_create_exec_error"):
                 exec_error_id = None
-                _logger.warning(
-                    "Detect infinite loop when create exec_error, stop it."
-                )
+                _logger.warning("Detect infinite loop when create exec_error, stop it.")
             else:
                 exec_error_id = (
                     self.env["devops.exec.error"]
@@ -1880,14 +1796,10 @@ sock.close()
             "description": description,
         }
         if not ignore_parent:
-            devops_exec_bundle_parent = self.env.context.get(
-                "devops_exec_bundle"
-            )
+            devops_exec_bundle_parent = self.env.context.get("devops_exec_bundle")
             if devops_exec_bundle_parent:
                 value_bundle["parent_id"] = devops_exec_bundle_parent
-        devops_exec_bundle_id = self.env["devops.exec.bundle"].create(
-            [value_bundle]
-        )
+        devops_exec_bundle_id = self.env["devops.exec.bundle"].create([value_bundle])
         rec = self.with_context(devops_exec_bundle=devops_exec_bundle_id.id)
         if ctx:
             rec = rec.with_context(**ctx)
@@ -1900,8 +1812,7 @@ sock.close()
         #     raise e
         except Exception as e:
             _logger.exception(
-                f"'{description}' it.exec.bundle id"
-                f" '{devops_exec_bundle_id.id}' failed"
+                f"'{description}' it.exec.bundle id '{devops_exec_bundle_id.id}' failed"
             )
             escaped_tb = tools.html_escape(traceback.format_exc()).replace(
                 "&quot;", '"'

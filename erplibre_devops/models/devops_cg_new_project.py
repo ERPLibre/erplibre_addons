@@ -11,6 +11,7 @@ import uuid
 
 from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
+
 from odoo import _, api, exceptions, fields, models, tools
 
 with open(".odoo-version", "r") as f:
@@ -67,8 +68,7 @@ class DevopsCgNewProject(models.Model):
     config_uca_enable_export_data = fields.Boolean(
         default=False,
         help=(
-            "Will enable option nonmenclator in CG to export data associate to"
-            " models."
+            "Will enable option nonmenclator in CG to export data associate to models."
         ),
     )
 
@@ -86,40 +86,34 @@ class DevopsCgNewProject(models.Model):
         help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_snippet_generic_mdl = (
-        fields.Char(help="Feature for mode_view_snippet")
+    mode_view_snippet_template_generate_website_snippet_generic_mdl = fields.Char(
+        help="Feature for mode_view_snippet"
     )
 
-    mode_view_snippet_template_generate_website_snippet_ctrl_featur = (
-        fields.Selection(
-            selection=[
-                ("helloworld", "helloworld"),
-                ("model_show_item_individual", "Model show item individual"),
-                ("model_show_item_list", "Model show item list"),
-            ],
-            default="model_show_item_individual",
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_snippet_ctrl_featur = fields.Selection(
+        selection=[
+            ("helloworld", "helloworld"),
+            ("model_show_item_individual", "Model show item individual"),
+            ("model_show_item_list", "Model show item list"),
+        ],
+        default="model_show_item_individual",
+        help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_enable_javascript = (
-        fields.Boolean(
-            default=True,
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_enable_javascript = fields.Boolean(
+        default=True,
+        help="Feature for mode_view_snippet",
     )
 
-    mode_view_snippet_template_generate_website_snippet_type = (
-        fields.Selection(
-            selection=[
-                ("content", "Content"),
-                ("effect", "Effect"),
-                ("feature", "Feature"),
-                ("structure", "Structure"),
-            ],
-            default="effect",
-            help="Feature for mode_view_snippet",
-        )
+    mode_view_snippet_template_generate_website_snippet_type = fields.Selection(
+        selection=[
+            ("content", "Content"),
+            ("effect", "Effect"),
+            ("feature", "Feature"),
+            ("structure", "Structure"),
+        ],
+        default="effect",
+        help="Feature for mode_view_snippet",
     )
 
     last_new_project = fields.Many2one(
@@ -145,9 +139,7 @@ class DevopsCgNewProject(models.Model):
         help="Force UcA only from feature use_existing_meta_module"
     )
 
-    uca_option_with_inherit = fields.Boolean(
-        help="UCA configuration - with inherit"
-    )
+    uca_option_with_inherit = fields.Boolean(help="UCA configuration - with inherit")
 
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
@@ -161,8 +153,7 @@ class DevopsCgNewProject(models.Model):
     is_pause = fields.Boolean(
         readonly=True,
         help=(
-            "Is pause is True when debug is execute and set at pause to run"
-            " outside."
+            "Is pause is True when debug is execute and set at pause to run outside."
         ),
     )
 
@@ -170,9 +161,7 @@ class DevopsCgNewProject(models.Model):
 
     directory = fields.Char(required=True)
 
-    directory_cg = fields.Char(
-        help="Specify cg generator directory, or use directory."
-    )
+    directory_cg = fields.Char(help="Specify cg generator directory, or use directory.")
 
     directory_template = fields.Char(
         help="Specify template directory, or use directory."
@@ -220,8 +209,7 @@ class DevopsCgNewProject(models.Model):
     breakpoint_all_write_hook_before_model = fields.Boolean(
         string="ALL Write hook before model",
         help=(
-            "Breakpoint general when write hook before write model/fields into"
-            " hook."
+            "Breakpoint general when write hook before write model/fields into hook."
         ),
     )
 
@@ -280,17 +268,13 @@ class DevopsCgNewProject(models.Model):
     breakpoint_condition_value_label_view_item = fields.Char(
         string="String view item",
         help=(
-            "View breakpoint condition to diagnostic module. The string of"
-            " view item."
+            "View breakpoint condition to diagnostic module. The string of view item."
         ),
     )
 
     breakpoint_condition_name_view_item = fields.Char(
         string="Name view item",
-        help=(
-            "View breakpoint condition to diagnostic module. The name of view"
-            " item."
-        ),
+        help=("View breakpoint condition to diagnostic module. The name of view item."),
     )
 
     breakpoint_condition_item_type_view_item = fields.Char(
@@ -303,10 +287,7 @@ class DevopsCgNewProject(models.Model):
 
     breakpoint_condition_view_name = fields.Char(
         string="View name",
-        help=(
-            "View breakpoint condition to diagnostic module. The id of the"
-            " view."
-        ),
+        help=("View breakpoint condition to diagnostic module. The id of the view."),
     )
 
     breakpoint_UcA_first_line_hook = fields.Boolean(
@@ -331,25 +312,17 @@ class DevopsCgNewProject(models.Model):
 
     breakpoint_UcA_extract_python_controller_warning = fields.Boolean(
         string="UcA Extract Python controller WARNING",
-        help=(
-            "Breakpoint UcA to diagnostic warning when extract python"
-            " controller."
-        ),
+        help=("Breakpoint UcA to diagnostic warning when extract python controller."),
     )
 
     breakpoint_UcA_extract_python_module_warning = fields.Boolean(
         string="UcA Extract Python module WARNING",
-        help=(
-            "Breakpoint UcA to diagnostic warning when extract python module."
-        ),
+        help=("Breakpoint UcA to diagnostic warning when extract python module."),
     )
 
     breakpoint_UcA_extract_python_module_file_warning = fields.Boolean(
         string="UcA Extract Python module file WARNING",
-        help=(
-            "Breakpoint UcA to diagnostic warning when extract python module"
-            " file."
-        ),
+        help=("Breakpoint UcA to diagnostic warning when extract python module file."),
     )
 
     breakpoint_UcA_extract_python_detect_field = fields.Boolean(
@@ -481,9 +454,7 @@ class DevopsCgNewProject(models.Model):
 
     template_hooks_py = fields.Char(help="Path of template hooks python file.")
 
-    template_manifest_py = fields.Char(
-        help="Path of template manifest python file."
-    )
+    template_manifest_py = fields.Char(help="Path of template manifest python file.")
 
     bd_name_demo = fields.Char(help="BD name for uc0")
 
@@ -574,8 +545,7 @@ class DevopsCgNewProject(models.Model):
             rec.name += f"{rec.devops_workspace.name} - {rec.module}"
             if rec.exec_stop_date:
                 rec.name += (
-                    f" - finish {rec.exec_stop_date} duration"
-                    f" {rec.exec_time_duration}"
+                    f" - finish {rec.exec_stop_date} duration {rec.exec_time_duration}"
                 )
             elif rec.exec_start_date:
                 rec.name += f" - start {rec.exec_start_date}"
@@ -741,9 +711,7 @@ class DevopsCgNewProject(models.Model):
                 if has_debug:
                     rec.with_context(rec_ws._context).action_new_project()
                 else:
-                    raise exceptions.UserError(
-                        "Cannot support debug for this stage"
-                    )
+                    raise exceptions.UserError("Cannot support debug for this stage")
 
     def action_new_project_setup_IDE(
         self,
@@ -759,9 +727,7 @@ class DevopsCgNewProject(models.Model):
             ) as rec_ws:
                 if not rec.can_setup_ide:
                     continue
-                has_bp = rec_ws._context.get(
-                    "new_project_with_breakpoint", True
-                )
+                has_bp = rec_ws._context.get("new_project_with_breakpoint", True)
                 if has_bp:
                     lst_name = []
                     dct_condition = {}
@@ -785,13 +751,10 @@ class DevopsCgNewProject(models.Model):
                         if len(bp_ids) != len(lst_name):
                             # error, missing breakpoint, search it
                             for name in lst_name:
-                                find_it = bp_ids.filtered(
-                                    lambda a: a.name == name
-                                )
+                                find_it = bp_ids.filtered(lambda a: a.name == name)
                                 if not find_it:
                                     raise Exception(
-                                        "Cannot find breakpoint name"
-                                        f" '{name}'."
+                                        f"Cannot find breakpoint name '{name}'."
                                     )
                         if bp_ids:
                             rec.add_breakpoint(bp_ids=bp_ids)
@@ -923,19 +886,14 @@ class DevopsCgNewProject(models.Model):
                 if not rec.directory_cg:
                     rec.directory_cg = rec.directory
                 if not ws.os_path_exists(rec.directory_cg, to_instance=True):
-                    msg_error = (
-                        f"Path cg directory '{rec.directory_cg}' not exist."
-                    )
+                    msg_error = f"Path cg directory '{rec.directory_cg}' not exist."
                     raise Exception(msg_error)
 
                 if not rec.directory_template:
                     rec.directory_template = rec.directory
-                if not ws.os_path_exists(
-                    rec.directory_template, to_instance=True
-                ):
+                if not ws.os_path_exists(rec.directory_template, to_instance=True):
                     msg_error = (
-                        f"Path template directory '{rec.directory_template}'"
-                        " not exist."
+                        f"Path template directory '{rec.directory_template}' not exist."
                     )
                     raise Exception(msg_error)
 
@@ -957,23 +915,16 @@ class DevopsCgNewProject(models.Model):
                     rec.module, rec.directory, ws, path=rec.module_path
                 )
                 if not rec.force and not is_over:
-                    msg_error = (
-                        f"Cannot generate on module path '{rec.module_path}'"
-                    )
+                    msg_error = f"Cannot generate on module path '{rec.module_path}'"
                     raise Exception(msg_error)
 
-                rec.cg_path = os.path.join(
-                    rec.directory_cg, rec.code_generator_name
-                )
+                rec.cg_path = os.path.join(rec.directory_cg, rec.code_generator_name)
                 rec.cg_hooks_py = os.path.join(rec.cg_path, "hooks.py")
-                if (
-                    not rec.force
-                    and not rec.validate_path_ready_to_be_override(
-                        rec.code_generator_name,
-                        rec.directory_cg,
-                        ws,
-                        path=rec.cg_path,
-                    )
+                if not rec.force and not rec.validate_path_ready_to_be_override(
+                    rec.code_generator_name,
+                    rec.directory_cg,
+                    ws,
+                    path=rec.cg_path,
                 ):
                     msg_error = f"Cannot generate on cg path '{rec.cg_path}'"
                     raise Exception(msg_error)
@@ -981,24 +932,18 @@ class DevopsCgNewProject(models.Model):
                 rec.template_path = os.path.join(
                     rec.directory_template, rec.template_name
                 )
-                rec.template_hooks_py = os.path.join(
-                    rec.template_path, "hooks.py"
-                )
+                rec.template_hooks_py = os.path.join(rec.template_path, "hooks.py")
                 rec.template_manifest_py = os.path.join(
                     rec.template_path, "__manifest__.py"
                 )
-                if (
-                    not rec.force
-                    and not rec.validate_path_ready_to_be_override(
-                        rec.template_name,
-                        rec.directory_template,
-                        ws,
-                        path=rec.template_path,
-                    )
+                if not rec.force and not rec.validate_path_ready_to_be_override(
+                    rec.template_name,
+                    rec.directory_template,
+                    ws,
+                    path=rec.template_path,
                 ):
                     msg_error = (
-                        "Cannot generate on template path"
-                        f" '{rec.template_path}'"
+                        f"Cannot generate on template path '{rec.template_path}'"
                     )
                     raise Exception(msg_error)
 
@@ -1042,21 +987,14 @@ class DevopsCgNewProject(models.Model):
                         relative_actual_addons_path = os.path.relpath(
                             actual_addons_path
                         )
-                        relative_new_addons_path = os.path.relpath(
-                            new_addons_path
-                        )
-                        if (
-                            relative_actual_addons_path
-                            == relative_new_addons_path
-                        ):
+                        relative_new_addons_path = os.path.relpath(new_addons_path)
+                        if relative_actual_addons_path == relative_new_addons_path:
                             break
                     else:
                         lst_addons_path.insert(0, new_addons_path)
                         has_change = True
                 if has_change:
-                    config.set(
-                        "options", "addons_path", ",".join(lst_addons_path)
-                    )
+                    config.set("options", "addons_path", ",".join(lst_addons_path))
                 fd_i, temp_file = tempfile.mkstemp()
                 with open(temp_file, "w") as configfile:
                     config.write(configfile)
@@ -1091,8 +1029,7 @@ class DevopsCgNewProject(models.Model):
                             (
                                 KEY_REPLACE_CODE_GENERATOR_DEMO
                                 % CODE_GENERATOR_DEMO_NAME,
-                                KEY_REPLACE_CODE_GENERATOR_DEMO
-                                % rec.template_name,
+                                KEY_REPLACE_CODE_GENERATOR_DEMO % rec.template_name,
                             ),
                             (
                                 'value["enable_sync_template"] = False',
@@ -1102,8 +1039,7 @@ class DevopsCgNewProject(models.Model):
                                 "# path_module_generate ="
                                 " os.path.normpath(os.path.join(os.path.dirname(__file__),"
                                 " '..'))",
-                                "path_module_generate ="
-                                f' "{rec.directory_template}"',
+                                f'path_module_generate = "{rec.directory_template}"',
                             ),
                             (
                                 '# "path_sync_code": path_module_generate,',
@@ -1129,8 +1065,7 @@ class DevopsCgNewProject(models.Model):
 
                 if rec.new_project_with_code_generator:
                     cmd = (
-                        "./script/database/db_restore.py --database"
-                        f" {rec.bd_name_demo}"
+                        f"./script/database/db_restore.py --database {rec.bd_name_demo}"
                     )
                 else:
                     cmd = (
@@ -1147,9 +1082,7 @@ class DevopsCgNewProject(models.Model):
 
                 # TODO need pause if ask? and continue if ask
                 if rec.can_setup_ide:
-                    _logger.info(
-                        "========= Ask stop, setup pycharm and exit ========="
-                    )
+                    _logger.info("========= Ask stop, setup pycharm and exit =========")
                     rec.is_pause = True
                     # rec.config_path is a temporary file, it will not work. Use default config instead
                     rec.action_new_project_setup_IDE(
@@ -1160,9 +1093,7 @@ class DevopsCgNewProject(models.Model):
                     )
                     continue
 
-                _logger.info(
-                    "========= GENERATE code_generator_demo ========="
-                )
+                _logger.info("========= GENERATE code_generator_demo =========")
 
                 if rec.active_coverage:
                     cmd = (
@@ -1176,19 +1107,16 @@ class DevopsCgNewProject(models.Model):
                         f" {rec.bd_name_demo} code_generator_demo"
                         f" {rec.config_path}"
                     )
-                exec_id = ws.with_context(
-                    devops_cg_new_project=rec.id
-                ).execute(cmd=cmd, to_instance=True)
+                exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
+                    cmd=cmd, to_instance=True
+                )
                 rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
                 if rec.has_error:
                     _logger.info("Exit new project")
                     continue
 
                 if not self.keep_bd_alive:
-                    cmd = (
-                        "odoo_bin.sh db --drop"
-                        f" --database {rec.bd_name_demo}"
-                    )
+                    cmd = f"odoo_bin.sh db --drop --database {rec.bd_name_demo}"
                     _logger.info(cmd)
                     ws.execute(cmd=cmd, to_instance=True)
 
@@ -1200,13 +1128,9 @@ class DevopsCgNewProject(models.Model):
 
                 # Validate
                 if not ws.os_path_exists(rec.template_path, to_instance=True):
-                    raise Exception(
-                        f"Module template not exists '{rec.template_path}'"
-                    )
+                    raise Exception(f"Module template not exists '{rec.template_path}'")
                 else:
-                    _logger.info(
-                        f"Module template exists '{rec.template_path}'"
-                    )
+                    _logger.info(f"Module template exists '{rec.template_path}'")
                 if not rec.has_error:
                     rec.stage_id = self.env.ref(
                         "erplibre_devops.devops_cg_new_project_stage_generate_uca"
@@ -1227,9 +1151,7 @@ class DevopsCgNewProject(models.Model):
                 # Execute all
                 if not rec.bd_name_template:
                     rec.bd_name_template = (
-                        f"new_project_code_generator_template_{uuid.uuid4()}"[
-                            :63
-                        ]
+                        f"new_project_code_generator_template_{uuid.uuid4()}"[:63]
                     )
 
                 if rec.new_project_with_code_generator:
@@ -1243,17 +1165,15 @@ class DevopsCgNewProject(models.Model):
                         f" {rec.bd_name_template} --restore_image"
                         " addons_install_code_generator_basic"
                     )
-                exec_id = ws.with_context(
-                    devops_cg_new_project=rec.id
-                ).execute(cmd=cmd, to_instance=True)
+                exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
+                    cmd=cmd, to_instance=True
+                )
                 rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
                 if rec.has_error:
                     _logger.info("Exit new project")
                     continue
                 _logger.info(cmd)
-                _logger.info(
-                    f"========= GENERATE {rec.template_name} ========="
-                )
+                _logger.info(f"========= GENERATE {rec.template_name} =========")
                 # TODO maybe the module exist somewhere else
                 if ws.os_path_exists(rec.module_path, to_instance=True):
                     # Install module before running code generator
@@ -1264,12 +1184,10 @@ class DevopsCgNewProject(models.Model):
                     if rec.uca_option_with_inherit:
                         cmd += " --with_inherit"
                     _logger.info(cmd)
-                    exec_id = ws.with_context(
-                        devops_cg_new_project=rec.id
-                    ).execute(cmd=cmd, to_instance=True)
-                    rec.has_error = bool(
-                        exec_id.devops_exec_error_ids.exists()
+                    exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
+                        cmd=cmd, to_instance=True
                     )
+                    rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
                     if rec.has_error:
                         _logger.info("Exit new project")
                         continue
@@ -1297,17 +1215,14 @@ class DevopsCgNewProject(models.Model):
                     if rec.mode_view == "new_view":
                         lst_template_hooks_py_replace.append(
                             (
-                                'value["force_generic_template_wizard_view"] ='
-                                " False",
-                                'value["force_generic_template_wizard_view"] ='
-                                " True",
+                                'value["force_generic_template_wizard_view"] = False',
+                                'value["force_generic_template_wizard_view"] = True',
                             )
                         )
                 if rec.config_uca_enable_export_data:
                     lst_template_hooks_py_replace.append(
                         (
-                            'value["enable_template_website_snippet_view"] ='
-                            " False",
+                            'value["enable_template_website_snippet_view"] = False',
                             f'value["enable_template_website_snippet_view"] ='
                             f' False\n    value["template_auto_export_data"] = True\n'
                             f'    value["template_auto_export_data_exclude_model"]'
@@ -1331,8 +1246,7 @@ class DevopsCgNewProject(models.Model):
                 else:
                     lst_template_hooks_py_replace.append(
                         (
-                            'value["enable_template_website_snippet_view"] ='
-                            " False",
+                            'value["enable_template_website_snippet_view"] = False',
                             f'value["enable_template_website_snippet_view"] ='
                             f" False\n       "
                             f' value["template_ignore_export_data"] ='
@@ -1342,8 +1256,7 @@ class DevopsCgNewProject(models.Model):
                 if rec.mode_view_snippet in ["enable_snippet"]:
                     lst_template_hooks_py_replace.append(
                         (
-                            'value["enable_template_website_snippet_view"] ='
-                            " False",
+                            'value["enable_template_website_snippet_view"] = False',
                             'value["enable_template_website_snippet_view"] ='
                             f" {rec.mode_view_snippet_enable_template_website_snippet_view}\n"
                             "       "
@@ -1364,8 +1277,7 @@ class DevopsCgNewProject(models.Model):
                     lst_template_manifest_py_replace.append(
                         (
                             '"depends": [',
-                            '"depends": [\n       '
-                            ' "code_generator_website_snippet",',
+                            '"depends": [\n        "code_generator_website_snippet",',
                         )
                     )
 
@@ -1376,7 +1288,7 @@ class DevopsCgNewProject(models.Model):
                     lst_template_hooks_py_replace.append(
                         (
                             "code_generator_id.add_module_dependency(lst_depend_module)",
-                            f'lst_depend_module.extend([{", ".join(l_d)}])\n'
+                            f"lst_depend_module.extend([{', '.join(l_d)}])\n"
                             "       "
                             " code_generator_id.add_module_dependency(lst_depend_module)",
                         )
@@ -1386,15 +1298,11 @@ class DevopsCgNewProject(models.Model):
                 if self.config:
                     config = json.loads(self.config)
                     config_lst_model = config.get("model")
-                    str_lst_model = "; ".join(
-                        [a.get("name") for a in config_lst_model]
-                    )
+                    str_lst_model = "; ".join([a.get("name") for a in config_lst_model])
 
                     has_error = False
                     try:
-                        self.env[
-                            "devops.ide.breakpoint"
-                        ].get_no_line_breakpoint(
+                        self.env["devops.ide.breakpoint"].get_no_line_breakpoint(
                             'value\\["template_model_name"\\] =',
                             rec.template_hooks_py,
                             ws,
@@ -1411,18 +1319,12 @@ class DevopsCgNewProject(models.Model):
                             'value["template_model_name"] ='
                             f' "{str_lst_model};"\n    value["template_model_name"] +='
                         )
-                        lst_template_hooks_py_replace.append(
-                            (old_str, new_str)
-                        )
+                        lst_template_hooks_py_replace.append((old_str, new_str))
                     if not has_error and rec.model_to_remove:
-                        for (
-                            model_to_remove
-                        ) in rec.model_to_remove.strip().split(";"):
+                        for model_to_remove in rec.model_to_remove.strip().split(";"):
                             old_str = f"{model_to_remove};"
                             new_str = ""
-                            lst_template_hooks_py_replace.append(
-                                (old_str, new_str)
-                            )
+                            lst_template_hooks_py_replace.append((old_str, new_str))
 
                 if lst_template_hooks_py_replace:
                     self.search_and_replace_file(
@@ -1452,21 +1354,17 @@ class DevopsCgNewProject(models.Model):
                             f" {rec.bd_name_template} {rec.module} {rec.config_path}"
                         )
                     _logger.info(cmd)
-                    exec_id = ws.with_context(
-                        devops_cg_new_project=rec.id
-                    ).execute(cmd=cmd, to_instance=True)
-                    rec.has_error = bool(
-                        exec_id.devops_exec_error_ids.exists()
+                    exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
+                        cmd=cmd, to_instance=True
                     )
+                    rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
                     if rec.has_error:
                         _logger.info("Exit new project")
                         continue
 
                 # TODO need pause if ask? and continue if ask
                 if rec.can_setup_ide:
-                    _logger.info(
-                        "========= Ask stop, setup pycharm and exit ========="
-                    )
+                    _logger.info("========= Ask stop, setup pycharm and exit =========")
                     rec.is_pause = True
                     # rec.config_path is a temporary file, it will not work. Use default config instead
                     rec.action_new_project_setup_IDE(
@@ -1489,17 +1387,14 @@ class DevopsCgNewProject(models.Model):
                         f" {rec.template_name} {rec.config_path}"
                     )
                 _logger.info(cmd)
-                exec_id = ws.with_context(
-                    devops_cg_new_project=rec.id
-                ).execute(cmd=cmd, to_instance=True)
+                exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
+                    cmd=cmd, to_instance=True
+                )
 
                 rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
 
                 if not self.keep_bd_alive:
-                    cmd = (
-                        "odoo_bin.sh db --drop"
-                        f" --database {rec.bd_name_template}"
-                    )
+                    cmd = f"odoo_bin.sh db --drop --database {rec.bd_name_template}"
                     _logger.info(cmd)
                     ws.execute(cmd=cmd, to_instance=True)
 
@@ -1543,12 +1438,10 @@ class DevopsCgNewProject(models.Model):
                         " addons_install_code_generator_basic"
                     )
                 _logger.info(cmd)
-                exec_id = ws.with_context(
-                    devops_cg_new_project=rec.id
-                ).execute(cmd=cmd, to_instance=True)
-                _logger.info(
-                    f"========= GENERATE {rec.code_generator_name} ========="
+                exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
+                    cmd=cmd, to_instance=True
                 )
+                _logger.info(f"========= GENERATE {rec.code_generator_name} =========")
 
                 rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
                 if rec.has_error:
@@ -1575,13 +1468,9 @@ class DevopsCgNewProject(models.Model):
                             if "relation" in a.keys():
                                 dct_value["relation"] = a["relation"]
                             if "relation_field" in a.keys():
-                                dct_value["relation_field"] = a[
-                                    "relation_field"
-                                ]
+                                dct_value["relation_field"] = a["relation_field"]
                             if "description" in a.keys():
-                                dct_value["field_description"] = a[
-                                    "description"
-                                ]
+                                dct_value["field_description"] = a["description"]
                             dct_field[a.get("name")] = dct_value
                         if "name" not in dct_field.keys():
                             dct_field["name"] = {"ttype": "char"}
@@ -1624,9 +1513,7 @@ class DevopsCgNewProject(models.Model):
 
                 # TODO need pause if ask? and continue if ask
                 if rec.can_setup_ide:
-                    _logger.info(
-                        "========= Ask stop, setup pycharm and exit ========="
-                    )
+                    _logger.info("========= Ask stop, setup pycharm and exit =========")
                     rec.is_pause = True
                     # rec.config_path is a temporary file, it will not work. Use default config instead
                     rec.action_new_project_setup_IDE(
@@ -1648,9 +1535,7 @@ class DevopsCgNewProject(models.Model):
                         f" {rec.bd_name_generator} {rec.code_generator_name} {rec.config_path}"
                     )
                 _logger.info(cmd)
-                exec_id = ws.with_context(
-                    devops_cg_new_project=rec.id
-                ).execute(
+                exec_id = ws.with_context(devops_cg_new_project=rec.id).execute(
                     cmd=cmd,
                     to_instance=True,
                 )
@@ -1658,10 +1543,7 @@ class DevopsCgNewProject(models.Model):
                 rec.has_error = bool(exec_id.devops_exec_error_ids.exists())
 
                 if not self.keep_bd_alive:
-                    cmd = (
-                        "odoo_bin.sh db --drop"
-                        f" --database {rec.bd_name_generator}"
-                    )
+                    cmd = f"odoo_bin.sh db --drop --database {rec.bd_name_generator}"
                     _logger.info(cmd)
                     ws.execute(cmd=cmd, to_instance=True)
 
@@ -1690,8 +1572,7 @@ class DevopsCgNewProject(models.Model):
             raise Exception(f"Directory not existing '{directory}'")
         except InvalidGitRepositoryError:
             raise Exception(
-                f"The path '{path}' exist, but no git repo, use force to"
-                " ignore it."
+                f"The path '{path}' exist, but no git repo, use force to ignore it."
             )
 
         if self.stop_execution_if_env_not_clean:
@@ -1705,16 +1586,12 @@ class DevopsCgNewProject(models.Model):
         return True
 
     @staticmethod
-    def restore_git_code_generator_demo(
-        code_generator_demo_path, relative_path
-    ):
+    def restore_git_code_generator_demo(code_generator_demo_path, relative_path):
         # TODO support to remote
         try:
             git_repo = Repo(code_generator_demo_path)
         except NoSuchPathError:
-            raise Exception(
-                f"Directory not existing '{code_generator_demo_path}'"
-            )
+            raise Exception(f"Directory not existing '{code_generator_demo_path}'")
         except InvalidGitRepositoryError:
             raise Exception(
                 f"The path '{code_generator_demo_path}' exist, but no git repo"
@@ -1765,9 +1642,9 @@ class DevopsCgNewProject(models.Model):
                     if key:
                         lst_no_line = (
                             file_path,
-                            self.env[
-                                "devops.ide.breakpoint"
-                            ].get_no_line_breakpoint(key, file_path, rec_ws),
+                            self.env["devops.ide.breakpoint"].get_no_line_breakpoint(
+                                key, file_path, rec_ws
+                            ),
                             condition,
                         )
                     elif no_line:
@@ -1821,6 +1698,4 @@ class DevopsCgNewProject(models.Model):
             with rec.devops_workspace.devops_create_exec_bundle(
                 "New project start PyCharm", devops_cg_new_project=rec.id
             ) as rec_ws:
-                rec_ws.ide_pycharm.action_start_pycharm(
-                    ctx=ctx, new_project_id=self
-                )
+                rec_ws.ide_pycharm.action_start_pycharm(ctx=ctx, new_project_id=self)

@@ -22,22 +22,16 @@ class WebsiteGenerator(models.Model):
     lead_id = fields.Many2one("crm.lead", string="Lead", ondelete="cascade")
     website_domain = fields.Char(
         string="Website Domain",
-        default=lambda self: self.env["ir.config_parameter"]
-        .sudo()
-        .get_param(
-            "erplibre_crm_website_generator.website_generator_base_domain"
+        default=lambda self: (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("erplibre_crm_website_generator.website_generator_base_domain")
         ),
     )
     website_sub_domain = fields.Char(string="Website Sub Domain")
-    website_domain_complete = fields.Char(
-        compute="_compute_website_domain_complete"
-    )
-    enable_custom_domain = fields.Boolean(
-        help="Permit user to change the domain."
-    )
-    website_url = fields.Char(
-        string="Website URL", compute="_compute_website_url"
-    )
+    website_domain_complete = fields.Char(compute="_compute_website_domain_complete")
+    enable_custom_domain = fields.Boolean(help="Permit user to change the domain.")
+    website_url = fields.Char(string="Website URL", compute="_compute_website_url")
     website_id = fields.Many2one("website", string="Website")
     state = fields.Selection(
         [
@@ -82,9 +76,7 @@ class WebsiteGenerator(models.Model):
                 cloudflare_enabled = (
                     rec.env["ir.config_parameter"]
                     .sudo()
-                    .get_param(
-                        "erplibre_website_cloudflare_nginx.cloudflare_enabled"
-                    )
+                    .get_param("erplibre_website_cloudflare_nginx.cloudflare_enabled")
                 )
                 if cloudflare_enabled:
                     # TODO how to pass new_website to res.config.settings? Il faut le mettre dans un dictionnaire et l'activer.
@@ -94,9 +86,7 @@ class WebsiteGenerator(models.Model):
                 nginx_enabled = (
                     rec.env["ir.config_parameter"]
                     .sudo()
-                    .get_param(
-                        "erplibre_website_cloudflare_nginx.nginx_enabled"
-                    )
+                    .get_param("erplibre_website_cloudflare_nginx.nginx_enabled")
                 )
                 if nginx_enabled:
                     # rec.env["res.config.settings"].create([{"website_id": new_website.id}]).action_nginx_set_website_dns()
@@ -114,24 +104,16 @@ class WebsiteGenerator(models.Model):
         for rec in self:
             if rec.website_sub_domain and rec.website_domain:
                 actuel_url = (
-                    self.env["ir.config_parameter"]
-                    .sudo()
-                    .get_param("web.base.url")
+                    self.env["ir.config_parameter"].sudo().get_param("web.base.url")
                 )
-                http = (
-                    "https://" if actuel_url.startswith("https") else "http://"
-                )
+                http = "https://" if actuel_url.startswith("https") else "http://"
 
                 normalize_sub_domain = unicodedata.normalize(
                     "NFD", rec.website_sub_domain.lower()
                 )
-                website_sub_domain = re.sub(
-                    r"[^a-z]", "", normalize_sub_domain
-                )
+                website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)
 
-                rec.website_url = (
-                    f"{http}{website_sub_domain}.{rec.website_domain}"
-                )
+                rec.website_url = f"{http}{website_sub_domain}.{rec.website_domain}"
 
             else:
                 rec.website_url = ""
@@ -143,6 +125,4 @@ class WebsiteGenerator(models.Model):
                 "NFD", rec.website_sub_domain.lower()
             )
             website_sub_domain = re.sub(r"[^a-z]", "", normalize_sub_domain)
-            rec.website_domain_complete = (
-                website_sub_domain + "." + rec.website_domain
-            )
+            rec.website_domain_complete = website_sub_domain + "." + rec.website_domain

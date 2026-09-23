@@ -9,6 +9,7 @@ import time
 import uuid
 
 import xmltodict
+
 from odoo import _, api, exceptions, fields, models, tools
 
 _logger = logging.getLogger(__name__)
@@ -30,9 +31,7 @@ class DevopsIdePycharm(models.Model):
         required=True,
     )
 
-    line_file_tb_detected = fields.Text(
-        help="Detected line to add breakpoint."
-    )
+    line_file_tb_detected = fields.Text(help="Detected line to add breakpoint.")
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -48,9 +47,7 @@ class DevopsIdePycharm(models.Model):
     @api.model
     def action_kill_pycharm(self):
         self.ensure_one()
-        with self.devops_workspace.devops_create_exec_bundle(
-            "Kill PyCharm"
-        ) as rec:
+        with self.devops_workspace.devops_create_exec_bundle("Kill PyCharm") as rec:
             cmd = (
                 "pkill -f $(ps aux | grep pycharm | grep -v grep | grep"
                 " bin/java | awk '{print $11}')"
@@ -72,11 +69,7 @@ class DevopsIdePycharm(models.Model):
             breakpoint_name = rec_ws._context.get("breakpoint_name")
             id_breakpoint = rec_ws._context.get("breakpoint_id")
             if id_breakpoint:
-                bp_id = (
-                    self.env["devops.ide.breakpoint"]
-                    .browse(id_breakpoint)
-                    .exists()
-                )
+                bp_id = self.env["devops.ide.breakpoint"].browse(id_breakpoint).exists()
             elif breakpoint_name:
                 bp_id = (
                     self.env["devops.ide.breakpoint"]
@@ -92,9 +85,7 @@ class DevopsIdePycharm(models.Model):
                             rec_ws, new_project_id=new_project_id
                         )
                     except Exception as e:
-                        raise exceptions.UserError(
-                            f"Breakpoint '{bp_id.name}' : {e}"
-                        )
+                        raise exceptions.UserError(f"Breakpoint '{bp_id.name}' : {e}")
             if lst_line:
                 filename = lst_line[0][0]
                 no_line = lst_line[0][1][0]
@@ -106,9 +97,7 @@ class DevopsIdePycharm(models.Model):
                 self.action_pycharm_open(rec_ws, folder=rec_ws.folder)
 
     @staticmethod
-    def action_pycharm_open(
-        rec_ws, folder=None, filename=None, pycharm_arg=None
-    ):
+    def action_pycharm_open(rec_ws, folder=None, filename=None, pycharm_arg=None):
         # TODO auto-search pycharm binary
         cmd = "~/.local/share/JetBrains/Toolbox/scripts/pycharm"
         # cmd = "/snap/bin/pycharm-community"
@@ -146,9 +135,7 @@ class DevopsIdePycharm(models.Model):
                 path_idea = os.path.join(rec_ws.folder, ".idea", "misc.xml")
                 rec.is_installed = rec_ws.os_path_exists(path_idea)
 
-    def action_cg_setup_pycharm_debug(
-        self, ctx=None, log=None, exec_error_id=None
-    ):
+    def action_cg_setup_pycharm_debug(self, ctx=None, log=None, exec_error_id=None):
         for rec in self:
             with rec.devops_workspace.devops_create_exec_bundle(
                 "Setup PyCharm debug", ctx=ctx
@@ -193,13 +180,11 @@ class DevopsIdePycharm(models.Model):
                     f' "{os.path.normpath(os.path.join(rec_ws.folder_odoo_version))}',
                     "File"
                     f' "{os.path.normpath(os.path.join(rec_ws.folder, "./script"))}',
-                    "File" f' "{os.path.join(rec_ws.folder, "./script")}',
+                    f'File "{os.path.join(rec_ws.folder, "./script")}',
                 )
                 for search_path in lst_search_path:
                     if index_error > 0:
-                        no_last_file_error = log.rfind(
-                            search_path, 0, index_error
-                        )
+                        no_last_file_error = log.rfind(search_path, 0, index_error)
                     else:
                         no_last_file_error = log.rfind(search_path, 0)
                     if no_last_file_error == -1:
@@ -249,9 +234,7 @@ class DevopsIdePycharm(models.Model):
                         "ignore_test": True,
                         "generated_by_execution": True,
                     }
-                    bp_id = self.env["devops.ide.breakpoint"].create(
-                        [bp_value]
-                    )
+                    bp_id = self.env["devops.ide.breakpoint"].create([bp_value])
                     exec_error_id.exec_filename = filepath_breakpoint
                     exec_error_id.exec_line_number = update_line
                     exec_error_id.ide_breakpoint = bp_id.id
@@ -335,13 +318,9 @@ class DevopsIdePycharm(models.Model):
                     if exec_error_id and result.log_all:
                         exec_error_id.diagnostic_idea = result.log_all
                         if not exec_error_id.line_file_tb_detected:
-                            exec_error_id.line_file_tb_detected = (
-                                result.log_all
-                            )
+                            exec_error_id.line_file_tb_detected = result.log_all
                         else:
-                            exec_error_id.line_file_tb_detected += (
-                                result.log_all
-                            )
+                            exec_error_id.line_file_tb_detected += result.log_all
                         exec_error_id.find_resolution = "diagnostic"
                         return True
 
@@ -373,9 +352,7 @@ class DevopsIdePycharm(models.Model):
                         f" -c {conf_add_config_path} --stop-after-init --dev"
                         f" cg -d {conf_add_db} -i {conf_add_module}"
                     )
-                    line_to_add = (
-                        f"\n{conf_add_conf_name},{cmd},{group},{default}"
-                    )
+                    line_to_add = f"\n{conf_add_conf_name},{cmd},{group},{default}"
 
                     v = {
                         "name": conf_add_conf_name,
@@ -389,9 +366,7 @@ class DevopsIdePycharm(models.Model):
                         "devops_cg_new_project"
                     )
                     if id_devops_cg_new_project:
-                        v["devops_cg_new_project_id"] = (
-                            id_devops_cg_new_project
-                        )
+                        v["devops_cg_new_project_id"] = id_devops_cg_new_project
                     self.env["devops.ide.pycharm.configuration"].create([v])
 
                     if line_to_add not in file_content_before:
@@ -408,9 +383,7 @@ class DevopsIdePycharm(models.Model):
                     #     file_content_before,
                     # )
                 else:
-                    _logger.warning(
-                        f"Unknown add_configuration mode {conf_add_mode}"
-                    )
+                    _logger.warning(f"Unknown add_configuration mode {conf_add_mode}")
 
     def add_script_python_configuration(self, cmd, args=""):
         for rec in self:
@@ -456,9 +429,7 @@ class DevopsIdePycharm(models.Model):
                 rec.action_pycharm_conf_init()
 
     @api.model
-    def add_breakpoint(
-        self, file_path, line, condition=None, minus_1_line=False
-    ):
+    def add_breakpoint(self, file_path, line, condition=None, minus_1_line=False):
         # TODO change tactic, fill variable into erplibre with breakpoint to support
         # TODO support validate already exist to not duplicate
         with self.devops_workspace.devops_create_exec_bundle(
@@ -476,9 +447,7 @@ class DevopsIdePycharm(models.Model):
                     f" '{type(line)}' for line '{line}'."
                 )
             url = file_path.replace(rec_ws.folder, "file://$PROJECT_DIR$")
-            workspace_xml_path = os.path.join(
-                rec_ws.folder, ".idea", "workspace.xml"
-            )
+            workspace_xml_path = os.path.join(rec_ws.folder, ".idea", "workspace.xml")
             with open(workspace_xml_path) as xml:
                 xml_as_string = xml.read()
                 dct_project_xml = xmltodict.parse(xml_as_string)
@@ -486,14 +455,10 @@ class DevopsIdePycharm(models.Model):
             # Add a line-breakpoint
             project = dct_project_xml.get("project")
             if not project:
-                raise Exception(
-                    f"Cannot find <project> into {workspace_xml_path}"
-                )
+                raise Exception(f"Cannot find <project> into {workspace_xml_path}")
             component = project.get("component")
             if not component:
-                raise Exception(
-                    f"Cannot find <component> into {workspace_xml_path}"
-                )
+                raise Exception(f"Cannot find <component> into {workspace_xml_path}")
             for x_debug_manager in component:
                 if x_debug_manager.get("@name") == "XDebuggerManager":
                     break
@@ -523,9 +488,7 @@ class DevopsIdePycharm(models.Model):
                 breakpoint_manager = x_debug_manager.get("breakpoint-manager")
                 if not breakpoint_manager:
                     x_debug_manager["breakpoint-manager"] = {
-                        "breakpoints": {
-                            "line-breakpoint": dct_config_breakpoint
-                        }
+                        "breakpoints": {"line-breakpoint": dct_config_breakpoint}
                     }
                     has_update = True
 
@@ -547,20 +510,14 @@ class DevopsIdePycharm(models.Model):
                     config_exist = False
                     if type(line_breakpoint) is list:
                         for a_line_bp in line_breakpoint:
-                            if a_line_bp.get(
+                            if a_line_bp.get("url") == dct_config_breakpoint.get(
                                 "url"
-                            ) == dct_config_breakpoint.get(
-                                "url"
-                            ) and a_line_bp.get(
-                                "line"
-                            ) == dct_config_breakpoint.get(
+                            ) and a_line_bp.get("line") == dct_config_breakpoint.get(
                                 "line"
                             ):
                                 config_exist = True
                         if not config_exist:
-                            breakpoints["line-breakpoint"].append(
-                                dct_config_breakpoint
-                            )
+                            breakpoints["line-breakpoint"].append(dct_config_breakpoint)
                             has_update = True
                     else:
                         breakpoints["line-breakpoint"] = dct_config_breakpoint

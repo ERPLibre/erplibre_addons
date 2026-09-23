@@ -20,6 +20,4 @@ class DevopsLogMakefileTarget(models.Model):
             with rec.devops_workspace_id.devops_create_exec_bundle(
                 "Launch target"
             ) as rec_ws:
-                exec_id = rec_ws.execute(
-                    cmd=f"make {rec.name}", to_instance=True
-                )
+                exec_id = rec_ws.execute(cmd=f"make {rec.name}", to_instance=True)
