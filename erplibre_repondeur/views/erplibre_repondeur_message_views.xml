@@ -9,6 +9,7 @@
                  voir ce qui reste a traiter. -->
             <list decoration-bf="state == 'new'">
                 <field name="received_at"/>
+                <field name="source"/>
                 <field name="partner_id"/>
                 <field name="number" widget="phone"/>
                 <field name="duration_seconds"/>
@@ -48,6 +49,7 @@
                         <group>
                             <field name="received_at"/>
                             <field name="duration_seconds"/>
+                            <field name="source"/>
                         </group>
                         <group>
                             <field name="peak"/>
@@ -77,11 +79,18 @@
                         domain="[('state', '=', 'new')]"/>
                 <filter name="sans_contact" string="Sans fiche"
                         domain="[('partner_id', '=', False)]"/>
+                <separator/>
+                <filter name="de_l_operateur" string="Boite vocale de l'operateur"
+                        domain="[('source', '=', 'operateur')]"/>
+                <filter name="du_repondeur" string="Repondeur ERPLibre"
+                        domain="[('source', '=', 'erplibre')]"/>
                 <group expand="0" string="Regrouper par">
                     <filter name="par_contact" string="Contact"
                             context="{'group_by': 'partner_id'}"/>
                     <filter name="par_etat" string="Etat"
                             context="{'group_by': 'state'}"/>
+                    <filter name="par_source" string="Source"
+                            context="{'group_by': 'source'}"/>
                 </group>
             </search>
         </field>

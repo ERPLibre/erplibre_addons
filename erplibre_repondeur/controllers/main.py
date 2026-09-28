@@ -113,8 +113,10 @@ class RepondeurController(http.Controller):
         charge, refus = self._authentifier()
         if refus:
             return refus
-        if not charge.get("numero") or not charge.get("recu_le"):
-            return _refus(400, "missing numero or recu_le")
+        # Le numero n'est pas exige : la boite vocale de l'operateur ne le
+        # transmet pas. La date, elle, situe le message dans la liste.
+        if not charge.get("recu_le"):
+            return _refus(400, "missing recu_le")
         identifiant = (
             request.env["erplibre.repondeur.message"]
             .sudo()

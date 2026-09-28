@@ -22,7 +22,19 @@ class RepondeurMessage(models.Model):
     _order = "received_at DESC, id DESC"
     _rec_name = "number"
 
-    number = fields.Char("Numero", required=True, readonly=True, index=True)
+    # Le numero est FACULTATIF : la boite vocale de l'operateur annonce
+    # l'appelant a la voix, dans son annonce parlee, et ne le transmet sous
+    # aucune forme lisible. Le laisser vide dit qu'on ne le sait pas ;
+    # y mettre le numero de la messagerie pretendrait le contraire.
+    number = fields.Char("Numero", readonly=True, index=True)
+    source = fields.Selection(
+        [("erplibre", "Repondeur ERPLibre"),
+         ("operateur", "Boite vocale de l'operateur")],
+        default="erplibre", required=True, readonly=True, index=True,
+        help="Les deux ne se traitent pas pareil : un message de l'operateur "
+             "a deja ete efface chez lui au moment ou il arrive ici, et il "
+             "porte rarement le numero de l'appelant.",
+    )
     partner_id = fields.Many2one(
         "res.partner",
         "Contact",
@@ -69,10 +81,13 @@ class RepondeurMessage(models.Model):
         ),
     ]
 
-    @api.depends("number", "partner_id", "received_at")
+    @api.depends("number", "partner_id", "received_at", "source")
     def _compute_display_name(self):
         for message in self:
-            qui = message.partner_id.display_name or message.number
+            # Sans contact ni numero, on nomme la SOURCE : « — 12:04 » ne dit
+            # rien, et un message de l'operateur n'a souvent que cela.
+            qui = (message.partner_id.display_name or message.number
+                   or dict(self._fields["source"].selection)[message.source])
             message.display_name = "%s — %s" % (qui, message.received_at or "")
 
     @api.model_create_multi
@@ -100,7 +115,8 @@ class RepondeurMessage(models.Model):
             message.message_post(
                 body=_(
                     "Message sur le repondeur, de %(qui)s (%(duree)s s).",
-                    qui=message.partner_id.display_name or message.number,
+                    qui=(message.partner_id.display_name or message.number
+                         or _("appelant inconnu, annonce a la voix")),
                     duree=message.duration_seconds,
                 ),
                 partner_ids=destinataires.partner_id.ids,
@@ -161,7 +177,10 @@ class RepondeurMessage(models.Model):
         son = charge.get("audio_b64") or ""
         message = self.sudo().create(
             {
-                "number": charge.get("numero") or "",
+                # Faux plutot que chaine vide : un champ vide se cherche par
+                # « = False », et une chaine vide y echappe.
+                "number": charge.get("numero") or False,
+                "source": charge.get("source") or "erplibre",
                 "received_at": charge.get("recu_le"),
                 "duration_seconds": int(charge.get("duree_secondes") or 0),
                 "peak": int(charge.get("crete") or 0),

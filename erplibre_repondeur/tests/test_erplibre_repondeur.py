@@ -153,3 +153,42 @@ class TestRepondeur(TransactionCase):
         )
         self.assertTrue(annonces, "personne n'a ete prevenu du message")
         self.assertIn("Ecole de danse", annonces[0].body)
+
+    def test_un_message_de_l_operateur_n_a_pas_de_numero(self):
+        """La boite vocale de l'operateur annonce l'appelant a la voix et ne
+        le transmet pas : un numero vide dit qu'on ne le sait pas, la ou celui
+        de la messagerie pretendrait le contraire."""
+        charge = self._charge(numero="", reference="op-1")
+        charge["source"] = "operateur"
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(charge)
+        )
+        self.assertEqual(message.source, "operateur")
+        self.assertFalse(message.number)
+        self.assertFalse(message.partner_id)
+        # Le nom affiche nomme la source, faute de mieux : « — 12:04 » ne dirait
+        # rien.
+        self.assertIn("operateur", message.display_name.lower())
+
+    def test_la_source_par_defaut_reste_le_repondeur_erplibre(self):
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(self._charge(reference="def-1"))
+        )
+        self.assertEqual(message.source, "erplibre")
+
+    def test_l_annonce_nomme_la_source_quand_le_numero_manque(self):
+        """Prevenir quelqu'un d'un message « de » rien du tout ne se lit pas."""
+        prevenu = self.env["res.users"].create(
+            {"name": "Accueil", "login": "accueil_operateur_essai"}
+        )
+        self.societe.repondeur_notify_user_ids = prevenu
+        charge = self._charge(numero="", reference="op-2")
+        charge["source"] = "operateur"
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(charge)
+        )
+        annonces = message.message_ids.filtered(
+            lambda m: prevenu.partner_id in m.partner_ids
+        )
+        self.assertTrue(annonces)
+        self.assertIn("inconnu", annonces[0].body)
