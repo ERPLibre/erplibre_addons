@@ -8,7 +8,11 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
 from ..tools import signature
-from ..tools.sms_api_erplibre import analyse_body, non_gsm7_characters
+from ..tools.sms_api_erplibre import (
+    SmsApiErplibre,
+    analyse_body,
+    non_gsm7_characters,
+)
 
 
 @tagged("post_install", "-at_install")
@@ -267,7 +271,7 @@ class TestErplibreSmsGuards(TransactionCase):
     def setUp(self):
         super().setUp()
         self.company = self.env.company
-        self.company.sms_provider = "erplibre"
+        self.company.erplibre_sms_provider = "passerelle"
         # Le compositeur ne recoit pas sa passerelle : il la RESOUT, par un
         # `search(limit=1)` sur la societe, trie par `sequence, id`. Une
         # passerelle deja presente dans la base — celle d'une demonstration,
@@ -513,7 +517,7 @@ class TestErplibreSmsGatewayChoice(TransactionCase):
     def setUp(self):
         super().setUp()
         self.company = self.env.company
-        self.company.sms_provider = "erplibre"
+        self.company.erplibre_sms_provider = "passerelle"
         # Une passerelle laissee par une autre demonstration gagnerait le tri
         # par `sequence, id` et repondrait a la place de celles du test. La
         # transaction est annulee en fin de test : rien n'est desactive
@@ -886,3 +890,115 @@ class TestErplibreVoicemail(TransactionCase):
         self.gateway._signaler_messagerie(False)
         self.assertTrue(self.gateway.voicemail_checked_at)
         self.assertEqual(len(self._annonces()), 0)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsFournisseur(TransactionCase):
+    """Le choix du fournisseur, qui appartient a ce module.
+
+    Le champ est le notre et non un `selection_add` sur le `sms_provider`
+    d'un connecteur du coeur : le module s'installe donc sans connecteur
+    tiers, et n'ecrase la liste de personne.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+
+    def test_le_module_ne_depend_d_aucun_connecteur_tiers(self):
+        """Une dependance a un connecteur imposerait de l'installer pour
+        envoyer par sa propre carte SIM."""
+        module = self.env["ir.module.module"].search(
+            [("name", "=", "erplibre_mobile_gateway")], limit=1)
+        self.assertTrue(module)
+        self.assertNotIn(
+            "sms_twilio",
+            module.dependencies_id.mapped("name"),
+        )
+
+    def test_aucun_par_defaut_laisse_le_coeur_decider(self):
+        """Installer le module ne doit pas detourner les SMS : sans choix
+        explicite, l'envoi reste celui d'avant."""
+        self.company.erplibre_sms_provider = "aucun"
+        self.assertNotEqual(
+            self.company._get_sms_api_class(), SmsApiErplibre)
+        self.assertFalse(self.company._erplibre_uses_gateway())
+
+    def test_la_passerelle_choisie_fournit_l_api(self):
+        self.company.erplibre_sms_provider = "passerelle"
+        self.assertEqual(self.company._get_sms_api_class(), SmsApiErplibre)
+        self.assertTrue(self.company._erplibre_uses_gateway())
+
+    def test_la_table_des_classes_est_le_point_d_extension(self):
+        """Un fournisseur supplementaire s'ajoute par une entree ici, sans
+        toucher `_get_sms_api_class`."""
+        classes = self.env["res.company"]._erplibre_sms_api_classes()
+        self.assertEqual(classes.get("passerelle"), SmsApiErplibre)
+        valeurs = dict(
+            self.env["res.company"]._selection_erplibre_sms_provider())
+        for cle in classes:
+            self.assertIn(cle, valeurs, cle)
+
+    def test_deux_fournisseurs_a_la_fois_sont_refuses(self):
+        """Chaque connecteur rend sa classe quand SON champ le designe : celui
+        qui gagne est le plus externe, donc l'ordre de chargement des modules.
+        Le refus est ce qui rend le routage independant de cet ordre.
+        """
+        if "sms_provider" not in self.env["res.company"]._fields:
+            self.skipTest("aucun connecteur du coeur installe")
+        selection = dict(
+            self.env["res.company"]._fields["sms_provider"]._description_selection(
+                self.env))
+        autre = [cle for cle in selection if cle not in ("iap", False)]
+        if not autre:
+            self.skipTest("le connecteur n'ajoute aucune valeur")
+        self.company.sms_provider = autre[0]
+        with self.assertRaises(ValidationError):
+            self.company.erplibre_sms_provider = "passerelle"
+
+    def test_le_coeur_reste_atteignable_a_cote(self):
+        """Choisir « Aucun » ne doit rien casser chez le connecteur voisin."""
+        self.company.erplibre_sms_provider = "aucun"
+        if "sms_provider" in self.env["res.company"]._fields:
+            self.company.sms_provider = "iap"
+        self.assertTrue(self.company._get_sms_api_class())
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsSociete(TransactionCase):
+    """La societe qui route est celle de la CREATION du message.
+
+    Le coeur la resout a l'envoi, `env.company` a defaut de `mail.message` :
+    un SMS repris par le cron partirait alors par le fournisseur de la societe
+    de l'utilisateur du cron.
+    """
+
+    def test_la_societe_est_figee_a_la_creation(self):
+        sms = self.env["sms.sms"].create({"number": "+15550001", "body": "x"})
+        self.assertEqual(sms.erplibre_company_id, self.env.company)
+        self.assertEqual(sms._get_sms_company(), self.env.company)
+
+    def test_une_societe_donnee_n_est_pas_remplacee(self):
+        autre = self.env["res.company"].create({"name": "Societe d'essai"})
+        sms = self.env["sms.sms"].create({
+            "number": "+15550002", "body": "x",
+            "erplibre_company_id": autre.id,
+        })
+        self.assertEqual(sms._get_sms_company(), autre)
+
+    def test_le_routage_suit_la_societe_du_message(self):
+        """Deux societes, deux fournisseurs : le decoupage doit les separer."""
+        autre = self.env["res.company"].create({"name": "Societe sans passerelle"})
+        self.env.company.erplibre_sms_provider = "passerelle"
+        autre.erplibre_sms_provider = "aucun"
+        a = self.env["sms.sms"].create({"number": "+15550003", "body": "x"})
+        b = self.env["sms.sms"].create({
+            "number": "+15550004", "body": "x",
+            "erplibre_company_id": autre.id,
+        })
+        routage = {}
+        for api, messages in (a | b)._split_by_api():
+            for message in messages:
+                routage[message.id] = api.__class__
+        self.assertEqual(routage[a.id], SmsApiErplibre)
+        self.assertNotEqual(routage[b.id], SmsApiErplibre)

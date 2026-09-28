@@ -93,7 +93,7 @@ class PhoneCommon(models.AbstractModel):
         """
         result = super().click2dial(erp_number)
         company = self.env.company
-        if company.sms_provider != "erplibre":
+        if not company._erplibre_uses_gateway():
             # Un autre connecteur est actif : on ne s'impose pas.
             return result
 

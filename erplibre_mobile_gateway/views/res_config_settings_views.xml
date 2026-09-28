@@ -10,8 +10,12 @@
         <field name="inherit_id" ref="sms.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <setting id="sms" position="inside">
+                <div class="row mb-2">
+                    <label for="erplibre_sms_provider" class="col-lg-6 o_light_label"/>
+                    <field name="erplibre_sms_provider"/>
+                </div>
                 <div class="content-group mt-2"
-                     invisible="sms_provider != 'erplibre'">
+                     invisible="erplibre_sms_provider != 'passerelle'">
                     <field name="company_id" invisible="1"/>
                     <div class="row mb-2">
                         <label for="erplibre_gateway_id" class="col-lg-6 o_light_label"/>

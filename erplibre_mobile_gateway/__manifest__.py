@@ -36,18 +36,10 @@ Le module est donc construit autour de la détection de panne :
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",
     "category": "Technical",
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "license": "AGPL-3",
     "depends": [
         "sms",
-        # `sms_twilio` est le module coeur qui INTRODUIT le champ
-        # `res.company.sms_provider` (models/res_company.py lignes 12-19). Le
-        # coeur `sms` ne fournit que `_get_sms_api_class()`, pas le champ. On en
-        # depend donc pour pouvoir faire un `selection_add` : sans lui, Odoo
-        # refuse de charger avec « Field res.company.sms_provider without
-        # selection ». Sa presence ajoute une option « Send via Twilio » qui
-        # reste simplement inutilisee.
-        "sms_twilio",
         "phone_validation",
         # Fournit le bouton « Appeler » et le point de surcharge `click2dial`
         # que ce module branche sur la passerelle.

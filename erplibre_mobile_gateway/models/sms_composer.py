@@ -40,9 +40,27 @@ class SmsComposer(models.TransientModel):
         for composer in self:
             company = composer.env.company
             gateway = self.env["erplibre.sms.gateway"]
-            if company.sms_provider == "erplibre":
+            if company._erplibre_uses_gateway():
                 gateway = gateway._for_company(company)
             composer.erplibre_gateway_id = gateway
+
+    def _prepare_mass_sms_values(self, records):
+        """Fige sur chaque SMS la societe de l'enregistrement vise.
+
+        En envoi de masse, les destinataires peuvent appartenir a des societes
+        differentes de celle de l'utilisateur qui compose. Sans cette valeur,
+        tous les SMS partiraient par le fournisseur de la societe courante.
+        """
+        results = super()._prepare_mass_sms_values(records)
+        for record in records:
+            company = self.env.company
+            if "company_id" in record._fields:
+                company = record.company_id
+            elif "record_company_id" in record._fields:
+                company = record.record_company_id
+            if company:
+                results[record.id]["erplibre_company_id"] = company.id
+        return results
 
     @api.depends("body", "recipient_valid_count", "erplibre_gateway_id")
     def _compute_erplibre_estimate(self):

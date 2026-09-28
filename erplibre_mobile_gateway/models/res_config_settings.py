@@ -7,6 +7,13 @@ from ..tools import signature
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
+    erplibre_sms_provider = fields.Selection(
+        related="company_id.erplibre_sms_provider",
+        readonly=False,
+        string="Fournisseur SMS ERPLibre",
+        help="Qui envoie les SMS de cette societe. « Aucun » laisse le choix "
+             "au coeur d'Odoo et a ses connecteurs.",
+    )
     erplibre_gateway_id = fields.Many2one(
         "erplibre.sms.gateway",
         "Passerelle mobile",

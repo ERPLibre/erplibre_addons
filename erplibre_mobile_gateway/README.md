@@ -82,9 +82,12 @@ messages : le module expose trois routes sur l'Odoo existant.
 
 ### 3. Côté Odoo
 
-1. Installer le module. Il dépend de `sms_twilio`, qui est le module cœur
-   introduisant le champ `res.company.sms_provider` ; Twilio reste inutilisé.
-2. **Réglages → Général → SMS** : choisir « Passerelle mobile ERPLibre ».
+1. Installer le module. Il ne dépend que du module cœur `sms` : aucun
+   connecteur tiers n'est requis pour envoyer par sa propre carte SIM.
+2. **Réglages → Général → SMS** : mettre « Fournisseur SMS ERPLibre » à
+   « Passerelle mobile ERPLibre ». Le champ est propre à ce module et cohabite
+   avec le `sms_provider` des connecteurs du cœur ; en choisir deux à la fois
+   est refusé, le routage dépendrait sinon de l'ordre de chargement.
 3. **Passerelle mobile → Configuration → Passerelles** : créer la fiche et régler
    l'intervalle d'interrogation. Noter l'**identifiant d'appareil** généré.
 4. Renseigner un **canal d'escalade indépendant** — un point d'accès HTTP vers
