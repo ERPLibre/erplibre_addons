@@ -4,7 +4,7 @@
     "summary": "Envoi de SMS par une passerelle Android auto-hébergée, en HTTPS",
     "description": """
 Passerelle mobile auto-hébergée
-============================
+===============================
 
 Ajoute un fournisseur SMS ``erplibre`` qui n'utilise ni Odoo IAP ni aucun
 agrégateur externe. Les SMS sont mis en file ; un téléphone Android exécutant
