@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_table_configure_wizard_view_form" model="ir.ui.view">
+        <field name="name">event.table.configure.wizard.form</field>
+        <field name="model">event.table.configure.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="plan_id" invisible="1" />
+                <group>
+                    <field name="mode" widget="radio" />
+                    <field name="table_count" />
+                    <field name="seats_per_table" />
+                    <field name="existing_table_count" readonly="1" />
+                    <field name="participant_count" readonly="1" />
+                    <field name="seat_balance" readonly="1" />
+                </group>
+                <div
+                    class="alert alert-warning"
+                    role="alert"
+                    invisible="mode != 'replace' or existing_table_count == 0"
+                >
+                    <field name="existing_table_warning" nolabel="1" />
+                </div>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply" class="btn-primary" />
+                    <button string="Cancel" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

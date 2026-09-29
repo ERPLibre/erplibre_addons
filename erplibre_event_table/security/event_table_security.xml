@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="event_table_plan_company_rule" model="ir.rule">
+            <field name="name">Rotating Table Plan: multi-company</field>
+            <field name="model_id" ref="model_event_table_plan" />
+            <field name="global" eval="True" />
+            <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="event_table_company_rule" model="ir.rule">
+            <field name="name">Event Table: multi-company</field>
+            <field name="model_id" ref="model_event_table" />
+            <field name="global" eval="True" />
+            <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="event_table_participant_company_rule" model="ir.rule">
+            <field name="name">Rotating Table Participant: multi-company</field>
+            <field name="model_id" ref="model_event_table_participant" />
+            <field name="global" eval="True" />
+            <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="event_table_combination_company_rule" model="ir.rule">
+            <field name="name">Rotating Table Combination: multi-company</field>
+            <field name="model_id" ref="model_event_table_combination" />
+            <field name="global" eval="True" />
+            <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="event_table_assignment_company_rule" model="ir.rule">
+            <field name="name">Rotating Table Assignment: multi-company</field>
+            <field name="model_id" ref="model_event_table_assignment" />
+            <field name="global" eval="True" />
+            <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="event_table_pin_company_rule" model="ir.rule">
+            <field name="name">Rotating Table Pin: multi-company</field>
+            <field name="model_id" ref="model_event_table_pin" />
+            <field name="global" eval="True" />
+            <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+    </data>
+</odoo>

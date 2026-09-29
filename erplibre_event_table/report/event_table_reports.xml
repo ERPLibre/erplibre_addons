@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_report_participant_card" model="ir.actions.report">
+        <field name="name">Participant Tables</field>
+        <field name="model">event.table.participant</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">erplibre_event_table.report_participant_card</field>
+        <field name="report_file">erplibre_event_table.report_participant_card</field>
+    </record>
+
+    <record id="action_report_table_sheet" model="ir.actions.report">
+        <field name="name">Table Sheet</field>
+        <field name="model">event.table</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">erplibre_event_table.report_table_sheet</field>
+        <field name="report_file">erplibre_event_table.report_table_sheet</field>
+    </record>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_table_participant_wizard_view_form" model="ir.ui.view">
+        <field name="name">event.table.participant.wizard.form</field>
+        <field name="model">event.table.participant.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="event_id" readonly="1" />
+                <group>
+                    <field name="plan_id" />
+                    <field name="registration_scope" widget="radio" />
+                    <field name="partner_ids" widget="many2many_tags" />
+                </group>
+                <footer>
+                    <button name="action_add" type="object" string="Add" class="btn-primary" />
+                    <button string="Cancel" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

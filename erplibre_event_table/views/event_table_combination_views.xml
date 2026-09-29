@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_table_combination_view_form" model="ir.ui.view">
+        <field name="name">event.table.combination.form</field>
+        <field name="model">event.table.combination</field>
+        <field name="arch" type="xml">
+            <form string="Combination">
+                <header>
+                    <button
+                        name="action_choose"
+                        type="object"
+                        string="Choose"
+                        class="btn-primary"
+                        groups="event.group_event_user"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Indicators">
+                            <field name="company_pair_count" />
+                            <field name="repeated_pair_count" />
+                            <field name="extra_meeting_count" />
+                            <field name="max_pair_meetings" />
+                            <field name="table_return_count" />
+                        </group>
+                        <group>
+                            <field name="met_distinct_min" />
+                            <field name="met_distinct_avg" />
+                            <field name="lower_bound" />
+                            <field name="is_proven_optimal" />
+                            <field name="is_close_variant" />
+                            <field name="is_adjusted" />
+                            <field name="is_pin_constrained" />
+                            <field name="method" />
+                            <field name="stopped_by" />
+                        </group>
+                    </group>
+                    <widget name="event_table_floor_plan" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

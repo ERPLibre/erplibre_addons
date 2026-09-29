@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_participant_card">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <t t-foreach="docs" t-as="participant">
+                    <t t-set="rows" t-value="participant._report_rows()" />
+                    <div
+                        style="display: inline-block; page-break-inside: avoid; width: 45%; border: 1pt solid black; border-radius: 8pt; margin: 5pt; padding: 8pt; vertical-align: top;"
+                    >
+                        <div>
+                            <span class="o_event_table_card_event" t-out="participant.event_id.name" />
+                            —
+                            <t
+                                t-out="participant.event_id.date_begin"
+                                t-options='{"widget": "datetime", "date_only": True, "tz_name": participant.event_id.date_tz, "format": "long"}'
+                            />
+                        </div>
+                        <h3 class="o_event_table_card_name" t-out="participant.name" />
+                        <div class="o_event_table_card_company" t-out="participant.company_label or ''" />
+                        <t t-if="rows">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Round</th>
+                                        <th>Table</th>
+                                        <th t-if="participant.plan_id.assign_seats">Seat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="rows" t-as="row">
+                                        <td>
+                                            <span class="o_event_table_card_round" t-out="row['round']" />
+                                        </td>
+                                        <td>
+                                            <span class="o_event_table_card_number" t-out="row['table_number']" />
+                                        </td>
+                                        <td t-if="participant.plan_id.assign_seats">
+                                            <span class="o_event_table_card_seat" t-out="row['seat_number']" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                        <p t-else="">No table assigned yet.</p>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_table_sheet">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="table">
+                <div class="page" style="page-break-after: always;">
+                    <h1 class="o_event_table_sheet_number" t-out="table.number" />
+                    <div class="o_event_table_sheet_event" t-out="table.event_id.name" />
+                    <t t-foreach="table._report_rounds()" t-as="entry">
+                        <h4>
+                            Round
+                            <span class="o_event_table_sheet_round" t-out="entry['round']" />
+                        </h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr t-foreach="entry['rows']" t-as="row">
+                                    <td t-if="table.plan_id.assign_seats">
+                                        <span class="o_event_table_sheet_seat" t-out="row['seat_number']" />
+                                    </td>
+                                    <td>
+                                        <span class="o_event_table_sheet_name" t-out="row['name']" />
+                                    </td>
+                                    <td t-out="row['company']" />
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,26 @@
+# Copyright 2026 TechnoLibre - Mathieu Benoit
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from . import (
+    test_after_choice,
+    test_event_option,
+    test_floor_plan_data,
+    test_generation_choice,
+    test_moves,
+    test_participants,
+    test_partner_tables,
+    test_pin_generation,
+    test_pins,
+    test_plan_menus,
+    test_plan_state,
+    test_plan_tables,
+    test_reports_mail,
+    test_rotation_bounds,
+    test_rotation_construct,
+    test_rotation_generate,
+    test_rotation_metrics_seats,
+    test_rotation_search,
+    test_rotation_state,
+    test_rotation_targets,
+    test_security,
+    test_visual_table_size_matches_js,
+)

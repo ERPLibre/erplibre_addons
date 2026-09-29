@@ -1,0 +1,555 @@
+// Copyright 2026 TechnoLibre - Mathieu Benoit
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+// EVERY colour in this file comes from a SCSS variable of the bundle, never
+// from a `--bs-` custom property and never from a hard-coded hex value.
+//
+// The backend compiles Bootstrap's variables into values and publishes no
+// `:root` block, so a `--bs-` reference resolves to nothing at every level
+// of the DOM, from a chip up to `html`. A custom property that does not
+// resolve makes its WHOLE declaration invalid at computed-value time: the
+// declaration is dropped, a fill computes to fully transparent and a border
+// shorthand to `0px none`, while every declaration around it without a
+// custom property still applies. The failure is silent — geometry without
+// paint, and a stylesheet that looks loaded because it is.
+//
+// A SCSS variable has neither problem, and carries the colour scheme for
+// free: each scheme recompiles this file with its own palette, so one
+// declaration serves light and dark alike and there is no second rule to
+// keep in step by hand. static/tests/scss_custom_properties.test.js fails
+// if a `--bs-` reference ever comes back.
+
+// The widget caps its own height so the plan does not push the rest of the
+// form out of view; the fullscreen action takes the whole window instead.
+// Both then hand the SAME flex chain down to .o_event_table_floor_plan, then
+// .o_event_table_body, then .o_event_table_floor: without min-height: 0 at
+// every step, a flex item refuses to shrink below its content size, and the
+// floor overflows its wrapper instead of scrolling inside it. The same
+// argument holds sideways: .o_event_table_body lays the floor out next to
+// the 220 px tray, so without min-width: 0 at the same steps a wide room
+// pushes the whole widget past the edge of the form instead of scrolling.
+.o_event_table_floor_plan_widget {
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+}
+
+.o_event_table_floor_plan_action {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.o_event_table_floor_plan_widget,
+.o_event_table_floor_plan_action {
+    .o_event_table_floor_plan {
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.o_event_table_floor_plan {
+    .o_event_table_empty {
+        padding: 1rem 0;
+    }
+
+    .o_event_table_body {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
+    }
+
+    // The scrolling pane the room sits in. Sized by floorStyle to the room's
+    // footprint AT THE CURRENT ZOOM, so the reserved space shrinks together
+    // with "Fit to window" instead of always demanding the room's full
+    // size — it is also the element the drag hooks read a bounding rect
+    // from, so it is the one carrying t-ref="floor". The grid modifier stays
+    // here too (a hoot test targets it on this class), its background-size
+    // set inline by floorStyle to the same zoom so the lines still land on
+    // the room's own 10 px snap grid (GRID_SIZE in geometry.js).
+    .o_event_table_floor {
+        position: relative;
+        overflow: auto;
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
+        border: 1px solid $border-color;
+        background-color: $body-bg;
+
+        // Shown only while editing the layout, as a placement guide for the
+        // grid every drag and resize snaps to.
+        &.o_event_table_grid {
+            background-image: linear-gradient(to right, $border-color 1px, transparent 1px),
+                linear-gradient(to bottom, $border-color 1px, transparent 1px);
+        }
+    }
+
+    // The room itself, always laid out at its native (unzoomed) size so a
+    // table's absolute position and the drag geometry never have to care
+    // about the zoom — roomStyle applies the zoom as a transform here
+    // instead, which is why this is a separate element from .o_event_table_floor:
+    // a transform never changes the space its OWN element reserves in
+    // layout, only how it paints, so the reservation has to live on the
+    // parent (floorStyle) while the visual scale lives here.
+    .o_event_table_room {
+        position: relative;
+    }
+
+    .o_event_table_block {
+        position: absolute;
+    }
+
+    // Both edit-only controls anchor to the block itself, which is already
+    // position: absolute and so already a positioning context for them.
+    .o_event_table_shape_toggle {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        font-size: 0.65rem;
+        padding: 0 0.25rem;
+        line-height: 1.4;
+    }
+
+    .o_event_table_handle {
+        position: absolute;
+        right: -6px;
+        bottom: -6px;
+        width: 14px;
+        height: 14px;
+        border-radius: 2px;
+        background-color: $primary;
+        border: 1px solid $body-bg;
+        cursor: nwse-resize;
+        // Keeps a touch drag from also panning the scrolling floor
+        // underneath while a corner is being pulled.
+        touch-action: none;
+    }
+
+    // The table top. Filled in the tone the backend gives a sheet of content
+    // laid over the webclient background, NOT in the tertiary background:
+    // that one resolves to the very value $body-bg already gives the floor,
+    // so a table would differ from the floor it sits on by its border alone.
+    .o_event_table_surface {
+        position: relative;
+        border: 2px solid $border-color;
+        background-color: $o-view-background-color;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &.o_event_table_surface_round {
+            border-radius: 50%;
+        }
+
+        &.o_event_table_surface_square {
+            border-radius: 8px;
+        }
+
+        // Visual mode: a wooden surface, drawn entirely in CSS — this
+        // module ships no image asset, and a gradient stays crisp at
+        // any zoom where a bitmap would blur. mix() derives a warm,
+        // wood-like tone from $warning and $body-bg AT COMPILE TIME, so
+        // each colour scheme recompiles its own pair of values and no
+        // browser is asked to blend anything at paint time. Layers on
+        // top of the round/square rule above, which still owns the
+        // shape.
+        //
+        // The grain is mixed from $wood-base itself, toward black —
+        // NOT from $warning toward black independently, which inverts
+        // in dark mode: $warning keeps roughly the same luminance
+        // across schemes while $body-bg flips from light to dark, so a
+        // grain formula blind to the base can land LIGHTER than a base
+        // that has already gone dark. Darkening whatever the base
+        // resolved to cannot invert, since removing a fixed proportion
+        // of any colour strictly lowers its luminance (measured
+        // grain-to-base: 2.04:1 light, 1.69:1 dark).
+        //
+        // The table number and the occupancy count are written ON this
+        // fill, so the surface picks its own foreground by measured
+        // luminance rather than letting the page's body colour land
+        // wherever the mix ends up: black at 14.3:1 on the light base,
+        // white at 4.8:1 on the dark one, where WCAG AA asks 4.5:1 for
+        // body text. The threshold is passed explicitly because the
+        // backend lowers the default to 3.
+        &.o_event_table_surface_wood {
+            $wood-base: mix($warning, $body-bg, 55%);
+            $wood-grain: mix(black, $wood-base, 30%);
+            background-color: $wood-base;
+            background-image: repeating-linear-gradient(
+                95deg,
+                $wood-grain 0,
+                $wood-grain 1px,
+                transparent 1px,
+                transparent 7px
+            );
+            border-color: $wood-grain;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25), 0 2px 3px rgba(0, 0, 0, 0.3);
+            color: color-contrast($wood-base, $min-contrast-ratio: 4.5);
+
+            // Both carry a colour of their own below, and an explicitly
+            // styled descendant never falls back to an ancestor's
+            // through inheritance: without this they keep the secondary
+            // tone of the page on top of the wood.
+            .o_event_table_occupancy,
+            .o_event_table_table_menu {
+                color: inherit;
+            }
+        }
+    }
+
+    .o_event_table_number {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    // $body-secondary-color is the backend's own tone for a subordinate
+    // label: $body-color at 75% alpha, so it answers to whatever fill it is
+    // laid over instead of pinning a second value per colour scheme. It
+    // reads at 4.2:1 over a table top and 4.1:1 over the floor in the light
+    // scheme, 4.8:1 and 5.0:1 in the dark one. The light pair sits just
+    // under the 4.5:1 WCAG AA asks for body text: it is the value the whole
+    // client gives a secondary label, and raising it here alone would make
+    // these three labels louder than every other one on the screen.
+    .o_event_table_occupancy {
+        font-size: 0.75rem;
+        color: $body-secondary-color;
+    }
+
+    // The table's own end of the dragless path, stacked under its number
+    // and its occupancy by the surface's flex column, so it stays at the
+    // centre of the disc whatever size the table is drawn at. Stripped to
+    // the glyph like the person menu: a full button here would read as the
+    // table's own control rather than as a discreet handle, and the surface
+    // has no room to spare at the sizes visualTableSize computes.
+    .o_event_table_table_menu {
+        border: 0;
+        background: none;
+        padding: 0;
+        line-height: 1;
+        color: $body-secondary-color;
+    }
+
+    .o_event_table_conflict {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: $danger;
+        border: 1px solid $body-bg;
+    }
+
+    .o_event_table_seat {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        margin-left: -11px;
+        margin-top: -11px;
+        border-radius: 50%;
+        border: 1px solid $border-color;
+        background-color: $body-bg;
+        // The foreground every seat variant hands to its own number,
+        // which takes it by inheritance rather than naming a colour of
+        // its own: the fill below changes per variant, and a number
+        // written in one fixed tone would follow only one of them. On
+        // this one the page's body colour already reads at 7.8:1 light
+        // and 8.0:1 dark.
+        color: $body-color;
+
+        &.o_event_table_seat_taken {
+            background-color: $primary;
+            // 5.3:1, picked by measured luminance so the dark bundle —
+            // where $white and $black are swapped — still lands on the
+            // readable one. WCAG AA asks 4.5:1; the threshold is passed
+            // explicitly because the backend lowers the default to 3.
+            color: color-contrast($primary, $min-contrast-ratio: 4.5);
+        }
+    }
+
+    // Visual mode: the same seat marker redrawn as a chair seen from
+    // above — a fabric pad with a backrest strip on its own local LEFT
+    // edge, rotated as a whole by seatStyle's transform (floor_plan.js,
+    // the angle geometry.js computes) so the strip ends up on whichever
+    // side actually faces away from the table for that seat. Width,
+    // height, centring and border are inherited from .o_event_table_seat
+    // above; only the shape and colour change. The pad is mixed at
+    // compile time from $body-color rather than from
+    // $body-secondary-color: that one carries alpha, and mixing a
+    // translucent colour yields a translucent one, so the pad would let
+    // the table top show through instead of reading as fabric. Each
+    // fill then picks its own foreground by measured luminance for the
+    // seat number written on it — 9.3:1 and 7.7:1 in the light scheme,
+    // 6.7:1 and 8.3:1 in the dark one, free pad then taken pad, against
+    // the 4.5:1 WCAG AA asks for body text.
+    .o_event_table_seat_chair {
+        $chair-pad: mix($body-color, $body-bg, 45%);
+        $chair-pad-taken: mix($primary, $body-bg, 65%);
+        border-radius: 5px;
+        background-color: $chair-pad;
+        color: color-contrast($chair-pad, $min-contrast-ratio: 4.5);
+        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.25);
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: -4px;
+            top: 3px;
+            bottom: 3px;
+            width: 5px;
+            border-radius: 2px;
+            // Matches whatever this pad's own background-color resolves
+            // to (fabric grey, or the taken tint below) without a second
+            // colour rule to keep in step with the first.
+            background-color: inherit;
+            border: 1px solid $border-color;
+        }
+
+        &.o_event_table_seat_taken {
+            background-color: $chair-pad-taken;
+            color: color-contrast($chair-pad-taken, $min-contrast-ratio: 4.5);
+        }
+    }
+
+    // The seat's own number, written on the chair. Concentric with the
+    // pad BY CONSTRUCTION — it is the pad's child, stretched to its four
+    // edges — so nothing recomputes a chair's centre a second time.
+    // seatNumberStyle (floor_plan.js) adds the counter-rotation that
+    // keeps the digits upright. Two of them have to fit a 22 px pad,
+    // seat_count carrying no upper bound (only CHECK >= 2): at 0.6rem
+    // two digits measure about 11 px, half the pad's width. It never
+    // takes the pointer, so a drop on a chair still reads as that
+    // chair's own seat request.
+    .o_event_table_seat_number {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+        line-height: 1;
+        // Inherited from the seat, whose own rule picks a foreground
+        // against the fill that seat is actually wearing — free, taken,
+        // flat marker or chair pad.
+        color: inherit;
+        pointer-events: none;
+    }
+
+    // The name list beside the table. Its position and width are set
+    // inline by namesStyle (floor_plan.js) from LIST_WIDTH, the same
+    // value the floor and the grid reserve their space from; the width
+    // is repeated here so a chip stays bounded even if that inline
+    // style is ever absent.
+    .o_event_table_names {
+        position: absolute;
+        width: 220px;
+        text-align: left;
+        overflow-wrap: break-word;
+
+        // One chip per line, and never more than one line: a chip
+        // allowed to wrap stands 45 px tall where LIST_LINE_HEIGHT
+        // (geometry.js) reserves 29, and every row below it would be
+        // short by the difference. The four properties below only work
+        // together — a width to clip against, hidden overflow, no
+        // wrapping, and the ellipsis that shows a name was cut. The
+        // 0.25rem margin is what the measured 29 px pitch is measured
+        // WITH, so the two move together or not at all.
+        .o_event_table_person {
+            display: block;
+            max-width: 100%;
+            margin: 0.25rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        // show_full_names: the chip WRAPS instead of clipping, and the
+        // clamp below stops it at two name lines, which is the pitch
+        // listLinePitch (geometry.js) reserves for it — LIST_LINE_HEIGHT
+        // plus LIST_FULL_NAME_LINE_HEIGHT. A third line would draw
+        // outside that reservation, into the row below.
+        //
+        // The clamp rides the NAME span, never the chip: a chip carries
+        // the company on a block line of its own, and clamping the chip
+        // would count that line as one of the two and eat the name's
+        // second one. The chip only drops its own `nowrap`, which is
+        // what lets the name break at all — and with it, the chip's
+        // `text-overflow`, which applies to one unwrapped line only. The
+        // ellipsis comes back from the clamp, on the second line.
+        //
+        // A name still longer than two lines hold is clipped, 79
+        // characters at the width listWidth gives this list. Both
+        // spellings of the clamp are written: the unprefixed property is
+        // the standard one, the prefixed pair is what every current
+        // engine actually implements, and `-webkit-box` is the display
+        // both forms need.
+        &.o_event_table_names_full .o_event_table_person {
+            white-space: normal;
+
+            .o_event_table_person_name {
+                display: -webkit-box;
+                overflow: hidden;
+                overflow-wrap: break-word;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+            }
+        }
+    }
+
+    // One connector per table, its box placed inline by connectorStyle
+    // (floor_plan.js). Drawn entirely in CSS — this module ships no
+    // image asset — in Bootstrap's own border colour, so light and dark
+    // mode both follow whatever Odoo's bundle set it to, with nothing
+    // to keep in step by hand. It never takes the pointer: a drop in
+    // this gap belongs to whatever sits underneath, not to the drawing.
+    .o_event_table_connector {
+        position: absolute;
+        pointer-events: none;
+    }
+
+    // The straight trait, from the table's edge to the bracket's spine.
+    // Its own vertical place comes from connectorTraitStyle; the 20 px
+    // here and the bracket's 14 px below are the two halves of
+    // CONNECTOR_WIDTH (34). Drawn in the SECONDARY tone, not the border
+    // one the tables and the tray use: a grouping mark has to be read
+    // as a mark, and at 2 px the border tone is close enough to the
+    // background to disappear on a screenshot. The shorthand carries the
+    // colour again, now that it is a compiled value: a border written in
+    // one declaration can no longer be dropped whole for a colour that
+    // fails to resolve.
+    .o_event_table_connector_trait {
+        position: absolute;
+        left: 0;
+        width: 20px;
+        border-top: 2px solid $body-secondary-color;
+    }
+
+    // The bracket embracing the list: a spine with an arm curling toward
+    // the list at each end, open on the side the list is on. Its height
+    // comes from the parent, so a list of two names and one of twenty
+    // need no separate rule.
+    .o_event_table_connector_bracket {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 14px;
+        border: 2px solid $body-secondary-color;
+        border-right: 0;
+        border-radius: 6px 0 0 6px;
+    }
+
+    // A chip reads as a card laid over the floor, so it takes the same
+    // content tone as a table top rather than the tertiary background,
+    // which resolves to the very value the floor and the reserve already
+    // use — a chip would then differ from its ground by its border alone.
+    .o_event_table_person {
+        display: inline-block;
+        padding: 0.1rem 0.4rem;
+        margin: 0.1rem;
+        border-radius: 1rem;
+        background-color: $o-view-background-color;
+        border: 1px solid $border-color;
+
+        // The one chip a reader has to find without looking for it, in a
+        // list of ninety names spread over a dozen tables, and find again
+        // at every round.
+        //
+        // Its colours come from the bundle's SCSS variables, like every
+        // other colour here and for the reason the head of this file
+        // gives.
+        &.o_event_table_highlighted {
+            background-color: $warning;
+            // Hue alone separates amber from the floor by only 1.8:1 in
+            // lightness against a light background, which a monochrome
+            // screen or a low-vision reader loses. The ring restores that
+            // channel at 7.8:1 against the same background. An OUTLINE,
+            // not a border: it is painted outside the border box and takes
+            // no part in layout, so the chip keeps the exact height
+            // LIST_LINE_HEIGHT (geometry.js) reserves per line and the
+            // exact width the ellipsis is measured against.
+            outline: 2px solid $body-color;
+            // Picked by measured luminance rather than named: the function
+            // walks its candidates and returns the first above the ratio
+            // asked for, so the dark bundle — where $white and $black are
+            // swapped — still lands on the readable one. Against this
+            // amber it is black, at 11.1:1, where WCAG AA asks 4.5:1 for
+            // body text. The threshold is passed explicitly because the
+            // backend lowers the default to 3.
+            color: color-contrast($warning, $min-contrast-ratio: 4.5);
+
+            // Without this, the inner spans' own explicit colors below
+            // always win: an explicitly styled descendant never falls
+            // back to an ancestor's color through inheritance, no matter
+            // how the highlight rule above is written. The higher
+            // specificity here (two classes) is what makes the highlight
+            // win instead.
+            .o_event_table_person_name,
+            .o_event_table_person_company {
+                color: inherit;
+            }
+        }
+    }
+
+    // The name reads at a glance in a dense panel: underlined, and in the
+    // link colour rather than in $primary. The two differ where it counts:
+    // $primary is a FILL, chosen to carry white text, and as ink on a chip
+    // it falls to 3.1:1 in the dark scheme, under the 4.5:1 WCAG AA asks
+    // for body text. $link-color is chosen as ink, and holds 6.2:1 light
+    // and 7.8:1 dark on the chip fill above.
+    .o_event_table_person_name {
+        color: $link-color;
+        text-decoration: underline;
+    }
+
+    // Shown under the name, in a smaller and secondary tone, only when
+    // show_company asks for it (floor_plan.xml).
+    .o_event_table_person_company {
+        display: block;
+        font-size: 0.75rem;
+        color: $body-secondary-color;
+    }
+
+    // The dragless move path, tucked into the chip itself: the "ignore"
+    // selector on the person hook keeps a click here from also starting a
+    // drag (floor_plan.js).
+    .o_event_table_person_menu {
+        border: 0;
+        background: none;
+        padding: 0 0.2rem;
+        margin-left: 0.15rem;
+        line-height: 1;
+        color: inherit;
+    }
+
+    // A column fixed to the right of the floor, outside its scroll and its
+    // zoom, so the reserve neither pans nor scales with the room: it stays
+    // put, and visible even empty, so the gesture of dropping someone here
+    // stays findable.
+    .o_event_table_tray {
+        flex: 0 0 220px;
+        width: 220px;
+        overflow-y: auto;
+        padding: 0.5rem;
+        border-left: 1px solid $border-color;
+        background-color: $body-bg;
+
+        .o_event_table_person {
+            display: block;
+            margin: 0.25rem 0;
+        }
+    }
+
+    .o_event_table_tray_label {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.75rem;
+        color: $body-secondary-color;
+    }
+}
