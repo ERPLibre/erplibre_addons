@@ -651,6 +651,43 @@ class TestErplibreSmsMateriel(TransactionCase):
             "kind": "modem",
         })
 
+    def _appeler(self, gateway):
+        """Ce que « Appeler » rend, cette passerelle etant celle de la societe."""
+        self.company.erplibre_sms_provider = "passerelle"
+        self.company.erplibre_gateway_id = gateway
+        return self.env["phone.common"].click2dial("+15145550142")
+
+    def test_le_modem_ne_met_pas_l_appel_en_file(self):
+        """L'agent des SMS refuse les appels : son cycle doit rendre la main en
+        quelques secondes quand un appel dure des minutes. Un appel mis en file
+        pour un modem ne partirait donc jamais."""
+        avant = self.env["erplibre.mobile.call"].search_count([])
+        resultat = self._appeler(self.modem)
+        self.assertEqual(self.env["erplibre.mobile.call"].search_count([]), avant,
+                         "aucune fiche : la trace est celle du softphone")
+        self.assertIn("softphone", resultat.get("dialing_message", "").lower())
+
+    def test_le_telephone_met_toujours_l_appel_en_file(self):
+        """C'est lui qui compose, a son tour d'interrogation."""
+        resultat = self._appeler(self.telephone)
+        appel = self.env["erplibre.mobile.call"].search(
+            [("gateway_id", "=", self.telephone.id)], order="id desc", limit=1)
+        self.assertTrue(appel)
+        self.assertEqual(appel.state, "queued")
+        self.assertEqual(appel.source, "click")
+        self.assertIn("file", resultat.get("dialing_message", "").lower())
+
+    def test_une_alarme_ne_bloque_que_la_file(self):
+        """Un appel en file partirait des le retour de la passerelle, des heures
+        plus tard, vers quelqu'un qui ne s'y attend plus. Place en direct, il
+        echoue tout de suite et se voit."""
+        self.telephone._raise_alarm("essai")
+        self.modem._raise_alarm("essai")
+        with self.assertRaises(UserError):
+            self._appeler(self.telephone)
+        self.assertIn("softphone",
+                      self._appeler(self.modem).get("dialing_message", "").lower())
+
     def test_le_materiel_par_defaut_est_le_telephone(self):
         """Les fiches d'avant ce champ ne doivent pas changer de comportement."""
         sans_choix = self.env["erplibre.sms.gateway"].create({

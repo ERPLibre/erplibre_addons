@@ -105,15 +105,35 @@ class PhoneCommon(models.AbstractModel):
                     " etre place. Verifiez Passerelle mobile > Configuration."
                 )
             )
+        numero = self.convert_to_dial_number(erp_number)
+        if not gateway._trait("appels_en_file"):
+            # Un modem ne prend pas d'appel en file : le softphone du
+            # navigateur le place en direct et le service de voix compose sur
+            # la SIM. Mettre l'appel en file le confierait a l'agent des SMS,
+            # qui le refuse — son cycle doit rendre la main en quelques
+            # secondes quand un appel dure des minutes.
+            #
+            # Rien n'est cree ici : la trace de l'appel est celle du softphone,
+            # et une seconde fiche pour le meme appel les ferait diverger.
+            result.update({
+                "dialed_number": numero,
+                "dialing_message": _(
+                    "Le softphone de votre navigateur compose par la carte SIM"
+                    " du modem : repondez ICI, pas sur un telephone."
+                ),
+            })
+            return result
+
         if gateway.alarm_active:
             # Mettre un appel en file vers une passerelle en panne le ferait
             # partir des son retour, peut-etre des heures plus tard, vers
-            # quelqu'un qui ne s'y attend plus.
+            # quelqu'un qui ne s'y attend plus. Un appel place en direct, lui,
+            # echoue tout de suite et se voit : le refus n'a donc de sens que
+            # pour une file.
             raise UserError(
                 _("La passerelle est en panne : %s") % (gateway.alarm_reason or "")
             )
 
-        numero = self.convert_to_dial_number(erp_number)
         appel = self.env["erplibre.mobile.call"].create(
             {
                 "call_uuid": uuid.uuid4().hex,

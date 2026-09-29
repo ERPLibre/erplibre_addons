@@ -48,6 +48,9 @@ MATERIELS = {
         "batterie": True,
         # Plafond impose par l'appareil, en segments par minute. 0 = aucun.
         "plafond_segments": ANDROID_SEGMENTS_PER_MINUTE,
+        # L'appel se MET EN FILE : l'application le prend a son tour
+        # d'interrogation, et il part depuis le telephone.
+        "appels_en_file": True,
         "sans_envoi": (
             "La permission d'envoi de SMS n'est plus accordee sur " "le telephone."
         ),
@@ -58,6 +61,12 @@ MATERIELS = {
         "cadencement_systeme": False,
         "batterie": False,
         "plafond_segments": 0,
+        # L'appel NE se met PAS en file : le softphone du navigateur le place
+        # en direct, et le service de voix compose sur la SIM. Le mettre en
+        # file le confierait a l'agent des SMS, qui refuse les appels — le
+        # cycle doit rendre la main en quelques secondes quand un appel dure
+        # des minutes.
+        "appels_en_file": False,
         "sans_envoi": "L'agent ne peut plus commander le modem.",
         "sans_sim": "La carte SIM du modem n'est pas enregistree au reseau.",
     },
