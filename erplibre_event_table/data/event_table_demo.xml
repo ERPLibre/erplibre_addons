@@ -1,0 +1,977 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Written once, never rewritten. Replaying this file would write
+    round_count, separate_companies and event_id again on plans that the
+    passes below move out of draft, and write() refuses those three
+    fields on anything but a draft plan. The same flag keeps the
+    <function> calls from running a second time: _tag_function
+    (odoo/tools/convert.py) returns at once when noupdate is set outside
+    init mode. load_data (odoo/modules/loading.py) already forces
+    noupdate on every demo file, so this attribute adds no protection of
+    its own; it states in the file what the file depends on. -->
+    <data noupdate="1">
+        <!-- ================================================================
+             Draft: tables and participants set up, nothing generated yet.
+             ================================================================ -->
+        <record id="event_table_plan_demo_draft" model="event.table.plan">
+            <field name="name">Networking Dinner Seating</field>
+            <field name="event_id" ref="event.event_1" />
+        </record>
+
+        <record id="event_table_demo_draft_1" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="number">1</field>
+            <field name="seat_count">8</field>
+            <field name="position_h">40.0</field>
+            <field name="position_v">40.0</field>
+        </record>
+        <record id="event_table_demo_draft_2" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="number">2</field>
+            <field name="seat_count">8</field>
+            <field name="position_h">360.0</field>
+            <field name="position_v">40.0</field>
+        </record>
+
+        <record id="event_table_participant_demo_draft_01" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Rosalind Fennimore</field>
+            <field name="email">rosalind.fennimore@example.com</field>
+            <field name="company_label">Emberfield Robotics</field>
+        </record>
+        <record id="event_table_participant_demo_draft_02" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Desmond Yarrow</field>
+            <field name="email">desmond.yarrow@example.com</field>
+            <field name="company_label">Emberfield Robotics</field>
+        </record>
+        <record id="event_table_participant_demo_draft_03" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Junko Hollowell</field>
+            <field name="email">junko.hollowell@example.com</field>
+            <field name="company_label">Cascade Millworks</field>
+        </record>
+        <record id="event_table_participant_demo_draft_04" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Petra Loombridge</field>
+            <field name="email">petra.loombridge@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_draft_05" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Tobias Wrenfield</field>
+            <field name="email">tobias.wrenfield@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_draft_06" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Aiko Stonebranch</field>
+            <field name="email">aiko.stonebranch@example.com</field>
+            <field name="company_label">Cascade Millworks</field>
+        </record>
+        <record id="event_table_participant_demo_draft_07" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Callum Ashdale</field>
+            <field name="email">callum.ashdale@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_draft_08" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Marguerite Ivorwood</field>
+            <field name="email">marguerite.ivorwood@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_draft_09" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Faisal Drummond</field>
+            <field name="email">faisal.drummond@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_draft_10" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_draft" />
+            <field name="name">Selby Cranmoor</field>
+            <field name="email">selby.cranmoor@example.com</field>
+        </record>
+
+        <!-- ================================================================
+             Proposed: two generated combinations, waiting for a choice.
+             separate_companies is off here, unlike the other two plans.
+             ================================================================ -->
+        <!-- Tables, rounds and options change only on a draft plan (02 S2.1):
+        this record is created as a draft like any other, and a later pass
+        moves it to "proposed" once its tables, participants and
+        combinations all exist. -->
+        <record id="event_table_plan_demo_proposed" model="event.table.plan">
+            <field name="name">Design Fair Gala Seating</field>
+            <field name="event_id" ref="event.event_0" />
+            <field name="round_count">4</field>
+            <field name="combination_count">2</field>
+            <field name="separate_companies" eval="False" />
+            <field name="generation_seed">42</field>
+            <field name="generation_duration">0.08</field>
+        </record>
+
+        <record id="event_table_demo_proposed_1" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="number">1</field>
+            <field name="seat_count">4</field>
+            <field name="position_h">40.0</field>
+            <field name="position_v">40.0</field>
+        </record>
+        <record id="event_table_demo_proposed_2" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="number">2</field>
+            <field name="seat_count">4</field>
+            <field name="position_h">360.0</field>
+            <field name="position_v">40.0</field>
+        </record>
+        <record id="event_table_demo_proposed_3" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="number">3</field>
+            <field name="seat_count">4</field>
+            <field name="position_h">40.0</field>
+            <field name="position_v">334.0</field>
+        </record>
+
+        <record id="event_table_participant_demo_proposed_01" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Imelda Suncrest</field>
+            <field name="email">imelda.suncrest@example.com</field>
+            <field name="company_label">Northlight Media</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_02" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Baxter Hallowell</field>
+            <field name="email">baxter.hallowell@example.com</field>
+            <field name="company_label">Northlight Media</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_03" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Corinne Ashworth</field>
+            <field name="email">corinne.ashworth@example.com</field>
+            <field name="company_label">Cobalt Analytics</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_04" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Dashiell Marrow</field>
+            <field name="email">dashiell.marrow@example.com</field>
+            <field name="company_label">Cobalt Analytics</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_05" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Elowen Brightbrook</field>
+            <field name="email">elowen.brightbrook@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_06" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Fintan Oakhurst</field>
+            <field name="email">fintan.oakhurst@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_07" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Giselle Ferrowick</field>
+            <field name="email">giselle.ferrowick@example.com</field>
+            <field name="company_label">Fernbridge Textiles</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_08" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Hollis Underdown</field>
+            <field name="email">hollis.underdown@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_09" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Ines Cobblestone</field>
+            <field name="email">ines.cobblestone@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_10" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Jarrah Winterbourne</field>
+            <field name="email">jarrah.winterbourne@example.com</field>
+            <field name="company_label">Fernbridge Textiles</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_11" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Kestrel Amberlyn</field>
+            <field name="email">kestrel.amberlyn@example.com</field>
+        </record>
+        <record id="event_table_participant_demo_proposed_12" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="name">Lowen Thackeray</field>
+            <field name="email">lowen.thackeray@example.com</field>
+        </record>
+
+        <!-- Both combinations below come from rotation.generate(), run once
+        offline with a fixed seed (42) against this exact problem and
+        options, never from a solver call at install: install only inserts
+        the rows, so loading demo data stays fast and deterministic. -->
+        <record id="event_table_combination_demo_proposed_1" model="event.table.combination">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="rank">1</field>
+            <field name="placement_data" eval="[
+                [1, ref('event_table_participant_demo_proposed_06'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_08'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_09'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_12'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_04'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_05'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_10'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_11'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_01'), 3, 0],
+                [1, ref('event_table_participant_demo_proposed_02'), 3, 0],
+                [1, ref('event_table_participant_demo_proposed_03'), 3, 0],
+                [1, ref('event_table_participant_demo_proposed_07'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_02'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_03'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_11'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_12'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_04'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_06'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_07'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_10'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_01'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_05'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_08'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_09'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_01'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_03'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_10'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_12'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_05'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_07'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_09'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_11'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_02'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_04'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_06'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_08'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_03'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_05'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_06'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_08'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_01'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_04'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_11'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_12'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_02'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_07'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_09'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_10'), 3, 0],
+            ]" />
+            <field name="company_pair_count">3</field>
+            <field name="repeated_pair_count">16</field>
+            <field name="extra_meeting_count">17</field>
+            <field name="max_pair_meetings">3</field>
+            <field name="table_return_count">19</field>
+            <field name="met_distinct_min">8</field>
+            <field name="met_distinct_avg">9.166666666666666</field>
+            <field name="cost">180</field>
+            <field name="lower_bound">180</field>
+            <field name="seed">42000126</field>
+            <field name="distance_to_first">0.0</field>
+            <field name="is_proven_optimal" eval="True" />
+            <field name="is_close_variant" eval="False" />
+            <field name="method">greedy</field>
+            <field name="stopped_by">lower_bound</field>
+            <field name="is_adjusted" eval="False" />
+        </record>
+        <record id="event_table_combination_demo_proposed_2" model="event.table.combination">
+            <field name="plan_id" ref="event_table_plan_demo_proposed" />
+            <field name="rank">2</field>
+            <field name="placement_data" eval="[
+                [1, ref('event_table_participant_demo_proposed_07'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_09'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_10'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_11'), 1, 0],
+                [1, ref('event_table_participant_demo_proposed_04'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_05'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_06'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_08'), 2, 0],
+                [1, ref('event_table_participant_demo_proposed_01'), 3, 0],
+                [1, ref('event_table_participant_demo_proposed_02'), 3, 0],
+                [1, ref('event_table_participant_demo_proposed_03'), 3, 0],
+                [1, ref('event_table_participant_demo_proposed_12'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_01'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_05'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_10'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_11'), 1, 0],
+                [2, ref('event_table_participant_demo_proposed_03'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_04'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_07'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_08'), 2, 0],
+                [2, ref('event_table_participant_demo_proposed_02'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_06'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_09'), 3, 0],
+                [2, ref('event_table_participant_demo_proposed_12'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_02'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_05'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_07'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_12'), 1, 0],
+                [3, ref('event_table_participant_demo_proposed_03'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_06'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_10'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_11'), 2, 0],
+                [3, ref('event_table_participant_demo_proposed_01'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_04'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_08'), 3, 0],
+                [3, ref('event_table_participant_demo_proposed_09'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_01'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_02'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_04'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_11'), 1, 0],
+                [4, ref('event_table_participant_demo_proposed_06'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_08'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_10'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_12'), 2, 0],
+                [4, ref('event_table_participant_demo_proposed_03'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_05'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_07'), 3, 0],
+                [4, ref('event_table_participant_demo_proposed_09'), 3, 0],
+            ]" />
+            <field name="company_pair_count">4</field>
+            <field name="repeated_pair_count">12</field>
+            <field name="extra_meeting_count">15</field>
+            <field name="max_pair_meetings">3</field>
+            <field name="table_return_count">20</field>
+            <field name="met_distinct_min">9</field>
+            <field name="met_distinct_avg">9.5</field>
+            <field name="cost">180</field>
+            <field name="lower_bound">180</field>
+            <field name="seed">42000127</field>
+            <field name="distance_to_first">0.46808510638297873</field>
+            <field name="is_proven_optimal" eval="True" />
+            <field name="is_close_variant" eval="False" />
+            <field name="method">greedy</field>
+            <field name="stopped_by">lower_bound</field>
+            <field name="is_adjusted" eval="False" />
+        </record>
+
+        <!-- Both combinations exist now: move the plan to "proposed", a
+        plain state write the draft-only guard does not cover. -->
+        <record id="event_table_plan_demo_proposed" model="event.table.plan">
+            <field name="state">proposed</field>
+        </record>
+
+        <!-- ================================================================
+             Chosen: a combination picked, seats assigned, ready to print
+             and email.
+             ================================================================ -->
+        <!-- Tables and options are set while the plan is still a draft, the
+        same reason as the proposed plan above; state and
+        chosen_combination_id follow once the tables, participants and
+        combinations all exist. -->
+        <record id="event_table_plan_demo_chosen" model="event.table.plan">
+            <field name="name">Architects Conference Seating</field>
+            <field name="event_id" ref="event.event_2" />
+            <field name="round_count">3</field>
+            <field name="combination_count">2</field>
+            <field name="separate_companies" eval="True" />
+            <field name="avoid_repeat_table" eval="True" />
+            <field name="assign_seats" eval="True" />
+            <field name="generation_seed">7</field>
+            <field name="generation_duration">0.05</field>
+        </record>
+
+        <record id="event_table_demo_chosen_1" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="number">1</field>
+            <field name="seat_count">4</field>
+            <field name="position_h">40.0</field>
+            <field name="position_v">40.0</field>
+        </record>
+        <record id="event_table_demo_chosen_2" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="number">2</field>
+            <field name="seat_count">4</field>
+            <field name="position_h">360.0</field>
+            <field name="position_v">40.0</field>
+        </record>
+        <record id="event_table_demo_chosen_3" model="event.table">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="number">3</field>
+            <field name="seat_count">4</field>
+            <field name="position_h">40.0</field>
+            <field name="position_v">334.0</field>
+        </record>
+
+        <record id="event_table_participant_demo_chosen_01" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Odalys Ferncastle</field>
+            <field name="email">odalys.ferncastle@example.com</field>
+            <field name="company_label">Alder Peak Consulting</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_02" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Peregrine Ashvale</field>
+            <field name="email">peregrine.ashvale@example.com</field>
+            <field name="company_label">Alder Peak Consulting</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_03" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Quinlan Ryewood</field>
+            <field name="email">quinlan.ryewood@example.com</field>
+            <field name="company_label">Alder Peak Consulting</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_04" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Rosamund Thistledown</field>
+            <field name="email">rosamund.thistledown@example.com</field>
+            <field name="company_label">Marrow Bridge Studio</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_05" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Silas Moorcroft</field>
+            <field name="email">silas.moorcroft@example.com</field>
+            <field name="company_label">Marrow Bridge Studio</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_06" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Tamsin Brackenfell</field>
+            <field name="email">tamsin.brackenfell@example.com</field>
+            <field name="company_label">Marrow Bridge Studio</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_07" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Ulysses Hartwell</field>
+            <field name="email">ulysses.hartwell@example.com</field>
+            <field name="company_label">Quillfeather Design</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_08" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Verity Oldstone</field>
+            <field name="email">verity.oldstone@example.com</field>
+            <field name="company_label">Quillfeather Design</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_09" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Wendell Grayfox</field>
+            <field name="email">wendell.grayfox@example.com</field>
+            <field name="company_label">Quillfeather Design</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_10" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Ximena Larkspur</field>
+            <field name="email">ximena.larkspur@example.com</field>
+            <field name="company_label">Stonecrop Engineering</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_11" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Yannick Postlewaite</field>
+            <field name="email">yannick.postlewaite@example.com</field>
+            <field name="company_label">Stonecrop Engineering</field>
+        </record>
+        <record id="event_table_participant_demo_chosen_12" model="event.table.participant">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="name">Zinnia Foxglove</field>
+            <field name="email">zinnia.foxglove@example.com</field>
+            <field name="company_label">Stonecrop Engineering</field>
+        </record>
+
+        <!-- Both combinations below come from rotation.generate(), run once
+        offline with a fixed seed (7) against this exact problem and
+        options, never from a solver call at install. Combination 1 is the
+        one chosen; assignment rows mirror its placement_data exactly. -->
+        <record id="event_table_combination_demo_chosen_1" model="event.table.combination">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="rank">1</field>
+            <field name="placement_data" eval="[
+                [1, ref('event_table_participant_demo_chosen_12'), 1, 1],
+                [1, ref('event_table_participant_demo_chosen_03'), 1, 2],
+                [1, ref('event_table_participant_demo_chosen_04'), 1, 3],
+                [1, ref('event_table_participant_demo_chosen_09'), 1, 4],
+                [1, ref('event_table_participant_demo_chosen_08'), 2, 1],
+                [1, ref('event_table_participant_demo_chosen_01'), 2, 2],
+                [1, ref('event_table_participant_demo_chosen_05'), 2, 3],
+                [1, ref('event_table_participant_demo_chosen_10'), 2, 4],
+                [1, ref('event_table_participant_demo_chosen_02'), 3, 1],
+                [1, ref('event_table_participant_demo_chosen_11'), 3, 2],
+                [1, ref('event_table_participant_demo_chosen_07'), 3, 3],
+                [1, ref('event_table_participant_demo_chosen_06'), 3, 4],
+                [2, ref('event_table_participant_demo_chosen_02'), 1, 1],
+                [2, ref('event_table_participant_demo_chosen_12'), 1, 2],
+                [2, ref('event_table_participant_demo_chosen_07'), 1, 3],
+                [2, ref('event_table_participant_demo_chosen_05'), 1, 4],
+                [2, ref('event_table_participant_demo_chosen_06'), 2, 1],
+                [2, ref('event_table_participant_demo_chosen_03'), 2, 2],
+                [2, ref('event_table_participant_demo_chosen_10'), 2, 3],
+                [2, ref('event_table_participant_demo_chosen_09'), 2, 4],
+                [2, ref('event_table_participant_demo_chosen_04'), 3, 1],
+                [2, ref('event_table_participant_demo_chosen_01'), 3, 2],
+                [2, ref('event_table_participant_demo_chosen_11'), 3, 3],
+                [2, ref('event_table_participant_demo_chosen_08'), 3, 4],
+                [3, ref('event_table_participant_demo_chosen_06'), 1, 1],
+                [3, ref('event_table_participant_demo_chosen_08'), 1, 2],
+                [3, ref('event_table_participant_demo_chosen_12'), 1, 3],
+                [3, ref('event_table_participant_demo_chosen_01'), 1, 4],
+                [3, ref('event_table_participant_demo_chosen_09'), 2, 1],
+                [3, ref('event_table_participant_demo_chosen_05'), 2, 2],
+                [3, ref('event_table_participant_demo_chosen_11'), 2, 3],
+                [3, ref('event_table_participant_demo_chosen_02'), 2, 4],
+                [3, ref('event_table_participant_demo_chosen_07'), 3, 1],
+                [3, ref('event_table_participant_demo_chosen_04'), 3, 2],
+                [3, ref('event_table_participant_demo_chosen_10'), 3, 3],
+                [3, ref('event_table_participant_demo_chosen_03'), 3, 4],
+            ]" />
+            <field name="company_pair_count">0</field>
+            <field name="repeated_pair_count">7</field>
+            <field name="extra_meeting_count">8</field>
+            <field name="max_pair_meetings">3</field>
+            <field name="table_return_count">8</field>
+            <field name="met_distinct_min">6</field>
+            <field name="met_distinct_avg">7.666666666666667</field>
+            <field name="cost">99</field>
+            <field name="lower_bound">99</field>
+            <field name="seed">7000021</field>
+            <field name="distance_to_first">0.0</field>
+            <field name="is_proven_optimal" eval="True" />
+            <field name="is_close_variant" eval="False" />
+            <field name="method">greedy</field>
+            <field name="stopped_by">lower_bound</field>
+            <field name="is_adjusted" eval="False" />
+        </record>
+        <record id="event_table_combination_demo_chosen_2" model="event.table.combination">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="rank">2</field>
+            <field name="placement_data" eval="[
+                [1, ref('event_table_participant_demo_chosen_04'), 1, 1],
+                [1, ref('event_table_participant_demo_chosen_09'), 1, 2],
+                [1, ref('event_table_participant_demo_chosen_11'), 1, 3],
+                [1, ref('event_table_participant_demo_chosen_03'), 1, 4],
+                [1, ref('event_table_participant_demo_chosen_10'), 2, 1],
+                [1, ref('event_table_participant_demo_chosen_02'), 2, 2],
+                [1, ref('event_table_participant_demo_chosen_07'), 2, 3],
+                [1, ref('event_table_participant_demo_chosen_06'), 2, 4],
+                [1, ref('event_table_participant_demo_chosen_05'), 3, 1],
+                [1, ref('event_table_participant_demo_chosen_01'), 3, 2],
+                [1, ref('event_table_participant_demo_chosen_12'), 3, 3],
+                [1, ref('event_table_participant_demo_chosen_08'), 3, 4],
+                [2, ref('event_table_participant_demo_chosen_11'), 1, 1],
+                [2, ref('event_table_participant_demo_chosen_07'), 1, 2],
+                [2, ref('event_table_participant_demo_chosen_05'), 1, 3],
+                [2, ref('event_table_participant_demo_chosen_02'), 1, 4],
+                [2, ref('event_table_participant_demo_chosen_08'), 2, 1],
+                [2, ref('event_table_participant_demo_chosen_06'), 2, 2],
+                [2, ref('event_table_participant_demo_chosen_12'), 2, 3],
+                [2, ref('event_table_participant_demo_chosen_03'), 2, 4],
+                [2, ref('event_table_participant_demo_chosen_01'), 3, 1],
+                [2, ref('event_table_participant_demo_chosen_09'), 3, 2],
+                [2, ref('event_table_participant_demo_chosen_10'), 3, 3],
+                [2, ref('event_table_participant_demo_chosen_04'), 3, 4],
+                [3, ref('event_table_participant_demo_chosen_06'), 1, 1],
+                [3, ref('event_table_participant_demo_chosen_11'), 1, 2],
+                [3, ref('event_table_participant_demo_chosen_08'), 1, 3],
+                [3, ref('event_table_participant_demo_chosen_01'), 1, 4],
+                [3, ref('event_table_participant_demo_chosen_04'), 2, 1],
+                [3, ref('event_table_participant_demo_chosen_12'), 2, 2],
+                [3, ref('event_table_participant_demo_chosen_09'), 2, 3],
+                [3, ref('event_table_participant_demo_chosen_02'), 2, 4],
+                [3, ref('event_table_participant_demo_chosen_03'), 3, 1],
+                [3, ref('event_table_participant_demo_chosen_10'), 3, 2],
+                [3, ref('event_table_participant_demo_chosen_05'), 3, 3],
+                [3, ref('event_table_participant_demo_chosen_07'), 3, 4],
+            ]" />
+            <field name="company_pair_count">0</field>
+            <field name="repeated_pair_count">7</field>
+            <field name="extra_meeting_count">8</field>
+            <field name="max_pair_meetings">3</field>
+            <field name="table_return_count">8</field>
+            <field name="met_distinct_min">6</field>
+            <field name="met_distinct_avg">7.666666666666667</field>
+            <field name="cost">99</field>
+            <field name="lower_bound">99</field>
+            <field name="seed">7000022</field>
+            <field name="distance_to_first">0.36363636363636365</field>
+            <field name="is_proven_optimal" eval="True" />
+            <field name="is_close_variant" eval="False" />
+            <field name="method">greedy</field>
+            <field name="stopped_by">lower_bound</field>
+            <field name="is_adjusted" eval="False" />
+        </record>
+
+        <!-- A second pass on the same id writes state and
+        chosen_combination_id: neither is a structure field, so this write
+        is not subject to the draft-only guard, and the combination it
+        points to must exist first. -->
+        <record id="event_table_plan_demo_chosen" model="event.table.plan">
+            <field name="state">chosen</field>
+            <field name="chosen_combination_id" ref="event_table_combination_demo_chosen_1" />
+        </record>
+
+        <record id="event_table_assignment_demo_chosen_001" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_12" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_002" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_03" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_003" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_04" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_004" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_09" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_005" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_08" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_006" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_01" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_007" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_05" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_008" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_10" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_009" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_02" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_010" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_11" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_011" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_07" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_012" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">1</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_06" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_013" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_02" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_014" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_12" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_015" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_07" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_016" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_05" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_017" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_06" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_018" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_03" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_019" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_10" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_020" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_09" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_021" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_04" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_022" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_01" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_023" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_11" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_024" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">2</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_08" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_025" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_06" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_026" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_08" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_027" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_12" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_028" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_1" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_01" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_029" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_09" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_030" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_05" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_031" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_11" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_032" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_2" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_02" />
+            <field name="seat_number">4</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_033" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_07" />
+            <field name="seat_number">1</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_034" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_04" />
+            <field name="seat_number">2</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_035" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_10" />
+            <field name="seat_number">3</field>
+        </record>
+        <record id="event_table_assignment_demo_chosen_036" model="event.table.assignment" context="{'event_table_assignment_write': True}">
+            <field name="plan_id" ref="event_table_plan_demo_chosen" />
+            <field name="combination_id" ref="event_table_combination_demo_chosen_1" />
+            <field name="round_number">3</field>
+            <field name="table_id" ref="event_table_demo_chosen_3" />
+            <field name="participant_id" ref="event_table_participant_demo_chosen_03" />
+            <field name="seat_number">4</field>
+        </record>
+
+        <!-- ================================================================
+             Twelve rectangular tables, still a draft: the room stands
+             and nobody is seated. A plan without a combination still
+             describes its rounds, empty, and names everyone waiting in
+             the tray.
+             ================================================================ -->
+        <record id="event_table_plan_demo_twelve_draft" model="event.table.plan">
+            <field name="name">Collection Reveal Seating</field>
+            <field name="event_id" ref="event.event_7" />
+            <field name="round_count">3</field>
+            <field name="separate_companies" eval="True" />
+            <field name="avoid_repeat_table" eval="True" />
+            <field name="assign_seats" eval="True" />
+            <field name="show_seat_number" eval="True" />
+            <field name="visual_tables" eval="True" />
+        </record>
+
+        <!-- Tables and participants come from the demo builder
+        (models/event_table_plan_demo.py). Ninety people written as ninety
+        records say no more than the five numbers below, and cost several
+        hundred lines. Twelve companies over twelve tables hold the
+        largest company to eight people, under the number of tables it
+        would otherwise have to be spread across. -->
+        <function model="event.table.plan" name="_demo_fill_room">
+            <value eval="[ref('event_table_plan_demo_twelve_draft')]" />
+            <value name="table_count" eval="12" />
+            <value name="seat_count" eval="8" />
+            <value name="participant_count" eval="90" />
+            <value name="company_count" eval="12" />
+            <value name="shape" eval="'square'" />
+        </function>
+
+        <!-- ================================================================
+             Twelve round tables, chosen, each person labelled with their
+             company on the floor plan. Same room and same crowd as the
+             draft above, generated and seated.
+             ================================================================ -->
+        <record id="event_table_plan_demo_twelve_chosen" model="event.table.plan">
+            <field name="name">Business Workshop Seating</field>
+            <field name="event_id" ref="event.event_4" />
+            <field name="round_count">3</field>
+            <field name="separate_companies" eval="True" />
+            <field name="avoid_repeat_table" eval="True" />
+            <field name="assign_seats" eval="True" />
+            <field name="show_company" eval="True" />
+            <field name="visual_tables" eval="True" />
+        </record>
+
+        <function model="event.table.plan" name="_demo_fill_room">
+            <value eval="[ref('event_table_plan_demo_twelve_chosen')]" />
+            <value name="table_count" eval="12" />
+            <value name="seat_count" eval="8" />
+            <value name="participant_count" eval="90" />
+            <value name="company_count" eval="12" />
+            <value name="name_offset" eval="90" />
+        </function>
+
+        <!-- The combinations are generated and one is chosen by the
+        plan's own actions, never written out here: action_choose is what
+        carries event_table_assignment_write and what points the plan at
+        its combination. precheck reports nothing on this problem, and
+        action_generate_combinations raises only on a blocking
+        diagnostic, so the installation goes through. -->
+        <function model="event.table.plan" name="_demo_seat_first_combination">
+            <value eval="[ref('event_table_plan_demo_twelve_chosen')]" />
+        </function>
+
+        <!-- ================================================================
+             Seats left free: the chairs carry no number, and the name
+             list beside each table is numbered 1..N in alphabetical
+             order. That is the other half of the sort rule the plans
+             above show with numbered seats.
+             ================================================================ -->
+        <record id="event_table_plan_demo_free_seating" model="event.table.plan">
+            <field name="name">Tournament Banquet Seating</field>
+            <field name="event_id" ref="event.event_5" />
+            <field name="round_count">3</field>
+            <field name="separate_companies" eval="True" />
+            <field name="assign_seats" eval="False" />
+            <field name="visual_tables" eval="True" />
+        </record>
+
+        <function model="event.table.plan" name="_demo_fill_room">
+            <value eval="[ref('event_table_plan_demo_free_seating')]" />
+            <value name="table_count" eval="4" />
+            <value name="seat_count" eval="6" />
+            <value name="participant_count" eval="16" />
+            <value name="company_count" eval="8" />
+            <value name="name_offset" eval="180" />
+        </function>
+        <function model="event.table.plan" name="_demo_seat_first_combination">
+            <value eval="[ref('event_table_plan_demo_free_seating')]" />
+        </function>
+    </data>
+</odoo>

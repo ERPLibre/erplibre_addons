@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_participant_tables" model="mail.template">
+            <field name="name">Rotating Tables: Participant Tables</field>
+            <field name="model_id" ref="erplibre_event_table.model_event_table_participant" />
+            <field name="subject">Your tables for {{ object.event_id.name }}</field>
+            <field name="email_from">{{ (object.event_id.organizer_id.email_formatted or object.event_id.company_id.partner_id.email_formatted or user.email_formatted or '') }}</field>
+            <field name="email_to">{{ (object.email and '"%s" &lt;%s&gt;' % (object.name, object.email) or '') }}</field>
+            <field name="lang">{{ object.partner_id.lang or object.event_id.company_id.partner_id.lang }}</field>
+            <field name="description">Sent to a participant with their table for each round</field>
+            <field name="auto_delete" eval="True" />
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: Verdana, Arial, sans-serif; font-size: 14px; color: #454748;">
+                    Hello
+                    <t t-out="object.name or ''">Ana Bloom</t>
+                    ,
+                    <br />
+                    <br />
+                    <t t-set="rows" t-value="object._report_rows()" />
+                    <t t-if="rows">
+                        Here are your tables for
+                        <strong t-out="object.event_id.name or ''">Spring Forum</strong>
+                        .
+                        <br />
+                        <br />
+                        <table border="0" cellpadding="4" cellspacing="0" style="border-collapse: collapse;">
+                            <tr>
+                                <td style="border-bottom: 1px solid #cccccc;">
+                                    <strong>Round</strong>
+                                </td>
+                                <td style="border-bottom: 1px solid #cccccc;">
+                                    <strong>Table</strong>
+                                </td>
+                                <td t-if="object.plan_id.assign_seats" style="border-bottom: 1px solid #cccccc;">
+                                    <strong>Seat</strong>
+                                </td>
+                            </tr>
+                            <tr t-foreach="rows" t-as="row">
+                                <td>
+                                    <span class="o_event_table_mail_round" t-out="row['round']">1</span>
+                                </td>
+                                <td>
+                                    <span class="o_event_table_mail_number" t-out="row['table_number']">3</span>
+                                </td>
+                                <td t-if="object.plan_id.assign_seats">
+                                    <span class="o_event_table_mail_seat" t-out="row['seat_number']">2</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+                    <p t-else="">No table assigned yet.</p>
+                    <br />
+                    <t t-if="object.event_id.address_id">
+                        <span t-out="object.event_id.address_id.name or ''">Forum Hall</span>
+                        <br />
+                    </t>
+                    <t t-out="object.event_id.date_begin" t-options='{"widget": "datetime", "tz_name": object.event_id.date_tz, "format": "long"}'>April 2, 2026 9:00 AM</t>
+                    <br />
+                    <br />
+                    See you soon.
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

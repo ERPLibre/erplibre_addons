@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_event_table_plan_desk,event.table.plan desk,model_event_table_plan,event.group_event_registration_desk,1,0,0,0
+access_event_table_plan_user,event.table.plan user,model_event_table_plan,event.group_event_user,1,1,1,1
+access_event_table_desk,event.table desk,model_event_table,event.group_event_registration_desk,1,0,0,0
+access_event_table_user,event.table user,model_event_table,event.group_event_user,1,1,1,1
+access_event_table_configure_wizard_user,event.table.configure.wizard user,model_event_table_configure_wizard,event.group_event_user,1,1,1,1
+access_event_table_participant_desk,event.table.participant desk,model_event_table_participant,event.group_event_registration_desk,1,0,0,0
+access_event_table_participant_user,event.table.participant user,model_event_table_participant,event.group_event_user,1,1,1,1
+access_event_table_participant_wizard_user,event.table.participant.wizard user,model_event_table_participant_wizard,event.group_event_user,1,1,1,1
+access_event_table_pin_generate_wizard_user,event.table.pin.generate.wizard user,model_event_table_pin_generate_wizard,event.group_event_user,1,1,1,1
+access_event_table_combination_desk,event.table.combination desk,model_event_table_combination,event.group_event_registration_desk,1,0,0,0
+access_event_table_combination_user,event.table.combination user,model_event_table_combination,event.group_event_user,1,1,1,1
+access_event_table_assignment_desk,event.table.assignment desk,model_event_table_assignment,event.group_event_registration_desk,1,0,0,0
+access_event_table_assignment_user,event.table.assignment user,model_event_table_assignment,event.group_event_user,1,1,1,1
+access_event_table_pin_desk,event.table.pin desk,model_event_table_pin,event.group_event_registration_desk,1,0,0,0
+access_event_table_pin_user,event.table.pin user,model_event_table_pin,event.group_event_user,1,1,1,1

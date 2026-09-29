@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_table_assignment_view_list" model="ir.ui.view">
+        <field name="name">event.table.assignment.list</field>
+        <field name="model">event.table.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Assignments" create="0" delete="0" edit="0">
+                <field name="event_id" />
+                <field name="plan_id" />
+                <field name="round_number" />
+                <field name="table_number" />
+                <field name="seat_number" optional="show" />
+                <field name="participant_id" />
+                <field name="partner_id" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_table_assignment_view_search" model="ir.ui.view">
+        <field name="name">event.table.assignment.search</field>
+        <field name="model">event.table.assignment</field>
+        <field name="arch" type="xml">
+            <search string="Assignments">
+                <field name="plan_id" />
+                <field name="participant_id" />
+                <field name="partner_id" />
+                <group expand="0" string="Group By">
+                    <filter name="group_by_plan" string="Plan" context="{'group_by': 'plan_id'}" />
+                    <filter name="group_by_round" string="Round" context="{'group_by': 'round_number'}" />
+                    <filter name="group_by_table" string="Table" context="{'group_by': 'table_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

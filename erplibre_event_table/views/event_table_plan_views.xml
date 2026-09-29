@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_table_plan_view_list" model="ir.ui.view">
+        <field name="name">event.table.plan.list</field>
+        <field name="model">event.table.plan</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="event_id" />
+                <field name="state" />
+                <field name="participant_count" />
+                <field name="seat_count" />
+                <field name="round_count" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_table_plan_view_search" model="ir.ui.view">
+        <field name="name">event.table.plan.search</field>
+        <field name="model">event.table.plan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="event_id" />
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]" />
+                <filter name="filter_proposed" string="Proposed" domain="[('state', '=', 'proposed')]" />
+                <filter name="filter_chosen" string="Chosen" domain="[('state', '=', 'chosen')]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="event_table_plan_view_form" model="ir.ui.view">
+        <field name="name">event.table.plan.form</field>
+        <field name="model">event.table.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_open_participant_wizard"
+                        type="object"
+                        string="Add Participants"
+                        invisible="state == 'locked'"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_open_configure_wizard"
+                        type="object"
+                        string="Configure Tables"
+                        invisible="state == 'locked'"
+                        groups="event.group_event_user"
+                    />
+                    <!-- A plan laid out before a spacing term changed
+                         keeps its stored positions — no option toggle
+                         moves a table, by contract — so this button is
+                         the only remedy for lists that sit on the next
+                         table over. It writes position_h and position_v,
+                         which a locked plan refuses like everything
+                         else: the cure there is to unlock, arrange and
+                         lock again. -->
+                    <button
+                        name="action_rearrange_tables"
+                        type="object"
+                        string="Rearrange Tables"
+                        invisible="state == 'locked'"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_request_generation"
+                        type="object"
+                        string="Generate Combinations"
+                        class="btn-primary"
+                        invisible="state == 'locked'"
+                        groups="event.group_event_user"
+                    />
+                    <!-- The way out of hand placement: the pins hold,
+                         the generator seats everyone else around them.
+                         It shows only while the plan has reservations and
+                         no seating yet, which is exactly when it applies. -->
+                    <button
+                        name="action_retain_placement"
+                        type="object"
+                        string="Retain This Placement"
+                        class="btn-primary"
+                        invisible="state == 'locked' or pin_count == 0 or has_assignments"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_print_participant_cards"
+                        type="object"
+                        class="btn-secondary"
+                        string="Print Participant Cards"
+                        invisible="not has_assignments"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_print_table_sheets"
+                        type="object"
+                        class="btn-secondary"
+                        string="Print Table Sheets"
+                        invisible="not has_assignments"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_send_assignment_emails"
+                        type="object"
+                        class="btn-secondary"
+                        string="Send Tables by Email"
+                        invisible="not has_assignments"
+                        confirm="Send each participant their tables by email?"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_lock"
+                        type="object"
+                        string="Lock"
+                        class="btn-secondary"
+                        invisible="state == 'locked'"
+                        groups="event.group_event_user"
+                        confirm="Lock the plan? No change is accepted until it is unlocked."
+                    />
+                    <button
+                        name="action_unlock"
+                        type="object"
+                        string="Unlock"
+                        class="btn-secondary"
+                        invisible="state != 'locked'"
+                        groups="event.group_event_user"
+                    />
+                    <!-- Clicking the bar is how draft, proposed and chosen
+                         are set: they order the work and restrict nothing,
+                         so no button is spent on them. "locked" is absent
+                         from statusbar_visible, which shows it only while
+                         it IS the state, and the bar turns readonly then —
+                         the two buttons above are the only way in and out
+                         of the one state that has teeth. -->
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,proposed,chosen"
+                        options="{'clickable': '1'}"
+                        readonly="state == 'locked'"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            name="action_open_floor_plan_fullscreen"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-expand"
+                        >
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Full Screen</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="seat_balance >= 0">
+                        <field name="capacity_message" />
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="seat_balance &lt; 0">
+                        <field name="capacity_message" />
+                    </div>
+                    <div class="alert alert-primary" role="alert" invisible="not placement_message">
+                        <field name="placement_message" nolabel="1" readonly="1" />
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not sync_message">
+                        <field name="sync_message" nolabel="1" readonly="1" />
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not diagnostic_message">
+                        <field name="diagnostic_message" nolabel="1" readonly="1" />
+                    </div>
+                    <field name="seat_balance" invisible="1" />
+                    <field name="has_assignments" invisible="1" />
+                    <field name="pin_count" invisible="1" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="state == 'locked'" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="plan" string="Plan">
+                            <field name="event_id" readonly="state == 'locked'" />
+                            <field name="round_count" readonly="state == 'locked'" />
+                            <field name="combination_count" readonly="state == 'locked'" />
+                        </group>
+                        <group name="options" string="Options">
+                            <field name="separate_companies" readonly="state == 'locked'" />
+                            <field name="avoid_repeat_neighbors" readonly="state == 'locked'" />
+                            <field name="avoid_repeat_table" readonly="state == 'locked'" />
+                            <field name="assign_seats" readonly="state == 'locked'" />
+                            <!-- The four display options change only what
+                                 the screen draws, so they stay editable in
+                                 every state but one: a locked plan refuses
+                                 every write, and a form offering a toggle the
+                                 server will reject is worse than one that
+                                 greys it out. -->
+                            <field name="show_seat_number" readonly="state == 'locked'" />
+                            <field name="show_company" readonly="state == 'locked'" />
+                            <field name="show_full_names" readonly="state == 'locked'" />
+                            <field name="visual_tables" readonly="state == 'locked'" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="floor_plan" string="Floor Plan">
+                            <widget name="event_table_floor_plan" />
+                        </page>
+                        <page name="participants" string="Participants">
+                            <field name="participant_ids" readonly="state == 'locked'">
+                                <list editable="bottom">
+                                    <field name="name" />
+                                    <field name="partner_id" />
+                                    <field name="email" />
+                                    <field name="company_label" />
+                                    <field name="source" readonly="1" />
+                                    <field name="excluded" widget="boolean_toggle" />
+                                    <field name="assignment_summary" optional="show" />
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tables" string="Tables">
+                            <field name="table_ids" readonly="state == 'locked'">
+                                <list editable="bottom">
+                                    <field name="number" />
+                                    <field name="seat_count" />
+                                    <field name="shape" optional="hide" />
+                                </list>
+                            </field>
+                        </page>
+                        <page name="combinations" string="Combinations" invisible="not combination_ids">
+                            <button
+                                name="action_clear_combinations"
+                                type="object"
+                                string="Clear All"
+                                class="btn-secondary mb-2"
+                                invisible="state == 'locked'"
+                                groups="event.group_event_user"
+                                confirm="Delete every combination except the chosen one?"
+                            />
+                            <field name="combination_ids" nolabel="1" readonly="state == 'locked'">
+                                <list create="0" delete="0" decoration-success="is_chosen">
+                                    <field name="is_chosen" column_invisible="1" />
+                                    <field name="plan_state" column_invisible="1" />
+                                    <field name="rank" />
+                                    <field name="company_pair_count" />
+                                    <field name="extra_meeting_count" />
+                                    <field name="repeated_pair_count" optional="hide" />
+                                    <field name="max_pair_meetings" />
+                                    <field name="table_return_count" />
+                                    <field name="met_distinct_min" />
+                                    <field name="met_distinct_avg" optional="hide" />
+                                    <field name="lower_bound" />
+                                    <field name="is_proven_optimal" />
+                                    <field name="is_close_variant" optional="hide" />
+                                    <field name="is_adjusted" />
+                                    <button
+                                        name="action_open_preview"
+                                        type="object"
+                                        string="Preview"
+                                        class="btn-link"
+                                    />
+                                    <button
+                                        name="action_choose"
+                                        type="object"
+                                        string="Choose"
+                                        class="btn-link"
+                                        invisible="plan_state == 'chosen' or plan_state == 'locked'"
+                                        groups="event.group_event_user"
+                                    />
+                                    <button
+                                        name="action_choose"
+                                        type="object"
+                                        string="Choose"
+                                        class="btn-link"
+                                        invisible="plan_state != 'chosen'"
+                                        groups="event.group_event_user"
+                                        confirm="Replace the current assignments with this combination? Manual changes are lost."
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+</odoo>

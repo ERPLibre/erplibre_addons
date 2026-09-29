@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_event_table_plan" model="ir.actions.act_window">
+        <field name="name">Rotating Tables</field>
+        <field name="res_model">event.table.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        name="Rotating Tables"
+        id="menu_event_table_plan"
+        action="action_event_table_plan"
+        sequence="2"
+        parent="event.event_main_menu"
+        groups="event.group_event_registration_desk"
+    />
+</odoo>

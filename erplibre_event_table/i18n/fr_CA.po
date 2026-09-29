@@ -1,0 +1,2012 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_event_table
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-27 06:21+0000\n"
+"PO-Revision-Date: 2026-09-23 10:12+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Odoo\n"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_event__table_plan_count
+msgid "# Rotating Table Plans"
+msgstr "# Plans de tables tournantes"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_res_partner__table_plan_count
+#: model:ir.model.fields,field_description:erplibre_event_table.field_res_users__table_plan_count
+msgid "# Rotating Tables"
+msgstr "# Tables tournantes"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_combination.py:0
+msgid "%(combination)s chosen."
+msgstr "%(combination)s choisie."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"%(company)s has %(members)s participants for %(tables)s open tables. "
+"Colleague pairs that cannot be avoided: %(minimum)s."
+msgstr ""
+"%(company)s compte %(members)s participants pour %(tables)s tables ouvertes. "
+"Paires de collègues inévitables : %(minimum)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "%(count)s participant(s) still to place."
+msgstr "%(count)s participant(s) restant(s) à placer."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_pin_generate_wizard.py:0
+msgid "%(count)s places are reserved by hand."
+msgstr "%(count)s places sont réservées à la main."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"%(count)s reserved places held. A pin reserves a table, not a seat: seat "
+"numbers are recomputed for the whole table."
+msgstr ""
+"%(count)s places réservées ont été tenues. Une réservation retient une "
+"table, pas un siège : les numéros de siège sont recalculés pour toute la "
+"table."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_participant.py:0
+msgid "%(name)s added to the plan."
+msgstr "%(name)s est ajouté au plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "%(name)s does not take part in this plan."
+msgstr "%(name)s ne participe pas à ce plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_participant.py:0
+msgid "%(name)s excluded: removed from every round."
+msgstr "%(name)s est exclu : retiré de tous les tours."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_participant.py:0
+msgid "%(name)s is included again and waits to be seated."
+msgstr "%(name)s est réintégré et attend une place."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "%(name)s is not at table %(table)s in round %(round)s."
+msgstr "%(name)s n'est pas à la table %(table)s au tour %(round)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"%(name)s is pinned in round %(round)s but is seated nowhere in it. Remove "
+"the pin, or put the participant back in the plan."
+msgstr ""
+"%(name)s a une place réservée au tour %(round)s, mais n'y est assis nulle "
+"part. Retirez la réservation, ou remettez le participant dans le plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"%(name)s is pinned in round %(round)s, and this plan has %(count)s rounds. "
+"Remove that pin or add rounds."
+msgstr ""
+"%(name)s a une place réservée au tour %(round)s, et ce plan compte %(count)s "
+"tours. Retirez cette réservation ou ajoutez des tours."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"%(name)s is pinned to two different tables in round %(round)s. Keep one of "
+"the two pins."
+msgstr ""
+"%(name)s a une place réservée à deux tables différentes au tour %(round)s. "
+"Gardez l'une des deux réservations."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_participant.py:0
+msgid "%(name)s removed from the plan."
+msgstr "%(name)s est retiré du plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"%(pinned)s people are pinned to table %(table)s in round %(round)s, which "
+"seats %(seats)s of them there. Remove pins, or make the table bigger."
+msgstr ""
+"%(pinned)s personnes ont une place réservée à la table %(table)s au tour %"
+"(round)s, qui en accueille %(seats)s. Retirez des réservations, ou "
+"agrandissez la table."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_pin__seat_number
+msgid ""
+"0 when no seat is requested. A pin reserves the table; the seat number is a "
+"wish seating may not be able to grant."
+msgstr ""
+"0 quand aucun siège n'est demandé. Une réservation retient la table ; le "
+"numéro de siège est un souhait que le placement ne peut pas toujours exaucer."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_assignment__seat_number
+msgid "0 when seats are not assigned."
+msgstr "0 quand les sièges ne sont pas attribués."
+
+#. module: erplibre_event_table
+#: model:mail.template,body_html:erplibre_event_table.mail_template_participant_tables
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-family: Verdana, Arial, sans-"
+"serif; font-size: 14px; color: #454748;\">\n"
+"                    Hello\n"
+"                    <t t-out=\"object.name or ''\">Ana Bloom</t>\n"
+"                    ,\n"
+"                    <br/>\n"
+"                    <br/>\n"
+"                    <t t-set=\"rows\" t-value=\"object._report_rows()\"/>\n"
+"                    <t t-if=\"rows\">\n"
+"                        Here are your tables for\n"
+"                        <strong t-out=\"object.event_id.name or ''\">Spring "
+"Forum</strong>\n"
+"                        .\n"
+"                        <br/>\n"
+"                        <br/>\n"
+"                        <table border=\"0\" cellpadding=\"4\" "
+"cellspacing=\"0\" style=\"border-collapse: collapse;\">\n"
+"                            <tr>\n"
+"                                <td style=\"border-bottom: 1px solid #cccccc;"
+"\">\n"
+"                                    <strong>Round</strong>\n"
+"                                </td>\n"
+"                                <td style=\"border-bottom: 1px solid #cccccc;"
+"\">\n"
+"                                    <strong>Table</strong>\n"
+"                                </td>\n"
+"                                <td t-if=\"object.plan_id.assign_seats\" "
+"style=\"border-bottom: 1px solid #cccccc;\">\n"
+"                                    <strong>Seat</strong>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                            <tr t-foreach=\"rows\" t-as=\"row\">\n"
+"                                <td>\n"
+"                                    <span class=\"o_event_table_mail_round\" "
+"t-out=\"row['round']\">1</span>\n"
+"                                </td>\n"
+"                                <td>\n"
+"                                    <span "
+"class=\"o_event_table_mail_number\" t-out=\"row['table_number']\">3</span>\n"
+"                                </td>\n"
+"                                <td t-if=\"object.plan_id.assign_seats\">\n"
+"                                    <span class=\"o_event_table_mail_seat\" "
+"t-out=\"row['seat_number']\">2</span>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                        </table>\n"
+"                    </t>\n"
+"                    <p t-else=\"\">No table assigned yet.</p>\n"
+"                    <br/>\n"
+"                    <t t-if=\"object.event_id.address_id\">\n"
+"                        <span t-out=\"object.event_id.address_id.name or "
+"''\">Forum Hall</span>\n"
+"                        <br/>\n"
+"                    </t>\n"
+"                    <t t-out=\"object.event_id.date_begin\" t-"
+"options=\"{&quot;widget&quot;: &quot;datetime&quot;, &quot;tz_name&quot;: "
+"object.event_id.date_tz, &quot;format&quot;: &quot;long&quot;}\">April 2, "
+"2026 9:00 AM</t>\n"
+"                    <br/>\n"
+"                    <br/>\n"
+"                    See you soon.\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-family: Verdana, Arial, sans-"
+"serif; font-size: 14px; color: #454748;\">\n"
+"                    Bonjour\n"
+"                    <t t-out=\"object.name or ''\">Ana Bloom</t>\n"
+"                    ,\n"
+"                    <br/>\n"
+"                    <br/>\n"
+"                    <t t-set=\"rows\" t-value=\"object._report_rows()\"/>\n"
+"                    <t t-if=\"rows\">\n"
+"                        Voici vos tables pour\n"
+"                        <strong t-out=\"object.event_id.name or ''\">Spring "
+"Forum</strong>\n"
+"                        .\n"
+"                        <br/>\n"
+"                        <br/>\n"
+"                        <table border=\"0\" cellpadding=\"4\" "
+"cellspacing=\"0\" style=\"border-collapse: collapse;\">\n"
+"                            <tr>\n"
+"                                <td style=\"border-bottom: 1px solid #cccccc;"
+"\">\n"
+"                                    <strong>Tour</strong>\n"
+"                                </td>\n"
+"                                <td style=\"border-bottom: 1px solid #cccccc;"
+"\">\n"
+"                                    <strong>Table</strong>\n"
+"                                </td>\n"
+"                                <td t-if=\"object.plan_id.assign_seats\" "
+"style=\"border-bottom: 1px solid #cccccc;\">\n"
+"                                    <strong>Siège</strong>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                            <tr t-foreach=\"rows\" t-as=\"row\">\n"
+"                                <td>\n"
+"                                    <span class=\"o_event_table_mail_round\" "
+"t-out=\"row['round']\">1</span>\n"
+"                                </td>\n"
+"                                <td>\n"
+"                                    <span "
+"class=\"o_event_table_mail_number\" t-out=\"row['table_number']\">3</span>\n"
+"                                </td>\n"
+"                                <td t-if=\"object.plan_id.assign_seats\">\n"
+"                                    <span class=\"o_event_table_mail_seat\" "
+"t-out=\"row['seat_number']\">2</span>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                        </table>\n"
+"                    </t>\n"
+"                    <p t-else=\"\">Aucune table attribuée pour l'instant.</"
+"p>\n"
+"                    <br/>\n"
+"                    <t t-if=\"object.event_id.address_id\">\n"
+"                        <span t-out=\"object.event_id.address_id.name or "
+"''\">Forum Hall</span>\n"
+"                        <br/>\n"
+"                    </t>\n"
+"                    <t t-out=\"object.event_id.date_begin\" t-"
+"options=\"{&quot;widget&quot;: &quot;datetime&quot;, &quot;tz_name&quot;: "
+"object.event_id.date_tz, &quot;format&quot;: &quot;long&quot;}\">April 2, "
+"2026 9:00 AM</t>\n"
+"                    <br/>\n"
+"                    <br/>\n"
+"                    À bientôt.\n"
+"                </div>\n"
+"            "
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "<span class=\"o_stat_text\">Full Screen</span>"
+msgstr "<span class=\"o_stat_text\">Plein écran</span>"
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_pin_participant_round_unique
+msgid "A participant is pinned to one table per round."
+msgstr "Un participant a une place réservée à une seule table par tour."
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_assignment_participant_round_unique
+msgid "A participant sits once per round."
+msgstr "Un participant est assis une fois par tour."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__avoid_repeat_table
+msgid "A person does not return to a table where they already sat."
+msgstr "Une personne ne retourne pas à une table où elle s'est déjà assise."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_pin_generate_wizard_view_form
+msgid ""
+"A pin reserves a table, not a seat: seat numbers are\n"
+"                    recomputed for the whole table, so a requested seat\n"
+"                    number may not be the one given."
+msgstr ""
+"Une réservation retient une table, pas un siège : les numéros de\n"
+"                    siège sont recalculés pour toute la table, donc le "
+"numéro\n"
+"                    de siège demandé peut ne pas être celui donné."
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_plan_round_count_range
+msgid "A plan has between 1 and 50 rounds."
+msgstr "Un plan compte entre 1 et 50 tours."
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_plan_combination_count_range
+msgid "A plan proposes between 1 and 10 combinations."
+msgstr "Un plan propose entre 1 et 10 combinaisons."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_assignment.py:0
+msgid "A seat holds one participant per round."
+msgstr "Un siège reçoit une seule personne par tour."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_seat_claim.py:0
+msgid "A seat is claimed once per table and round."
+msgstr "Un siège est revendiqué une seule fois par table et par tour."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_pin.py:0
+msgid "A seat is requested once per table and round."
+msgstr "Un siège est demandé une seule fois par table et par tour."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_configure_wizard.py:0
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_seat_count_min
+msgid "A table has at least 2 seats."
+msgstr "Une table compte au moins 2 sièges."
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_size_min
+msgid "A table is at least 40 pixels wide and high."
+msgstr "Une table mesure au moins 40 pixels de large et de haut."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_participant_wizard_view_form
+msgid "Add"
+msgstr "Ajouter"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Add Participants"
+msgstr "Ajouter des participants"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_participant_wizard
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_event_view_form_table
+msgid "Add Rotating Table Participants"
+msgstr "Ajouter des personnes aux tables tournantes"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_configure_wizard__mode__append
+msgid "Add tables after the last one"
+msgstr "Ajouter des tables à la suite"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Add tables or seats."
+msgstr "Ajoutez des tables ou des sièges."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__is_adjusted
+msgid "Adjusted by Hand"
+msgstr "Retouchée à la main"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Adjusted by hand"
+msgstr "Retouchée à la main"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_combination__method__design
+msgid "Algebraic Design"
+msgstr "Plan algébrique"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_configure_wizard_view_form
+msgid "Apply"
+msgstr "Appliquer"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__assign_seats
+msgid "Assign Seats"
+msgstr "Attribuer les sièges"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__assignment_ids
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__assignment_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_assignment_view_list
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_assignment_view_search
+msgid "Assignments"
+msgstr "Affectations"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_assignment.py:0
+msgid "Assignments change only through the floor plan."
+msgstr "Les affectations ne changent que par le plan de salle."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "At least 2 participants are needed."
+msgstr "Il faut au moins 2 participants."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_participant_wizard__registration_scope__attended
+msgid "Attended only"
+msgstr "Présents seulement"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Auto-arrange the tables"
+msgstr "Réorganiser les tables automatiquement"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_configure_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_participant_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_pin_generate_wizard_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__capacity_message
+msgid "Capacity Message"
+msgstr "Message de capacité"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_combination_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Choose"
+msgstr "Choisir"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_plan__state__chosen
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_search
+msgid "Chosen"
+msgstr "Choisi"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__chosen_combination_id
+msgid "Chosen Combination"
+msgstr "Combinaison choisie"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table__shape__round
+msgid "Circular"
+msgstr "Ronde"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Clear All"
+msgstr "Tout effacer"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__is_close_variant
+msgid "Close Variant"
+msgstr "Variante proche"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__company_pair_count
+msgid "Colleague Pairs"
+msgstr "Paires de collègues"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Colleagues at this table"
+msgstr "Collègues à cette table"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__combination_id
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_combination_view_form
+msgid "Combination"
+msgstr "Combinaison"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_combination.py:0
+msgid "Combination %(rank)s"
+msgstr "Combinaison %(rank)s"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__combination_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Combinations"
+msgstr "Combinaisons"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Combinations cleared: %(count)s deleted."
+msgstr "Combinaisons effacées : %(count)s supprimée(s)."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Combinations generated: %(count)s, in %(seconds)s s."
+msgstr "Combinaisons générées : %(count)s, en %(seconds)s s."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__combination_count
+msgid "Combinations to Propose"
+msgstr "Combinaisons à proposer"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__company_label
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__company_id
+msgid "Company"
+msgstr "Entreprise"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__company_key
+msgid "Company Key"
+msgstr "Clé d'entreprise"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_configure_wizard
+msgid "Configure Rotating Tables"
+msgstr "Configurer les tables tournantes"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Configure Tables"
+msgstr "Configurer les tables"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Configure the tables first."
+msgstr "Configurez d'abord les tables."
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Configure the tables to draw the floor plan."
+msgstr "Configurez les tables pour dessiner le plan de salle."
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_res_partner
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__partner_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__partner_id
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_participant__source__partner
+msgid "Contact"
+msgstr "Contact"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__cost
+msgid "Cost"
+msgstr "Coût"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Delete every combination except the chosen one?"
+msgstr "Supprimer toutes les combinaisons sauf celle qui est retenue ?"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__diagnostic_message
+msgid "Diagnostic Message"
+msgstr "Message de diagnostic"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__distance_to_first
+msgid "Distance To First"
+msgstr "Distance à la première combinaison"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Distinct combinations found: %(count)s of %(requested)s requested."
+msgstr ""
+"Combinaisons distinctes trouvées : %(count)s sur %(requested)s demandées."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__separate_companies
+msgid "Do not seat two people from the same company at the same table."
+msgstr "Ne pas asseoir deux personnes de la même entreprise à la même table."
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Done"
+msgstr "Terminé"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_plan__state__draft
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_search
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid ""
+"Dragging someone reserves their seat for the next generation instead of "
+"seating them."
+msgstr ""
+"Faire glisser quelqu'un réserve sa place pour la prochaine génération au "
+"lieu de l'asseoir."
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_number_unique
+msgid "Each table number is used once per plan."
+msgstr "Chaque numéro de table est utilisé une seule fois par plan."
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Edit Layout"
+msgstr "Modifier la disposition"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Edit participants"
+msgstr "Modifier les participants"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__email
+msgid "Email"
+msgstr "Courriel"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_configure_wizard.py:0
+msgid "Enter at least one table."
+msgstr "Indiquez au moins une table."
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_event
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__event_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__event_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__event_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__event_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__event_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__event_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__event_id
+msgid "Event"
+msgstr "Événement"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table
+msgid "Event Table"
+msgstr "Table d'événement"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_type
+msgid "Event Template"
+msgstr "Modèle d'événement"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_type__use_rotating_tables
+msgid "Events created from this template start with rotating tables enabled."
+msgstr ""
+"Les événements créés depuis ce modèle démarrent avec les tables tournantes "
+"activées."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__excluded
+msgid "Excluded"
+msgstr "Exclu"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__existing_table_warning
+msgid "Existing Table Warning"
+msgstr "Avertissement des tables existantes"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Exit Full Screen"
+msgstr "Quitter le plein écran"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__extra_meeting_count
+msgid "Extra Meetings"
+msgstr "Rencontres en trop"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Fit to window"
+msgstr "Ajuster à la fenêtre"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Floor Plan"
+msgstr "Plan de salle"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Full Screen"
+msgstr "Plein écran"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_pin_generate_wizard_view_form
+msgid "Generate"
+msgstr "Générer"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_pin_generate_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Generate Combinations"
+msgstr "Générer les combinaisons"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_pin_generate_wizard
+msgid "Generate Combinations Around Pins"
+msgstr "Générer les combinaisons autour des places réservées"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Generate and choose a combination to see who sits where."
+msgstr "Générez et choisissez une combinaison pour voir qui est assis où."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_combination.py:0
+msgid "Generate combinations before choosing one."
+msgstr "Générez des combinaisons avant d'en choisir une."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__is_pin_constrained
+msgid "Generated Around Pins"
+msgstr "Générée autour des places réservées"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__generation_seed
+msgid "Generation Seed"
+msgstr "Graine de génération"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__generation_duration
+msgid "Generation Time (seconds)"
+msgstr "Durée de génération (secondes)"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__assign_seats
+msgid ""
+"Give each person a seat number. Otherwise people choose where to sit at "
+"their table."
+msgstr ""
+"Attribuez un numéro de siège à chaque personne. Sinon, les personnes "
+"choisissent où s'asseoir à leur table."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_combination__method__greedy
+msgid "Greedy Construction"
+msgstr "Construction gloutonne"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_assignment_view_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_participant__source__guest
+msgid "Guest"
+msgstr "Invité"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__has_assignments
+msgid "Has Assignments"
+msgstr "A des attributions"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__height
+msgid "Height"
+msgstr "Hauteur"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Highlight a participant"
+msgstr "Mettre un participant en évidence"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__id
+msgid "ID"
+msgstr "ID"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_combination_view_form
+msgid "Indicators"
+msgstr "Indicateurs"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__is_chosen
+msgid "Is Chosen"
+msgstr "Choisie"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__is_proven_optimal
+msgid "Is Proven Optimal"
+msgstr "Optimalité prouvée"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_combination__stopped_by__iterations
+msgid "Iteration limit"
+msgstr "Limite d'itérations"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_participant__excluded
+msgid "Keep the person in the list without seating them."
+msgstr "Garde la personne dans la liste sans l'asseoir."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_participant_wizard__plan_id
+msgid "Leave empty to create a new plan."
+msgstr "Laissez vide pour créer un nouveau plan."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__show_full_names
+msgid ""
+"Let a long name wrap onto a second line in the list beside each table, "
+"instead of cutting it at the column's width. The column always widens; the "
+"extra height is reserved only where a name is long enough to need that "
+"second line. Rearranging the tables spaces them for whichever room the plan "
+"reserved."
+msgstr ""
+"Laisse un nom long passer à la ligne dans la liste à côté de chaque table, "
+"au lieu de le couper à la largeur de la colonne. La colonne s'élargit "
+"toujours ; la hauteur supplémentaire n'est réservée que là où un nom est "
+"assez long pour avoir besoin de cette seconde ligne. Réorganiser les tables "
+"les espace selon la place que le plan a réservée."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Lock"
+msgstr "Bloquer"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Lock the plan? No change is accepted until it is unlocked."
+msgstr ""
+"Bloquer le plan ? Aucune modification ne sera acceptée avant le déblocage."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_plan__state__locked
+msgid "Locked"
+msgstr "Bloqué"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__method
+msgid "Method"
+msgstr "Méthode"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_combination__stopped_by__lower_bound
+msgid "Minimum reached"
+msgstr "Minimum atteint"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__mode
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__mode
+msgid "Mode"
+msgstr "Mode"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"More rounds (%(rounds)s) than open tables (%(tables)s). Table returns that "
+"cannot be avoided: %(minimum)s."
+msgstr ""
+"Plus de tours (%(rounds)s) que de tables ouvertes (%(tables)s). Retours à "
+"une table inévitables : %(minimum)s."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__max_pair_meetings
+msgid "Most Meetings of a Pair"
+msgstr "Rencontres maximales d'une paire"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__name
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__avoid_repeat_neighbors
+msgid "New Neighbours Each Round"
+msgstr "Nouveaux voisins à chaque tour"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__avoid_repeat_table
+msgid "New Table Each Round"
+msgstr "Nouvelle table à chaque tour"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_combination__stopped_by__no_conflict
+msgid "No conflict left"
+msgstr "Plus aucun conflit"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_participant_wizard__registration_scope__none
+msgid "No registration"
+msgstr "Aucune inscription"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.report_participant_card
+msgid "No table assigned yet."
+msgstr "Aucune table attribuée pour l'instant."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Nobody is placed yet. Put at least one person at a table before retaining "
+"the placement."
+msgstr ""
+"Personne n'est encore placé. Mettez au moins une personne à une table avant "
+"de retenir le placement."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Nobody is seated yet. Choose a combination first."
+msgstr "Personne n'est encore placé. Choisissez d'abord une combinaison."
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Nobody is waiting for a place"
+msgstr "Personne n'attend de place"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Not seated (%(count)s)"
+msgstr "Sans place (%(count)s)"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__table_count
+msgid "Number of Tables"
+msgstr "Nombre de tables"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_pin_generate_wizard.py:0
+msgid "One place is reserved by hand."
+msgstr "Une place est réservée à la main."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Options"
+msgstr "Options"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__partner_ids
+msgid "Other Contacts"
+msgstr "Autres contacts"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__participant_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__participant_id
+msgid "Participant"
+msgstr "Participant"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__participant_count
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__participant_count
+msgid "Participant Count"
+msgstr "Nombre de participants"
+
+#. module: erplibre_event_table
+#: model:ir.actions.report,name:erplibre_event_table.action_report_participant_card
+msgid "Participant Tables"
+msgstr "Tables des participants"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__participant_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Participants"
+msgstr "Participants"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_participant_wizard.py:0
+msgid ""
+"Participants added: %(added)s. Registrations merged with an existing "
+"participant: %(merged)s."
+msgstr ""
+"Participants ajoutés : %(added)s. Inscriptions fusionnées avec un "
+"participant existant : %(merged)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_combination.py:0
+msgid ""
+"Participants or tables changed since this combination was generated. "
+"Generate the combinations again."
+msgstr ""
+"Les participants ou les tables ont changé depuis la génération de cette "
+"combinaison. Générez à nouveau les combinaisons."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Participants: %(persons)s. Seats: %(seats)s. Every seat is taken."
+msgstr ""
+"Participants : %(persons)s. Sièges : %(seats)s. Tous les sièges sont pris."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Participants: %(persons)s. Seats: %(seats)s. Free: %(free)s."
+msgstr "Participants : %(persons)s. Sièges : %(seats)s. Libres : %(free)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Participants: %(persons)s. Seats: %(seats)s. Missing: %(missing)s."
+msgstr ""
+"Participants : %(persons)s. Sièges : %(seats)s. Manquants : %(missing)s."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__met_distinct_avg
+msgid "People Met (Average)"
+msgstr "Personnes rencontrées (moyenne)"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__met_distinct_min
+msgid "People Met (Minimum)"
+msgstr "Personnes rencontrées (minimum)"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_participant__company_label
+msgid ""
+"People sharing this company are kept apart when colleagues are separated. "
+"Clear it to exempt this person."
+msgstr ""
+"Les personnes qui partagent cette entreprise sont séparées quand les "
+"collègues le sont. Videz le champ pour exempter cette personne."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__pin_count
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__pin_count
+msgid "Pin Count"
+msgstr "Nombre de places réservées"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__pin_summary
+msgid "Pin Summary"
+msgstr "Résumé des places réservées"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__pin_ids
+msgid "Pins"
+msgstr "Places réservées"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Pins carried over: %(carried)s. Left behind for want of an identifiable "
+"participant: %(dropped)s."
+msgstr ""
+"Places réservées reportées : %(carried)s. Laissées de côté faute d'un "
+"participant identifiable : %(dropped)s."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__placement_data
+msgid "Placement Data"
+msgstr "Données de placement"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__placement_message
+msgid "Placement Message"
+msgstr "Message de placement"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__plan_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin_generate_wizard__plan_id
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_assignment_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Plan"
+msgstr "Plan"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Plan duplicated from %(plan_name)s."
+msgstr "Plan dupliqué depuis %(plan_name)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Plan locked: no change is accepted."
+msgstr "Plan bloqué : aucune modification n'est acceptée."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Plan unlocked."
+msgstr "Plan débloqué."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__position_h
+msgid "Position H"
+msgstr "Position H"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__position_v
+msgid "Position V"
+msgstr "Position V"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Preview"
+msgstr "Aperçu"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Print Participant Cards"
+msgstr "Imprimer les cartes des participants"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Print Table Sheets"
+msgstr "Imprimer les feuilles de table"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_plan__state__proposed
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_search
+msgid "Proposed"
+msgstr "Proposé"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__lower_bound
+msgid "Proven Minimum"
+msgstr "Minimum prouvé"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__rank
+msgid "Rank"
+msgstr "Rang"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Rearrange Tables"
+msgstr "Réorganiser les tables"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table__shape__square
+msgid "Rectangular"
+msgstr "Carrée"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_participant_wizard__registration_scope__registered
+msgid "Registered and attended"
+msgstr "Inscrits et présents"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__registration_id
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_participant__source__registration
+msgid "Registration"
+msgstr "Inscription"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant_wizard__registration_scope
+msgid "Registration Scope"
+msgstr "Portée des inscriptions"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Remove from this round"
+msgstr "Retirer de ce tour"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__repeated_pair_count
+msgid "Repeated Meetings"
+msgstr "Rencontres répétées"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Repeated meetings at this table"
+msgstr "Rencontres répétées à cette table"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid ""
+"Replace the current assignments with this combination? Manual changes are "
+"lost."
+msgstr ""
+"Remplacer les affectations actuelles par cette combinaison ? Les retouches "
+"manuelles seront perdues."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_configure_wizard__mode__replace
+msgid "Replace the tables"
+msgstr "Remplacer les tables"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__seat_number
+msgid "Requested Seat"
+msgstr "Siège demandé"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Reservations"
+msgstr "Réservations"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_pin_generate_wizard__mode__keep
+msgid "Reserve the pinned places and fill around them"
+msgstr "Tenir les places réservées et remplir autour"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Retain This Placement"
+msgstr "Retenir ce placement"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Returns to this table"
+msgstr "Retours à cette table"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_assignment
+msgid "Rotating Table Assignment"
+msgstr "Affectation aux tables tournantes"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/res_partner.py:0
+#: model:ir.model.fields,field_description:erplibre_event_table.field_res_partner__table_assignment_ids
+#: model:ir.model.fields,field_description:erplibre_event_table.field_res_users__table_assignment_ids
+msgid "Rotating Table Assignments"
+msgstr "Affectations aux tables tournantes"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_combination
+msgid "Rotating Table Combination"
+msgstr "Combinaison de tables tournantes"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_participant
+msgid "Rotating Table Participant"
+msgstr "Participant aux tables tournantes"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_pin
+msgid "Rotating Table Pin"
+msgstr "Place réservée aux tables tournantes"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_participant_wizard.py:0
+#: model:ir.model,name:erplibre_event_table.model_event_table_plan
+msgid "Rotating Table Plan"
+msgstr "Plan de tables tournantes"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_event__table_plan_ids
+msgid "Rotating Table Plans"
+msgstr "Plans de tables tournantes"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+#: model:ir.actions.act_window,name:erplibre_event_table.action_event_table_plan
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_event__use_rotating_tables
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_type__use_rotating_tables
+#: model:ir.ui.menu,name:erplibre_event_table.menu_event_table_plan
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_event_view_form_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.res_partner_view_form_table
+msgid "Rotating Tables"
+msgstr "Tables tournantes"
+
+#. module: erplibre_event_table
+#: model:mail.template,name:erplibre_event_table.mail_template_participant_tables
+msgid "Rotating Tables: Participant Tables"
+msgstr "Tables tournantes : tables du participant"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__round_number
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__round_number
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_assignment_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.report_participant_card
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.report_table_sheet
+msgid "Round"
+msgstr "Tour"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Round %(round)s does not exist in this plan."
+msgstr "Le tour %(round)s n'existe pas dans ce plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Round %(round)s: %(name)s and %(other)s swapped places."
+msgstr "Tour %(round)s : %(name)s et %(other)s ont échangé leurs places."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Round %(round)s: %(name)s no longer sits at a table."
+msgstr "Tour %(round)s : %(name)s n'est plus à une table."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Round %(round)s: %(name)s now sits at table %(table)s."
+msgstr "Tour %(round)s : %(name)s est maintenant à la table %(table)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_participant.py:0
+msgid "Round %(round)s: table %(table)s"
+msgstr "Tour %(round)s : table %(table)s"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_participant.py:0
+msgid "Round %(round)s: table %(table)s, seat %(seat)s"
+msgstr "Tour %(round)s : table %(table)s, siège %(seat)s"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Round shape"
+msgstr "Forme ronde"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__round_count
+msgid "Rounds"
+msgstr "Tours"
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_pin_round_number_positive
+msgid "Rounds start at 1."
+msgstr "Les tours commencent à 1."
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Save the record to draw the floor plan."
+msgstr "Enregistrez la fiche pour dessiner le plan de salle."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__seat_number
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.report_participant_card
+msgid "Seat"
+msgstr "Siège"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Seat %(seat)s at table %(table)s is taken by %(name)s. Drop the person onto "
+"them to swap."
+msgstr ""
+"Le siège %(seat)s de la table %(table)s est occupé par %(name)s. Déposez la "
+"personne dessus pour les échanger."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__seat_balance
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__seat_balance
+msgid "Seat Balance"
+msgstr "Solde des sièges"
+
+#. module: erplibre_event_table
+#: model:ir.model,name:erplibre_event_table.model_event_table_seat_claim
+msgid "Seat Claim Uniqueness"
+msgstr "Unicité de la revendication de siège"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__seat_count
+msgid "Seat Count"
+msgstr "Nombre de sièges"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Seat someone at table %(number)s"
+msgstr "Asseoir quelqu'un à la table %(number)s"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__seat_count
+msgid "Seats"
+msgstr "Sièges"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__seats_per_table
+msgid "Seats per Table"
+msgstr "Sièges par table"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__seed
+msgid "Seed"
+msgstr "Graine"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Seed: %(seed)s. Method: %(method)s. Stopped by: %(stopped)s."
+msgstr "Graine : %(seed)s. Méthode : %(method)s. Arrêt : %(stopped)s."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Send Tables by Email"
+msgstr "Envoyer les tables par courriel"
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Send each participant their tables by email?"
+msgstr "Envoyer à chaque participant ses tables par courriel ?"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Send to table…"
+msgstr "Envoyer à la table…"
+
+#. module: erplibre_event_table
+#: model:mail.template,description:erplibre_event_table.mail_template_participant_tables
+msgid "Sent to a participant with their table for each round"
+msgstr "Envoyé à un participant avec sa table pour chaque tour"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__separate_companies
+msgid "Separate Colleagues"
+msgstr "Séparer les collègues"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__shape
+msgid "Shape"
+msgstr "Forme"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__show_company
+msgid "Show Company"
+msgstr "Afficher l'entreprise"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__show_full_names
+msgid "Show Full Names"
+msgstr "Afficher les noms en entier"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__show_seat_number
+msgid "Show Seat Numbers"
+msgstr "Afficher les numéros de siège"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.xml:0
+msgid "Show the name lists"
+msgstr "Afficher les listes de noms"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__source
+msgid "Source"
+msgstr "Source"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Square shape"
+msgstr "Forme carrée"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_pin_generate_wizard__mode__reset
+msgid "Start over from zero, ignoring the pins"
+msgstr "Repartir de zéro, sans tenir compte des places réservées"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__plan_state
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__state
+msgid "State"
+msgstr "État"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__stopped_by
+msgid "Stopped By"
+msgstr "Arrêt"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__sync_message
+msgid "Sync Message"
+msgstr "Message de synchronisation"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__table_id
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_pin__table_id
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_assignment_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.report_participant_card
+msgid "Table"
+msgstr "Table"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table.py:0
+msgid "Table %(number)s"
+msgstr "Table %(number)s"
+
+#. module: erplibre_event_table
+#. odoo-javascript
+#: code:addons/erplibre_event_table/static/src/floor_plan/floor_plan.js:0
+msgid "Table %(number)s (%(taken)s / %(seats)s)"
+msgstr "Table %(number)s (%(taken)s / %(seats)s)"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Table %(table)s does not belong to this plan."
+msgstr "La table %(table)s n'appartient pas à ce plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Table %(table)s has no seat %(seat)s."
+msgstr "La table %(table)s n'a pas de siège %(seat)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_assignment.py:0
+msgid "Table %(table)s holds %(seats)s people at most."
+msgstr "La table %(table)s accueille %(seats)s personnes au plus."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Table %(table)s is full in round %(round)s. Drop the person onto someone to "
+"swap them."
+msgstr ""
+"La table %(table)s est pleine au tour %(round)s. Déposez la personne sur "
+"quelqu'un pour les échanger."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Table %(table)s is not part of this plan."
+msgstr "La table %(table)s ne fait pas partie de ce plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Table %(table)s seats nobody in round %(round)s, so %(name)s cannot be "
+"pinned to it."
+msgstr ""
+"La table %(table)s n'accueille personne au tour %(round)s, donc %(name)s ne "
+"peut pas y réserver de place."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_configure_wizard__existing_table_count
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__table_count
+msgid "Table Count"
+msgstr "Nombre de tables"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__number
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_assignment__table_number
+msgid "Table Number"
+msgstr "Numéro de table"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_combination__table_return_count
+msgid "Table Returns"
+msgstr "Retours à une table"
+
+#. module: erplibre_event_table
+#: model:ir.actions.report,name:erplibre_event_table.action_report_table_sheet
+msgid "Table Sheet"
+msgstr "Feuille de table"
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_number_positive
+msgid "Table numbers start at 1."
+msgstr "Les numéros de table commencent à 1."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__assignment_summary
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__table_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Tables"
+msgstr "Tables"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_configure_wizard.py:0
+msgid "Tables %(first)s to %(last)s created, %(seats)s seats each."
+msgstr "Tables %(first)s à %(last)s créées, %(seats)s sièges chacune."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_participant__assignment_ids
+msgid "Tables by Round"
+msgstr "Tables par tour"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "Tables rearranged on the floor plan."
+msgstr "Tables réorganisées sur le plan de salle."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Tables sent by email. Sent: %(sent)s. Without email address: %(skipped)s."
+msgstr ""
+"Tables envoyées par courriel. Envoyés : %(sent)s. Sans adresse courriel : %"
+"(skipped)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Tables too full for this number of tables. Repeated meetings or table "
+"returns that cannot be avoided: %(minimum)s."
+msgstr ""
+"Tables trop remplies pour ce nombre de tables. Rencontres répétées ou "
+"retours à une table inévitables : %(minimum)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Tables too full for this number of tables. Repeated meetings that cannot be "
+"avoided: %(minimum)s."
+msgstr ""
+"Tables trop remplies pour ce nombre de tables. Rencontres répétées "
+"inévitables : %(minimum)s."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_configure_wizard.py:0
+msgid "The %(count)s existing tables will be deleted."
+msgstr "Les %(count)s tables existantes seront supprimées."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/wizards/event_table_configure_wizard.py:0
+msgid "The existing table will be deleted."
+msgstr "La table existante sera supprimée."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "The generation produced no combination to retain."
+msgstr "La génération n'a produit aucune combinaison à retenir."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "The plan no longer matches its participants. Not seated: %(unseated)s."
+msgstr ""
+"Le plan ne correspond plus à ses participants. Sans place : %(unseated)s."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_combination__is_pin_constrained
+msgid ""
+"The reserved places of the plan were held while this combination was "
+"generated."
+msgstr ""
+"Les places réservées du plan ont été tenues pendant la génération de cette "
+"combinaison."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_pin_generate_wizard_view_form
+msgid ""
+"The reserved places stay on the plan and are ignored\n"
+"                    for this generation only."
+msgstr ""
+"Les places réservées restent sur le plan et ne sont ignorées\n"
+"                    que pour cette génération."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_combination.py:0
+msgid ""
+"This combination is the one in use. Choose another one before deleting it."
+msgstr ""
+"Cette combinaison est celle en service. Choisissez-en une autre avant de la "
+"supprimer."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"This configuration is tight: with %(suggested_tables)s tables an algebraic "
+"plan applies and usually avoids every conflict."
+msgstr ""
+"Cette configuration est serrée : avec %(suggested_tables)s tables, un plan "
+"algébrique s'applique et évite en général tout conflit."
+
+#. module: erplibre_event_table
+#: model:ir.model.constraint,message:erplibre_event_table.constraint_event_table_participant_partner_unique
+msgid "This contact already takes part in this plan."
+msgstr "Ce contact participe déjà à ce plan."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid "This plan is locked. Unlock it before changing anything."
+msgstr "Ce plan est bloqué. Débloquez-le avant de modifier quoi que ce soit."
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_pin.py:0
+msgid "This plan is locked. Unlock it before pinning anyone."
+msgstr ""
+"Ce plan est bloqué. Débloquez-le avant de réserver une place à qui que ce "
+"soit."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields.selection,name:erplibre_event_table.selection__event_table_combination__stopped_by__time
+msgid "Time limit"
+msgstr "Limite de temps"
+
+#. module: erplibre_event_table
+#. odoo-python
+#: code:addons/erplibre_event_table/models/event_table_plan.py:0
+msgid ""
+"Too many rounds for these table sizes. Repeated meetings that cannot be "
+"avoided: %(minimum)s."
+msgstr ""
+"Trop de tours pour ces tailles de table. Rencontres répétées inévitables : %"
+"(minimum)s."
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__avoid_repeat_neighbors
+msgid "Two people who already shared a table are not seated together again."
+msgstr ""
+"Deux personnes qui ont déjà partagé une table ne sont pas réassises ensemble."
+
+#. module: erplibre_event_table
+#: model_terms:ir.ui.view,arch_db:erplibre_event_table.event_table_plan_view_form
+msgid "Unlock"
+msgstr "Débloquer"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__unplaced_count
+msgid "Unplaced Count"
+msgstr "Nombre de personnes sans place"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__unseated_count
+msgid "Unseated Count"
+msgstr "Nombre de personnes sans place"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__visual_tables
+msgid "Visual Tables"
+msgstr "Tables illustrées"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table_plan__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,help:erplibre_event_table.field_event_table_plan__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: erplibre_event_table
+#: model:ir.model.fields,field_description:erplibre_event_table.field_event_table__width
+msgid "Width"
+msgstr "Largeur"
+
+#. module: erplibre_event_table
+#: model:mail.template,subject:erplibre_event_table.mail_template_participant_tables
+msgid "Your tables for {{ object.event_id.name }}"
+msgstr "Vos tables pour {{ object.event_id.name }}"
+
+#~ msgid ""
+#~ "Let a long name wrap onto a second line in the list beside each table, "
+#~ "instead of cutting it at the column's width. The column widens, and the "
+#~ "plan reserves the extra room, so rearranging the tables spaces them for "
+#~ "the wider lists."
+#~ msgstr ""
+#~ "Laisse un nom long passer à la ligne dans la liste à côté de chaque "
+#~ "table, au lieu de le couper à la largeur de la colonne. La colonne "
+#~ "s'élargit et le plan réserve la place supplémentaire, de sorte que "
+#~ "réorganiser les tables les espace pour les listes élargies."
+
+#~ msgid ""
+#~ "Nobody is seated yet. Generate a combination, or place people by hand, "
+#~ "before moving anyone."
+#~ msgstr ""
+#~ "Personne n'est encore placé. Générez une combinaison, ou placez les gens "
+#~ "à la main, avant de déplacer quiconque."
+
+#~ msgid ""
+#~ "A combination is already chosen. Use Back to Draft, or duplicate the plan "
+#~ "from the Actions menu, before generating new combinations."
+#~ msgstr ""
+#~ "Une combinaison est déjà choisie. Utilisez « Remettre en brouillon », ou "
+#~ "dupliquez le plan depuis le menu Actions, avant de générer de nouvelles "
+#~ "combinaisons."
+
+#~ msgid "Back to Draft"
+#~ msgstr "Remettre en brouillon"
+
+#~ msgid "Delete the proposed combinations and the assignments?"
+#~ msgstr "Supprimer les combinaisons proposées et les affectations ?"
+
+#~ msgid "Participants can be moved only in the chosen combination."
+#~ msgstr ""
+#~ "On ne peut déplacer des participants que dans la combinaison choisie."
+
+#~ msgid "Plan back to draft: combinations and assignments deleted."
+#~ msgstr "Plan remis en brouillon : combinaisons et affectations supprimées."
+
+#~ msgid ""
+#~ "This plan is no longer a draft. Use Back to Draft, or duplicate the plan "
+#~ "from the Actions menu, before changing tables, rounds or options."
+#~ msgstr ""
+#~ "Ce plan n'est plus un brouillon. Utilisez « Remettre en brouillon », ou "
+#~ "dupliquez le plan depuis le menu Actions, avant de modifier les tables, "
+#~ "les tours ou les options."

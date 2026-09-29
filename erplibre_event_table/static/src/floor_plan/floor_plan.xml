@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 TechnoLibre - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_event_table.EventTableFloorPlan">
+        <div class="o_event_table_floor_plan" t-ref="root">
+            <div class="o_event_table_toolbar d-flex flex-wrap align-items-center gap-2 mb-2" t-if="state.payload">
+                <div class="o_event_table_rounds d-flex align-items-center gap-1">
+                    <label class="me-1">Round</label>
+                    <t t-foreach="roundNumbers" t-as="r" t-key="r">
+                        <button
+                            type="button"
+                            class="btn btn-sm o_event_table_round_button"
+                            t-att-class="{'btn-primary': r === state.round, 'btn-secondary': r !== state.round}"
+                            t-att-data-round="r"
+                            t-on-click="() => this.setRound(r)"
+                            t-esc="r"
+                        />
+                    </t>
+                </div>
+                <span class="o_event_table_capacity text-muted" t-esc="state.payload.plan.capacity_message" />
+                <div
+                    class="o_event_table_sync alert alert-warning py-1 px-2 mb-0"
+                    role="alert"
+                    t-if="state.payload.plan.sync_message"
+                    t-esc="state.payload.plan.sync_message"
+                />
+                <!-- Says which record a drag will write. Without it the
+                     two modes look alike: people move around the room in
+                     both, but before a combination exists the gesture
+                     reserves a seat instead of taking one. -->
+                <span
+                    class="o_event_table_pin_mode badge text-bg-secondary"
+                    t-if="state.payload.plan.draws_pins"
+                    title="Dragging someone reserves their seat for the next generation instead of seating them."
+                >
+                    Reservations
+                </span>
+                <div class="o_event_table_indicators d-flex gap-1" t-if="state.payload.indicators">
+                    <span class="badge text-bg-success" t-if="state.payload.indicators.is_proven_optimal">
+                        Minimum reached
+                    </span>
+                    <span class="badge text-bg-info" t-if="state.payload.indicators.is_adjusted">Adjusted by hand</span>
+                </div>
+                <div class="o_event_table_highlight d-flex align-items-center gap-1">
+                    <label class="me-1">Highlight a participant</label>
+                    <select class="form-select form-select-sm" t-model.number="state.highlightParticipantId">
+                        <option value="0" />
+                        <t t-foreach="state.payload.participants" t-as="participant" t-key="participant.id">
+                            <option t-att-value="participant.id" t-esc="participant.name" />
+                        </t>
+                    </select>
+                </div>
+                <div class="o_event_table_zoom btn-group btn-group-sm">
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_zoom_50"
+                        t-on-click="() => this.setZoom(0.5)"
+                    >
+                        50%
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_zoom_75"
+                        t-on-click="() => this.setZoom(0.75)"
+                    >
+                        75%
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_zoom_100"
+                        t-on-click="() => this.setZoom(1)"
+                    >
+                        100%
+                    </button>
+                    <!-- Called through an arrow rather than bound directly:
+                         a bare handler name hands the click EVENT to
+                         fitToWindow, whose first parameter is its options
+                         object. -->
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_zoom_fit"
+                        t-on-click="() => this.fitToWindow()"
+                    >
+                        Fit to window
+                    </button>
+                </div>
+                <!-- Three icon buttons rather than three more labels: the bar
+                     already carries the round selector, the highlight picker
+                     and the zoom group. Each carries its wording twice all the
+                     same — `title` for the pointer, `aria-label` for whoever
+                     has none — and both are literal attributes, which is what
+                     puts them in front of the extractor. The glyph itself is
+                     aria-hidden so the label is announced once, not twice.
+                     A button that BASCULES says so with aria-pressed, the
+                     `active` class being its visible half. -->
+                <div class="o_event_table_display btn-group btn-group-sm">
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_toggle_names"
+                        t-att-class="{active: state.showNames}"
+                        t-att-aria-pressed="state.showNames ? 'true' : 'false'"
+                        title="Show the name lists"
+                        aria-label="Show the name lists"
+                        t-on-click="toggleShowNames"
+                    >
+                        <i class="fa fa-list-ul" aria-hidden="true" />
+                    </button>
+                    <!-- The only one of the three that writes to the database.
+                         Restricted to a plan resModel for the same reason as
+                         Full Screen: action_rearrange_tables lives on the plan,
+                         and a combination preview holds no plan id to call it
+                         with. -->
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_rearrange"
+                        t-if="state.payload.plan.can_edit_layout and props.resModel === 'event.table.plan'"
+                        title="Auto-arrange the tables"
+                        aria-label="Auto-arrange the tables"
+                        t-on-click="rearrangeTables"
+                    >
+                        <i class="fa fa-th" aria-hidden="true" />
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary o_event_table_edit_participants"
+                        t-if="state.payload.plan.can_move_participants"
+                        t-att-class="{active: state.editParticipants}"
+                        t-att-aria-pressed="state.editParticipants ? 'true' : 'false'"
+                        title="Edit participants"
+                        aria-label="Edit participants"
+                        t-on-click="toggleEditParticipants"
+                    >
+                        <i class="fa fa-exchange" aria-hidden="true" />
+                    </button>
+                </div>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-secondary o_event_table_edit_layout"
+                    t-if="state.payload.plan.can_edit_layout"
+                    t-on-click="toggleEditLayout"
+                >
+                    <t t-if="state.editLayout">Done</t>
+                    <t t-else="">Edit Layout</t>
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-secondary o_event_table_full_screen"
+                    t-if="!props.fullscreen and props.resModel === 'event.table.plan'"
+                    t-on-click="openFullScreen"
+                >
+                    Full Screen
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-secondary o_event_table_exit_full_screen"
+                    t-if="props.fullscreen"
+                    t-on-click="exitFullScreen"
+                >
+                    Exit Full Screen
+                </button>
+            </div>
+            <div class="o_event_table_empty text-muted" t-if="emptyMessage" t-esc="emptyMessage" />
+            <div class="o_event_table_body d-flex" t-if="state.payload">
+                <div
+                    class="o_event_table_floor"
+                    t-att-class="{'o_event_table_grid': state.editLayout}"
+                    t-ref="floor"
+                    t-att-style="floorStyle"
+                >
+                    <!-- Laid out at the room's native, unzoomed size: roomStyle
+                         scales it with a transform, which never changes the
+                         space THIS element reserves in the flex chain above —
+                         that reservation is floorStyle's job instead, on the
+                         parent. Keeping tables at native coordinates here is
+                         also what lets blockStyle and the drag geometry
+                         ignore the zoom entirely. -->
+                    <div class="o_event_table_room" t-att-style="roomStyle">
+                        <t t-foreach="state.payload.tables" t-as="table" t-key="table.id">
+                            <div
+                                class="o_event_table_block"
+                                t-att-data-table-id="table.id"
+                                t-att-style="blockStyle(table)"
+                            >
+                                <div
+                                    class="o_event_table_surface"
+                                    t-att-class="{'o_event_table_surface_round': table.shape === 'round', 'o_event_table_surface_square': table.shape === 'square', 'o_event_table_surface_wood': state.payload.plan.visual_tables}"
+                                    t-att-data-table-id="table.id"
+                                    t-att-style="surfaceStyle(table)"
+                                >
+                                    <span class="o_event_table_number" t-esc="table.number" />
+                                    <span class="o_event_table_occupancy" t-esc="occupancyText(table)" />
+                                    <t t-call="erplibre_event_table.EventTableFloorPlanTableMenu" />
+                                    <t t-set="conflict" t-value="conflictFor(table.id)" />
+                                    <div
+                                        class="o_event_table_conflict"
+                                        t-if="conflict"
+                                        t-att-title="conflictTitle(conflict)"
+                                    />
+                                    <t t-if="state.payload.plan.assign_seats or state.payload.plan.visual_tables">
+                                        <t t-foreach="seatPositionsFor(table)" t-as="seat" t-key="seat.seat">
+                                            <div
+                                                class="o_event_table_seat"
+                                                t-att-class="{'o_event_table_seat_taken': isSeatTaken(table, seat.seat), 'o_event_table_seat_chair': state.payload.plan.visual_tables}"
+                                                t-att-data-table-id="table.id"
+                                                t-att-data-seat="state.payload.plan.assign_seats ? seat.seat : false"
+                                                t-att-style="seatStyle(seat)"
+                                            >
+                                                <!-- The seat's own number, written on the
+                                                     chair, once the chairs are drawn AND the
+                                                     seats are actually attributed: an
+                                                     unassigned chair belongs to nobody in
+                                                     particular, so numbering it would promise
+                                                     a place the plan does not hold. A child
+                                                     of the pad rather than a sibling, so it
+                                                     is concentric by construction instead of
+                                                     by a second position computed from the
+                                                     same angle. -->
+                                                <span
+                                                    class="o_event_table_seat_number"
+                                                    t-if="state.payload.plan.visual_tables and state.payload.plan.assign_seats"
+                                                    t-att-style="seatNumberStyle(seat)"
+                                                    t-esc="seat.seat"
+                                                />
+                                            </div>
+                                        </t>
+                                    </t>
+                                </div>
+                                <!-- ONE connector per table, never one per person: a straight
+                                     trait leaving the table's edge, then a bracket embracing
+                                     the whole list. The trait sits at the midpoint of what
+                                     the table and the list actually SHARE vertically, which
+                                     is what makes it touch both whether the list is shorter
+                                     than its table (two names) or far taller (twenty).
+                                     Drawn only where there is a list to point at. -->
+                                <div
+                                    class="o_event_table_connector"
+                                    t-if="state.showNames and peopleFor(table).length"
+                                    t-att-style="connectorStyle(table)"
+                                >
+                                    <div
+                                        class="o_event_table_connector_trait"
+                                        t-att-style="connectorTraitStyle(table)"
+                                    />
+                                    <div class="o_event_table_connector_bracket" />
+                                </div>
+                                <!-- The names, in a column BESIDE the table — never around it
+                                     and never inside it — in every mode. data-table-id is
+                                     what makes the blank space of the list a drop target for
+                                     this table: without it, elementsFromPoint walks up to the
+                                     body without meeting a dataset, findDropTarget returns
+                                     null, and the drop is a silent non-event. -->
+                                <!-- The modifier is what lets a chip WRAP
+                                     instead of clipping its name
+                                     (floor_plan.scss). It rides the list, not
+                                     the chip, so one class covers however many
+                                     names the table carries; the reserve draws
+                                     the same chips outside this list and wraps
+                                     them already, its own column being under no
+                                     floorSize reservation. -->
+                                <div
+                                    class="o_event_table_names"
+                                    t-att-class="{'o_event_table_names_full': state.payload.plan.show_full_names}"
+                                    t-if="state.showNames"
+                                    t-att-data-table-id="table.id"
+                                    t-att-style="namesStyle(table)"
+                                >
+                                    <t t-foreach="peopleFor(table)" t-as="person" t-key="person.id">
+                                        <!-- An attributed seat numbers its own line, so the
+                                             list reads in the order the chairs go round the
+                                             table. Without attribution peopleFor has already
+                                             sorted by name, and the line takes the loop's own
+                                             1-based position instead, so the list is numbered
+                                             1..N either way. -->
+                                        <t t-set="listNumber" t-value="person.seat or person_index + 1" />
+                                        <span
+                                            class="o_event_table_person"
+                                            t-att-class="{'o_event_table_highlighted': person.id === state.highlightParticipantId}"
+                                            t-att-title="personTitle(person)"
+                                            t-att-data-table-id="table.id"
+                                            t-att-data-participant-id="person.id"
+                                        >
+                                            <t t-call="erplibre_event_table.EventTableFloorPlanPersonLabel" />
+                                            <t t-call="erplibre_event_table.EventTableFloorPlanPersonMenu" />
+                                        </span>
+                                    </t>
+                                </div>
+                                <!-- Edit-only controls: a corner handle for the
+                                     resize, tracked by hand instead of a
+                                     draggable hook, and a button that flips the
+                                     surface's shape. -->
+                                <t t-if="state.editLayout">
+                                    <button
+                                        type="button"
+                                        class="o_event_table_shape_toggle btn btn-sm btn-secondary"
+                                        t-on-click="() => this.toggleShape(table)"
+                                        t-esc="shapeToggleLabel(table)"
+                                    />
+                                    <!-- Visual mode recomputes its own size from the
+                                         seat count on every render (visualTableSize,
+                                         geometry.js): a handle that resizes something
+                                         which immediately overrides the result would
+                                         be a lie, so it is hidden rather than drawn
+                                         and ignored. -->
+                                    <div
+                                        class="o_event_table_handle o_event_table_resize"
+                                        t-if="!state.payload.plan.visual_tables"
+                                        t-on-pointerdown="(ev) => this.startResize(ev, table)"
+                                    />
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <!-- Fixed to the right of the floor, outside its own scroll
+                     and zoom, so the reserve stays put while the room
+                     underneath pans or scales. -->
+                <div class="o_event_table_tray" data-tray="1">
+                    <div class="o_event_table_tray_label" t-esc="trayTitle" />
+                    <t t-foreach="trayPeople" t-as="person" t-key="person.id">
+                        <!-- Nobody in the reserve holds a seat, so no number is
+                             written: the shared label prints one only for a
+                             caller that sets it. -->
+                        <t t-set="listNumber" t-value="0" />
+                        <span
+                            class="o_event_table_person"
+                            t-att-class="{'o_event_table_highlighted': person.id === state.highlightParticipantId}"
+                            t-att-title="personTitle(person)"
+                            data-tray="1"
+                            t-att-data-participant-id="person.id"
+                        >
+                            <t t-call="erplibre_event_table.EventTableFloorPlanPersonLabel" />
+                            <t t-call="erplibre_event_table.EventTableFloorPlanPersonMenu" />
+                        </span>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- A person chip's own label: its number, the name itself, and the
+         company underneath when show_company asks for it. Shared by the
+         list chips and the tray chips, hence its own sub-template rather
+         than two copies. `person` AND `listNumber` both come from the
+         caller's scope, and EVERY caller sets `listNumber`: a list
+         numbers each of its lines 1..N unconditionally, while the tray
+         passes 0, its people having legitimately no number at all. The
+         show_seat_number branch below is what remains for a caller whose
+         number is the seat itself. -->
+    <t t-name="erplibre_event_table.EventTableFloorPlanPersonLabel">
+        <span class="o_event_table_person_name">
+            <t t-if="listNumber" t-esc="listNumber + '. '" />
+            <t t-elif="state.payload.plan.show_seat_number and person.seat" t-esc="person.seat + '. '" />
+            <t t-esc="person.name" />
+        </span>
+        <span
+            class="o_event_table_person_company"
+            t-if="state.payload.plan.show_company and person.company"
+            t-esc="person.company"
+        />
+    </t>
+
+    <!-- The dragless path: works with a finger, a keyboard, or when the
+         source and target tables sit far apart in a large room. Shared by
+         the table chips and the tray chips, hence its own sub-template
+         rather than two copies. `person` comes from the caller's scope,
+         where it is the variable of the loop drawing the chips; the t-set
+         reads it once, at call time, and the panel below acts on THAT.
+         The panel is a slot: it renders only when the menu opens, after
+         the loop has ended, and a loop variable read that late carries the
+         last value the loop left in it — every chip of a table would then
+         act on the last person of that table. The t-set writes into this
+         template's own scope, one fresh object per call, which no later
+         iteration reaches. -->
+    <t t-name="erplibre_event_table.EventTableFloorPlanPersonMenu">
+        <t t-set="personId" t-value="person.id" />
+        <Dropdown t-if="state.payload.plan.can_move_participants and state.editParticipants and !state.editLayout">
+            <button type="button" class="o_event_table_person_menu btn btn-sm">⋮</button>
+            <t t-set-slot="content">
+                <div class="dropdown-header">Send to table…</div>
+                <t t-foreach="state.payload.tables" t-as="destTable" t-key="destTable.id">
+                    <DropdownItem
+                        class="'o_event_table_send_to'"
+                        attrs="{'data-table-id': destTable.id}"
+                        onSelected="() => this.sendToTable(personId, destTable.id)"
+                    >
+                        <t t-esc="sendToTableLabel(destTable)" />
+                    </DropdownItem>
+                </t>
+                <div class="dropdown-divider" />
+                <DropdownItem
+                    class="'o_event_table_remove_from_round'"
+                    onSelected="() => this.removeFromRound(personId)"
+                >
+                    Remove from this round
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+    <!-- The same dragless path, taken from the TABLE's end: its menu seats
+         someone the round left without a place. `table` comes from the
+         caller's scope, where it is the variable of the loop drawing the
+         blocks; the t-set reads it once, at call time, and the panel below
+         acts on THAT. The panel is a slot: it renders only when the menu
+         opens, after the loop has ended, and a loop variable read that late
+         carries the last value the loop left in it — every table's menu would
+         then seat people at the last table of the room. The t-set writes into
+         this template's own scope, one fresh object per call, which no later
+         iteration reaches. The people loop inside the slot is free of that
+         trap: it runs at open time, and its own variable is scoped to it.
+         The menu goes with the participant mode, and never with the layout
+         one, where a click inside the surface is the start of a table drag. -->
+    <t t-name="erplibre_event_table.EventTableFloorPlanTableMenu">
+        <t t-set="tableId" t-value="table.id" />
+        <Dropdown t-if="state.payload.plan.can_move_participants and state.editParticipants and !state.editLayout">
+            <button type="button" class="o_event_table_table_menu btn btn-sm">⋮</button>
+            <t t-set-slot="content">
+                <div class="dropdown-header" t-esc="seatHereLabel(table)" />
+                <t t-foreach="trayPeople" t-as="person" t-key="person.id">
+                    <DropdownItem
+                        class="'o_event_table_seat_here'"
+                        attrs="{'data-participant-id': person.id}"
+                        onSelected="() => this.sendToTable(person.id, tableId)"
+                    >
+                        <t t-esc="person.name" />
+                    </DropdownItem>
+                </t>
+                <div class="dropdown-item-text text-muted o_event_table_tray_empty" t-if="!trayPeople.length">
+                    Nobody is waiting for a place
+                </div>
+            </t>
+        </Dropdown>
+    </t>
+
+    <t t-name="erplibre_event_table.EventTableFloorPlanWidget">
+        <div class="o_event_table_floor_plan_widget">
+            <EventTableFloorPlan
+                resModel="props.record.resModel"
+                resId="props.record.resId"
+                reloadKey="props.record.id"
+                onDataChanged.bind="onDataChanged"
+            />
+        </div>
+    </t>
+
+    <t t-name="erplibre_event_table.EventTableFloorPlanAction">
+        <div class="o_event_table_floor_plan_action">
+            <EventTableFloorPlan resModel="'event.table.plan'" resId="props.action.params.plan_id" fullscreen="true" />
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_type_view_form_table" model="ir.ui.view">
+        <field name="name">event.type.form.rotating.tables</field>
+        <field name="model">event.type</field>
+        <field name="inherit_id" ref="event.view_event_type_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='has_seats_limitation']/.." position="after">
+                <field name="use_rotating_tables" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
