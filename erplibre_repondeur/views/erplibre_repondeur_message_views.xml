@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_repondeur_message_list" model="ir.ui.view">
+        <field name="name">erplibre.repondeur.message.list</field>
+        <field name="model">erplibre.repondeur.message</field>
+        <field name="arch" type="xml">
+            <!-- Le non-ecoute en gras : une liste de repondeur sert d'abord a
+                 voir ce qui reste a traiter. -->
+            <list decoration-bf="state == 'new'">
+                <field name="received_at"/>
+                <field name="source"/>
+                <field name="partner_id"/>
+                <field name="number" widget="phone"/>
+                <field name="duration_seconds"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_repondeur_message_form" model="ir.ui.view">
+        <field name="name">erplibre.repondeur.message.form</field>
+        <field name="model">erplibre.repondeur.message</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_marquer_ecoute" type="object"
+                            string="Marquer ecoute" class="btn-primary"
+                            invisible="state == 'heard'"/>
+                    <button name="action_marquer_nouveau" type="object"
+                            string="Marquer non ecoute"
+                            invisible="state == 'new'"/>
+                    <button name="action_ouvrir_contact" type="object"
+                            string="Ouvrir la fiche" icon="fa-user"
+                            invisible="not partner_id"/>
+                    <button name="action_ouvrir_contact" type="object"
+                            string="Creer la fiche" icon="fa-user-plus"
+                            invisible="partner_id"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="partner_id" placeholder="Inconnu"/></h1>
+                        <!-- Le widget « phone » est celui que voip_oca detourne :
+                             cliquer le numero rappelle par le softphone. -->
+                        <h2><field name="number" widget="phone" readonly="1"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="received_at"/>
+                            <field name="duration_seconds"/>
+                            <field name="source"/>
+                        </group>
+                        <group>
+                            <field name="peak"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="source_ref" groups="base.group_no_one"/>
+                        </group>
+                    </group>
+                    <group string="Enregistrement">
+                        <field name="audio_filename" invisible="1"/>
+                        <!-- Le lecteur d'abord, le telechargement ensuite :
+                             ecouter est ce qu'on vient faire, garder le
+                             fichier est l'exception. -->
+                        <field name="audio_player" nolabel="1" colspan="2"
+                               invisible="not audio_player"/>
+                        <field name="audio" filename="audio_filename"
+                               widget="binary" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_repondeur_message_search" model="ir.ui.view">
+        <field name="name">erplibre.repondeur.message.search</field>
+        <field name="model">erplibre.repondeur.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <filter name="non_ecoutes" string="Non ecoutes"
+                        domain="[('state', '=', 'new')]"/>
+                <filter name="sans_contact" string="Sans fiche"
+                        domain="[('partner_id', '=', False)]"/>
+                <separator/>
+                <filter name="de_l_operateur" string="Boite vocale de l'operateur"
+                        domain="[('source', '=', 'operateur')]"/>
+                <filter name="du_repondeur" string="Repondeur ERPLibre"
+                        domain="[('source', '=', 'erplibre')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_contact" string="Contact"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="par_etat" string="Etat"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="par_source" string="Source"
+                            context="{'group_by': 'source'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_repondeur_message" model="ir.actions.act_window">
+        <field name="name">Repondeur</field>
+        <field name="res_model">erplibre.repondeur.message</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_non_ecoutes': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun message.</p>
+            <p>Le repondeur decroche quand personne ne prend l'appel dans le
+               softphone, avant que la boite vocale de l'operateur ne s'en
+               charge. Il s'active dans les reglages.</p>
+        </field>
+    </record>
+
+</odoo>

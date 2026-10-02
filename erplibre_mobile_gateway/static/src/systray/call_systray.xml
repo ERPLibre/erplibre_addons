@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre — License AGPL-3.0 or later -->
+<templates xml:space="preserve">
+
+    <t t-name="erplibre_mobile_gateway.CallSystray">
+        <Dropdown state="dropdown" beforeOpen.bind="onBeforeOpen"
+                  menuClass="'o-dropdown--menu-submenu erplibre-calls'">
+            <button class="btn o-dropdown-caret dropdown-toggle o-no-caret o_erplibre_call_systray"
+                    t-att-title="titre" aria-label="Appels">
+                <i class="fa fa-phone" role="img"/>
+                <sup t-if="state.nouveaux &gt; 0"
+                     class="badge text-bg-danger"
+                     t-esc="state.nouveaux"/>
+            </button>
+
+            <t t-set-slot="content">
+                <div class="px-3 py-2 fw-bold text-muted" t-esc="titre"/>
+
+                <div t-if="state.chargement" class="px-3 py-2 text-muted">
+                    Chargement…
+                </div>
+
+                <div t-elif="state.calls.length === 0" class="px-3 py-2 text-muted">
+                    Aucun appel enregistré.
+                </div>
+
+                <t t-else="">
+                    <t t-foreach="state.calls" t-as="call" t-key="call.id">
+                        <div class="dropdown-item d-flex align-items-center gap-2"
+                             t-on-click="() => this.ouvrirAppel(call)"
+                             style="cursor: pointer;">
+                            <i t-att-class="'fa ' + icone(call)" role="img"/>
+                            <div class="flex-grow-1 text-truncate">
+                                <span t-if="call.partner_id"
+                                      class="fw-bold text-primary"
+                                      t-on-click="(ev) => this.ouvrirContact(call, ev)"
+                                      t-esc="libelle(call)"/>
+                                <span t-else="" t-esc="libelle(call)"/>
+                                <small class="d-block text-muted">
+                                    <t t-esc="heure(call)"/>
+                                    <t t-if="call.duration_display and call.duration_display != '0:00'">
+                                        — <t t-esc="call.duration_display"/>
+                                    </t>
+                                </small>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+
+                <div class="dropdown-divider"/>
+                <div class="dropdown-item text-center fw-bold"
+                     t-on-click="ouvrirTout" style="cursor: pointer;">
+                    Voir tous les appels
+                </div>
+            </t>
+        </Dropdown>
+    </t>
+
+</templates>

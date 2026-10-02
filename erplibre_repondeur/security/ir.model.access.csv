@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_repondeur_message_user,erplibre.repondeur.message.user,model_erplibre_repondeur_message,base.group_user,1,1,0,0
+access_repondeur_message_manager,erplibre.repondeur.message.manager,model_erplibre_repondeur_message,base.group_system,1,1,1,1

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Juste apres les reglages SMS, dans la vue du module coeur `sms`. Le
+         bloc « Integrations » de base_setup s'ancre sur un attribut `name` et
+         non un `id` : `erplibre_mobile_gateway` l'a deja constate. Le
+         voisinage se justifie aussi : SMS et repondeur sont deux usages de la
+         meme ligne cellulaire. -->
+    <record id="res_config_settings_view_form_repondeur" model="ir.ui.view">
+        <field name="name">res.config.settings.form.repondeur</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sms.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <setting id="sms" position="after">
+                <setting id="erplibre_repondeur"
+                         string="Repondeur de la ligne cellulaire"
+                         help="Le repondeur decroche quand personne ne prend
+                               l'appel dans le softphone, avant que la boite
+                               vocale de l'operateur ne s'en charge.">
+                    <field name="repondeur_actif"/>
+                    <div class="content-group mt-2" invisible="not repondeur_actif">
+                        <div class="row mb-2">
+                            <label for="repondeur_sonneries"
+                                   class="col-lg-6 o_light_label"/>
+                            <field name="repondeur_sonneries"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="repondeur_duree_max"
+                                   class="col-lg-6 o_light_label"/>
+                            <field name="repondeur_duree_max"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="repondeur_annonce"
+                                   class="col-lg-6 o_light_label"/>
+                            <field name="repondeur_annonce_filename" invisible="1"/>
+                            <field name="repondeur_annonce"
+                                   filename="repondeur_annonce_filename"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="repondeur_notify_user_ids"
+                                   class="col-lg-6 o_light_label"/>
+                            <field name="repondeur_notify_user_ids"
+                                   widget="many2many_tags"/>
+                        </div>
+                        <div class="text-muted">
+                            Une sonnerie dure six secondes et la boite vocale de
+                            l'operateur repond vers trente : au-dela de cinq
+                            sonneries, le repondeur ne decrocherait jamais.
+                        </div>
+                    </div>
+                </setting>
+            </setting>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_erplibre_sms_root"
+              name="Passerelle mobile"
+              sequence="95"
+              groups="erplibre_mobile_gateway.group_erplibre_sms_send"/>
+
+    <menuitem id="menu_erplibre_sms_dispatch"
+              name="Envois"
+              parent="menu_erplibre_sms_root"
+              action="action_erplibre_sms_dispatch"
+              sequence="10"/>
+
+    <menuitem id="menu_erplibre_mobile_call"
+              name="Appels"
+              parent="menu_erplibre_sms_root"
+              action="action_erplibre_mobile_call"
+              sequence="25"
+              groups="erplibre_mobile_gateway.group_erplibre_sms_send"/>
+
+    <menuitem id="menu_erplibre_sms_dispatch_problem"
+              name="SMS non partis"
+              parent="menu_erplibre_sms_root"
+              action="action_erplibre_sms_dispatch_problem"
+              sequence="20"/>
+
+    <menuitem id="menu_erplibre_sms_inbound"
+              name="SMS recus"
+              parent="menu_erplibre_sms_root"
+              action="action_erplibre_sms_inbound"
+              sequence="30"/>
+
+    <menuitem id="menu_erplibre_sms_config"
+              name="Configuration"
+              parent="menu_erplibre_sms_root"
+              sequence="90"
+              groups="erplibre_mobile_gateway.group_erplibre_sms_manager"/>
+
+    <menuitem id="menu_erplibre_sms_gateway"
+              name="Passerelles"
+              parent="menu_erplibre_sms_config"
+              action="action_erplibre_sms_gateway"
+              sequence="10"/>
+
+</odoo>
