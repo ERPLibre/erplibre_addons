@@ -44,6 +44,33 @@ class TestRepondeur(TransactionCase):
         self.assertEqual(message.state, "new")
         self.assertEqual(message.taille_du_son(), len(b"RIFF....WAVE"))
 
+    def test_le_lecteur_pointe_la_piece_jointe_sans_la_charger(self):
+        """Ecouter se fait dans la fiche, et sans payer le son a l'ouverture.
+
+        Une balise qui porterait le son encode ferait peser chaque lecture de
+        la fiche du poids de l'enregistrement, meme quand personne ne clique.
+        """
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(self._charge())
+        )
+        lecteur = message.audio_player
+        self.assertIn("<audio", lecteur)
+        self.assertIn('preload="none"', lecteur)
+        self.assertIn("field=audio", lecteur)
+        self.assertIn("id=%s" % message.id, lecteur)
+        self.assertNotIn(base64.b64encode(b"RIFF....WAVE").decode("ascii"), lecteur)
+
+    def test_sans_enregistrement_il_n_y_a_pas_de_lecteur(self):
+        """Un message de l'operateur peut arriver sans son.
+
+        Un lecteur vide donnerait une commande qui ne joue rien, et ferait
+        chercher une panne la ou il n'y a simplement rien a entendre.
+        """
+        message = self.messages.create(
+            {"received_at": "2026-09-05 12:00:00", "source": "operateur"}
+        )
+        self.assertFalse(message.audio_player)
+
     def test_un_service_qui_reessaie_ne_cree_pas_de_doublon(self):
         """Une reponse perdue fait reessayer le service.
 

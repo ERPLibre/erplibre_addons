@@ -9,7 +9,9 @@ dates et des numeros.
 """
 import base64
 import logging
+from urllib.parse import urlencode
 
+from markupsafe import Markup
 from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -47,6 +49,14 @@ class RepondeurMessage(models.Model):
     duration_seconds = fields.Integer("Duree (s)", readonly=True)
     audio = fields.Binary("Enregistrement", attachment=True, readonly=True)
     audio_filename = fields.Char("Nom du fichier", readonly=True)
+    audio_player = fields.Html(
+        "Ecoute",
+        compute="_compute_audio_player",
+        sanitize=False,
+        help="Lecteur du navigateur. Un champ binaire ne sait que "
+        "telecharger, et un message qu'on doit ouvrir hors d'Odoo pour "
+        "l'entendre n'est pas ecoute.",
+    )
     state = fields.Selection(
         [("new", "Nouveau"), ("heard", "Ecoute")],
         default="new",
@@ -80,6 +90,35 @@ class RepondeurMessage(models.Model):
             "reponse perdue, et le rejouer creerait un doublon.",
         ),
     ]
+
+    @api.depends("audio_filename")
+    def _compute_audio_player(self):
+        """Rend la balise qui joue l'enregistrement dans la fiche.
+
+        Elle POINTE la piece jointe au lieu de porter le son : incruster deux
+        megaoctets encodes ferait peser chaque ouverture de fiche, et
+        « preload=none » laisse le navigateur ne les chercher qu'au premier
+        clic sur la lecture.
+
+        Le declencheur est le NOM du fichier et non le son : dependre du
+        binaire le lirait depuis la piece jointe a chaque calcul, pour n'en
+        regarder que la presence. Les deux sont ecrits ensemble.
+        """
+        for message in self:
+            if not message.audio_filename or not isinstance(message.id, int):
+                message.audio_player = False
+                continue
+            lien = "/web/content?" + urlencode(
+                {
+                    "model": message._name,
+                    "id": message.id,
+                    "field": "audio",
+                    "filename_field": "audio_filename",
+                }
+            )
+            message.audio_player = (
+                Markup('<audio controls preload="none" src="%s"></audio>') % lien
+            )
 
     @api.depends("number", "partner_id", "received_at", "source")
     def _compute_display_name(self):
