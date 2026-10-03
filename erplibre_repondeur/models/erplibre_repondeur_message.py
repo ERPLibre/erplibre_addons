@@ -182,6 +182,24 @@ class RepondeurMessage(models.Model):
                 subtype_xmlid="mail.mt_comment",
             )
 
+    def _completer_depuis_le_service(self, charge):
+        """Ajoute a une fiche connue ce qui lui manque, sans rien remplacer.
+
+        Jamais d'ecrasement : ce qui est deja la a ete televerse une fois et
+        ecoute peut-etre depuis, et un reessai ne doit pas pouvoir le changer.
+        """
+        self.ensure_one()
+        son = charge.get("numero_audio_b64") or ""
+        if not son or self.audio_numero:
+            return False
+        self.sudo().write({
+            "audio_numero": son.encode("ascii"),
+            "audio_numero_filename": charge.get("numero_nom_fichier")
+            or "numero.wav",
+            "numero_duration_seconds": int(charge.get("numero_duree_secondes") or 0),
+        })
+        return True
+
     def action_marquer_ecoute(self):
         self.write({"state": "heard"})
         return True
@@ -227,11 +245,17 @@ class RepondeurMessage(models.Model):
         Rend l'identifiant cree, ou celui qui existait deja : un service qui
         reessaie apres une reponse perdue doit obtenir la meme reponse, sans
         quoi il televerse en boucle.
+
+        Une fiche connue est ENRICHIE de ce qu'elle n'a pas encore. Un
+        relevement rejoue apres une mise a jour apporte parfois davantage —
+        l'annonce du numero, que les anciens ne portaient pas — et l'ignorer
+        obligerait a effacer la fiche pour en profiter.
         """
         reference = charge.get("reference")
         if reference:
             connu = self.sudo().search([("source_ref", "=", reference)], limit=1)
             if connu:
+                connu._completer_depuis_le_service(charge)
                 return connu.id
         son = charge.get("audio_b64") or ""
         message = self.sudo().create(

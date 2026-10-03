@@ -114,6 +114,41 @@ class TestRepondeur(TransactionCase):
         self.assertFalse(message.audio_numero_player)
         self.assertIn("<audio", message.audio_player)
 
+    def test_un_rejeu_enrichit_la_fiche_de_ce_qui_lui_manquait(self):
+        """Les relevements d'avant la decoupe du numero n'en portent pas.
+        Rejoues apres, ils doivent pouvoir le donner — sinon il faudrait
+        effacer la fiche pour en profiter."""
+        premier = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(self._charge())
+        )
+        self.assertFalse(premier.audio_numero)
+
+        enrichi = dict(self._charge())
+        enrichi["numero_audio_b64"] = base64.b64encode(b"NUM").decode("ascii")
+        enrichi["numero_nom_fichier"] = "numero-appel.wav"
+        second = self.messages.enregistrer_depuis_le_service(enrichi)
+
+        self.assertEqual(second, premier.id, "une seconde fiche a ete creee")
+        self.assertTrue(premier.audio_numero)
+        self.assertEqual(premier.audio_numero_filename, "numero-appel.wav")
+
+    def test_un_rejeu_ne_remplace_jamais_ce_qui_est_deja_la(self):
+        """Ce qui est deja la a ete ecoute peut-etre : un reessai ne doit pas
+        pouvoir le changer."""
+        charge = dict(self._charge())
+        charge["numero_audio_b64"] = base64.b64encode(b"PREMIER").decode("ascii")
+        charge["numero_nom_fichier"] = "premier.wav"
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(charge)
+        )
+
+        autre = dict(charge)
+        autre["numero_audio_b64"] = base64.b64encode(b"SECOND").decode("ascii")
+        autre["numero_nom_fichier"] = "second.wav"
+        self.messages.enregistrer_depuis_le_service(autre)
+
+        self.assertEqual(message.audio_numero_filename, "premier.wav")
+
     def test_le_lecteur_pointe_la_piece_jointe_sans_la_charger(self):
         """Ecouter se fait dans la fiche, et sans payer le son a l'ouverture.
 
