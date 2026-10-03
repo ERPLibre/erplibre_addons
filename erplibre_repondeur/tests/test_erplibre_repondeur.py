@@ -43,8 +43,14 @@ class TestRepondeur(TransactionCase):
 
     def test_les_reglages_portent_de_quoi_relever(self):
         """Le service lit CE canal et pas un autre : ce qui n'y est pas ne lui
-        parvient pas."""
-        reglages = self.societe.reglages_du_repondeur()
+        parvient pas.
+
+        Sur une societe NEUVE : celle de l'installation porte ce que son
+        exploitant y a pose, et l'epreuve dirait alors l'etat de la base au
+        lieu de celui du code.
+        """
+        societe = self.env["res.company"].create({"name": "Canal"})
+        reglages = societe.reglages_du_repondeur()
         for cle in ("operateur_releve_auto", "operateur_releve_efface",
                     "operateur_releve_demande"):
             self.assertIn(cle, reglages)
@@ -52,16 +58,20 @@ class TestRepondeur(TransactionCase):
 
     def test_le_bouton_pose_une_date_que_le_service_verra(self):
         """Odoo ne peut pas appeler : le bouton pose une date, le service
-        compare. Une date nouvelle vaut un relevement."""
-        self.assertFalse(self.societe.operateur_releve_demande)
-        self.societe.action_relever_la_messagerie()
-        self.assertTrue(self.societe.operateur_releve_demande)
-        demande = self.societe.reglages_du_repondeur()["operateur_releve_demande"]
+        compare. Une date nouvelle vaut un relevement.
+
+        Sur une societe NEUVE, pour la meme raison que l'epreuve du canal.
+        """
+        societe = self.env["res.company"].create({"name": "Bouton"})
+        self.assertFalse(societe.operateur_releve_demande)
+        societe.action_relever_la_messagerie()
+        self.assertTrue(societe.operateur_releve_demande)
+        demande = societe.reglages_du_repondeur()["operateur_releve_demande"]
         self.assertTrue(demande)
         # Rejouer le MEME reglage ne doit pas ressembler a une seconde
         # demande : c'est la comparaison qui decide, pas la presence.
         self.assertEqual(
-            demande, self.societe.reglages_du_repondeur()["operateur_releve_demande"]
+            demande, societe.reglages_du_repondeur()["operateur_releve_demande"]
         )
 
     def test_un_message_recu_trouve_sa_fiche(self):
@@ -76,6 +86,33 @@ class TestRepondeur(TransactionCase):
         self.assertEqual(message.partner_id, self.contact)
         self.assertEqual(message.state, "new")
         self.assertEqual(message.taille_du_son(), len(b"RIFF....WAVE"))
+
+    def test_le_numero_annonce_arrive_avec_le_message(self):
+        """La messagerie ne transmet le numero sous aucune forme lisible :
+        elle l'ENONCE. Ces secondes-la sont ce qui permet de remplir la
+        fiche, et elles voyagent dans la meme charge que le message —
+        separees, une fiche porterait l'un sans l'autre."""
+        charge = self._charge()
+        charge["numero_audio_b64"] = base64.b64encode(b"NUM..WAVE").decode("ascii")
+        charge["numero_nom_fichier"] = "numero-appel.wav"
+        charge["numero_duree_secondes"] = 3
+
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(charge)
+        )
+        self.assertEqual(message.audio_numero_filename, "numero-appel.wav")
+        self.assertEqual(message.numero_duration_seconds, 3)
+        self.assertIn("<audio", message.audio_numero_player)
+        self.assertIn("field=audio_numero", message.audio_numero_player)
+
+    def test_un_message_sans_numero_annonce_n_a_pas_de_second_lecteur(self):
+        """Un lecteur vide donnerait une commande qui ne joue rien, et ferait
+        chercher une panne la ou il n'y a rien a entendre."""
+        message = self.messages.browse(
+            self.messages.enregistrer_depuis_le_service(self._charge())
+        )
+        self.assertFalse(message.audio_numero_player)
+        self.assertIn("<audio", message.audio_player)
 
     def test_le_lecteur_pointe_la_piece_jointe_sans_la_charger(self):
         """Ecouter se fait dans la fiche, et sans payer le son a l'ouverture.

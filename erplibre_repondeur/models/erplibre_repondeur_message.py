@@ -49,6 +49,21 @@ class RepondeurMessage(models.Model):
     duration_seconds = fields.Integer("Duree (s)", readonly=True)
     audio = fields.Binary("Enregistrement", attachment=True, readonly=True)
     audio_filename = fields.Char("Nom du fichier", readonly=True)
+    audio_numero = fields.Binary(
+        "Numero annonce",
+        attachment=True,
+        readonly=True,
+        help="Les secondes ou la messagerie enonce le numero de l'appelant. "
+        "Elle ne le transmet sous aucune forme lisible : c'est en les "
+        "ecoutant qu'on remplit le champ Numero.",
+    )
+    audio_numero_filename = fields.Char("Nom du fichier du numero", readonly=True)
+    numero_duration_seconds = fields.Integer("Duree du numero (s)", readonly=True)
+    audio_numero_player = fields.Html(
+        "Ecoute du numero",
+        compute="_compute_audio_player",
+        sanitize=False,
+    )
     audio_player = fields.Html(
         "Ecoute",
         compute="_compute_audio_player",
@@ -91,7 +106,7 @@ class RepondeurMessage(models.Model):
         ),
     ]
 
-    @api.depends("audio_filename")
+    @api.depends("audio_filename", "audio_numero_filename")
     def _compute_audio_player(self):
         """Rend la balise qui joue l'enregistrement dans la fiche.
 
@@ -105,20 +120,25 @@ class RepondeurMessage(models.Model):
         regarder que la presence. Les deux sont ecrits ensemble.
         """
         for message in self:
-            if not message.audio_filename or not isinstance(message.id, int):
-                message.audio_player = False
-                continue
-            lien = "/web/content?" + urlencode(
-                {
-                    "model": message._name,
-                    "id": message.id,
-                    "field": "audio",
-                    "filename_field": "audio_filename",
-                }
+            message.audio_player = message._lecteur("audio", "audio_filename")
+            message.audio_numero_player = message._lecteur(
+                "audio_numero", "audio_numero_filename"
             )
-            message.audio_player = (
-                Markup('<audio controls preload="none" src="%s"></audio>') % lien
-            )
+
+    def _lecteur(self, champ, champ_nom):
+        """La balise qui joue un des sons de la fiche, ou Faux s'il manque."""
+        self.ensure_one()
+        if not self[champ_nom] or not isinstance(self.id, int):
+            return False
+        lien = "/web/content?" + urlencode(
+            {
+                "model": self._name,
+                "id": self.id,
+                "field": champ,
+                "filename_field": champ_nom,
+            }
+        )
+        return Markup('<audio controls preload="none" src="%s"></audio>') % lien
 
     @api.depends("number", "partner_id", "received_at", "source")
     def _compute_display_name(self):
@@ -225,6 +245,16 @@ class RepondeurMessage(models.Model):
                 "peak": int(charge.get("crete") or 0),
                 "audio": son.encode("ascii") if son else False,
                 "audio_filename": charge.get("nom_fichier") or "message.wav",
+                # Le numero annonce arrive AVEC le message, dans la meme
+                # charge : deux envois separes laisseraient une fiche
+                # portant l'un sans l'autre.
+                "audio_numero": (
+                    (charge.get("numero_audio_b64") or "").encode("ascii") or False
+                ),
+                "audio_numero_filename": charge.get("numero_nom_fichier") or False,
+                "numero_duration_seconds": int(
+                    charge.get("numero_duree_secondes") or 0
+                ),
                 "source_ref": reference or False,
             }
         )

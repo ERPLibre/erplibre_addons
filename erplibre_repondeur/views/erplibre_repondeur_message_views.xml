@@ -57,6 +57,17 @@
                             <field name="source_ref" groups="base.group_no_one"/>
                         </group>
                     </group>
+                    <!-- Le numero AVANT le message : la messagerie annonce
+                         l'appelant puis son message, et c'est dans cet ordre
+                         qu'on les ecoute — le premier dit qui rappeler. -->
+                    <group string="Numero annonce"
+                           invisible="not audio_numero_player">
+                        <field name="audio_numero_filename" invisible="1"/>
+                        <field name="audio_numero_player" nolabel="1" colspan="2"/>
+                        <field name="numero_duration_seconds"/>
+                        <field name="audio_numero" filename="audio_numero_filename"
+                               widget="binary" readonly="1"/>
+                    </group>
                     <group string="Enregistrement">
                         <field name="audio_filename" invisible="1"/>
                         <!-- Le lecteur d'abord, le telechargement ensuite :
