@@ -1039,3 +1039,65 @@ class TestErplibreSmsSociete(TransactionCase):
                 routage[message.id] = api.__class__
         self.assertEqual(routage[a.id], SmsApiErplibre)
         self.assertNotEqual(routage[b.id], SmsApiErplibre)
+
+
+@tagged("post_install", "-at_install")
+class TestEscaladeDUneAlerte(TransactionCase):
+    """Le canal d'alerte est le seul dont le travail est de prevenir.
+
+    On ne le regarde que le jour ou il a servi : ce qu'il tait ce jour-la ne
+    se rattrape pas.
+    """
+
+    class _Reponse:
+        def __init__(self, code, texte=""):
+            self.status_code = code
+            self.text = texte
+
+        @property
+        def ok(self):
+            return 200 <= self.status_code < 300
+
+    def setUp(self):
+        super().setUp()
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle d'essai",
+            "alarm_webhook_url": "http://127.0.0.1:8080/sujet-d-essai",
+        })
+
+    def test_un_point_d_acces_qui_refuse_est_journalise_en_erreur(self):
+        """Un POST refuse REND une reponse, il ne leve pas : sans lire le
+        code, un rejet se lit comme une reussite."""
+        with patch("odoo.addons.erplibre_mobile_gateway.models"
+                   ".erplibre_sms_gateway.requests.post",
+                   return_value=self._Reponse(403, "forbidden")):
+            with self.assertLogs(
+                    "odoo.addons.erplibre_mobile_gateway.models"
+                    ".erplibre_sms_gateway", level="ERROR") as journal:
+                self.gateway._escalate("essai")
+        self.assertTrue(any("403" in ligne for ligne in journal.output),
+                        journal.output)
+
+    def test_un_point_d_acces_qui_accepte_ne_crie_pas(self):
+        """L'invariant est l'ABSENCE d'erreur, pas la presence d'une trace :
+        le niveau de journalisation du lanceur filtre les lignes
+        d'information, et une epreuve qui en exige une mesurerait ce
+        reglage-la."""
+        with patch("odoo.addons.erplibre_mobile_gateway.models"
+                   ".erplibre_sms_gateway.requests.post",
+                   return_value=self._Reponse(200)):
+            with self.assertNoLogs(
+                    "odoo.addons.erplibre_mobile_gateway.models"
+                    ".erplibre_sms_gateway", level="ERROR"):
+                self.gateway._escalate("essai")
+
+    def test_sans_point_d_acces_le_manque_se_dit(self):
+        """L'alerte ne partirait que par courriel — le canal que la
+        passerelle remplace."""
+        self.gateway.alarm_webhook_url = False
+        with self.assertLogs(
+                "odoo.addons.erplibre_mobile_gateway.models"
+                ".erplibre_sms_gateway", level="ERROR") as journal:
+            self.gateway._escalate("essai")
+        self.assertTrue(any("escalade" in l.lower() for l in journal.output),
+                        journal.output)

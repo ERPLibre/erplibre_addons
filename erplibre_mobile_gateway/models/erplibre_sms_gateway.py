@@ -786,7 +786,7 @@ class ErplibreSmsGateway(models.Model):
         self.ensure_one()
         if self.alarm_webhook_url:
             try:
-                requests.post(
+                reponse = requests.post(
                     self.alarm_webhook_url,
                     json={
                         "gateway": self.name,
@@ -795,6 +795,22 @@ class ErplibreSmsGateway(models.Model):
                     },
                     timeout=ESCALATION_TIMEOUT,
                 )
+                # Le CODE et pas seulement l'absence d'exception : un POST
+                # refuse rend une reponse, il ne leve pas. Un point d'acces
+                # qui rejette l'alerte se lisait donc comme un point d'acces
+                # qui l'accepte — sur le seul canal dont le travail est de
+                # prevenir, et qu'on ne regarde que le jour ou il a servi.
+                if not reponse.ok:
+                    _logger.error(
+                        "erplibre_mobile_gateway: escalade refusee par le"
+                        " point d'acces (%s) : %s",
+                        reponse.status_code, (reponse.text or "")[:200],
+                    )
+                else:
+                    _logger.info(
+                        "erplibre_mobile_gateway: escalade transmise au"
+                        " point d'acces (%s)", reponse.status_code,
+                    )
             except (
                 Exception
             ) as exc:  # noqa: BLE001 - une escalade ne doit jamais propager
