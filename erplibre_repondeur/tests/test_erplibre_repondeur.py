@@ -31,6 +31,39 @@ class TestRepondeur(TransactionCase):
             "reference": reference,
         }
 
+    def test_le_relevement_part_des_le_drapeau_et_efface_par_defaut(self):
+        """Les deux reponses par defaut sont celles d'une ligne d'essai : on
+        releve des qu'il y a de quoi, et on efface pour que le drapeau
+        retombe. Un message laisse en place maintiendrait le drapeau leve et
+        ferait repartir le relevement sans fin."""
+        societe = self.env["res.company"].create({"name": "Essai"})
+        self.assertTrue(societe.operateur_releve_auto)
+        self.assertTrue(societe.operateur_releve_efface)
+        self.assertFalse(societe.operateur_releve_demande)
+
+    def test_les_reglages_portent_de_quoi_relever(self):
+        """Le service lit CE canal et pas un autre : ce qui n'y est pas ne lui
+        parvient pas."""
+        reglages = self.societe.reglages_du_repondeur()
+        for cle in ("operateur_releve_auto", "operateur_releve_efface",
+                    "operateur_releve_demande"):
+            self.assertIn(cle, reglages)
+        self.assertEqual(reglages["operateur_releve_demande"], "")
+
+    def test_le_bouton_pose_une_date_que_le_service_verra(self):
+        """Odoo ne peut pas appeler : le bouton pose une date, le service
+        compare. Une date nouvelle vaut un relevement."""
+        self.assertFalse(self.societe.operateur_releve_demande)
+        self.societe.action_relever_la_messagerie()
+        self.assertTrue(self.societe.operateur_releve_demande)
+        demande = self.societe.reglages_du_repondeur()["operateur_releve_demande"]
+        self.assertTrue(demande)
+        # Rejouer le MEME reglage ne doit pas ressembler a une seconde
+        # demande : c'est la comparaison qui decide, pas la presence.
+        self.assertEqual(
+            demande, self.societe.reglages_du_repondeur()["operateur_releve_demande"]
+        )
+
     def test_un_message_recu_trouve_sa_fiche(self):
         """Le rapprochement se fait par les chiffres, comme pour un appel.
 

@@ -48,6 +48,37 @@
                         </div>
                     </div>
                 </setting>
+                <setting id="erplibre_repondeur_operateur"
+                         string="Boite vocale de l'operateur"
+                         help="Un relevement APPELLE la boite vocale par la
+                               carte SIM : la ligne est occupee pendant
+                               l'appel. Il ne part donc que lorsque la SIM
+                               annonce un message.">
+                    <field name="operateur_releve_auto"/>
+                    <div class="content-group mt-2"
+                         invisible="not operateur_releve_auto">
+                        <div class="row mb-2">
+                            <field name="operateur_releve_efface"/>
+                            <label for="operateur_releve_efface"
+                                   class="o_light_label"/>
+                        </div>
+                        <div class="text-muted">
+                            L'effacement est IRREVERSIBLE : la boite de
+                            l'operateur n'a pas de corbeille. Eteint, le
+                            service ecoute sans rien effacer — le drapeau
+                            reste alors leve et le relevement ne repartira
+                            pas tout seul.
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <button name="action_relever_la_messagerie"
+                                type="object" class="btn-link"
+                                icon="fa-phone"
+                                string="Relever maintenant"/>
+                        <field name="operateur_releve_demande" readonly="1"
+                               invisible="not operateur_releve_demande"/>
+                    </div>
+                </setting>
             </setting>
         </field>
     </record>

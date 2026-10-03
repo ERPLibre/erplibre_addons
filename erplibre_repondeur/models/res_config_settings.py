@@ -25,3 +25,18 @@ class ResConfigSettings(models.TransientModel):
     repondeur_notify_user_ids = fields.Many2many(
         related="company_id.repondeur_notify_user_ids", readonly=False
     )
+    operateur_releve_auto = fields.Boolean(
+        related="company_id.operateur_releve_auto", readonly=False
+    )
+    operateur_releve_efface = fields.Boolean(
+        related="company_id.operateur_releve_efface", readonly=False
+    )
+    operateur_releve_demande = fields.Datetime(
+        related="company_id.operateur_releve_demande"
+    )
+
+    def action_relever_la_messagerie(self):
+        """Relaie le bouton vers la societe. Les reglages sont transitoires :
+        poser la date ici la perdrait a la fermeture de l'ecran."""
+        self.ensure_one()
+        return self.company_id.action_relever_la_messagerie()

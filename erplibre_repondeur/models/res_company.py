@@ -58,6 +58,54 @@ class ResCompany(models.Model):
         "ne vaut pas mieux que pas de repondeur.",
     )
 
+    operateur_releve_auto = fields.Boolean(
+        "Relever la boite vocale de l'operateur",
+        default=True,
+        help="Le service appelle la boite vocale des que la carte SIM annonce "
+        "un message. Le declencheur est ce drapeau et non une horloge : un "
+        "relevement OCCUPE la ligne, et il n'a de raison de partir que s'il "
+        "y a quelque chose a prendre.",
+    )
+    operateur_releve_efface = fields.Boolean(
+        "Effacer le message chez l'operateur",
+        default=True,
+        help="Un message releve et laisse en place maintient le drapeau leve, "
+        "et le relevement repartirait sans fin. L'effacement est "
+        "IRREVERSIBLE : la boite de l'operateur n'a pas de corbeille, et une "
+        "decoupe ratee perd le message. Eteint, le service ecoute sans rien "
+        "effacer, ce qui laisse le drapeau leve.",
+    )
+    operateur_releve_demande = fields.Datetime(
+        "Relevement demande le",
+        readonly=True,
+        help="Pose par le bouton. Le service compare cette date a la derniere "
+        "qu'il a traitee : une date nouvelle vaut un relevement, et rejouer "
+        "la meme n'en declenche pas un second.",
+    )
+
+    def action_relever_la_messagerie(self):
+        """Demande UN relevement au service, a sa prochaine interrogation.
+
+        Odoo ne peut pas appeler : le modem est ailleurs, et le service vient
+        chercher ses reglages chaque minute. Le bouton pose donc une date, et
+        c'est le service qui agit — d'ou le delai, qui est normal.
+        """
+        self.ensure_one()
+        self.sudo().operateur_releve_demande = fields.Datetime.now()
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": self.env._("Relevement demande"),
+                "message": self.env._(
+                    "Le service appellera la boite vocale a sa prochaine "
+                    "interrogation, dans la minute. La ligne sera occupee "
+                    "pendant l'appel."
+                ),
+                "type": "success",
+            },
+        }
+
     @api.constrains("repondeur_sonneries", "repondeur_duree_max")
     def _verifier_les_bornes(self):
         """Refuse ce que le service corrigerait en silence.
@@ -101,6 +149,16 @@ class ResCompany(models.Model):
             "annonce_b64": (
                 (self.repondeur_annonce or b"").decode("ascii")
                 if self.repondeur_annonce
+                else ""
+            ),
+            "operateur_releve_auto": bool(self.operateur_releve_auto),
+            "operateur_releve_efface": bool(self.operateur_releve_efface),
+            # En texte et non en horodatage : le service la COMPARE a la
+            # derniere traitee, il ne la lit pas. Un format qui se compare
+            # caractere par caractere evite d'accorder deux fuseaux.
+            "operateur_releve_demande": (
+                self.operateur_releve_demande.isoformat()
+                if self.operateur_releve_demande
                 else ""
             ),
         }
