@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 09:10+0000\n"
-"PO-Revision-Date: 2026-07-17 10:27+0000\n"
+"POT-Creation-Date: 2026-10-04 07:59+0000\n"
+"PO-Revision-Date: 2026-10-04 08:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -88,12 +88,6 @@ msgstr "Icône du type d'activité"
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_show_tux
 msgid "Afficher le pingouin Tux à côté de la roue (caché par défaut)."
 msgstr "Afficher le pingouin Tux à côté de la roue (caché par défaut)."
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__ai_bridge_info
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__ai_bridge_info
-msgid "Ai Bridge Info"
-msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__tux_animation
@@ -515,9 +509,7 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__message_has_error
-#: model:ir.model.fields,help:event_raffle.field_event_raffle__message_has_sms_error
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__message_has_error
-#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 "Si cette case est cochée, certains messages ont une erreur de livraison."
@@ -544,9 +536,9 @@ msgstr "Saut avec sourire"
 #: code:addons/event_raffle/wizard/event_raffle_start_wizard.py:0
 msgid ""
 "L'événement « %s » n'a pas de question de questionnaire : aucun inscrit ne "
-"peut avoir rempli le sondage. Ajoutez une question, ou choisissez un autre "
-"type de participants."
-msgstr "L'événement « %s » n'a pas de question de questionnaire : aucun inscrit ne peut avoir rempli le sondage. Ajoutez une question, ou choisissez un autre type de participants."
+"peut avoir rempli le questionnaire. Ajoutez une question, ou choisissez un "
+"autre type de participants."
+msgstr "L'événement « %s » n'a pas de question de questionnaire : aucun inscrit ne peut avoir rempli le questionnaire. Ajoutez une question, ou choisissez un autre type de participants."
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__write_uid
@@ -642,12 +634,6 @@ msgstr "Échéance de mon activité"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__name
 msgid "Name"
 msgstr "Nom"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__activity_calendar_event_id
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__activity_calendar_event_id
-msgid "Next Activity Calendar Event"
-msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__activity_date_deadline
@@ -798,11 +784,21 @@ msgid "Présent :"
 msgstr "Présent :"
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__question_and_present
+msgid "Questionnaire filled and present"
+msgstr "Questionnaire rempli et présent"
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__question_only
+msgid "Questionnaire filled only"
+msgstr "Questionnaire rempli seulement"
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_start_wizard__copy_strategy
 msgid ""
-"Qui entre dans le tirage. Les deux choix « sondage » ne gardent que les "
-"inscrits ayant répondu au questionnaire d'inscription de l'événement."
-msgstr "Qui entre dans le tirage. Les deux choix « sondage » ne gardent que les inscrits ayant répondu au questionnaire d'inscription de l'événement."
+"Qui entre dans le tirage. Les deux choix « Questionnaire » ne gardent que "
+"les inscrits ayant répondu au questionnaire d'inscription de l'événement."
+msgstr "Qui entre dans le tirage. Les deux choix « Questionnaire » ne gardent que les inscrits ayant répondu au questionnaire d'inscription de l'événement."
 
 #. module: event_raffle
 #. odoo-javascript
@@ -853,12 +849,6 @@ msgstr "Tirages"
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__random
 msgid "Random (any of the below)"
 msgstr "Aléatoire (une des suivantes)"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__rating_ids
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__rating_ids
-msgid "Ratings"
-msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__rave
@@ -915,12 +905,6 @@ msgstr "Rotation (alterne toutes)"
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
 msgid "Roue"
 msgstr "Roue"
-
-#. module: event_raffle
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_has_sms_error
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_has_sms_error
-msgid "SMS Delivery error"
-msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__spectacle
@@ -982,16 +966,6 @@ msgstr ""
 "En retard : la date d'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
 "Planifiée : activités futures."
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__survey_and_present
-msgid "Survey filled and present"
-msgstr "Sondage rempli et présent"
-
-#. module: event_raffle
-#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__survey_only
-msgid "Survey filled only"
-msgstr "Sondage rempli seulement"
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__flag_text

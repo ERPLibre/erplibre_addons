@@ -60,10 +60,23 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
 ## Usage
 
 1. Ouvrir un événement → bouton **« Démarrer un tirage »**.
-2. Choisir la stratégie de copie : *Présents seulement*, *Inscrits et présents*, ou
-   *Tous, puis filtrer* (cases Éligible + boutons Tout inclure/exclure).
+2. Choisir qui entre dans le tirage (champ **Participants**) :
+   - *Présents seulement* : les inscrits marqués présents ;
+   - *Inscrits et présents* : les inscrits confirmés et les présents ;
+   - *Questionnaire rempli seulement* : les inscrits, présents ou non, qui ont
+     répondu à au moins une question du questionnaire d'inscription (onglet
+     *Questions* de l'événement). Seules les questions de type *Sélection* ou
+     *Saisie de texte* comptent : Nom, Courriel, Téléphone et Société sont
+     ignorées ;
+   - *Questionnaire rempli et présent* : la même chose, pour les présents
+     seulement.
+
+   Les inscriptions qui partagent un même identifiant (le contact, sinon le
+   courriel, sinon le nom) n'entrent qu'une fois.
 3. Ajouter au besoin des participants (contact ou invité) dans l'onglet Participants,
-   puis **sauvegarder** : ils apparaissent automatiquement sur la roue.
+   puis **sauvegarder** : ils apparaissent automatiquement sur la roue. La colonne
+   *Exclu* et les boutons **Tout inclure** / **Tout exclure** retirent quelqu'un de
+   la roue sans l'effacer.
 4. Cliquer **« Démarrer le tirage »** (ou **« Plein écran »** pour projeter ; le bouton
    **« Quitter le plein écran »** revient à la vue précédente).
 5. Enchaîner avec **« Prochain tirage »**. Marquer un gagnant **absent** depuis le tir
