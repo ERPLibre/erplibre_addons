@@ -72,7 +72,9 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
      seulement.
 
    Les inscriptions qui partagent un même identifiant (le contact, sinon le
-   courriel, sinon le nom) n'entrent qu'une fois.
+   courriel, sinon le nom) n'entrent qu'une fois. Le module `event_raffle_survey`
+   ajoute *Sondage rempli seulement*, qui prend les répondants d'un sondage
+   (`survey`).
 3. Ajouter au besoin des participants (contact ou invité) dans l'onglet Participants,
    puis **sauvegarder** : ils apparaissent automatiquement sur la roue. La colonne
    *Exclu* et les boutons **Tout inclure** / **Tout exclure** retirent quelqu'un de

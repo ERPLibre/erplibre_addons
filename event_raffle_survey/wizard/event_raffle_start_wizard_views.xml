@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_start_wizard_form_survey" model="ir.ui.view">
+        <field name="name">event.raffle.start.wizard.form.survey</field>
+        <field name="model">event.raffle.start.wizard</field>
+        <field name="inherit_id" ref="event_raffle.event_raffle_start_wizard_form" />
+        <field name="arch" type="xml">
+            <field name="copy_strategy" position="after">
+                <!-- Closing a survey archives it: without active_test, a
+                     closed survey would vanish from this list. -->
+                <field
+                    name="survey_id"
+                    invisible="copy_strategy != 'survey_only'"
+                    required="copy_strategy == 'survey_only'"
+                    context="{'active_test': False}"
+                    options="{'no_create': True}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
