@@ -3,10 +3,12 @@
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
-# Odoo puts a Name, an Email and a Phone question on every event by default,
-# and the registration form answers those by itself. An answer to one proves
-# nothing about the questionnaire, so only the question types an attendee
-# actually fills in count as "questionnaire filled".
+# Only the question types that ask something count as "questionnaire
+# filled". The identification types (Name, Email, Phone, Company) say who the
+# attendee is, and Odoo copies their answers onto the registration itself; it
+# puts the first three on every event by default and the registration form
+# answers them on its own. An answer to one of them proves nothing about the
+# questionnaire.
 QUESTIONNAIRE_QUESTION_TYPES = ("simple_choice", "text_box")
 
 
@@ -68,8 +70,9 @@ class EventRaffleStartWizard(models.TransientModel):
                 _(
                     "L'événement « %s » n'a pas de question de "
                     "questionnaire : aucun inscrit ne peut avoir rempli le "
-                    "questionnaire. Ajoutez une question, ou choisissez un "
-                    "autre type de participants."
+                    "questionnaire. Ajoutez une question de type Sélection "
+                    "ou Saisie de texte, ou choisissez un autre type de "
+                    "participants."
                 )
                 % self.event_id.name
             )

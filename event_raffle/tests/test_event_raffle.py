@@ -428,10 +428,10 @@ class TestRaffleWizard(TransactionCase):
         self.assertEqual(raffle.participant_count, 1)
 
     # ---- questionnaire strategies -----------------------------------------
-    # "Filled the questionnaire" means answering a question the attendee
-    # actually types into. Odoo puts Name / Email / Phone questions on every
-    # event and the registration form answers those on its own, so they are
-    # not proof of anything and the strategies must ignore them.
+    # "Filled the questionnaire" means answering a Selection or a Text Input
+    # question. The identification questions (Name, Email, Phone, Company)
+    # prove nothing: Odoo puts the first three on every event and the
+    # registration form answers them on its own.
 
     def _add_questionnaire_question(self, title="Distro préférée ?"):
         return self.env["event.question"].create(
@@ -490,6 +490,22 @@ class TestRaffleWizard(TransactionCase):
         )
         self._add_questionnaire_question()
         self._answer(self.reg_done, identity[0], text="Reg Present")
+        self.assertEqual(
+            self._run_wizard("question_only").participant_count, 0
+        )
+
+    def test_questionnaire_ignores_the_company_question(self):
+        # Odoo does not put a Company question on events by default, and the
+        # attendee types the answer, but it identifies them all the same.
+        company = self.env["event.question"].create(
+            {
+                "event_id": self.event.id,
+                "title": "Company",
+                "question_type": "company_name",
+            }
+        )
+        self._add_questionnaire_question()
+        self._answer(self.reg_done, company, text="Example Co")
         self.assertEqual(
             self._run_wizard("question_only").participant_count, 0
         )

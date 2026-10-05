@@ -66,8 +66,10 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
    - *Questionnaire rempli seulement* : les inscrits, présents ou non, qui ont
      répondu à au moins une question du questionnaire d'inscription (onglet
      *Questions* de l'événement). Seules les questions de type *Sélection* ou
-     *Saisie de texte* comptent : Nom, Courriel, Téléphone et Société sont
-     ignorées ;
+     *Saisie de texte* comptent. Les types d'identification *Nom*, *E-mail*,
+     *Téléphone* et *Société* sont ignorés : ils disent qui est l'inscrit, et
+     Odoo ajoute d'office les trois premiers, que le formulaire en ligne
+     pré-remplit ;
    - *Questionnaire rempli et présent* : la même chose, pour les présents
      seulement.
 
