@@ -96,6 +96,9 @@ msgfmt --check -o /dev/null \
     odoo18.0/addons/ERPLibre_erplibre_addons/event_raffle_survey/i18n/fr_CA.po
 ```
 
+The wizard is also driven end to end in Firefox against a running instance:
+see `selenium/README.md`.
+
 ## Credits
 
 ### Authors
@@ -192,7 +195,8 @@ pour l'application Recrutement.
 ## Développement
 
 Les commandes de test, de formatage et de traduction sont celles de la section
-*Development* ci-dessus.
+*Development* ci-dessus. L'assistant est aussi parcouru de bout en bout dans
+Firefox, contre une instance démarrée : voir `selenium/README.md`.
 
 ## Crédits
 
