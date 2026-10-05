@@ -6,14 +6,14 @@
         <field name="inherit_id" ref="event.view_event_form" />
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_start_raffle" type="object" string="Démarrer un tirage" class="btn-primary" />
+                <button name="action_start_raffle" type="object" string="Start a Raffle" class="btn-primary" />
             </xpath>
             <div name="button_box" position="inside">
                 <button name="action_view_raffle_winners" type="object" class="oe_stat_button" icon="fa-trophy">
-                    <field name="raffle_winner_count" widget="statinfo" string="Gagnants" />
+                    <field name="raffle_winner_count" widget="statinfo" string="Winners" />
                 </button>
                 <button name="action_view_raffles" type="object" class="oe_stat_button" icon="fa-random">
-                    <field name="raffle_count" widget="statinfo" string="Tirages" />
+                    <field name="raffle_count" widget="statinfo" string="Raffles" />
                 </button>
             </div>
         </field>

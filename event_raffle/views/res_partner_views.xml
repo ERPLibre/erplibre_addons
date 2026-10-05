@@ -17,7 +17,7 @@
                     groups="event.group_event_user"
                     invisible="raffle_win_count == 0"
                 >
-                    <field name="raffle_win_count" widget="statinfo" string="Gagnant tirage" />
+                    <field name="raffle_win_count" widget="statinfo" string="Raffle Winner" />
                 </button>
             </div>
         </field>
@@ -31,7 +31,7 @@
             <filter name="type_company" position="after">
                 <separator />
                 <filter
-                    string="Gagnant tirage"
+                    string="Raffle Winner"
                     name="raffle_winner"
                     domain="[('raffle_draw_ids.winner_participant_id',
                                   '!=', False)]"

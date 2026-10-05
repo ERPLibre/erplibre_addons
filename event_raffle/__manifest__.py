@@ -3,7 +3,7 @@
 {
     "name": "Event Raffle (Tirage)",
     "version": "18.0.1.2.0",
-    "summary": "Tirages animés (roue 3D) pour les événements",
+    "summary": "Animated prize draws (3D wheel) for events",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "category": "Marketing/Events",

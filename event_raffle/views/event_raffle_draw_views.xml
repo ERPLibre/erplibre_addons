@@ -4,7 +4,7 @@
         <field name="name">event.raffle.draw.list</field>
         <field name="model">event.raffle.draw</field>
         <field name="arch" type="xml">
-            <list string="Gagnants">
+            <list string="Winners">
                 <field name="sequence" />
                 <field name="raffle_id" />
                 <field name="winner_name" />
@@ -27,19 +27,19 @@
         <field name="name">event.raffle.draw.form</field>
         <field name="model">event.raffle.draw</field>
         <field name="arch" type="xml">
-            <form string="Tir">
+            <form string="Draw">
                 <header>
                     <button
                         name="action_mark_absent"
                         type="object"
-                        string="Marquer absent"
+                        string="Mark Absent"
                         class="btn-secondary"
                         invisible="is_absent"
                     />
                     <button
                         name="action_mark_present"
                         type="object"
-                        string="Marquer présent"
+                        string="Mark Present"
                         class="btn-secondary"
                         invisible="not is_absent"
                     />
@@ -63,8 +63,12 @@
                             <field name="prize_received_date" />
                         </group>
                     </group>
-                    <group string="Commentaire">
-                        <field name="comment" nolabel="1" placeholder="Remise du prix, coordonnées, suivi..." />
+                    <group string="Comment">
+                        <field
+                            name="comment"
+                            nolabel="1"
+                            placeholder="Prize hand-over, contact details, follow-up..."
+                        />
                     </group>
                 </sheet>
                 <chatter />

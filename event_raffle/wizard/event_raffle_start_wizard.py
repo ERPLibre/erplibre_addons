@@ -33,9 +33,9 @@ class EventRaffleStartWizard(models.TransientModel):
         string="Participants",
         default="present_only",
         required=True,
-        help="Qui entre dans le tirage. Les deux choix « Questionnaire » ne "
-        "gardent que les inscrits ayant répondu au questionnaire "
-        "d'inscription de l'événement.",
+        help="Who enters the raffle. Both 'Questionnaire' choices keep only "
+        "the attendees who answered the event's registration "
+        "questionnaire.",
     )
     context_note = fields.Text(string="Context")
     remove_winner = fields.Boolean(string="Remove Winner", default=True)
@@ -68,11 +68,10 @@ class EventRaffleStartWizard(models.TransientModel):
         if not questions:
             raise UserError(
                 _(
-                    "L'événement « %s » n'a pas de question de "
-                    "questionnaire : aucun inscrit ne peut avoir rempli le "
-                    "questionnaire. Ajoutez une question de type Sélection "
-                    "ou Saisie de texte, ou choisissez un autre type de "
-                    "participants."
+                    "The event '%s' has no questionnaire question: no attendee "
+                    "can have filled in the questionnaire. Add a question of "
+                    "type Selection or Text Input, or choose another type "
+                    "of participants."
                 )
                 % self.event_id.name
             )
@@ -140,7 +139,7 @@ class EventRaffleStartWizard(models.TransientModel):
         self.ensure_one()
         raffle = self.env["event.raffle"].create(
             {
-                "name": self.name or _("Tirage - %s") % self.event_id.name,
+                "name": self.name or _("Raffle - %s") % self.event_id.name,
                 "event_id": self.event_id.id,
                 "context_note": self.context_note or False,
                 "remove_winner": self.remove_winner,

@@ -884,9 +884,9 @@ export class RaffleScene {
         if (size.runaway && !this._sizeWarned) {
             this._sizeWarned = true;
             console.warn(
-                `event_raffle: canvas mesuré ${w}x${size.measuredHeight} px, ` +
-                `ramené à ${h} px — une feuille de style réinjecte la taille ` +
-                `du canvas dans la mise en page.`
+                `event_raffle: canvas measured at ${w}x${size.measuredHeight} ` +
+                `px, clamped to ${h} px — a stylesheet feeds the canvas size ` +
+                `back into the layout.`
             );
             const style = this.canvas.style;
             style.setProperty("flex", "1 1 0", "important");

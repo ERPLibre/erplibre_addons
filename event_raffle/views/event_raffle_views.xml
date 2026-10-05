@@ -4,7 +4,7 @@
         <field name="name">event.raffle.list</field>
         <field name="model">event.raffle</field>
         <field name="arch" type="xml">
-            <list string="Tirages">
+            <list string="Raffles">
                 <field name="name" />
                 <field name="event_id" />
                 <field name="participant_count" />
@@ -18,7 +18,7 @@
         <field name="name">event.raffle.form</field>
         <field name="model">event.raffle</field>
         <field name="arch" type="xml">
-            <form string="Tirage">
+            <form string="Raffle">
                 <header>
                     <field name="state" widget="statusbar" />
                 </header>
@@ -32,12 +32,12 @@
                         <field name="event_id" />
                         <field name="company_id" groups="base.group_multi_company" />
                     </group>
-                    <field name="context_note" placeholder="Contexte..." />
+                    <field name="context_note" placeholder="Context..." />
                     <widget name="raffle_wheel" />
                     <notebook>
                         <page string="Participants" name="participants">
-                            <button name="action_include_all" type="object" string="Tout inclure" class="btn-link" />
-                            <button name="action_exclude_all" type="object" string="Tout exclure" class="btn-link" />
+                            <button name="action_include_all" type="object" string="Include All" class="btn-link" />
+                            <button name="action_exclude_all" type="object" string="Exclude All" class="btn-link" />
                             <field name="participant_ids">
                                 <list editable="bottom">
                                     <field name="partner_id" />
@@ -51,7 +51,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Tirs" name="draws">
+                        <page string="Draws" name="draws">
                             <field name="draw_ids">
                                 <list>
                                     <field name="sequence" />
@@ -70,7 +70,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Paramètres" name="settings">
+                        <page string="Settings" name="settings">
                             <group>
                                 <field name="theme" />
                                 <field name="winner_celebration" />

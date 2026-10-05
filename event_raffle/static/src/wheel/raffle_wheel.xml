@@ -57,7 +57,7 @@
                         t-on-click="() => this.openFullscreen()"
                         t-att-disabled="state.spinning"
                     >
-                        Plein écran
+                        Full Screen
                     </button>
                     <button
                         t-if="isFullscreen"
@@ -65,32 +65,32 @@
                         t-on-click="() => this.exitFullscreen()"
                         t-att-disabled="state.spinning"
                     >
-                        Quitter le plein écran
+                        Exit Full Screen
                     </button>
                     <input
                         type="text"
-                        placeholder="Lot (optionnel)"
+                        placeholder="Prize (optional)"
                         t-model="state.prize"
                         t-att-disabled="state.spinning"
                     />
                 </div>
                 <div class="o_raffle_winner" t-if="state.winner">
-                    🎉 Gagnant :
+                    🎉 Winner:
                     <t t-esc="state.winner" />
                 </div>
                 <div class="o_raffle_tb_right">
                     <span class="o_raffle_count">
-                        Éligibles :
+                        Eligible:
                         <t t-esc="state.eligibleCount" />
                     </span>
                     <button
                         class="btn btn-primary o_raffle_spin"
                         t-on-click="() => this.spin()"
                         t-att-disabled="state.spinning or !state.canDrawNext"
-                        t-att-title="!state.canDrawNext and !state.spinning ? 'Plus assez de participants pour un tirage' : false"
+                        t-att-title="!state.canDrawNext and !state.spinning ? noDrawLeftTitle : false"
                     >
-                        <t t-if="state.drawCount === 0">Démarrer le tirage</t>
-                        <t t-else="">Prochain tirage</t>
+                        <t t-if="state.drawCount === 0">Start the Raffle</t>
+                        <t t-else="">Next Draw</t>
                     </button>
                 </div>
             </div>
@@ -101,7 +101,7 @@
             >
                 <div class="o_raffle_history_title" t-on-click="() => this.toggleHistoryCollapsed()">
                     <span class="o_raffle_history_caret" t-esc="state.historyCollapsed ? '▸' : '▾'" />
-                    Historique des gagnants
+                    Winner History
                     <t t-esc="'(' + state.history.length + ')'" />
                 </div>
                 <ul t-if="!state.historyCollapsed">
@@ -120,24 +120,25 @@
                             <span class="o_name">
                                 <t t-esc="draw.winner_name" />
                             </span>
-                            <span class="o_absent_badge" t-if="!draw.present">non présent</span>
+                            <span class="o_absent_badge" t-if="!draw.present">not present</span>
                         </div>
                         <div class="o_raffle_history_details" t-if="state.expandedId === draw.id">
                             <div t-if="draw.prize">
-                                Lot :
+                                Prize:
                                 <t t-esc="draw.prize" />
                             </div>
                             <div t-if="draw.prize_description">
-                                Description :
+                                Description:
                                 <t t-esc="draw.prize_description" />
                             </div>
                             <div t-if="draw.date">
-                                Date :
+                                Date:
                                 <t t-esc="draw.date" />
                             </div>
                             <div>
-                                Présent :
-                                <t t-esc="draw.present ? 'Oui' : 'Non'" />
+                                Present:
+                                <t t-if="draw.present">Yes</t>
+                                <t t-else="">No</t>
                             </div>
                         </div>
                     </li>
