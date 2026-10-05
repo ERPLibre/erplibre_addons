@@ -24,7 +24,10 @@ The buttons below keep their French labels in every language, as in
 2. Under **Participants**, choose *Survey filled only*, then pick the
    **Survey**. Closed surveys are listed too: closing a survey archives it, and
    the draw usually comes after.
-3. Click **Démarrer**. The survey's respondents become the raffle's
+3. Optionally, add questions of that survey to **Required Questions**, then
+   choose under **Answered** whether a respondent must have answered *Each* of
+   them (the default) or *At least one*.
+4. Click **Démarrer**. The survey's respondents become the raffle's
    participants, with the *Survey* source. The event's registrations are not
    copied.
 
@@ -33,6 +36,11 @@ The buttons below keep their French labels in every language, as in
 An answer counts when it is completed, is not a test entry, and answers at
 least one question. Ending a live session marks every answer of the survey
 completed, even one that was only opened: the last condition keeps those out.
+
+When **Required Questions** lists questions, an answer must also answer each
+of them, or at least one, as **Answered** says. Answering means giving a
+non-blank answer, right or wrong. An empty list filters nobody, and picking
+another survey empties it.
 
 Each answer is identified by its contact, else by its email (whatever its
 case, and `"Name" <address>` included), else by its nickname. Answers sharing
@@ -118,7 +126,10 @@ les inscrits qui ont répondu aux questions d'inscription de l'événement.
 2. Dans **Participants**, choisir *Sondage rempli seulement*, puis le
    **Sondage**. Les sondages fermés sont proposés aussi : fermer un sondage
    l'archive, et le tirage vient souvent après.
-3. Cliquer **Démarrer**. Les répondants du sondage deviennent les participants
+3. En option, ajouter des questions de ce sondage aux **Questions exigées**,
+   puis choisir sous **Répondu à** si un répondant doit avoir répondu à
+   *Chacune* (par défaut) ou à *Au moins une*.
+4. Cliquer **Démarrer**. Les répondants du sondage deviennent les participants
    du tirage, avec la source *Sondage*. Les inscrits de l'événement ne sont pas
    copiés.
 
@@ -128,6 +139,11 @@ Une participation compte si elle est terminée, n'est pas un test et répond à
 au moins une question. Terminer une session en direct marque terminées toutes
 les participations du sondage, même celles qui ont seulement été ouvertes : la
 dernière condition les écarte.
+
+Si les **Questions exigées** contiennent des questions, une participation doit
+aussi répondre à chacune, ou à au moins une, selon **Répondu à**. Répondre veut
+dire donner une réponse non vide, juste ou non. Une liste vide ne filtre
+personne, et choisir un autre sondage la vide.
 
 Chaque participation est identifiée par son contact, sinon par son courriel
 (quelle qu'en soit la casse, `"Nom" <adresse>` compris), sinon par son pseudo.

@@ -34,6 +34,18 @@ class TestRaffleSurveyStrategy(TransactionCase):
         )
         cls.survey = cls._create_survey("Raffle survey")
         cls.other_survey = cls._create_survey("Other survey")
+        # A survey of three questions, for the required-questions filter.
+        cls.quiz = cls.env["survey.survey"].create({"title": "Quiz"})
+        cls.q1, cls.q2, cls.q3 = cls.env["survey.question"].create(
+            [
+                {
+                    "survey_id": cls.quiz.id,
+                    "title": title,
+                    "question_type": "char_box",
+                }
+                for title in ("Distribution?", "Desktop?", "Editor?")
+            ]
+        )
 
     @classmethod
     def _create_survey(cls, title):
@@ -242,6 +254,102 @@ class TestRaffleSurveyStrategy(TransactionCase):
             self._names(self._run_wizard()),
             ["Ann", "Bob", "carol@example.com"],
         )
+
+    # ---- required questions -----------------------------------------------
+
+    def _quiz_answer(self, nickname, answered=(), skipped=()):
+        """A completed answer to self.quiz that answers the `answered`
+        questions and leaves the `skipped` ones blank."""
+        answer = self.env["survey.user_input"].create(
+            {"survey_id": self.quiz.id, "nickname": nickname, "state": "done"}
+        )
+        self.env["survey.user_input.line"].create(
+            [
+                {
+                    "user_input_id": answer.id,
+                    "question_id": question.id,
+                    "answer_type": "char_box",
+                    "value_char_box": "Debian",
+                }
+                for question in answered
+            ]
+            + [
+                {
+                    "user_input_id": answer.id,
+                    "question_id": question.id,
+                    "skipped": True,
+                }
+                for question in skipped
+            ]
+        )
+        return answer
+
+    def _quiz_respondents(self):
+        self._quiz_answer("Both", answered=self.q1 | self.q2)
+        self._quiz_answer("First", answered=self.q1, skipped=self.q2)
+        self._quiz_answer("Second", answered=self.q2)
+        self._quiz_answer("Third", answered=self.q3, skipped=self.q1 | self.q2)
+
+    def _run_quiz(self, questions, **vals):
+        return self._run_wizard(
+            survey_id=self.quiz.id,
+            survey_question_ids=[Command.set(questions.ids)],
+            **vals,
+        )
+
+    def test_required_questions_must_each_be_answered_by_default(self):
+        self._quiz_respondents()
+        raffle = self._run_quiz(self.q1 | self.q2)
+        self.assertEqual(self._names(raffle), ["Both"])
+
+    def test_required_questions_can_need_only_one_answer(self):
+        self._quiz_respondents()
+        raffle = self._run_quiz(self.q1 | self.q2, survey_question_match="any")
+        self.assertEqual(self._names(raffle), ["Both", "First", "Second"])
+
+    def test_no_required_question_filters_nobody(self):
+        self._quiz_respondents()
+        for match in ("all", "any"):
+            raffle = self._run_quiz(
+                self.env["survey.question"], survey_question_match=match
+            )
+            self.assertEqual(
+                self._names(raffle), ["Both", "First", "Second", "Third"]
+            )
+
+    def test_required_questions_belong_to_the_chosen_survey(self):
+        section = self.env["survey.question"].create(
+            {"survey_id": self.quiz.id, "title": "Section", "is_page": True}
+        )
+        for stranger in (self.survey.question_ids, section):
+            with self.assertRaises(ValidationError):
+                self.env["event.raffle.start.wizard"].create(
+                    {
+                        "event_id": self.event.id,
+                        "copy_strategy": "survey_only",
+                        "survey_id": self.quiz.id,
+                        "survey_question_ids": [Command.set(stranger.ids)],
+                    }
+                )
+
+    def test_form_offers_the_questions_of_the_picked_survey(self):
+        form = Form(
+            self.env["event.raffle.start.wizard"].with_context(
+                default_event_id=self.event.id
+            )
+        )
+        form.copy_strategy = "survey_only"
+        with self.assertRaisesRegex(AssertionError, "not visible"):
+            form.survey_question_ids.add(self.q1)
+        form.survey_id = self.quiz
+        form.survey_question_ids.add(self.q1)
+        form.survey_question_match = "any"
+        # Another survey's questions cannot stay: picking it empties the
+        # list, and the match choice goes with it.
+        form.survey_id = self.survey
+        self.assertEqual(len(form.survey_question_ids), 0)
+        with self.assertRaisesRegex(AssertionError, "invisible field"):
+            form.survey_question_match = "all"
 
     # ---- the wizard -------------------------------------------------------
 

@@ -31,6 +31,22 @@ class EventRaffleStartWizard(models.TransientModel):
         "every completed answer that is not a test and answers at least one "
         "question.",
     )
+    survey_question_ids = fields.Many2many(
+        "survey.question",
+        string="Required Questions",
+        domain="[('survey_id', '=', survey_id), ('is_page', '=', False)]",
+        help="Optional. When the list holds questions, only the respondents "
+        "who answered them enter the raffle: each of them, or at least one, "
+        "as Answered says.",
+    )
+    survey_question_match = fields.Selection(
+        [("all", "Each"), ("any", "At least one")],
+        string="Answered",
+        default="all",
+        required=True,
+        help="Which of the required questions a respondent must have "
+        "answered: each of them, or at least one.",
+    )
 
     @api.constrains("copy_strategy", "survey_id")
     def _check_survey_id(self):
@@ -42,22 +58,70 @@ class EventRaffleStartWizard(models.TransientModel):
                     _("Choose the survey whose respondents enter the raffle.")
                 )
 
+    @api.constrains("survey_id", "survey_question_ids")
+    def _check_survey_question_ids(self):
+        # A question of another survey, or a section, has no answer in the
+        # chosen survey: the raffle would come out empty without a word. An
+        # empty list reads no question, so a user without survey rights can
+        # still start the other strategies.
+        for wizard in self:
+            questions = wizard.survey_question_ids
+            if questions and questions - wizard.survey_id.question_ids:
+                raise ValidationError(
+                    _(
+                        "The required questions must be questions of the "
+                        "chosen survey."
+                    )
+                )
+
+    @api.onchange("survey_id")
+    def _onchange_survey_id(self):
+        # The questions of the previous survey have no answer in this one.
+        self.survey_question_ids = False
+
     def _filled_survey_answers(self):
         """The answers that count as filling the survey, oldest first.
 
         Completed is not enough: ending a live session marks every answer of
         the survey done, even one opened and never answered, so an answer must
-        also answer at least one question. Test entries never count.
+        also answer at least one question. Test entries never count. When
+        required questions are set, an answer must also answer each of them,
+        or at least one, as survey_question_match says; answering means one
+        line at least that is not skipped.
         """
         self.ensure_one()
+        domain = [
+            ("survey_id", "=", self.survey_id.id),
+            ("state", "=", "done"),
+            ("test_entry", "=", False),
+            ("user_input_line_ids", "any", [("skipped", "=", False)]),
+        ]
+        questions = self.survey_question_ids
+        if questions and self.survey_question_match == "any":
+            domain.append(
+                (
+                    "user_input_line_ids",
+                    "any",
+                    [
+                        ("question_id", "in", questions.ids),
+                        ("skipped", "=", False),
+                    ],
+                )
+            )
+        else:
+            for question in questions:
+                domain.append(
+                    (
+                        "user_input_line_ids",
+                        "any",
+                        [
+                            ("question_id", "=", question.id),
+                            ("skipped", "=", False),
+                        ],
+                    )
+                )
         return self.env["survey.user_input"].search(
-            [
-                ("survey_id", "=", self.survey_id.id),
-                ("state", "=", "done"),
-                ("test_entry", "=", False),
-                ("user_input_line_ids", "any", [("skipped", "=", False)]),
-            ],
-            order="create_date, id",
+            domain, order="create_date, id"
         )
 
     def _copy_participants(self, raffle):

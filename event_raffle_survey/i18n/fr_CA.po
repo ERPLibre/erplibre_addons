@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-04 08:00+0000\n"
-"PO-Revision-Date: 2026-10-04 08:10+0000\n"
+"POT-Creation-Date: 2026-10-05 04:47+0000\n"
+"PO-Revision-Date: 2026-10-05 05:10+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -18,10 +18,25 @@ msgstr ""
 "X-Generator: Odoo\n"
 
 #. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
+msgid "Answered"
+msgstr "Répondu à"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__survey_question_match__any
+msgid "At least one"
+msgstr "Au moins une"
+
+#. module: event_raffle_survey
 #. odoo-python
 #: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
 msgid "Choose the survey whose respondents enter the raffle."
 msgstr "Choisissez le sondage dont les répondants entrent dans le tirage."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__survey_question_match__all
+msgid "Each"
+msgstr "Chacune"
 
 #. module: event_raffle_survey
 #. odoo-python
@@ -38,6 +53,16 @@ msgstr ""
 "Ses répondants entrent dans le tirage à la place des inscrits : toute "
 "participation terminée qui n'est pas un test et répond à au moins une "
 "question."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
+msgid ""
+"Optional. When the list holds questions, only the respondents who answered "
+"them enter the raffle: each of them, or at least one, as Answered says."
+msgstr ""
+"Facultatif. Si la liste contient des questions, seuls les répondants qui y "
+"ont répondu entrent dans le tirage : à chacune, ou à au moins une, selon « "
+"Répondu à »."
 
 #. module: event_raffle_survey
 #: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__copy_strategy
@@ -59,6 +84,11 @@ msgid "Raffle Participant"
 msgstr "Participant au tirage"
 
 #. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
+msgid "Required Questions"
+msgstr "Questions exigées"
+
+#. module: event_raffle_survey
 #: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_participant__source
 msgid "Source"
 msgstr "Source"
@@ -78,3 +108,18 @@ msgstr "Sondage"
 #: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__copy_strategy__survey_only
 msgid "Survey filled only"
 msgstr "Sondage rempli seulement"
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "The required questions must be questions of the chosen survey."
+msgstr "Les questions exigées doivent être des questions du sondage choisi."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
+msgid ""
+"Which of the required questions a respondent must have answered: each of "
+"them, or at least one."
+msgstr ""
+"Les questions exigées auxquelles un répondant doit avoir répondu : chacune, "
+"ou au moins une."

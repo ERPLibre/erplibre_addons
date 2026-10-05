@@ -18,6 +18,9 @@ event's registrations. An answer counts when it is completed, is not a
 test entry and answers at least one question. Answers sharing an
 identifier enter once: the contact, else the email, else the nickname.
 
+Optionally, list required questions of the survey: only the respondents
+who answered each of them, or at least one, then enter.
+
 Drawing from a survey needs the Surveys: User access right.
 
 Français
@@ -28,6 +31,9 @@ dans le tirage à la place des inscrits de l'événement. Une participation
 compte si elle est terminée, n'est pas un test et répond à au moins une
 question. Les participations qui partagent un identifiant n'entrent
 qu'une fois : le contact, sinon le courriel, sinon le pseudo.
+
+En option, listez des questions exigées du sondage : seuls les répondants
+qui ont répondu à chacune, ou à au moins une, entrent alors.
 
 Tirer depuis un sondage demande le droit d'accès Sondages : Utilisateur.
 """,

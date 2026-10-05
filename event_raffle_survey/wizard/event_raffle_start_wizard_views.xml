@@ -15,6 +15,20 @@
                     context="{'active_test': False}"
                     options="{'no_create': True}"
                 />
+                <!-- Optional filter on the chosen survey's questions; the
+                     list links existing questions and creates none. -->
+                <field name="survey_question_ids" invisible="copy_strategy != 'survey_only' or not survey_id">
+                    <list create="0">
+                        <field name="title" />
+                        <field name="question_type" />
+                    </list>
+                </field>
+                <field
+                    name="survey_question_match"
+                    widget="radio"
+                    options="{'horizontal': true}"
+                    invisible="copy_strategy != 'survey_only' or not survey_id or not survey_question_ids"
+                />
             </field>
         </field>
     </record>
