@@ -9,6 +9,7 @@ import {
     useRef,
     useState,
 } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { loadBundle } from "@web/core/assets";
@@ -48,6 +49,8 @@ export class RaffleWheel extends Component {
         // fullscreen client action carries `action`; the embedded widget a
         // `record`. Used to show the "exit fullscreen" button.
         this.isFullscreen = !!(this.props.action && this.props.action.params);
+        // Tooltip of the spin button while too few participants are left.
+        this.noDrawLeftTitle = _t("Not enough participants left for a draw");
 
         onWillStart(async () => {
             await loadBundle("event_raffle.assets_three");

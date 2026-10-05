@@ -33,6 +33,29 @@ class TestEventRaffle(TransactionCase):
         # The pointer sits at the top unless the raffle says otherwise.
         self.assertEqual(self.raffle.pointer_angle, "0")
 
+    # These labels exist in English and in fr_CA: each test reads both, so a
+    # label left untranslated, or translated once and cached, shows up.
+
+    def _env_in(self, lang):
+        self.env["res.lang"]._activate_lang(lang)
+        return self.env(context=dict(self.env.context, lang=lang))
+
+    def test_default_name_is_translatable(self):
+        for lang, name in (("en_US", "Raffle"), ("fr_CA", "Tirage")):
+            raffle = self._env_in(lang)["event.raffle"].create({})
+            self.assertEqual(raffle.name, name)
+
+    def test_settings_are_named_in_the_reader_language(self):
+        # Whatever name the record stores, the label is the reader's own.
+        settings = self.env.ref("event_raffle.raffle_config_singleton")
+        settings.name = "Stored name"
+        for lang, label in (
+            ("en_US", "Default Settings"),
+            ("fr_CA", "Paramètres par défaut"),
+        ):
+            labelled = settings.with_env(self._env_in(lang))
+            self.assertEqual(labelled.display_name, label)
+
     def test_participant_eligible_default(self):
         p = self._add_participant("Alice")
         self.assertTrue(p.eligible)
@@ -90,7 +113,7 @@ class TestEventRaffle(TransactionCase):
     def test_draw_next_picks_eligible(self):
         self.raffle.remove_winner = True
         p1 = self._add_participant("A")
-        p2 = self._add_participant("B", excluded=True)
+        self._add_participant("B", excluded=True)
         res = self.raffle.action_draw_next()
         self.assertEqual(res["winner"]["id"], p1.id)
         self.assertEqual([w["id"] for w in res["wheel"]], [p1.id])
@@ -349,6 +372,18 @@ class TestRaffleWizard(TransactionCase):
         self.assertEqual(action["res_model"], "event.raffle")
         self.assertTrue(action["res_id"])
 
+    def test_unnamed_raffle_is_named_after_the_event(self):
+        for lang, prefix in (("en_US", "Raffle"), ("fr_CA", "Tirage")):
+            self.env["res.lang"]._activate_lang(lang)
+            env = self.env(context=dict(self.env.context, lang=lang))
+            wizard = env["event.raffle.start.wizard"].create(
+                {"event_id": self.event.id}
+            )
+            raffle = env["event.raffle"].browse(
+                wizard.action_start()["res_id"]
+            )
+            self.assertEqual(raffle.name, f"{prefix} - {self.event.name}")
+
     def test_copy_blank_guests_not_deduped(self):
         ev = self.env["event.event"].create(
             {
@@ -373,13 +408,67 @@ class TestRaffleWizard(TransactionCase):
         )
         self.assertEqual(raffle.participant_count, 2)
 
-    # ---- survey strategies ------------------------------------------------
-    # "Filled the survey" means answering a question the attendee actually
-    # types into. Odoo puts Name / Email / Phone questions on every event and
-    # the registration form answers those on its own, so they are not proof
-    # of anything and the strategies must ignore them.
+    # ---- identity: the same person enters once ----------------------------
+    # A contact identifies a person before an email, and an email before a
+    # name; an email or a name matches whatever its case and outer spaces.
 
-    def _add_survey_question(self, title="Distro préférée ?"):
+    def _present_raffle(self, *registrations):
+        """Raffle of a fresh event where every given registration attended."""
+        ev = self.env["event.event"].create(
+            {
+                "name": "E3",
+                "date_begin": "2026-01-01 09:00:00",
+                "date_end": "2026-01-01 18:00:00",
+            }
+        )
+        self.env["event.registration"].create(
+            [
+                dict(vals, event_id=ev.id, state="done")
+                for vals in registrations
+            ]
+        )
+        wizard = self.env["event.raffle.start.wizard"].create(
+            {"event_id": ev.id, "copy_strategy": "present_only"}
+        )
+        return self.env["event.raffle"].browse(wizard.action_start()["res_id"])
+
+    def test_copy_dedupes_on_contact_whatever_the_email(self):
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        raffle = self._present_raffle(
+            {"partner_id": ann.id, "name": "Ann", "email": "ann@example.com"},
+            {
+                "partner_id": ann.id,
+                "name": "Ann",
+                "email": "ann.b@example.com",
+            },
+        )
+        self.assertEqual(raffle.participant_count, 1)
+
+    def test_copy_dedupes_on_email_whatever_its_case(self):
+        raffle = self._present_raffle(
+            {"name": "Ann", "email": " Ann@Example.com"},
+            {"name": "Ann B.", "email": "ann@example.com "},
+        )
+        self.assertEqual(raffle.participant_count, 1)
+
+    def test_copy_keeps_homonyms_with_different_emails(self):
+        raffle = self._present_raffle(
+            {"name": "Ann", "email": "ann@example.com"},
+            {"name": "Ann", "email": "ann.b@example.com"},
+        )
+        self.assertEqual(raffle.participant_count, 2)
+
+    def test_copy_dedupes_on_name_without_contact_or_email(self):
+        raffle = self._present_raffle({"name": " Bob"}, {"name": "bob "})
+        self.assertEqual(raffle.participant_count, 1)
+
+    # ---- questionnaire strategies -----------------------------------------
+    # "Filled the questionnaire" means answering a Selection or a Text Input
+    # question. The identification questions (Name, Email, Phone, Company)
+    # prove nothing: Odoo puts the first three on every event and the
+    # registration form answers them on its own.
+
+    def _add_questionnaire_question(self, title="Distro préférée ?"):
         return self.env["event.question"].create(
             {
                 "event_id": self.event.id,
@@ -397,48 +486,66 @@ class TestRaffleWizard(TransactionCase):
             }
         )
 
-    def test_survey_only_keeps_answered_whatever_the_state(self):
-        q = self._add_survey_question()
+    def test_question_only_keeps_answered_whatever_the_state(self):
+        q = self._add_questionnaire_question()
         self._answer(self.reg_open, q)
         self._answer(self.reg_done, q)
-        raffle = self._run_wizard("survey_only")
+        raffle = self._run_wizard("question_only")
         self.assertEqual(
             raffle.participant_ids.mapped("name"),
             ["Reg Open", "Reg Present"],
         )
 
-    def test_survey_only_drops_the_unanswered(self):
-        q = self._add_survey_question()
+    def test_question_only_drops_the_unanswered(self):
+        q = self._add_questionnaire_question()
         self._answer(self.reg_open, q)
-        raffle = self._run_wizard("survey_only")
+        raffle = self._run_wizard("question_only")
         self.assertEqual(raffle.participant_ids.mapped("name"), ["Reg Open"])
 
-    def test_survey_and_present_demands_both(self):
-        q = self._add_survey_question()
+    def test_question_and_present_demands_both(self):
+        q = self._add_questionnaire_question()
         # answered, but only registered: out.
         self._answer(self.reg_open, q)
         self.assertEqual(
-            self._run_wizard("survey_and_present").participant_count, 0
+            self._run_wizard("question_and_present").participant_count, 0
         )
         # the attended one answers too: in.
         self._answer(self.reg_done, q)
-        raffle = self._run_wizard("survey_and_present")
+        raffle = self._run_wizard("question_and_present")
         self.assertEqual(
             raffle.participant_ids.mapped("name"), ["Reg Present"]
         )
 
-    def test_survey_ignores_the_default_identity_questions(self):
+    def test_questionnaire_ignores_the_default_identity_questions(self):
         identity = self.event.question_ids.filtered(
             lambda q: q.question_type in ("name", "email", "phone")
         )
         self.assertTrue(
             identity, "event should carry Odoo's default questions"
         )
-        self._add_survey_question()
+        self._add_questionnaire_question()
         self._answer(self.reg_done, identity[0], text="Reg Present")
-        self.assertEqual(self._run_wizard("survey_only").participant_count, 0)
+        self.assertEqual(
+            self._run_wizard("question_only").participant_count, 0
+        )
 
-    def test_survey_strategy_without_a_survey_question_raises(self):
+    def test_questionnaire_ignores_the_company_question(self):
+        # Odoo does not put a Company question on events by default, and the
+        # attendee types the answer, but it identifies them all the same.
+        company = self.env["event.question"].create(
+            {
+                "event_id": self.event.id,
+                "title": "Company",
+                "question_type": "company_name",
+            }
+        )
+        self._add_questionnaire_question()
+        self._answer(self.reg_done, company, text="Example Co")
+        self.assertEqual(
+            self._run_wizard("question_only").participant_count, 0
+        )
+
+    def test_question_strategy_without_a_questionnaire_question_raises(self):
         # The event carries only the default identity questions, so the
         # strategy could never match anyone: say so instead of building an
         # empty raffle.
@@ -448,7 +555,7 @@ class TestRaffleWizard(TransactionCase):
             )
         )
         with self.assertRaises(UserError):
-            self._run_wizard("survey_only")
+            self._run_wizard("question_only")
 
 
 class TestRaffleDrawPrize(TransactionCase):

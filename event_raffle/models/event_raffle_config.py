@@ -1,6 +1,6 @@
 # Copyright 2026 TechnoLibre - Mathieu Benoit
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import fields, models
+from odoo import _, api, fields, models
 
 from .event_raffle import (
     BELLY_LOGO_SELECTION,
@@ -15,7 +15,7 @@ class EventRaffleConfig(models.Model):
     _name = "event.raffle.config"
     _description = "Event Raffle Default Settings"
 
-    name = fields.Char(default="Paramètres par défaut", readonly=True)
+    name = fields.Char(default="Default Settings", readonly=True)
     default_theme = fields.Selection(
         THEME_SELECTION,
         string="Default Theme",
@@ -45,7 +45,7 @@ class EventRaffleConfig(models.Model):
     default_show_tux = fields.Boolean(
         string="Default Show Penguin (Tux)",
         default=False,
-        help="Afficher le pingouin Tux à côté de la roue (caché par défaut).",
+        help="Show Tux the penguin next to the wheel (hidden by default).",
     )
     default_belly_logo = fields.Selection(
         BELLY_LOGO_SELECTION,
@@ -71,3 +71,11 @@ class EventRaffleConfig(models.Model):
         string="Default Flag Text",
         default="Vive le logiciel libre",
     )
+
+    @api.depends_context("lang")
+    def _compute_display_name(self):
+        # The name is noupdate data that an upgrade never rewrites, so it can
+        # hold a label in another language; the breadcrumb shows the reader's
+        # label instead.
+        for config in self:
+            config.display_name = _("Default Settings")

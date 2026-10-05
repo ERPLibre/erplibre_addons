@@ -11,9 +11,8 @@
     // height, so the `height: 100%` above resolves to auto. Give it a real
     // one; the fullscreen client action already gets its own from Odoo's
     // `.o_action_manager > .o_action` rule.
-    // 2/1 is the shape the panel has always had -- it came from the default
-    // 300x150 canvas bitmap, which is what the old sizing ended up copying.
-    // Declared here it survives, and it no longer depends on the bitmap.
+    // 2/1 keeps the panel at the default canvas proportions (300x150),
+    // declared here so that it does not depend on the bitmap.
     .o_widget_raffle_wheel > & {
         aspect-ratio: 2 / 1;
         height: auto;
@@ -33,7 +32,7 @@
             white-space: nowrap;
         }
 
-        // "Lot (optionnel)" input — roughly double the previous compact size.
+        // "Prize (optional)" input: wide enough for a prize name.
         input {
             font-size: 1rem;
             width: 300px;
@@ -41,7 +40,7 @@
             padding: 7px 12px;
         }
 
-        // Left group: fullscreen + Lot input.
+        // Left group: fullscreen button + prize input.
         .o_raffle_tb_left {
             display: flex;
             align-items: center;
@@ -79,7 +78,7 @@
     // from the container's free space and its intrinsic size is never read.
     // `min-height: 0` switches off the automatic minimum size, which would
     // otherwise let that intrinsic size back in as a floor. No `height: 100%`:
-    // it is unresolvable in a form sheet and was the other way back in.
+    // it is unresolvable in a form sheet and lets the intrinsic size back in.
     .o_raffle_canvas {
         flex: 1 1 0;
         min-height: 0;

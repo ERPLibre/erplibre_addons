@@ -75,7 +75,9 @@ class EventRaffle(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "create_date desc"
 
-    name = fields.Char(string="Name", required=True, default="Tirage")
+    name = fields.Char(
+        string="Name", required=True, default=lambda self: _("Raffle")
+    )
     event_id = fields.Many2one(
         "event.event",
         string="Event",
@@ -86,7 +88,7 @@ class EventRaffle(models.Model):
     remove_winner = fields.Boolean(
         string="Remove Winner",
         default=_default("default_remove_winner", True),
-        help="Retire le gagnant du pool au prochain tir.",
+        help="Removes the winner from the pool at the next draw.",
     )
     state = fields.Selection(
         [("draft", "Draft"), ("in_progress", "In Progress"), ("done", "Done")],
@@ -124,21 +126,21 @@ class EventRaffle(models.Model):
     spin_duration = fields.Float(
         string="Spin Duration (s)",
         default=_default("default_spin_duration", 6.0),
-        help="Durée de rotation de la roue, en secondes.",
+        help="How long the wheel spins, in seconds.",
     )
     spin_turns = fields.Integer(
         string="Spin Turns",
         default=_default("default_spin_turns", 5),
-        help="Nombre de tours complets avant l'atterrissage.",
+        help="Number of full turns before the wheel stops.",
     )
     pointer_angle = fields.Selection(
         POINTER_ANGLE_SELECTION,
         string="Pointer Angle",
         default=_default("default_pointer_angle", "0"),
         required=True,
-        help="Position de la flèche sur la roue, en degrés dans le sens "
-        "horaire depuis le haut : 0 en haut, 90 à droite, 180 en bas, "
-        "-90 à gauche. Le gagnant s'arrête sous la flèche.",
+        help="Position of the pointer on the wheel, in degrees clockwise from "
+        "the top: 0 at the top, 90 on the right, 180 at the bottom, -90 on "
+        "the left. The winner stops under the pointer.",
     )
     show_fireworks = fields.Boolean(
         string="Show Fireworks",
@@ -147,43 +149,43 @@ class EventRaffle(models.Model):
     show_tux = fields.Boolean(
         string="Show Penguin (Tux)",
         default=_default("default_show_tux", False),
-        help="Afficher le pingouin Tux à côté de la roue (caché par défaut).",
+        help="Show Tux the penguin next to the wheel (hidden by default).",
     )
     belly_logo = fields.Selection(
         BELLY_LOGO_SELECTION,
         string="Belly Logo",
         default=_default("default_belly_logo", "none"),
         required=True,
-        help="Logo affiché sur le ventre de Tux (aucun par défaut).",
+        help="Logo shown on Tux's belly (none by default).",
     )
     tux_animation = fields.Selection(
         TUX_ANIMATION_SELECTION,
         string="Tux Animation",
         default=_default("default_tux_animation", "rotate"),
         required=True,
-        help="Animation Tux joue avant chaque tir. 'Rotate' alterne "
-        "entre toutes les animations disponibles.",
+        help="Animation that Tux plays before each draw. 'Rotate' cycles "
+        "through all the available animations.",
     )
     flag_text = fields.Text(
         string="Flag Text",
         default=_default("default_flag_text", "Vive le logiciel libre"),
-        help="Texte du drapeau (animation 'flag'). Une ligne au hasard "
-        "est affichée à chaque tir.",
+        help="Text of the flag shown by the 'Free software flag' animation. "
+        "A random line is shown at each draw.",
     )
     theme = fields.Selection(
         THEME_SELECTION,
         string="Theme",
         default=_default("default_theme", "light"),
         required=True,
-        help="Thème visuel de la roue.",
+        help="Visual theme of the wheel.",
     )
     winner_celebration = fields.Selection(
         CELEBRATION_SELECTION,
         string="Winner Celebration",
         default=_default("default_winner_celebration", "candles"),
         required=True,
-        help="Effet joué à l'annonce d'un gagnant. 'Random' en choisit "
-        "un au hasard à chaque tir.",
+        help="Effect played when a winner is announced. 'Random' picks "
+        "one at random at each draw.",
     )
 
     @api.depends(
@@ -287,7 +289,7 @@ class EventRaffle(models.Model):
                 prev.won = True
         eligible = self._eligible_participants()
         if not eligible:
-            raise UserError(_("Aucun participant éligible pour le tirage."))
+            raise UserError(_("No eligible participant for the raffle."))
         wheel = [{"id": p.id, "name": p.name} for p in eligible]
         winner = random.choice(eligible)
         winner_index = eligible.ids.index(winner.id)

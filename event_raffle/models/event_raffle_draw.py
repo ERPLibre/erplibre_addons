@@ -33,8 +33,8 @@ class EventRaffleDraw(models.Model):
         related="winner_participant_id.partner_id",
         store=True,
         index=True,
-        help="Contact gagnant, repris du participant. Stocké pour que la "
-        "fiche contact puisse lister ses tirages sans parcourir les "
+        help="Winning contact, taken from the participant. Stored so that "
+        "the contact form can list its draws without going through the "
         "participants.",
     )
     is_absent = fields.Boolean(string="Absent", default=False, tracking=True)
