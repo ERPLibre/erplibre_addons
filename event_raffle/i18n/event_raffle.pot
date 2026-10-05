@@ -468,7 +468,7 @@ msgstr ""
 #. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Historique des gagnants ("
+msgid "Historique des gagnants"
 msgstr ""
 
 #. module: event_raffle

@@ -16,8 +16,9 @@ Example::
 
     ./run.sh -d test_event_raffle --db-filter test_event_raffle \\
         --http-port 8069 --workers 0 &
+    MODULE=odoo18.0/addons/ERPLibre_erplibre_addons/event_raffle
     .venv.erplibre/bin/python \\
-        odoo18.0/addons/addons/event_raffle/selenium/test_event_raffle_selenium.py \\
+        "$MODULE"/selenium/test_event_raffle_selenium.py \\
         --url http://localhost:8069 --db test_event_raffle \\
         --login admin --password admin --headless
 """

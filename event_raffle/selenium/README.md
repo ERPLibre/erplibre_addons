@@ -40,7 +40,7 @@ animations, so the wheel/Tux/flag rendering can be inspected visually.
 
 # 2. run the scenarios (headless)
 .venv.erplibre/bin/python \
-    odoo18.0/addons/addons/event_raffle/selenium/test_event_raffle_selenium.py \
+    odoo18.0/addons/ERPLibre_erplibre_addons/event_raffle/selenium/test_event_raffle_selenium.py \
     --url http://localhost:8069 --db test_event_raffle \
     --login admin --password admin --headless
 ```

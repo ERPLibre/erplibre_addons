@@ -90,7 +90,7 @@ class TestEventRaffle(TransactionCase):
     def test_draw_next_picks_eligible(self):
         self.raffle.remove_winner = True
         p1 = self._add_participant("A")
-        p2 = self._add_participant("B", excluded=True)
+        self._add_participant("B", excluded=True)
         res = self.raffle.action_draw_next()
         self.assertEqual(res["winner"]["id"], p1.id)
         self.assertEqual([w["id"] for w in res["wheel"]], [p1.id])

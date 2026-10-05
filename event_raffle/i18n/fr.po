@@ -797,8 +797,8 @@ msgstr "absent"
 #. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
-msgid "Historique des gagnants ("
-msgstr "Historique des gagnants ("
+msgid "Historique des gagnants"
+msgstr "Historique des gagnants"
 
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__linux
@@ -986,9 +986,6 @@ msgstr "🎉 Gagnant :"
 
 #~ msgid "🎉 Gagnant:"
 #~ msgstr "🎉 Gagnant :"
-
-#~ msgid "Historique des gagnants"
-#~ msgstr "Historique des gagnants"
 
 #~ msgid "Thème clair ou sombre de la roue."
 #~ msgstr "Thème clair ou sombre de la roue."
