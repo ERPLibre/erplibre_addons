@@ -16,18 +16,17 @@ keep the registrations that answered the event's own registration questions.
 
 ## Usage
 
-The buttons below keep their French labels in every language, as in
-`event_raffle`.
-
-1. Open an event, then click **Démarrer un tirage**: the *Start a Raffle*
-   dialog opens.
+1. Open an event, then click **Start a Raffle**.
 2. Under **Participants**, choose *Survey filled only*, then pick the
    **Survey**. Closed surveys are listed too: closing a survey archives it, and
    the draw usually comes after.
 3. Optionally, add questions of that survey to **Required Questions**, then
    choose under **Answered** whether a respondent must have answered *Each* of
    them (the default) or *At least one*.
-4. Click **Démarrer**. The survey's respondents become the raffle's
+4. Check **Respondents Entering**: it counts, as the choices change, the
+   people the draw will hold. **Anonymous Among Them** shows up when some of
+   them gave no contact, email or nickname.
+5. Click **Start**. The survey's respondents become the raffle's
    participants, with the *Survey* source. The event's registrations are not
    copied.
 
@@ -36,27 +35,33 @@ The buttons below keep their French labels in every language, as in
 An answer counts when it is completed, is not a test entry, and answers at
 least one question. Ending a live session marks every answer of the survey
 completed, even one that was only opened: the last condition keeps those out.
+A question saved as the respondent's nickname or email does not count as an
+answer, since Odoo fills it in for a logged-in respondent before they answer
+anything.
 
 When **Required Questions** lists questions, an answer must also answer each
 of them, or at least one, as **Answered** says. Answering means giving a
 non-blank answer, right or wrong. An empty list filters nobody, and picking
 another survey empties it.
 
-Each answer is identified by its contact, else by its email (whatever its
-case, and `"Name" <address>` included), else by its nickname. Answers sharing
-that identifier enter once, and the oldest of them names the participant: the
-contact's name, else the nickname, else the email, else *Guest*. The
-participant's email is the one the answer carries.
-
-The identifier is a single one per answer: an answer linked to a contact and
-an anonymous answer giving the same email stay two entries.
+Each person enters once. Answers linked to the same contact are one person.
+An answer with no contact joins the contact whose answers carry its email
+(whatever its case, and `"Name" <address>` included), unless that address
+shows on the answers of several contacts, a family address for instance,
+which tells nobody apart; that is read from every answer of the survey,
+finished or not, so a filter never hides it. The other answers group by
+email, then by nickname; an answer with none of the three enters alone, as a
+separate *Guest*. A person is named by their contact, else by their oldest
+nickname, else by their oldest email, else *Guest*; the participant's email
+is the oldest one their answers carry.
 
 ## Access rights
 
 Reading a survey's answers needs the *Surveys: User* access right, which Odoo
 gives every internal user when the survey module is installed. An event user
-without it gets Odoo's access error: the module never reads the answers as
-superuser, so a survey restricted to some users stays restricted.
+without it is not offered *Survey filled only*, and the survey fields stay
+out of the form. The module never reads the answers as superuser, so a survey
+restricted to some users stays restricted.
 
 Only non-specialised surveys are offered (survey, live session, assessment,
 custom): a recruitment survey keeps its answers to the Recruitment app.
@@ -129,7 +134,10 @@ les inscrits qui ont répondu aux questions d'inscription de l'événement.
 3. En option, ajouter des questions de ce sondage aux **Questions exigées**,
    puis choisir sous **Répondu à** si un répondant doit avoir répondu à
    *Chacune* (par défaut) ou à *Au moins une*.
-4. Cliquer **Démarrer**. Les répondants du sondage deviennent les participants
+4. Lire **Répondants retenus** : le compte, qui suit les choix, des personnes
+   que le tirage contiendra. **Dont anonymes** apparaît quand certaines n'ont
+   donné ni contact, ni courriel, ni pseudo.
+5. Cliquer **Démarrer**. Les répondants du sondage deviennent les participants
    du tirage, avec la source *Sondage*. Les inscrits de l'événement ne sont pas
    copiés.
 
@@ -138,30 +146,35 @@ les inscrits qui ont répondu aux questions d'inscription de l'événement.
 Une participation compte si elle est terminée, n'est pas un test et répond à
 au moins une question. Terminer une session en direct marque terminées toutes
 les participations du sondage, même celles qui ont seulement été ouvertes : la
-dernière condition les écarte.
+dernière condition les écarte. Une question enregistrée comme pseudo ou
+courriel du répondant ne compte pas comme réponse : Odoo la remplit pour un
+répondant connecté avant qu'il ne réponde à quoi que ce soit.
 
 Si les **Questions exigées** contiennent des questions, une participation doit
 aussi répondre à chacune, ou à au moins une, selon **Répondu à**. Répondre veut
 dire donner une réponse non vide, juste ou non. Une liste vide ne filtre
 personne, et choisir un autre sondage la vide.
 
-Chaque participation est identifiée par son contact, sinon par son courriel
-(quelle qu'en soit la casse, `"Nom" <adresse>` compris), sinon par son pseudo.
-Les participations qui partagent cet identifiant n'entrent qu'une fois, et la
-plus ancienne donne le nom : celui du contact, sinon le pseudo, sinon le
-courriel, sinon *Invité*. Le courriel du participant est celui que porte la
-participation.
-
-L'identifiant est unique par participation : une participation liée à un
-contact et une participation anonyme qui donne le même courriel restent deux
-entrées.
+Chaque personne n'entre qu'une fois. Les participations liées au même contact
+sont une seule personne. Une participation sans contact rejoint le contact
+dont les participations portent son courriel (quelle qu'en soit la casse,
+`"Nom" <adresse>` compris), sauf si cette adresse figure sur les
+participations de plusieurs contacts, une adresse familiale par exemple, qui
+ne départage personne ; cela se lit sur toutes les participations du sondage,
+terminées ou non, si bien qu'un filtre ne le cache jamais. Les autres
+participations se regroupent par courriel, puis par pseudo ; une participation
+sans aucun des trois entre seule, comme un *Invité* distinct. Une personne est
+nommée par son contact, sinon par son plus ancien pseudo, sinon par son plus
+ancien courriel, sinon *Invité* ; le courriel du participant est le plus
+ancien que portent ses participations.
 
 ## Droits d'accès
 
 Lire les participations d'un sondage demande le droit *Sondages :
 Utilisateur*, qu'Odoo donne à tout utilisateur interne quand le module
-`survey` s'installe. Un utilisateur des événements qui ne l'a pas reçoit
-l'erreur d'accès d'Odoo : le module ne lit jamais les participations en
+`survey` s'installe. Un utilisateur des événements qui ne l'a pas ne se voit
+pas proposer *Sondage rempli seulement*, et les champs du sondage restent hors
+du formulaire. Le module ne lit jamais les participations en
 superutilisateur, et un sondage réservé à certains utilisateurs le reste.
 
 Seuls les sondages non spécialisés sont proposés (sondage, session en direct,

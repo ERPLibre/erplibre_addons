@@ -18,6 +18,11 @@ msgstr ""
 "X-Generator: Odoo\n"
 
 #. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_anonymous_count
+msgid "Anonymous Among Them"
+msgstr "Dont anonymes"
+
+#. module: event_raffle_survey
 #: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
 msgid "Answered"
 msgstr "Répondu à"
@@ -43,6 +48,13 @@ msgstr "Chacune"
 #: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
 msgid "Guest"
 msgstr "Invité"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_respondent_count
+msgid "How many people Start puts in the raffle, with the choices made above."
+msgstr ""
+"Nombre de personnes que Démarrer met dans le tirage, selon les choix ci-"
+"dessus."
 
 #. module: event_raffle_survey
 #: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_id
@@ -78,6 +90,20 @@ msgstr "Participant au tirage"
 #: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
 msgid "Required Questions"
 msgstr "Questions exigées"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_respondent_count
+msgid "Respondents Entering"
+msgstr "Répondants retenus"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_anonymous_count
+msgid ""
+"Respondents with no contact, email or nickname: each enters as a separate "
+"Guest, and a guest who wins cannot be identified."
+msgstr ""
+"Répondants sans contact, courriel ni pseudo : chacun entre comme un Invité "
+"distinct, et un invité gagnant ne peut pas être identifié."
 
 #. module: event_raffle_survey
 #: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_participant__source

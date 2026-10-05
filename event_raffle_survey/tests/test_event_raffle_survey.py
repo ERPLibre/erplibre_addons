@@ -255,13 +255,197 @@ class TestRaffleSurveyStrategy(TransactionCase):
             ["Ann", "Bob", "carol@example.com"],
         )
 
+    def test_an_answer_without_contact_joins_the_contact_owning_its_email(
+        self,
+    ):
+        # Answering once through a contact and once without one, with the
+        # same address, is one person: the contact names them, whatever the
+        # order.
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        self._answer(nickname="Annie", email="ANN@example.com")
+        self._answer(partner=ann, email="ann@example.com")
+        raffle = self._run_wizard()
+        self.assertEqual(self._names(raffle), ["Ann"])
+        self.assertEqual(raffle.participant_ids.partner_id, ann)
+
+    def test_contacts_sharing_an_email_stay_apart(self):
+        # A shared address, a family one for instance, tells nobody apart: two
+        # contacts stay two, and an anonymous answer with that address joins
+        # neither of them.
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        bob = self.env["res.partner"].create({"name": "Bob"})
+        self._answer(partner=ann, email="family@example.com")
+        self._answer(partner=bob, email="family@example.com")
+        self._answer(email="family@example.com")
+        self.assertEqual(
+            self._names(self._run_wizard()),
+            ["Ann", "Bob", "family@example.com"],
+        )
+
+    def test_a_shared_address_counts_unfinished_answers_too(self):
+        # Bob's answer is not finished, yet it shows that Bob uses the family
+        # address: Carol, without a contact, joins nobody.
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        bob = self.env["res.partner"].create({"name": "Bob"})
+        self._answer(partner=ann, email="family@example.com")
+        self._answer(
+            partner=bob, email="family@example.com", state="in_progress"
+        )
+        self._answer(nickname="Carol", email="family@example.com")
+        self.assertEqual(self._names(self._run_wizard()), ["Ann", "Carol"])
+
+    def test_a_contact_without_email_absorbs_nobody(self):
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        self._answer(partner=ann)
+        self._answer()
+        self._answer(nickname="Bob")
+        self.assertEqual(self._counts(), (3, 1))
+        self.assertEqual(
+            self._names(self._run_wizard()), ["Ann", "Bob", "Guest"]
+        )
+
+    def test_the_oldest_nickname_names_the_person(self):
+        self._answer(nickname="Old", email="x@example.com")
+        self._answer(nickname="New", email="X@example.com")
+        self.assertEqual(self._names(self._run_wizard()), ["Old"])
+
+    def test_an_accented_email_enters_once_whatever_its_case(self):
+        # Odoo's normalisation keeps the case of a non-ASCII local part.
+        self._answer(email="Élise@example.com")
+        self._answer(email="élise@example.com")
+        self.assertEqual(self._sources(self._run_wizard()), ["survey"])
+
+    def test_an_unparsable_email_enters_once_whatever_its_case(self):
+        # An address typed into a survey link is not validated: compared
+        # raw, lowercased and stripped, it still identifies its person.
+        self._answer(email="Ann at home")
+        self._answer(email=" ANN AT HOME ")
+        self.assertEqual(self._sources(self._run_wizard()), ["survey"])
+
+    def test_a_prefilled_identity_line_proves_no_answer(self):
+        # Odoo writes a logged-in respondent's nickname into the question
+        # saved as nickname before any answer, and ending a live session
+        # marks that answer done.
+        survey = self.env["survey.survey"].create({"title": "Session"})
+        nickname_question = self.env["survey.question"].create(
+            {
+                "survey_id": survey.id,
+                "title": "Your nickname?",
+                "question_type": "char_box",
+                "save_as_nickname": True,
+            }
+        )
+        self.env["survey.question"].create(
+            {
+                "survey_id": survey.id,
+                "title": "Distribution?",
+                "question_type": "char_box",
+            }
+        )
+        user = new_test_user(
+            self.env, login="raffle_session_user", name="Logged Attendee"
+        )
+        answer = survey._create_answer(user=user)
+        answer.state = "done"
+        self.assertEqual(
+            answer.user_input_line_ids.filtered(
+                lambda line: not line.skipped
+            ).question_id,
+            nickname_question,
+        )
+        raffle = self._run_wizard(survey_id=survey.id)
+        self.assertEqual(raffle.participant_count, 0)
+
+    # ---- the wizard's counts ----------------------------------------------
+
+    def _counts(self, **vals):
+        wizard = self.env["event.raffle.start.wizard"].create(
+            {
+                "event_id": self.event.id,
+                "copy_strategy": "survey_only",
+                "survey_id": self.survey.id,
+                **vals,
+            }
+        )
+        return wizard.survey_respondent_count, wizard.survey_anonymous_count
+
+    def test_an_email_alone_is_not_anonymous(self):
+        self._answer(email="solo@example.com")
+        self.assertEqual(self._counts(), (1, 0))
+
+    def test_a_contact_alone_is_not_anonymous(self):
+        solo = self.env["res.partner"].create({"name": "Solo"})
+        self._answer(partner=solo)
+        self.assertEqual(self._counts(), (1, 0))
+
+    def test_a_blank_nickname_is_anonymous(self):
+        self._answer(nickname="   ")
+        self.assertEqual(self._counts(), (1, 1))
+        self.assertEqual(self._names(self._run_wizard()), ["Guest"])
+
+    def test_wizard_counts_the_respondents_before_the_draw(self):
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        self._answer(partner=ann, email="ann@example.com")
+        self._answer(email="ann@example.com")
+        self._answer(nickname="Bob")
+        self._answer()
+        self._answer()
+        self._answer(nickname="Unfinished", state="in_progress")
+        wizard = self.env["event.raffle.start.wizard"].create(
+            {
+                "event_id": self.event.id,
+                "copy_strategy": "survey_only",
+                "survey_id": self.survey.id,
+            }
+        )
+        self.assertEqual(wizard.survey_respondent_count, 4)
+        self.assertEqual(wizard.survey_anonymous_count, 2)
+        raffle = self.env["event.raffle"].browse(
+            wizard.action_start()["res_id"]
+        )
+        self.assertEqual(raffle.participant_count, 4)
+
+    def test_counts_follow_the_required_questions_live(self):
+        self._quiz_respondents()
+        form = Form(
+            self.env["event.raffle.start.wizard"].with_context(
+                default_event_id=self.event.id
+            )
+        )
+        form.copy_strategy = "survey_only"
+        form.survey_id = self.quiz
+        self.assertEqual(form.survey_respondent_count, 4)
+        form.survey_question_ids.add(self.q1)
+        form.survey_question_ids.add(self.q2)
+        self.assertEqual(form.survey_respondent_count, 1)
+        form.survey_question_match = "any"
+        self.assertEqual(form.survey_respondent_count, 3)
+
+    def test_counts_stay_empty_for_the_other_strategies(self):
+        self._answer(nickname="Respondent")
+        wizard = self.env["event.raffle.start.wizard"].create(
+            {
+                "event_id": self.event.id,
+                "copy_strategy": "present_only",
+                "survey_id": self.survey.id,
+            }
+        )
+        self.assertEqual(wizard.survey_respondent_count, 0)
+        self.assertEqual(wizard.survey_anonymous_count, 0)
+
     # ---- required questions -----------------------------------------------
 
-    def _quiz_answer(self, nickname, answered=(), skipped=()):
+    def _quiz_answer(self, nickname, answered=(), skipped=(), **vals):
         """A completed answer to self.quiz that answers the `answered`
-        questions and leaves the `skipped` ones blank."""
+        questions and leaves the `skipped` ones blank; `vals` adds or
+        overrides user_input values (partner_id, email, state)."""
         answer = self.env["survey.user_input"].create(
-            {"survey_id": self.quiz.id, "nickname": nickname, "state": "done"}
+            {
+                "survey_id": self.quiz.id,
+                "nickname": nickname,
+                "state": "done",
+                **vals,
+            }
         )
         self.env["survey.user_input.line"].create(
             [
@@ -316,6 +500,31 @@ class TestRaffleSurveyStrategy(TransactionCase):
             self.assertEqual(
                 self._names(raffle), ["Both", "First", "Second", "Third"]
             )
+
+    def test_a_shared_address_stays_shared_whatever_the_filter(self):
+        # Bob's answer misses the required question, yet it still shows that
+        # Bob uses the family address: Carol, without a contact, joins nobody.
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        bob = self.env["res.partner"].create({"name": "Bob"})
+        family = "family@example.com"
+        self._quiz_answer("Ann", self.q1, partner_id=ann.id, email=family)
+        self._quiz_answer("Bob", self.q2, partner_id=bob.id, email=family)
+        self._quiz_answer("Carol", self.q1, email=family)
+        self.assertEqual(
+            self._names(self._run_quiz(self.q1)), ["Ann", "Carol"]
+        )
+
+    def test_an_answer_enters_as_the_contact_owning_its_email(self):
+        # Ann's own answer misses the required question; her answer without
+        # a contact, under her address, answers it and brings her in.
+        ann = self.env["res.partner"].create({"name": "Ann"})
+        self._quiz_answer(
+            "Ann", self.q2, partner_id=ann.id, email="ann@example.com"
+        )
+        self._quiz_answer("Annie", self.q1, email="ANN@example.com")
+        raffle = self._run_quiz(self.q1)
+        self.assertEqual(self._names(raffle), ["Ann"])
+        self.assertEqual(raffle.participant_ids.partner_id, ann)
 
     def test_required_questions_belong_to_the_chosen_survey(self):
         section = self.env["survey.question"].create(
@@ -399,7 +608,35 @@ class TestRaffleSurveyStrategy(TransactionCase):
 
     # ---- access rights ----------------------------------------------------
     # No sudo on the answers: whoever may not read them may not draw from
-    # them either.
+    # them either, and the form does not offer them the survey strategy.
+
+    def _wizard_form_view(self, user):
+        return (
+            self.env["event.raffle.start.wizard"]
+            .with_user(user)
+            .get_views([(False, "form")])
+        )
+
+    def test_survey_strategy_hidden_without_survey_rights(self):
+        event_user = new_test_user(
+            self.env,
+            login="raffle_no_survey",
+            groups="event.group_event_user",
+        )
+        survey_user = new_test_user(
+            self.env,
+            login="raffle_with_survey",
+            groups="event.group_event_user,survey.group_survey_user",
+        )
+        for user, shown in ((event_user, False), (survey_user, True)):
+            views = self._wizard_form_view(user)
+            fields = views["models"]["event.raffle.start.wizard"]["fields"]
+            choices = [
+                value for value, _label in fields["copy_strategy"]["selection"]
+            ]
+            self.assertEqual("survey_only" in choices, shown)
+            arch = views["views"]["form"]["arch"]
+            self.assertEqual('name="survey_id"' in arch, shown)
 
     def test_event_user_without_survey_rights_is_refused(self):
         user = new_test_user(
@@ -410,6 +647,27 @@ class TestRaffleSurveyStrategy(TransactionCase):
         self._answer(nickname="Done")
         with self.assertRaises(AccessError):
             self._run_wizard(user=user)
+
+    def test_counts_need_the_right_to_read_answers(self):
+        user = new_test_user(
+            self.env,
+            login="raffle_counts_user",
+            groups="event.group_event_user",
+        )
+        self._answer(nickname="Done")
+        wizard = (
+            self.env["event.raffle.start.wizard"]
+            .with_user(user)
+            .create(
+                {
+                    "event_id": self.event.id,
+                    "copy_strategy": "survey_only",
+                    "survey_id": self.survey.id,
+                }
+            )
+        )
+        with self.assertRaises(AccessError):
+            wizard.survey_respondent_count  # noqa: B018
 
     def test_event_user_with_survey_rights_draws_from_the_survey(self):
         user = new_test_user(
