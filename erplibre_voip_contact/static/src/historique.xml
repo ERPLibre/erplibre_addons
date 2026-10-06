@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre — License AGPL-3.0 or later -->
+<templates xml:space="preserve">
+
+    <t t-name="erplibre_voip_contact.Historique">
+        <div class="o_erplibre_voip_historique d-flex flex-column px-3 pt-2"
+             t-if="state.appels.length or state.sms.length">
+
+            <div t-if="state.appels.length">
+                <div class="d-flex justify-content-between align-items-center cursor-pointer"
+                     t-on-click="() => this.basculer('appels')">
+                    <span>Appels <span class="text-muted"
+                                       t-esc="'(' + state.appels.length + ')'" /></span>
+                    <i t-att-class="chevron('appels')" />
+                </div>
+                <div class="small my-1" t-if="state.ouvert.appels">
+                    <t t-foreach="state.appels" t-as="passe" t-key="passe.id">
+                        <div class="d-flex justify-content-between py-1">
+                            <span>
+                                <i t-att-class="iconeSens(passe.typeCall)" />
+                                <span class="mx-2" t-esc="dateAppel(passe)" />
+                            </span>
+                            <span class="text-muted" t-esc="dureeAppel(passe)" />
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div t-if="state.sms.length">
+                <div class="d-flex justify-content-between align-items-center cursor-pointer"
+                     t-on-click="() => this.basculer('sms')">
+                    <span>SMS <span class="text-muted"
+                                    t-esc="'(' + state.sms.length + ')'" /></span>
+                    <i t-att-class="chevron('sms')" />
+                </div>
+                <div class="small my-1" t-if="state.ouvert.sms">
+                    <t t-foreach="state.sms" t-as="message" t-key="message.id">
+                        <div class="py-1">
+                            <div class="d-flex justify-content-between">
+                                <span>
+                                    <i t-att-class="iconeSens(message.sens)" />
+                                    <span class="mx-2"
+                                          t-esc="dateCourte(message.date)" />
+                                </span>
+                                <span class="text-muted" t-esc="message.etat" />
+                            </div>
+                            <div class="text-muted text-truncate"
+                                 t-att-title="message.texte" t-esc="message.texte" />
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+        </div>
+    </t>
+
+</templates>

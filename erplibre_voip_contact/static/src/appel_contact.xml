@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre — License AGPL-3.0 or later -->
+<templates xml:space="preserve">
+
+    <!-- Pendant l'appel. L'appel en cours est exclu de sa propre liste : il
+         est deja affiche au-dessus. -->
+    <t t-name="erplibre_voip_contact.CallHistorique"
+       t-inherit="voip_oca.Call"
+       t-inherit-mode="extension">
+
+        <xpath expr="//div[hasclass('pt-2')]" position="after">
+            <HistoriqueCorrespondant
+                phoneNumber="voip.call.phoneNumber"
+                partnerId="voip.partner and voip.partner.id"
+                excludeCallId="voip.call.id" />
+        </xpath>
+
+        <xpath expr="//button[@title='Info contact']" position="after">
+            <button class="btn btn-secondary p-3 rounded-circle"
+                    title="Envoyer un SMS"
+                    t-on-click="onEnvoyerSms">
+                <i class="fa fa-fw fa-lg fa-comment-o" />
+            </button>
+            <!-- Un numero inconnu n'offrait aucune issue : ni fiche a ouvrir,
+                 ni fiche a creer. -->
+            <button t-if="!(voip.partner and voip.partner.id)"
+                    class="btn btn-secondary p-3 rounded-circle"
+                    title="Nouveau contact"
+                    t-on-click="onCreerContact">
+                <i class="fa fa-fw fa-lg fa-user-plus" />
+            </button>
+        </xpath>
+
+    </t>
+
+    <!-- Apres avoir raccroche. C'est ce panneau qui reste a l'ecran, et
+         l'historique y disparaissait au moment ou on voulait le relire. -->
+    <t t-name="erplibre_voip_contact.PartnerHistorique"
+       t-inherit="voip_oca.Partner"
+       t-inherit-mode="extension">
+
+        <xpath expr="//div[hasclass('o_voip_partner_actions')]" position="after">
+            <HistoriqueCorrespondant
+                phoneNumber="phoneNumber"
+                partnerId="props.partner.id" />
+        </xpath>
+
+        <xpath expr="//button[@title='Info contact']" position="after">
+            <button class="btn btn-secondary p-3 rounded-circle"
+                    title="Envoyer un SMS"
+                    t-on-click="onEnvoyerSms">
+                <i class="fa fa-fw fa-lg fa-comment-o" />
+            </button>
+        </xpath>
+
+    </t>
+
+    <!-- Pendant la composition, avant meme de savoir si quelqu'un repondra :
+         c'est la qu'on decide d'appeler ou d'ecrire. -->
+    <t t-name="erplibre_voip_contact.NumpadHistorique"
+       t-inherit="voip_oca.Numpad"
+       t-inherit-mode="extension">
+
+        <xpath expr="//div[hasclass('row-cols-3')]" position="after">
+            <HistoriqueCorrespondant phoneNumber="voip.numpad.value" />
+        </xpath>
+
+    </t>
+
+</templates>
