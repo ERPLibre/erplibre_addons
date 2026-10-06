@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_erplibre_repondeur"
+              name="Repondeur"
+              parent="erplibre_mobile_gateway.menu_erplibre_sms_root"
+              action="action_repondeur_message"
+              sequence="27"/>
+
+</odoo>
