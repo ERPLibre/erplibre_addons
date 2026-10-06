@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Pas de noupdate ici : ces intervalles doivent pouvoir etre corriges par
+         une mise a jour du module. C'est precisement l'inverse du cron du module
+         coeur `sms`, declare dans un bloc noupdate="1", dont l'intervalle
+         horaire ne peut donc PAS etre corrige par XML a la mise a jour — il
+         l'est par le post_init_hook. -->
+
+    <record id="ir_cron_expire_stale_dispatch" model="ir.cron">
+        <field name="name">Passerelle mobile : declarer expires les envois non confirmes</field>
+        <field name="model_id" ref="model_erplibre_sms_dispatch"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_expire_stale()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="ir_cron_check_heartbeat" model="ir.cron">
+        <field name="name">Passerelle mobile : verifier le signal de vie</field>
+        <field name="model_id" ref="model_erplibre_sms_gateway"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_check_heartbeat()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Affiche la duree d'envoi estimee avant de cliquer, parce qu'elle n'est
+         pas intuitive : la limite de debit d'Android fait qu'un groupe de
+         40 personnes prend plusieurs minutes, et le double si le message
+         contient une cedille. -->
+    <record id="view_sms_composer_form_erplibre" model="ir.ui.view">
+        <field name="name">sms.composer.form.erplibre</field>
+        <field name="model">sms.composer</field>
+        <field name="inherit_id" ref="sms.sms_composer_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='body']" position="after">
+                <div class="alert alert-info mt-2 mb-0" role="alert"
+                     invisible="not erplibre_gateway_id or not erplibre_estimate">
+                    <field name="erplibre_gateway_id" invisible="1"/>
+                    <field name="erplibre_estimate" readonly="1" nolabel="1"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

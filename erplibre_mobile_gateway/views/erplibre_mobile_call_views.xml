@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- © 2026 TechnoLibre — License AGPL-3.0 or later -->
+<odoo>
+
+    <record id="view_erplibre_mobile_call_list" model="ir.ui.view">
+        <field name="name">erplibre.mobile.call.list</field>
+        <field name="model">erplibre.mobile.call</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'failed'"
+                  decoration-muted="state == 'expired'"
+                  decoration-info="state in ('queued', 'published', 'dialing')">
+                <field name="requested_at"/>
+                <field name="number"/>
+                <field name="direction"/>
+                <field name="source"/>
+                <field name="duration_display" string="Duree"/>
+                <field name="state"/>
+                <field name="partner_id" optional="show"/>
+                <field name="requested_by_uid" optional="hide"/>
+                <field name="duration_source" optional="hide"/>
+                <field name="device_id" optional="hide"/>
+                <field name="failure_reason" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_erplibre_mobile_call_form" model="ir.ui.view">
+        <field name="name">erplibre.mobile.call.form</field>
+        <field name="model">erplibre.mobile.call</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_call_again" type="object"
+                            string="Appeler" class="btn-primary"
+                            icon="fa-phone"
+                            invisible="not number"
+                            groups="erplibre_mobile_gateway.group_erplibre_sms_send"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="number" readonly="1"/></h1>
+                        <h2><field name="duration_display" readonly="1"/></h2>
+                    </div>
+
+                    <!-- Un appel mis en file par Odoo est compose SANS que
+                         personne ne puisse parler : Android n'injecte pas de
+                         voix. On le rappelle sur la fiche, la ou quelqu'un
+                         cherchera a comprendre pourquoi l'appel a dure sept
+                         secondes et n'a rien produit. -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="source != 'queued'">
+                        Appel compose automatiquement par la passerelle.
+                        Personne ne parle au bout du fil : l'application ne
+                        peut pas transmettre de voix. Un tel appel est un appel
+                        automatise, encadre au Canada par les Regles sur les
+                        telecommunications non sollicitees du CRTC.
+                    </div>
+
+                    <group>
+                        <group string="Appel">
+                            <field name="direction"/>
+                            <field name="source"/>
+                            <field name="state"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Duree">
+                            <field name="duration_seconds"/>
+                            <field name="duration_source"/>
+                        </group>
+                        <group string="Horodatage">
+                            <field name="requested_at"/>
+                            <field name="published_at"/>
+                            <field name="started_at"/>
+                            <field name="ended_at"/>
+                        </group>
+                        <group string="Tracabilite">
+                            <field name="requested_by_uid"/>
+                            <field name="gateway_id"/>
+                            <field name="device_id"/>
+                            <field name="call_uuid"/>
+                        </group>
+                    </group>
+                    <group string="Echec" invisible="not failure_reason">
+                        <field name="failure_reason" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_erplibre_mobile_call_search" model="ir.ui.view">
+        <field name="name">erplibre.mobile.call.search</field>
+        <field name="model">erplibre.mobile.call</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <filter name="out" string="Sortants"
+                        domain="[('direction', '=', 'out')]"/>
+                <filter name="in" string="Entrants"
+                        domain="[('direction', '=', 'in')]"/>
+                <separator/>
+                <!-- Le filtre qui compte pour un audit : ce que le systeme a
+                     compose tout seul. -->
+                <filter name="automatise" string="Composes par Odoo"
+                        domain="[('source', '=', 'queued')]"/>
+                <filter name="en_cours" string="En cours"
+                        domain="[('state', 'in', ['queued', 'published', 'dialing', 'connected'])]"/>
+                <filter name="echecs" string="Echecs"
+                        domain="[('state', '=', 'failed')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_source" string="Origine"
+                            context="{'group_by': 'source'}"/>
+                    <filter name="par_etat" string="Etat"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="par_jour" string="Jour"
+                            context="{'group_by': 'requested_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_erplibre_mobile_call" model="ir.actions.act_window">
+        <field name="name">Appels</field>
+        <field name="res_model">erplibre.mobile.call</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_erplibre_mobile_call_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun appel enregistre</p>
+            <p>
+                La passerelle trace trois choses : les appels composes a la
+                main sur le telephone, ceux lances depuis l'application, et
+                ceux mis en file par Odoo.
+            </p>
+        </field>
+    </record>
+
+</odoo>
