@@ -1,0 +1,1103 @@
+# Part of TechnoLibre. See LICENSE file for full copyright and licensing details.
+import json
+from datetime import timedelta
+from unittest.mock import patch
+
+from odoo import fields
+from odoo.exceptions import UserError, ValidationError
+from odoo.tests import TransactionCase, tagged
+
+from ..tools import signature
+from ..tools.sms_api_erplibre import (
+    SmsApiErplibre,
+    analyse_body,
+    non_gsm7_characters,
+)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsEncoding(TransactionCase):
+    """Segmentation et encodage, alignes sur le widget du coeur."""
+
+    def test_gsm7_basic(self):
+        self.assertEqual(analyse_body("Le rendez-vous de ce soir est annule"), ("gsm7", 1))
+
+    def test_lowercase_cedilla_forces_ucs2(self):
+        """Le piege qui double le temps d'envoi en francais du Quebec.
+
+        `Ç` majuscule est dans l'alphabet GSM 03.38, `ç` minuscule NON. Donc
+        « recu », « ca », « lecon », « francais » ecrits avec la cedille font
+        tomber le message a 70 caracteres par segment au lieu de 160.
+        """
+        encoding, _segments = analyse_body("Merci, bien reçu")
+        self.assertEqual(encoding, "ucs2")
+        self.assertEqual(non_gsm7_characters("reçu"), ["ç"])
+        self.assertEqual(analyse_body("ÇA VA")[0], "gsm7")
+
+    def test_accents_in_basic_alphabet(self):
+        """Les accents courants du francais, eux, restent en GSM-7."""
+        for text in ("annulé", "règle", "à 19h", "où", "ìl"):
+            self.assertEqual(analyse_body(text)[0], "gsm7", text)
+
+    def test_segment_boundaries(self):
+        self.assertEqual(analyse_body("a" * 160), ("gsm7", 1))
+        self.assertEqual(analyse_body("a" * 161), ("gsm7", 2))
+        self.assertEqual(analyse_body("ç" * 70), ("ucs2", 1))
+        self.assertEqual(analyse_body("ç" * 71), ("ucs2", 2))
+
+    def test_extension_characters_count_double(self):
+        """Les caracteres de la table d'extension occupent deux septets."""
+        self.assertEqual(analyse_body("€" * 80), ("gsm7", 1))
+        self.assertEqual(analyse_body("€" * 81), ("gsm7", 2))
+
+    def test_empty_body(self):
+        self.assertEqual(analyse_body("")[1], 0)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsSignature(TransactionCase):
+
+    def setUp(self):
+        super().setUp()
+        self.patcher = patch.dict(
+            "os.environ", {signature.ENV_HMAC_SECRET: "secret-de-test"}
+        )
+        self.patcher.start()
+        self.addCleanup(self.patcher.stop)
+
+    def test_round_trip(self):
+        body = json.dumps({"v": 1, "hello": "wörld"}, separators=(",", ":"), ensure_ascii=False)
+        header = signature.SIGNATURE_PREFIX + signature.compute(body)
+        self.assertTrue(signature.verify(body.encode("utf-8"), header))
+
+    def test_tampered_body_rejected(self):
+        body = '{"v":1}'
+        header = signature.SIGNATURE_PREFIX + signature.compute(body)
+        self.assertFalse(signature.verify(b'{"v":2}', header))
+        self.assertFalse(signature.verify(body.encode("utf-8") + b" ", header))
+
+    def test_missing_signature_rejected(self):
+        self.assertFalse(signature.verify(b'{"v":1}', ""))
+        self.assertFalse(signature.verify(b'{"v":1}', None))
+
+    def test_missing_secret_raises(self):
+        with patch.dict("os.environ", {}, clear=True):
+            with self.assertRaises(signature.MissingSecret):
+                signature.get_hmac_secret()
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsDispatch(TransactionCase):
+    """Machine a etats : c'est elle qui empeche le systeme de mentir."""
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        # Le repli du cron d'expiration resout une passerelle PAR SOCIETE
+        # quand l'envoi n'en porte aucune. Une passerelle deja presente dans
+        # la base gagnerait ce tri (meme sequence, id plus petit) et
+        # recevrait l'alerte a la place de celle du test. La transaction est
+        # annulee en fin de test : rien n'est desactive durablement.
+        self.env["erplibre.sms.gateway"].search(
+            [("company_id", "=", self.company.id)]
+        ).write({"active": False})
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.company.id,
+        })
+
+    def _dispatch(self, uuid="uuid-0001", state="published", **values):
+        return self.env["erplibre.sms.dispatch"].create({
+            "sms_uuid": uuid,
+            "number": "+15145550123",
+            "body": "Cours annule",
+            "company_id": self.company.id,
+            "gateway_id": self.gateway.id,
+            "state": state,
+            **values,
+        })
+
+    def test_progression(self):
+        dispatch = self._dispatch()
+        self.assertTrue(dispatch._apply_event("submitted", seq=1))
+        self.assertEqual(dispatch.state, "submitted")
+        self.assertTrue(dispatch._apply_event("delivered", seq=2))
+        self.assertEqual(dispatch.state, "delivered")
+
+    def test_replayed_sequence_ignored(self):
+        dispatch = self._dispatch()
+        dispatch._apply_event("submitted", seq=1)
+        self.assertFalse(dispatch._apply_event("submitted", seq=1))
+        self.assertFalse(dispatch._apply_event("delivered", seq=1))
+
+    def test_report_without_sequence_rejected(self):
+        """Un rapport non numerote ne peut pas etre ordonne : on le refuse.
+
+        L'accepter rouvrirait la faille que la sequence existe pour fermer.
+        `seq=0` doit etre traite comme invalide, et non comme « absent ».
+        """
+        dispatch = self._dispatch()
+        dispatch._apply_event("submitted", seq=1)
+        self.assertFalse(dispatch._apply_event("delivered", seq=0))
+        self.assertEqual(dispatch.state, "submitted")
+
+    def test_state_regression_ignored(self):
+        dispatch = self._dispatch()
+        dispatch._apply_event("submitted", seq=1)
+        self.assertFalse(dispatch._apply_event("published", seq=9))
+        self.assertEqual(dispatch.state, "submitted")
+
+    def test_late_delivered_cannot_overwrite_failed(self):
+        """LE test qui compte.
+
+        Le coeur d'Odoo ne protege pas de ce cas : dans
+        `sms.tracker._update_sms_notifications`, la liste d'ignorance d'un
+        nouveau statut `sent` ne contient que `sent` -- un `sent` tardif ecrase
+        donc un `bounce`. Ici, un `delivered` rejoue apres un `failed` ferait
+        croire a l'expediteur qu'il a prevenu ses destinataires alors que
+        rien recu.
+        """
+        dispatch = self._dispatch()
+        dispatch._apply_event("submitted", seq=1)
+        dispatch._apply_event("failed", seq=2, android_code="RESULT_ERROR_NO_SERVICE")
+        self.assertEqual(dispatch.state, "failed")
+        self.assertFalse(dispatch._apply_event("delivered", seq=3))
+        self.assertEqual(dispatch.state, "failed")
+
+    def test_server_originated_event_needs_no_sequence(self):
+        dispatch = self._dispatch()
+        self.assertTrue(dispatch._apply_event("failed", android_code="GATEWAY_DOWN"))
+        self.assertEqual(dispatch.report_seq, 1)
+
+    def test_expire_stale_raises_alarm(self):
+        dispatch = self._dispatch(
+            send_deadline=fields.Datetime.now() - timedelta(minutes=5),
+        )
+        self.env["erplibre.sms.dispatch"]._cron_expire_stale()
+        dispatch.invalidate_recordset()
+        self.assertEqual(dispatch.state, "expired")
+        self.assertEqual(dispatch.android_code, "GATEWAY_DEADLINE")
+        self.assertTrue(self.gateway.alarm_active)
+
+    def test_expired_without_gateway_spares_other_company(self):
+        """Un envoi sans passerelle n'alerte pas celle d'une AUTRE societe.
+
+        Le repli cherchait la premiere passerelle venue, sans filtrer sur la
+        societe. Un envoi expire chez A pouvait donc mettre en alerte le
+        telephone SAIN de B — et une alerte bloque tous les envois de B. La
+        societe est pourtant toujours connue : `company_id` est requis.
+        """
+        autre_societe = self.env["res.company"].create({"name": "Autre OBNL"})
+        # `sequence = 1` place DELIBEREMENT la passerelle de B en tete du tri
+        # global `sequence, id`. C'est ce qui rend ce test discriminant :
+        # l'ancien repli, qui cherchait sans filtre de societe, tombait alors
+        # sur elle. Sans cette sequence, il tombait par hasard sur la bonne
+        # passerelle et le test passait aussi sur le code bogue — donc ne
+        # prouvait rien.
+        passerelle_b = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de B",
+            "company_id": autre_societe.id,
+            "sequence": 1,
+        })
+        # L'envoi expire appartient a A et ne porte AUCUNE passerelle : c'est
+        # exactement le cas qui declenchait le repli fautif.
+        dispatch = self._dispatch(
+            uuid="uuid-sans-passerelle",
+            gateway_id=False,
+            send_deadline=fields.Datetime.now() - timedelta(minutes=5),
+        )
+
+        self.env["erplibre.sms.dispatch"]._cron_expire_stale()
+
+        dispatch.invalidate_recordset()
+        self.assertEqual(dispatch.state, "expired")
+        passerelle_b.invalidate_recordset()
+        self.assertFalse(
+            passerelle_b.alarm_active,
+            "la passerelle d'une autre societe a ete mise en alerte",
+        )
+        self.assertTrue(
+            self.gateway.alarm_active,
+            "la passerelle de la societe concernee aurait du etre alertee",
+        )
+
+    def test_expired_without_gateway_nor_fallback_is_silent(self):
+        """Sans passerelle active dans la societe, on n'alerte personne.
+
+        Choisir une passerelle etrangere pour avoir l'air d'agir serait pire
+        que de ne rien faire : le journal le dit, et rien n'est bloque.
+        """
+        autre_societe = self.env["res.company"].create({"name": "Autre OBNL"})
+        passerelle_b = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de B",
+            "company_id": autre_societe.id,
+            "sequence": 1,
+        })
+        self.gateway.active = False
+        dispatch = self._dispatch(
+            uuid="uuid-orphelin",
+            gateway_id=False,
+            send_deadline=fields.Datetime.now() - timedelta(minutes=5),
+        )
+
+        self.env["erplibre.sms.dispatch"]._cron_expire_stale()
+
+        dispatch.invalidate_recordset()
+        self.assertEqual(dispatch.state, "expired")
+        passerelle_b.invalidate_recordset()
+        self.assertFalse(passerelle_b.alarm_active)
+
+    def test_android_code_maps_to_allowed_provider_error(self):
+        """Tout code annonce doit se traduire en une valeur que le coeur accepte.
+
+        `sms.tracker._action_update_from_provider_error` remplace par `unknown`
+        tout `sms_<code>` absent de `sms.sms.DELIVERY_ERRORS` : un mappage vers
+        une valeur hors liste ferait afficher « Unknown error » a l'utilisatrice
+        et perdrait tout le diagnostic.
+        """
+        from ..models.erplibre_sms_dispatch import ANDROID_CODE_TO_PROVIDER_ERROR
+        allowed = self.env["sms.sms"].DELIVERY_ERRORS
+        for android_code, provider_error in ANDROID_CODE_TO_PROVIDER_ERROR.items():
+            self.assertIn(
+                f"sms_{provider_error}", allowed,
+                f"{android_code} -> {provider_error} n'est pas dans DELIVERY_ERRORS",
+            )
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsGuards(TransactionCase):
+    """Garde-fous du compositeur : ils doivent LEVER, pas etre avales."""
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.company.erplibre_sms_provider = "passerelle"
+        # Le compositeur ne recoit pas sa passerelle : il la RESOUT, par un
+        # `search(limit=1)` sur la societe, trie par `sequence, id`. Une
+        # passerelle deja presente dans la base — celle d'une demonstration,
+        # par exemple — a la meme sequence par defaut et un id plus petit :
+        # elle gagne le tri. Les garde-fous se verifiaient alors sur elle et
+        # non sur celle du test, et les deux `assertRaises` echouaient alors
+        # que le code teste etait juste.
+        #
+        # On isole donc au lieu de dependre de ce qui traine dans la base.
+        # La transaction est annulee en fin de test : rien n'est desactive
+        # durablement.
+        self.env["erplibre.sms.gateway"].search(
+            [("company_id", "=", self.company.id)]
+        ).write({"active": False})
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.company.id,
+            "max_recipients_per_send": 2,
+        })
+
+    def _composer(self, numbers):
+        return self.env["sms.composer"].create({
+            "body": "Cours annule",
+            "composition_mode": "numbers",
+            "numbers": numbers,
+        })
+
+    def test_api_class_is_selected(self):
+        self.assertEqual(self.company._get_sms_api_class().__name__, "SmsApiErplibre")
+
+    def test_recipient_cap_raises(self):
+        composer = self._composer("+15145550001,+15145550002,+15145550003")
+        with self.assertRaises(UserError):
+            composer._erplibre_check_allowed()
+
+    def test_recipient_cap_allows_under_limit(self):
+        composer = self._composer("+15145550001,+15145550002")
+        composer._erplibre_check_allowed()
+
+    def test_alarm_blocks_sending(self):
+        self.gateway.max_recipients_per_send = 60
+        self.gateway._raise_alarm("test de panne")
+        composer = self._composer("+15145550001")
+        with self.assertRaises(UserError):
+            composer._erplibre_check_allowed()
+        self.gateway._clear_alarm()
+        composer._erplibre_check_allowed()
+
+    def test_segments_per_minute_cannot_exceed_android_limit(self):
+        with self.assertRaises(UserError):
+            self.gateway.segments_per_minute = 31
+
+    def test_estimate_mentions_ucs2_offenders(self):
+        composer = self._composer("+15145550001")
+        composer.body = "Bien reçu, ça commence à 19h"
+        composer._compute_erplibre_estimate()
+        self.assertIn("UCS2", composer.erplibre_estimate)
+        self.assertIn("ç", composer.erplibre_estimate)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsInbound(TransactionCase):
+
+    def setUp(self):
+        super().setUp()
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.env.company.id,
+        })
+
+    def test_stop_feeds_blacklist(self):
+        record = self.env["erplibre.sms.inbound"]._record(self.gateway, {
+            "id": "in-0001", "from": "+15145559999", "body": "STOP", "at": 1754300000,
+        })
+        self.assertTrue(record.is_opt_out)
+        self.assertTrue(record.blacklist_id)
+        self.assertTrue(record.blacklist_id.active)
+
+    def test_french_keyword_recognised(self):
+        for keyword in ("ARRET", "arrêt", "Desabonnement", "stop"):
+            self.env["erplibre.sms.inbound"].search([]).unlink()
+            record = self.env["erplibre.sms.inbound"]._record(self.gateway, {
+                "id": "in-" + keyword, "from": "+15145559998", "body": keyword,
+            })
+            self.assertTrue(record.is_opt_out, keyword)
+
+    def test_ordinary_reply_is_not_opt_out(self):
+        record = self.env["erplibre.sms.inbound"]._record(self.gateway, {
+            "id": "in-0002", "from": "+15145559997",
+            "body": "Merci, je serai là",
+        })
+        self.assertFalse(record.is_opt_out)
+        self.assertFalse(record.blacklist_id)
+
+    def test_duplicate_ignored(self):
+        payload = {"id": "in-0003", "from": "+15145559996", "body": "STOP"}
+        self.assertTrue(self.env["erplibre.sms.inbound"]._record(self.gateway, payload))
+        self.assertFalse(self.env["erplibre.sms.inbound"]._record(self.gateway, payload))
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsNonce(TransactionCase):
+
+    def test_single_use(self):
+        model = self.env["erplibre.sms.nonce"]
+        self.assertTrue(model._consume("nonce-1", "dev-1"))
+        self.assertFalse(model._consume("nonce-1", "dev-1"))
+        self.assertTrue(model._consume("nonce-2", "dev-1"))
+
+    def test_empty_nonce_refused(self):
+        self.assertFalse(self.env["erplibre.sms.nonce"]._consume("", "dev-1"))
+        self.assertFalse(self.env["erplibre.sms.nonce"]._consume(None, "dev-1"))
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsCron(TransactionCase):
+
+    def test_core_send_cron_was_retuned(self):
+        """Le cron d'envoi du coeur est HORAIRE : inacceptable pour une alerte.
+
+        Il est declare dans un bloc `noupdate="1"`, donc un XML de surcharge
+        serait ignore a chaque mise a jour. C'est le `post_init_hook` qui le
+        corrige, et ce test verifie qu'il l'a fait.
+        """
+        cron = self.env.ref("sms.ir_cron_sms_scheduler_action")
+        self.assertEqual(cron.interval_type, "minutes")
+        self.assertLessEqual(cron.interval_number, 5)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsPolling(TransactionCase):
+    """Remise des travaux par interrogation, et reprise apres perte."""
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.company.id,
+            "poll_interval_seconds": 60,
+            "redelivery_seconds": 300,
+        })
+
+    def _queued(self, uuid, **values):
+        return self.env["erplibre.sms.dispatch"].create({
+            "sms_uuid": uuid,
+            "number": "+1514555" + uuid[-4:],
+            "body": "Cours annule",
+            "company_id": self.company.id,
+            "gateway_id": self.gateway.id,
+            "state": "queued",
+            **values,
+        })
+
+    def test_claim_marks_delivered_and_returns_once(self):
+        dispatch = self._queued("uuid-p001")
+        claimed = self.gateway._claim_pending()
+        self.assertIn(dispatch, claimed)
+        self.assertEqual(dispatch.state, "published")
+        self.assertTrue(dispatch.published_at)
+        # Une seconde interrogation immediate ne doit pas le reproposer.
+        self.assertNotIn(dispatch, self.gateway._claim_pending())
+
+    def test_unconfirmed_job_is_offered_again_after_delay(self):
+        """Le telephone a pu mourir entre la reception et l'enregistrement.
+
+        Sans cette reprise, le SMS disparaitrait en silence — le mode de
+        defaillance que toute cette conception s'interdit.
+        """
+        dispatch = self._queued("uuid-p002")
+        self.gateway._claim_pending()
+        self.assertNotIn(dispatch, self.gateway._claim_pending())
+        # On recule la remise au-dela du delai de reprise.
+        dispatch.write({
+            "published_at": fields.Datetime.now() - timedelta(seconds=600),
+        })
+        self.assertIn(dispatch, self.gateway._claim_pending())
+
+    def test_confirmed_job_is_never_offered_again(self):
+        dispatch = self._queued("uuid-p003")
+        self.gateway._claim_pending()
+        dispatch._apply_event("submitted", seq=1)
+        dispatch.write({
+            "published_at": fields.Datetime.now() - timedelta(seconds=600),
+        })
+        self.assertNotIn(dispatch, self.gateway._claim_pending())
+
+    def test_claim_is_bounded(self):
+        self.gateway.max_jobs_per_poll = 3
+        for index in range(5):
+            self._queued(f"uuid-p1{index:02d}")
+        self.assertEqual(len(self.gateway._claim_pending()), 3)
+
+    def test_payload_writes_body_once_per_group(self):
+        for index in range(3):
+            self._queued(f"uuid-p2{index:02d}")
+        self._queued("uuid-p299", body="Autre message")
+        groups = self.gateway._payload_for(self.gateway._claim_pending())
+        self.assertEqual(len(groups), 2)
+        by_body = {group["body"]: group for group in groups}
+        self.assertEqual(len(by_body["Cours annule"]["to"]), 3)
+        self.assertEqual(len(by_body["Autre message"]["to"]), 1)
+
+    def test_poll_counts_as_liveness(self):
+        self.assertFalse(self.gateway.last_poll_at)
+        self.gateway._record_poll({
+            "sms_permission": True, "sim_ready": True, "battery": 88, "charging": True,
+        })
+        self.assertTrue(self.gateway.last_poll_at)
+        self.assertTrue(self.gateway.is_healthy)
+
+    def test_poll_reporting_a_revoked_permission_raises_alarm(self):
+        """Le telephone parle, mais pour dire qu'il ne peut pas envoyer."""
+        self.gateway._record_poll({"sms_permission": False, "sim_ready": True})
+        self.assertTrue(self.gateway.alarm_active)
+        self.assertIn("permission", self.gateway.alarm_reason.lower())
+
+    def test_silence_raises_alarm(self):
+        self.gateway._record_poll({"sms_permission": True, "sim_ready": True})
+        self.env["erplibre.sms.gateway"]._cron_check_heartbeat()
+        self.assertFalse(self.gateway.alarm_active)
+        # Trois intervalles manques : la passerelle est declaree muette.
+        self.gateway.write({
+            "last_poll_at": fields.Datetime.now() - timedelta(seconds=600),
+        })
+        self.env["erplibre.sms.gateway"]._cron_check_heartbeat()
+        self.assertTrue(self.gateway.alarm_active)
+
+    def test_poll_interval_floor(self):
+        with self.assertRaises(UserError):
+            self.gateway.poll_interval_seconds = 5
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsGatewayChoice(TransactionCase):
+    """Quelle passerelle envoie, quand il y en a plus d'une.
+
+    Tant qu'il n'y en avait qu'une, `search(limit=1)` la designait toujours.
+    Des qu'un second materiel existe, ce tri devient un tirage : ces tests
+    fixent la regle qui le remplace.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.company.erplibre_sms_provider = "passerelle"
+        # Une passerelle laissee par une autre demonstration gagnerait le tri
+        # par `sequence, id` et repondrait a la place de celles du test. La
+        # transaction est annulee en fin de test : rien n'est desactive
+        # durablement.
+        self.env["erplibre.sms.gateway"].search(
+            [("company_id", "=", self.company.id)]
+        ).write({"active": False})
+        self.company.erplibre_gateway_id = False
+        Gateway = self.env["erplibre.sms.gateway"]
+        self.premiere = Gateway.create({
+            "name": "Passerelle A",
+            "company_id": self.company.id,
+            "sequence": 10,
+        })
+        self.seconde = Gateway.create({
+            "name": "Passerelle B",
+            "company_id": self.company.id,
+            "sequence": 20,
+        })
+
+    def _resoudre(self):
+        return self.env["erplibre.sms.gateway"]._for_company(self.company)
+
+    def test_sans_choix_la_sequence_decide(self):
+        """L'ancien comportement survit : sans choix, la premiere active."""
+        self.assertEqual(self._resoudre(), self.premiere)
+
+    def test_le_choix_explicite_bat_la_sequence(self):
+        self.company.erplibre_gateway_id = self.seconde
+        self.assertEqual(self._resoudre(), self.seconde)
+
+    def test_une_passerelle_choisie_puis_archivee_ne_se_remplace_pas(self):
+        """Substituer ferait partir le message depuis un autre numero."""
+        self.company.erplibre_gateway_id = self.seconde
+        self.seconde.active = False
+        self.assertFalse(self._resoudre())
+
+    def test_le_refus_dit_lequel_des_deux_problemes(self):
+        """« Aucune » et « celle choisie ne va plus » ne se reparent pas pareil."""
+        api = self.company._get_sms_api_class()(self.env)
+        lot = [{"content": "Cours annule",
+                "numbers": [{"number": "+15145550142", "uuid": "uuid-choix-1"}]}]
+
+        self.company.erplibre_gateway_id = self.seconde
+        self.seconde.active = False
+        self.assertEqual(
+            api._send_sms_batch(lot)[0]["state"], "gateway_inactive"
+        )
+
+        self.company.erplibre_gateway_id = False
+        (self.premiere | self.seconde).write({"active": False})
+        self.assertEqual(
+            api._send_sms_batch(lot)[0]["state"], "gateway_missing"
+        )
+
+    def test_les_deux_etats_sont_traduits_et_classes(self):
+        """Un etat sans message ni type d'echec ressortirait en « inconnu »."""
+        api = self.company._get_sms_api_class()(self.env)
+        for etat in ("gateway_missing", "gateway_inactive"):
+            self.assertIn(etat, api._get_sms_api_error_messages())
+            self.assertIn(etat, api.PROVIDER_TO_SMS_FAILURE_TYPE)
+
+    def test_une_passerelle_etrangere_est_refusee_a_la_configuration(self):
+        """Refuser au reglage ce que l'envoi refuserait plus tard, sans cause visible."""
+        autre = self.env["res.company"].create({"name": "Autre organisme"})
+        etrangere = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle d'ailleurs",
+            "company_id": autre.id,
+        })
+        with self.assertRaises(ValidationError):
+            self.company.erplibre_gateway_id = etrangere
+
+    def test_le_compositeur_montre_la_passerelle_choisie(self):
+        self.company.erplibre_gateway_id = self.seconde
+        composer = self.env["sms.composer"].create({
+            "body": "Cours annule",
+            "composition_mode": "numbers",
+            "numbers": "+15145550142",
+        })
+        self.assertEqual(composer.erplibre_gateway_id, self.seconde)
+
+    def test_une_seule_passerelle_porte_la_marque(self):
+        self.company.erplibre_gateway_id = self.seconde
+        self.assertFalse(self.premiere.is_company_default)
+        self.assertTrue(self.seconde.is_company_default)
+
+    def test_le_bouton_pose_le_choix_et_refuse_une_archivee(self):
+        self.seconde.action_set_as_company_default()
+        self.assertEqual(self.company.erplibre_gateway_id, self.seconde)
+        self.premiere.active = False
+        with self.assertRaises(UserError):
+            self.premiere.action_set_as_company_default()
+
+    def test_le_cron_dexpiration_alerte_la_passerelle_choisie(self):
+        """Un envoi orphelin retombe sur la MEME passerelle que l'envoi aurait prise."""
+        self.company.erplibre_gateway_id = self.seconde
+        self.env["erplibre.sms.dispatch"].create({
+            "sms_uuid": "uuid-orphelin-choix",
+            "number": "+15145550142",
+            "body": "Cours annule",
+            "company_id": self.company.id,
+            "state": "queued",
+            "send_deadline": fields.Datetime.now() - timedelta(seconds=60),
+        })
+        self.env["erplibre.sms.dispatch"]._cron_expire_stale()
+        self.assertTrue(self.seconde.alarm_active)
+        self.assertFalse(self.premiere.alarm_active)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsMateriel(TransactionCase):
+    """Un modem juge sur les criteres d'un telephone se declare en panne.
+
+    Doze, alarmes exactes, batterie, plafond de trente segments par minute :
+    quatre choses qu'un modem USB n'a pas, et sur lesquelles le module jugeait
+    tout le monde.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        Gateway = self.env["erplibre.sms.gateway"]
+        self.telephone = Gateway.create({
+            "name": "Telephone de test",
+            "company_id": self.company.id,
+            "kind": "mobile",
+        })
+        self.modem = Gateway.create({
+            "name": "Modem de test",
+            "company_id": self.company.id,
+            "kind": "modem",
+        })
+
+    def _appeler(self, gateway):
+        """Ce que « Appeler » rend, cette passerelle etant celle de la societe."""
+        self.company.erplibre_sms_provider = "passerelle"
+        self.company.erplibre_gateway_id = gateway
+        return self.env["phone.common"].click2dial("+15145550142")
+
+    def test_le_modem_ne_met_pas_l_appel_en_file(self):
+        """L'agent des SMS refuse les appels : son cycle doit rendre la main en
+        quelques secondes quand un appel dure des minutes. Un appel mis en file
+        pour un modem ne partirait donc jamais."""
+        avant = self.env["erplibre.mobile.call"].search_count([])
+        resultat = self._appeler(self.modem)
+        self.assertEqual(self.env["erplibre.mobile.call"].search_count([]), avant,
+                         "aucune fiche : la trace est celle du softphone")
+        self.assertIn("softphone", resultat.get("dialing_message", "").lower())
+
+    def test_le_telephone_met_toujours_l_appel_en_file(self):
+        """C'est lui qui compose, a son tour d'interrogation."""
+        resultat = self._appeler(self.telephone)
+        appel = self.env["erplibre.mobile.call"].search(
+            [("gateway_id", "=", self.telephone.id)], order="id desc", limit=1)
+        self.assertTrue(appel)
+        self.assertEqual(appel.state, "queued")
+        self.assertEqual(appel.source, "click")
+        self.assertIn("file", resultat.get("dialing_message", "").lower())
+
+    def test_une_alarme_ne_bloque_que_la_file(self):
+        """Un appel en file partirait des le retour de la passerelle, des heures
+        plus tard, vers quelqu'un qui ne s'y attend plus. Place en direct, il
+        echoue tout de suite et se voit."""
+        self.telephone._raise_alarm("essai")
+        self.modem._raise_alarm("essai")
+        with self.assertRaises(UserError):
+            self._appeler(self.telephone)
+        self.assertIn("softphone",
+                      self._appeler(self.modem).get("dialing_message", "").lower())
+
+    def test_le_materiel_par_defaut_est_le_telephone(self):
+        """Les fiches d'avant ce champ ne doivent pas changer de comportement."""
+        sans_choix = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle sans materiel",
+            "company_id": self.company.id,
+        })
+        self.assertEqual(sans_choix.kind, "mobile")
+
+    def test_le_cadencement_nest_juge_que_la_ou_le_systeme_le_degrade(self):
+        etat = {"sms_permission": True, "sim_ready": True}
+        self.telephone._record_poll(etat)
+        self.modem._record_poll(etat)
+        self.assertTrue(self.telephone.pacing_degraded)
+        self.assertFalse(self.modem.pacing_degraded,
+                         "un modem n'a ni Doze ni permission d'alarme")
+
+    def test_le_plafond_dandroid_ne_bride_pas_le_modem(self):
+        with self.assertRaises(UserError):
+            self.telephone.segments_per_minute = 60
+        self.modem.segments_per_minute = 60
+        self.assertEqual(self.modem.segments_per_minute, 60)
+
+    def test_lalarme_nomme_le_materiel_quon_a_devant_soi(self):
+        etat = {"sms_permission": False, "sim_ready": True}
+        self.telephone._record_poll(etat)
+        self.modem._record_poll(etat)
+        self.assertIn("telephone", self.telephone.alarm_reason.lower())
+        self.assertIn("modem", self.modem.alarm_reason.lower())
+
+    def test_ce_quun_materiel_na_pas_nest_pas_retenu(self):
+        """Une fiche passee au modem ne doit pas garder la derniere batterie."""
+        self.modem.write({"battery_percent": 42, "doze_exempt": True})
+        self.modem._record_poll({
+            "sms_permission": True, "sim_ready": True,
+            "battery": 88, "doze_exempt": True, "exact_alarms": True,
+        })
+        self.assertEqual(self.modem.battery_percent, 0)
+        self.assertFalse(self.modem.doze_exempt)
+
+    def test_un_telephone_retient_ce_quil_rapporte(self):
+        self.telephone._record_poll({
+            "sms_permission": True, "sim_ready": True,
+            "battery": 88, "doze_exempt": True, "exact_alarms": True,
+        })
+        self.assertEqual(self.telephone.battery_percent, 88)
+        self.assertTrue(self.telephone.pacing_degraded is False)
+
+    def test_un_desaccord_de_materiel_se_dit_sans_rien_reecrire(self):
+        avant = len(self.telephone.message_ids)
+        self.telephone._record_poll({
+            "sms_permission": True, "sim_ready": True, "kind": "modem",
+        })
+        self.assertEqual(self.telephone.kind, "mobile",
+                         "une fiche qui se reecrit seule est pire que le desaccord")
+        self.assertGreater(len(self.telephone.message_ids), avant)
+
+    def test_un_materiel_accorde_ne_dit_rien(self):
+        avant = len(self.modem.message_ids)
+        self.modem._record_poll({
+            "sms_permission": True, "sim_ready": True, "kind": "modem",
+        })
+        self.assertEqual(len(self.modem.message_ids), avant)
+
+    def test_la_fiche_ne_montre_que_ce_qui_existe(self):
+        self.assertTrue(self.telephone.montre_batterie)
+        self.assertTrue(self.telephone.montre_cadencement)
+        self.assertFalse(self.modem.montre_batterie)
+        self.assertFalse(self.modem.montre_cadencement)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsEntrantVu(TransactionCase):
+    """Un SMS entrant que personne ne voit est un SMS perdu.
+
+    Deux facons de le perdre, et elles se cumulent : ne pas le rattacher au
+    contact, et le deposer dans un fil que personne ne suit.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle de test",
+            "company_id": self.company.id,
+        })
+        self.contact = self.env["res.partner"].create({
+            "name": "Correspondant de test",
+            # Format humain : c'est celui que produisent la saisie et le
+            # formatage d'Odoo, et celui sur lequel l'egalite echouait.
+            "phone": "514 555-0142",
+        })
+        # Un utilisateur BIEN A NOUS, actif et dans le groupe d'envoi.
+        # `self.env.user` ne convient pas : les tests tournent sous OdooBot,
+        # qui est archive — et un utilisateur archive est ecarte des
+        # destinataires, a juste titre.
+        # `base.group_user` est INDISPENSABLE : sans lui l'utilisateur est
+        # externe, `share` vaut vrai, et il est ecarte des destinataires.
+        self.lecteur = self.env["res.users"].create({
+            "name": "Lecteur de SMS",
+            "login": "lecteur-sms-test",
+            "groups_id": [(4, self.env.ref("base.group_user").id),
+                          (4, self.env.ref(
+                              "erplibre_mobile_gateway.group_erplibre_sms_send"
+                          ).id)],
+        })
+        self.gateway.notify_user_ids = self.lecteur
+
+    def _recevoir(self, corps="Bonjour", numero="+15145550142", ident="in-1"):
+        return self.env["erplibre.sms.inbound"]._record(self.gateway, {
+            "id": ident, "from": numero, "body": corps,
+        })
+
+    def test_le_contact_est_retrouve_malgre_le_format(self):
+        """« 514 555-0142 » et « +15145550142 » designent la meme personne."""
+        recu = self._recevoir()
+        self.assertEqual(recu.partner_id, self.contact)
+
+    def test_le_message_arrive_dans_le_fil_du_contact(self):
+        avant = len(self.contact.message_ids)
+        recu = self._recevoir(corps="Je serai en retard")
+        self.assertGreater(len(self.contact.message_ids), avant)
+        self.assertIn("Je serai en retard", self.contact.message_ids[0].body)
+        self.assertTrue(recu.partner_id)
+
+    def test_quelquun_est_nomme_destinataire(self):
+        """Sans destinataire, le message se depose dans un fil non suivi."""
+        self._recevoir()
+        message = self.contact.message_ids[0]
+        self.assertTrue(message.partner_ids)
+        self.assertIn(self.lecteur.partner_id, message.partner_ids)
+
+    def test_un_numero_inconnu_se_pose_sur_la_passerelle(self):
+        """Faute de contact, il faut bien que le message soit quelque part."""
+        avant = len(self.gateway.message_ids)
+        recu = self._recevoir(numero="+15145559999", ident="in-inconnu")
+        self.assertFalse(recu.partner_id)
+        self.assertGreater(len(self.gateway.message_ids), avant)
+
+    def test_un_desabonnement_se_dit_comme_tel(self):
+        recu = self._recevoir(corps="STOP", ident="in-stop")
+        self.assertTrue(recu.is_opt_out)
+        self.assertIn("esabonnement", self.contact.message_ids[0].body)
+
+    def test_la_liste_explicite_lemporte_sur_le_groupe(self):
+        """Nomme, on prend ceux-la ; vide, on prend le groupe d'envoi."""
+        hors_groupe = self.env["res.users"].create({
+            "name": "Sans le groupe", "login": "temoin-notification",
+            "groups_id": [(4, self.env.ref("base.group_user").id)],
+        })
+        self.gateway.notify_user_ids = hors_groupe
+        self.assertEqual(
+            self.gateway._destinataires_notification(), hors_groupe
+        )
+        self.gateway.notify_user_ids = False
+        par_le_groupe = self.gateway._destinataires_notification()
+        self.assertIn(self.lecteur, par_le_groupe)
+        self.assertNotIn(hors_groupe, par_le_groupe)
+
+    def test_un_utilisateur_archive_nest_pas_un_destinataire(self):
+        """Le prevenir reviendrait a ne prevenir personne, sans le dire."""
+        dormeur = self.env["res.users"].create({
+            "name": "Parti", "login": "temoin-archive", "active": False,
+            "groups_id": [(4, self.env.ref("base.group_user").id)],
+        })
+        self.gateway.notify_user_ids = dormeur
+        self.assertFalse(self.gateway._destinataires_notification())
+
+    def test_les_appels_et_les_sms_previennent_les_memes_gens(self):
+        """Deux regles pour un meme evenement finiraient par se contredire."""
+        appel = self.env["erplibre.mobile.call"].create({
+            "call_uuid": "uuid-notif-1",
+            "number": "+15145550142",
+            "direction": "in",
+            "company_id": self.company.id,
+            "gateway_id": self.gateway.id,
+            "state": "queued",
+        })
+        self.assertEqual(
+            appel.gateway_id._destinataires_notification(appel.company_id),
+            self.gateway._destinataires_notification(),
+        )
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreVoicemail(TransactionCase):
+    """L'etat de la boite vocale de l'operateur, tel que le service le transmet."""
+
+    def setUp(self):
+        super().setUp()
+        self.prevenu = self.env["res.users"].create(
+            {"name": "Accueil", "login": "accueil_messagerie_essai"}
+        )
+        self.gateway = self.env["erplibre.sms.gateway"].create(
+            {
+                "name": "Modem de test",
+                "kind": "modem",
+                "device_id": "modem-essai-messagerie",
+                "company_id": self.env.company.id,
+                "notify_user_ids": [(6, 0, self.prevenu.ids)],
+            }
+        )
+
+    def _annonces(self):
+        return self.gateway.message_ids.filtered(
+            lambda m: self.prevenu.partner_id in m.partner_ids
+        )
+
+    def test_la_levee_est_annoncee_aux_destinataires(self):
+        """C'est la levee qui demande un geste : rappeler la messagerie."""
+        self.assertTrue(self.gateway._signaler_messagerie(True))
+        self.assertTrue(self.gateway.voicemail_waiting)
+        self.assertTrue(self.gateway.voicemail_since)
+        self.assertEqual(len(self._annonces()), 1)
+
+    def test_un_etat_inchange_ne_reannonce_rien(self):
+        """Le service renvoie l'etat a chaque demarrage : l'annoncer a chaque
+        fois ferait sonner la cloche pour un message deja connu."""
+        self.gateway._signaler_messagerie(True)
+        depuis = self.gateway.voicemail_since
+        self.assertFalse(self.gateway._signaler_messagerie(True))
+        self.assertEqual(len(self._annonces()), 1)
+        self.assertEqual(self.gateway.voicemail_since, depuis)
+
+    def test_la_retombee_s_inscrit_sans_prevenir_personne(self):
+        """Prevenir chacun qu'une boite a ete videe, par quelqu'un qui le sait
+        deja, noierait l'annonce qui compte."""
+        self.gateway._signaler_messagerie(True)
+        self.assertTrue(self.gateway._signaler_messagerie(False))
+        self.assertFalse(self.gateway.voicemail_waiting)
+        self.assertFalse(self.gateway.voicemail_since)
+        self.assertEqual(len(self._annonces()), 1)
+
+    def test_la_lecture_est_datee_meme_sans_changement(self):
+        """La date de lecture est ce qui rend le groupe visible sur la fiche :
+        une fiche jamais lue ne doit pas afficher « pas de message »."""
+        self.assertFalse(self.gateway.voicemail_checked_at)
+        self.gateway._signaler_messagerie(False)
+        self.assertTrue(self.gateway.voicemail_checked_at)
+        self.assertEqual(len(self._annonces()), 0)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsFournisseur(TransactionCase):
+    """Le choix du fournisseur, qui appartient a ce module.
+
+    Le champ est le notre et non un `selection_add` sur le `sms_provider`
+    d'un connecteur du coeur : le module s'installe donc sans connecteur
+    tiers, et n'ecrase la liste de personne.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+
+    def test_le_module_ne_depend_d_aucun_connecteur_tiers(self):
+        """Une dependance a un connecteur imposerait de l'installer pour
+        envoyer par sa propre carte SIM."""
+        module = self.env["ir.module.module"].search(
+            [("name", "=", "erplibre_mobile_gateway")], limit=1)
+        self.assertTrue(module)
+        self.assertNotIn(
+            "sms_twilio",
+            module.dependencies_id.mapped("name"),
+        )
+
+    def test_aucun_par_defaut_laisse_le_coeur_decider(self):
+        """Installer le module ne doit pas detourner les SMS : sans choix
+        explicite, l'envoi reste celui d'avant."""
+        self.company.erplibre_sms_provider = "aucun"
+        self.assertNotEqual(
+            self.company._get_sms_api_class(), SmsApiErplibre)
+        self.assertFalse(self.company._erplibre_uses_gateway())
+
+    def test_la_passerelle_choisie_fournit_l_api(self):
+        self.company.erplibre_sms_provider = "passerelle"
+        self.assertEqual(self.company._get_sms_api_class(), SmsApiErplibre)
+        self.assertTrue(self.company._erplibre_uses_gateway())
+
+    def test_la_table_des_classes_est_le_point_d_extension(self):
+        """Un fournisseur supplementaire s'ajoute par une entree ici, sans
+        toucher `_get_sms_api_class`."""
+        classes = self.env["res.company"]._erplibre_sms_api_classes()
+        self.assertEqual(classes.get("passerelle"), SmsApiErplibre)
+        valeurs = dict(
+            self.env["res.company"]._selection_erplibre_sms_provider())
+        for cle in classes:
+            self.assertIn(cle, valeurs, cle)
+
+    def test_deux_fournisseurs_a_la_fois_sont_refuses(self):
+        """Chaque connecteur rend sa classe quand SON champ le designe : celui
+        qui gagne est le plus externe, donc l'ordre de chargement des modules.
+        Le refus est ce qui rend le routage independant de cet ordre.
+        """
+        if "sms_provider" not in self.env["res.company"]._fields:
+            self.skipTest("aucun connecteur du coeur installe")
+        selection = dict(
+            self.env["res.company"]._fields["sms_provider"]._description_selection(
+                self.env))
+        autre = [cle for cle in selection if cle not in ("iap", False)]
+        if not autre:
+            self.skipTest("le connecteur n'ajoute aucune valeur")
+        self.company.sms_provider = autre[0]
+        with self.assertRaises(ValidationError):
+            self.company.erplibre_sms_provider = "passerelle"
+
+    def test_le_coeur_reste_atteignable_a_cote(self):
+        """Choisir « Aucun » ne doit rien casser chez le connecteur voisin."""
+        self.company.erplibre_sms_provider = "aucun"
+        if "sms_provider" in self.env["res.company"]._fields:
+            self.company.sms_provider = "iap"
+        self.assertTrue(self.company._get_sms_api_class())
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreSmsSociete(TransactionCase):
+    """La societe qui route est celle de la CREATION du message.
+
+    Le coeur la resout a l'envoi, `env.company` a defaut de `mail.message` :
+    un SMS repris par le cron partirait alors par le fournisseur de la societe
+    de l'utilisateur du cron.
+    """
+
+    def test_la_societe_est_figee_a_la_creation(self):
+        sms = self.env["sms.sms"].create({"number": "+15550001", "body": "x"})
+        self.assertEqual(sms.erplibre_company_id, self.env.company)
+        self.assertEqual(sms._get_sms_company(), self.env.company)
+
+    def test_une_societe_donnee_n_est_pas_remplacee(self):
+        autre = self.env["res.company"].create({"name": "Societe d'essai"})
+        sms = self.env["sms.sms"].create({
+            "number": "+15550002", "body": "x",
+            "erplibre_company_id": autre.id,
+        })
+        self.assertEqual(sms._get_sms_company(), autre)
+
+    def test_le_routage_suit_la_societe_du_message(self):
+        """Deux societes, deux fournisseurs : le decoupage doit les separer."""
+        autre = self.env["res.company"].create({"name": "Societe sans passerelle"})
+        self.env.company.erplibre_sms_provider = "passerelle"
+        autre.erplibre_sms_provider = "aucun"
+        a = self.env["sms.sms"].create({"number": "+15550003", "body": "x"})
+        b = self.env["sms.sms"].create({
+            "number": "+15550004", "body": "x",
+            "erplibre_company_id": autre.id,
+        })
+        routage = {}
+        for api, messages in (a | b)._split_by_api():
+            for message in messages:
+                routage[message.id] = api.__class__
+        self.assertEqual(routage[a.id], SmsApiErplibre)
+        self.assertNotEqual(routage[b.id], SmsApiErplibre)
+
+
+@tagged("post_install", "-at_install")
+class TestEscaladeDUneAlerte(TransactionCase):
+    """Le canal d'alerte est le seul dont le travail est de prevenir.
+
+    On ne le regarde que le jour ou il a servi : ce qu'il tait ce jour-la ne
+    se rattrape pas.
+    """
+
+    class _Reponse:
+        def __init__(self, code, texte=""):
+            self.status_code = code
+            self.text = texte
+
+        @property
+        def ok(self):
+            return 200 <= self.status_code < 300
+
+    def setUp(self):
+        super().setUp()
+        self.gateway = self.env["erplibre.sms.gateway"].create({
+            "name": "Passerelle d'essai",
+            "alarm_webhook_url": "http://127.0.0.1:8080/sujet-d-essai",
+        })
+
+    def test_un_point_d_acces_qui_refuse_est_journalise_en_erreur(self):
+        """Un POST refuse REND une reponse, il ne leve pas : sans lire le
+        code, un rejet se lit comme une reussite."""
+        with patch("odoo.addons.erplibre_mobile_gateway.models"
+                   ".erplibre_sms_gateway.requests.post",
+                   return_value=self._Reponse(403, "forbidden")):
+            with self.assertLogs(
+                    "odoo.addons.erplibre_mobile_gateway.models"
+                    ".erplibre_sms_gateway", level="ERROR") as journal:
+                self.gateway._escalate("essai")
+        self.assertTrue(any("403" in ligne for ligne in journal.output),
+                        journal.output)
+
+    def test_un_point_d_acces_qui_accepte_ne_crie_pas(self):
+        """L'invariant est l'ABSENCE d'erreur, pas la presence d'une trace :
+        le niveau de journalisation du lanceur filtre les lignes
+        d'information, et une epreuve qui en exige une mesurerait ce
+        reglage-la."""
+        with patch("odoo.addons.erplibre_mobile_gateway.models"
+                   ".erplibre_sms_gateway.requests.post",
+                   return_value=self._Reponse(200)):
+            with self.assertNoLogs(
+                    "odoo.addons.erplibre_mobile_gateway.models"
+                    ".erplibre_sms_gateway", level="ERROR"):
+                self.gateway._escalate("essai")
+
+    def test_sans_point_d_acces_le_manque_se_dit(self):
+        """L'alerte ne partirait que par courriel — le canal que la
+        passerelle remplace."""
+        self.gateway.alarm_webhook_url = False
+        with self.assertLogs(
+                "odoo.addons.erplibre_mobile_gateway.models"
+                ".erplibre_sms_gateway", level="ERROR") as journal:
+            self.gateway._escalate("essai")
+        self.assertTrue(any("escalade" in l.lower() for l in journal.output),
+                        journal.output)
