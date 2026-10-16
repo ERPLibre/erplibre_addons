@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_devops_requirement_user,devops.requirement user,model_devops_requirement,base.group_user,1,1,1,1
+access_devops_requirement_category_user,devops.requirement.category user,model_devops_requirement_category,base.group_user,1,1,1,1
+access_devops_requirement_phase_user,devops.requirement.phase user,model_devops_requirement_phase,base.group_user,1,1,1,1
