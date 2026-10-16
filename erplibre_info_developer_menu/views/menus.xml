@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- The « 🧰 Dev » menu opens to base.group_erp_manager; these entries
+         keep the base.group_system access of erplibre_info. -->
+    <menuitem
+        id="erplibre_code_snapshot_dev_menu"
+        name="🧬 ERPLibre snapshots"
+        parent="developer_menu.conf_tech"
+        action="erplibre_info.erplibre_code_snapshot_action"
+        groups="base.group_system"
+        sequence="200"
+    />
+    <menuitem
+        id="erplibre_code_run_dev_menu"
+        name="🏃 ERPLibre runs"
+        parent="developer_menu.conf_tech"
+        action="erplibre_info.erplibre_code_run_action"
+        groups="base.group_system"
+        sequence="210"
+    />
+    <menuitem
+        id="erplibre_info_settings_dev_menu"
+        name="⚙ ERPLibre settings"
+        parent="developer_menu.conf_tech"
+        action="erplibre_info.erplibre_info_config_settings_action"
+        groups="base.group_system"
+        sequence="220"
+    />
+</odoo>
