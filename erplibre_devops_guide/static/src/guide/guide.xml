@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="devops_guide.Guide">
+        <div class="o_devops_guide">
+
+            <t t-if="state.loaded and !state.page">
+                <div class="o_devops_guide_empty">
+                    <p>No guide to show. Pick one in Requirements / Configuration / Guides.</p>
+                </div>
+            </t>
+
+            <t t-if="state.page">
+                <section class="o_devops_guide_hero">
+                    <div class="o_devops_guide_hero_inner">
+                        <span t-if="state.page.eyebrow" class="o_devops_guide_eyebrow"
+                              t-esc="state.page.eyebrow"/>
+                        <h1 t-esc="state.page.title"/>
+                        <p t-if="state.page.subtitle" class="o_devops_guide_hero_sub"
+                           t-esc="state.page.subtitle"/>
+                        <div class="o_devops_guide_hero_actions">
+                            <button t-if="canStartTour" class="btn btn-lg o_devops_guide_btn_primary"
+                                    t-on-click="() => this.startTour()">
+                                <i class="fa fa-play me-2"/>
+                                <t t-esc="state.page.tour_label or 'Start the tour'"/>
+                            </button>
+                            <button t-if="state.page.primary_action"
+                                    class="btn btn-lg o_devops_guide_btn_ghost"
+                                    t-on-click="() => this.openAction(state.page.primary_action)">
+                                <t t-esc="state.page.primary_label"/>
+                            </button>
+                        </div>
+                        <div t-if="state.page.stats.length" class="o_devops_guide_stats">
+                            <t t-foreach="state.page.stats" t-as="s" t-key="s_index">
+                                <button t-if="s.action_xmlid"
+                                        class="o_devops_guide_stat o_devops_guide_stat_clickable"
+                                        t-on-click="() => this.openAction(s.action_xmlid)">
+                                    <span class="o_devops_guide_stat_num" t-esc="s.value"/>
+                                    <span class="o_devops_guide_stat_lbl" t-esc="s.label"/>
+                                </button>
+                                <div t-else="" class="o_devops_guide_stat">
+                                    <span class="o_devops_guide_stat_num" t-esc="s.value"/>
+                                    <span class="o_devops_guide_stat_lbl" t-esc="s.label"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+
+                <t t-foreach="state.page.sections" t-as="section" t-key="section_index">
+                    <section class="o_devops_guide_section">
+                        <div t-if="section.num" class="o_devops_guide_phase_head">
+                            <div class="o_devops_guide_phase_num" t-esc="section.num"/>
+                            <div>
+                                <h2 class="o_devops_guide_h2" t-esc="section.title"/>
+                                <div t-if="section.intro" class="o_devops_guide_section_intro"
+                                     t-out="section.intro"/>
+                            </div>
+                        </div>
+                        <t t-else="">
+                            <h2 t-if="section.title" class="o_devops_guide_h2" t-esc="section.title"/>
+                            <div t-if="section.intro" class="o_devops_guide_lead"
+                                 t-out="section.intro"/>
+                        </t>
+
+                        <div t-if="section.kind === 'cards'" class="o_devops_guide_grid">
+                            <t t-foreach="section.cards" t-as="c" t-key="c_index">
+                                <div class="o_devops_guide_card">
+                                    <div t-if="c.icon" class="o_devops_guide_card_icon">
+                                        <i t-att-class="'fa ' + c.icon"/>
+                                    </div>
+                                    <h3 t-if="c.title" class="o_devops_guide_card_title" t-esc="c.title"/>
+                                    <p t-if="c.problem" class="o_devops_guide_problem">
+                                        <i class="fa fa-exclamation-triangle"/>
+                                        <span t-esc="c.problem"/>
+                                    </p>
+                                    <p t-if="c.solution" class="o_devops_guide_solution">
+                                        <i class="fa fa-check-circle"/>
+                                        <span t-esc="c.solution"/>
+                                    </p>
+                                    <button t-if="hasButton(c)" class="btn btn-sm o_devops_guide_card_btn"
+                                            t-on-click="() => this.openCard(c)">
+                                        <span t-esc="c.action_label"/>
+                                        <i class="fa fa-arrow-right ms-1"/>
+                                    </button>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div t-if="section.kind === 'roadmap'" class="o_devops_guide_roadmap">
+                            <t t-foreach="section.cards" t-as="c" t-key="c_index">
+                                <div class="o_devops_guide_step">
+                                    <div class="o_devops_guide_step_num" t-esc="c.num"/>
+                                    <h4 class="o_devops_guide_step_title" t-esc="c.title"/>
+                                    <p class="o_devops_guide_step_text" t-esc="c.solution"/>
+                                </div>
+                            </t>
+                        </div>
+                    </section>
+                </t>
+
+                <footer t-if="state.page.footer" class="o_devops_guide_footer">
+                    <p t-esc="state.page.footer"/>
+                    <p t-if="state.page.footer_small" class="o_devops_guide_footer_small"
+                       t-esc="state.page.footer_small"/>
+                </footer>
+            </t>
+        </div>
+    </t>
+</templates>

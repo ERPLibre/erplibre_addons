@@ -67,3 +67,20 @@ class DevopsGuideCounterMixin(models.AbstractModel):
                 exc_info=True,
             )
             return 0
+
+    def _json_domain(self):
+        """Rend le domaine en liste, prête pour le client.
+
+        Un domaine illisible rend une liste vide, cohérent avec
+        `_count_records`, qui rend 0 sur la même entrée.
+        """
+        self.ensure_one()
+        try:
+            domain = ast.literal_eval(self.count_domain or "[]")
+        except (ValueError, SyntaxError):
+            return []
+        if not isinstance(domain, list):
+            return []
+        return [
+            list(item) if isinstance(item, tuple) else item for item in domain
+        ]

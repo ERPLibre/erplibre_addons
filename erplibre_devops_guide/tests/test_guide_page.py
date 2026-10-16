@@ -191,3 +191,19 @@ class TestGuidePage(TransactionCase):
             ._resolve_from_context()
         )
         self.assertFalse(found)
+
+    def test_card_domain_travels_as_a_list(self):
+        section = self.env["devops.guide.section"].create(
+            {"guide_id": self.guide.id, "kind": "cards", "title": "S"}
+        )
+        self.env["devops.guide.card"].create(
+            {
+                "section_id": section.id,
+                "title": "Counted",
+                "count_model": "devops.requirement",
+                "count_domain": "[('name', '=', \"it's here\")]",
+            }
+        )
+        page = self.guide.get_page()
+        card = page["sections"][-1]["cards"][0]
+        self.assertEqual(card["count_domain"], [["name", "=", "it's here"]])
