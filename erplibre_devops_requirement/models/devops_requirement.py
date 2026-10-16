@@ -36,8 +36,12 @@ class DevopsRequirement(models.Model):
         default="should",
         index=True,
     )
+    # Le libellé du palier intermédiaire se dit « Normal » et non
+    # « Medium », qui est déjà celui de `size` : un même terme anglais pour
+    # deux axes se réduit à une seule entrée de traduction, impossible à
+    # accorder dans une langue genrée.
     priority = fields.Selection(
-        [("high", "High"), ("medium", "Medium"), ("low", "Low")],
+        [("high", "High"), ("medium", "Normal"), ("low", "Low")],
         string="Priority",
         default="medium",
         index=True,

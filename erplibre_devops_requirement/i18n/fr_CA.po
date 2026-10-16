@@ -1,0 +1,343 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_devops_requirement
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-16 18:25+0000\n"
+"PO-Revision-Date: 2026-10-16 18:25+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Odoo\n"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__accepted
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Accepted"
+msgstr "Accepté"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__achievement
+msgid "Achievement"
+msgstr "Réalisation"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Achievement (how)"
+msgstr "Réalisation (comment)"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.actions.act_window,help:erplibre_devops_requirement.action_devops_requirement
+msgid "Add a requirement"
+msgstr "Ajouter un requis"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__approved
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__code
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__code
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_classifier__code
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__code
+msgid "Code"
+msgstr "Code"
+
+#. module: erplibre_devops_requirement
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement_config
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__could
+msgid "Could have"
+msgstr "Pourrait (souhaitable)"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.actions.act_window,help:erplibre_devops_requirement.action_devops_requirement
+msgid "Describe what the project commits to, by domain and by phase."
+msgstr "Décrit ce à quoi le projet s'engage, par domaine et par phase."
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__description
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Description"
+msgstr "Description"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__category_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Domain"
+msgstr "Domaine"
+
+#. module: erplibre_devops_requirement
+#: model:ir.actions.act_window,name:erplibre_devops_requirement.action_devops_requirement_category
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement_category
+msgid "Domains"
+msgstr "Domaines"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__done
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Done"
+msgstr "Réalisé"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Essential (Must)"
+msgstr "Essentiel (Doit)"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__size
+msgid "Estimated effort"
+msgstr "Effort estimé"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Group by"
+msgstr "Regrouper par"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__high
+msgid "High"
+msgstr "Haute"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid ""
+"How this requirement is covered: module, menu, view, or the current state "
+"and what comes next."
+msgstr "Comment ce requis est couvert : module, menu, vue, ou l'état actuel et la suite."
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__id
+msgid "ID"
+msgstr "ID"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__size__l
+msgid "Large"
+msgstr "Grand"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__write_uid
+msgid "Last Updated by"
+msgstr "Dernière modification par"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__write_date
+msgid "Last Updated on"
+msgstr "Dernière modification le"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__low
+msgid "Low"
+msgstr "Basse"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__size__m
+msgid "Medium"
+msgstr "Moyen"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__moscow
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "MoSCoW level"
+msgstr "Niveau d'exigence"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__must
+msgid "Must have"
+msgstr "Doit (essentiel)"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_classifier__name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__medium
+msgid "Normal"
+msgstr "Normale"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Not accepted"
+msgstr "Non accepté"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Not approved"
+msgstr "Non approuvé"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__notes
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Notes"
+msgstr "Notes"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__phase_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Phase"
+msgstr "Phase / jalon"
+
+#. module: erplibre_devops_requirement
+#: model:ir.actions.act_window,name:erplibre_devops_requirement.action_devops_requirement_phase
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement_phase
+msgid "Phases"
+msgstr "Phases"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__priority
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Priority"
+msgstr "Priorité"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__name
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Requirement"
+msgstr "Requis"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_classifier
+msgid "Requirement classification axis"
+msgstr "Axe de classement des requis"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_category
+msgid "Requirement domain"
+msgstr "Domaine de requis"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_phase
+msgid "Requirement phase"
+msgstr "Phase de requis"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Requirement title"
+msgstr "Titre du requis"
+
+#. module: erplibre_devops_requirement
+#: model:ir.actions.act_window,name:erplibre_devops_requirement.action_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__requirement_ids
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__requirement_ids
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_list
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_pivot
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Requirements"
+msgstr "Requis"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_graph
+msgid "Requirements by domain"
+msgstr "Requis par domaine"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__responsible_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_classifier__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__should
+msgid "Should have"
+msgstr "Devrait (important)"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__size__s
+msgid "Small"
+msgstr "Petit"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement
+msgid "Software requirement (MoSCoW)"
+msgstr "Requis logiciel (MoSCoW)"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_category__code
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_classifier__code
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_phase__code
+msgid ""
+"Stable identifier used by data files and by the domains of counted figures. "
+"Renaming it silently breaks every count that matches on it."
+msgstr "Identifiant stable employé par les fichiers de données et par les domaines des chiffres comptés. Le renommer casse en silence tout décompte qui s'appuie dessus."
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_category_code_uniq
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_classifier_code_uniq
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_phase_code_uniq
+msgid "The code must be unique."
+msgstr "Le code doit être unique."
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "To do"
+msgstr "À faire"
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__missing
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "What is missing"
+msgstr "Ce qui manque"
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "What is still missing for a complete production delivery."
+msgstr "Ce qui manque encore pour une livraison complète en production."
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__wont
+msgid "Won't have"
+msgstr "Ne fera pas (hors périmètre)"
