@@ -14,6 +14,9 @@ class DevopsGuideCard(models.Model):
     `action_label` accepte le marqueur `{count}`, remplacé par le décompte
     quand `count_model` est posé. Un libellé reste ainsi juste quand les
     données bougent, là où un nombre écrit en dur dérive.
+
+    Le libellé fait partie du contrat : une cible sans libellé ne rend
+    aucun bouton, plutôt qu'un bouton vide ne portant que sa flèche.
     """
 
     _name = "devops.guide.card"
@@ -36,6 +39,9 @@ class DevopsGuideCard(models.Model):
         help="Font Awesome class without the fa prefix, e.g. fa-database.",
     )
     title = fields.Char(string="Title", translate=True)
+    # Mention courte posee a cote du titre, pour distinguer une carte des
+    # autres sans toucher a son texte.
+    badge = fields.Char(string="Badge", translate=True)
     problem = fields.Text(string="Problem", translate=True)
     solution = fields.Text(string="Solution", translate=True)
     action_xmlid = fields.Char(
@@ -58,6 +64,11 @@ class DevopsGuideCard(models.Model):
     resolved_label = fields.Char(
         string="Resolved label", compute="_compute_resolved_label"
     )
+
+    @api.constrains("section_id")
+    def _check_section_renders_cards(self):
+        for rec in self:
+            rec.section_id._check_lead_has_no_cards()
 
     @api.depends("action_label", "count_model", "count_domain")
     def _compute_resolved_label(self):

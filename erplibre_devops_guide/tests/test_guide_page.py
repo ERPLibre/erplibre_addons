@@ -1,5 +1,6 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase, tagged
 
 
@@ -207,3 +208,38 @@ class TestGuidePage(TransactionCase):
         page = self.guide.get_page()
         card = page["sections"][-1]["cards"][0]
         self.assertEqual(card["count_domain"], [["name", "=", "it's here"]])
+
+    def test_badge_travels_with_its_card(self):
+        section = self.env["devops.guide.section"].create(
+            {"guide_id": self.guide.id, "kind": "cards", "title": "S"}
+        )
+        self.env["devops.guide.card"].create(
+            {
+                "section_id": section.id,
+                "title": "Flagged",
+                "badge": "Priority 1",
+            }
+        )
+        page = self.guide.get_page()
+        self.assertEqual(
+            page["sections"][-1]["cards"][0]["badge"], "Priority 1"
+        )
+
+    def test_a_card_without_a_badge_reads_as_a_string(self):
+        """Un Char vide se relit False, que le navigateur afficherait."""
+        page = self.guide.get_page()
+        badge = page["sections"][1]["cards"][0]["badge"]
+        self.assertIsNot(badge, False)
+        self.assertEqual(badge, "")
+
+    def test_a_lead_section_refuses_a_card(self):
+        """Une carte posée sur une section `lead` ne serait jamais rendue."""
+        with self.assertRaises(ValidationError):
+            self.env["devops.guide.card"].create(
+                {"section_id": self.lead.id, "title": "Lost"}
+            )
+
+    def test_a_section_holding_cards_refuses_to_become_lead(self):
+        """L'autre sens : changer la forme emporterait les cartes."""
+        with self.assertRaises(ValidationError):
+            self.cards.kind = "lead"

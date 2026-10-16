@@ -56,8 +56,11 @@ export class DevopsGuide extends Component {
         }
     }
 
+    // Une cible SANS libellé ne rend aucun bouton : un bouton vide ne
+    // portant que sa flèche n'apprend rien sur ce qu'il ouvre.
     hasButton(card) {
-        return Boolean(card.url || card.action_xmlid || card.count_model);
+        const target = card.url || card.action_xmlid || card.count_model;
+        return Boolean(target && card.action_label);
     }
 
     // Trois sources, dans l'ordre. Les trois vides : la carte n'a pas de
@@ -73,10 +76,15 @@ export class DevopsGuide extends Component {
                 type: "ir.actions.act_window",
                 name: card.title,
                 res_model: card.count_model,
-                view_mode: "list,form",
+                // Les quatre vues : un décompte s'inspecte en liste, mais
+                // se lit aussi par axe. Odoo engendre une vue graphique ou
+                // croisée que le modèle ne déclare pas.
+                view_mode: "list,form,graph,pivot",
                 views: [
                     [false, "list"],
                     [false, "form"],
+                    [false, "graph"],
+                    [false, "pivot"],
                 ],
                 domain: card.count_domain || [],
             });

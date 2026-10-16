@@ -70,13 +70,20 @@
                                     <div t-if="c.icon" class="o_devops_guide_card_icon">
                                         <i t-att-class="'fa ' + c.icon"/>
                                     </div>
-                                    <h3 t-if="c.title" class="o_devops_guide_card_title" t-esc="c.title"/>
+                                    <h3 t-if="c.title" class="o_devops_guide_card_title">
+                                        <t t-esc="c.title"/>
+                                        <span t-if="c.badge" class="o_devops_guide_card_badge"
+                                              t-esc="c.badge"/>
+                                    </h3>
                                     <p t-if="c.problem" class="o_devops_guide_problem">
                                         <i class="fa fa-exclamation-triangle"/>
                                         <span t-esc="c.problem"/>
                                     </p>
+                                    <!-- Le crochet dit « réponse à ce problème » : il ne
+                                         s'affiche donc que lorsqu'un problème est posé.
+                                         Un texte seul est du texte, pas une solution. -->
                                     <p t-if="c.solution" class="o_devops_guide_solution">
-                                        <i class="fa fa-check-circle"/>
+                                        <i t-if="c.problem" class="fa fa-check-circle"/>
                                         <span t-esc="c.solution"/>
                                     </p>
                                     <button t-if="hasButton(c)" class="btn btn-sm o_devops_guide_card_btn"

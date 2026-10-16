@@ -80,6 +80,7 @@
                                             <field name="num"/>
                                             <field name="icon"/>
                                             <field name="title"/>
+                                            <field name="badge"/>
                                             <field name="problem"/>
                                             <field name="solution"/>
                                             <field name="action_xmlid"/>
@@ -102,6 +103,22 @@
                     </notebook>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="view_devops_guide_search" model="ir.ui.view">
+        <field name="name">devops.guide.search</field>
+        <field name="model">devops.guide</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="title"/>
+                <!-- Sans ce filtre, un guide archivé n'est atteignable par
+                     aucun écran : le domaine implicite d'`active` l'exclut
+                     de la liste, et rien ne permet de l'y ramener. -->
+                <filter name="inactive" string="Archived"
+                        domain="[('active', '=', False)]"/>
+            </search>
         </field>
     </record>
 
