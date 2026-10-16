@@ -25,5 +25,12 @@
         "views/devops_guide_views.xml",
         "views/devops_guide_menus.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "erplibre_devops_guide/static/src/guide/guide.scss",
+            "erplibre_devops_guide/static/src/guide/guide.xml",
+            "erplibre_devops_guide/static/src/guide/guide.js",
+        ],
+    },
     "installable": True,
 }

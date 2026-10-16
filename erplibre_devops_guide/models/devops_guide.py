@@ -1,6 +1,6 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class DevopsGuide(models.Model):
@@ -59,6 +59,17 @@ class DevopsGuide(models.Model):
             return self.browse(guide_id).exists()
         return self.browse()
 
+    @api.model
+    def get_page_from_context(self):
+        """Point d'entrée du composant : un appel, une page ou rien.
+
+        Rend `{}` quand le contexte ne désigne aucun guide ou qu'il en
+        désigne un disparu, ce que le composant affiche comme une page
+        vide plutôt qu'en cassant l'écran.
+        """
+        guide = self._resolve_from_context()
+        return guide.get_page() if guide else {}
+
     def get_page(self):
         """Rend la page entière en un seul aller-retour.
 
@@ -103,7 +114,7 @@ class DevopsGuide(models.Model):
                             "url": card.url or "",
                             "action_label": card.resolved_label or "",
                             "count_model": card.count_model or "",
-                            "count_domain": card.count_domain or "",
+                            "count_domain": card._json_domain(),
                         }
                         for card in section.card_ids
                     ],
