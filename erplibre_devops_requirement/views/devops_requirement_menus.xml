@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Menu racine de la famille. erplibre_devops_guide n'en pose PAS
+         un second : il dépend de ce module et accroche sa configuration
+         sous celui-ci. Deux icônes pour un même outil se paient à
+         l'usage. -->
+    <menuitem id="menu_erplibre_devops_requirement"
+              name="Requirements"
+              web_icon="erplibre_devops_requirement,static/description/icon.png"
+              sequence="21"/>
+
+    <menuitem id="menu_devops_requirement"
+              name="Requirements"
+              parent="menu_erplibre_devops_requirement"
+              action="action_devops_requirement"
+              sequence="1"/>
+
+    <menuitem id="menu_devops_requirement_config"
+              name="Configuration"
+              parent="menu_erplibre_devops_requirement"
+              sequence="100"/>
+
+    <menuitem id="menu_devops_requirement_category"
+              name="Domains"
+              parent="menu_devops_requirement_config"
+              action="action_devops_requirement_category"
+              sequence="1"/>
+
+    <menuitem id="menu_devops_requirement_phase"
+              name="Phases"
+              parent="menu_devops_requirement_config"
+              action="action_devops_requirement_phase"
+              sequence="2"/>
+
+</odoo>

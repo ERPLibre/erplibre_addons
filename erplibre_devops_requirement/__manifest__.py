@@ -20,6 +20,9 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/devops_requirement_views.xml",
+        "views/devops_requirement_config_views.xml",
+        "views/devops_requirement_menus.xml",
     ],
     "installable": True,
 }
