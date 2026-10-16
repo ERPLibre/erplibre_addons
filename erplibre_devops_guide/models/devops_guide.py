@@ -21,10 +21,19 @@ class DevopsGuide(models.Model):
     subtitle = fields.Text(string="Subtitle", translate=True)
     # Visite guidée lancée par le premier bouton du héros. Vide : pas de
     # bouton — toutes les pages n'ont pas de visite.
-    tour_name = fields.Char(string="Tour name")
+    tour_name = fields.Char(
+        string="Tour name",
+        help=(
+            "Technical name of a registered tour. Left empty, or with "
+            "web_tour absent, the tour button is not shown."
+        ),
+    )
     tour_label = fields.Char(string="Tour button", translate=True)
     # Identifiant XML ouvert par le second bouton du héros.
-    primary_action = fields.Char(string="Primary action")
+    primary_action = fields.Char(
+        string="Primary action",
+        help="XML id of the action the second hero button opens.",
+    )
     primary_label = fields.Char(string="Primary button", translate=True)
     footer = fields.Text(string="Footer", translate=True)
     footer_small = fields.Char(string="Footer note", translate=True)

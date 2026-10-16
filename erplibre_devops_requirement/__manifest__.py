@@ -14,9 +14,11 @@
     "application": True,
     # Le module ne livre AUCUN requis, AUCUN domaine et AUCUNE phase : ces
     # vocabulaires appartiennent au projet qui l'installe.
+    # `mail` n'est PAS une dépendance : aucun modèle n'hérite de
+    # `mail.thread` ni de `mail.activity.mixin`. L'ajouter pour un fil de
+    # discussion est une décision à prendre avec le champ qui l'emploie.
     "depends": [
         "base",
-        "mail",
     ],
     "data": [
         "security/ir.model.access.csv",
