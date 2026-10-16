@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.erplibre.info</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90" />
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="ERPLibre" string="ERPLibre" name="erplibre_info" groups="base.group_system">
+                    <field name="erplibre_server_actions_allowed" invisible="1" />
+                    <block title="Odoo modules environment" name="erplibre_code_environment">
+                        <setting
+                            string="Current state"
+                            help="Read from the last snapshot: opening this page runs nothing."
+                        >
+                            <div class="mt8">
+                                <div invisible="erplibre_last_snapshot_id">
+                                    <span class="text-muted">No snapshot yet.</span>
+                                </div>
+                                <div invisible="not erplibre_last_snapshot_id">
+                                    <div>
+                                        <span class="o_form_label me-2">ERPLibre</span>
+                                        <field name="erplibre_version" class="oe_inline" />
+                                        <span class="mx-1">·</span>
+                                        <field name="erplibre_commit" class="oe_inline" />
+                                        <span class="mx-1">·</span>
+                                        <field name="erplibre_mode" class="oe_inline" />
+                                    </div>
+                                    <div>
+                                        <span class="o_form_label me-2">Last snapshot</span>
+                                        <field name="erplibre_last_snapshot_date" class="oe_inline" />
+                                    </div>
+                                    <div>
+                                        <field name="erplibre_state_summary" class="oe_inline" />
+                                    </div>
+                                    <div invisible="not erplibre_pending_update_count">
+                                        <span class="o_form_label me-2">Modules to upgrade</span>
+                                        <field name="erplibre_pending_update_count" class="oe_inline" />
+                                    </div>
+                                    <field name="erplibre_last_snapshot_id" invisible="1" />
+                                </div>
+                                <div
+                                    class="alert alert-danger mt8 mb-0"
+                                    role="alert"
+                                    invisible="not erplibre_last_failed_run_id"
+                                >
+                                    <field name="erplibre_last_failed_run_id" invisible="1" />
+                                    <div class="fw-bold">The last snapshot failed:</div>
+                                    <field name="erplibre_last_failed_log" class="text-danger" />
+                                    <button
+                                        name="action_erplibre_open_runs"
+                                        type="object"
+                                        string="Runs"
+                                        class="btn-link p-0"
+                                        icon="fa-arrow-right"
+                                    />
+                                </div>
+                                <div
+                                    class="alert alert-warning mt8 mb-0"
+                                    role="alert"
+                                    invisible="not erplibre_checkout_problem or not (erplibre_snapshot_on_startup or erplibre_snapshot_periodic)"
+                                >
+                                    <div class="fw-bold">Snapshots cannot run:</div>
+                                    <field name="erplibre_checkout_problem" />
+                                </div>
+                                <div class="mt8">
+                                    <button
+                                        name="action_erplibre_capture_now"
+                                        type="object"
+                                        string="Capture now"
+                                        class="btn-primary"
+                                        icon="fa-camera"
+                                    />
+                                    <button
+                                        name="action_erplibre_open_snapshots"
+                                        type="object"
+                                        string="History"
+                                        class="btn-link"
+                                        icon="fa-arrow-right"
+                                    />
+                                </div>
+                            </div>
+                        </setting>
+                        <setting
+                            id="erplibre_snapshot_on_startup"
+                            help="Queue one snapshot each time the server starts."
+                        >
+                            <field name="erplibre_snapshot_on_startup" />
+                        </setting>
+                        <setting
+                            id="erplibre_snapshot_periodic"
+                            help="Take a snapshot at each interval; it is stored only when the code changed."
+                        >
+                            <field name="erplibre_snapshot_periodic" />
+                            <div class="mt8" invisible="not erplibre_snapshot_periodic">
+                                <span class="me-2">Every</span>
+                                <field
+                                    name="erplibre_snapshot_interval_number"
+                                    class="oe_inline text-center"
+                                    style="width: 5ch;"
+                                />
+                                <field name="erplibre_snapshot_interval_type" class="oe_inline ms-2" />
+                            </div>
+                        </setting>
+                        <setting id="erplibre_snapshot_check_dirty" help="Also run git status in every clone (slower).">
+                            <field name="erplibre_snapshot_check_dirty" />
+                        </setting>
+                        <setting
+                            id="erplibre_server_actions"
+                            string="Server actions"
+                            help="Developer mode, Settings group and erplibre_info_allow_server_actions = True in the Odoo configuration file."
+                            groups="base.group_no_one"
+                        >
+                            <div class="mt8" invisible="not erplibre_server_actions_allowed">
+                                <button
+                                    name="action_erplibre_fetch_rebase"
+                                    type="object"
+                                    string="Fetch + rebase from upstream"
+                                    class="btn-secondary"
+                                    icon="fa-code-fork"
+                                />
+                                <button
+                                    name="action_erplibre_restart"
+                                    type="object"
+                                    string="Restart the server"
+                                    class="btn-secondary ms-2"
+                                    icon="fa-power-off"
+                                />
+                                <button
+                                    name="action_erplibre_open_runs"
+                                    type="object"
+                                    string="Runs"
+                                    class="btn-link"
+                                    icon="fa-arrow-right"
+                                />
+                            </div>
+                            <div class="text-muted mt8" invisible="erplibre_server_actions_allowed">
+                                Disabled: set erplibre_info_allow_server_actions = True
+                                in the Odoo configuration file.
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="erplibre_info_config_settings_action" model="ir.actions.act_window">
+        <field name="name">ERPLibre settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'erplibre_info', 'bin_size': False}</field>
+    </record>
+</odoo>

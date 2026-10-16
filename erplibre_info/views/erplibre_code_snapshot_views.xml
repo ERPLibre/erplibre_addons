@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_snapshot_view_list" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.list</field>
+        <field name="model">erplibre.code.snapshot</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0">
+                <header>
+                    <button
+                        name="action_capture_now"
+                        type="object"
+                        string="Capture now"
+                        class="btn-primary"
+                        display="always"
+                    />
+                </header>
+                <field name="date" />
+                <field name="trigger" />
+                <field name="erplibre_commit" />
+                <field name="odoo_version" optional="show" />
+                <field name="mode" optional="show" />
+                <field name="repo_count" optional="show" />
+                <field name="count_conforme" optional="show" />
+                <field name="count_en_avance" optional="hide" />
+                <field name="count_decale" optional="show" />
+                <field name="count_sale" optional="hide" />
+                <field name="count_absent" optional="hide" />
+                <field name="count_hors_manifeste" optional="hide" />
+                <field name="count_erreur" optional="hide" />
+                <field name="changed_repo_count" optional="show" />
+                <field name="pending_update_count" optional="show" />
+                <field name="user_id" optional="hide" />
+                <field name="fingerprint" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.form</field>
+        <field name="model">erplibre.code.snapshot</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <button name="action_capture_now" type="object" string="Capture now" class="btn-primary" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_repos" type="object" class="oe_stat_button" icon="fa-code-fork">
+                            <field name="repo_count" widget="statinfo" string="Repositories" />
+                        </button>
+                        <button name="action_open_modules" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <field name="pending_update_count" widget="statinfo" string="To upgrade" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                        <field name="state_summary" />
+                    </div>
+                    <group>
+                        <group string="ERPLibre">
+                            <field name="erplibre_version" />
+                            <field name="erplibre_commit" />
+                            <field name="erplibre_branch" />
+                            <field name="erplibre_head" />
+                            <field name="erplibre_dirty" invisible="not dirty_checked" />
+                        </group>
+                        <group string="Odoo">
+                            <field name="odoo_version" />
+                            <field name="odoo_python" />
+                            <field name="mode" />
+                            <field name="mode_pinned" />
+                            <field name="mode_total" />
+                            <field name="local_manifest" />
+                        </group>
+                        <group string="Snapshot">
+                            <field name="trigger" />
+                            <field name="user_id" />
+                            <field name="run_id" invisible="not run_id" />
+                            <field name="previous_id" />
+                            <field name="dirty_checked" />
+                            <field name="duration_ms" />
+                            <field name="raw_json" filename="raw_json_filename" />
+                            <field name="raw_json_filename" invisible="1" />
+                        </group>
+                        <group string="Fingerprint" groups="base.group_no_one">
+                            <field name="fingerprint" />
+                            <field name="code_fingerprint" />
+                            <field name="code_module_count" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Changes" name="changes">
+                            <field name="changed_repo_ids" nolabel="1" />
+                            <group invisible="not removed_repo_paths">
+                                <field name="removed_repo_paths" />
+                            </group>
+                        </page>
+                        <page string="Repositories" name="repos">
+                            <field name="repo_ids" nolabel="1" />
+                        </page>
+                        <page string="Pending upgrades" name="pending">
+                            <field name="pending_module_ids" nolabel="1" />
+                        </page>
+                        <page string="Installed modules" name="modules">
+                            <field name="module_ids" nolabel="1" />
+                        </page>
+                        <page string="Errors" name="errors" invisible="not errors">
+                            <field name="errors" nolabel="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_view_search" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.search</field>
+        <field name="model">erplibre.code.snapshot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="erplibre_commit" />
+                <field name="fingerprint" />
+                <filter name="manual" string="Manual" domain="[('trigger', '=', 'manual')]" />
+                <filter name="cron" string="Periodic" domain="[('trigger', '=', 'cron')]" />
+                <filter name="startup" string="Server start" domain="[('trigger', '=', 'startup')]" />
+                <filter name="upgrade" string="Upgrade" domain="[('trigger', '=', 'upgrade')]" />
+                <separator />
+                <filter name="with_changes" string="With changes" domain="[('changed_repo_count', '>', 0)]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_trigger" string="Trigger" context="{'group_by': 'trigger'}" />
+                    <filter name="group_date" string="Date" context="{'group_by': 'date'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_action" model="ir.actions.act_window">
+        <field name="name">Code snapshots</field>
+        <field name="res_model">erplibre.code.snapshot</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No snapshot yet</p>
+            <p>
+                A snapshot records the state of the ERPLibre code behind this
+                database: the commit of each repository, its gap to the
+                manifest, and the installed modules waiting for an upgrade.
+            </p>
+        </field>
+    </record>
+</odoo>

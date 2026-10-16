@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_snapshot_module_view_list" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.module.list</field>
+        <field name="model">erplibre.code.snapshot.module</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" decoration-warning="pending_update">
+                <field name="snapshot_id" optional="hide" />
+                <field name="name" />
+                <field name="module_state" optional="hide" />
+                <field name="installed_version" />
+                <field name="code_version" />
+                <field name="pending_update" />
+                <field name="repo_path" optional="show" />
+                <field name="found_in_code" optional="hide" />
+                <button
+                    name="action_cross_version"
+                    type="object"
+                    string="Other versions"
+                    icon="fa-exchange"
+                    invisible="not repo_line_id"
+                />
+                <field name="repo_line_id" column_invisible="True" />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_module_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.module.form</field>
+        <field name="model">erplibre.code.snapshot.module</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <button
+                        name="action_cross_version"
+                        type="object"
+                        string="Other Odoo versions"
+                        invisible="not repo_line_id"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="module_id" />
+                            <field name="module_state" />
+                            <field name="snapshot_id" />
+                        </group>
+                        <group>
+                            <field name="installed_version" />
+                            <field name="code_version" />
+                            <field name="pending_update" />
+                            <field name="repo_line_id" />
+                            <field name="path" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_module_view_search" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.module.search</field>
+        <field name="model">erplibre.code.snapshot.module</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="snapshot_id" />
+                <field name="repo_line_id" />
+                <filter name="pending" string="Upgrade pending" domain="[('pending_update', '=', True)]" />
+                <filter name="not_found" string="Not found in the code" domain="[('found_in_code', '=', False)]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_snapshot" string="Snapshot" context="{'group_by': 'snapshot_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_module_action" model="ir.actions.act_window">
+        <field name="name">Snapshot installed modules</field>
+        <field name="res_model">erplibre.code.snapshot.module</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

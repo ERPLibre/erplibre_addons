@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <!-- Inactive at install. The settings activate it for the periodic
+         snapshot; a queued run activates it until the run is done. -->
+    <record id="ir_cron_erplibre_code" model="ir.cron">
+        <field name="name">ERPLibre: code environment</field>
+        <field name="model_id" ref="model_erplibre_code_run" />
+        <field name="state">code</field>
+        <field name="code">model._cron_process()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False" />
+    </record>
+</odoo>

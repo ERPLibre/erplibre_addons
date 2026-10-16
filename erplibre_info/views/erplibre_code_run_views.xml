@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_run_view_list" model="ir.ui.view">
+        <field name="name">erplibre.code.run.list</field>
+        <field name="model">erplibre.code.run</field>
+        <field name="arch" type="xml">
+            <list
+                create="0"
+                edit="0"
+                decoration-info="state in ('queued', 'running')"
+                decoration-danger="state == 'failed'"
+            >
+                <field name="create_date" string="Queued" />
+                <field name="run_type" />
+                <field name="trigger" optional="show" />
+                <field name="state" widget="badge" />
+                <field name="user_id" optional="show" />
+                <field name="date_start" optional="hide" />
+                <field name="date_end" optional="show" />
+                <field name="plan_count" optional="show" />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_code_run_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.run.form</field>
+        <field name="model">erplibre.code.run</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <field name="server_actions_allowed" invisible="1" />
+                    <field name="can_apply" invisible="1" />
+                    <button
+                        name="action_refresh"
+                        type="object"
+                        string="Refresh"
+                        invisible="state not in ('queued', 'running')"
+                    />
+                    <button
+                        name="action_apply"
+                        type="object"
+                        string="Apply"
+                        class="btn-primary"
+                        groups="base.group_no_one"
+                        invisible="not can_apply or not server_actions_allowed"
+                    />
+                    <button
+                        name="action_restart_upgrade"
+                        type="object"
+                        string="Upgrade the modules and restart"
+                        class="btn-primary"
+                        groups="base.group_no_one"
+                        invisible="run_type != 'apply' or state != 'done' or not upgrade_module_ids or not server_actions_allowed"
+                    />
+                    <button
+                        name="action_restart"
+                        type="object"
+                        string="Restart the server"
+                        groups="base.group_no_one"
+                        invisible="run_type != 'apply' or state != 'done' or not server_actions_allowed"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div
+                        class="alert alert-warning"
+                        role="alert"
+                        invisible="run_type != 'dry_run' or not apply_note"
+                    >
+                        <field name="apply_note" readonly="1" />
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="run_type" />
+                            <field name="trigger" invisible="run_type != 'snapshot'" />
+                            <field name="user_id" />
+                            <field name="odoo_version" invisible="not odoo_version" />
+                            <field name="parent_id" invisible="not parent_id" />
+                            <field name="snapshot_id" invisible="not snapshot_id" />
+                        </group>
+                        <group>
+                            <field name="create_date" string="Queued" />
+                            <field name="date_start" />
+                            <field name="date_end" />
+                            <field name="exit_code" invisible="run_type not in ('dry_run', 'apply')" />
+                            <field name="pass_dir" invisible="not pass_dir" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Report" name="report" invisible="not report_html">
+                            <field name="report_html" nolabel="1" />
+                        </page>
+                        <page string="Plan" name="plan" invisible="run_type not in ('dry_run', 'apply')">
+                            <group>
+                                <field name="plan_count" />
+                                <field name="plan_paths" />
+                                <field name="left_paths" />
+                            </group>
+                            <field name="child_ids" invisible="run_type != 'dry_run'" />
+                        </page>
+                        <page string="Modules to upgrade" name="modules" invisible="run_type != 'apply'">
+                            <p class="text-muted">
+                                These installed modules are upgraded at the next start
+                                of the server, once marked with "Upgrade the modules
+                                and restart".
+                            </p>
+                            <field name="upgrade_module_ids" invisible="1" />
+                            <h5>Code changed by the apply</h5>
+                            <p class="text-muted">
+                                A file of the module differs between the commit before
+                                and the commit after the apply, whatever its version.
+                            </p>
+                            <field name="code_changed_module_ids" nolabel="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="latest_version" />
+                                    <field name="state" />
+                                </list>
+                            </field>
+                            <h5>Version pending</h5>
+                            <p class="text-muted">
+                                The version of the manifest on disk differs from the
+                                version in the database.
+                            </p>
+                            <field name="version_pending_module_ids" nolabel="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="latest_version" />
+                                    <field name="state" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Log" name="log">
+                            <field name="log" nolabel="1" class="font-monospace" />
+                        </page>
+                        <page string="JSON" name="json" groups="base.group_no_one">
+                            <field name="result_json" nolabel="1" class="font-monospace" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_code_run_view_search" model="ir.ui.view">
+        <field name="name">erplibre.code.run.search</field>
+        <field name="model">erplibre.code.run</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="run_type" />
+                <field name="user_id" />
+                <filter name="running" string="Queued or running" domain="[('state', 'in', ('queued', 'running'))]" />
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Type" context="{'group_by': 'run_type'}" />
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_code_run_action" model="ir.actions.act_window">
+        <field name="name">Code runs</field>
+        <field name="res_model">erplibre.code.run</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No run yet</p>
+            <p>
+                A run is a long action on the code: a snapshot in the
+                background, the dry run and the apply step of a fetch + rebase,
+                a server restart.
+            </p>
+        </field>
+    </record>
+</odoo>

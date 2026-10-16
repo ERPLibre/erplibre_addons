@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_erplibre_code_snapshot_system,erplibre.code.snapshot system,model_erplibre_code_snapshot,base.group_system,1,1,1,1
+access_erplibre_code_snapshot_repo_system,erplibre.code.snapshot.repo system,model_erplibre_code_snapshot_repo,base.group_system,1,1,1,1
+access_erplibre_code_snapshot_module_system,erplibre.code.snapshot.module system,model_erplibre_code_snapshot_module,base.group_system,1,1,1,1
+access_erplibre_code_cross_version_system,erplibre.code.cross.version system,model_erplibre_code_cross_version,base.group_system,1,1,1,1
+access_erplibre_code_run_system,erplibre.code.run system,model_erplibre_code_run,base.group_system,1,1,1,1
+access_erplibre_code_confirm_wizard_system,erplibre.code.confirm.wizard system,model_erplibre_code_confirm_wizard,base.group_system,1,1,1,1
