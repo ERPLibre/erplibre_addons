@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_snapshot_repo_view_list" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.repo.list</field>
+        <field name="model">erplibre.code.snapshot.repo</field>
+        <field name="arch" type="xml">
+            <list
+                create="0"
+                edit="0"
+                decoration-success="state == 'conforme'"
+                decoration-info="state == 'en_avance'"
+                decoration-warning="state in ('decale', 'sale', 'hors_manifeste')"
+                decoration-danger="state in ('absent', 'erreur')"
+            >
+                <field name="snapshot_date" optional="hide" />
+                <field name="path" />
+                <field name="odoo_version" optional="show" />
+                <field name="state" widget="badge" />
+                <field name="branch" optional="show" />
+                <field name="head_short" />
+                <field name="ahead" optional="show" />
+                <field name="behind" optional="show" />
+                <field name="dirty" optional="hide" />
+                <field name="module_count" optional="show" />
+                <field name="change" optional="show" />
+                <field name="previous_head_short" optional="hide" />
+                <field name="upstream_remote" optional="hide" />
+                <field name="upstream_branch" optional="hide" />
+                <field name="error" optional="hide" />
+                <button
+                    name="action_load_commits"
+                    type="object"
+                    string="Commits"
+                    icon="fa-list"
+                    invisible="change != 'changed'"
+                />
+                <button
+                    name="action_cross_version"
+                    type="object"
+                    string="Other versions"
+                    icon="fa-exchange"
+                    invisible="not odoo_version"
+                />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_repo_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.repo.form</field>
+        <field name="model">erplibre.code.snapshot.repo</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <button
+                        name="action_load_commits"
+                        type="object"
+                        string="Load the commits"
+                        class="btn-primary"
+                        invisible="change != 'changed'"
+                    />
+                    <button
+                        name="action_cross_version"
+                        type="object"
+                        string="Other Odoo versions"
+                        invisible="not odoo_version"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="path" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Manifest">
+                            <field name="snapshot_id" />
+                            <field name="name" />
+                            <field name="remote" />
+                            <field name="url" />
+                            <field name="revision" />
+                            <field name="manifest_branch" />
+                            <field name="freeze_revision" />
+                        </group>
+                        <group string="Clone">
+                            <field name="head" />
+                            <field name="branch" />
+                            <field name="target" />
+                            <field name="ahead" />
+                            <field name="behind" />
+                            <field name="alignment" />
+                            <field name="dirty" />
+                            <field name="error" invisible="not error" />
+                        </group>
+                        <group string="Upstream" invisible="not upstream_remote and not upstream_url">
+                            <field name="upstream_remote" />
+                            <field name="upstream_name" />
+                            <field name="upstream_branch" />
+                            <field name="upstream_freeze_revision" />
+                            <field name="upstream_declared" />
+                            <field name="upstream_url" />
+                        </group>
+                        <group string="Since the previous snapshot">
+                            <field name="change" />
+                            <field name="previous_head" invisible="not previous_head" />
+                            <field name="between_count" invisible="not between_loaded" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Commits" name="commits" invisible="not between_loaded">
+                            <field name="between_html" nolabel="1" />
+                        </page>
+                        <page string="Installed modules" name="modules">
+                            <field name="module_line_ids" nolabel="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="installed_version" />
+                                    <field name="code_version" />
+                                    <field name="pending_update" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_repo_view_search" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.repo.search</field>
+        <field name="model">erplibre.code.snapshot.repo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="path" />
+                <field name="snapshot_id" />
+                <field name="head" />
+                <filter
+                    name="active_version"
+                    string="Running Odoo version"
+                    domain="[('is_active_version', '=', True)]"
+                />
+                <separator />
+                <filter
+                    name="not_conforming"
+                    string="Not matching the manifest"
+                    domain="[('state', '!=', 'conforme')]"
+                />
+                <filter name="changed" string="HEAD moved" domain="[('change', '=', 'changed')]" />
+                <filter name="dirty" string="Modified" domain="[('dirty', '=', True)]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}" />
+                    <filter name="group_version" string="Odoo version" context="{'group_by': 'odoo_version'}" />
+                    <filter name="group_snapshot" string="Snapshot" context="{'group_by': 'snapshot_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_repo_action" model="ir.actions.act_window">
+        <field name="name">Snapshot repositories</field>
+        <field name="res_model">erplibre.code.snapshot.repo</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active_version': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,1841 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_info
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-16 12:33+0000\n"
+"PO-Revision-Date: 2026-10-16 12:33+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "%(command)s cannot start: %(error)s"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "%(command)s did not finish within %(seconds)s seconds."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/runner.py:0
+msgid "%(command)s failed (exit code %(code)s): %(detail)s"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "%(count)s files"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "%(shown)s of %(count)s files are listed."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"me-2\">Every</span>"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"mx-1\">·</span>"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"o_form_label me-2\">ERPLibre</span>"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"o_form_label me-2\">Last snapshot</span>"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"o_form_label me-2\">Modules to upgrade</span>"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"text-muted\">No snapshot yet.</span>"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A fetch + rebase is already queued or running."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid ""
+"A file of the module differs between the commit before\n"
+"                                and the commit after the apply, whatever its version."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A newer dry run exists: apply that one."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_run_action
+msgid ""
+"A run is a long action on the code: a snapshot in the\n"
+"                background, the dry run and the apply step of a fetch + rebase,\n"
+"                a server restart."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_snapshot_action
+msgid ""
+"A snapshot records the state of the ERPLibre code behind this\n"
+"                database: the commit of each repository, its gap to the\n"
+"                manifest, and the installed modules waiting for an upgrade."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_code_cross_version_action
+#: model:ir.ui.menu,name:erplibre_info.erplibre_code_cross_version_menu
+msgid "Across Odoo versions"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__action
+msgid "Action"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_res_config_settings__erplibre_snapshot_periodic
+msgid ""
+"Activate the cron that takes a snapshot at each interval. A snapshot is "
+"stored only when the code changed."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Added"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_en_avance
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__ahead
+msgid "Ahead"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__en_avance
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__en_avance
+msgid "Ahead of the manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__alignment
+msgid "Alignment"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Already ported"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Also run git status in every clone (slower)."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_res_config_settings__erplibre_snapshot_check_dirty
+msgid ""
+"Also run git status in every clone: slower, and shows uncommitted changes."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__child_ids
+msgid "Applied"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Apply"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__apply_note
+msgid "Apply Note"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__apply
+msgid "Apply the rebase"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid "Author"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__behind
+msgid "Behind"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__between_json
+msgid "Between Json"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__between_loaded
+msgid "Between Loaded"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__branch
+msgid "Branch"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__mode__branches
+msgid "Branches"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot__mode
+#: model:ir.model.fields,help:erplibre_info.field_res_config_settings__erplibre_mode
+msgid "Branches: the manifest follows branches. Frozen: it pins commits."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__can_apply
+msgid "Can Apply"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_list
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Capture now"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__changed_repo_count
+msgid "Changed repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__changed_repo_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Changes"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_snapshot_check_dirty
+msgid "Check modified trees"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Clone"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__code_fingerprint
+msgid "Code Fingerprint"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__code_version
+msgid "Code Version"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__code_changed_module_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Code changed by the apply"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Code difference"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot__fingerprint
+msgid ""
+"Code fingerprint plus the installed module versions: two snapshots of the "
+"same state share it."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_code_run_action
+#: model:ir.ui.menu,name:erplibre_info.erplibre_code_run_menu
+msgid "Code runs"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_code_snapshot_action
+#: model:ir.ui.menu,name:erplibre_info.erplibre_code_snapshot_menu
+msgid "Code snapshots"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid "Commit"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__between_count
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_list
+msgid "Commits"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__between_html
+msgid "Commits between"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__to_port_count
+msgid "Commits to port"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid "Confirm"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__executor__cron
+msgid "Cron"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Current state"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__database_name
+msgid "Database Name"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__snapshot_date
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Date"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Dated branch"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_snapshot_interval_type__days
+msgid "Days"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Decision"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid ""
+"Developer mode, Settings group and erplibre_info_allow_server_actions = True"
+" in the Odoo configuration file."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid ""
+"Disabled: set erplibre_info_allow_server_actions = True\n"
+"                                in the Odoo configuration file."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__done
+msgid "Done"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__parent_id
+msgid "Dry run"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__duration_ms
+msgid "Duration (ms)"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.ui.menu,name:erplibre_info.erplibre_info_menu_technical
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "ERPLibre"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__erplibre_head
+msgid "ERPLibre HEAD"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__erplibre_branch
+msgid "ERPLibre branch"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_checkout_problem
+msgid "ERPLibre checkout problem"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_cross_version
+msgid "ERPLibre code across Odoo versions"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_run
+msgid "ERPLibre code run"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_snapshot
+msgid "ERPLibre code snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_snapshot_module
+msgid "ERPLibre code snapshot installed module"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_snapshot_repo
+msgid "ERPLibre code snapshot repository"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__erplibre_commit
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_commit
+msgid "ERPLibre commit"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_mode
+msgid "ERPLibre mode"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__erplibre_dirty
+msgid "ERPLibre modified"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_pending_update_count
+msgid "ERPLibre modules to upgrade"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_state_summary
+msgid "ERPLibre repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_confirm_wizard
+msgid "ERPLibre server action confirmation"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_info_config_settings_action
+msgid "ERPLibre settings"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__erplibre_version
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_version
+msgid "ERPLibre version"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.server,name:erplibre_info.ir_cron_erplibre_code_ir_actions_server
+msgid "ERPLibre: code environment"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__date_end
+msgid "Ended"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_server_actions_allowed
+msgid "Erplibre Server Actions Allowed"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__error
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__error
+msgid "Error"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__errors
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Errors"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__executor
+msgid "Executor"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__exit_code
+msgid "Exit Code"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__failed
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Failed"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Fetch + rebase from upstream"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__apply
+msgid "Fetch + rebase: apply"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__dry_run
+msgid "Fetch + rebase: dry run"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "File"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Files"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__fingerprint
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Fingerprint"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__left_paths
+msgid ""
+"Forks with a predicted conflict: they are resolved in the TODO menu, never "
+"from Odoo."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_confirm_wizard__plan_paths
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__plan_paths
+msgid "Forks without predicted conflict, one path per line."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__found_in_code
+msgid "Found In Code"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__freeze_revision
+msgid "Freeze Revision"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "From"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__mode__frozen
+msgid "Frozen"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__full_diff
+msgid "Full Diff"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__full_diff_date
+msgid "Full Diff Date"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__full_diff_truncated
+msgid "Full Diff Truncated"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
+msgid "Full diff"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_module_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Group By"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__head
+msgid "HEAD"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__head_short
+msgid "HEAD (short)"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__change__changed
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+msgid "HEAD moved"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Here"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "History"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "History side by side"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_snapshot_interval_type__hours
+msgid "Hours"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__understood
+msgid "I understand what this action does"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__id
+msgid "ID"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__installed_version
+msgid "Installed Version"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__module_ids
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__module_line_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Installed modules"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__data_json
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__raw_json
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "JSON"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__result_json
+msgid "JSON result"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_last_snapshot_id
+msgid "Last ERPLibre snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_last_snapshot_date
+msgid "Last ERPLibre snapshot date"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_last_failed_log
+msgid "Last ERPLibre snapshot failure"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_last_failed_run_id
+msgid "Last failed ERPLibre snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Load the commits"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
+msgid "Load the full diff"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__local_manifest
+msgid "Local Manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__log
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Log"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__manifest_branch
+msgid "Manifest Branch"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__mode_total
+msgid "Manifest repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__trigger__manual
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__trigger__manual
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Manual"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Match"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__conforme
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__conforme
+msgid "Matches the manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_conforme
+msgid "Matching"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_absent
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__absent
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__absent
+msgid "Missing"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__mode
+msgid "Mode"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_sale
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__dirty
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__sale
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__sale
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+msgid "Modified"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__dirty_checked
+msgid "Modified trees checked"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__module_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__module_id
+msgid "Module"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__module_state
+msgid "Module state"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__module_count
+msgid "Modules"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__code_module_count
+msgid "Modules in the code"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Modules marked to upgrade: %(names)s"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__module_ids
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__upgrade_module_ids
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__pending_update_count
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Modules to upgrade"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__name
+msgid "Name"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__change__new
+msgid "New"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "No difference."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "No dry run to apply."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "No other Odoo version of this checkout holds this path."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_module.py:0
+msgid "No repository of the manifest holds this module."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_run_action
+msgid "No run yet"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_snapshot_action
+msgid "No snapshot yet"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "None."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Not cloned."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_module_view_search
+msgid "Not found in the code"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_hors_manifeste
+msgid "Not in manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__hors_manifeste
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__hors_manifeste
+msgid "Not in the manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+msgid "Not matching the manifest"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_cross_version_action
+msgid "Nothing compared yet"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Odoo"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Odoo %(version)s"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Odoo %(version)s (here)"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__odoo_version
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__odoo_version
+msgid "Odoo Version"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Odoo modules environment"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__odoo_version
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+msgid "Odoo version"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_decale
+msgid "Off"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__decale
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__decale
+msgid "Off the manifest"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid ""
+"Only some modules are shown, those that differ first: choose a module for "
+"its full history."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Only the Settings administrators run server actions."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid "Only the first %(max)s commits are shown."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_cross_version_action
+msgid ""
+"Open a repository or an installed module of a snapshot and\n"
+"                click \"Other Odoo versions\"."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_module_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Other Odoo versions"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_cross_version__other_versions
+msgid "Other Odoo versions that hold the path."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__other_versions
+msgid "Other Versions"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_module_view_list
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_list
+msgid "Other versions"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Our commits were read up to the limit: the list may be incomplete."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Ours"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__pass_dir
+msgid "Pass record"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__path
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__path
+msgid "Path"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__pending_module_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Pending upgrades"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__trigger__cron
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__trigger__cron
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Periodic"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_snapshot_periodic
+msgid "Periodic snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__mode_pinned
+msgid "Pinned repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Plan"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__plan_count
+msgid "Plan Count"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__previous_head
+msgid "Previous HEAD"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__previous_head_short
+msgid "Previous Head Short"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__previous_id
+msgid "Previous snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__name
+msgid "Project"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__odoo_python
+msgid "Python version"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Queue one snapshot each time the server starts."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_res_config_settings__erplibre_snapshot_on_startup
+msgid ""
+"Queue one snapshot each time the server starts. It runs in the background, "
+"after the registry is loaded."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__queued
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_list
+msgid "Queued"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Queued or running"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__raw_json_filename
+msgid "Raw Json Filename"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Read from the last snapshot: opening this page runs nothing."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Reason / conflicts"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Refresh"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__remote
+msgid "Remote"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "Removed"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__removed_repo_paths
+msgid "Removed repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Report"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__report_html
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__report_html
+msgid "Report Html"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__repo_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__left_paths
+msgid "Repositories left to the TODO menu"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__plan_paths
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__plan_paths
+msgid "Repositories to apply"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__repo_path
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__repo_line_id
+msgid "Repository"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__repo_count
+msgid "Repository count"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__repo_path
+msgid "Repository path"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__user_id
+msgid "Requested by"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Restart requested by %(user)s."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__restart
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Restart the server"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Restarting"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Result"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__revision
+msgid "Revision"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__run_id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__run_id
+msgid "Run"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__running
+msgid "Running"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__is_active_version
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+msgid "Running Odoo version"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Runs"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__server_actions_allowed
+msgid "Server Actions Allowed"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Server actions"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled. Set %(flag)s = True in the Odoo configuration "
+"file to allow them."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Server actions require the developer mode."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__restart
+msgid "Server restart"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__trigger__startup
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__trigger__startup
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Server start"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.ui.menu,name:erplibre_info.erplibre_info_settings_menu
+msgid "Settings"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__change
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Since the previous snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__snapshot_id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__snapshot_id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__snapshot_id
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__snapshot
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_module_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "Snapshot"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Snapshot %(name)s created."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_snapshot_on_startup
+msgid "Snapshot at server start"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_snapshot_interval_number
+msgid "Snapshot every"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_code_snapshot_module_action
+#: model:ir.ui.menu,name:erplibre_info.erplibre_code_snapshot_module_menu
+msgid "Snapshot installed modules"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_snapshot_interval_type
+msgid "Snapshot interval unit"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_code_snapshot_repo_action
+#: model:ir.ui.menu,name:erplibre_info.erplibre_code_snapshot_repo_menu
+msgid "Snapshot repositories"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Snapshots cannot run:"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__date_start
+msgid "Started"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__state
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__state
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_search
+msgid "State"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__state_summary
+msgid "State Summary"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid "Subject"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "TODO menu"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid ""
+"Take a snapshot at each interval; it is stored only when the code changed."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__target
+msgid "Target"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__name
+msgid "Technical name"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"The ERPLibre checkout was not found. Set the system parameter %(param)s to "
+"the directory that holds %(script)s."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "The ERPLibre cron is missing."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "The ERPLibre interpreter %(python)s is missing."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "The code did not change: no new snapshot."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot_module__pending_update
+msgid ""
+"The code on disk carries another version than the database: the module waits"
+" for an upgrade (-u)."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"The dry run is out of date: the upstream changed the list of repositories to"
+" apply, or the commits shown. Nothing was written; run a new dry run."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "The last snapshot failed:"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__upgrade_module_ids
+msgid ""
+"The modules whose code the apply changed, plus those whose version waits for"
+" an upgrade."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid "The previous HEAD is no longer in the clone."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid ""
+"The previous HEAD is not an ancestor: %(count)s commits left the history."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid ""
+"The repositories below are rebased on their upstream, each in\n"
+"                    a new dated branch. A repository that conflicts is put back\n"
+"                    where it was. Nothing is pushed."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot_repo__is_active_version
+msgid ""
+"The repository lies under the tree of the Odoo version that runs this "
+"database."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "The script %(script)s is missing from the ERPLibre checkout."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "The server restarts. Reload the page in a few seconds."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid ""
+"The server stops and starts again: every user loses the\n"
+"                    request in progress."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "The typed name is not the name of this database."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "The upstream moved since this dry run: run a new dry run."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid ""
+"The version of the manifest on disk differs from the\n"
+"                                version in the database."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "There"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid ""
+"These installed modules are upgraded at the next start\n"
+"                                of the server, once marked with \"Upgrade the modules\n"
+"                                and restart\"."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "This dry run has nothing left to apply."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+msgid "This repository has no previous HEAD to compare."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "Tick the box to confirm."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "To"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
+msgid "To upgrade"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__trigger
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__trigger
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Trigger"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__run_type
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Type"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__typed_database_name
+msgid "Type the database name"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__url
+msgid "URL"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__change__same
+msgid "Unchanged"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_erreur
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__erreur
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__erreur
+msgid "Unreadable"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__trigger__upgrade
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__trigger__upgrade
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "Upgrade"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__pending_update
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_module_view_search
+msgid "Upgrade pending"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Upgrade the modules and restart"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__restart_upgrade
+msgid "Upgrade the modules and restart the server"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Upstream"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__upstream_branch
+msgid "Upstream Branch"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__upstream_declared
+msgid "Upstream Declared"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__upstream_name
+msgid "Upstream Name"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__upstream_remote
+msgid "Upstream Remote"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__upstream_url
+msgid "Upstream URL"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Upstream ahead"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__upstream_freeze_revision
+msgid "Upstream base"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Upstream remotes not fetched:"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__user_id
+msgid "User"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Verdict"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot_module__code_version
+msgid "Version of the manifest on disk, as Odoo stores it."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__version_pending_module_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Version pending"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot_module__installed_version
+msgid "Version recorded in the database."
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_snapshot_interval_type__weeks
+msgid "Weeks"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__executor
+msgid ""
+"Who executes the queued run: the ERPLibre cron, or a queue_job job. Each one"
+" only takes its own runs."
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_search
+msgid "With changes"
+msgstr ""
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_search
+msgid "With commits to port"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "absent"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "applied"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "fork"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "not a fork"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "not a fork: no upstream base separates our commits"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__executor__queue_job
+msgid "queue_job"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+msgid "the upstream base is unknown (shallow clone or upstream not fetched)"
+msgstr ""

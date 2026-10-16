@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_confirm_wizard_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.confirm.wizard.form</field>
+        <field name="model">erplibre.code.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="action" invisible="1" />
+                <div class="alert alert-warning" role="alert" invisible="action != 'apply'">
+                    The repositories below are rebased on their upstream, each in
+                    a new dated branch. A repository that conflicts is put back
+                    where it was. Nothing is pushed.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action == 'apply'">
+                    The server stops and starts again: every user loses the
+                    request in progress.
+                </div>
+                <group>
+                    <field name="run_id" invisible="not run_id" />
+                    <field name="plan_paths" invisible="action != 'apply'" />
+                    <field name="module_ids" widget="many2many_tags" invisible="action != 'restart_upgrade'" />
+                    <field name="database_name" />
+                    <field name="typed_database_name" />
+                    <field name="understood" />
+                </group>
+                <footer>
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Confirm"
+                        class="btn-danger"
+                        invisible="not understood"
+                    />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
