@@ -179,6 +179,21 @@
         font-weight: 700;
         margin-bottom: 0.6rem;
     }
+    // La pastille reprend --dg-warn, déjà la couleur de l'alerte : elle
+    // signale sans ajouter une onzième variable au contrat du thème.
+    .o_devops_guide_card_badge {
+        margin-left: 0.5rem;
+        padding: 0.1rem 0.45rem;
+        border-radius: 999px;
+        background: var(--dg-warn);
+        color: var(--dg-bg);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
     .o_devops_guide_problem,
     .o_devops_guide_solution {
         font-size: 0.9rem;

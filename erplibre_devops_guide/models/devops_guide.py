@@ -117,6 +117,7 @@ class DevopsGuide(models.Model):
                             "num": card.num or "",
                             "icon": card.icon or "",
                             "title": card.title or "",
+                            "badge": card.badge or "",
                             "problem": card.problem or "",
                             "solution": card.solution or "",
                             "action_xmlid": card.action_xmlid or "",
