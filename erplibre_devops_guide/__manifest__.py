@@ -22,6 +22,8 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/devops_guide_views.xml",
+        "views/devops_guide_menus.xml",
     ],
     "installable": True,
 }

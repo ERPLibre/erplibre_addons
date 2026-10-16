@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record id="view_devops_guide_list" model="ir.ui.view">
+        <field name="name">devops.guide.list</field>
+        <field name="model">devops.guide</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="title"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_devops_guide_form" model="ir.ui.view">
+        <field name="name">devops.guide.form</field>
+        <field name="model">devops.guide</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_preview" type="object" string="Preview"
+                            class="btn-primary" icon="fa-eye"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Internal name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Hero">
+                            <field name="eyebrow"/>
+                            <field name="title"/>
+                            <field name="subtitle"/>
+                        </group>
+                        <group string="Buttons">
+                            <field name="tour_name"/>
+                            <field name="tour_label"/>
+                            <field name="primary_action"/>
+                            <field name="primary_label"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Statistics" name="stats">
+                            <field name="stat_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="num"/>
+                                    <field name="label"/>
+                                    <field name="count_model"/>
+                                    <field name="count_domain"/>
+                                    <field name="total_domain"/>
+                                    <field name="action_xmlid"/>
+                                    <field name="value" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Sections" name="sections">
+                            <field name="section_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="kind"/>
+                                    <field name="num"/>
+                                    <field name="title"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="kind"/>
+                                        <field name="num"/>
+                                        <field name="title"/>
+                                    </group>
+                                    <field name="intro" widget="html"/>
+                                    <field name="card_ids">
+                                        <list editable="bottom">
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="num"/>
+                                            <field name="icon"/>
+                                            <field name="title"/>
+                                            <field name="problem"/>
+                                            <field name="solution"/>
+                                            <field name="action_xmlid"/>
+                                            <field name="url"/>
+                                            <field name="action_label"/>
+                                            <field name="count_model"/>
+                                            <field name="count_domain"/>
+                                        </list>
+                                    </field>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Footer" name="footer">
+                            <group>
+                                <field name="footer"/>
+                                <field name="footer_small"/>
+                                <field name="active"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_devops_guide" model="ir.actions.act_window">
+        <field name="name">Guides</field>
+        <field name="res_model">devops.guide</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
