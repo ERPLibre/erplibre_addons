@@ -38,9 +38,23 @@ class DevopsGuideCard(models.Model):
     title = fields.Char(string="Title", translate=True)
     problem = fields.Text(string="Problem", translate=True)
     solution = fields.Text(string="Solution", translate=True)
-    action_xmlid = fields.Char(string="Action")
-    url = fields.Char(string="URL")
-    action_label = fields.Char(string="Button label", translate=True)
+    action_xmlid = fields.Char(
+        string="Action",
+        help="XML id of an action, e.g. crm.crm_lead_action_pipeline.",
+    )
+    url = fields.Char(
+        string="URL",
+        help="Opened in a new tab, and takes precedence over the action.",
+    )
+    action_label = fields.Char(
+        string="Button label",
+        translate=True,
+        help=(
+            "The marker {count} is replaced by the counted figure when a "
+            "counted model is set, so the label stays true as data changes. "
+            "Without a counted model the marker is left as written."
+        ),
+    )
     resolved_label = fields.Char(
         string="Resolved label", compute="_compute_resolved_label"
     )

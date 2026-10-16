@@ -24,9 +24,19 @@ class DevopsGuideStat(models.Model):
         index=True,
     )
     sequence = fields.Integer(default=10)
-    num = fields.Char(string="Literal value", translate=True)
+    num = fields.Char(
+        string="Literal value",
+        translate=True,
+        help=(
+            "Shown as written when no counted model is set. Ignored as soon "
+            "as one is, the figure being counted instead."
+        ),
+    )
     label = fields.Char(string="Label", translate=True)
-    action_xmlid = fields.Char(string="Action")
+    action_xmlid = fields.Char(
+        string="Action",
+        help="XML id of an action; without it the figure is not clickable.",
+    )
     total_domain = fields.Char(
         string="Total domain",
         help="When set, the value reads as a ratio: counted / total.",

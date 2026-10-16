@@ -15,7 +15,16 @@ class DevopsRequirementClassifier(models.AbstractModel):
     _description = "Requirement classification axis"
     _order = "sequence, code"
 
-    code = fields.Char(string="Code", required=True, index=True)
+    code = fields.Char(
+        string="Code",
+        required=True,
+        index=True,
+        help=(
+            "Stable identifier used by data files and by the domains of "
+            "counted figures. Renaming it silently breaks every count that "
+            "matches on it."
+        ),
+    )
     name = fields.Char(string="Name", required=True, translate=True)
     sequence = fields.Integer(default=10)
 
