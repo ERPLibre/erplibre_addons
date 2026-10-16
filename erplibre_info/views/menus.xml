@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <menuitem
+        id="erplibre_info_menu_technical"
+        name="ERPLibre"
+        parent="base.menu_custom"
+        groups="base.group_system"
+        sequence="200"
+    >
+        <menuitem
+            id="erplibre_code_snapshot_menu"
+            name="Code snapshots"
+            action="erplibre_code_snapshot_action"
+            sequence="10"
+        />
+        <menuitem
+            id="erplibre_code_snapshot_repo_menu"
+            name="Snapshot repositories"
+            action="erplibre_code_snapshot_repo_action"
+            sequence="20"
+        />
+        <menuitem
+            id="erplibre_code_snapshot_module_menu"
+            name="Snapshot installed modules"
+            action="erplibre_code_snapshot_module_action"
+            sequence="30"
+        />
+        <menuitem
+            id="erplibre_code_cross_version_menu"
+            name="Across Odoo versions"
+            action="erplibre_code_cross_version_action"
+            sequence="40"
+        />
+        <menuitem id="erplibre_code_run_menu" name="Code runs" action="erplibre_code_run_action" sequence="50" />
+        <menuitem
+            id="erplibre_info_settings_menu"
+            name="Settings"
+            action="erplibre_info_config_settings_action"
+            sequence="90"
+        />
+    </menuitem>
+</odoo>
