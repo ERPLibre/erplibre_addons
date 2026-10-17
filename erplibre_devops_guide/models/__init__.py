@@ -8,3 +8,4 @@ from . import devops_guide
 from . import devops_guide_section
 from . import devops_guide_card
 from . import devops_guide_stat
+from . import devops_requirement

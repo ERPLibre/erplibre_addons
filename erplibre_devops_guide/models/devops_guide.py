@@ -1,6 +1,8 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import api, fields, models
+from collections import defaultdict
+
+from odoo import _, api, fields, models
 
 
 class DevopsGuide(models.Model):
@@ -19,13 +21,15 @@ class DevopsGuide(models.Model):
     eyebrow = fields.Char(string="Eyebrow", translate=True)
     title = fields.Char(string="Title", required=True, translate=True)
     subtitle = fields.Text(string="Subtitle", translate=True)
-    # Visite guidée lancée par le premier bouton du héros. Vide : pas de
-    # bouton — toutes les pages n'ont pas de visite.
+    # Visite guidée lancée par le premier bouton du héros. Vide, ou absente
+    # du registre JS des visites : pas de bouton — toutes les pages n'ont
+    # pas de visite, et un bouton qui ne lance rien n'est pas montré.
     tour_name = fields.Char(
         string="Tour name",
         help=(
-            "Technical name of a registered tour. Left empty, or with "
-            "web_tour absent, the tour button is not shown."
+            "Technical name of a registered tour. Left empty, or unknown to "
+            "the tour registry of the web client, the tour button is not "
+            "shown."
         ),
     )
     tour_label = fields.Char(string="Tour button", translate=True)
@@ -84,16 +88,28 @@ class DevopsGuide(models.Model):
 
         Chaque valeur passe par `or ""` : un Char, un Text, un Html ou un
         Many2one vide se relit False côté Python, et un False rendu au
-        navigateur s'affiche « false » dans la page.
+        navigateur s'affiche « false ». Une carte réservée à des groupes
+        dont l'utilisateur n'est pas membre n'est pas rendue : la règle
+        d'accès des cartes en décide. Les cartes viennent d'une recherche
+        et non de `card_ids` : le cache d'un One2many est partagé par les
+        environnements d'une transaction, et une valeur lue par un autre
+        utilisateur, ou en sudo, ne refléterait pas les droits du lecteur.
         """
         self.ensure_one()
+        cards_by_section = defaultdict(list)
+        for card in self.env["devops.guide.card"].search(
+            [("section_id", "in", self.section_ids.ids)]
+        ):
+            cards_by_section[card.section_id.id].append(card)
         return {
             "id": self.id,
             "eyebrow": self.eyebrow or "",
             "title": self.title or "",
             "subtitle": self.subtitle or "",
             "tour_name": self.tour_name or "",
-            "tour_label": self.tour_label or "",
+            # Le repli est traduit ici, côté serveur : une chaîne écrite en
+            # dur dans une expression du gabarit n'est jamais extraite.
+            "tour_label": self.tour_label or _("Start the tour"),
             "primary_action": self.primary_action or "",
             "primary_label": self.primary_label or "",
             "footer": self.footer or "",
@@ -113,20 +129,8 @@ class DevopsGuide(models.Model):
                     "title": section.title or "",
                     "intro": section.intro or "",
                     "cards": [
-                        {
-                            "num": card.num or "",
-                            "icon": card.icon or "",
-                            "title": card.title or "",
-                            "badge": card.badge or "",
-                            "problem": card.problem or "",
-                            "solution": card.solution or "",
-                            "action_xmlid": card.action_xmlid or "",
-                            "url": card.url or "",
-                            "action_label": card.resolved_label or "",
-                            "count_model": card.count_model or "",
-                            "count_domain": card._json_domain(),
-                        }
-                        for card in section.card_ids
+                        card._get_page_card()
+                        for card in cards_by_section[section.id]
                     ],
                 }
                 for section in self.section_ids

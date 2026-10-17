@@ -20,10 +20,12 @@
                         <p t-if="state.page.subtitle" class="o_devops_guide_hero_sub"
                            t-esc="state.page.subtitle"/>
                         <div class="o_devops_guide_hero_actions">
-                            <button t-if="canStartTour" class="btn btn-lg o_devops_guide_btn_primary"
-                                    t-on-click="() => this.startTour()">
+                            <!-- Le libellé de repli vient traduit du serveur. -->
+                            <button t-if="canStartTour(state.page.tour_name)"
+                                    class="btn btn-lg o_devops_guide_btn_primary"
+                                    t-on-click="() => this.startTour(state.page.tour_name)">
                                 <i class="fa fa-play me-2"/>
-                                <t t-esc="state.page.tour_label or 'Start the tour'"/>
+                                <t t-esc="state.page.tour_label"/>
                             </button>
                             <button t-if="state.page.primary_action"
                                     class="btn btn-lg o_devops_guide_btn_ghost"
@@ -70,6 +72,7 @@
                                     <div t-if="c.icon" class="o_devops_guide_card_icon">
                                         <i t-att-class="'fa ' + c.icon"/>
                                     </div>
+                                    <t t-call="devops_guide.CardPills"/>
                                     <h3 t-if="c.title" class="o_devops_guide_card_title">
                                         <t t-esc="c.title"/>
                                         <span t-if="c.badge" class="o_devops_guide_card_badge"
@@ -86,11 +89,7 @@
                                         <i t-if="c.problem" class="fa fa-check-circle"/>
                                         <span t-esc="c.solution"/>
                                     </p>
-                                    <button t-if="hasButton(c)" class="btn btn-sm o_devops_guide_card_btn"
-                                            t-on-click="() => this.openCard(c)">
-                                        <span t-esc="c.action_label"/>
-                                        <i class="fa fa-arrow-right ms-1"/>
-                                    </button>
+                                    <t t-call="devops_guide.CardActions"/>
                                 </div>
                             </t>
                         </div>
@@ -99,8 +98,10 @@
                             <t t-foreach="section.cards" t-as="c" t-key="c_index">
                                 <div class="o_devops_guide_step">
                                     <div class="o_devops_guide_step_num" t-esc="c.num"/>
+                                    <t t-call="devops_guide.CardPills"/>
                                     <h4 class="o_devops_guide_step_title" t-esc="c.title"/>
                                     <p class="o_devops_guide_step_text" t-esc="c.solution"/>
+                                    <t t-call="devops_guide.CardActions"/>
                                 </div>
                             </t>
                         </div>
@@ -113,6 +114,59 @@
                        t-esc="state.page.footer_small"/>
                 </footer>
             </t>
+        </div>
+    </t>
+
+    <!-- Pastilles d'une carte rattachée à un requis : son code et son
+         niveau MoSCoW, puis l'état de ses tests, coloré par état. Une
+         carte sans requis reçoit un `requirement` aux clés vides et ne
+         rend aucune pastille. Lit `c` dans la portée de l'appelant. -->
+    <t t-name="devops_guide.CardPills">
+        <div t-if="c.requirement.id" class="o_devops_guide_pills">
+            <span class="o_devops_guide_pill o_devops_guide_pill_req"
+                  t-att-title="c.requirement.name">
+                <span t-if="c.requirement.code" class="o_devops_guide_pill_code"
+                      t-esc="c.requirement.code"/>
+                <span t-if="c.requirement.moscow_label" class="o_devops_guide_pill_level"
+                      t-esc="c.requirement.moscow_label"/>
+            </span>
+            <span t-if="c.requirement.test_state_label"
+                  t-att-class="'o_devops_guide_pill o_devops_guide_pill_test o_devops_guide_pill_test_' + c.requirement.test_state"
+                  title="Test state">
+                <i class="fa fa-flask me-1"/>
+                <t t-esc="c.requirement.test_state_label"/>
+            </span>
+        </div>
+    </t>
+
+    <!-- Boutons d'une carte, en grille comme en feuille de route. La
+         visite ne s'affiche que si elle est connue du registre ; le guide
+         du requis, que s'il en a un. Lit `c` dans la portée de
+         l'appelant. -->
+    <t t-name="devops_guide.CardActions">
+        <div t-if="hasButton(c) or canStartTour(c.tour_name) or c.requirement.id"
+             class="o_devops_guide_card_actions">
+            <button t-if="canStartTour(c.tour_name)"
+                    class="btn btn-sm o_devops_guide_card_tour"
+                    t-on-click="() => this.startTour(c.tour_name)">
+                <i class="fa fa-play me-1"/>
+                <t t-esc="c.tour_label"/>
+            </button>
+            <button t-if="c.requirement.id" class="btn btn-sm o_devops_guide_card_link"
+                    t-on-click="() => this.openRequirement(c.requirement)">
+                <i class="fa fa-list-alt me-1"/>
+                Requirement
+            </button>
+            <button t-if="c.requirement.has_guide" class="btn btn-sm o_devops_guide_card_link"
+                    t-on-click="() => this.openGuide(c.requirement)">
+                <i class="fa fa-book me-1"/>
+                Guide
+            </button>
+            <button t-if="hasButton(c)" class="btn btn-sm o_devops_guide_card_btn"
+                    t-on-click="() => this.openCard(c)">
+                <span t-esc="c.action_label"/>
+                <i class="fa fa-arrow-right ms-1"/>
+            </button>
         </div>
     </t>
 </templates>

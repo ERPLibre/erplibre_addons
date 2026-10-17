@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 18:36+0000\n"
-"PO-Revision-Date: 2026-10-16 18:36+0000\n"
+"POT-Creation-Date: 2026-10-17 09:37+0000\n"
+"PO-Revision-Date: 2026-10-17 09:37+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -98,12 +98,22 @@ msgid "Created on"
 msgstr "Créé le"
 
 #. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_requirement__guide_id
+msgid "Detailed guide page of this requirement."
+msgstr "Page de guide détaillée de ce requis."
+
+#. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__display_name
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__display_name
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__display_name
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__display_name
 msgid "Display Name"
 msgstr "Nom affiché"
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__effective_tour_name
+msgid "Effective tour"
+msgstr "Visite effective"
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__eyebrow
@@ -127,8 +137,18 @@ msgid "Footer note"
 msgstr "Note de pied de page"
 
 #. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__groups_id
+msgid "Groups"
+msgstr "Groupes"
+
+#. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__guide_id
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__guide_id
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__guide_id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_requirement__guide_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_requirement_form_guide
 msgid "Guide"
 msgstr "Guide"
 
@@ -136,6 +156,11 @@ msgstr "Guide"
 #: model:ir.model,name:erplibre_devops_guide.model_devops_guide_card
 msgid "Guide card"
 msgstr "Carte de guide"
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_requirement__guide_card_ids
+msgid "Guide cards"
+msgstr "Cartes de guide"
 
 #. module: erplibre_devops_guide
 #: model:ir.model,name:erplibre_devops_guide.model_devops_guide_section
@@ -209,6 +234,13 @@ msgid "Lead text"
 msgstr "Texte d'accroche"
 
 #. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__groups_id
+msgid ""
+"Left empty, every reader of the guide sees the card. Otherwise only members "
+"of at least one of these groups see it."
+msgstr "Laissé vide, tout lecteur du guide voit la carte. Sinon, seuls les membres d'au moins un de ces groupes la voient."
+
+#. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__num
 msgid "Literal value"
 msgstr "Valeur littérale"
@@ -263,6 +295,13 @@ msgid "Problem"
 msgstr "Problème"
 
 #. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__requirement_id
+msgid "Requirement"
+msgstr "Requis"
+
+#. module: erplibre_devops_guide
 #: model:ir.model,name:erplibre_devops_guide.model_devops_guide_counter_mixin
 msgid "Resolve a declared record count"
 msgstr "Résout un décompte d'enregistrements déclaré"
@@ -301,6 +340,12 @@ msgid "Shape"
 msgstr "Forme"
 
 #. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_guide_card.py:0
+msgid "Show me"
+msgstr "Me montrer"
+
+#. module: erplibre_devops_guide
 #: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_stat__num
 msgid ""
 "Shown as written when no counted model is set. Ignored as soon as one is, "
@@ -308,9 +353,20 @@ msgid ""
 msgstr "Affichée telle quelle tant qu'aucun modèle compté n'est fixé. Ignorée dès qu'il y en a un, le chiffre étant alors compté."
 
 #. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_requirement
+msgid "Software requirement (MoSCoW)"
+msgstr "Requis logiciel (MoSCoW)"
+
+#. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__solution
 msgid "Solution"
 msgstr "Solution"
+
+#. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_guide.py:0
+msgid "Start the tour"
+msgstr "Lancer la visite"
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__stat_ids
@@ -326,9 +382,18 @@ msgstr "Sous-titre"
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide__tour_name
 msgid ""
-"Technical name of a registered tour. Left empty, or with web_tour absent, "
-"the tour button is not shown."
-msgstr "Nom technique d'une visite guidée enregistrée. Laissé vide, ou sans web_tour, le bouton de visite ne s'affiche pas."
+"Technical name of a registered tour. Left empty, or unknown to the tour "
+"registry of the web client, the tour button is not shown."
+msgstr ""
+"Nom technique d'une visite guidée enregistrée. Laissé vide, ou inconnu du "
+"registre des visites du client web, le bouton de visite ne s'affiche pas."
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__tour_name
+msgid ""
+"Technical name of a registered tour. Left empty, the card launches the tour "
+"of its requirement, if any."
+msgstr "Nom technique d'une visite guidée enregistrée. Laissé vide, la carte lance la visite de son requis, s'il en a une."
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__count_model
@@ -338,12 +403,29 @@ msgid "Technical name of the model to count, e.g. devops.requirement."
 msgstr "Nom technique du modèle à compter, p. ex. devops.requirement."
 
 #. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+msgid "Test state"
+msgstr "État des tests"
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__requirement_id
+msgid "The card shows this requirement's code, level and test state."
+msgstr "La carte affiche le code, le niveau d'exigence et l'état des tests de ce requis."
+
+#. module: erplibre_devops_guide
 #: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__action_label
 msgid ""
 "The marker {count} is replaced by the counted figure when a counted model is"
 " set, so the label stays true as data changes. Without a counted model the "
 "marker is left as written."
 msgstr "Le marqueur {count} est remplacé par le chiffre compté dès qu'un modèle compté est fixé, pour que le libellé reste vrai quand les données changent. Sans modèle compté, le marqueur reste tel quel."
+
+#. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_requirement.py:0
+msgid "This requirement has no guide page."
+msgstr "Ce requis n'a pas de page de guide."
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__title
@@ -359,11 +441,13 @@ msgstr "Domaine du total"
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__tour_label
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__tour_label
 msgid "Tour button"
 msgstr "Bouton de visite guidée"
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__tour_name
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__tour_name
 msgid "Tour name"
 msgstr "Nom de la visite guidée"
 
