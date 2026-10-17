@@ -2,11 +2,12 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "ERPLibre DevOps Requirement",
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Project",
     "summary": (
         "Track the software requirements of an implementation project in "
-        "MoSCoW terms, by domain and by phase."
+        "MoSCoW terms, by domain and by phase, through the DevSecOps loop, "
+        "with their threats and the tests that prove them."
     ),
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",
@@ -21,6 +22,7 @@
         "base",
     ],
     "data": [
+        "security/devops_requirement_security.xml",
         "security/ir.model.access.csv",
         "views/devops_requirement_views.xml",
         "views/devops_requirement_config_views.xml",
