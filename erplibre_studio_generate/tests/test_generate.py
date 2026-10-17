@@ -104,6 +104,10 @@ class TestGenerate(StudioCase):
         self.assertEqual(manifest["license"], "AGPL-3")
         self.assertIn("views/erplibre_studio_views.xml", manifest["data"])
         self.assertFalse(os.path.exists(os.path.join(target, "security")))
+        # No new model: no hook, not an application.
+        self.assertNotIn("pre_init_hook", manifest)
+        self.assertNotIn("application", manifest)
+        self.assertFalse(os.path.exists(os.path.join(target, "hooks.py")))
 
         model = self.read("models", "res_partner.py")
         compile(model, "res_partner.py", "exec")

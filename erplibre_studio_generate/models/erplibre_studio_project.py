@@ -13,10 +13,15 @@ import odoo
 from odoo import api, fields, models, release
 from odoo.addons.erplibre_info import runner
 from odoo.addons.erplibre_studio import arch as studio_arch
+from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
+    PERMS as studio_perms,
+)
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import file_open
+from odoo.tools.safe_eval import safe_eval
 
 from .. import version as studio_version
+from .code_generator_writer import project_migration_file
 
 _logger = logging.getLogger(__name__)
 
@@ -179,15 +184,15 @@ class ErplibreStudioProject(models.Model):
 
     @api.model
     def _check_field_texts(self, label, help_text):
-        """The label and the tooltip of a new field go into a quoted Python
-        string of the generated module."""
+        """The label and the tooltip of a new field, and the label of a new
+        model, go into a quoted Python string of the generated module."""
         super()._check_field_texts(label, help_text)
         for value in (label, help_text):
             if any(char in value for char in _UNSAFE_TEXT):
                 raise UserError(
                     self.env._(
-                        "The label and the tooltip of a new field cannot "
-                        "contain quotes, backslashes or line breaks: "
+                        "The labels and tooltips of new fields and models "
+                        "cannot contain quotes, backslashes or line breaks: "
                         "%(value)s",
                         value=value,
                     )
@@ -196,9 +201,12 @@ class ErplibreStudioProject(models.Model):
     def _check_generation_texts(self):
         """The checks of ``_check_manifest_text`` and ``_check_field_texts``
         again, on the texts as they are: a project recorded before this
-        module was installed went through none of them."""
+        module was installed went through none of them. The label of a new
+        model becomes its ``_description``."""
         self.ensure_one()
         self._check_manifest_text()
+        for line in self.new_model_ids:
+            self._check_field_texts((line.name or "").strip(), "")
         for change in self._project_field_changes():
             definition = change._payload().get("field") or {}
             self._check_field_texts(
@@ -264,8 +272,30 @@ class ErplibreStudioProject(models.Model):
             )
         return path
 
-    def _field_models(self):
-        return sorted(set(self._project_field_changes().mapped("model")))
+    def _generation_models(self):
+        """The models of the generated module: the new models and the
+        models the new fields extend."""
+        return sorted(
+            set(self._project_field_changes().mapped("model"))
+            | self._studio_new_models()
+        )
+
+    def _rule_domain_fields(self, rule):
+        """The fields that the domain of ``rule`` names first in each of its
+        paths, as ir.model.fields records of its model."""
+        Fields = self.env["ir.model.fields"].sudo()
+        try:
+            domain = safe_eval(
+                rule.domain_force or "[]", self.env["ir.rule"]._eval_context()
+            )
+        except Exception:  # Apply refuses such a domain; it names no field.
+            return Fields
+        for term in domain if isinstance(domain, (list, tuple)) else []:
+            if isinstance(term, (list, tuple)) and len(term) == 3:
+                path = term[0]
+                if isinstance(path, str):
+                    Fields |= Fields._get(rule.model, path.split(".")[0])
+        return Fields
 
     def _view_type_module(self, view_type):
         """The module that adds ``view_type`` to ir.ui.view (web_timeline
@@ -291,7 +321,10 @@ class ErplibreStudioProject(models.Model):
         views, of their view types and of the nodes the changes locate
         (read from the branding of the combined arch), of the models
         extended, of the fields added or named by the changes (a filter
-        domain, a group-by, a timeline date) and of the comodels."""
+        domain, a group-by, a timeline date) and of the comodels; mail for
+        a chatter; those of the parent menus, of the groups and of the
+        existing models of the access rights and record rules, and of the
+        fields their domains name."""
         self.ensure_one()
         IrModel = self.env["ir.model"].sudo()
         names = {"base"}
@@ -334,14 +367,45 @@ class ErplibreStudioProject(models.Model):
             relation = change._payload()["field"].get("relation")
             if relation:
                 names.add(self._module_of("ir.model", IrModel._get_id(relation)))
+        names |= self._model_line_dependencies()
         names.discard(False)
         names.discard(self.module_name)
         return sorted(names)
 
+    def _model_line_dependencies(self):
+        """The modules the new models, the access rights and the record
+        rules of the project need: mail for a chatter, those of the parent
+        menus, of the groups, of the existing models and of the fields the
+        domains name. A set that may hold False."""
+        IrModel = self.env["ir.model"].sudo()
+        names = set()
+        if self.new_model_ids.filtered("chatter"):
+            names.add("mail")
+        for menu in self.new_model_ids.filtered(
+            lambda m: m.menu_mode == "menu"
+        ).menu_parent_id:
+            names.add(self._module_of("ir.ui.menu", menu.id))
+        for group in self.access_line_ids.group_id | self.rule_line_ids.group_ids:
+            names.add(self._module_of("res.groups", group.id))
+        models_named = set(self.access_line_ids.mapped("model"))
+        models_named |= set(self.rule_line_ids.mapped("model"))
+        for model in models_named - self._studio_new_models():
+            names.add(self._module_of("ir.model", IrModel._get_id(model)))
+        for rule in self.rule_line_ids:
+            for field in self._rule_domain_fields(rule):
+                names.add(self._module_of("ir.model.fields", field.id))
+        return names
+
     def _code_generator_module(self, dependencies):
-        """The code.generator.module of the project, created or updated."""
+        """The code.generator.module of the project, created or updated. Its
+        icon is the one of the app of the project, else the studio's; it is
+        an application when it has an app."""
         self.ensure_one()
-        with file_open("erplibre_studio/static/description/icon.png", "rb") as icon:
+        has_app = bool(self.new_model_ids.filtered(lambda m: m.menu_mode == "app"))
+        icon_module = "erplibre_studio"
+        if has_app and self.app_icon:
+            icon_module = self._studio_icon_module(self.app_icon)
+        with file_open(f"{icon_module}/static/description/icon.png", "rb") as icon:
             icon_data = base64.b64encode(icon.read())
         vals = {
             "name": self.module_name,
@@ -351,6 +415,7 @@ class ErplibreStudioProject(models.Model):
             "license": self.license,
             "enable_sync_code": False,
             "icon_real_image": icon_data,
+            "application": has_app,
         }
         Generator = self.env["code.generator.module"].sudo()
         generator = self.code_generator_id.sudo()
@@ -363,25 +428,62 @@ class ErplibreStudioProject(models.Model):
             lambda d: d.depend_id.name not in dependencies
         ).unlink()
         generator.add_module_dependency(dependencies)
+        missing = self._missing_dependencies(generator, dependencies)
+        if missing:
+            # code_generator links the modules of ir.module.module only: a
+            # module generated since the last update of the list is not
+            # there yet.
+            self.env["ir.module.module"].sudo().update_list()
+            generator.add_module_dependency(dependencies)
+            missing = self._missing_dependencies(generator, dependencies)
+        if missing:
+            raise UserError(
+                self.env._(
+                    "The module depends on %(modules)s, which this server does "
+                    "not know: generate them into the addons path first.",
+                    modules=", ".join(missing),
+                )
+            )
         return generator
+
+    @api.model
+    def _missing_dependencies(self, generator, dependencies):
+        """The names of ``dependencies`` the generator does not depend on."""
+        linked = set(generator.dependencies_id.depend_id.mapped("name"))
+        return sorted(set(dependencies) - linked)
 
     @contextmanager
     def _generator_scope(self, generator):
         """Link the models of the project to ``generator`` for the time of
         one generation, then restore their links. code_generator reads
         ``ir.model.m2o_module``, one generator per model; and that link
-        cascades on delete."""
+        cascades on delete. A model the project extends inherits itself;
+        a new model inherits the mail mixins of its chatter, or nothing,
+        which makes it a model of its own (``_name``)."""
         IrModel = self.env["ir.model"].sudo()
         records = IrModel.browse(
-            [IrModel._get_id(name) for name in self._field_models()]
+            [IrModel._get_id(name) for name in self._generation_models()]
         )
+        chatter = set(self.new_model_ids.filtered("chatter").mapped("model"))
+        new_models = self._studio_new_models()
         saved = [(m, m.m2o_module, m.inherit_model_ids) for m in records]
         Dependency = self.env["code.generator.ir.model.dependency"].sudo()
         created = Dependency
         cursor = self.env.cr
         try:
             for record in records:
-                created_one = Dependency.create([{"depend_id": record.id}])
+                if record.model not in new_models:
+                    parents = [record.id]
+                elif record.model in chatter:
+                    parents = [
+                        IrModel._get_id("mail.thread"),
+                        IrModel._get_id("mail.activity.mixin"),
+                    ]
+                else:
+                    parents = []
+                created_one = Dependency.create(
+                    [{"depend_id": parent} for parent in parents]
+                )
                 created |= created_one
                 record.write(
                     {
@@ -427,6 +529,47 @@ class ErplibreStudioProject(models.Model):
                 f"- {view.type} view `{view.xml_id or view.name}`: "
                 + self.env._("%(count)s change(s)", count=count)
             )
+        for line in self.new_model_ids:
+            label = (line.menu_name or "").strip() or line.name.strip()
+            if line.menu_mode == "app":
+                text = self.env._(
+                    "new model, menu %(menu)s in the app %(app)s",
+                    menu=label,
+                    app=self.app_name,
+                )
+            else:
+                text = self.env._(
+                    "new model, menu %(menu)s under %(parent)s",
+                    menu=label,
+                    parent=line.menu_parent_id.complete_name,
+                )
+            if line.chatter:
+                text += ", " + self.env._("with a chatter")
+            lines.append(f"- `{line.model}` ({line.name.strip()}): {text}")
+        for access in self.access_line_ids:
+            perms = "".join(
+                letter if access[perm] else "-"
+                for letter, perm in zip("rwcd", studio_perms, strict=True)
+            )
+            lines.append(
+                f"- `{access.model}`: "
+                + self.env._(
+                    "access right %(perms)s for %(group)s",
+                    perms=perms,
+                    group=access.group_id.full_name,
+                )
+            )
+        for rule in self.rule_line_ids:
+            groups = ", ".join(rule.group_ids.mapped("full_name"))
+            lines.append(
+                f"- `{rule.model}`: "
+                + self.env._(
+                    "record rule %(name)s for %(groups)s: `%(domain)s`",
+                    name=rule.name,
+                    groups=groups or self.env._("every user"),
+                    domain=rule.domain_force,
+                )
+            )
         return "\n".join(lines) + "\n"
 
     def _marker_text(self):
@@ -459,7 +602,7 @@ class ErplibreStudioProject(models.Model):
         self._check_studio_access()
         self._check_studio_disk()
         self._update_state()
-        if not self.change_ids:
+        if not self.item_count:
             raise UserError(self.env._("The project has no change to generate."))
         self._check_generation_texts()
         if self.state == "draft":
@@ -513,6 +656,15 @@ class ErplibreStudioProject(models.Model):
                 fh.write(self._readme(version))
             with open(os.path.join(rootdir, MARKER_FILE), "w", encoding="utf-8") as fh:
                 fh.write(self._marker_text())
+            if self.new_model_ids:
+                # An upgrade to this version takes over the models Apply
+                # created since the module was installed (hooks.py).
+                migration = os.path.join(rootdir, "migrations", version)
+                os.makedirs(migration, exist_ok=True)
+                with open(
+                    os.path.join(migration, "pre-migration.py"), "w", encoding="utf-8"
+                ) as fh:
+                    fh.write(project_migration_file(self, self.license))
             files = sorted(
                 os.path.relpath(os.path.join(base, name), rootdir)
                 for base, _dirs, names in os.walk(rootdir)
@@ -536,6 +688,11 @@ class ErplibreStudioProject(models.Model):
             "files:",
             *[f"  {name}" for name in files],
         ]
+        # The external ids of the module are in its files now: an upgrade
+        # updates their records, and deletes those its files lose.
+        self.env["ir.model.data"].sudo().search(
+            [("module", "=", self.module_name), ("noupdate", "=", True)]
+        ).write({"noupdate": False})
         self._internal().write(
             {
                 "version": version,
@@ -559,10 +716,21 @@ class ErplibreStudioProject(models.Model):
         return True
 
     def action_install_module(self):
-        """Install the generated module in this database, on request."""
+        """Install the generated module in this database, on request, once
+        it holds the last Apply: installing a module older than the
+        database would delete what Apply made since (the external ids of
+        the module its files do not hold)."""
         self.ensure_one()
         self._check_studio_access()
         self._check_studio_disk()
+        self._update_state()
+        if self.state != "generated":
+            raise UserError(
+                self.env._(
+                    "Generate the module again first: the database holds "
+                    "changes the module on the disk does not have."
+                )
+            )
         Module = self.env["ir.module.module"].sudo()
         module = Module.search([("name", "=", self.module_name)])
         if not module:

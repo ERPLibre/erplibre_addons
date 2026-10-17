@@ -118,6 +118,16 @@ msgid "Generate the module"
 msgstr "Générer le module"
 
 #. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid ""
+"Generate the module again first: the database holds changes the module on "
+"the disk does not have."
+msgstr ""
+"Générez d'abord le module à nouveau : la base contient des modifications que"
+" le module sur le disque n'a pas."
+
+#. module: erplibre_studio_generate
 #: model:ir.model.fields.selection,name:erplibre_studio_generate.selection__erplibre_studio_project__state__generated
 msgid "Generated"
 msgstr "Généré"
@@ -223,11 +233,22 @@ msgstr "La destination %(path)s n'est pas un répertoire."
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid ""
-"The label and the tooltip of a new field cannot contain quotes, backslashes "
-"or line breaks: %(value)s"
+"The labels and tooltips of new fields and models cannot contain quotes, "
+"backslashes or line breaks: %(value)s"
 msgstr ""
-"Le libellé et l'infobulle d'un nouveau champ ne peuvent contenir ni "
-"guillemets, ni barres obliques inverses, ni sauts de ligne : %(value)s"
+"Les libellés et les infobulles des nouveaux champs et modèles ne peuvent "
+"contenir ni guillemets, ni barres obliques inverses, ni sauts de ligne : "
+"%(value)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid ""
+"The module depends on %(modules)s, which this server does not know: generate"
+" them into the addons path first."
+msgstr ""
+"Le module dépend de %(modules)s, que ce serveur ne connaît pas : générez-les"
+" d'abord dans le chemin des addons."
 
 #. module: erplibre_studio_generate
 #. odoo-python
@@ -282,3 +303,39 @@ msgstr ""
 #: model:ir.model.fields,help:erplibre_studio_generate.field_erplibre_studio_project__description
 msgid "Written in the readme of the generated module."
 msgstr "Écrit dans le readme du module généré."
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "access right %(perms)s for %(group)s"
+msgstr "droit d'accès %(perms)s pour %(group)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "every user"
+msgstr "tous les utilisateurs"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "new model, menu %(menu)s in the app %(app)s"
+msgstr "nouveau modèle, menu %(menu)s dans l'application %(app)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "new model, menu %(menu)s under %(parent)s"
+msgstr "nouveau modèle, menu %(menu)s sous %(parent)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "record rule %(name)s for %(groups)s: `%(domain)s`"
+msgstr "règle d'enregistrement %(name)s pour %(groups)s : `%(domain)s`"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "with a chatter"
+msgstr "avec un fil de discussion"
