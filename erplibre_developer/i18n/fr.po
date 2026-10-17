@@ -1,0 +1,491 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_developer
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-16 23:21+0000\n"
+"PO-Revision-Date: 2026-10-16 23:21+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "%(path)s is not a source file of this server."
+msgstr "%(path)s n'est pas un fichier source de ce serveur."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Action"
+msgstr "Action"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Asset bundles deleted: the page reloads."
+msgstr "Paquets d'assets supprimés : la page se recharge."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Clone"
+msgstr "Clone"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Close"
+msgstr "Fermer"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Code & repository"
+msgstr "Code et dépôt"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Copy the path"
+msgstr "Copier le chemin"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Copy this path"
+msgstr "Copiez ce chemin"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Current view"
+msgstr "Vue affichée"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Custom field, defined in the database"
+msgstr "Champ personnalisé, défini dans la base"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Defined in"
+msgstr "Défini dans"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Dev actions"
+msgstr "Actions de dev"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/debug_items.js:0
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Developer panel"
+msgstr "Panneau développeur"
+
+#. module: erplibre_developer
+#: model:ir.model,name:erplibre_developer.model_erplibre_developer
+msgid "ERPLibre developer panel"
+msgstr "Panneau développeur ERPLibre"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Fields & modules"
+msgstr "Champs et modules"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Filter by field or module"
+msgstr "Filtrer par champ ou module"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "HEAD"
+msgstr "HEAD"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Hide its arch"
+msgstr "Masquer son arch"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Hide the combined arch"
+msgstr "Masquer l'arch combinée"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "ID"
+msgstr "ID"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Inspect: click a field of the page to select it"
+msgstr "Inspecter : cliquer un champ de la page pour le sélectionner"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Last snapshot"
+msgstr "Dernier instantané"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Loading…"
+msgstr "Chargement…"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Mark to upgrade and restart the server"
+msgstr "Marquer à mettre à jour et redémarrer le serveur"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Module"
+msgstr "Module"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "Module %(module)s is not installed."
+msgstr "Le module %(module)s n'est pas installé."
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "Module %(module)s not found."
+msgstr "Module %(module)s introuvable."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "No ERPLibre snapshot"
+msgstr "Aucun instantané ERPLibre"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "No IDE is configured on this server."
+msgstr "Aucun IDE n'est configuré sur ce serveur."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "No commit."
+msgstr "Aucun commit."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "No field."
+msgstr "Aucun champ."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Odoo core"
+msgstr "Cœur d'Odoo"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "Only the Settings administrators open the developer panel."
+msgstr ""
+"Seuls les administrateurs des Paramètres ouvrent le panneau développeur."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Open in IDE"
+msgstr "Ouvrir dans l'IDE"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Overridden by"
+msgstr "Surchargé par"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Path copied."
+msgstr "Chemin copié."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Priority"
+msgstr "Priorité"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Read the clones"
+msgstr "Lire les clones"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Recent commits"
+msgstr "Commits récents"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Reload"
+msgstr "Recharger"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Reload the assets"
+msgstr "Recharger les assets"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Repository"
+msgstr "Dépôt"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Show its arch"
+msgstr "Afficher son arch"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Show the combined arch"
+msgstr "Afficher l'arch combinée"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "The developer panel requires the developer mode."
+msgstr "Le panneau développeur exige le mode développeur."
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "The module is not in a git clone."
+msgstr "Le module n'est pas dans un clone git."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "This page shows no view."
+msgstr "Cette page n'affiche aucune vue."
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "Unknown model %(model)s."
+msgstr "Modèle %(model)s inconnu."
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/models/erplibre_developer.py:0
+msgid "Unknown view type %(type)s."
+msgstr "Type de vue %(type)s inconnu."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Upgrade (-u)"
+msgstr "Mettre à jour (-u)"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid ""
+"Upgrading a module restarts the server: it needs erplibre_info_allow_server_actions = True in the Odoo\n"
+"                configuration file, the Settings group and the developer mode."
+msgstr ""
+"Mettre à jour un module redémarre le serveur : il faut "
+"erplibre_info_allow_server_actions = True dans le fichier de configuration "
+"d'Odoo, le groupe Paramètres et le mode développeur."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Version on disk: an upgrade is pending"
+msgstr "Version sur le disque : une mise à jour est en attente"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "Views & inheritance"
+msgstr "Vues et héritages"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "Views applied, in order"
+msgstr "Vues appliquées, dans l'ordre"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "branch"
+msgstr "branche"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "compute"
+msgstr "calcul"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "constraint"
+msgstr "contrainte"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "definitions and methods"
+msgstr "définitions et méthodes"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "delegated by"
+msgstr "délégué par"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "field"
+msgstr "champ"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "from the snapshot"
+msgstr "selon l'instantané"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/code.py:0
+msgid "git cannot start: %(error)s"
+msgstr "git ne peut pas démarrer : %(error)s"
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/code.py:0
+msgid "git log did not finish within %(s)s seconds."
+msgstr "git log n'a pas fini en %(s)s secondes."
+
+#. module: erplibre_developer
+#. odoo-python
+#: code:addons/erplibre_developer/code.py:0
+msgid "git log failed (exit code %(code)s)."
+msgstr "git log a échoué (code de sortie %(code)s)."
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "inverse"
+msgstr "inverse"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "modified"
+msgstr "modifié"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "no file"
+msgstr "aucun fichier"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "onchange"
+msgstr "onchange"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "priority"
+msgstr "priorité"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "read now"
+msgstr "lu à l'instant"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "related"
+msgstr "lié à"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.js:0
+msgid "search"
+msgstr "recherche"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "· groups"
+msgstr "· groupes"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "· inherits"
+msgstr "· hérite de"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "· manifest"
+msgstr "· manifeste"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "· mode"
+msgstr "· mode"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "· model"
+msgstr "· modèle"
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/developer_drawer.xml:0
+msgid "· type"
+msgstr "· type"

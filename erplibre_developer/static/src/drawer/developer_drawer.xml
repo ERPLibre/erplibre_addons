@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_developer.SourceLocation">
+        <span class="o_erplibre_dev_location d-inline-flex align-items-center gap-1" t-if="props.file">
+            <code class="text-break" t-esc="text" t-att-title="props.file" />
+            <button class="btn btn-link btn-sm p-0 o_erplibre_dev_copy" title="Copy the path" t-on-click.stop="copy">
+                <i class="fa fa-clipboard" />
+            </button>
+            <button
+                t-if="props.ide"
+                class="btn btn-link btn-sm p-0 o_erplibre_dev_ide"
+                title="Open in IDE"
+                t-on-click.stop="openInIde"
+            >
+                <i class="fa fa-external-link" />
+            </button>
+        </span>
+        <span t-else="" class="text-muted">no file</span>
+        <div t-if="props.file and copyState.manual" class="input-group input-group-sm mt-1 o_erplibre_dev_manual_copy">
+            <input
+                class="form-control"
+                readonly="1"
+                t-ref="manual"
+                t-att-value="fullText"
+                t-on-click.stop="(ev) => ev.target.select()"
+            />
+            <button class="btn btn-secondary" title="Close" t-on-click.stop="closeManual">
+                <i class="fa fa-times" />
+            </button>
+        </div>
+    </t>
+
+    <t t-name="erplibre_developer.DeveloperDrawer">
+        <aside
+            t-if="state.open"
+            class="o_erplibre_dev_drawer d-flex flex-column bg-view border-start shadow"
+            role="complementary"
+        >
+            <header class="o_erplibre_dev_header d-flex align-items-center gap-2 px-3 py-2 border-bottom">
+                <i class="fa fa-code" />
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="fw-bold">Developer panel</div>
+                    <div class="small text-muted text-truncate o_erplibre_dev_view_title" t-if="info">
+                        <t t-esc="info.model" />
+                        ·
+                        <t t-esc="info.view_type" />
+                        <t t-if="info.view">
+                            ·
+                            <t t-esc="info.view.xml_id or info.view.name" />
+                        </t>
+                    </div>
+                </div>
+                <button
+                    class="btn btn-sm o_erplibre_dev_inspect"
+                    t-att-class="state.inspecting ? 'btn-primary' : 'btn-secondary'"
+                    title="Inspect: click a field of the page to select it"
+                    t-on-click="toggleInspect"
+                >
+                    <i class="fa fa-crosshairs" />
+                </button>
+                <button class="btn btn-sm btn-secondary o_erplibre_dev_refresh" title="Reload" t-on-click="refresh">
+                    <i class="fa fa-refresh" />
+                </button>
+                <button class="btn btn-sm btn-secondary o_erplibre_dev_close" title="Close" t-on-click="close">
+                    <i class="fa fa-times" />
+                </button>
+            </header>
+            <ul class="nav nav-tabs px-2 pt-2 o_erplibre_dev_tabs">
+                <li class="nav-item" t-foreach="tabs" t-as="tab" t-key="tab.id">
+                    <a
+                        href="#"
+                        class="nav-link py-1 px-2"
+                        t-att-class="{'active': state.tab === tab.id}"
+                        t-att-data-tab="tab.id"
+                        t-on-click.prevent="() => this.selectTab(tab.id)"
+                        t-esc="tab.label"
+                    />
+                </li>
+            </ul>
+            <div class="o_erplibre_dev_body flex-grow-1 overflow-auto p-3">
+                <div t-if="data.loading" class="text-muted">
+                    <i class="fa fa-spinner fa-spin" />
+                    Loading…
+                </div>
+                <div t-elif="data.error" class="alert alert-warning o_erplibre_dev_error" t-esc="data.error" />
+                <t t-elif="info">
+                    <t t-if="state.tab === 'views'" t-call="erplibre_developer.DeveloperDrawer.Views" />
+                    <t t-elif="state.tab === 'fields'" t-call="erplibre_developer.DeveloperDrawer.Fields" />
+                    <t t-elif="state.tab === 'code'" t-call="erplibre_developer.DeveloperDrawer.Code" />
+                    <t t-elif="state.tab === 'actions'" t-call="erplibre_developer.DeveloperDrawer.Actions" />
+                </t>
+            </div>
+        </aside>
+    </t>
+
+    <t t-name="erplibre_developer.DeveloperDrawer.Views">
+        <section class="o_erplibre_dev_views">
+            <div t-if="info.view" class="card mb-3 o_erplibre_dev_current_view">
+                <div class="card-body p-2 small">
+                    <div class="fw-bold mb-1">Current view</div>
+                    <div>
+                        ID
+                        <t t-esc="info.view.id" />
+                        ·
+                        <code t-esc="info.view.xml_id or info.view.name" />
+                    </div>
+                    <div>
+                        Module
+                        <span class="badge text-bg-info" t-esc="info.view.module or '—'" />
+                        · model
+                        <code t-esc="info.view.model" />
+                        · type
+                        <t t-esc="info.view.type" />
+                    </div>
+                    <div>
+                        Priority
+                        <t t-esc="info.view.priority" />
+                        · mode
+                        <t t-esc="info.view.mode" />
+                    </div>
+                    <SourceLocation
+                        file="info.view.file"
+                        fileRel="info.view.file_rel"
+                        line="info.view.line"
+                        ide="info.ide_available"
+                    />
+                </div>
+            </div>
+            <div t-if="info.action" class="small mb-3 o_erplibre_dev_action">
+                Action
+                <code t-esc="info.action.xml_id or info.action.id" />
+                ·
+                <t t-esc="info.action.name" />
+                <span t-if="info.action.module" class="badge text-bg-light" t-esc="info.action.module" />
+            </div>
+            <div class="fw-bold mb-2">Views applied, in order</div>
+            <div
+                t-foreach="info.views"
+                t-as="view"
+                t-key="view.id"
+                class="border rounded p-2 mb-2 small o_erplibre_dev_view_row"
+                t-att-class="{'border-primary': view.is_current}"
+                t-att-data-view-id="view.id"
+                t-on-mouseenter="() => this.highlight(view.fields)"
+                t-on-mouseleave="unhighlight"
+            >
+                <div class="d-flex align-items-center gap-1">
+                    <span class="text-muted" t-esc="view_index + 1" />
+                    .
+                    <code class="flex-grow-1 text-break" t-esc="view.xml_id or view.name" />
+                    <span class="badge text-bg-info o_erplibre_dev_module" t-esc="view.module or '—'" />
+                </div>
+                <div class="text-muted">
+                    priority
+                    <t t-esc="view.priority" />
+                    ·
+                    <t t-esc="view.mode" />
+                    <t t-if="view.inherit_name">
+                        · inherits
+                        <code t-esc="view.inherit_name" />
+                    </t>
+                    <t t-if="view.groups.length">
+                        · groups
+                        <t t-esc="view.groups.join(', ')" />
+                    </t>
+                </div>
+                <ul t-if="view.specs.length" class="mb-1 ps-3 o_erplibre_dev_specs">
+                    <li t-foreach="view.specs" t-as="spec" t-key="spec_index">
+                        <code t-esc="spec.expr" />
+                        <span class="badge text-bg-secondary" t-esc="spec.position" />
+                        <t t-if="spec.attributes.length">
+                            <t t-esc="spec.attributes.join(', ')" />
+                        </t>
+                    </li>
+                </ul>
+                <SourceLocation file="view.file" fileRel="view.file_rel" line="view.line" ide="info.ide_available" />
+                <div>
+                    <a href="#" class="small" t-on-click.prevent="() => this.toggle('arch_' + view.id)">
+                        <t t-if="data.expanded['arch_' + view.id]">Hide its arch</t>
+                        <t t-else="">Show its arch</t>
+                    </a>
+                    <pre
+                        t-if="data.expanded['arch_' + view.id]"
+                        class="bg-100 p-2 mt-1 mb-0 o_erplibre_dev_arch"
+                        t-esc="view.arch"
+                    />
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="#" class="o_erplibre_dev_toggle_combined" t-on-click.prevent="toggleCombined">
+                    <t t-if="data.showCombined">Hide the combined arch</t>
+                    <t t-else="">Show the combined arch</t>
+                </a>
+                <pre
+                    t-if="data.showCombined"
+                    class="bg-100 p-2 mt-1 small o_erplibre_dev_combined"
+                    t-esc="info.combined_arch"
+                />
+            </div>
+        </section>
+    </t>
+
+    <t t-name="erplibre_developer.DeveloperDrawer.Fields">
+        <section class="o_erplibre_dev_fields" t-ref="fields">
+            <input
+                type="search"
+                class="form-control form-control-sm mb-2 o_erplibre_dev_filter"
+                placeholder="Filter by field or module"
+                t-model="data.filter"
+            />
+            <div t-if="!filteredFields.length" class="text-muted">No field.</div>
+            <div
+                t-foreach="filteredFields"
+                t-as="field"
+                t-key="field.name"
+                class="border rounded p-2 mb-2 small o_erplibre_dev_field_row"
+                t-att-class="{'border-primary bg-100 o_erplibre_dev_selected': state.selectedField === field.name}"
+                t-att-data-field="field.name"
+                t-on-mouseenter="() => this.highlight([field.name])"
+                t-on-mouseleave="unhighlight"
+                t-on-click="() => this.selectField(field.name)"
+            >
+                <div class="d-flex align-items-center gap-1">
+                    <code class="fw-bold" t-esc="field.name" />
+                    <span class="text-muted text-truncate flex-grow-1" t-esc="field.string" />
+                    <span class="badge text-bg-light" t-esc="field.type" />
+                </div>
+                <div t-if="field.relation" class="text-muted">
+                    →
+                    <code t-esc="field.relation" />
+                </div>
+                <div t-if="field.related">
+                    related
+                    <code t-esc="field.related" />
+                </div>
+                <div t-if="field.inherited_model">
+                    delegated by
+                    <code t-esc="field.inherited_model" />
+                </div>
+                <div t-if="field.defined_in" class="o_erplibre_dev_defined_in">
+                    Defined in
+                    <span class="badge text-bg-info" t-esc="moduleLabel(field.defined_in)" />
+                    <SourceLocation
+                        file="field.defined_in.file"
+                        fileRel="field.defined_in.file_rel"
+                        line="field.defined_in.line"
+                        ide="info.ide_available"
+                    />
+                </div>
+                <div t-elif="field.manual" class="text-muted">Custom field, defined in the database</div>
+                <div t-if="field.override_modules.length" class="o_erplibre_dev_overridden_by">
+                    Overridden by
+                    <span
+                        t-foreach="field.override_modules"
+                        t-as="module"
+                        t-key="module"
+                        class="badge text-bg-warning me-1"
+                        t-esc="module"
+                    />
+                </div>
+                <div t-if="field.overrides.length">
+                    <a href="#" t-on-click.prevent.stop="() => this.toggle('field_' + field.name)">
+                        <t t-esc="field.overrides.length" />
+                        definitions and methods
+                    </a>
+                    <ul t-if="data.expanded['field_' + field.name]" class="ps-3 mb-0 o_erplibre_dev_overrides">
+                        <li t-foreach="field.overrides" t-as="entry" t-key="entry_index">
+                            <span class="badge text-bg-secondary" t-esc="kindLabel(entry.kind)" />
+                            <span class="badge text-bg-info" t-esc="moduleLabel(entry)" />
+                            <code t-if="entry.method" t-esc="entry.method" />
+                            <t t-if="entry.attrs and entry.attrs.length">
+                                <t t-esc="entry.attrs.join(', ')" />
+                            </t>
+                            <div>
+                                <SourceLocation
+                                    file="entry.file"
+                                    fileRel="entry.file_rel"
+                                    line="entry.line"
+                                    ide="info.ide_available"
+                                />
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </t>
+
+    <t t-name="erplibre_developer.DeveloperDrawer.Code">
+        <section class="o_erplibre_dev_code">
+            <div class="d-flex align-items-center mb-2">
+                <div class="flex-grow-1 small text-muted">
+                    <t t-if="data.code and data.code.snapshot_date">
+                        Last snapshot
+                        <span class="o_erplibre_dev_snapshot_date" t-esc="snapshotDate" />
+                    </t>
+                    <t t-else="">No ERPLibre snapshot</t>
+                </div>
+                <button
+                    class="btn btn-sm btn-secondary o_erplibre_dev_code_refresh"
+                    t-on-click="() => this.loadCode(true)"
+                >
+                    <i class="fa fa-refresh" />
+                    Read the clones
+                </button>
+            </div>
+            <div t-if="data.codeLoading" class="text-muted">
+                <i class="fa fa-spinner fa-spin" />
+                Loading…
+            </div>
+            <div t-if="data.codeError" class="alert alert-warning small" t-esc="data.codeError" />
+            <div
+                t-foreach="codeModules"
+                t-as="module"
+                t-key="module.name"
+                class="border rounded p-2 mb-2 small o_erplibre_dev_code_row"
+                t-att-data-module="module.name"
+            >
+                <div class="d-flex align-items-center gap-1">
+                    <span class="fw-bold flex-grow-1" t-esc="module.name" />
+                    <span class="badge text-bg-light" t-esc="module.installed_version" />
+                    <span
+                        t-if="module.code_version and module.code_version !== module.installed_version"
+                        class="badge text-bg-warning"
+                        title="Version on disk: an upgrade is pending"
+                        t-esc="module.code_version"
+                    />
+                </div>
+                <div>
+                    <code class="text-break" t-esc="module.path_rel or module.path" />
+                </div>
+                <div t-if="module.repo" class="o_erplibre_dev_repo">
+                    Repository
+                    <code t-esc="module.repo.path" />
+                    <span
+                        class="badge"
+                        t-att-class="module.repo.state === 'conforme' ? 'text-bg-success' : 'text-bg-warning'"
+                        t-esc="module.repo.state_label or module.repo.state"
+                    />
+                    <span t-if="module.repo.dirty" class="badge text-bg-danger">modified</span>
+                    <div class="text-muted">
+                        <t t-if="module.repo.branch">
+                            branch
+                            <t t-esc="module.repo.branch" />
+                            ·
+                        </t>
+                        HEAD
+                        <code t-esc="shortSha(module.repo.head)" />
+                        <t t-if="module.repo.manifest_branch">
+                            · manifest
+                            <t t-esc="module.repo.manifest_branch" />
+                        </t>
+                        ·
+                        <t t-if="module.repo_source === 'snapshot'">from the snapshot</t>
+                        <t t-else="">read now</t>
+                    </div>
+                </div>
+                <div t-elif="module.clone_rel" class="text-muted">
+                    Clone
+                    <code t-esc="module.clone_rel" />
+                </div>
+                <a
+                    href="#"
+                    class="o_erplibre_dev_commits_link"
+                    t-on-click.prevent="() => this.loadCommits(module.name)"
+                >
+                    Recent commits
+                </a>
+                <t t-call="erplibre_developer.DeveloperDrawer.Commits">
+                    <t t-set="commits" t-value="data.commits[module.name]" />
+                </t>
+            </div>
+        </section>
+    </t>
+
+    <t t-name="erplibre_developer.DeveloperDrawer.Commits">
+        <div t-if="commits" class="mt-1 o_erplibre_dev_commits">
+            <div t-if="commits.loading" class="text-muted">
+                <i class="fa fa-spinner fa-spin" />
+            </div>
+            <div t-elif="commits.error" class="text-warning" t-esc="commits.error" />
+            <div t-elif="!commits.commits.length" class="text-muted">No commit.</div>
+            <ul t-else="" class="ps-3 mb-0">
+                <li t-foreach="commits.commits" t-as="commit" t-key="commit.sha">
+                    <code t-esc="shortSha(commit.sha)" />
+                    <t t-esc="commit.subject" />
+                    <span class="text-muted">
+                        ·
+                        <t t-esc="commit.author" />
+                        ·
+                        <t t-esc="commitDate(commit.date)" />
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </t>
+
+    <t t-name="erplibre_developer.DeveloperDrawer.Actions">
+        <section class="o_erplibre_dev_actions small">
+            <div t-if="!info.server_actions_allowed" class="alert alert-info o_erplibre_dev_actions_disabled">
+                Upgrading a module restarts the server: it needs erplibre_info_allow_server_actions = True in the Odoo
+                configuration file, the Settings group and the developer mode.
+            </div>
+            <button class="btn btn-sm btn-secondary mb-3 o_erplibre_dev_reload_assets" t-on-click="reloadAssets">
+                <i class="fa fa-paint-brush" />
+                Reload the assets
+            </button>
+            <div
+                t-foreach="info.modules"
+                t-as="module"
+                t-key="module"
+                class="border rounded p-2 mb-2 o_erplibre_dev_action_row"
+                t-att-data-module="module"
+            >
+                <div class="d-flex align-items-center gap-1">
+                    <span class="fw-bold flex-grow-1" t-esc="module" />
+                    <button
+                        class="btn btn-sm btn-primary o_erplibre_dev_upgrade"
+                        t-att-disabled="!info.server_actions_allowed"
+                        title="Mark to upgrade and restart the server"
+                        t-on-click="() => this.upgrade(module)"
+                    >
+                        Upgrade (-u)
+                    </button>
+                    <button
+                        class="btn btn-sm btn-secondary"
+                        title="Recent commits"
+                        t-on-click="() => this.loadCommits(module)"
+                    >
+                        <i class="fa fa-history" />
+                    </button>
+                </div>
+                <t t-call="erplibre_developer.DeveloperDrawer.Commits">
+                    <t t-set="commits" t-value="data.commits[module]" />
+                </t>
+            </div>
+        </section>
+    </t>
+</templates>
