@@ -103,6 +103,12 @@ msgid "Detailed guide page of this requirement."
 msgstr "Page de guide détaillée de ce requis."
 
 #. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+msgid "DevSecOps stage"
+msgstr "Étape DevSecOps"
+
+#. module: erplibre_devops_guide
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__display_name
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__display_name
 #: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__display_name
@@ -410,8 +416,10 @@ msgstr "État des tests"
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__requirement_id
-msgid "The card shows this requirement's code, level and test state."
-msgstr "La carte affiche le code, le niveau d'exigence et l'état des tests de ce requis."
+msgid "The card shows this requirement's code, level, stage and test state."
+msgstr ""
+"La carte affiche le code, le niveau d'exigence, l'étape et l'état des tests "
+"de ce requis."
 
 #. module: erplibre_devops_guide
 #: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__action_label

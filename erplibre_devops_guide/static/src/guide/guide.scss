@@ -272,6 +272,26 @@
     .o_devops_guide_pill_test_passed { color: #fff; background: var(--dg-ok); border-color: var(--dg-ok); }
     .o_devops_guide_pill_test_not_run { color: #fff; background: var(--dg-warn); border-color: var(--dg-warn); }
     .o_devops_guide_pill_test_failed { color: #fff; background: var(--dg-fail); border-color: var(--dg-fail); }
+    // Étape DevSecOps, en contour pour ne pas rivaliser avec l'état des
+    // tests : en pointillé tant que le requis n'est pas livré (plan à
+    // test), plein en --dg-accent une fois publié ou déployé, plein en
+    // --dg-ok en exploitation ou sous surveillance.
+    .o_devops_guide_pill_stage {
+        background: var(--dg-surface);
+        border-style: dashed;
+    }
+    .o_devops_guide_pill_stage_release,
+    .o_devops_guide_pill_stage_deploy {
+        border-style: solid;
+        border-color: var(--dg-accent);
+        color: var(--dg-accent);
+    }
+    .o_devops_guide_pill_stage_operate,
+    .o_devops_guide_pill_stage_monitor {
+        border-style: solid;
+        border-color: var(--dg-ok);
+        color: var(--dg-ok);
+    }
 
     // ---- Roadmap ----
     .o_devops_guide_roadmap {

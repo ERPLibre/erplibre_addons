@@ -124,9 +124,26 @@ class TestGuideRequirement(TransactionCase):
         self.assertEqual(requirement["name"], "Export the inventory")
         self.assertEqual(requirement["moscow"], "must")
         self.assertEqual(requirement["moscow_label"], "Must have")
+        # L'étape par défaut du requis : planifié, pas encore livré.
+        self.assertEqual(requirement["stage"], "plan")
+        self.assertEqual(requirement["stage_label"], "Plan")
         self.assertEqual(requirement["test_state"], "not_run")
         self.assertEqual(requirement["test_state_label"], "Not run")
         self.assertEqual(requirement["has_guide"], "")
+
+    def test_requirement_block_has_every_key(self):
+        requirement = self._page_cards(self.internal)["Linked"]["requirement"]
+        self.assertEqual(set(requirement), set(REQUIREMENT_KEYS))
+        self.assertIn("stage", REQUIREMENT_KEYS)
+        self.assertIn("stage_label", REQUIREMENT_KEYS)
+
+    def test_stage_follows_the_requirement(self):
+        # Un requis en exploitation est livré : la page le dit par son
+        # étape, que le niveau MoSCoW ne porte pas.
+        self.requirement.devsecops_stage = "operate"
+        requirement = self._page_cards(self.internal)["Linked"]["requirement"]
+        self.assertEqual(requirement["stage"], "operate")
+        self.assertEqual(requirement["stage_label"], "Operate")
 
     def test_has_guide_follows_the_guide_field(self):
         detail = self.env["devops.guide"].create(
@@ -341,8 +358,9 @@ class TestGuideRequirementFrCA(TransactionCase):
     """En fr_CA, les libellés que la page calcule arrivent traduits.
 
     Le repli des boutons de visite est une chaîne de code, lue dans
-    i18n/fr_CA.po ; les libellés MoSCoW et d'état de test sont ceux des
-    sélections du module de requis, chargés en base avec la langue.
+    i18n/fr_CA.po ; les libellés MoSCoW, d'étape et d'état de test sont
+    ceux des sélections du module de requis, chargés en base avec la
+    langue.
     """
 
     @classmethod
@@ -387,4 +405,5 @@ class TestGuideRequirementFrCA(TransactionCase):
         self.assertEqual(
             card["requirement"]["moscow_label"], "Doit (essentiel)"
         )
+        self.assertEqual(card["requirement"]["stage_label"], "Planification")
         self.assertEqual(card["requirement"]["test_state_label"], "Aucun test")
