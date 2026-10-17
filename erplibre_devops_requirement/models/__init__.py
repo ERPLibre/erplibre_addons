@@ -9,3 +9,5 @@ from . import devops_requirement_classifier
 from . import devops_requirement_category
 from . import devops_requirement_phase
 from . import devops_requirement
+from . import devops_requirement_threat
+from . import devops_requirement_test
