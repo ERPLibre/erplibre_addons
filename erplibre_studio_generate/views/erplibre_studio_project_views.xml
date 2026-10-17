@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_studio_project_view_list" model="ir.ui.view">
+        <field name="name">erplibre.studio.project.list generate</field>
+        <field name="model">erplibre.studio.project</field>
+        <field name="inherit_id" ref="erplibre_studio.erplibre_studio_project_view_list" />
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="version" />
+            </field>
+            <field name="user_id" position="after">
+                <field name="destination" optional="hide" />
+                <field name="generated_date" optional="show" />
+            </field>
+        </field>
+    </record>
+
+    <record id="erplibre_studio_project_view_form" model="ir.ui.view">
+        <field name="name">erplibre.studio.project.form generate</field>
+        <field name="model">erplibre.studio.project</field>
+        <field name="inherit_id" ref="erplibre_studio.erplibre_studio_project_view_form" />
+        <field name="arch" type="xml">
+            <button name="action_revert" position="before">
+                <button
+                    name="action_generate"
+                    type="object"
+                    string="Generate the module"
+                    class="btn-primary"
+                    invisible="state != 'applied'"
+                />
+                <button name="action_generate" type="object" string="Regenerate" invisible="state != 'generated'" />
+                <button
+                    name="action_install_module"
+                    type="object"
+                    string="Install the generated module"
+                    invisible="not generation_count or module_state == 'installed'"
+                    confirm="Install the generated module in this database now?"
+                />
+            </button>
+            <div name="generation_hint" position="replace" />
+            <field name="module_name" position="attributes">
+                <attribute name="readonly">generation_count</attribute>
+            </field>
+            <field name="module_name" position="after">
+                <field name="version" />
+                <field name="destination" />
+            </field>
+            <field name="module_id" position="before">
+                <field name="summary" />
+                <field name="author" />
+                <field name="license" />
+            </field>
+            <page name="database" position="before">
+                <page string="Description" name="description">
+                    <field name="description" />
+                </page>
+            </page>
+            <page name="database" position="after">
+                <page string="Generation" name="generation">
+                    <group>
+                        <field name="generated_date" />
+                        <field name="generated_version" />
+                        <field name="generated_path" />
+                        <field name="generation_count" />
+                        <field name="code_generator_id" />
+                    </group>
+                    <field name="generation_log" />
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>
