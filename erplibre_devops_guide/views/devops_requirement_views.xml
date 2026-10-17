@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Le bouton Guide n'apparaît qu'avec une page détaillée : sans elle,
+         il n'ouvrirait rien. Les cartes qui citent le requis se lisent
+         dans l'onglet Guide, pour savoir où il est présenté. -->
+    <record id="view_devops_requirement_form_guide" model="ir.ui.view">
+        <field name="name">devops.requirement.form.guide</field>
+        <field name="model">devops.requirement</field>
+        <field name="inherit_id" ref="erplibre_devops_requirement.view_devops_requirement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='devsecops_stage']" position="before">
+                <button name="action_open_guide" type="object" string="Guide"
+                        icon="fa-book" invisible="not guide_id"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Guide" name="guide">
+                    <group>
+                        <field name="guide_id"/>
+                    </group>
+                    <field name="guide_card_ids" readonly="1">
+                        <list>
+                            <field name="guide_id"/>
+                            <field name="title"/>
+                            <field name="effective_tour_name"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

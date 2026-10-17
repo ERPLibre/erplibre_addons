@@ -23,6 +23,7 @@ vieillir en dur dans le gabarit.
 | `devops.guide.section` | Une section, dont la **forme** tient dans `kind`. |
 | `devops.guide.card` | Une carte : un problème, sa réponse, au plus un bouton. |
 | `devops.guide.counter.mixin` | Mixin abstrait : résout un décompte décrit en données. |
+| `devops.requirement` (extension) | `guide_id`, la page détaillée du requis, et `guide_card_ids`, les cartes qui le citent. |
 
 ### Les trois formes de section
 
@@ -45,6 +46,46 @@ vides : aucun bouton, ce qui rend une étape de feuille de route.
 
 **Une cible sans libellé ne rend aucun bouton** : un bouton ne portant que sa
 flèche n'apprend rien sur ce qu'il ouvre.
+
+Un bouton dont la cible n'est pas ouvrable par le lecteur **n'est pas
+rendu** : une action introuvable, qui n'est pas une action, réservée à des
+groupes dont il n'est pas membre, ou dont il ne peut pas lire le `res_model` ;
+un modèle compté qu'il ne peut pas lire. `get_page` rend alors `action_xmlid`
+et `action_label` vides. Vider aussi le libellé empêche le repli sur
+`count_model`, qui ouvrirait une autre cible que celle annoncée.
+
+### Une carte réservée à des groupes
+
+`groups_id` vide : tout lecteur du guide voit la carte. Posé : seul un membre
+d'au moins un de ces groupes la voit, groupes impliqués compris. C'est ce qui
+évite de montrer une visite qui mène vers un menu que le lecteur ne peut pas
+ouvrir.
+
+La restriction est une **règle d'accès** sur `devops.guide.card`, pas un
+filtre d'affichage : la carte manque à la page, à l'onglet **Guide** du
+formulaire du requis et à un appel RPC. L'administrateur (`base.group_system`)
+lit toutes les cartes, pour les éditer.
+
+### Une carte rattachée à un requis
+
+`requirement_id` rattache la carte à un requis de
+`erplibre_devops_requirement`. La carte affiche alors, en grille comme en
+feuille de route :
+
+- une pastille avec le **code** et le **niveau MoSCoW** du requis ;
+- une pastille avec l'**état de ses tests**, colorée par état ;
+- un bouton **Requirement**, qui ouvre le formulaire du requis ;
+- un bouton **Guide**, si le requis désigne une page détaillée (`guide_id`) ;
+- un bouton de **visite**, si une visite connue du navigateur est attachée
+  (voir plus bas).
+
+`get_page` rend, pour chaque carte, un dictionnaire `requirement` aux clés
+fixes : `id`, `code`, `name`, `moscow`, `moscow_label`, `test_state`,
+`test_state_label`, `has_guide`. Une carte sans requis, ou dont le requis
+n'est pas lisible, reçoit ces mêmes clés **vides** (`""`) ; `has_guide` vaut
+`True` ou `""`. Un requis illisible ne prête pas non plus sa visite : la
+carte reste affichée, sans bouton de visite si elle n'en porte pas une à
+elle. Les libellés arrivent traduits dans la langue du lecteur.
 
 ### Un chiffre du bandeau n'est pas filtré par son domaine
 
@@ -98,7 +139,7 @@ qui le dit — l'écran s'ouvre plutôt que de casser.
 
 ## Thème
 
-La feuille pose dix variables sur `.o_devops_guide`. Un projet les redéfinit
+La feuille pose onze variables sur `.o_devops_guide`. Un projet les redéfinit
 sans recopier le style :
 
 ```scss
@@ -110,8 +151,9 @@ sans recopier le style :
     --dg-ink: #1f2937;           // texte
     --dg-muted: #5b6b70;         // texte secondaire
     --dg-line: #e5e7eb;          // filets et bordures
-    --dg-warn: #f6a623;          // icône de problème, pastille
-    --dg-ok: #2e7d32;            // icône de réponse
+    --dg-warn: #f6a623;          // icône de problème, pastille, tests à lancer
+    --dg-ok: #2e7d32;            // icône de réponse, tests passés
+    --dg-fail: #c62828;          // tests en échec
     --dg-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 ```
@@ -121,9 +163,46 @@ Le crochet vert ne s'affiche que lorsqu'un problème est posé : il dit
 
 ## Visite guidée
 
-`tour_name` lance une visite au premier bouton du bandeau. Le service de
-visite est absent quand `web_tour` n'est pas installé : le bouton ne s'affiche
-alors pas, plutôt que de faire échouer le montage du composant.
+Deux sources de visite :
+
+- `tour_name` du guide, lancée par le premier bouton du bandeau ;
+- la visite **effective** d'une carte : son propre `tour_name`, sinon celle
+  de son requis (`tour_name` du requis, la référence de sa première ligne de
+  test de sorte « tour »).
+
+Le libellé vient de `tour_label`, sinon d'un repli traduit côté serveur
+(« Start the tour » au bandeau, « Show me » sur une carte).
+
+**Un bouton de visite ne s'affiche que si la visite est au registre JS**
+(`web_tour.tours`) du navigateur. Le service rend sans rien faire pour un nom
+inconnu ; un bouton muet n'est donc pas montré. Une visite déclarée seulement
+dans `web.assets_tests` n'est au registre qu'en mode test : une visite destinée
+au guide se déclare dans `web.assets_backend`, sous `static/src`, où ses `_t`
+sont aussi extraits pour la traduction.
+
+### L'Onboarding est rétabli
+
+Le mode manuel du service active l'Onboarding de l'utilisateur **en base**.
+Laissé actif, chaque chargement suivant lancerait les visites natives d'Odoo
+non consommées, et la fin de la visite enchaînerait sur la suivante. Le guide
+lit l'état du chargement de la page (`session.tour_enabled`) et, s'il était
+inactif, le rétablit sitôt la visite démarrée.
+
+La visite en cours continue, son état vivant dans le navigateur. En contrepartie,
+**un rechargement de page l'efface** : le service ne reprend une visite
+manuelle au chargement que si l'Onboarding est actif. Une visite lancée du
+guide navigue donc par les menus : pas d'`url` (le guide passe
+`redirect: false`), pas de `goToUrl`, pas d'`expectUnloadPage`.
+
+Ne pas livrer d'enregistrement `web_tour.tour` pour une visite du guide, sauf
+avec `custom=True` : sinon elle entre dans la file des visites d'Onboarding.
+
+## Guide détaillé d'un requis
+
+`guide_id` sur le requis désigne sa page détaillée. Le bouton **Guide** du
+formulaire du requis, visible seulement quand `guide_id` est posé, l'ouvre par
+`action_open_guide`, comme le bouton **Preview** d'un guide. L'onglet **Guide**
+du formulaire liste les cartes qui citent le requis.
 
 ## Voir aussi
 
