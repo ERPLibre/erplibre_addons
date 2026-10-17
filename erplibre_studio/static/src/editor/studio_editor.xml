@@ -155,7 +155,11 @@
             t-on-click.stop="() => this.select()"
         >
             <i t-if="canDrag" class="fa fa-arrows me-1" />
-            <t t-esc="block.tag" />
+            <t t-if="block.tag === 'chatter'">
+                <i class="fa fa-comments me-1" />
+                Chatter: messages, followers and activities
+            </t>
+            <t t-else="" t-esc="block.tag" />
             <t t-if="block.label !== block.tag">
                 ·
                 <t t-esc="block.label" />
@@ -573,9 +577,39 @@
                 <div class="ms-auto d-flex flex-wrap gap-1">
                     <t t-if="project">
                         <button
+                            class="btn btn-sm btn-secondary o_erplibre_studio_new_model"
+                            title="A new model of the project, with its views, its menu and its access rights"
+                            t-att-disabled="state.busy"
+                            t-on-click="() => this.openModelDialog()"
+                        >
+                            <i class="fa fa-plus" />
+                            New model
+                        </button>
+                        <button
+                            class="btn btn-sm o_erplibre_studio_access_toggle"
+                            t-att-class="state.panel === 'access' ? 'btn-primary' : 'btn-secondary'"
+                            title="The access rights the project gives to groups"
+                            t-att-disabled="state.busy"
+                            t-on-click="() => this.togglePanel('access')"
+                        >
+                            <i class="fa fa-key" />
+                            Access rights
+                        </button>
+                        <button
+                            class="btn btn-sm o_erplibre_studio_rules_toggle"
+                            t-att-class="state.panel === 'rules' ? 'btn-primary' : 'btn-secondary'"
+                            title="The record rules of the project"
+                            t-att-disabled="state.busy"
+                            t-on-click="() => this.togglePanel('rules')"
+                        >
+                            <i class="fa fa-filter" />
+                            Record rules
+                        </button>
+                        <button
                             class="btn btn-sm o_erplibre_studio_preview_toggle"
                             t-att-class="state.preview ? 'btn-primary' : 'btn-secondary'"
                             title="Show the view as its editor sees the draft"
+                            t-att-disabled="state.panel"
                             t-on-click="togglePreview"
                         >
                             <i class="fa fa-eye" />
@@ -600,8 +634,8 @@
                         </button>
                         <button
                             class="btn btn-sm btn-primary o_erplibre_studio_apply"
-                            t-att-disabled="state.busy or project.state !== 'draft' or !project.change_count"
-                            title="Create the fields and the inherited views in the database"
+                            t-att-disabled="state.busy or project.state !== 'draft' or !project.item_count"
+                            title="Create the models, fields, views, menus and rights in the database"
                             t-on-click="() => this.projectAction('action_apply')"
                         >
                             Apply
@@ -645,7 +679,7 @@
             </div>
             <div t-elif="state.error" class="alert alert-warning m-3 o_erplibre_studio_error" t-esc="state.error" />
             <div t-else="" class="d-flex flex-grow-1 overflow-hidden">
-                <aside class="o_erplibre_studio_palette border-end p-2 overflow-auto">
+                <aside t-if="!panel" class="o_erplibre_studio_palette border-end p-2 overflow-auto">
                     <t t-call="erplibre_studio.Palette" />
                 </aside>
                 <main
@@ -653,7 +687,8 @@
                     t-att-class="{'o_erplibre_studio_busy': state.busy}"
                     t-on-click="onCanvasClick"
                 >
-                    <div t-if="state.preview" class="o_erplibre_studio_preview border rounded">
+                    <t t-if="panel" t-call="erplibre_studio.Panel.{{panel}}" />
+                    <div t-elif="state.preview" class="o_erplibre_studio_preview border rounded">
                         <View t-props="previewProps" t-key="previewKey" />
                     </div>
                     <t
@@ -664,6 +699,10 @@
                 </main>
                 <aside class="o_erplibre_studio_sidebar border-start p-2 overflow-auto">
                     <t t-call="erplibre_studio.Editor.Properties" />
+                    <t t-if="project">
+                        <hr />
+                        <t t-call="erplibre_studio.Editor.Models" />
+                    </t>
                     <hr />
                     <div class="fw-bold small mb-1">Changes of this view</div>
                     <div

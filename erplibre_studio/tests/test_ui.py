@@ -145,3 +145,69 @@ class TestStudioUi(HttpCase):
             success_signal="[HOOT] Test suite succeeded",
             error_checker=_hoot_error,
         )
+
+
+@tagged("post_install", "-at_install")
+class TestStudioModelsUi(HttpCase):
+    """A class of its own: Apply adds a model to the registry, which the
+    rollback of the test leaves there until the cleanup of the class."""
+
+    def test_models_tour(self):
+        """A new model made from the editor: a new app with an icon, Apply
+        and open, a field dropped into its form, an access right changed,
+        a rule checked and saved, Apply. Every record lives under the
+        external ids of the module."""
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?debug=1&view_type=list",
+            "erplibre_studio_models",
+            login="admin",
+            timeout=240,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_models")]
+        )
+        self.assertEqual(project.state, "applied")
+        self.assertEqual(
+            (project.app_name, project.app_icon),
+            ("Tour item", "base,static/description/icon.png"),
+        )
+        line = project.new_model_ids
+        self.assertEqual((line.model, line.name), ("x_tour_item", "Tour item"))
+        model = project.created_model_ids
+        self.assertEqual((model.model, model.state), ("x_tour_item", "manual"))
+        self.assertIn("x_tour_item", self.env)
+        app = project.created_menu_ids.filtered(lambda m: not m.parent_id)
+        self.assertEqual(app.name, "Tour item")
+        self.assertEqual(app.web_icon, "base,static/description/icon.png")
+        menu = project.created_menu_ids - app
+        self.assertEqual(menu.parent_id, app)
+        self.assertEqual(menu.action, project.created_action_ids)
+        self.assertEqual(project.created_action_ids.res_model, "x_tour_item")
+        access = project.created_access_ids
+        self.assertEqual(access.group_id, self.env.ref("base.group_user"))
+        self.assertEqual(
+            (
+                access.perm_read,
+                access.perm_write,
+                access.perm_create,
+                access.perm_unlink,
+            ),
+            (True, True, True, False),
+        )
+        rule = project.created_rule_ids
+        self.assertEqual(
+            (rule.name, rule.model_id, rule.domain_force),
+            ("Tour own items", model, "[('create_uid', '=', user.id)]"),
+        )
+        form = project.created_view_ids.filtered(lambda v: v.type == "form")
+        studio = project.studio_view_ids
+        self.assertEqual(studio.inherit_id, form)
+        new_field = project.field_ids
+        self.assertEqual((new_field.model, new_field.ttype), ("x_tour_item", "char"))
+        arch = etree.fromstring(
+            self.env["x_tour_item"].get_view(form.id, "form")["arch"]
+        )
+        left = arch.xpath("//group[@name='studio_left']/field")
+        self.assertEqual([n.get("name") for n in left], [new_field.name])

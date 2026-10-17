@@ -159,3 +159,8 @@ body.o_erplibre_studio_dragging .o_erplibre_studio {
         min-height: 1.5rem;
     }
 }
+
+// The control that removes a group from a rule, inside its badge.
+.o_erplibre_studio_rule_group_remove {
+    font-size: 0.6em;
+}

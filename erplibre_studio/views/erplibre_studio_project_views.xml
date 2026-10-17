@@ -16,6 +16,7 @@
                     decoration-success="state != 'draft'"
                 />
                 <field name="change_count" optional="show" />
+                <field name="item_count" optional="hide" />
                 <field name="user_id" optional="show" />
                 <field name="applied_date" optional="show" />
             </list>
@@ -33,20 +34,20 @@
                         type="object"
                         string="Open the editor"
                         class="btn-secondary"
-                        invisible="not change_count"
+                        invisible="not change_count and not created_model_ids"
                     />
                     <button
                         name="action_apply"
                         type="object"
                         string="Apply"
                         class="btn-primary"
-                        invisible="state != 'draft' or not change_count"
+                        invisible="state != 'draft' or not item_count"
                     />
                     <button
                         name="action_discard"
                         type="object"
                         string="Discard the draft"
-                        invisible="state != 'draft' or not change_count"
+                        invisible="state != 'draft' or (not item_count and not applied_snapshot)"
                         confirm="Back to the changes of the last Apply?"
                     />
                     <button
@@ -54,13 +55,13 @@
                         type="object"
                         string="Revert"
                         invisible="state == 'draft' and not applied_snapshot"
-                        confirm="Remove the views and the custom fields of this project from the database? The values of these fields are lost."
+                        confirm="Remove what this project created from the database: its models and their records, its fields and their values, its views, menus, actions and rights?"
                     />
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
                     <!-- erplibre_studio_generate removes it and adds the generation. -->
-                    <div name="generation_hint" class="alert alert-info" role="status" invisible="not change_count">
+                    <div name="generation_hint" class="alert alert-info" role="status" invisible="not item_count">
                         Generating a module needs ERPLibre studio generate, on a database started with --dev.
                     </div>
                     <div class="oe_title">
@@ -76,6 +77,11 @@
                         <group name="installed_module">
                             <field name="module_id" invisible="not module_id" />
                             <field name="module_state" invisible="not module_id" />
+                        </group>
+                        <group name="app">
+                            <field name="app_name" />
+                            <field name="app_icon" invisible="not app_name" />
+                            <field name="app_sequence" invisible="not app_name" />
                         </group>
                     </group>
                     <notebook>
@@ -102,6 +108,69 @@
                                 </form>
                             </field>
                         </page>
+                        <page string="New models" name="new_models">
+                            <field name="new_model_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="model" readonly="applied" />
+                                    <field name="chatter" />
+                                    <field name="menu_mode" />
+                                    <field
+                                        name="menu_parent_id"
+                                        invisible="menu_mode != 'menu'"
+                                        required="menu_mode == 'menu'"
+                                    />
+                                    <field name="menu_name" optional="show" />
+                                    <field name="menu_sequence" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Access rights" name="access_rights">
+                            <field name="access_line_ids">
+                                <list editable="bottom">
+                                    <field name="model" />
+                                    <field name="group_id" />
+                                    <field name="perm_read" />
+                                    <field name="perm_write" />
+                                    <field name="perm_create" />
+                                    <field name="perm_unlink" />
+                                    <field name="xml_name" optional="hide" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Record rules" name="record_rules">
+                            <field name="rule_line_ids">
+                                <list>
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="model" />
+                                    <field name="group_ids" widget="many2many_tags" />
+                                    <field name="perm_read" />
+                                    <field name="perm_write" />
+                                    <field name="perm_create" />
+                                    <field name="perm_unlink" />
+                                </list>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="name" />
+                                            <field name="model" />
+                                            <field name="group_ids" widget="many2many_tags" />
+                                            <field name="xml_name" />
+                                        </group>
+                                        <group>
+                                            <field name="perm_read" />
+                                            <field name="perm_write" />
+                                            <field name="perm_create" />
+                                            <field name="perm_unlink" />
+                                        </group>
+                                    </group>
+                                    <field name="domain_force" />
+                                </form>
+                            </field>
+                        </page>
                         <page string="Database" name="database">
                             <group>
                                 <field name="applied_date" />
@@ -120,6 +189,48 @@
                                         <field name="name" />
                                         <field name="inherit_id" />
                                         <field name="priority" />
+                                    </list>
+                                </field>
+                                <field name="created_model_ids">
+                                    <list>
+                                        <field name="model" />
+                                        <field name="name" />
+                                        <field name="state" />
+                                    </list>
+                                </field>
+                                <field name="created_view_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="type" />
+                                    </list>
+                                </field>
+                                <field name="created_action_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="res_model" />
+                                    </list>
+                                </field>
+                                <field name="created_menu_ids">
+                                    <list>
+                                        <field name="complete_name" />
+                                    </list>
+                                </field>
+                                <field name="created_access_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="model_id" />
+                                        <field name="group_id" />
+                                        <field name="perm_read" />
+                                        <field name="perm_write" />
+                                        <field name="perm_create" />
+                                        <field name="perm_unlink" />
+                                    </list>
+                                </field>
+                                <field name="created_rule_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="model_id" />
+                                        <field name="domain_force" />
                                     </list>
                                 </field>
                             </group>

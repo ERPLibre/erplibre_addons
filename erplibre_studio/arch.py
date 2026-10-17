@@ -295,11 +295,24 @@ ITEM_KINDS = ("many2one", "raw", "text")
 # The tags « add_node » inserts; the attributes come from the operation.
 NODE_TAGS = ("filter", "separator", "widget")
 
+# The leaf elements of a form that stay where the view puts them: the
+# chatter is laid out by the web client beside or under the sheet, from
+# where it stands in the arch.
+FIXED_TAGS = ("chatter",)
+
+# A model the studio creates: « x_ », then a letter. 50 characters keep
+# the names built from it (« <model>_<comodel>_rel », « view_<model>_search »,
+# its table and their indexes) under the 63 characters of PostgreSQL.
+MODEL_NAME_SIZE = 50
+# The default views of a model the studio creates.
+MODEL_VIEW_TYPES = ("form", "list", "search")
+
 OPTIONAL_VALUES = ("", "show", "hide")
 
 _SAFE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _TEMPLATE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.-]*$")
 _FIELD_NAME = re.compile(r"^x_[a-z0-9_]+$")
+_MODEL_NAME = re.compile(r"^x_[a-z][a-z0-9_]*$")
 _MODULE_NAME = re.compile(r"^[a-z][a-z0-9_]*$")
 # A node attribute a change may write: never a QWeb directive (« t- »).
 _ATTRIBUTE_NAME = re.compile(r"^[a-z_][a-z0-9_]*$")
@@ -567,7 +580,7 @@ def drop_refusal(view_type, node, position):
 def move_refusal(view_type, node):
     """Why ``node`` cannot move (an ArchError), or None when it can."""
     parent = node.getparent()
-    if parent is None or node.tag == "templates" or is_template(node):
+    if parent is None or node.tag in ("templates",) + FIXED_TAGS or is_template(node):
         return ArchError(f"<{node.tag}> cannot move.", "no_move", tag=node.tag)
     if view_type in TEMPLATED_TYPES:
         if not in_template(node):
@@ -584,6 +597,8 @@ def hide_refusal(view_type, node):
     """Why ``node`` cannot be hidden (an ArchError), or None."""
     if node.getparent() is None:
         return ArchError("The view itself cannot be hidden.", "no_hide_root")
+    if node.tag in FIXED_TAGS:
+        return ArchError(f"<{node.tag}> cannot be hidden.", "no_hide", tag=node.tag)
     if view_type in TEMPLATED_TYPES:
         if not in_template(node):
             return ArchError(
@@ -1059,17 +1074,67 @@ def shown_field_names(root, view_type):
     }
 
 
-def field_name_from_label(label, taken):
-    """A free ``x_`` field name made of ``label``: ASCII, lower case,
-    underscores, at most 63 characters, not in ``taken``."""
+def _slug(label):
+    """``label`` in ASCII lower case letters, digits and underscores."""
     text = unicodedata.normalize("NFKD", label or "").encode("ascii", "ignore")
-    slug = re.sub(r"[^a-z0-9]+", "_", text.decode().lower()).strip("_") or "field"
-    base = f"x_{slug}"[:58].rstrip("_")
+    return re.sub(r"[^a-z0-9]+", "_", text.decode().lower()).strip("_")
+
+
+def _free_name(base, taken):
     name, count = base, 2
     while name in taken:
         name = f"{base}_{count}"
         count += 1
     return name
+
+
+def field_name_from_label(label, taken):
+    """A free ``x_`` field name made of ``label``: ASCII, lower case,
+    underscores, at most 63 characters, not in ``taken``."""
+    base = f"x_{_slug(label) or 'field'}"[:58].rstrip("_")
+    return _free_name(base, taken)
+
+
+def model_name_from_label(label, taken):
+    """A free ``x_`` model name made of ``label`` as
+    ``field_name_from_label`` makes a field name: a letter after « x_ »,
+    at most ``MODEL_NAME_SIZE`` characters, not in ``taken``."""
+    slug = _slug(label) or "model"
+    if not slug[0].isalpha():
+        slug = f"model_{slug}"
+    base = f"x_{slug}"[: MODEL_NAME_SIZE - 4].rstrip("_")
+    return _free_name(base, taken)
+
+
+def valid_model_name(name):
+    return bool(name and len(name) <= MODEL_NAME_SIZE and _MODEL_NAME.match(name))
+
+
+def default_model_arch(view_type, label, chatter=False):
+    """The arch text of the default ``view_type`` view (``MODEL_VIEW_TYPES``)
+    of a model the studio creates, labelled ``label``. The form has a title
+    on ``x_name`` and two empty columns to drop fields into, then the
+    chatter when ``chatter``. The arch depends on these values only: the
+    changes of the editor on the view stay in an inherited view, so that
+    writing the arch again never moves the nodes they locate."""
+    root = etree.Element(view_type, {"string": label})
+    if view_type == "form":
+        sheet = etree.SubElement(root, "sheet")
+        title = etree.SubElement(sheet, "div", {"class": "oe_title"})
+        heading = etree.SubElement(title, "h1")
+        etree.SubElement(heading, "field", {"name": "x_name", "placeholder": label})
+        main = etree.SubElement(sheet, "group", {"name": "studio_main"})
+        etree.SubElement(main, "group", {"name": "studio_left"})
+        etree.SubElement(main, "group", {"name": "studio_right"})
+        if chatter:
+            etree.SubElement(root, "chatter")
+    elif view_type in ("list", "search"):
+        etree.SubElement(root, "field", {"name": "x_name"})
+    else:
+        raise ArchError(
+            f"Unknown view type {view_type}.", "unknown_view_type", type=view_type
+        )
+    return etree.tostring(root, encoding="unicode", pretty_print=True)
 
 
 def valid_field_name(name):

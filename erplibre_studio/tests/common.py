@@ -93,6 +93,21 @@ class StudioMixin(DeveloperMixin):
             new_test_user(self.env, login="erplibre_studio_j2_other", groups=groups),
         )
 
+    def make_model(self, project, label="Studio test item", **values):
+        """A model line of ``project`` made as the editor makes it, with its
+        default access row."""
+        return project._studio_create_model({"name": label, **values})
+
+    def mail_available(self):
+        return self.Project._studio_mail_available()
+
+    def module_records(self, module_name, model=None):
+        """The ir.model.data of ``module_name`` (of ``model`` when given)."""
+        domain = [("module", "=", module_name)]
+        if model:
+            domain.append(("model", "=", model))
+        return self.env["ir.model.data"].search(domain)
+
     def preview_key(self, project):
         return {PREVIEW_KEY: f"{project.id}:{project.draft_revision}"}
 

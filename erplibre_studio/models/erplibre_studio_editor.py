@@ -5,7 +5,12 @@ from odoo import api, models
 from odoo.exceptions import UserError
 
 from .. import arch as studio_arch
-from .erplibre_studio_project import NEW_FIELD_TYPES, PREVIEW_KEY
+from .erplibre_studio_project import (
+    NEW_FIELD_TYPES,
+    PERMS,
+    PREVIEW_KEY,
+    protected_model,
+)
 
 FIELD_ATTRIBUTES = [
     "string",
@@ -74,12 +79,19 @@ class ErplibreStudioEditor(models.AbstractModel):
         return view
 
     @api.model
-    def _project(self, project_id, pick_project=True):
-        """The project ``project_id``; without one, the last project of the
-        user unless ``pick_project`` is False. Opening a project makes the
-        user its editor, the one who sees its draft."""
+    def _project(self, project_id, pick_project=True, model=None):
+        """The project ``project_id``; without one, unless ``pick_project``
+        is False, the project that creates ``model``, else the last project
+        of the user. Opening a project makes the user its editor, the one
+        who sees its draft."""
         Project = self.env["erplibre.studio.project"]
         project = Project.browse(int(project_id)).exists() if project_id else Project
+        if not project and pick_project and model:
+            project = (
+                self.env["erplibre.studio.model"]
+                .search([("model", "=", model)], limit=1)
+                .project_id
+            )
         if not project and pick_project:
             project = Project.search([("user_id", "=", self.env.uid)], limit=1)
         if project and project.user_id != self.env.user:
@@ -279,7 +291,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         ``pick_project``: see ``_project``."""
         self._check_studio_access()
         view = self._resolve_view(model, view_id, view_type)
-        project = self._project(project_id, pick_project)
+        project = self._project(project_id, pick_project, model)
         Project = self.env["erplibre.studio.project"]
         if project:
             arch, errors = project._draft_arch(view)
@@ -338,6 +350,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             ],
             "preview_key": PREVIEW_KEY,
             "sample_res_id": sample or False,
+            "mail_available": Project._studio_mail_available(),
         }
 
     @api.model
@@ -354,7 +367,58 @@ class ErplibreStudioEditor(models.AbstractModel):
             "revision": project.draft_revision,
             "preview_value": f"{project.id}:{project.draft_revision}",
             "change_count": project.change_count,
+            "item_count": project.item_count,
             "applied": bool(project.applied_snapshot),
+            "app": (
+                {"name": project.app_name, "icon": project.app_icon or False}
+                if project.app_name
+                else False
+            ),
+            "models": [self._model_payload(line) for line in project.new_model_ids],
+            # The menus Apply made, as the web client shows them: when they
+            # change, the editor reloads the menus of the web client.
+            "menus": [
+                [menu.id, menu.name, menu.web_icon or False, menu.parent_id.id]
+                for menu in project.created_menu_ids.sudo().sorted("id")
+            ],
+            "access": [
+                {
+                    "id": line.id,
+                    "model": line.model,
+                    "group": [line.group_id.id, line.group_id.full_name],
+                    **{perm: line[perm] for perm in PERMS},
+                }
+                for line in project.access_line_ids
+            ],
+            "rules": [
+                {
+                    "id": rule.id,
+                    "name": rule.name,
+                    "model": rule.model,
+                    "domain": rule.domain_force,
+                    "groups": [[g.id, g.full_name] for g in rule.group_ids],
+                    **{perm: rule[perm] for perm in PERMS},
+                }
+                for rule in project.rule_line_ids
+            ],
+        }
+
+    @api.model
+    def _model_payload(self, line):
+        """A model line as the editor shows it; ``views`` holds the ids of
+        its default views once applied."""
+        views = line._studio_views() if line.applied else {}
+        parent = line.menu_parent_id
+        return {
+            "id": line.id,
+            "model": line.model,
+            "name": line.name,
+            "chatter": line.chatter,
+            "menu_mode": line.menu_mode,
+            "menu_parent": [parent.id, parent.complete_name] if parent else False,
+            "menu_name": line.menu_name or "",
+            "applied": line.applied,
+            "views": {view_type: view.id for view_type, view in views.items()},
         }
 
     @api.model
@@ -397,11 +461,22 @@ class ErplibreStudioEditor(models.AbstractModel):
 
     @api.model
     def project_action(
-        self, project_id, action, model, view_id, view_type, revision=None
+        self,
+        project_id,
+        action,
+        model,
+        view_id,
+        view_type,
+        revision=None,
+        fallback=None,
     ):
         """Run ``action`` (apply, discard, revert, undo) on the project;
         return the new payload, with the ``notice`` of the action when it
-        answered a notification."""
+        answered a notification. When the action removed the model or the
+        view on screen (a model of the project), the payload is the one of
+        ``fallback`` ([model, view id, view type], the view the editor was
+        opened on) with ``view_changed``; without such a view left, only
+        {view_gone, project, notice}."""
         self._check_studio_access()
         if action not in PROJECT_ACTIONS:
             raise UserError(self.env._("Unknown action %(action)s.", action=action))
@@ -411,18 +486,239 @@ class ErplibreStudioEditor(models.AbstractModel):
             result = project.action_undo(view)
         else:
             result = getattr(project, action)()
-        data = self.get_editor_data(model, view.id, view_type, project.id)
+        if model in self.env and view.exists():
+            data = self.get_editor_data(model, view.id, view_type, project.id)
+        else:
+            data = self._fallback_data(project, fallback)
         if isinstance(result, dict) and result.get("tag") == "display_notification":
             data["notice"] = result["params"]["message"]
         return data
 
     @api.model
-    def get_comodels(self):
-        """[[model, name]] of the models a many2one can point to."""
-        self._check_studio_access()
+    def _fallback_data(self, project, fallback):
+        """The payload of the view ``fallback`` [model, view id, view type]
+        flagged ``view_changed``, or {view_gone, project} when it is gone
+        too."""
+        model, view_id, view_type = (list(fallback or []) + [False] * 3)[:3]
+        if model and model in self.env:
+            try:
+                data = self.get_editor_data(
+                    model, view_id, view_type or "form", project.id
+                )
+                data["view_changed"] = True
+                return data
+            except UserError:
+                pass
+        return {"view_gone": True, "project": self._project_payload(project)}
+
+    @api.model
+    def _registry_models(self):
+        """[[model, name]] of the models of the registry that store records."""
         records = self.env["ir.model"].sudo().search([("transient", "=", False)])
         return [
             [r.model, r.name]
             for r in records
             if r.model in self.env and not self.env[r.model]._abstract
+        ]
+
+    @api.model
+    def _pending_models(self, project_id):
+        """[[model, name]] of the models of the project not created yet."""
+        Project = self.env["erplibre.studio.project"]
+        project = Project.browse(int(project_id)).exists() if project_id else Project
+        return [
+            [line.model, line.name]
+            for line in project.new_model_ids
+            if line.model not in self.env
+        ]
+
+    @api.model
+    def get_comodels(self, project_id=False):
+        """[[model, name]] of the models a many2one can point to: those of
+        the registry, and the models of the project ``project_id`` that
+        Apply creates first."""
+        self._check_studio_access()
+        return self._registry_models() + self._pending_models(project_id)
+
+    # ── models, access rights and rules ─────────────────────────────────
+
+    @api.model
+    def get_studio_choices(self, project_id=False):
+        """What the dialogs of the models, the access grid and the rules
+        offer: the menus a model can go under (with an external id, no
+        action, outside the project), the groups (with an external id), the
+        icons of an app, the models rights can name, and the model names a
+        new model cannot take (``taken_models``)."""
+        self._check_studio_access()
+        Project = self.env["erplibre.studio.project"]
+        project = Project.browse(int(project_id)).exists() if project_id else Project
+        Menu = (
+            self.env["ir.ui.menu"].sudo().with_context(**{"ir.ui.menu.full_list": True})
+        )
+        menus = Menu.search([]) - project.created_menu_ids
+        menu_xmlids = menus.get_external_id()
+        groups = self.env["res.groups"].sudo().search([])
+        group_xmlids = groups.get_external_id()
+        return {
+            "mail_available": Project._studio_mail_available(),
+            "icons": Project._studio_app_icons(),
+            "menus": sorted(
+                (
+                    {
+                        "id": menu.id,
+                        "name": menu.complete_name,
+                        "xml_id": menu_xmlids[menu.id],
+                    }
+                    for menu in menus
+                    if menu_xmlids.get(menu.id) and not menu.action
+                ),
+                key=lambda m: m["name"].lower(),
+            ),
+            "groups": sorted(
+                (
+                    {
+                        "id": group.id,
+                        "name": group.full_name,
+                        "xml_id": group_xmlids[group.id],
+                    }
+                    for group in groups
+                    if group_xmlids.get(group.id)
+                ),
+                key=lambda g: g["name"].lower(),
+            ),
+            "models": [
+                item for item in self._registry_models() if not protected_model(item[0])
+            ]
+            + self._pending_models(project.id),
+            "taken_models": sorted(Project._studio_taken_models()),
+        }
+
+    @api.model
+    def _answer(self, project, model, view_id, view_type, **extra):
+        data = self.get_editor_data(model, view_id, view_type, project.id)
+        data.update(extra)
+        return data
+
+    @api.model
+    def create_model(
+        self, project_id, values, model, view_id, view_type, revision=None
+    ):
+        """Add a model to the project (see ``_studio_create_model``); the
+        payload of the current view, with ``created_model``."""
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        line = project._studio_create_model(values or {})
+        return self._answer(
+            project,
+            model,
+            view.id,
+            view_type,
+            created_model=self._model_payload(line),
+        )
+
+    @api.model
+    def update_model(
+        self, project_id, line_id, values, model, view_id, view_type, revision=None
+    ):
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        project._studio_update_model(project._studio_model_line(line_id), values or {})
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def remove_model(
+        self, project_id, line_id, model, view_id, view_type, revision=None
+    ):
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        project._studio_remove_model(project._studio_model_line(line_id))
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def update_app(self, project_id, values, model, view_id, view_type, revision=None):
+        """Rename the app of the project or change its icon."""
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        project._studio_update_app(values or {})
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def set_access(self, project_id, rows, model, view_id, view_type, revision=None):
+        """Replace the access rows of the project (``_studio_set_access``)."""
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        project._studio_set_access(rows or [])
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def save_rule(self, project_id, rule, model, view_id, view_type, revision=None):
+        """Create or update a rule of the project (``_studio_save_rule``)."""
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        line = project._studio_save_rule(rule or {})
+        return self._answer(project, model, view.id, view_type, saved_rule=line.id)
+
+    @api.model
+    def remove_rule(
+        self, project_id, rule_id, model, view_id, view_type, revision=None
+    ):
+        self._check_studio_access()
+        view = self._resolve_view(model, view_id, view_type)
+        project = self._edited_project(project_id, revision)
+        project._studio_remove_rule(project._studio_rule_line(rule_id))
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def check_rule_domain(self, project_id, model, domain):
+        """{ok, count} when ``domain`` applies to ``model`` as a record
+        rule, ``count`` the records it matches (False for a model not
+        created yet); else {ok: False, error}."""
+        self._check_studio_access()
+        # A read: the project is not opened, its editor and its revision
+        # stay as they are.
+        Project = self.env["erplibre.studio.project"]
+        project = Project.browse(int(project_id or 0)).exists()
+        if not project:
+            raise UserError(self.env._("Choose or create a studio project first."))
+        try:
+            project._studio_check_rights_model(model)
+            terms = project._studio_rule_domain(model, domain)
+        except UserError as exc:
+            return {"ok": False, "error": str(exc.args[0])}
+        count = False
+        if model in self.env:
+            count = self.env[model].sudo().search_count(terms)
+        return {"ok": True, "count": count}
+
+    @api.model
+    def get_access_existing(self, project_id, model):
+        """The access rights of ``model`` the project did not create:
+        [{id, name, group, perm_*, module}], to show next to its grid."""
+        self._check_studio_access()
+        Project = self.env["erplibre.studio.project"]
+        project = Project.browse(int(project_id)).exists() if project_id else Project
+        if model not in self.env:
+            return []
+        rows = (
+            self.env["ir.model.access"].sudo().search([("model_id.model", "=", model)])
+            - project.created_access_ids
+        )
+        xmlids = rows.get_external_id()
+        return [
+            {
+                "id": row.id,
+                "name": row.name,
+                "group": (
+                    [row.group_id.id, row.group_id.full_name] if row.group_id else False
+                ),
+                "module": (xmlids.get(row.id) or "").split(".")[0] or False,
+                **{perm: row[perm] for perm in PERMS},
+            }
+            for row in rows
         ]

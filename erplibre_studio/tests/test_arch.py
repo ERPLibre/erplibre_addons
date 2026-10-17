@@ -238,3 +238,73 @@ class TestArch(BaseCase):
         self.assertTrue(studio_arch.constant_true("True"))
         self.assertFalse(studio_arch.constant_true("is_company"))
         self.assertFalse(studio_arch.constant_true(None))
+
+    def test_model_names(self):
+        for name in ("x_item", "x_a1_b", "x_" + "a" * 48):
+            self.assertTrue(studio_arch.valid_model_name(name), name)
+        for name in (
+            "",
+            "x_",
+            "x_1a",
+            "x_A",
+            "item",
+            "x_a.b",
+            "x_a-b",
+            "x_" + "a" * 49,
+        ):
+            self.assertFalse(studio_arch.valid_model_name(name), name)
+        self.assertEqual(
+            studio_arch.model_name_from_label("Équipe à faire", set()),
+            "x_equipe_a_faire",
+        )
+        self.assertEqual(
+            studio_arch.model_name_from_label("Item", {"x_item", "x_item_2"}),
+            "x_item_3",
+        )
+        self.assertEqual(studio_arch.model_name_from_label("!!", set()), "x_model")
+        self.assertEqual(studio_arch.model_name_from_label("3 D", set()), "x_model_3_d")
+        long_name = studio_arch.model_name_from_label("word " * 30, set())
+        self.assertTrue(studio_arch.valid_model_name(long_name))
+        self.assertTrue(
+            studio_arch.valid_model_name(
+                studio_arch.model_name_from_label("word " * 30, {long_name})
+            )
+        )
+
+    def test_default_model_arch(self):
+        form = etree.fromstring(studio_arch.default_model_arch("form", "Item"))
+        self.assertEqual(form.get("string"), "Item")
+        self.assertEqual(
+            [node.get("name") for node in form.iter("field", "group")],
+            ["x_name", "studio_main", "studio_left", "studio_right"],
+        )
+        self.assertEqual(form.find(".//field").get("placeholder"), "Item")
+        self.assertFalse(form.xpath("//chatter"))
+        form = etree.fromstring(studio_arch.default_model_arch("form", "Item", True))
+        self.assertEqual(form[-1].tag, "chatter")
+        for view_type in ("list", "search"):
+            root = etree.fromstring(studio_arch.default_model_arch(view_type, "Item"))
+            self.assertEqual(root.tag, view_type)
+            self.assertEqual([f.get("name") for f in root], ["x_name"])
+        # The label is an attribute value: lxml escapes it.
+        form = etree.fromstring(studio_arch.default_model_arch("form", 'A "b" <c>'))
+        self.assertEqual(form.get("string"), 'A "b" <c>')
+        with self.assertRaises(studio_arch.ArchError):
+            studio_arch.default_model_arch("kanban", "Item")
+
+    def test_chatter_stays_in_place(self):
+        root = etree.fromstring(
+            studio_arch.default_model_arch("form", "Item", chatter=True)
+        )
+        chatter = root.find("chatter")
+        self.assertEqual(studio_arch.move_refusal("form", chatter).code, "no_move")
+        self.assertEqual(studio_arch.hide_refusal("form", chatter).code, "no_hide")
+        self.assertEqual(
+            studio_arch.drop_refusal("form", chatter, "after").code, "no_drop"
+        )
+        self.assertIsNotNone(studio_arch.drop_refusal("form", chatter, "inside"))
+        block = studio_arch.arch_blocks(root, "form", {})["children"][-1]
+        self.assertEqual(
+            (block["tag"], block["kind"], block["movable"]), ("chatter", "other", False)
+        )
+        self.assertNotIn("drop", block)

@@ -5,11 +5,15 @@ import json
 import logging
 import re
 
+import psycopg2
 from lxml import etree
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 from odoo.addons.base.models.ir_module import STATES
 from odoo.exceptions import UserError, ValidationError
 from odoo.modules.module import get_module_path
+from odoo.osv import expression
+from odoo.tools.misc import file_path
+from odoo.tools.safe_eval import safe_eval
 
 from .. import arch as studio_arch
 
@@ -40,8 +44,91 @@ MANAGED_FIELDS = frozenset(
         "applied_date",
         "field_ids",
         "studio_view_ids",
+        "created_model_ids",
+        "created_view_ids",
+        "created_action_ids",
+        "created_menu_ids",
+        "created_access_ids",
+        "created_rule_ids",
     }
 )
+
+# What Apply creates for the lines of a project, by kind: the managed field
+# that holds the records. ``_studio_remove_created`` removes them in the
+# order of REMOVAL_ORDER, so that nothing removed is still referred to.
+CREATED_FIELDS = {
+    "models": "created_model_ids",
+    "primary_views": "created_view_ids",
+    "actions": "created_action_ids",
+    "menus": "created_menu_ids",
+    "access": "created_access_ids",
+    "rules": "created_rule_ids",
+}
+REMOVAL_ORDER = (
+    "menus",
+    "actions",
+    "rules",
+    "access",
+    "views",
+    "primary_views",
+    "fields",
+    "models",
+)
+
+# The priority of the default views of a model the studio creates: the
+# one Odoo gives a view that names none.
+MODEL_VIEW_PRIORITY = 16
+# The icon of an app whose project chose none.
+DEFAULT_APP_ICON = "erplibre_studio,static/description/icon.png"
+# The icon of an app: the icon of an installed module.
+_APP_ICON = re.compile(r"^([a-z][a-z0-9_]*),static/description/icon\.png$")
+# The longest record rule domain the studio records.
+RULE_DOMAIN_SIZE = 2000
+PERMS = ("perm_read", "perm_write", "perm_create", "perm_unlink")
+# The existing models a project gives no access row nor rule on, by the
+# start of their name: the rights, the users, the companies, the settings
+# and the technical records of the database (``ir.*``: views, actions,
+# server actions, crons, external ids, modules, parameters). A row on one of
+# them would decide who changes the rights, or open the configuration of
+# the server, in every database that installs the generated module.
+PROTECTED_MODEL_PREFIXES = (
+    "ir.",
+    "res.users",
+    "res.groups",
+    "res.company",
+    "res.config",
+    "res.device",
+    "base.",
+    "bus.",
+    "auth_",
+)
+# The name of an external id Apply gives: letters, digits, « _ » and « - »;
+# it goes as such into the files of a generated module.
+XML_NAME = re.compile(r"^[A-Za-z0-9_\-]+$")
+# The name of the external id of a rule line.
+RULE_XML_NAME = re.compile(r"^rule_[a-z0-9_]+$")
+# The rights a share group (portal, public) never gets from a project on a
+# model the project does not create.
+SHARE_DENIED_PERMS = ("perm_write", "perm_create", "perm_unlink")
+# Set to SERVER_VALUES by the server code that writes the fields of the
+# lines the server computes (the external id names, kept by Discard): a
+# client value of these fields is dropped otherwise.
+RESTORE_KEY = "erplibre_studio_restore"
+
+
+class _ServerValues:
+    """The value of RESTORE_KEY: a Python object, which no RPC call can
+    put in its context."""
+
+
+SERVER_VALUES = _ServerValues()
+
+
+def protected_model(model):
+    """Whether ``model`` takes no access row nor rule from a project (see
+    PROTECTED_MODEL_PREFIXES)."""
+    return (model or "").startswith(PROTECTED_MODEL_PREFIXES)
+
 
 # Inheriting views apply by priority then id: 99 puts the studio view
 # after the views of the modules, as in the draft.
@@ -148,6 +235,80 @@ class ErplibreStudioProject(models.Model):
     module_state = fields.Selection(
         STATES, compute="_compute_module_id", string="Module state"
     )
+    app_name = fields.Char(
+        string="App",
+        help="The name of the top-level menu of the project, where its "
+        "models « In the app of the project » go.",
+    )
+    app_icon = fields.Char(
+        help="The icon of the app: « <module>,static/description/icon.png », "
+        "the icon of an installed module; empty: the icon of the studio.",
+    )
+    app_sequence = fields.Integer(default=50)
+    new_model_ids = fields.One2many(
+        "erplibre.studio.model", "project_id", string="New models", copy=False
+    )
+    access_line_ids = fields.One2many(
+        "erplibre.studio.access", "project_id", string="Access rights", copy=False
+    )
+    rule_line_ids = fields.One2many(
+        "erplibre.studio.rule", "project_id", string="Record rules", copy=False
+    )
+    item_count = fields.Integer(compute="_compute_item_count")
+    created_model_ids = fields.Many2many(
+        "ir.model",
+        "erplibre_studio_project_model_rel",
+        "project_id",
+        "model_id",
+        string="Models created",
+        readonly=True,
+        copy=False,
+    )
+    created_view_ids = fields.Many2many(
+        "ir.ui.view",
+        "erplibre_studio_project_primary_view_rel",
+        "project_id",
+        "view_id",
+        string="Default views created",
+        readonly=True,
+        copy=False,
+    )
+    created_action_ids = fields.Many2many(
+        "ir.actions.act_window",
+        "erplibre_studio_project_action_rel",
+        "project_id",
+        "action_id",
+        string="Actions created",
+        readonly=True,
+        copy=False,
+    )
+    created_menu_ids = fields.Many2many(
+        "ir.ui.menu",
+        "erplibre_studio_project_menu_rel",
+        "project_id",
+        "menu_id",
+        string="Menus created",
+        readonly=True,
+        copy=False,
+    )
+    created_access_ids = fields.Many2many(
+        "ir.model.access",
+        "erplibre_studio_project_access_rel",
+        "project_id",
+        "access_id",
+        string="Access rights created",
+        readonly=True,
+        copy=False,
+    )
+    created_rule_ids = fields.Many2many(
+        "ir.rule",
+        "erplibre_studio_project_rule_rel",
+        "project_id",
+        "rule_id",
+        string="Record rules created",
+        readonly=True,
+        copy=False,
+    )
 
     _sql_constraints = [
         (
@@ -163,6 +324,16 @@ class ErplibreStudioProject(models.Model):
     def _compute_change_count(self):
         for project in self:
             project.change_count = len(project.change_ids)
+
+    @api.depends("change_ids", "new_model_ids", "access_line_ids", "rule_line_ids")
+    def _compute_item_count(self):
+        for project in self:
+            project.item_count = (
+                len(project.change_ids)
+                + len(project.new_model_ids)
+                + len(project.access_line_ids)
+                + len(project.rule_line_ids)
+            )
 
     @api.depends("module_name")
     def _compute_module_id(self):
@@ -200,6 +371,21 @@ class ErplibreStudioProject(models.Model):
             if module and not own:
                 raise ValidationError(
                     self.env._("A module named %(name)s is already known.", name=name)
+                )
+
+    @api.constrains("app_name", "app_icon")
+    def _check_studio_app(self):
+        for project in self:
+            if project.app_icon:
+                project._studio_icon_module(project.app_icon)
+            in_app = project.new_model_ids.filtered(lambda m: m.menu_mode == "app")
+            if in_app and not (project.app_name or "").strip():
+                raise ValidationError(
+                    self.env._(
+                        "The models %(models)s go in the app of the project: "
+                        "it needs a name.",
+                        models=", ".join(in_app.mapped("model")),
+                    )
                 )
 
     def _is_own_directory(self, path):
@@ -242,6 +428,7 @@ class ErplibreStudioProject(models.Model):
 
     def write(self, vals):
         self._check_managed_fields([vals])
+        app_changed = {"app_name", "app_icon", "app_sequence"} & set(vals)
         if "module_name" in vals:
             for project in self:
                 if project.module_name != vals["module_name"]:
@@ -253,19 +440,34 @@ class ErplibreStudioProject(models.Model):
                 # The draft moves to another user: a new preview revision,
                 # so that no view cached for the former editor is reused.
                 project._internal().draft_revision += 1
+        if app_changed and not self.env.context.get(NO_TOUCH_KEY):
+            self._touch()
         return res
 
     def unlink(self):
         for project in self:
-            if project.studio_view_ids or project.field_ids:
+            created = [project[name] for name in CREATED_FIELDS.values()]
+            if any([project.studio_view_ids, project.field_ids, *created]):
                 raise UserError(
                     self.env._(
-                        "Revert the project %(name)s before deleting it: its "
-                        "fields and views are in the database.",
+                        "Revert the project %(name)s before deleting it: what "
+                        "it created is in the database.",
                         name=project.name,
                     )
                 )
         return super().unlink()
+
+    @api.model
+    def _studio_applied(self):
+        """The projects that have records in the database while their
+        generated module is not installed."""
+        return self.search([]).filtered(
+            lambda p: p.module_state != "installed"
+            and any(
+                [p.studio_view_ids, p.field_ids]
+                + [p[name] for name in CREATED_FIELDS.values()]
+            )
+        )
 
     # ── guards ──────────────────────────────────────────────────────────
 
@@ -274,11 +476,273 @@ class ErplibreStudioProject(models.Model):
         """Settings group and developer mode, as the developer panel."""
         self.env["erplibre.developer"]._check_panel_access()
 
+    # ── models, menus and rights of the project ─────────────────────────
+
+    @api.model
+    def _studio_mail_available(self):
+        """Whether a model can get a chatter: mail is installed. The studio
+        does not depend on it."""
+        return (
+            "mail.thread" in self.env
+            and "is_mail_thread" in self.env["ir.model"]._fields
+        )
+
+    def _studio_new_models(self):
+        """The names of the models the project creates."""
+        return set(self.new_model_ids.mapped("model"))
+
+    @api.model
+    def _studio_icon_module(self, icon):
+        """The module whose icon ``icon`` names; ValidationError unless it is
+        « <module>,static/description/icon.png » of an installed module."""
+        match = _APP_ICON.match(icon or "")
+        module = match and match.group(1)
+        installed = module and self.env["ir.module.module"].sudo().search_count(
+            [("name", "=", module), ("state", "=", "installed")]
+        )
+        if installed:
+            try:
+                file_path(f"{module}/static/description/icon.png")
+                return module
+            except (FileNotFoundError, ValueError):
+                pass
+        raise ValidationError(
+            self.env._("%(icon)s is not the icon of an installed module.", icon=icon)
+        )
+
+    @api.model
+    def _studio_app_icons(self):
+        """The icons an app can take: [{value, label, url}] of the installed
+        modules that have one, the studio first."""
+        icons = []
+        modules = (
+            self.env["ir.module.module"].sudo().search([("state", "=", "installed")])
+        )
+        for module in modules:
+            path = f"{module.name}/static/description/icon.png"
+            try:
+                file_path(path)
+            except (FileNotFoundError, ValueError):
+                continue
+            icons.append(
+                {
+                    "value": f"{module.name},static/description/icon.png",
+                    "label": module.shortdesc or module.name,
+                    "url": f"/{path}",
+                }
+            )
+        icons.sort(key=lambda i: (i["value"] != DEFAULT_APP_ICON, i["label"].lower()))
+        return icons
+
+    def _studio_check_menu(self, line):
+        """Raise ValidationError when the model line ``line`` cannot have
+        its menu: « app » needs the app of the project; « menu » needs a
+        parent menu with an external id, outside the project, that opens no
+        action."""
+        self.ensure_one()
+        if line.menu_mode == "app":
+            if not (self.app_name or "").strip():
+                raise ValidationError(
+                    self.env._(
+                        "The model %(model)s goes in the app of the project: "
+                        "name the app first.",
+                        model=line.model,
+                    )
+                )
+            return
+        parent = line.menu_parent_id.sudo()
+        if not parent:
+            raise ValidationError(
+                self.env._(
+                    "Choose the menu the model %(model)s goes under.",
+                    model=line.model,
+                )
+            )
+        if not parent.get_external_id().get(parent.id):
+            raise ValidationError(
+                self.env._(
+                    "The menu %(menu)s has no external id: the module could "
+                    "not refer to it.",
+                    menu=parent.complete_name,
+                )
+            )
+        if parent in self.created_menu_ids:
+            raise ValidationError(
+                self.env._(
+                    "The menu %(menu)s is a menu of this project: choose « In "
+                    "the app of the project ».",
+                    menu=parent.complete_name,
+                )
+            )
+        if parent.action:
+            raise ValidationError(
+                self.env._(
+                    "The menu %(menu)s opens an action: a menu that opens an "
+                    "action takes no submenu.",
+                    menu=parent.complete_name,
+                )
+            )
+
+    def _studio_check_rights_model(self, model):
+        """Raise ValidationError unless an access row or a rule of the
+        project can name ``model``: a model it creates, or a model of the
+        database that stores records."""
+        self.ensure_one()
+        if model in self._studio_new_models():
+            return
+        Model = self.env.get(model) if model else None
+        if (
+            Model is None
+            or Model._transient
+            or Model._abstract
+            or protected_model(model)
+        ):
+            raise ValidationError(
+                self.env._(
+                    "%(model)s cannot take access rights nor record rules "
+                    "from a studio project.",
+                    model=model,
+                )
+            )
+
+    @api.model
+    def _studio_check_group(self, group):
+        if not group.sudo().get_external_id().get(group.id):
+            raise ValidationError(
+                self.env._(
+                    "The group %(group)s has no external id: the module could "
+                    "not refer to it.",
+                    group=group.full_name,
+                )
+            )
+
+    @api.model
+    def _studio_share_groups(self, groups):
+        """The groups of ``groups`` for users outside the company: the
+        portal and public groups, the groups that imply them, and the
+        groups marked « share »."""
+        outside = self.env.ref("base.group_portal") | self.env.ref("base.group_public")
+        return groups.sudo().filtered(
+            lambda g: g.share or g in outside or g.trans_implied_ids & outside
+        )
+
+    def _studio_check_access_line(self, line):
+        """Raise ValidationError when the access row ``line`` gives a share
+        group (portal, public) more than reading a model the project does
+        not create: it would open an existing model to the users outside
+        the company."""
+        self.ensure_one()
+        if line.model in self._studio_new_models():
+            return
+        if not self._studio_share_groups(line.group_id):
+            return
+        if any(line[perm] for perm in SHARE_DENIED_PERMS):
+            raise ValidationError(
+                self.env._(
+                    "The group %(group)s is for users outside the company: on "
+                    "%(model)s, which the project does not create, it may only "
+                    "read.",
+                    group=line.group_id.full_name,
+                    model=line.model,
+                )
+            )
+
+    def _studio_check_rule(self, rule):
+        """Raise UserError when the rule line ``rule`` does not apply. On a
+        model the project does not create, a rule of a share group (portal,
+        public) is refused: Odoo grants a user the union of the rules of
+        its groups, so such a rule widens what these users reach."""
+        if not any(rule[perm] for perm in PERMS):
+            raise ValidationError(
+                self.env._(
+                    "The rule %(name)s applies to at least one operation.",
+                    name=rule.name,
+                )
+            )
+        shared = self._studio_share_groups(rule.group_ids)
+        if shared and rule.model not in self._studio_new_models():
+            raise ValidationError(
+                self.env._(
+                    "The rule %(name)s names groups of users outside the "
+                    "company (%(groups)s) on %(model)s, which the project does "
+                    "not create: it would widen what they reach.",
+                    name=rule.name,
+                    groups=", ".join(shared.mapped("full_name")),
+                    model=rule.model,
+                )
+            )
+        self._studio_rule_domain(rule.model, rule.domain_force, rule.name)
+
+    @api.model
+    def _studio_rule_domain(self, model, text, name=None):
+        """The domain of ``text`` evaluated as ir.rule evaluates it (``user``,
+        ``company_ids``, ``time``...). On a model of the registry, its terms
+        are checked against the fields of the model; on a model not created
+        yet, only their shape. Raise UserError, naming the rule ``name``,
+        when it does not apply."""
+        try:
+            if len(text or "") > RULE_DOMAIN_SIZE:
+                raise ValueError(
+                    self.env._("longer than %(size)s characters", size=RULE_DOMAIN_SIZE)
+                )
+            domain = safe_eval(text or "[]", self.env["ir.rule"]._eval_context())
+            if not isinstance(domain, (list, tuple)):
+                raise ValueError(self.env._("a domain is a list"))
+            if model in self.env:
+                with self.env.cr.savepoint():
+                    expression.expression(list(domain), self.env[model].sudo())
+            else:
+                check_domain_shape(domain)
+        except Exception as exc:  # noqa: BLE001 - any error is the message
+            raise UserError(
+                self.env._(
+                    "The domain of the rule %(name)s does not apply: %(error)s",
+                    name=name or model,
+                    error=exc,
+                )
+            ) from exc
+        return list(domain)
+
     # ── state ───────────────────────────────────────────────────────────
 
     def _current_snapshot(self):
+        """The JSON of the draft, to compare it with the one applied. A
+        project with changes of views only keeps the form of a list of its
+        changes, the one of the projects recorded before the models."""
         self.ensure_one()
-        return json.dumps(self.change_ids._snapshot(), sort_keys=True)
+        changes = self.change_ids._snapshot()
+        lines = self.new_model_ids or self.access_line_ids or self.rule_line_ids
+        if not lines and not self.app_name:
+            return json.dumps(changes, sort_keys=True)
+        return json.dumps(
+            {
+                "changes": changes,
+                "models": self.new_model_ids._snapshot(),
+                "access": self.access_line_ids._snapshot(),
+                "rules": self.rule_line_ids._snapshot(),
+                "app": {
+                    "name": self.app_name or "",
+                    "icon": self.app_icon or "",
+                    "sequence": self.app_sequence,
+                },
+            },
+            sort_keys=True,
+        )
+
+    @api.model
+    def _studio_load_snapshot(self, text):
+        """The dict {changes, models, access, rules, app} of the snapshot
+        ``text``, whichever form ``_current_snapshot`` gave it."""
+        value = json.loads(text or "[]")
+        if isinstance(value, list):
+            value = {"changes": value}
+        return {
+            "changes": value.get("changes") or [],
+            "models": value.get("models") or [],
+            "access": value.get("access") or [],
+            "rules": value.get("rules") or [],
+            "app": value.get("app") or {},
+        }
 
     def _touch(self):
         """After a change of the draft: new preview revision, new state."""
@@ -477,7 +941,11 @@ class ErplibreStudioProject(models.Model):
         return selection or [["value_1", self.env._("Value 1")]]
 
     def _clean_relation(self, field):
+        """The comodel of a new many2one: a model of the registry, or a
+        model the project creates, which Apply creates first."""
         relation = field.get("relation") or "res.partner"
+        if relation in self._studio_new_models():
+            return relation
         Comodel = self.env.get(relation)
         if Comodel is None or Comodel._transient or Comodel._abstract:
             raise UserError(
@@ -589,6 +1057,9 @@ class ErplibreStudioProject(models.Model):
             ),
             "bad_field": lambda: self.env._("Invalid field %(field)s.", **params),
             "bad_order": lambda: self.env._("Invalid order %(order)s.", **params),
+            "unknown_view_type": lambda: self.env._(
+                "The studio makes no default %(type)s view.", **params
+            ),
         }
         if code in messages:
             return messages[code]()
@@ -1384,6 +1855,38 @@ class ErplibreStudioProject(models.Model):
             view, arch, {"type": "hide", "target": xpath, "value": True}
         )
 
+    def _studio_dependent_changes(self, changes):
+        """``changes`` (of this project) with every change of the project
+        that locates a node one of them adds, or a node inside one, and so
+        on: what ``_remove_node`` removes with an added node."""
+        self.ensure_one()
+        result = changes
+        todo = changes
+        while todo:
+            found = self.env["erplibre.studio.change"]
+            for view in todo.mapped("view_id"):
+                view_changes = self._view_changes(view)
+                dicts = [c._as_dict() for c in view_changes]
+                base = self._base_arch(view)
+                for change in todo.filtered(lambda c, v=view: c.view_id == v):
+                    keys = studio_arch.changes_on_added(
+                        base, dicts, view.type, change.id
+                    )
+                    found |= view_changes.filtered(lambda c, k=keys: c.id in k)
+            todo = found - result
+            result |= found
+        return result
+
+    def _studio_changes_of_fields(self, names):
+        """The changes of the project that add or name one of the fields
+        ``names`` ({model: field names}), with the changes that depend on
+        the nodes they add."""
+        self.ensure_one()
+        naming = self.change_ids.filtered(
+            lambda c: self._studio_change_names(c, names.get(c.model, ()))
+        )
+        return self._studio_dependent_changes(naming)
+
     def action_undo(self, view=None):
         """Remove the last change (of ``view`` when given)."""
         self._check_studio_access()
@@ -1395,28 +1898,336 @@ class ErplibreStudioProject(models.Model):
         return True
 
     def action_discard(self):
-        """Back to the changes of the last Apply; no Apply: no change."""
+        """Back to the draft of the last Apply: its changes, models, access
+        rows, rules and app; no Apply: nothing. The database is left as
+        it is. A line of the snapshot that no longer applies (its model,
+        menu, group or view left the database since) is left out; return
+        True, or a notification that lists them."""
         self._check_studio_access()
+        skipped = []
         for project in self._editing():
-            snapshot = json.loads(project.applied_snapshot or "[]")
+            snapshot = project._studio_load_snapshot(project.applied_snapshot)
             project.change_ids.unlink()
+            project.rule_line_ids.unlink()
+            project.access_line_ids.unlink()
+            project.new_model_ids.unlink()
+            app = snapshot["app"]
+            project.write(
+                {
+                    "app_name": app.get("name") or False,
+                    "app_icon": app.get("icon") or False,
+                    "app_sequence": app.get("sequence") or 50,
+                }
+            )
+            restore = project.with_context(**{RESTORE_KEY: SERVER_VALUES})
+            for kind, model in (
+                ("models", "erplibre.studio.model"),
+                ("access", "erplibre.studio.access"),
+                ("rules", "erplibre.studio.rule"),
+            ):
+                Line = restore.env[model]
+                for item in snapshot[kind]:
+                    vals = dict(Line._studio_line_vals(item), project_id=project.id)
+                    skipped += project._studio_restore(Line, vals, item)
             Change = project.env["erplibre.studio.change"]
-            for index, item in enumerate(snapshot):
-                Change.create(
+            View = self.env["ir.ui.view"].sudo()
+            for index, item in enumerate(snapshot["changes"]):
+                vals = {
+                    "project_id": project.id,
+                    "sequence": (index + 1) * 10,
+                    "change_type": item["type"],
+                    "model": item["model"],
+                    "view_id": item["view_id"],
+                    "view_type": item["view_type"],
+                    "xpath": item["xpath"],
+                    "position": item["position"],
+                    "payload": json.dumps(item["payload"], sort_keys=True),
+                }
+                if item["model"] not in self.env or not (
+                    View.browse(item["view_id"] or 0).exists()
+                ):
+                    skipped.append(
+                        self.env._(
+                            "a change of a view of %(model)s, gone",
+                            model=item["model"],
+                        )
+                    )
+                    continue
+                Change.create(vals)
+            project._touch()
+        if not skipped:
+            return True
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "type": "warning",
+                "sticky": True,
+                "title": self.env._("Discarded"),
+                "message": self.env._(
+                    "Back to the last Apply, without what left the database "
+                    "since: %(items)s.",
+                    items="; ".join(skipped),
+                ),
+                "next": {"type": "ir.actions.client", "tag": "soft_reload"},
+            },
+        }
+
+    def _studio_restore(self, Line, vals, item):
+        """Create the line of ``vals`` (from ``item``, an entry of the
+        snapshot) on ``Line``; when it no longer applies, create nothing.
+        Return the descriptions of what was left out."""
+        self.ensure_one()
+        label = item.get("name") or item.get("model") or ""
+        gone = []
+        menu = vals.get("menu_parent_id")
+        if menu and not self.env["ir.ui.menu"].sudo().browse(menu).exists():
+            gone.append(self.env._("its parent menu"))
+        Groups = self.env["res.groups"].sudo()
+        group_ids = [vals["group_id"]] if vals.get("group_id") else []
+        if "group_ids" in vals:
+            group_ids = vals["group_ids"][0][2]
+        if len(Groups.browse(group_ids).exists()) != len(group_ids):
+            gone.append(self.env._("a group"))
+        model = vals.get("model")
+        if (
+            Line._name != "erplibre.studio.model"
+            and model not in self.env
+            and model not in self._studio_new_models()
+        ):
+            gone.append(self.env._("its model"))
+        if not gone:
+            try:
+                with self.env.cr.savepoint():
+                    Line.create(vals)
+                return []
+            except (UserError, ValidationError) as exc:
+                gone.append(str(exc.args[0]))
+            except psycopg2.Error as exc:
+                gone.append(str(exc).strip())
+        kind = {
+            "erplibre.studio.model": self.env._("the model"),
+            "erplibre.studio.access": self.env._("the access row on"),
+            "erplibre.studio.rule": self.env._("the rule"),
+        }[Line._name]
+        return [
+            self.env._(
+                "%(kind)s %(name)s (%(why)s)",
+                kind=kind,
+                name=label,
+                why=", ".join(gone),
+            )
+        ]
+
+    # ── models, access rows and rules of the editor ─────────────────────
+
+    def _studio_taken_models(self):
+        """The model names a new model cannot take: those of the registry,
+        transient and abstract ones included, and those of every model
+        line."""
+        return set(self.env.registry) | set(
+            self.env["erplibre.studio.model"].sudo().search([]).mapped("model")
+        )
+
+    def _studio_check_free_model(self, model, line=None):
+        """Raise UserError when another model line (than ``line``) of any
+        project creates ``model``."""
+        other = (
+            self.env["erplibre.studio.model"]
+            .sudo()
+            .search([("model", "=", model), ("id", "!=", line.id if line else 0)])
+        )
+        if other:
+            raise UserError(
+                self.env._(
+                    "The project %(project)s creates the model %(name)s already.",
+                    project=other.project_id.name,
+                    name=model,
+                )
+            )
+
+    def _studio_menu_vals(self, menu):
+        """The model line values of ``menu`` {mode, parent_id, name,
+        sequence}, as the editor sends it; the keys it lacks are left out."""
+        vals = {}
+        if "mode" in menu:
+            vals["menu_mode"] = menu["mode"] or "app"
+        if "parent_id" in menu:
+            vals["menu_parent_id"] = int(menu["parent_id"] or 0) or False
+        if "name" in menu:
+            vals["menu_name"] = (menu["name"] or "").strip() or False
+        if "sequence" in menu:
+            vals["menu_sequence"] = int(menu["sequence"] or 0)
+        return vals
+
+    def _studio_create_model(self, values):
+        """A new model line from ``values`` {name, model, chatter, menu:
+        {mode, app_name, app_icon, parent_id, name}}, with the default
+        access row (the internal users, every right). « app » names the app
+        of the project when it has none yet. Return the line."""
+        self.ensure_one()
+        project = self._editing()
+        label = (values.get("name") or "").strip()
+        if not label:
+            raise UserError(self.env._("A model needs a label."))
+        model = (
+            values.get("model") or ""
+        ).strip() or studio_arch.model_name_from_label(
+            label, self._studio_taken_models()
+        )
+        self._studio_check_free_model(model)
+        menu = values.get("menu") or {}
+        vals = {
+            "project_id": self.id,
+            "model": model,
+            "name": label,
+            "chatter": bool(values.get("chatter")),
+            "menu_mode": "app",
+            "sequence": max(self.new_model_ids.mapped("sequence") or [0]) + 10,
+            **project._studio_menu_vals(menu),
+        }
+        if vals["menu_mode"] == "app" and not self.app_name:
+            project.write(
+                {
+                    "app_name": (menu.get("app_name") or "").strip() or label,
+                    "app_icon": menu.get("app_icon") or False,
+                }
+            )
+        line = project.env["erplibre.studio.model"].create(vals)
+        project.env["erplibre.studio.access"].create(
+            {
+                "project_id": self.id,
+                "model": model,
+                "group_id": self.env.ref("base.group_user").id,
+                **{perm: True for perm in PERMS},
+            }
+        )
+        self._touch()
+        return line
+
+    def _studio_model_line(self, line_id):
+        line = self.new_model_ids.filtered(lambda m: m.id == int(line_id or 0))
+        if not line:
+            raise UserError(self.env._("This model is not a model of the project."))
+        return line
+
+    def _studio_update_model(self, line, values):
+        """Write ``values`` {name, model, chatter, menu, sequence} on the
+        model line ``line`` (see ``erplibre.studio.model.write``)."""
+        self.ensure_one()
+        project = self._editing()
+        line = line.with_context(**{NO_TOUCH_KEY: True})
+        vals = project._studio_menu_vals(values.get("menu") or {})
+        if "name" in values:
+            vals["name"] = (values["name"] or "").strip()
+        if "chatter" in values:
+            vals["chatter"] = bool(values["chatter"])
+        if "sequence" in values:
+            vals["sequence"] = int(values["sequence"] or 0)
+        if (values.get("model") or "").strip():
+            vals["model"] = values["model"].strip()
+            self._studio_check_free_model(vals["model"], line)
+        line.write(vals)
+        self._touch()
+        return line
+
+    def _studio_remove_model(self, line):
+        """Remove the model line ``line`` and what names its model (see
+        ``erplibre.studio.model.unlink``); Apply then removes it from the
+        database."""
+        self.ensure_one()
+        line.with_context(**{NO_TOUCH_KEY: True}).unlink()
+        self._touch()
+
+    def _studio_update_app(self, values):
+        """Write the app of the project from ``values`` {name, icon,
+        sequence}."""
+        self.ensure_one()
+        vals = {}
+        if "name" in values:
+            vals["app_name"] = (values["name"] or "").strip() or False
+        if "icon" in values:
+            vals["app_icon"] = values["icon"] or False
+        if "sequence" in values:
+            vals["app_sequence"] = int(values["sequence"] or 0)
+        self._editing().write(vals)
+        self._touch()
+
+    def _studio_set_access(self, rows):
+        """Replace the access rows of the project by ``rows`` [{model,
+        group_id, perm_read, perm_write, perm_create, perm_unlink}]; a row
+        that gives no right is left out."""
+        self.ensure_one()
+        project = self._editing()
+        Access = project.env["erplibre.studio.access"]
+        existing = {(a.model, a.group_id.id): a for a in self.access_line_ids}
+        seen = set()
+        for row in rows or []:
+            perms = {perm: bool(row.get(perm)) for perm in PERMS}
+            key = ((row.get("model") or "").strip(), int(row.get("group_id") or 0))
+            if not any(perms.values()) or key in seen:
+                continue
+            seen.add(key)
+            line = existing.get(key)
+            if not line:
+                Access.create(
                     {
-                        "project_id": project.id,
-                        "sequence": (index + 1) * 10,
-                        "change_type": item["type"],
-                        "model": item["model"],
-                        "view_id": item["view_id"],
-                        "view_type": item["view_type"],
-                        "xpath": item["xpath"],
-                        "position": item["position"],
-                        "payload": json.dumps(item["payload"], sort_keys=True),
+                        "project_id": self.id,
+                        "model": key[0],
+                        "group_id": key[1],
+                        **perms,
                     }
                 )
-            project._touch()
-        return True
+            elif any(line[perm] != value for perm, value in perms.items()):
+                line.with_context(**{NO_TOUCH_KEY: True}).write(perms)
+        Access.browse(
+            [line.id for key, line in existing.items() if key not in seen]
+        ).unlink()
+        self._touch()
+
+    def _studio_rule_line(self, rule_id):
+        rule = self.rule_line_ids.filtered(lambda r: r.id == int(rule_id or 0))
+        if not rule:
+            raise UserError(self.env._("This rule is not a rule of the project."))
+        return rule
+
+    def _studio_save_rule(self, values):
+        """Create the rule line of ``values`` {id, name, model, domain,
+        group_ids, perm_*}, or write the one of ``id``. Return it."""
+        self.ensure_one()
+        project = self._editing()
+        if not (values.get("name") or "").strip():
+            raise UserError(self.env._("A rule needs a name."))
+        vals = {
+            "name": (values.get("name") or "").strip(),
+            "model": (values.get("model") or "").strip(),
+            "domain_force": (values.get("domain") or "").strip() or "[]",
+            "group_ids": [(6, 0, [int(g) for g in values.get("group_ids") or []])],
+            **{perm: bool(values.get(perm)) for perm in PERMS},
+        }
+        if values.get("id"):
+            rule = project._studio_rule_line(values["id"]).with_context(
+                **{NO_TOUCH_KEY: True}
+            )
+            rule.write(vals)
+        else:
+            vals["project_id"] = self.id
+            vals["sequence"] = max(self.rule_line_ids.mapped("sequence") or [0]) + 10
+            rule = project.env["erplibre.studio.rule"].create(vals)
+        self._touch()
+        return rule
+
+    def _studio_remove_rule(self, rule):
+        self.ensure_one()
+        rule.with_context(**{NO_TOUCH_KEY: True}).unlink()
+        self._touch()
+
+    def _studio_default_arch(self, line, view_type):
+        """The arch of the default ``view_type`` view of the model line
+        ``line``: the one Apply writes and a generated module defines."""
+        return studio_arch.default_model_arch(
+            view_type, (line.name or "").strip(), line.chatter
+        )
 
     # ── apply / revert ──────────────────────────────────────────────────
 
@@ -1443,14 +2254,133 @@ class ErplibreStudioProject(models.Model):
         return self.env["ir.ui.view"].sudo().browse(data.res_id).exists()
 
     def _rename_studio_xmlids(self, new_name):
+        """Move the external ids of what the project created to the module
+        ``new_name``. An inherited view on a default view of a new model
+        is named after the external id of that view, which starts with the
+        module (``_studio_xmlname``): its external id and its name follow,
+        so that the next Apply finds it."""
         self.ensure_one()
-        self.env["ir.model.data"].sudo().search(
-            [
-                ("module", "=", self.module_name),
-                ("model", "=", "ir.ui.view"),
-                ("res_id", "in", self.studio_view_ids.ids),
-            ]
-        ).write({"module": new_name})
+        old_name = self.module_name
+        Data = self.env["ir.model.data"].sudo()
+        records = [self.studio_view_ids, self.field_ids] + [
+            self[name] for name in CREATED_FIELDS.values()
+        ]
+        for record in records:
+            if record:
+                Data.search(
+                    [
+                        ("module", "=", old_name),
+                        ("model", "=", record._name),
+                        ("res_id", "in", record.ids),
+                    ]
+                ).write({"module": new_name})
+        prefix = f"{old_name}_"
+        for view in self.studio_view_ids.sudo():
+            if view.inherit_id not in self.created_view_ids:
+                continue
+            data = Data.search(
+                [
+                    ("module", "=", new_name),
+                    ("model", "=", "ir.ui.view"),
+                    ("res_id", "=", view.id),
+                ],
+                limit=1,
+            )
+            if data.name.startswith(prefix):
+                name = f"{new_name}_{data.name[len(prefix):]}"
+                data.name = name
+                view.name = f"{new_name}.{name}"
+
+    # ── records under external ids of the module ────────────────────────
+
+    def _studio_record(self, res_model, name):
+        """The record of ``res_model`` under the external id ``name`` of the
+        module of the project, in sudo and without language (Apply writes
+        the source terms), or an empty recordset."""
+        Model = self.env[res_model].sudo().with_context(lang=None)
+        if len(self) != 1 or not self.module_name:
+            return Model
+        data = (
+            self.env["ir.model.data"]
+            .sudo()
+            .search(
+                [
+                    ("module", "=", self.module_name),
+                    ("name", "=", name),
+                    ("model", "=", res_model),
+                ],
+                limit=1,
+            )
+        )
+        return Model.browse(data.res_id).exists()
+
+    def _studio_bind(self, record, name):
+        """Give ``record`` the external id ``name`` of the module, marked
+        « noupdate »: when the generated module is installed in this
+        database, an upgrade deletes every external id of the module that
+        its files do not hold and is not « noupdate », with its record (a
+        model goes with its table). What Apply creates after the last
+        generation is in no file yet; a generation clears the mark of the
+        ids it writes (erplibre_studio_generate)."""
+        if not XML_NAME.match(name or ""):
+            raise UserError(
+                self.env._(
+                    "%(name)s is not a valid external id: letters, digits, « _ » "
+                    "and « - ».",
+                    name=name,
+                )
+            )
+        self.env["ir.model.data"].sudo().create(
+            {
+                "module": self.module_name,
+                "name": name,
+                "model": record._name,
+                "res_id": record.id,
+                "noupdate": True,
+            }
+        )
+
+    @api.model
+    def _studio_differences(self, record, vals):
+        """The values of ``vals`` (create values) that ``record`` lacks."""
+        todo = {}
+        for key, value in vals.items():
+            field = record._fields[key]
+            current = record[key]
+            if field.type == "many2one":
+                current, value = current.id, value or False
+            elif field.type in ("many2many", "one2many"):
+                current = sorted(current.ids)
+                value = sorted(value[0][2]) if value else []
+            elif field.type == "reference":
+                current = f"{current._name},{current.id}" if current else False
+            elif key == "arch":
+                current, value = normal_arch(current), normal_arch(value)
+            elif field.type in ("char", "text", "html"):
+                # The whitespace around a text is not part of it: a data
+                # file may wrap a long value on lines of its own.
+                current = (current or "").strip() or False
+                value = (value or "").strip() or False
+            if current != value:
+                todo[key] = vals[key]
+        return todo
+
+    def _studio_save(self, res_model, name, vals, log, update=True):
+        """The record of ``res_model`` under the external id ``name``,
+        created from ``vals``, or written where it differs. ``update``
+        False leaves an existing record as it is. Return (record, whether
+        it differs from ``vals`` and was left as it is)."""
+        record = self._studio_record(res_model, name)
+        if not record:
+            record = self.env[res_model].sudo().with_context(lang=None).create(vals)
+            self._studio_bind(record, name)
+            log.append(f"{res_model} {name}: created")
+            return record, False
+        todo = self._studio_differences(record, vals)
+        if todo and update:
+            record.write(todo)
+            log.append(f"{res_model} {name}: updated")
+        return record, bool(todo) and not update
 
     def _field_vals(self, model, name, definition):
         vals = {
@@ -1561,17 +2491,600 @@ class ErplibreStudioProject(models.Model):
                 log.append(f"view {vals['name']}: updated")
             else:
                 studio_view = View.create(vals)
-                self.env["ir.model.data"].sudo().create(
-                    {
-                        "module": self.module_name,
-                        "name": self._studio_xmlname(view),
-                        "model": "ir.ui.view",
-                        "res_id": studio_view.id,
-                    }
-                )
+                self._studio_bind(studio_view, self._studio_xmlname(view))
                 log.append(f"view {vals['name']}: created")
             kept |= studio_view
         return kept
+
+    def _studio_check_apply(self):
+        """The checks of the lines again, before Apply writes anything: the
+        parent menus, groups and models the lines name leave the database
+        with the module that defines them."""
+        self.ensure_one()
+        mail = self._studio_mail_available()
+        for line in self.new_model_ids:
+            self._studio_check_menu(line)
+            if line.chatter and not mail:
+                raise UserError(
+                    self.env._("A chatter needs the module mail (Discuss).")
+                )
+            if line.model in self.env and not line.applied:
+                raise UserError(
+                    self.env._("The model %(name)s already exists.", name=line.model)
+                )
+            if line.model not in self.access_line_ids.mapped("model"):
+                # Without one, the model is the superuser's only, and the
+                # generated module has no access file.
+                raise UserError(
+                    self.env._(
+                        "The model %(name)s needs at least one access right.",
+                        name=line.model,
+                    )
+                )
+        for line in self.access_line_ids:
+            self._studio_check_rights_model(line.model)
+            self._studio_check_group(line.group_id)
+            self._studio_check_access_line(line)
+            if line.xml_name != line._studio_xml_name():
+                raise UserError(
+                    self.env._(
+                        "The access row on %(model)s has the external id "
+                        "%(name)s instead of %(expected)s.",
+                        model=line.model,
+                        name=line.xml_name,
+                        expected=line._studio_xml_name(),
+                    )
+                )
+        for rule in self.rule_line_ids:
+            self._studio_check_rights_model(rule.model)
+            for group in rule.group_ids:
+                self._studio_check_group(group)
+            rule._check_studio_xml_name()
+            if rule.model in self.env:
+                self._studio_check_rule(rule)
+        names = self._studio_new_models()
+        self._studio_check_model_removal(
+            self.created_model_ids.exists().filtered(lambda m: m.model not in names)
+        )
+
+    def _apply_models(self, log):
+        """Create or update the custom models of the model lines, with their
+        ``x_name``. Return (models kept, names of the models whose new label
+        or chatter waits for the module): a model the generated module
+        defines, once installed, changes with the module only."""
+        IrModel = self.env["ir.model"].sudo().with_context(lang=None)
+        kept = IrModel
+        waiting = []
+        mail = self._studio_mail_available()
+        for line in self.new_model_ids:
+            name = line._studio_xml_names()["model"]
+            label = line.name.strip()
+            record = self._studio_record("ir.model", name)
+            if not record:
+                if IrModel._get_id(line.model):
+                    raise UserError(
+                        self.env._(
+                            "The model %(name)s already exists.", name=line.model
+                        )
+                    )
+                vals = {
+                    "model": line.model,
+                    "name": label,
+                    "state": "manual",
+                    "field_id": [
+                        Command.create(
+                            {
+                                "name": "x_name",
+                                "field_description": "Name",
+                                "ttype": "char",
+                                "required": True,
+                                "copied": True,
+                            }
+                        )
+                    ],
+                }
+                if line.chatter:
+                    vals.update(is_mail_thread=True, is_mail_activity=True)
+                record = IrModel.create(vals)
+                self._studio_bind(record, name)
+                log.append(f"model {line.model}: created")
+                kept |= record
+                continue
+            todo = {}
+            if record.name != label:
+                todo["name"] = label
+            if mail and line.chatter and not record.is_mail_thread:
+                todo.update(is_mail_thread=True, is_mail_activity=True)
+            elif mail and not line.chatter and record.is_mail_thread:
+                raise UserError(
+                    self.env._(
+                        "The chatter of %(name)s cannot be removed once applied.",
+                        name=line.model,
+                    )
+                )
+            if record.state != "manual":
+                if todo:
+                    waiting.append(line.model)
+                    log.append(
+                        f"model {line.model}: defined by the module, changes "
+                        "with its next generation and upgrade"
+                    )
+            elif todo:
+                record.write(todo)
+                log.append(f"model {line.model}: updated")
+            kept |= record
+        return kept, waiting
+
+    def _apply_model_views(self, log, owned):
+        """Create or update the default form, list and search views of the
+        model lines. Those of the models in ``owned``, defined by the
+        installed module, are left as they are. Return (views kept, names
+        of the views waiting for the module)."""
+        kept = self.env["ir.ui.view"].sudo()
+        waiting = []
+        for line in self.new_model_ids:
+            names = line._studio_xml_names()
+            for view_type in studio_arch.MODEL_VIEW_TYPES:
+                vals = {
+                    "name": f"{line.model}.{view_type}",
+                    "model": line.model,
+                    "type": view_type,
+                    "mode": "primary",
+                    "priority": MODEL_VIEW_PRIORITY,
+                    "arch": self._studio_default_arch(line, view_type),
+                }
+                view, differs = self._studio_save(
+                    "ir.ui.view",
+                    names[view_type],
+                    vals,
+                    log,
+                    update=line.model not in owned,
+                )
+                if differs:
+                    waiting.append(vals["name"])
+                kept |= view
+        return kept, waiting
+
+    def _apply_actions(self, log):
+        """Create or update the window action of each model line."""
+        kept = self.env["ir.actions.act_window"].sudo()
+        for line in self.new_model_ids:
+            names = line._studio_xml_names()
+            search = self._studio_record("ir.ui.view", names["search"])
+            action, _differs = self._studio_save(
+                "ir.actions.act_window",
+                names["action"],
+                {
+                    "name": line.name.strip(),
+                    "res_model": line.model,
+                    "view_mode": "list,form",
+                    "search_view_id": search.id,
+                },
+                log,
+            )
+            kept |= action
+        return kept
+
+    def _apply_menus(self, log):
+        """Create or update the app of the project, when a model goes in
+        it, and the menu of each model line, on its window action."""
+        kept = self.env["ir.ui.menu"].sudo()
+        app = kept
+        if self.new_model_ids.filtered(lambda m: m.menu_mode == "app"):
+            app, _differs = self._studio_save(
+                "ir.ui.menu",
+                "menu_app",
+                {
+                    "name": self.app_name.strip(),
+                    "web_icon": self.app_icon or DEFAULT_APP_ICON,
+                    "sequence": self.app_sequence,
+                    "parent_id": False,
+                    "action": False,
+                },
+                log,
+            )
+            kept |= app
+        for line in self.new_model_ids:
+            names = line._studio_xml_names()
+            action = self._studio_record("ir.actions.act_window", names["action"])
+            parent = app if line.menu_mode == "app" else line.menu_parent_id
+            menu, _differs = self._studio_save(
+                "ir.ui.menu",
+                names["menu"],
+                {
+                    "name": (line.menu_name or "").strip() or line.name.strip(),
+                    "parent_id": parent.id,
+                    "action": f"{action._name},{action.id}",
+                    "sequence": line.menu_sequence,
+                },
+                log,
+            )
+            kept |= menu
+        return kept
+
+    def _apply_access(self, log):
+        """Create or update the ir.model.access of each access row."""
+        kept = self.env["ir.model.access"].sudo()
+        IrModel = self.env["ir.model"]
+        for line in self.access_line_ids:
+            access, _differs = self._studio_save(
+                "ir.model.access",
+                line.xml_name,
+                {
+                    "name": line.xml_name,
+                    "model_id": IrModel._get_id(line.model),
+                    "group_id": line.group_id.id,
+                    **{perm: line[perm] for perm in PERMS},
+                },
+                log,
+            )
+            kept |= access
+        return kept
+
+    def _apply_rules(self, log):
+        """Create or update the ir.rule of each rule line; a domain on a
+        model created by this Apply is checked now that it exists."""
+        kept = self.env["ir.rule"].sudo()
+        IrModel = self.env["ir.model"]
+        for rule in self.rule_line_ids:
+            self._studio_check_rule(rule)
+            record, _differs = self._studio_save(
+                "ir.rule",
+                rule.xml_name,
+                {
+                    "name": rule.name,
+                    "model_id": IrModel._get_id(rule.model),
+                    "domain_force": rule.domain_force,
+                    "groups": [(6, 0, rule.group_ids.ids)],
+                    **{perm: rule[perm] for perm in PERMS},
+                },
+                log,
+            )
+            kept |= record
+        return kept
+
+    def _studio_check_model_removal(self, models, keep=None):
+        """Raise UserError when the custom models ``models`` cannot leave
+        the database with the project: removing a model removes every field
+        that points at it and the views of other projects on it, while
+        another project, a module or a hand-made field still needs it.
+        ``keep``: other records counted as the project's ({kind: records})."""
+        self.ensure_one()
+        if not models:
+            return
+        owned = models.filtered(lambda m: m.state != "manual")
+        if owned:
+            raise UserError(
+                self.env._(
+                    "Uninstall the module %(module)s first: it owns its models.",
+                    module=self.module_name,
+                )
+            )
+        keep = keep or {}
+        names = models.mapped("model")
+        Fields = self.env["ir.model.fields"].sudo()
+        own_fields = self.field_ids | keep.get("fields", Fields)
+        items = []
+        pointing = Fields.search(
+            [("relation", "in", names), ("model", "not in", names)]
+        )
+        on_models = Fields.search([("model", "in", names), ("name", "!=", "x_name")])
+        module_fields = set(
+            self.env["ir.model.data"]
+            .sudo()
+            .search(
+                [
+                    ("model", "=", "ir.model.fields"),
+                    ("res_id", "in", on_models.ids),
+                    ("module", "!=", self.module_name),
+                ]
+            )
+            .mapped("res_id")
+        )
+        for field in pointing | on_models:
+            # A field on the models made by Odoo (the fields of the chatter)
+            # goes with them; a custom field, or a field a module adds to
+            # them or points at them with, belongs to someone else. A field
+            # copied by « _inherits » (res.users from res.partner) is judged
+            # by the field it copies.
+            Model = self.env.get(field.model)
+            definition = Model._fields.get(field.name) if Model is not None else None
+            if definition is not None and definition.inherited:
+                continue
+            foreign = (
+                field in pointing
+                or field.state == "manual"
+                or field.id in module_fields
+            )
+            if foreign and field not in own_fields:
+                items.append(
+                    self.env._("field %(field)s", field=f"{field.model}.{field.name}")
+                )
+        own_views = self.studio_view_ids | self.created_view_ids
+        for kind in ("views", "primary_views"):
+            own_views |= keep.get(kind, self.env["ir.ui.view"])
+        for view in self.env["ir.ui.view"].sudo().search([("model", "in", names)]):
+            if view not in own_views:
+                items.append(self.env._("view %(view)s", view=view.name))
+        items += self._studio_foreign_rights(models, keep)
+        domain = [("project_id", "!=", self.id)]
+        for model, label in (
+            ("erplibre.studio.change", self.env._("change of the project %(project)s")),
+            (
+                "erplibre.studio.access",
+                self.env._("access row of the project %(project)s"),
+            ),
+            ("erplibre.studio.rule", self.env._("rule of the project %(project)s")),
+        ):
+            for line in (
+                self.env[model].sudo().search(domain + [("model", "in", names)])
+            ):
+                items.append(label % {"project": line.project_id.name})
+        for change in (
+            self.env["erplibre.studio.change"]
+            .sudo()
+            .search(domain + [("change_type", "=", "add_field")])
+        ):
+            if (change._payload().get("field") or {}).get("relation") in names:
+                items.append(
+                    self.env._(
+                        "new field %(field)s of the project %(project)s",
+                        field=f"{change.model}.{change.field_name}",
+                        project=change.project_id.name,
+                    )
+                )
+        if items:
+            raise UserError(
+                self.env._(
+                    "The models %(models)s cannot be removed: %(items)s.",
+                    models=", ".join(names),
+                    items=", ".join(sorted(set(items))),
+                )
+            )
+
+    def _studio_foreign_rights(self, models, keep):
+        """The descriptions of the access rights and record rules on the
+        custom models ``models`` that belong to someone else: created by
+        another project, or under the external id of another module. The
+        database deletes them with the model, which would leave their
+        project or module with dangling external ids. A right made by hand,
+        with no external id, goes with the model."""
+        items = []
+        Data = self.env["ir.model.data"].sudo()
+        for res_model, field, kind, label in (
+            (
+                "ir.model.access",
+                "created_access_ids",
+                "access",
+                self.env._("access right %(name)s"),
+            ),
+            (
+                "ir.rule",
+                "created_rule_ids",
+                "rules",
+                self.env._("record rule %(name)s"),
+            ),
+        ):
+            Model = self.env[res_model].sudo().with_context(active_test=False)
+            own = self[field] | keep.get(kind, Model)
+            rows = Model.search([("model_id", "in", models.ids)]) - own
+            if not rows:
+                continue
+            projects = self.sudo().search(
+                [("id", "!=", self.id), (field, "in", rows.ids)]
+            )
+            modules = {
+                data.res_id: data.module
+                for data in Data.search(
+                    [
+                        ("model", "=", res_model),
+                        ("res_id", "in", rows.ids),
+                        ("module", "!=", self.module_name),
+                    ]
+                )
+            }
+            for row in rows:
+                owner = next((p.name for p in projects if row in p[field]), None)
+                owner = owner or modules.get(row.id)
+                if owner:
+                    items.append(label % {"name": f"{row.name} ({owner})"})
+        return items
+
+    @api.model
+    def _studio_domain_fields(self, model, text):
+        """The (model, field name) pairs the domain ``text`` of a rule on
+        ``model`` names: every step of the path of each term, through the
+        comodels of the relational fields, and the terms of the « any »
+        sub-domains. A domain that does not evaluate names none."""
+        try:
+            domain = safe_eval(text or "[]", self.env["ir.rule"]._eval_context())
+        except Exception:  # noqa: BLE001 - such a domain is refused elsewhere
+            return set()
+        found = set()
+
+        def walk(model, domain):
+            for term in domain if isinstance(domain, (list, tuple)) else []:
+                if not (isinstance(term, (list, tuple)) and len(term) == 3):
+                    continue
+                path, operator, value = term
+                if not isinstance(path, str):
+                    continue
+                current = model
+                field = None
+                for part in path.split("."):
+                    found.add((current, part))
+                    Model = self.env.get(current)
+                    field = Model._fields.get(part) if Model is not None else None
+                    if field is None or not field.relational:
+                        break
+                    current = field.comodel_name
+                if operator in ("any", "not any") and field is not None:
+                    walk(current, value)
+
+        walk(model, domain)
+        return found
+
+    @api.model
+    def _studio_change_names(self, change, names):
+        """The names of ``names`` (field names of the model of ``change``)
+        that ``change`` names: as the field it adds or shows, in its node
+        path, or in its parameters (a domain, an attribute value)."""
+        text = " ".join(
+            [change.field_name or "", change.xpath or "", change.payload or ""]
+        )
+        return {
+            name
+            for name in names
+            if re.search(rf"(?<!\w){re.escape(name)}(?!\w)", text)
+        }
+
+    def _studio_check_field_removal(self, fields, removed_rules, own_changes):
+        """Raise UserError while something still names one of ``fields``
+        (ir.model.fields that leave the database): a record rule whose
+        domain names it, which would make its model unreadable for the
+        users it covers, or a change of a project that shows it, which
+        could no longer apply. ``removed_rules`` leave with the fields;
+        ``own_changes``: the changes of this project that stay in its
+        views."""
+        self.ensure_one()
+        if not fields:
+            return
+        names = {}
+        for field in fields:
+            names.setdefault(field.model, set()).add(field.name)
+        pairs = {(model, name) for model, items in names.items() for name in items}
+        every = sorted({name for _model, name in pairs})
+        items = []
+        Rule = self.env["ir.rule"].sudo().with_context(active_test=False)
+        domain = expression.OR([[("domain_force", "ilike", name)] for name in every])
+        rules = Rule.search(domain) - removed_rules
+        for rule in rules:
+            named = self._studio_domain_fields(rule.model_id.model, rule.domain_force)
+            if named & pairs:
+                owner = (
+                    self.sudo().search([("created_rule_ids", "in", rule.ids)], limit=1)
+                ).name
+                items.append(
+                    self.env._(
+                        "record rule %(name)s on %(model)s",
+                        name=f"{rule.name} ({owner})" if owner else rule.name,
+                        model=rule.model_id.model,
+                    )
+                )
+        Change = self.env["erplibre.studio.change"].sudo()
+        changes = own_changes | Change.search(
+            [("project_id", "!=", self.id), ("model", "in", list(names))]
+        )
+        for change in changes:
+            used = self._studio_change_names(change, names.get(change.model, ()))
+            if used:
+                items.append(
+                    self.env._(
+                        "change « %(change)s » of the view %(view)s (project "
+                        "%(project)s)",
+                        change=change.summary,
+                        view=change.view_id.name,
+                        project=change.project_id.name,
+                    )
+                )
+        if items:
+            raise UserError(
+                self.env._(
+                    "The fields %(fields)s cannot be removed, they are still "
+                    "used: %(items)s.",
+                    fields=", ".join(sorted(f"{m}.{n}" for m, n in pairs)),
+                    items=", ".join(sorted(set(items))),
+                )
+            )
+
+    def _studio_check_menu_removal(self, menus):
+        """Raise UserError while a menu or a model line outside the project
+        goes under one of ``menus``: Odoo would move it to the top level."""
+        self.ensure_one()
+        if not menus:
+            return
+        Menu = (
+            self.env["ir.ui.menu"]
+            .sudo()
+            .with_context(**{"ir.ui.menu.full_list": True, "active_test": False})
+        )
+        others = Menu.search(
+            [("parent_id", "in", menus.ids), ("id", "not in", menus.ids)]
+        )
+        lines = (
+            self.env["erplibre.studio.model"]
+            .sudo()
+            .search(
+                [("project_id", "!=", self.id), ("menu_parent_id", "in", menus.ids)]
+            )
+        )
+        items = others.mapped("complete_name") + [
+            self.env._("a model of the project %(project)s", project=p.name)
+            for p in lines.project_id
+        ]
+        if items:
+            raise UserError(
+                self.env._(
+                    "The menus %(menus)s cannot be removed: %(items)s go under them.",
+                    menus=", ".join(menus.mapped("name")),
+                    items=", ".join(items),
+                )
+            )
+
+    def _studio_remove_created(self, records, log, keep=None, own_changes=None):
+        """Remove ``records`` ({kind: records}, kinds of REMOVAL_ORDER) from
+        the database with their external ids, in that order; a field goes
+        only while custom. The changes of the project on a removed default
+        view go with it. ``keep``: see ``_studio_check_model_removal``;
+        ``own_changes``: the changes of the project that stay in its views,
+        which may not name a removed field. Return the number of the
+        changes removed with the default views."""
+        self.ensure_one()
+        Data = self.env["ir.model.data"].sudo()
+        Fields = self.env["ir.model.fields"].sudo()
+        records = {kind: value.exists() for kind, value in records.items() if value}
+        models = records.get("models", self.env["ir.model"])
+        self._studio_check_model_removal(models, keep)
+        self._studio_check_menu_removal(records.get("menus", self.env["ir.ui.menu"]))
+        # The fields that leave: the custom fields of the project, and with
+        # a model, its fields and those pointing at it. The rules on a
+        # removed model go with it.
+        leaving = records.get("fields", Fields).filtered(lambda f: f.state == "manual")
+        removed_rules = records.get("rules", self.env["ir.rule"])
+        if models:
+            names = models.mapped("model")
+            leaving |= Fields.search(
+                ["|", ("model", "in", names), ("relation", "in", names)]
+            )
+            removed_rules |= (
+                self.env["ir.rule"]
+                .sudo()
+                .with_context(active_test=False)
+                .search([("model_id", "in", models.ids)])
+            )
+        self._studio_check_field_removal(
+            leaving,
+            removed_rules,
+            own_changes or self.env["erplibre.studio.change"],
+        )
+        removed_changes = 0
+        for kind in REMOVAL_ORDER:
+            value = records.get(kind)
+            if kind == "fields" and value:
+                value = value.filtered(lambda f: f.state == "manual")
+            if not value:
+                continue
+            value = value.exists()
+            if kind == "primary_views":
+                changes = self.change_ids.filtered(lambda c: c.view_id in value)
+                removed_changes = len(changes)
+                changes.with_context(**{NO_TOUCH_KEY: True}).unlink()
+            Data.search(
+                [("model", "=", value._name), ("res_id", "in", value.ids)]
+            ).unlink()
+            value.unlink()
+            log.append(f"{len(value)} {kind} removed")
+        return removed_changes
 
     def action_apply(self):
         """Write the changes into the database: the new fields, then one
@@ -1583,31 +3096,45 @@ class ErplibreStudioProject(models.Model):
         waiting = []
         for project in self:
             log = []
-            views_before = project.studio_view_ids
-            fields_before = project.field_ids
-            kept_fields, waiting_fields = project._apply_fields(log)
-            waiting += waiting_fields
-            kept_views = project._apply_views(log)
-            obsolete_views = (views_before - kept_views).exists()
-            if obsolete_views:
-                obsolete_views.unlink()
-                log.append(f"{len(obsolete_views)} view(s) removed")
-            obsolete_fields = (
-                (fields_before - kept_fields)
-                .exists()
-                .filtered(lambda f: f.state == "manual")
+            project._studio_check_apply()
+            before = {kind: project[name] for kind, name in CREATED_FIELDS.items()}
+            before["views"] = project.studio_view_ids
+            before["fields"] = project.field_ids
+            kept = {}
+            kept["models"], waiting_models = project._apply_models(log)
+            owned = set(
+                kept["models"].filtered(lambda m: m.state != "manual").mapped("model")
             )
-            if obsolete_fields:
-                obsolete_fields.unlink()
-                log.append(f"{len(obsolete_fields)} field(s) removed")
-            project._internal().write(
+            kept["fields"], waiting_fields = project._apply_fields(log)
+            kept["primary_views"], waiting_views = project._apply_model_views(
+                log, owned
+            )
+            kept["views"] = project._apply_views(log)
+            kept["actions"] = project._apply_actions(log)
+            kept["menus"] = project._apply_menus(log)
+            kept["access"] = project._apply_access(log)
+            kept["rules"] = project._apply_rules(log)
+            waiting += waiting_models + waiting_fields + waiting_views
+            project._studio_remove_created(
+                {kind: before[kind] - kept[kind] for kind in before},
+                log,
+                kept,
+                own_changes=project.change_ids,
+            )
+            vals = {
+                name: [(6, 0, kept[kind].exists().ids)]
+                for kind, name in CREATED_FIELDS.items()
+            }
+            vals.update(
                 {
-                    "field_ids": [(6, 0, kept_fields.ids)],
-                    "studio_view_ids": [(6, 0, kept_views.ids)],
+                    "field_ids": [(6, 0, kept["fields"].exists().ids)],
+                    "studio_view_ids": [(6, 0, kept["views"].exists().ids)],
                     "applied_snapshot": project._current_snapshot(),
                     "applied_date": fields.Datetime.now(),
                 }
             )
+            project._internal().write(vals)
+            project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
             project._touch()
             _logger.info("Studio project %s applied: %s", project.module_name, log)
         if not waiting:
@@ -1620,9 +3147,9 @@ class ErplibreStudioProject(models.Model):
                 "sticky": True,
                 "title": self.env._("Applied"),
                 "message": self.env._(
-                    "The installed generated module defines these fields: "
-                    "their new definition takes effect once the module is "
-                    "regenerated and upgraded: %(fields)s",
+                    "The installed generated module defines these fields, "
+                    "models or views: their new definition takes effect once "
+                    "the module is regenerated and upgraded: %(fields)s",
                     fields=", ".join(waiting),
                 ),
                 "next": {"type": "ir.actions.client", "tag": "soft_reload"},
@@ -1630,17 +3157,22 @@ class ErplibreStudioProject(models.Model):
         }
 
     def action_revert(self):
-        """Remove from the database the views and the custom fields the
-        project created; the changes stay, as a draft."""
+        """Remove from the database what the project created: its menus,
+        actions, rules, access rights, views, custom fields and models, with
+        the records of these models. The lines and the changes stay, as a
+        draft, but for the changes of the default views of its models,
+        which go with the views. Return True, or a notification that counts
+        these changes."""
         self._check_studio_access()
+        removed = 0
         for project in self:
-            views = project.studio_view_ids.exists()
-            self.env["ir.model.data"].sudo().search(
-                [("model", "=", "ir.ui.view"), ("res_id", "in", views.ids)]
-            ).unlink()
-            views.unlink()
-            project.field_ids.exists().filtered(lambda f: f.state == "manual").unlink()
-            project._internal().write(
+            log = []
+            records = {kind: project[name] for kind, name in CREATED_FIELDS.items()}
+            records["views"] = project.studio_view_ids
+            records["fields"] = project.field_ids
+            removed += project._studio_remove_created(records, log)
+            vals = {name: [(5, 0, 0)] for name in CREATED_FIELDS.values()}
+            vals.update(
                 {
                     "field_ids": [(5, 0, 0)],
                     "studio_view_ids": [(5, 0, 0)],
@@ -1648,13 +3180,35 @@ class ErplibreStudioProject(models.Model):
                     "applied_date": False,
                 }
             )
+            project._internal().write(vals)
+            project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
             project._touch()
-        return True
+            _logger.info("Studio project %s reverted: %s", project.module_name, log)
+        if not removed:
+            return True
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "type": "warning",
+                "sticky": True,
+                "title": self.env._("Reverted"),
+                "message": self.env._(
+                    "%(count)s change(s) of the default views of the new "
+                    "models were removed with these views.",
+                    count=removed,
+                ),
+                "next": {"type": "ir.actions.client", "tag": "soft_reload"},
+            },
+        }
 
     def action_open_editor(self):
         """The editor on the first view the project changes."""
         self.ensure_one()
         view = self.change_ids[:1].view_id
+        if not view:
+            applied = self.new_model_ids.filtered("applied")[:1]
+            view = applied and applied._studio_views().get("form")
         if not view:
             raise UserError(
                 self.env._("Open the editor from the debug menu of a view.")
@@ -1662,6 +3216,15 @@ class ErplibreStudioProject(models.Model):
         return self.env["erplibre.studio.editor"].action_customize(
             view.model, view.id, view.type, project_id=self.id
         )
+
+
+def normal_arch(text):
+    """``text``, an arch, without the blank text between its nodes, to
+    compare two archs."""
+    if not text:
+        return ""
+    parser = etree.XMLParser(remove_blank_text=True)
+    return etree.tostring(etree.fromstring(text, parser))
 
 
 def etree_placeholder(label, note):
@@ -1687,3 +3250,12 @@ def remove_keeping_tail(node):
         else:
             parent.text = (parent.text or "") + node.tail
     parent.remove(node)
+
+
+def check_domain_shape(domain):
+    """Raise ValueError unless ``domain`` is a list of terms (field,
+    operator, value) and of « & », « | », « ! » that combine them."""
+    for token in domain:
+        if not (expression.is_operator(token) or expression.is_leaf(token)):
+            raise ValueError(f"invalid term {token!r}")
+    expression.normalize_domain(list(domain))

@@ -3,11 +3,13 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {Component, onWillStart, useState} from "@odoo/owl";
+import {ConfirmationDialog} from "@web/core/confirmation_dialog/confirmation_dialog";
 import {serializeDateTime} from "@web/core/l10n/dates";
 import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 import {View} from "@web/views/view";
+import {PERMS, StudioModelDialog, accessGrid, accessRows, permLabel} from "./studio_models";
 
 const {DateTime} = luxon;
 
@@ -360,6 +362,8 @@ export class StudioEditor extends Component {
         this.orm = useService("orm");
         this.action = useService("action");
         this.notification = useService("notification");
+        this.dialog = useService("dialog");
+        this.menuService = useService("menu");
         const params = (this.props.action && this.props.action.params) || {};
         this.params = {
             resModel: params.res_model,
@@ -367,6 +371,9 @@ export class StudioEditor extends Component {
             viewType: params.view_type || "form",
             actionId: params.action_id || false,
         };
+        // The view the editor was opened on: where the canvas goes back to
+        // when the model on screen leaves the project.
+        this.launch = {resModel: params.res_model, viewId: params.view_id || false, viewType: params.view_type || "form"};
         this.state = useState({
             loading: true,
             busy: false,
@@ -388,8 +395,19 @@ export class StudioEditor extends Component {
             ribbon: {title: "", bg_color: RIBBON_COLORS[0]},
             filterForm: null,
             colors: null,
+            // The canvas shows the view (null), the access grid or the rules.
+            panel: null,
+            // What the dialogs and the panels offer (get_studio_choices).
+            choices: null,
+            accessAdd: this.newAccessRow(),
+            accessExisting: {},
+            ruleForm: null,
+            ruleCheck: null,
+            // Why the server refused the last Save of the rule form.
+            ruleError: null,
         });
         this.ribbonColors = RIBBON_COLORS;
+        this.perms = PERMS;
         onWillStart(() => this.load());
     }
 
@@ -423,6 +441,11 @@ export class StudioEditor extends Component {
         return project && project.id === this.state.projectId ? project : null;
     }
 
+    /** The panel the canvas shows instead of the view, while a project is selected. */
+    get panel() {
+        return this.project ? this.state.panel : null;
+    }
+
     allows(operation) {
         return (this.data.operations || []).includes(operation);
     }
@@ -437,7 +460,12 @@ export class StudioEditor extends Component {
         return (error.data && error.data.message) || error.message || String(error);
     }
 
-    async call(method, args, kwargs = {}) {
+    /**
+     * Call ``method`` of the editor and show the payload it answers. On an
+     * error, ``onError(message)`` when given, else a notification; answer
+     * null.
+     */
+    async call(method, args, kwargs = {}, onError = null) {
         this.state.busy = true;
         try {
             const data = await this.orm.call(MODEL, method, args, kwargs);
@@ -450,7 +478,12 @@ export class StudioEditor extends Component {
             }
             return data;
         } catch (error) {
-            this.notification.add(this.errorMessage(error), {type: "danger"});
+            const message = this.errorMessage(error);
+            if (onError) {
+                onError(message);
+            } else {
+                this.notification.add(message, {type: "danger"});
+            }
             return null;
         } finally {
             this.state.busy = false;
@@ -472,6 +505,7 @@ export class StudioEditor extends Component {
             ]);
             this.state.data = data;
             this.params.viewId = data.view.id;
+            this.launch.viewId = this.launch.viewId || data.view.id;
             this.state.projectId = (data.project && data.project.id) || false;
         } catch (error) {
             this.state.error = this.errorMessage(error);
@@ -486,7 +520,36 @@ export class StudioEditor extends Component {
 
     /** Back to a canvas without selection, form or preview. */
     resetCanvas() {
+        this.state.panel = null;
         Object.assign(this.state, {selected: null, filterForm: null, colors: null, template: null, preview: false});
+    }
+
+    /**
+     * Edit the view ``viewId`` (false: the default one) of ``viewType`` of
+     * ``resModel``, in the same project. Answer whether it opened.
+     */
+    async openView(resModel, viewId, viewType) {
+        if (this.state.busy) {
+            return false;
+        }
+        const projectId = this.project ? this.project.id : false;
+        this.state.busy = true;
+        try {
+            const data = await this.orm.call(MODEL, "get_editor_data", [resModel, viewId, viewType, projectId], {
+                pick_project: Boolean(projectId),
+            });
+            Object.assign(this.params, {resModel, viewType, viewId: data.view.id});
+            this.resetCanvas();
+            this.state.data = data;
+            const keep = this.state.projectId === "new" ? "new" : false;
+            this.state.projectId = (data.project && data.project.id) || keep;
+            return true;
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return false;
+        } finally {
+            this.state.busy = false;
+        }
     }
 
     /**
@@ -498,25 +561,8 @@ export class StudioEditor extends Component {
         if (this.state.busy || viewType === this.params.viewType) {
             return;
         }
-        const projectId = this.project ? this.project.id : false;
-        this.state.busy = true;
-        try {
-            const data = await this.orm.call(
-                MODEL,
-                "get_editor_data",
-                [this.params.resModel, false, viewType, projectId],
-                {pick_project: Boolean(projectId)}
-            );
-            Object.assign(this.params, {viewType, viewId: data.view.id});
-            this.resetCanvas();
-            this.state.data = data;
-            const keep = this.state.projectId === "new" ? "new" : false;
-            this.state.projectId = (data.project && data.project.id) || keep;
-        } catch (error) {
+        if (!(await this.openView(this.params.resModel, false, viewType))) {
             ev.target.value = this.params.viewType;
-            this.notification.add(this.errorMessage(error), {type: "danger"});
-        } finally {
-            this.state.busy = false;
         }
     }
 
@@ -538,21 +584,62 @@ export class StudioEditor extends Component {
         });
     }
 
+    /** The view the editor was opened on, as ``project_action`` takes it. */
+    get launchArgs() {
+        const launch = this.launch;
+        return [launch.resModel, launch.viewId, launch.viewType];
+    }
+
+    /** Whether the menus Apply made for ``before`` and ``after`` (two project payloads) differ. */
+    menusChanged(before, after) {
+        const menus = (project) => JSON.stringify((project && project.menus) || []);
+        return menus(before) !== menus(after);
+    }
+
     async projectAction(action) {
         if (this.state.busy || !this.project) {
             return null;
         }
-        const data = await this.call("project_action", [this.project.id, action, ...this.viewArgs()], {
-            revision: this.project.revision,
-        });
-        if (data && ["action_apply", "action_revert"].includes(action)) {
-            // The applied views change what every view shows.
-            this.env.bus.trigger("CLEAR-CACHES");
+        const before = this.project;
+        this.state.busy = true;
+        let data = null;
+        try {
+            data = await this.orm.call(MODEL, "project_action", [this.project.id, action, ...this.viewArgs()], {
+                revision: this.project.revision,
+                fallback: this.launchArgs,
+            });
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return null;
+        } finally {
+            this.state.busy = false;
         }
-        if (data && data.notice) {
+        if (data.notice) {
             this.notification.add(data.notice, {type: "warning", sticky: true});
         }
-        if (data && action !== "action_apply") {
+        if (["action_apply", "action_revert"].includes(action)) {
+            // The applied views change what every view shows.
+            this.env.bus.trigger("CLEAR-CACHES");
+            if (this.menusChanged(before, data.project)) {
+                await this.menuService.reload();
+            }
+        }
+        if (data.view_gone) {
+            // The model on screen and the one the editor was opened on are gone.
+            await this.action.doAction("home");
+            return null;
+        }
+        if (data.view_changed) {
+            Object.assign(this.params, {resModel: data.model, viewType: data.view_type, viewId: data.view.id});
+            this.resetCanvas();
+        }
+        this.state.data = data;
+        this.state.projectId = (data.project && data.project.id) || false;
+        this.state.error = null;
+        if (!this.formIsCurrent(this.state.filterForm, data.project)) {
+            this.state.filterForm = null;
+        }
+        if (action !== "action_apply") {
             this.state.selected = null;
         }
         return data;
@@ -564,6 +651,7 @@ export class StudioEditor extends Component {
         }
         const value = ev.target.value;
         this.state.selected = null;
+        this.closePanel();
         const projectId = parseInt(value) || false;
         if (projectId) {
             await this.call("get_editor_data", [...this.viewArgs(), projectId]);
@@ -1154,10 +1242,10 @@ export class StudioEditor extends Component {
         return selectionToText((field.definition && field.definition.selection) || field.selection);
     }
 
+    /** The models a many2one can point to, the pending models of the project too. */
     async loadComodels() {
-        if (!this.state.comodels) {
-            this.state.comodels = await this.orm.call(MODEL, "get_comodels", []);
-        }
+        const projectId = this.project ? this.project.id : false;
+        this.state.comodels = await this.orm.call(MODEL, "get_comodels", [projectId]);
     }
 
     // ── colors of a timeline ────────────────────────────────────────────
@@ -1200,6 +1288,371 @@ export class StudioEditor extends Component {
         if (await this.setNodeAttribute(this.root, "colors", value.length ? value : "")) {
             this.state.colors = null;
         }
+    }
+
+    // ── models of the project ───────────────────────────────────────────
+
+    /**
+     * Call ``method`` on the project with ``params``, then the view on
+     * screen and the revision, as every editor call on the draft.
+     */
+    async projectCall(method, params, onError = null) {
+        if (this.state.busy || !this.project) {
+            return null;
+        }
+        return this.call(
+            method,
+            [this.project.id, ...params, ...this.viewArgs()],
+            {
+                revision: this.project.revision,
+            },
+            onError
+        );
+    }
+
+    /** What the dialogs and the panels offer, read again at each opening. */
+    async loadChoices() {
+        const projectId = this.project ? this.project.id : false;
+        try {
+            this.state.choices = await this.orm.call(MODEL, "get_studio_choices", [projectId]);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            this.state.choices = null;
+        }
+        return this.state.choices;
+    }
+
+    /** The models the project creates, as the payload lists them. */
+    get projectModels() {
+        return (this.project && this.project.models) || [];
+    }
+
+    get projectRules() {
+        return (this.project && this.project.rules) || [];
+    }
+
+    viewTypeLabel(viewType) {
+        return {form: _t("Form"), list: _t("List"), search: _t("Search")}[viewType] || viewType;
+    }
+
+    /** The label of ``model``: a model of the project, else of the database. */
+    modelLabel(model) {
+        const line = this.projectModels.find((m) => m.model === model);
+        if (line) {
+            return line.name;
+        }
+        const item = this.choiceModels.find((m) => m[0] === model);
+        return item ? item[1] : model;
+    }
+
+    /** The dialog of a new model, or of the model line ``line``. */
+    async openModelDialog(line = null) {
+        if (!this.project) {
+            this.notification.add(_t("Choose or create a studio project first."), {type: "warning"});
+            return;
+        }
+        const choices = await this.loadChoices();
+        if (!choices) {
+            return;
+        }
+        this.dialog.add(StudioModelDialog, {
+            project: this.project,
+            choices,
+            line,
+            taken: [
+                ...(choices.taken_models || []),
+                ...choices.models.map((m) => m[0]),
+                ...this.projectModels.map((m) => m.model),
+            ],
+            save: (values, app) => (line ? this.updateModel(line, values, app) : this.createModel(values)),
+        });
+    }
+
+    async createModel(values) {
+        return Boolean(await this.projectCall("create_model", [values]));
+    }
+
+    async updateModel(line, values, app) {
+        if (app && !(await this.projectCall("update_app", [app]))) {
+            return false;
+        }
+        return Boolean(await this.projectCall("update_model", [line.id, values]));
+    }
+
+    removeModel(line) {
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Remove the model"),
+            body: _t(
+                "Remove %(model)s from the project, with its access rows, its rules and the changes of its views? " +
+                    "Once applied, it leaves the database with its records.",
+                {model: line.model}
+            ),
+            confirmLabel: _t("Remove"),
+            confirm: async () => {
+                const data = await this.projectCall("remove_model", [line.id]);
+                if (data && line.model === this.params.resModel) {
+                    // Apply removes the model on screen: back to the view
+                    // the editor was opened on, or out of the editor when
+                    // that view is of the model too.
+                    if (this.launch.resModel === line.model) {
+                        await this.close();
+                    } else {
+                        await this.openView(...this.launchArgs);
+                    }
+                }
+            },
+            cancel: () => {},
+        });
+    }
+
+    /**
+     * Edit the default ``viewType`` view of the model line ``line``: the
+     * views Apply created for it.
+     */
+    async openModel(line, viewType = "form") {
+        const viewId = line.views && line.views[viewType];
+        if (!line.applied || !viewId) {
+            return false;
+        }
+        return this.openView(line.model, viewId, viewType);
+    }
+
+    /** Apply the project, then edit the form of the model line ``line``. */
+    async applyAndOpen(line) {
+        const data = await this.projectAction("action_apply");
+        const applied = data && data.project && (data.project.models || []).find((m) => m.id === line.id);
+        if (applied && applied.applied) {
+            await this.openModel(applied, "form");
+        }
+    }
+
+    // ── access rights and record rules ──────────────────────────────────
+
+    /** Show the access grid or the rules on the canvas; again, the view. */
+    async togglePanel(panel) {
+        if (this.state.busy) {
+            return;
+        }
+        if (this.state.panel === panel) {
+            this.closePanel();
+            return;
+        }
+        if (!this.project || !(await this.loadChoices())) {
+            return;
+        }
+        Object.assign(this.state, {
+            selected: null,
+            preview: false,
+            panel,
+            ruleForm: null,
+            ruleCheck: null,
+            ruleError: null,
+        });
+        this.state.accessExisting = {};
+        if (panel === "access") {
+            await this.loadAccessExisting(this.accessGrid.map((entry) => entry.model));
+        }
+    }
+
+    closePanel() {
+        Object.assign(this.state, {panel: null, ruleForm: null, ruleCheck: null, ruleError: null});
+    }
+
+    get choiceModels() {
+        return (this.state.choices && this.state.choices.models) || [];
+    }
+
+    get choiceGroups() {
+        return (this.state.choices && this.state.choices.groups) || [];
+    }
+
+    groupName(groupId) {
+        const group = this.choiceGroups.find((g) => g.id === groupId);
+        return group ? group.name : String(groupId);
+    }
+
+    permLabel(perm) {
+        return permLabel(perm);
+    }
+
+    get accessGrid() {
+        return this.project ? accessGrid(this.project) : [];
+    }
+
+    newAccessRow() {
+        return {model: "", group_id: "", perm_read: true, perm_write: false, perm_create: false, perm_unlink: false};
+    }
+
+    /** The access rows of the other modules on ``models``, shown read-only. */
+    async loadAccessExisting(models) {
+        const projectId = this.project && this.project.id;
+        for (const model of models) {
+            if (model in this.state.accessExisting) {
+                continue;
+            }
+            try {
+                this.state.accessExisting[model] = await this.orm.call(MODEL, "get_access_existing", [
+                    projectId,
+                    model,
+                ]);
+            } catch (error) {
+                this.notification.add(this.errorMessage(error), {type: "danger"});
+                return;
+            }
+        }
+    }
+
+    /** Replace the access rows of the project: one call, one change of the draft. */
+    async setAccess(rows) {
+        return this.projectCall("set_access", [rows]);
+    }
+
+    async toggleAccess(row, perm) {
+        const rows = accessRows(this.project.access);
+        const index = this.project.access.findIndex((r) => r.id === row.id);
+        rows[index][perm] = !rows[index][perm];
+        await this.setAccess(rows);
+    }
+
+    /** Remove an access row: the grid drops a row that gives no right. */
+    async removeAccess(row) {
+        const rows = accessRows(this.project.access.filter((r) => r.id !== row.id));
+        await this.setAccess(rows);
+    }
+
+    async addAccess() {
+        const add = this.state.accessAdd;
+        const groupId = parseInt(add.group_id) || false;
+        if (!add.model || !groupId) {
+            return;
+        }
+        if (this.project.access.some((r) => r.model === add.model && r.group[0] === groupId)) {
+            this.notification.add(_t("This group has a row on this model already: change its rights in the grid."), {
+                type: "warning",
+            });
+            return;
+        }
+        const row = {model: add.model, group_id: groupId};
+        for (const perm of PERMS) {
+            row[perm] = Boolean(add[perm]);
+        }
+        if (!PERMS.some((perm) => row[perm])) {
+            this.notification.add(_t("An access row gives at least one right."), {type: "warning"});
+            return;
+        }
+        if (await this.setAccess([...accessRows(this.project.access), row])) {
+            this.state.accessAdd = this.newAccessRow();
+            await this.loadAccessExisting([row.model]);
+        }
+    }
+
+    /** The form of the rule ``rule`` of the payload, or of a new rule. */
+    editRule(rule = null) {
+        const models = this.projectModels.map((m) => m.model);
+        this.state.ruleForm = rule
+            ? {
+                  id: rule.id,
+                  name: rule.name,
+                  model: rule.model,
+                  domain: rule.domain,
+                  group_ids: rule.groups.map((g) => g[0]),
+                  ...Object.fromEntries(PERMS.map((perm) => [perm, rule[perm]])),
+              }
+            : {
+                  id: false,
+                  name: "",
+                  model: models[0] || "",
+                  domain: "[]",
+                  group_ids: [],
+                  ...Object.fromEntries(PERMS.map((perm) => [perm, true])),
+              };
+        this.state.ruleCheck = null;
+        this.state.ruleError = null;
+    }
+
+    closeRuleForm() {
+        this.state.ruleForm = null;
+        this.state.ruleCheck = null;
+        this.state.ruleError = null;
+    }
+
+    addRuleGroup(ev) {
+        const groupId = parseInt(ev.target.value) || false;
+        ev.target.value = "";
+        if (groupId && !this.state.ruleForm.group_ids.includes(groupId)) {
+            this.state.ruleForm.group_ids.push(groupId);
+        }
+    }
+
+    removeGroupLabel(groupId) {
+        return _t("Remove the group %(group)s", {group: this.groupName(groupId)});
+    }
+
+    removeRuleGroup(groupId) {
+        const form = this.state.ruleForm;
+        form.group_ids = form.group_ids.filter((id) => id !== groupId);
+    }
+
+    get domainPlaceholder() {
+        return "[('create_uid', '=', user.id)]";
+    }
+
+    /** The answer of the last check, while the form holds the domain it checked. */
+    get ruleCheck() {
+        const check = this.state.ruleCheck;
+        const form = this.state.ruleForm;
+        return check && form && check.model === form.model && check.domain === form.domain ? check : null;
+    }
+
+    ruleCheckText(check) {
+        if (!check.ok) {
+            return check.error;
+        }
+        if (check.count === false) {
+            return _t("The domain reads well; Apply checks its fields once it created the model.");
+        }
+        return _t("The domain applies: %(count)s record(s) match it.", {count: check.count});
+    }
+
+    /** The domain of the form, as the server evaluates it for a rule. */
+    async checkRule() {
+        const form = this.state.ruleForm;
+        if (!form || !this.project) {
+            return;
+        }
+        const {model, domain} = form;
+        try {
+            const result = await this.orm.call(MODEL, "check_rule_domain", [this.project.id, model, domain]);
+            this.state.ruleCheck = {...result, model, domain};
+        } catch (error) {
+            this.state.ruleCheck = {ok: false, error: this.errorMessage(error), model, domain};
+        }
+    }
+
+    /**
+     * Save the rule of the form. A refusal shows at the top of the form
+     * until the next Save or Cancel: it may be about the domain, the model,
+     * the groups or the draft itself.
+     */
+    async saveRule() {
+        const form = this.state.ruleForm;
+        if (!form) {
+            return;
+        }
+        this.state.ruleError = null;
+        const data = await this.projectCall("save_rule", [{...form}], (message) => {
+            this.state.ruleError = message;
+        });
+        if (data) {
+            this.closeRuleForm();
+        }
+    }
+
+    async removeRule(rule) {
+        if (this.state.ruleForm && this.state.ruleForm.id === rule.id) {
+            this.closeRuleForm();
+        }
+        await this.projectCall("remove_rule", [rule.id]);
     }
 
     // ── toolbar ─────────────────────────────────────────────────────────

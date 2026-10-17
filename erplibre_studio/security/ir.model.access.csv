@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_erplibre_studio_project_system,erplibre.studio.project system,model_erplibre_studio_project,base.group_system,1,1,1,1
 access_erplibre_studio_change_system,erplibre.studio.change system,model_erplibre_studio_change,base.group_system,1,1,1,1
+access_erplibre_studio_model_system,erplibre.studio.model system,model_erplibre_studio_model,base.group_system,1,1,1,1
+access_erplibre_studio_access_system,erplibre.studio.access system,model_erplibre_studio_access,base.group_system,1,1,1,1
+access_erplibre_studio_rule_system,erplibre.studio.rule system,model_erplibre_studio_rule,base.group_system,1,1,1,1

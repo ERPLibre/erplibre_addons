@@ -41,10 +41,27 @@ list, kanban, search and pivot views, and timeline views once
 - Each change is recorded in a **studio project**, as a draft. **Preview**
   shows the real view with the draft applied, to the editor of the
   project only.
-- **Apply** creates the `x_` fields and one inherited view per edited view
-  in the database; applying again updates them. **Discard** goes back to
-  the last Apply, **Revert** removes the fields and views of the project
-  from the database.
+- **Apply** creates the `x_` models and fields, their views, actions and
+  menus, the access rights and rules, and one inherited view per edited
+  view in the database; applying again updates them, and removes what the
+  draft no longer has. **Discard** goes back to the last Apply, **Revert**
+  removes from the database what the project created, the records of its
+  models with them. A model another project or a module still uses (a
+  field pointing at it, a view or a right on it) is not removed.
+- **New models**: a project creates `x_` models. Each one comes with a
+  `x_name`, a form, a list and a search view, a window action, a menu and
+  an access row for the internal users, all editable afterwards like any
+  other view or right. Its menu goes in the app of the project, a new
+  top-level menu with an icon taken from an installed module, or under an
+  existing menu. With *mail* installed, a model can get a chatter
+  (messages, followers and activities); once applied, the chatter stays.
+  The editor creates a model from a dialog and lists the models of the
+  project in its side panel, to edit their views once applied.
+- **Access rights and record rules**: a grid of groups and rights (read,
+  write, create, delete) on the models of the project and on existing
+  models, shown next to the rights other modules give on them, and record
+  rules (a domain, groups, operations) checked against the fields of
+  their model; the editor shows both instead of the view.
 - **ERPLibre studio generate** (`erplibre_studio_generate`) writes a
   project as a module with *code_generator*; this module does not need
   it.

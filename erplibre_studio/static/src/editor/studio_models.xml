@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- A new model of the project, or one of its models: label, technical
+         name, chatter, and where its menu goes. -->
+    <t t-name="erplibre_studio.ModelDialog">
+        <Dialog title="title" size="'lg'" contentClass="'o_erplibre_studio_model_dialog'">
+            <div class="mb-3">
+                <label class="form-label" for="o_erplibre_studio_model_label">Label</label>
+                <input
+                    id="o_erplibre_studio_model_label"
+                    class="form-control o_erplibre_studio_model_label"
+                    placeholder="Equipment"
+                    aria-required="true"
+                    t-att-value="state.name"
+                    t-on-input="(ev) => this.setName(ev.target.value)"
+                />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="o_erplibre_studio_model_name">Technical name</label>
+                <input
+                    id="o_erplibre_studio_model_name"
+                    class="form-control font-monospace o_erplibre_studio_model_name"
+                    t-att-value="state.model"
+                    t-att-disabled="modelLocked"
+                    t-on-input="(ev) => this.setModel(ev.target.value)"
+                />
+                <div class="form-text">
+                    Starts with x_, then lower case letters, digits and underscores; it cannot change once applied.
+                </div>
+            </div>
+            <div t-if="choices.mail_available" class="form-check mb-3">
+                <input
+                    id="o_erplibre_studio_model_chatter"
+                    type="checkbox"
+                    class="form-check-input o_erplibre_studio_model_chatter"
+                    t-model="state.chatter"
+                    t-att-disabled="chatterLocked"
+                />
+                <label class="form-check-label" for="o_erplibre_studio_model_chatter">
+                    Chatter: messages, followers and activities
+                </label>
+                <div class="form-text">Once applied, the chatter cannot be removed.</div>
+            </div>
+            <fieldset class="mb-3 o_erplibre_studio_model_menu">
+                <legend class="fs-6 fw-bold">Menu</legend>
+                <div class="form-check">
+                    <input
+                        id="o_erplibre_studio_menu_app"
+                        type="radio"
+                        class="form-check-input o_erplibre_studio_menu_mode"
+                        name="o_erplibre_studio_menu_mode"
+                        value="app"
+                        t-att-checked="state.mode === 'app'"
+                        t-on-change="() => this.setMode('app')"
+                    />
+                    <label class="form-check-label" for="o_erplibre_studio_menu_app" t-esc="appLabel" />
+                </div>
+                <div t-if="state.mode === 'app' and editsApp" class="ms-4 mt-2 o_erplibre_studio_app_form">
+                    <label class="form-label mb-0" for="o_erplibre_studio_app_name">Name of the app</label>
+                    <input
+                        id="o_erplibre_studio_app_name"
+                        class="form-control form-control-sm mb-2 o_erplibre_studio_app_name"
+                        t-att-class="{'is-invalid': appNameMissing}"
+                        aria-required="true"
+                        t-att-aria-invalid="appNameMissing ? 'true' : 'false'"
+                        t-att-value="state.appName"
+                        t-on-input="(ev) => this.setAppName(ev.target.value)"
+                    />
+                    <div t-if="appNameMissing" class="invalid-feedback d-block mt-n2 mb-2">The app needs a name.</div>
+                    <div id="o_erplibre_studio_icons_label" class="form-label mb-1">Icon of the app</div>
+                    <div
+                        class="d-flex flex-wrap gap-1 o_erplibre_studio_icons"
+                        role="group"
+                        aria-labelledby="o_erplibre_studio_icons_label"
+                    >
+                        <button
+                            t-foreach="choices.icons or []"
+                            t-as="icon"
+                            t-key="icon.value"
+                            type="button"
+                            class="btn btn-light p-1 border o_erplibre_studio_icon"
+                            t-att-class="{'border-primary border-2 o_erplibre_studio_icon_selected': isIcon(icon.value)}"
+                            t-att-data-value="icon.value"
+                            t-att-title="icon.label"
+                            t-att-aria-pressed="isIcon(icon.value) ? 'true' : 'false'"
+                            t-on-click="() => this.setIcon(icon.value)"
+                        >
+                            <img t-att-src="icon.url" t-att-alt="icon.label" width="40" height="40" />
+                        </button>
+                    </div>
+                </div>
+                <div class="form-check mt-2">
+                    <input
+                        id="o_erplibre_studio_menu_under"
+                        type="radio"
+                        class="form-check-input o_erplibre_studio_menu_mode"
+                        name="o_erplibre_studio_menu_mode"
+                        value="menu"
+                        t-att-checked="state.mode === 'menu'"
+                        t-on-change="() => this.setMode('menu')"
+                    />
+                    <label class="form-check-label" for="o_erplibre_studio_menu_under">Under a menu</label>
+                </div>
+                <div t-if="state.mode === 'menu'" class="ms-4 mt-2 o_erplibre_studio_parent_form">
+                    <input
+                        class="form-control form-control-sm mb-1 o_erplibre_studio_menu_filter"
+                        placeholder="Filter the menus"
+                        aria-label="Filter the menus"
+                        t-model="state.menuFilter"
+                    />
+                    <select
+                        class="form-select form-select-sm o_erplibre_studio_menu_parent"
+                        aria-label="Parent menu"
+                        size="8"
+                        t-on-change="(ev) => this.setParent(ev.target.value)"
+                    >
+                        <option
+                            t-foreach="menus"
+                            t-as="menu"
+                            t-key="menu.id"
+                            t-att-value="menu.id"
+                            t-att-selected="menu.id === state.parentId"
+                            t-att-title="menu.xml_id"
+                            t-esc="menu.name"
+                        />
+                    </select>
+                    <div class="form-text">A menu that opens an action takes no submenu: it is not listed.</div>
+                </div>
+                <label class="form-label mb-0 mt-2" for="o_erplibre_studio_menu_name">Label of the menu</label>
+                <input
+                    id="o_erplibre_studio_menu_name"
+                    class="form-control form-control-sm o_erplibre_studio_menu_name"
+                    t-att-placeholder="state.name"
+                    t-model="state.menuName"
+                />
+            </fieldset>
+            <div class="form-text">
+                Apply creates the model with its name field, its form, list and search views, its action, its menu
+                and its access rights; they all stay editable.
+            </div>
+            <t t-set-slot="footer">
+                <button
+                    class="btn btn-primary o_erplibre_studio_model_save"
+                    t-att-disabled="!canSave"
+                    t-on-click="save"
+                >
+                    <t t-if="line">Save</t>
+                    <t t-else="">Create</t>
+                </button>
+                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <!-- The models of the project, under the properties of the sidebar. -->
+    <t t-name="erplibre_studio.Editor.Models">
+        <div class="o_erplibre_studio_models small">
+            <div class="d-flex align-items-center mb-1">
+                <span class="fw-bold">Models of the project</span>
+                <button
+                    class="btn btn-sm btn-link ms-auto p-0 o_erplibre_studio_add_model"
+                    t-att-disabled="state.busy"
+                    t-on-click="() => this.openModelDialog()"
+                >
+                    <i class="fa fa-plus" />
+                    New model
+                </button>
+            </div>
+            <div t-if="project.app" class="text-muted mb-1 o_erplibre_studio_app">
+                <i class="fa fa-th-large me-1" />
+                App:
+                <span t-esc="project.app.name" />
+            </div>
+            <div t-if="!projectModels.length" class="text-muted o_erplibre_studio_no_model">No new model.</div>
+            <div
+                t-foreach="projectModels"
+                t-as="line"
+                t-key="line.id"
+                class="o_erplibre_studio_model border rounded p-1 mb-1"
+                t-att-class="{'o_erplibre_studio_model_current': line.model === params.resModel}"
+                t-att-data-model="line.model"
+            >
+                <div class="d-flex align-items-center gap-1">
+                    <span class="fw-bold text-truncate" t-esc="line.name" />
+                    <span
+                        class="badge ms-auto o_erplibre_studio_model_state"
+                        t-att-class="line.applied ? 'text-bg-success' : 'text-bg-warning'"
+                        t-att-data-applied="line.applied ? '1' : '0'"
+                    >
+                        <t t-if="line.applied">in the database</t>
+                        <t t-else="">created by Apply</t>
+                    </span>
+                </div>
+                <code class="d-block text-truncate" t-esc="line.model" />
+                <div class="d-flex flex-wrap gap-1 mt-1">
+                    <t t-if="line.applied">
+                        <button
+                            t-foreach="['form', 'list', 'search']"
+                            t-as="type"
+                            t-key="type"
+                            class="btn btn-sm btn-secondary py-0 o_erplibre_studio_open_model"
+                            t-att-data-view-type="type"
+                            t-att-disabled="state.busy or !line.views[type]"
+                            t-on-click="() => this.openModel(line, type)"
+                            t-esc="viewTypeLabel(type)"
+                        />
+                    </t>
+                    <button
+                        t-else=""
+                        class="btn btn-sm btn-primary py-0 o_erplibre_studio_apply_open"
+                        title="Apply the project, then edit the form of the model"
+                        t-att-disabled="state.busy or project.state !== 'draft'"
+                        t-on-click="() => this.applyAndOpen(line)"
+                    >
+                        Apply and open
+                    </button>
+                    <button
+                        class="btn btn-sm btn-link py-0 px-1 ms-auto o_erplibre_studio_edit_model"
+                        title="Edit the model"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.openModelDialog(line)"
+                    >
+                        <i class="fa fa-pencil" />
+                    </button>
+                    <button
+                        class="btn btn-sm btn-link text-danger py-0 px-1 o_erplibre_studio_remove_model"
+                        title="Remove the model from the project"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.removeModel(line)"
+                    >
+                        <i class="fa fa-trash" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- The access grid: the rows of the project by model, with the rows of
+         the other modules on the same model below them. -->
+    <t t-name="erplibre_studio.Panel.access">
+        <div class="o_erplibre_studio_access_panel">
+            <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0">Access rights</h5>
+                <span class="text-muted small ms-2">
+                    Who reads, writes, creates and deletes the records; each change is part of the draft.
+                </span>
+            </div>
+            <div t-if="!accessGrid.length" class="text-muted small o_erplibre_studio_no_access">No access right.</div>
+            <div
+                t-foreach="accessGrid"
+                t-as="entry"
+                t-key="entry.model"
+                class="o_erplibre_studio_access_model border rounded p-2 mb-2"
+                t-att-data-model="entry.model"
+            >
+                <div class="fw-bold mb-1">
+                    <t t-esc="modelLabel(entry.model)" />
+                    <code class="ms-1 small" t-esc="entry.model" />
+                </div>
+                <table class="table table-sm mb-1 o_erplibre_studio_access_table">
+                    <thead>
+                        <tr>
+                            <th>Group</th>
+                            <th
+                                t-foreach="perms"
+                                t-as="perm"
+                                t-key="perm"
+                                class="text-center"
+                                t-esc="permLabel(perm)"
+                            />
+                            <th />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            t-foreach="entry.rows"
+                            t-as="row"
+                            t-key="row.id"
+                            class="o_erplibre_studio_access_row"
+                            t-att-data-group="row.group[0]"
+                        >
+                            <td t-esc="row.group[1]" />
+                            <td t-foreach="perms" t-as="perm" t-key="perm" class="text-center">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input o_erplibre_studio_access_perm"
+                                    t-att-aria-label="permLabel(perm) + ' – ' + row.group[1]"
+                                    t-att-data-perm="perm"
+                                    t-att-checked="row[perm]"
+                                    t-att-disabled="state.busy"
+                                    t-on-change="() => this.toggleAccess(row, perm)"
+                                />
+                            </td>
+                            <td class="text-end">
+                                <button
+                                    class="btn btn-sm btn-link text-danger p-0 o_erplibre_studio_access_remove"
+                                    title="Remove this row"
+                                    t-att-disabled="state.busy"
+                                    t-on-click="() => this.removeAccess(row)"
+                                >
+                                    <i class="fa fa-times" />
+                                </button>
+                            </td>
+                        </tr>
+                        <tr t-if="!entry.rows.length">
+                            <td colspan="6" class="text-muted small">No row of the project on this model.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <t t-set="existing" t-value="state.accessExisting[entry.model]" />
+                <div t-if="existing and existing.length" class="o_erplibre_studio_access_existing small">
+                    <div class="text-muted">Rows of the other modules, unchanged by the project:</div>
+                    <table class="table table-sm table-borderless text-muted mb-0">
+                        <tbody>
+                            <tr t-foreach="existing" t-as="row" t-key="row.id">
+                                <td>
+                                    <t t-if="row.group" t-esc="row.group[1]" />
+                                    <t t-else="">Every user</t>
+                                    <span t-if="row.module" class="badge text-bg-light ms-1" t-esc="row.module" />
+                                </td>
+                                <td t-foreach="perms" t-as="perm" t-key="perm" class="text-center">
+                                    <i t-if="row[perm]" class="fa fa-check" t-att-title="permLabel(perm)" />
+                                </td>
+                                <td />
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="o_erplibre_studio_access_add d-flex flex-wrap align-items-center gap-2 border rounded p-2">
+                <select
+                    class="form-select form-select-sm w-auto o_erplibre_studio_access_add_model"
+                    aria-label="Model of the new row"
+                    t-model="state.accessAdd.model"
+                >
+                    <option value="">Model…</option>
+                    <option
+                        t-foreach="choiceModels"
+                        t-as="item"
+                        t-key="item[0]"
+                        t-att-value="item[0]"
+                        t-esc="item[1] + ' (' + item[0] + ')'"
+                    />
+                </select>
+                <select
+                    class="form-select form-select-sm w-auto o_erplibre_studio_access_add_group"
+                    aria-label="Group of the new row"
+                    t-model="state.accessAdd.group_id"
+                >
+                    <option value="">Group…</option>
+                    <option
+                        t-foreach="choiceGroups"
+                        t-as="group"
+                        t-key="group.id"
+                        t-att-value="group.id"
+                        t-esc="group.name"
+                    />
+                </select>
+                <div t-foreach="perms" t-as="perm" t-key="perm" class="form-check form-check-inline mb-0">
+                    <input
+                        type="checkbox"
+                        class="form-check-input o_erplibre_studio_access_add_perm"
+                        t-att-id="'o_erplibre_studio_access_add_' + perm"
+                        t-att-data-perm="perm"
+                        t-model="state.accessAdd[perm]"
+                    />
+                    <label
+                        class="form-check-label"
+                        t-att-for="'o_erplibre_studio_access_add_' + perm"
+                        t-esc="permLabel(perm)"
+                    />
+                </div>
+                <button
+                    class="btn btn-sm btn-primary o_erplibre_studio_access_add_button"
+                    t-att-disabled="state.busy or !state.accessAdd.model or !state.accessAdd.group_id"
+                    t-on-click="addAccess"
+                >
+                    <i class="fa fa-plus" />
+                    Add
+                </button>
+            </div>
+        </div>
+    </t>
+
+    <!-- The record rules of the project, and the form of one of them. -->
+    <t t-name="erplibre_studio.Panel.rules">
+        <div class="o_erplibre_studio_rules_panel">
+            <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0">Record rules</h5>
+                <span class="text-muted small ms-2">
+                    Which records the groups reach; a rule without group applies to every user.
+                </span>
+                <button
+                    class="btn btn-sm btn-secondary ms-auto o_erplibre_studio_new_rule"
+                    t-att-disabled="state.busy"
+                    t-on-click="() => this.editRule()"
+                >
+                    <i class="fa fa-plus" />
+                    New rule
+                </button>
+            </div>
+            <div t-if="!projectRules.length and !state.ruleForm" class="text-muted small o_erplibre_studio_no_rule">
+                No record rule.
+            </div>
+            <table t-if="projectRules.length" class="table table-sm o_erplibre_studio_rules">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Model</th>
+                        <th>Groups</th>
+                        <th>Rights</th>
+                        <th />
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        t-foreach="projectRules"
+                        t-as="rule"
+                        t-key="rule.id"
+                        class="o_erplibre_studio_rule"
+                        t-att-data-id="rule.id"
+                    >
+                        <td>
+                            <div t-esc="rule.name" />
+                            <code class="small text-break" t-esc="rule.domain" />
+                        </td>
+                        <td>
+                            <code t-esc="rule.model" />
+                        </td>
+                        <td>
+                            <span
+                                t-foreach="rule.groups"
+                                t-as="group"
+                                t-key="group[0]"
+                                class="badge text-bg-light me-1"
+                                t-esc="group[1]"
+                            />
+                            <span t-if="!rule.groups.length" class="text-muted small">Every user</span>
+                        </td>
+                        <td class="small">
+                            <t t-foreach="perms" t-as="perm" t-key="perm">
+                                <span t-if="rule[perm]" class="me-1" t-esc="permLabel(perm)" />
+                            </t>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <button
+                                class="btn btn-sm btn-link p-0 me-2 o_erplibre_studio_edit_rule"
+                                title="Edit the rule"
+                                t-att-disabled="state.busy"
+                                t-on-click="() => this.editRule(rule)"
+                            >
+                                <i class="fa fa-pencil" />
+                            </button>
+                            <button
+                                class="btn btn-sm btn-link text-danger p-0 o_erplibre_studio_remove_rule"
+                                title="Remove the rule"
+                                t-att-disabled="state.busy"
+                                t-on-click="() => this.removeRule(rule)"
+                            >
+                                <i class="fa fa-trash" />
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div t-if="state.ruleForm" class="o_erplibre_studio_rule_form border rounded p-2 bg-light">
+                <t t-set="form" t-value="state.ruleForm" />
+                <div class="fw-bold mb-2">
+                    <t t-if="form.id">Edit the rule</t>
+                    <t t-else="">New rule</t>
+                </div>
+                <div
+                    t-if="state.ruleError"
+                    class="alert alert-danger py-1 px-2 small o_erplibre_studio_rule_error"
+                    role="alert"
+                    t-esc="state.ruleError"
+                />
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label mb-0" for="o_erplibre_studio_rule_name">Name</label>
+                        <input
+                            id="o_erplibre_studio_rule_name"
+                            class="form-control form-control-sm o_erplibre_studio_rule_name"
+                            aria-required="true"
+                            t-model="form.name"
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label mb-0" for="o_erplibre_studio_rule_model">Model</label>
+                        <select
+                            id="o_erplibre_studio_rule_model"
+                            class="form-select form-select-sm o_erplibre_studio_rule_model"
+                            aria-required="true"
+                            t-model="form.model"
+                        >
+                            <option value="">Model…</option>
+                            <option
+                                t-foreach="choiceModels"
+                                t-as="item"
+                                t-key="item[0]"
+                                t-att-value="item[0]"
+                                t-esc="item[1] + ' (' + item[0] + ')'"
+                            />
+                        </select>
+                    </div>
+                </div>
+                <div id="o_erplibre_studio_rule_groups_label" class="form-label mb-0 mt-2">Groups</div>
+                <div
+                    class="d-flex flex-wrap align-items-center gap-1 mb-1 o_erplibre_studio_rule_groups"
+                    role="group"
+                    aria-labelledby="o_erplibre_studio_rule_groups_label"
+                >
+                    <span
+                        t-foreach="form.group_ids"
+                        t-as="groupId"
+                        t-key="groupId"
+                        class="badge text-bg-secondary o_erplibre_studio_rule_group"
+                        t-att-data-group="groupId"
+                    >
+                        <t t-esc="groupName(groupId)" />
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white ms-1 align-middle o_erplibre_studio_rule_group_remove"
+                            t-att-aria-label="removeGroupLabel(groupId)"
+                            t-att-title="removeGroupLabel(groupId)"
+                            t-on-click="() => this.removeRuleGroup(groupId)"
+                        />
+                    </span>
+                    <select
+                        class="form-select form-select-sm w-auto o_erplibre_studio_rule_add_group"
+                        aria-label="Add a group"
+                        t-on-change="(ev) => this.addRuleGroup(ev)"
+                    >
+                        <option value="">Add a group…</option>
+                        <t t-foreach="choiceGroups" t-as="group" t-key="group.id">
+                            <option
+                                t-if="!form.group_ids.includes(group.id)"
+                                t-att-value="group.id"
+                                t-esc="group.name"
+                            />
+                        </t>
+                    </select>
+                    <span t-if="!form.group_ids.length" class="text-muted small">No group: every user.</span>
+                </div>
+                <label class="form-label mb-0 mt-2" for="o_erplibre_studio_rule_domain">Domain</label>
+                <textarea
+                    id="o_erplibre_studio_rule_domain"
+                    class="form-control form-control-sm font-monospace o_erplibre_studio_rule_domain"
+                    rows="3"
+                    t-att-placeholder="domainPlaceholder"
+                    t-model="form.domain"
+                />
+                <div class="form-text">It may name user, company_id, company_ids and time.</div>
+                <t t-set="check" t-value="ruleCheck" />
+                <div
+                    t-if="check"
+                    class="small mt-1 o_erplibre_studio_rule_check"
+                    t-att-class="check.ok ? 'text-success' : 'text-danger'"
+                    t-att-data-ok="check.ok ? '1' : '0'"
+                    t-esc="ruleCheckText(check)"
+                />
+                <div class="d-flex flex-wrap gap-3 mt-2">
+                    <div t-foreach="perms" t-as="perm" t-key="perm" class="form-check mb-0">
+                        <input
+                            type="checkbox"
+                            class="form-check-input o_erplibre_studio_rule_perm"
+                            t-att-id="'o_erplibre_studio_rule_' + perm"
+                            t-att-data-perm="perm"
+                            t-model="form[perm]"
+                        />
+                        <label
+                            class="form-check-label"
+                            t-att-for="'o_erplibre_studio_rule_' + perm"
+                            t-esc="permLabel(perm)"
+                        />
+                    </div>
+                </div>
+                <div class="d-flex gap-1 mt-2">
+                    <button
+                        class="btn btn-sm btn-secondary o_erplibre_studio_check_rule"
+                        t-att-disabled="state.busy or !form.model"
+                        t-on-click="checkRule"
+                    >
+                        Check
+                    </button>
+                    <button class="btn btn-sm btn-secondary ms-auto" t-on-click="closeRuleForm">Cancel</button>
+                    <button
+                        class="btn btn-sm btn-primary o_erplibre_studio_save_rule"
+                        t-att-disabled="state.busy or !form.name.trim() or !form.model"
+                        t-on-click="saveRule"
+                    >
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
