@@ -11,6 +11,8 @@ REQUIREMENT_KEYS = (
     "name",
     "moscow",
     "moscow_label",
+    "stage",
+    "stage_label",
     "test_state",
     "test_state_label",
     "has_guide",
@@ -33,7 +35,8 @@ class DevopsGuideCard(models.Model):
     aucun bouton, plutôt qu'un bouton vide ne portant que sa flèche.
 
     `requirement_id` rattache la carte à un requis : la page affiche alors
-    son code, son niveau MoSCoW et l'état de ses tests, et la carte lance
+    son code, son niveau MoSCoW, son étape DevSecOps et l'état de ses
+    tests, et la carte lance
     la visite guidée du requis. `tour_name` posé sur la carte l'emporte sur
     celle du requis (`effective_tour_name`).
 
@@ -100,7 +103,10 @@ class DevopsGuideCard(models.Model):
         string="Requirement",
         ondelete="set null",
         index=True,
-        help="The card shows this requirement's code, level and test state.",
+        help=(
+            "The card shows this requirement's code, level, stage and test "
+            "state."
+        ),
     )
     tour_name = fields.Char(
         string="Tour name",
@@ -220,6 +226,11 @@ class DevopsGuideCard(models.Model):
         moscow_labels = dict(
             requirement._fields["moscow"]._description_selection(self.env)
         )
+        stage_labels = dict(
+            requirement._fields["devsecops_stage"]._description_selection(
+                self.env
+            )
+        )
         state_labels = dict(
             requirement._fields["test_state"]._description_selection(self.env)
         )
@@ -229,6 +240,8 @@ class DevopsGuideCard(models.Model):
             "name": requirement.name or "",
             "moscow": requirement.moscow or "",
             "moscow_label": moscow_labels.get(requirement.moscow, ""),
+            "stage": requirement.devsecops_stage or "",
+            "stage_label": stage_labels.get(requirement.devsecops_stage, ""),
             "test_state": requirement.test_state or "",
             "test_state_label": state_labels.get(requirement.test_state, ""),
             "has_guide": True if requirement.guide_id else "",

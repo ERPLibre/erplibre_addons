@@ -73,6 +73,9 @@ lit toutes les cartes, pour les éditer.
 feuille de route :
 
 - une pastille avec le **code** et le **niveau MoSCoW** du requis ;
+- une pastille avec son **étape DevSecOps** (`devsecops_stage`), qui dit si
+  le requis est livré : un requis « could » encore planifié ne se confond
+  pas avec un requis livré ;
 - une pastille avec l'**état de ses tests**, colorée par état ;
 - un bouton **Requirement**, qui ouvre le formulaire du requis ;
 - un bouton **Guide**, si le requis désigne une page détaillée (`guide_id`) ;
@@ -80,12 +83,19 @@ feuille de route :
   (voir plus bas).
 
 `get_page` rend, pour chaque carte, un dictionnaire `requirement` aux clés
-fixes : `id`, `code`, `name`, `moscow`, `moscow_label`, `test_state`,
-`test_state_label`, `has_guide`. Une carte sans requis, ou dont le requis
+fixes : `id`, `code`, `name`, `moscow`, `moscow_label`, `stage`,
+`stage_label`, `test_state`, `test_state_label`, `has_guide`. Une carte sans requis, ou dont le requis
 n'est pas lisible, reçoit ces mêmes clés **vides** (`""`) ; `has_guide` vaut
 `True` ou `""`. Un requis illisible ne prête pas non plus sa visite : la
 carte reste affichée, sans bouton de visite si elle n'en porte pas une à
 elle. Les libellés arrivent traduits dans la langue du lecteur.
+
+La pastille d'étape porte une classe par valeur,
+`o_devops_guide_pill_stage_<étape>` (`plan`, `code`, `build`, `test`,
+`release`, `deploy`, `operate`, `monitor`). Elle est en contour : pointillé
+tant que le requis n'est pas livré (`plan` à `test`), plein en `--dg-accent`
+une fois publié ou déployé, plein en `--dg-ok` en exploitation ou sous
+surveillance. Un projet qui veut une autre lecture redéfinit ces classes.
 
 ### Un chiffre du bandeau n'est pas filtré par son domaine
 
@@ -144,7 +154,7 @@ sans recopier le style :
 
 ```scss
 .o_devops_guide {
-    --dg-accent: #1b6b5a;        // couleur d'accentuation
+    --dg-accent: #1b6b5a;        // couleur d'accentuation, requis publié
     --dg-accent-soft: #e8f2ef;   // son fond clair
     --dg-bg: #f7f7f8;            // fond de la page
     --dg-surface: #ffffff;       // fond d'une carte
@@ -152,7 +162,7 @@ sans recopier le style :
     --dg-muted: #5b6b70;         // texte secondaire
     --dg-line: #e5e7eb;          // filets et bordures
     --dg-warn: #f6a623;          // icône de problème, pastille, tests à lancer
-    --dg-ok: #2e7d32;            // icône de réponse, tests passés
+    --dg-ok: #2e7d32;            // icône de réponse, tests passés, requis en exploitation
     --dg-fail: #c62828;          // tests en échec
     --dg-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }

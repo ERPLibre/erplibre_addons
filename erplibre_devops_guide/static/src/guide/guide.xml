@@ -118,9 +118,11 @@
     </t>
 
     <!-- Pastilles d'une carte rattachée à un requis : son code et son
-         niveau MoSCoW, puis l'état de ses tests, coloré par état. Une
-         carte sans requis reçoit un `requirement` aux clés vides et ne
-         rend aucune pastille. Lit `c` dans la portée de l'appelant. -->
+         niveau MoSCoW, puis son étape DevSecOps, qui dit s'il est livré,
+         puis l'état de ses tests, coloré par état. Une classe par étape
+         et par état porte la couleur. Une carte sans requis reçoit un
+         `requirement` aux clés vides et ne rend aucune pastille. Lit `c`
+         dans la portée de l'appelant. -->
     <t t-name="devops_guide.CardPills">
         <div t-if="c.requirement.id" class="o_devops_guide_pills">
             <span class="o_devops_guide_pill o_devops_guide_pill_req"
@@ -129,6 +131,12 @@
                       t-esc="c.requirement.code"/>
                 <span t-if="c.requirement.moscow_label" class="o_devops_guide_pill_level"
                       t-esc="c.requirement.moscow_label"/>
+            </span>
+            <span t-if="c.requirement.stage_label"
+                  t-att-class="'o_devops_guide_pill o_devops_guide_pill_stage o_devops_guide_pill_stage_' + c.requirement.stage"
+                  title="DevSecOps stage">
+                <i class="fa fa-map-signs me-1"/>
+                <t t-esc="c.requirement.stage_label"/>
             </span>
             <span t-if="c.requirement.test_state_label"
                   t-att-class="'o_devops_guide_pill o_devops_guide_pill_test o_devops_guide_pill_test_' + c.requirement.test_state"

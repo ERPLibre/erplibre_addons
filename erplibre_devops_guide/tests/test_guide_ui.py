@@ -22,6 +22,10 @@ if (!code || code.textContent.trim() !== "ZZ-UI") {
     fail("requirement code pill missing");
 } else if (!linked.querySelector(".o_devops_guide_pill_test_not_run")) {
     fail("test state pill missing");
+} else if (!linked.querySelector(".o_devops_guide_pill_stage.o_devops_guide_pill_stage_operate")) {
+    fail("stage pill missing on the grid card");
+} else if (!roadmapStep.querySelector(".o_devops_guide_pill_stage_operate")) {
+    fail("stage pill missing on the roadmap step");
 } else if (linked.querySelector(".o_devops_guide_card_tour")) {
     fail("a tour button is shown for an unregistered tour");
 } else if (linkIcons.join("|") !== "fa-list-alt|fa-book") {
@@ -43,9 +47,9 @@ class TestGuideUi(HttpCase):
     """La page rend pastilles et boutons de requis, sans bouton muet.
 
     Le composant OWL est rendu dans Chrome headless : une carte de grille
-    et une étape de feuille de route rattachées à un requis portent sa
-    pastille et ses boutons, et un bouton de visite n'apparaît que pour
-    une visite connue du registre JS.
+    et une étape de feuille de route rattachées à un requis portent ses
+    pastilles, étape DevSecOps comprise, et ses boutons, et un bouton de
+    visite n'apparaît que pour une visite connue du registre JS.
     """
 
     @classmethod
@@ -66,6 +70,7 @@ class TestGuideUi(HttpCase):
                 "name": "Export the inventory",
                 "category_id": category.id,
                 "moscow": "must",
+                "devsecops_stage": "operate",
                 "guide_id": detail.id,
             }
         )
