@@ -3,6 +3,7 @@
 
 import json
 import logging
+import re
 
 from lxml import etree
 from odoo import api, fields, models
@@ -60,6 +61,19 @@ NEW_FIELD_TYPES = (
     "monetary",
 )
 
+# The fields_get attributes the operations check.
+FIELD_INFO = [
+    "string",
+    "type",
+    "store",
+    "groupable",
+    "searchable",
+    "sortable",
+    "aggregator",
+    "selection",
+    "relation",
+]
+
 
 class ViewExclusion(tuple):
     """The ids of the views left out of a combined arch (``EXCLUDE_KEY``).
@@ -69,8 +83,8 @@ class ViewExclusion(tuple):
 
 
 class ErplibreStudioProject(models.Model):
-    """A studio project: the changes of form and list views that make one
-    module. Its life: draft changes (previewed by its editor only), then
+    """A studio project: the changes of views (form, list, kanban, search,
+    pivot, timeline) that make one module. Its life: draft changes (previewed by its editor only), then
     applied to the database (``x_`` fields, one inherited view per edited
     view, under external ids of the module ``module_name``). Writing the
     project as a module is the part of erplibre_studio_generate."""
@@ -349,7 +363,8 @@ class ErplibreStudioProject(models.Model):
     def _preview_arch(self, arch, view, model):
         """``arch`` (the combined arch of ``view``, without the project
         views) with the draft applied. A new field not yet in the database
-        shows as a placeholder in a form and is left out of a list."""
+        shows as a placeholder in a form and is left out of the other view
+        types."""
         self.ensure_one()
         changes = [c._as_dict() for c in self._view_changes(view)]
         if not changes:
@@ -368,8 +383,8 @@ class ErplibreStudioProject(models.Model):
             if name not in pending or name in Model._fields:
                 continue
             parent = node.getparent()
-            if view.type == "list":
-                parent.remove(node)
+            if view.type != "form":
+                remove_keeping_tail(node)
                 continue
             placeholder = etree_placeholder(
                 pending[name].get("field_description") or name,
@@ -493,20 +508,16 @@ class ErplibreStudioProject(models.Model):
             )
         return currency
 
+    def _refuse(self, refusal):
+        """Raise the UserError of ``refusal``, an ArchError or None."""
+        if refusal is not None:
+            raise UserError(self._arch_message(refusal))
+
     def _check_drop(self, arch, op, view_type):
         target = op.get("target")
         position = op.get("position") or "after"
-        if position not in studio_arch.POSITIONS:
-            raise UserError(self.env._("Unknown position %(pos)s.", pos=position))
         node = self._locate(arch, target)
-        drops = studio_arch.DROP_CONTAINERS[view_type]
-        if position == "inside" and node.tag not in drops:
-            raise UserError(
-                self.env._("A field cannot be dropped inside <%(tag)s>.", tag=node.tag)
-            )
-        parent = node.getparent()
-        if position != "inside" and (parent is None or parent.tag not in drops):
-            raise UserError(self.env._("A field cannot be dropped there."))
+        self._refuse(studio_arch.drop_refusal(view_type, node, position))
         return target, position, node
 
     def _locate(self, arch, xpath):
@@ -521,14 +532,66 @@ class ErplibreStudioProject(models.Model):
         by its code, any other exception as it reads."""
         code = getattr(exc, "code", None)
         params = getattr(exc, "params", {})
-        if code == "no_node":
-            return self.env._("No node at %(xpath)s.", **params)
-        if code == "invalid_xpath":
-            return self.env._("Invalid XPath %(xpath)s: %(error)s", **params)
-        if code == "unknown_change":
-            return self.env._("Unknown change type %(type)s.", **params)
-        if code == "unknown_position":
-            return self.env._("Unknown position %(position)s.", **params)
+        messages = {
+            "no_node": lambda: self.env._("No node at %(xpath)s.", **params),
+            "invalid_xpath": lambda: self.env._(
+                "Invalid XPath %(xpath)s: %(error)s", **params
+            ),
+            "unknown_change": lambda: self.env._(
+                "Unknown change type %(type)s.", **params
+            ),
+            "unknown_position": lambda: self.env._(
+                "Unknown position %(position)s.", **params
+            ),
+            "no_drop_inside": lambda: self.env._(
+                "Nothing can be dropped inside <%(tag)s>.", **params
+            ),
+            "no_drop": lambda: self.env._("Nothing can be dropped there."),
+            "chain": lambda: self.env._(
+                "Nothing can be dropped between the nodes of a t-if chain."
+            ),
+            "no_move": lambda: self.env._("<%(tag)s> cannot move.", **params),
+            "chain_move": lambda: self.env._("A node of a t-if chain cannot move."),
+            "outside_template": lambda: self.env._(
+                "This field is loaded by the view for its templates: it "
+                "cannot move nor be hidden."
+            ),
+            "no_hide_root": lambda: self.env._("The view itself cannot be hidden."),
+            "no_hide": lambda: self.env._("<%(tag)s> cannot be hidden.", **params),
+            "chain_hide": lambda: self.env._(
+                "The t-if or the t-elif of a chain cannot be hidden."
+            ),
+            "content_directive": lambda: self.env._(
+                "<%(tag)s> replaces its content: nothing dropped into it shows.",
+                **params,
+            ),
+            "template_move": lambda: self.env._(
+                "A node of a template cannot move out of the templates."
+            ),
+            "unsafe_attribute": lambda: self.env._(
+                "A change cannot write the attribute %(attribute)s.", **params
+            ),
+            "unknown_node": lambda: self.env._(
+                "A change cannot add <%(tag)s>.", **params
+            ),
+            "bad_operator": lambda: self.env._(
+                "The operator %(operator)s does not apply to a %(type)s field.",
+                **params,
+            ),
+            "bad_color": lambda: self.env._("Invalid color %(color)s.", **params),
+            "bad_color_operator": lambda: self.env._(
+                "Invalid operator %(operator)s.", **params
+            ),
+            "bad_color_value": lambda: self.env._(
+                "The value %(value)s cannot be used in a timeline color: it "
+                "holds « : » or « ; ».",
+                **params,
+            ),
+            "bad_field": lambda: self.env._("Invalid field %(field)s.", **params),
+            "bad_order": lambda: self.env._("Invalid order %(order)s.", **params),
+        }
+        if code in messages:
+            return messages[code]()
         return str(exc)
 
     def _add_change(self, view, change_type, xpath, position, payload):
@@ -552,6 +615,14 @@ class ErplibreStudioProject(models.Model):
             lambda c: c.field_name == name
         )[:1]
 
+    @api.model
+    def _view_types(self):
+        """The view types the studio edits in this database: those of
+        ``VIEW_TYPES`` that ir.ui.view knows. « timeline » is one only when
+        a module (web_timeline) adds it."""
+        known = self.env["ir.ui.view"]._fields["type"].get_values(self.env)
+        return tuple(t for t in studio_arch.VIEW_TYPES if t in known)
+
     def _apply_operation(self, view, op):
         """Record the editor operation ``op`` (a dict with a ``type``) on
         ``view`` as a change, or update the change it refines. Return the
@@ -559,66 +630,469 @@ class ErplibreStudioProject(models.Model):
         operation does not fit the draft arch."""
         self.ensure_one()
         self = self._editing()
-        if view.type not in studio_arch.VIEW_TYPES:
-            raise UserError(self.env._("The studio edits form and list views only."))
-        arch, _errors = self._draft_arch(view)
+        if view.type not in self._view_types():
+            raise UserError(
+                self.env._("The studio does not edit %(type)s views.", type=view.type)
+            )
         otype = op.get("type")
-        Change = self.env["erplibre.studio.change"]
-        change = Change
-        if otype == "add_field":
-            target, position, _node = self._check_drop(arch, op, view.type)
-            name, definition = self._clean_field_definition(
-                view.model, op.get("field") or {}
-            )
-            change = self._add_change(
-                view,
-                "add_field",
-                target,
-                position,
-                {"field_name": name, "field": definition, "node_attrs": {}},
-            )
-        elif otype == "add_existing_field":
-            target, position, _node = self._check_drop(arch, op, view.type)
-            name = op.get("field_name")
-            if name not in self.env[view.model]._fields:
-                raise UserError(self.env._("Unknown field %(name)s.", name=name))
-            if arch.xpath(f"//field[@name='{name}']"):
-                raise UserError(
-                    self.env._("The field %(name)s is already in the view.", name=name)
-                )
-            change = self._add_change(
-                view,
-                "add_existing_field",
-                target,
-                position,
-                {"field_name": name, "node_attrs": {}},
-            )
-        elif otype == "move":
-            target, position, node = self._check_drop(arch, op, view.type)
-            source = self._locate(arch, op.get("source"))
-            if source is node or source in node.iterancestors():
-                raise UserError(self.env._("A node cannot move into itself."))
-            change = self._add_change(
-                view,
-                "move",
-                target,
-                position,
-                {"source": op.get("source"), "field_name": source.get("name")},
-            )
-        elif otype == "update_field":
-            change = self._update_field(view, op)
-        elif otype == "remove":
-            change = self._remove_node(view, arch, op)
-        elif otype in ("hide",) + tuple(studio_arch.ATTRIBUTE_CHANGES):
-            change = self._attribute_operation(view, arch, op)
-        else:
+        handlers = {
+            "add_field": self._op_add_field,
+            "add_existing_field": self._op_add_existing_field,
+            "add_filter": self._op_add_filter,
+            "add_group_by": self._op_add_group_by,
+            "add_separator": self._op_add_separator,
+            "add_widget": self._op_add_widget,
+            "move": self._op_move,
+            "update_field": lambda view, arch, op: self._update_field(view, op),
+            "remove": self._remove_node,
+            "hide": self._op_hide,
+            "set_attribute": self._op_set_attribute,
+        }
+        for name in studio_arch.ATTRIBUTE_CHANGES:
+            handlers[name] = self._attribute_operation
+        if otype not in handlers:
             raise UserError(self.env._("Unknown operation %(type)s.", type=otype))
+        if otype not in studio_arch.VIEW_OPERATIONS[view.type]:
+            raise UserError(
+                self.env._(
+                    "The operation %(type)s does not apply to a %(view_type)s view.",
+                    type=otype,
+                    view_type=view.type,
+                )
+            )
+        arch, _errors = self._draft_arch(view)
+        change = handlers[otype](view, arch, op)
         self._touch()
         if change.exists():
             _arch, errors = self._draft_arch(view)
             if change.id in errors:
                 raise UserError(errors[change.id])
         return change.exists()
+
+    # ── fields named by an operation ────────────────────────────────────
+
+    @api.model
+    def _field_info(self, model, name):
+        """The ``fields_get`` description of the field ``name`` of
+        ``model``; UserError when the model has no such field."""
+        Model = self.env[model]
+        if not name or name not in Model._fields:
+            raise UserError(self.env._("Unknown field %(name)s.", name=name))
+        return Model.fields_get([name], attributes=FIELD_INFO)[name]
+
+    def _check_groupable(self, model, name):
+        info = self._field_info(model, name)
+        if not info.get("groupable"):
+            raise UserError(
+                self.env._("The records cannot be grouped by %(name)s.", name=name)
+            )
+        return info
+
+    def _check_interval(self, info, interval):
+        """``interval`` checked against the field ``info``; None for none."""
+        if not interval:
+            return None
+        if interval not in studio_arch.INTERVALS:
+            raise UserError(
+                self.env._("Unknown interval %(interval)s.", interval=interval)
+            )
+        if info["type"] not in studio_arch.DATE_TYPES:
+            raise UserError(self.env._("Only a date field takes an interval."))
+        return interval
+
+    def _check_pivot_axis(self, model, name, axis, interval=None):
+        """The pivot attributes {type, interval} of the field ``name`` on
+        ``axis``: a measure adds up a number, a row or a column groups."""
+        if axis not in studio_arch.PIVOT_AXES:
+            raise UserError(
+                self.env._(
+                    "Choose the axis of the field: row, column or measure.",
+                )
+            )
+        info = self._field_info(model, name)
+        if axis == "measure":
+            if info["type"] not in studio_arch.NUMBER_TYPES or not info.get(
+                "aggregator"
+            ):
+                raise UserError(
+                    self.env._(
+                        "%(name)s cannot be a measure: a measure adds up a "
+                        "number field.",
+                        name=name,
+                    )
+                )
+            if interval:
+                raise UserError(self.env._("A measure takes no interval."))
+            return {"type": axis}
+        self._check_groupable(model, name)
+        attrs = {"type": axis}
+        interval = self._check_interval(info, interval)
+        if interval:
+            attrs["interval"] = interval
+        return attrs
+
+    def _typed_value(self, info, value):
+        """``value``, typed as the field ``info`` stores it, for a search
+        filter or a timeline color rule."""
+        ttype = info["type"]
+        try:
+            if ttype == "boolean":
+                if isinstance(value, str):
+                    return value.strip().lower() in ("1", "true", "yes")
+                return bool(value)
+            if ttype == "integer":
+                return int(value)
+            if ttype in ("float", "monetary"):
+                return float(value)
+            if ttype == "date":
+                return fields.Date.to_string(fields.Date.to_date(value))
+            if ttype == "datetime":
+                return fields.Datetime.to_string(fields.Datetime.to_datetime(value))
+            if ttype == "selection":
+                if value not in [item[0] for item in info.get("selection") or []]:
+                    raise ValueError(value)
+                return value
+            text = str(value if value is not None else "").strip()
+            if not text:
+                raise ValueError(value)
+            return text
+        except (TypeError, ValueError):
+            raise UserError(
+                self.env._(
+                    "%(value)s is not a value of the field %(name)s.",
+                    value=value,
+                    name=info.get("string"),
+                )
+            ) from None
+
+    def _check_domain(self, model, terms):
+        """Raise UserError when the domain of ``terms`` does not search
+        ``model``."""
+        try:
+            with self.env.cr.savepoint():
+                self.env[model].sudo()._search([tuple(term) for term in terms])
+        except (ValueError, KeyError, TypeError) as exc:
+            raise UserError(
+                self.env._("The filter does not apply: %(error)s", error=exc)
+            ) from exc
+
+    @api.model
+    def _clean_widget(self, name):
+        if not name or not re.match(r"^[a-z][a-z0-9_]*$", name):
+            raise UserError(self.env._("Invalid widget %(name)s.", name=name))
+        return name
+
+    # ── operations of the editor, by type ───────────────────────────────
+
+    def _op_add_field(self, view, arch, op):
+        target, position, _node = self._check_drop(arch, op, view.type)
+        name, definition = self._clean_field_definition(
+            view.model, op.get("field") or {}
+        )
+        return self._add_change(
+            view,
+            "add_field",
+            target,
+            position,
+            {"field_name": name, "field": definition, "node_attrs": {}},
+        )
+
+    def _field_scope(self, arch, node, view_type):
+        """The names of the fields a new field must not repeat: those of the
+        template the drop lands in, or of the view outside the templates;
+        the whole arch for the other view types."""
+        if view_type not in studio_arch.TEMPLATED_TYPES:
+            return studio_arch.arch_field_names(arch)
+        for item in [node, *node.iterancestors()]:
+            if studio_arch.is_template(item):
+                return studio_arch.template_field_names(view_type, item)
+        return self._loaded_fields(arch)
+
+    @api.model
+    def _loaded_fields(self, arch):
+        """The names of the fields a QWeb view loads outside its templates."""
+        return {
+            child.get("name")
+            for child in studio_arch.elements(arch)
+            if child.tag == "field"
+        }
+
+    def _op_add_existing_field(self, view, arch, op):
+        target, position, node = self._check_drop(arch, op, view.type)
+        name = op.get("field_name")
+        if name not in self.env[view.model]._fields:
+            raise UserError(self.env._("Unknown field %(name)s.", name=name))
+        if name in self._field_scope(arch, node, view.type):
+            raise UserError(
+                self.env._("The field %(name)s is already in the view.", name=name)
+            )
+        node_attrs = {}
+        extra = {}
+        if view.type == "timeline" and studio_arch.in_template(node):
+            extra = self._item_field(view.model, arch, name)
+        elif view.type == "search":
+            if not self._field_info(view.model, name).get("searchable"):
+                raise UserError(
+                    self.env._("The records cannot be searched by %(name)s.", name=name)
+                )
+        elif view.type == "pivot":
+            node_attrs = self._check_pivot_axis(
+                view.model, name, op.get("axis"), op.get("interval")
+            )
+        elif view.type == "kanban" and op.get("widget"):
+            node_attrs["widget"] = self._clean_widget(op["widget"])
+        return self._add_change(
+            view,
+            "add_existing_field",
+            target,
+            position,
+            {"field_name": name, "node_attrs": node_attrs, **extra},
+        )
+
+    def _item_field(self, model, arch, name):
+        """The payload keys of a field dropped into a timeline item: how it
+        shows (``item``, see ``arch.item_value``), and ``load`` when the
+        view does not load it yet."""
+        info = self._field_info(model, name)
+        if info["type"] not in studio_arch.ITEM_FIELD_TYPES:
+            raise UserError(
+                self.env._(
+                    "A timeline item cannot show %(name)s: its type is %(type)s.",
+                    name=info.get("string") or name,
+                    type=info["type"],
+                )
+            )
+        return {
+            "item": studio_arch.item_kind(info["type"]),
+            "load": name not in self._loaded_fields(arch),
+        }
+
+    def _op_add_filter(self, view, arch, op):
+        """A <filter> with a domain built from conditions {field, operator,
+        value}, joined by AND."""
+        target, position, _node = self._check_drop(arch, op, view.type)
+        conditions = op.get("conditions")
+        if conditions is None and op.get("field"):
+            conditions = [
+                {
+                    "field": op.get("field"),
+                    "operator": op.get("operator"),
+                    "value": op.get("value"),
+                }
+            ]
+        if not conditions or not isinstance(conditions, list):
+            raise UserError(self.env._("A filter needs at least one condition."))
+        terms, cleaned, names, labels = [], [], [], []
+        for condition in conditions:
+            name = (condition or {}).get("field")
+            info = self._field_info(view.model, name)
+            if not info.get("searchable"):
+                raise UserError(
+                    self.env._("The records cannot be searched by %(name)s.", name=name)
+                )
+            operator = condition.get("operator") or "="
+            value = condition.get("value")
+            if operator in ("set", "not set"):
+                value = None
+            else:
+                value = self._typed_value(info, value)
+            try:
+                terms.append(
+                    studio_arch.filter_condition(name, info["type"], operator, value)
+                )
+            except studio_arch.ArchError as exc:
+                raise UserError(self._arch_message(exc)) from exc
+            cleaned.append({"field": name, "operator": operator, "value": value})
+            names.append(name)
+            labels.append(info.get("string") or name)
+        self._check_domain(view.model, terms)
+        label = (op.get("label") or "").strip() or ", ".join(labels)
+        node_name = studio_arch.node_name_from_label(
+            "studio_filter", label, studio_arch.arch_names(arch)
+        )
+        attrs = {
+            "name": node_name,
+            "string": label,
+            "domain": studio_arch.domain_text(terms),
+        }
+        return self._add_change(
+            view,
+            "add_node",
+            target,
+            position,
+            {
+                "kind": "filter",
+                "node_name": node_name,
+                "node": {"tag": "filter", "attrs": attrs},
+                "conditions": cleaned,
+                "fields": sorted(set(names)),
+            },
+        )
+
+    def _op_add_group_by(self, view, arch, op):
+        """A <filter> that groups by a field, by ``interval`` for a date."""
+        target, position, _node = self._check_drop(arch, op, view.type)
+        name = op.get("field_name")
+        info = self._check_groupable(view.model, name)
+        interval = self._check_interval(info, op.get("interval"))
+        group_by = f"{name}:{interval}" if interval else name
+        if any(
+            studio_arch.group_by_of(node) == group_by for node in arch.iter("filter")
+        ):
+            raise UserError(
+                self.env._(
+                    "The search view already groups by %(group_by)s.",
+                    group_by=group_by,
+                )
+            )
+        label = (op.get("label") or "").strip() or info.get("string") or name
+        node_name = studio_arch.node_name_from_label(
+            "studio_group_by",
+            f"{name} {interval or ''}",
+            studio_arch.arch_names(arch),
+        )
+        attrs = {
+            "name": node_name,
+            "string": label,
+            "context": studio_arch.group_by_context(name, interval),
+        }
+        return self._add_change(
+            view,
+            "add_node",
+            target,
+            position,
+            {
+                "kind": "group_by",
+                "node_name": node_name,
+                "node": {"tag": "filter", "attrs": attrs},
+                "group_by": group_by,
+                "fields": [name],
+            },
+        )
+
+    def _op_add_separator(self, view, arch, op):
+        target, position, _node = self._check_drop(arch, op, view.type)
+        return self._add_change(
+            view,
+            "add_node",
+            target,
+            position,
+            {"kind": "separator", "node": {"tag": "separator", "attrs": {}}},
+        )
+
+    def _op_add_widget(self, view, arch, op):
+        """A <widget> of ``WIDGETS`` in a template of the view."""
+        target, position, _node = self._check_drop(arch, op, view.type)
+        widget = op.get("widget")
+        if widget not in studio_arch.WIDGETS:
+            raise UserError(self.env._("Invalid widget %(name)s.", name=widget))
+        attrs = {"name": widget}
+        given = op.get("attrs") or {}
+        for key in studio_arch.WIDGETS[widget]:
+            value = str(given.get(key) or "").strip()
+            if value:
+                attrs[key] = value
+        if not re.match(r"^[a-z0-9 _-]*$", attrs.get("bg_color", "")):
+            raise UserError(
+                self.env._("Invalid color %(color)s.", color=attrs["bg_color"])
+            )
+        return self._add_change(
+            view,
+            "add_node",
+            target,
+            position,
+            {"kind": "widget", "node": {"tag": "widget", "attrs": attrs}},
+        )
+
+    def _op_move(self, view, arch, op):
+        """Move a node; in a pivot, ``axis`` also moves a field to another
+        axis."""
+        target, position, node = self._check_drop(arch, op, view.type)
+        source_path = op.get("source")
+        source = self._locate(arch, source_path)
+        self._refuse(studio_arch.move_refusal(view.type, source))
+        if source is node or source in node.iterancestors():
+            raise UserError(self.env._("A node cannot move into itself."))
+        destination = node if position == "inside" else node.getparent()
+        if (
+            view.type in studio_arch.TEMPLATED_TYPES
+            and studio_arch.in_template(source)
+            and not studio_arch.in_template(destination)
+        ):
+            self._refuse(
+                studio_arch.ArchError(
+                    "A node of a template cannot move out of the templates.",
+                    "template_move",
+                )
+            )
+        payload = {"source": source_path}
+        field_name = studio_arch.shown_field_name(view.type, source)
+        if field_name:
+            payload["field_name"] = field_name
+        elif source.get("name"):
+            payload["node_name"] = source.get("name")
+        axis = op.get("axis")
+        if view.type == "pivot" and source.tag == "field" and axis:
+            if axis != source.get("type"):
+                interval = None if axis == "measure" else source.get("interval")
+                attrs = self._check_pivot_axis(
+                    view.model, source.get("name"), axis, interval
+                )
+                if axis == "measure" and source.get("interval"):
+                    attrs["interval"] = ""
+                payload["attrs"] = attrs
+        if payload.get("attrs"):
+            move = {
+                "type": "move",
+                "xpath": target,
+                "position": position,
+                "payload": payload,
+            }
+            try:
+                payload["attrs_xpath"] = studio_arch.moved_node_xpath(
+                    arch, move, view.type
+                )
+            except Exception as exc:  # noqa: BLE001 - reported as the move error
+                raise UserError(self._arch_message(exc)) from exc
+        return self._add_change(view, "move", target, position, payload)
+
+    def _op_hide(self, view, arch, op):
+        """Hide a node: by its hide attribute, or, in a search or a pivot
+        view, by removing it (see ``HIDE_MODES``)."""
+        if studio_arch.hide_mode(view.type) == "remove":
+            if not op.get("value"):
+                raise UserError(
+                    self.env._(
+                        "A removed node comes back with Undo, or by deleting "
+                        "the change that removed it."
+                    )
+                )
+            return self._remove_node(view, arch, op)
+        node = self._locate(arch, op.get("target"))
+        self._refuse(studio_arch.hide_refusal(view.type, node))
+        return self._attribute_operation(view, arch, op)
+
+    def _added_changes(self, view, xpath):
+        """The change of ``view`` that added the node at ``xpath`` of the
+        draft, or an empty recordset for a node of the view itself. The
+        node is found by the change that inserts it, whatever its name: a
+        ribbon is named after its widget, a separator has no name."""
+        changes = self._view_changes(view)
+        key = studio_arch.added_key(
+            self._base_arch(view), [c._as_dict() for c in changes], view.type, xpath
+        )
+        return changes.filtered(lambda c: str(c.id) == key)
+
+    def _replaced_change(self, view, arch, existing, xpath):
+        """The change among ``existing`` that a new value for the node at
+        ``xpath`` replaces: by name or at the root, the latest one; by
+        position, only the last change of the view, since a later change
+        may have moved what the position names."""
+        replaced = existing[-1:]
+        stable = xpath.startswith("//") or xpath == f"/{arch.tag}"
+        if replaced and not stable and replaced != self._view_changes(view)[-1:]:
+            replaced = existing.browse()
+        return replaced
 
     def _attribute_operation(self, view, arch, op):
         otype = op["type"]
@@ -645,16 +1119,18 @@ class ErplibreStudioProject(models.Model):
             return self._update_field(
                 view, {"field_name": name, "field": {field_attr: value}}
             )
-        changes = self._view_changes(view)
-        existing = changes.filtered(
+        if otype == "relabel" and value and node.tag != "field":
+            added = self._added_changes(view, xpath)
+            if added.change_type == "add_node":
+                # An element of the project: the label goes to its definition.
+                payload = added._payload()
+                payload["node"]["attrs"]["string"] = value
+                added._set_payload(payload)
+                return added
+        existing = self._view_changes(view).filtered(
             lambda c: c.change_type == otype and c.xpath == xpath
         )
-        # The change a new value replaces: by name, the latest one; by
-        # position, only the last change of the view, since a later change
-        # may have moved what the position names.
-        replaced = existing[-1:]
-        if replaced and not xpath.startswith("//") and replaced != changes[-1:]:
-            replaced = existing.browse()
+        replaced = self._replaced_change(view, arch, existing, xpath)
         if otype in studio_arch.BOOLEAN_CHANGES:
             if replaced:
                 before, _errors = self._draft_arch_without(view, replaced)
@@ -678,6 +1154,186 @@ class ErplibreStudioProject(models.Model):
             return replaced
         return self._add_change(view, otype, xpath, "attributes", {"value": value})
 
+    def _attribute_value(self, view, node, kind, value):
+        """(text, fields): the attribute text of ``value`` for an attribute
+        of ``kind`` (see ``SETTABLE_ATTRIBUTES``), and the fields it names.
+        An empty text removes the attribute."""
+        if kind == "bool":
+            if value in (None, ""):
+                return "", []
+            if isinstance(value, str):
+                value = studio_arch.constant_true(value)
+            return ("True" if value else "False"), []
+        if kind == "colors":
+            return self._colors_value(view.model, value)
+        if value in (None, "", False):
+            return "", []
+        if not isinstance(value, str):
+            raise UserError(self.env._("Invalid value %(value)s.", value=value))
+        check = {
+            "group_field": self._group_field_value,
+            "relation_group_field": self._relation_group_field_value,
+            "date_field": self._typed_field_value,
+            "number_field": self._typed_field_value,
+            "order": self._order_value,
+            "axis": self._axis_value,
+            "interval": self._interval_value,
+            "widget": lambda model, node, kind, value: (self._clean_widget(value), []),
+            "timeline_mode": self._mode_value,
+        }.get(kind)
+        if not check:
+            raise UserError(self.env._("Invalid value %(value)s.", value=value))
+        return check(view.model, node, kind, value.strip())
+
+    def _group_field_value(self, model, node, kind, value):
+        self._check_groupable(model, value)
+        return value, [value]
+
+    def _relation_group_field_value(self, model, node, kind, value):
+        info = self._check_groupable(model, value)
+        if info["type"] not in studio_arch.RELATION_TYPES:
+            raise UserError(
+                self.env._(
+                    "A timeline groups its items by a many2one or a many2many "
+                    "field only, not by %(name)s.",
+                    name=value,
+                )
+            )
+        return value, [value]
+
+    def _typed_field_value(self, model, node, kind, value):
+        info = self._field_info(model, value)
+        types = studio_arch.DATE_TYPES if kind == "date_field" else ("integer", "float")
+        if info["type"] not in types or not info.get("store"):
+            raise UserError(
+                self.env._(
+                    "%(name)s does not fit this attribute: a stored %(types)s "
+                    "field is needed.",
+                    name=value,
+                    types=" / ".join(types),
+                )
+            )
+        return value, [value]
+
+    def _order_value(self, model, node, kind, value):
+        try:
+            names = studio_arch.order_fields(value)
+        except studio_arch.ArchError as exc:
+            raise UserError(self._arch_message(exc)) from exc
+        for name in names:
+            if not self._field_info(model, name).get("sortable"):
+                raise UserError(
+                    self.env._("The records cannot be sorted by %(name)s.", name=name)
+                )
+        return value, sorted(set(names))
+
+    def _axis_value(self, model, node, kind, value):
+        interval = node.get("interval")
+        if value == "measure" and interval:
+            raise UserError(
+                self.env._("A measure takes no interval: remove the interval first.")
+            )
+        self._check_pivot_axis(model, node.get("name"), value, interval)
+        return value, []
+
+    def _interval_value(self, model, node, kind, value):
+        if node.get("type") == "measure":
+            raise UserError(self.env._("A measure takes no interval."))
+        info = self._field_info(model, node.get("name"))
+        return self._check_interval(info, value), []
+
+    def _mode_value(self, model, node, kind, value):
+        if value not in studio_arch.TIMELINE_MODES:
+            raise UserError(self.env._("Invalid value %(value)s.", value=value))
+        return value, []
+
+    def _colors_value(self, model, rules):
+        """The ``colors`` text of a timeline from rules {color, field,
+        operator, value}."""
+        if rules in (None, "", False, []):
+            return "", []
+        if not isinstance(rules, list):
+            raise UserError(self.env._("Invalid value %(value)s.", value=rules))
+        typed = []
+        for rule in rules:
+            rule = dict(rule or {})
+            info = self._field_info(model, rule.get("field"))
+            if info["type"] not in studio_arch.COLOR_FIELD_TYPES:
+                raise UserError(
+                    self.env._(
+                        "A color rule cannot compare %(name)s, a %(type)s field.",
+                        name=info.get("string") or rule.get("field"),
+                        type=info["type"],
+                    )
+                )
+            rule["value"] = self._typed_value(info, rule.get("value"))
+            typed.append(rule)
+        try:
+            text = studio_arch.colors_text(typed)
+        except studio_arch.ArchError as exc:
+            raise UserError(self._arch_message(exc)) from exc
+        return text, sorted({rule["field"] for rule in typed})
+
+    @api.model
+    def _normal_attribute(self, kind, text):
+        """``text``, the attribute of a node, as ``_attribute_value`` would
+        write it, to tell whether a value brings the node back."""
+        if text is None:
+            return ""
+        if kind == "bool":
+            if studio_arch.constant_true(text):
+                return "True"
+            if text in ("0", "False", "false"):
+                return "False"
+        return text
+
+    def _op_set_attribute(self, view, arch, op):
+        """Set an attribute of ``SETTABLE_ATTRIBUTES`` on a node. A value
+        that brings the node back to the arch without the change removes
+        the change."""
+        xpath = op.get("target")
+        node = self._locate(arch, xpath)
+        attribute = op.get("attribute")
+        settable = studio_arch.SETTABLE_ATTRIBUTES.get(view.type, {})
+        kind = settable.get(node.tag, {}).get(attribute)
+        if node.tag == view.type and node.getparent() is not None:
+            kind = None
+        if not kind:
+            raise UserError(
+                self.env._(
+                    "The attribute %(attribute)s of <%(tag)s> cannot be set here.",
+                    attribute=attribute,
+                    tag=node.tag,
+                )
+            )
+        value, named = self._attribute_value(view, node, kind, op.get("value"))
+        required = studio_arch.REQUIRED_ATTRIBUTES.get((view.type, node.tag), ())
+        if not value and attribute in required:
+            raise UserError(
+                self.env._(
+                    "The view needs the attribute %(attribute)s.", attribute=attribute
+                )
+            )
+        existing = self._view_changes(view).filtered(
+            lambda c: c.change_type == "set_attribute"
+            and c.xpath == xpath
+            and c._payload().get("attribute") == attribute
+        )
+        replaced = self._replaced_change(view, arch, existing, xpath)
+        if replaced:
+            before, _errors = self._draft_arch_without(view, replaced)
+            original = self._locate(before, xpath).get(attribute)
+        else:
+            original = node.get(attribute)
+        if value == self._normal_attribute(kind, original):
+            replaced.unlink()
+            return replaced.browse()
+        payload = {"attribute": attribute, "value": value, "fields": named}
+        if replaced:
+            replaced._set_payload(payload)
+            return replaced
+        return self._add_change(view, "set_attribute", xpath, "attributes", payload)
+
     def _update_field(self, view, op):
         name = op.get("field_name")
         change = self._field_add_change(view.model, name)
@@ -697,25 +1353,36 @@ class ErplibreStudioProject(models.Model):
         return change
 
     def _remove_node(self, view, arch, op):
-        """Remove a node: a field added by the project leaves the project
-        with the changes that name it; any other node is hidden."""
+        """Remove a node: one the project added leaves the project with the
+        changes that name it; any other node is hidden, or removed from
+        the arch in a view type whose hide mode is « remove »."""
         xpath = op.get("target")
         node = self._locate(arch, xpath)
-        name = node.get("name") if node.tag == "field" else None
-        added = self._view_changes(view).filtered(
-            lambda c: c.change_type in studio_arch.ADD_CHANGES and c.field_name == name
-        )
-        if not name or not added:
-            return self._attribute_operation(
-                view, arch, {"type": "hide", "target": xpath, "value": True}
+        if node.getparent() is None:
+            raise UserError(self.env._("The view itself cannot be removed."))
+        added = self._added_changes(view, xpath)
+        if added:
+            changes = self._view_changes(view)
+            keys = studio_arch.changes_on_added(
+                self._base_arch(view),
+                [c._as_dict() for c in changes],
+                view.type,
+                added.id,
             )
-        marker = f"@name='{name}'"
-        later = self._view_changes(view).filtered(
-            lambda c: c.sequence > added[0].sequence
-            and (marker in (c.xpath or "") or c.field_name == name)
+            (added | changes.filtered(lambda c: c.id in keys)).unlink()
+            return added.browse()
+        if studio_arch.hide_mode(view.type) == "remove":
+            payload = {}
+            field_name = studio_arch.shown_field_name(view.type, node)
+            if field_name:
+                payload["field_name"] = field_name
+            elif node.get("name"):
+                payload["node_name"] = node.get("name")
+            return self._add_change(view, "remove", xpath, "replace", payload)
+        self._refuse(studio_arch.hide_refusal(view.type, node))
+        return self._attribute_operation(
+            view, arch, {"type": "hide", "target": xpath, "value": True}
         )
-        (added | later).unlink()
-        return added.browse()
 
     def action_undo(self, view=None):
         """Remove the last change (of ``view`` when given)."""
@@ -990,7 +1657,7 @@ class ErplibreStudioProject(models.Model):
         view = self.change_ids[:1].view_id
         if not view:
             raise UserError(
-                self.env._("Open the editor from the debug menu of a form or a list.")
+                self.env._("Open the editor from the debug menu of a view.")
             )
         return self.env["erplibre.studio.editor"].action_customize(
             view.model, view.id, view.type, project_id=self.id
@@ -1008,3 +1675,15 @@ def etree_placeholder(label, note):
     span = etree.SubElement(div, "span", {"class": "text-muted ms-1"})
     span.text = f"({note})"
     return div
+
+
+def remove_keeping_tail(node):
+    """Remove ``node`` from its parent; the text that follows it stays."""
+    parent = node.getparent()
+    if node.tail:
+        previous = node.getprevious()
+        if previous is not None:
+            previous.tail = (previous.tail or "") + node.tail
+        else:
+            parent.text = (parent.text or "") + node.tail
+    parent.remove(node)

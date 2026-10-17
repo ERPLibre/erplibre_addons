@@ -267,11 +267,31 @@ class ErplibreStudioProject(models.Model):
     def _field_models(self):
         return sorted(set(self._project_field_changes().mapped("model")))
 
+    def _view_type_module(self, view_type):
+        """The module that adds ``view_type`` to ir.ui.view (web_timeline
+        for « timeline »), from the external id of the selection value."""
+        value = (
+            self.env["ir.model.fields.selection"]
+            .sudo()
+            .search(
+                [
+                    ("field_id.model", "=", "ir.ui.view"),
+                    ("field_id.name", "=", "type"),
+                    ("value", "=", view_type),
+                ],
+                limit=1,
+            )
+        )
+        return (
+            self._module_of("ir.model.fields.selection", value.id) if value else False
+        )
+
     def _dependencies(self):
         """The modules the generated module depends on: those of the edited
-        views and of the nodes the changes locate (read from the branding
-        of the combined arch), of the models extended, of the fields added
-        and of the comodels."""
+        views, of their view types and of the nodes the changes locate
+        (read from the branding of the combined arch), of the models
+        extended, of the fields added or named by the changes (a filter
+        domain, a group-by, a timeline date) and of the comodels."""
         self.ensure_one()
         IrModel = self.env["ir.model"].sudo()
         names = {"base"}
@@ -288,8 +308,10 @@ class ErplibreStudioProject(models.Model):
                     return module_of_view(int(item.get("data-oe-id")))
             return False
 
+        Fields = self.env["ir.model.fields"].sudo()
         for view in self.change_ids.mapped("view_id"):
             names.add(module_of_view(view.id))
+            names.add(self._view_type_module(view.type))
             current = self._base_arch(view, branding=True)
             for change in self._view_changes(view):
                 data = change._as_dict()
@@ -300,11 +322,13 @@ class ErplibreStudioProject(models.Model):
                     if nodes and hasattr(nodes[0], "tag"):
                         names.add(node_module(nodes[0]))
                 current, _errors = studio_arch.apply_changes(current, [data], view.type)
+                named = list(data["payload"].get("fields") or [])
                 if change.change_type == "add_existing_field":
-                    field = self.env["ir.model.fields"]._get(
-                        change.model, change.field_name
-                    )
-                    names.add(self._module_of("ir.model.fields", field.id))
+                    named.append(change.field_name)
+                for name in named:
+                    field = Fields._get(change.model, name)
+                    if field:
+                        names.add(self._module_of("ir.model.fields", field.id))
         for change in self._project_field_changes():
             names.add(self._module_of("ir.model", IrModel._get_id(change.model)))
             relation = change._payload()["field"].get("relation")

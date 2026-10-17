@@ -11,3 +11,7 @@ database only: *code_generator* installs only on a server started with
 `--dev`, and its installation drops the database constraint that keeps
 the names of custom fields starting with `x_`. Without it, the project
 form says so where the generation buttons would be.
+
+Timeline views are edited once *web_timeline* (OCA/web) is installed:
+the studio reads the view types of the database and offers *timeline*
+only when that module adds it; this module does not depend on it.

@@ -16,6 +16,10 @@ FIELD_ATTRIBUTES = [
     "selection",
     "help",
     "store",
+    "groupable",
+    "searchable",
+    "sortable",
+    "aggregator",
 ]
 
 PROJECT_ACTIONS = (
@@ -42,8 +46,10 @@ class ErplibreStudioEditor(models.AbstractModel):
     def _resolve_view(self, model, view_id, view_type):
         """The primary view the editor inherits: ``view_id``, or the default
         view of ``model`` for ``view_type``."""
-        if view_type not in studio_arch.VIEW_TYPES:
-            raise UserError(self.env._("The studio edits form and list views only."))
+        if view_type not in self.env["erplibre.studio.project"]._view_types():
+            raise UserError(
+                self.env._("The studio does not edit %(type)s views.", type=view_type)
+            )
         if model not in self.env:
             raise UserError(self.env._("Unknown model %(model)s.", model=model))
         View = self.env["ir.ui.view"].sudo()
@@ -123,6 +129,11 @@ class ErplibreStudioEditor(models.AbstractModel):
                     "readonly": definition.get("readonly", False),
                     "help": definition.get("help") or "",
                     "store": True,
+                    # Searched, grouped or added up once Apply creates it.
+                    "groupable": False,
+                    "searchable": False,
+                    "sortable": False,
+                    "aggregator": False,
                 },
             )
             entry["project"] = True
@@ -131,11 +142,140 @@ class ErplibreStudioEditor(models.AbstractModel):
         return info
 
     @api.model
+    def _palette(self, view_type, arch, fields_info):
+        """The fields the editor offers to drop: those the view does not
+        show yet, that its type can use. A pivot field says on which
+        ``axes`` it goes."""
+        if view_type == "search":
+            shown = {n.get("name") for n in arch.iter("field")}
+        else:
+            shown = studio_arch.shown_field_names(arch, view_type)
+        palette = []
+        for name, info in fields_info.items():
+            if name in shown or name == "id" or name.startswith("__"):
+                continue
+            item = {
+                "name": name,
+                "string": info.get("string") or name,
+                "type": info.get("type"),
+            }
+            if view_type == "search" and not info.get("searchable"):
+                continue
+            if view_type == "pivot":
+                axes = ["row", "col"] if info.get("groupable") else []
+                if self._measurable(info):
+                    axes.append("measure")
+                if not axes:
+                    continue
+                item["axes"] = axes
+            palette.append(item)
+        return sorted(palette, key=lambda f: (f["string"] or "").lower())
+
+    @api.model
+    def _measurable(self, info):
+        return bool(
+            info.get("type") in studio_arch.NUMBER_TYPES and info.get("aggregator")
+        )
+
+    @api.model
+    def _choices(self, fields_info):
+        """The values the editor offers for each kind of attribute value
+        (see ``SETTABLE_ATTRIBUTES``): [[value, label]] lists. A field of
+        the project not yet applied is in none of them."""
+
+        def fields_where(predicate):
+            items = [
+                [name, info.get("string") or name]
+                for name, info in fields_info.items()
+                if not info.get("pending") and predicate(info)
+            ]
+            return sorted(items, key=lambda item: (item[1] or "").lower())
+
+        def stored(types):
+            return lambda f: f.get("type") in types and f.get("store")
+
+        return {
+            "group_field": fields_where(lambda f: f.get("groupable")),
+            "relation_group_field": fields_where(
+                lambda f: f.get("groupable")
+                and f.get("type") in studio_arch.RELATION_TYPES
+            ),
+            "date_field": fields_where(stored(studio_arch.DATE_TYPES)),
+            "number_field": fields_where(stored(("integer", "float"))),
+            "measure": fields_where(self._measurable),
+            "search_field": fields_where(lambda f: f.get("searchable")),
+            "sort_field": fields_where(lambda f: f.get("sortable")),
+            "bool": [["True", "True"], ["False", "False"]],
+            "axis": [[axis, axis] for axis in studio_arch.PIVOT_AXES],
+            "interval": [[i, i] for i in studio_arch.INTERVALS],
+            "timeline_mode": [[m, m] for m in studio_arch.TIMELINE_MODES],
+            "widget": [[w, w] for w in studio_arch.WIDGETS],
+        }
+
+    @api.model
+    def _layout(self, view_type, arch):
+        """The part of the payload proper to ``view_type``: where its zones
+        are in the arch (paths of the blocks)."""
+        path = lambda node: studio_arch.node_xpath(arch, node)  # noqa: E731
+        root = f"/{arch.tag}"
+        loaded = [c.get("name") for c in studio_arch.elements(arch) if c.tag == "field"]
+        if view_type == "kanban":
+            templates = studio_arch.templates_of(arch)
+            card = templates.get("card")
+            if card is None:
+                card = templates.get("kanban-box")
+            return {
+                "root": root,
+                "card": path(card) if card is not None else False,
+                "templates": {name: path(node) for name, node in templates.items()},
+                "loaded_fields": loaded,
+                "widgets": {k: list(v) for k, v in studio_arch.WIDGETS.items()},
+            }
+        if view_type == "timeline":
+            item = studio_arch.templates_of(arch).get("timeline-item")
+            return {
+                "root": root,
+                "template": path(item) if item is not None else False,
+                "loaded_fields": loaded,
+                "colors": studio_arch.colors_rules(arch.get("colors")),
+                "color_operators": list(studio_arch.COLOR_OPERATORS),
+                "color_types": list(studio_arch.COLOR_FIELD_TYPES),
+            }
+        if view_type == "search":
+            kinds = {"fields": [], "filters": [], "group_bys": []}
+            for node in arch.iter("field", "filter"):
+                if node.tag == "field":
+                    kinds["fields"].append(path(node))
+                elif studio_arch.group_by_of(node):
+                    kinds["group_bys"].append(path(node))
+                else:
+                    kinds["filters"].append(path(node))
+            return {
+                "root": root,
+                **kinds,
+                "operators": {
+                    ttype: list(ops)
+                    for ttype, ops in studio_arch.SEARCH_OPERATORS.items()
+                },
+            }
+        if view_type == "pivot":
+            axes = {axis: [] for axis in studio_arch.PIVOT_AXES}
+            others = []
+            for node in studio_arch.elements(arch):
+                if node.tag != "field":
+                    continue
+                axis = node.get("type")
+                (axes[axis] if axis in axes else others).append(path(node))
+            return {"root": root, "axes": axes, "others": others}
+        return {"root": root}
+
+    @api.model
     def get_editor_data(
         self, model, view_id, view_type, project_id=False, pick_project=True
     ):
         """The editor payload of a view: the blocks of its draft arch, the
-        fields of the model, the changes of the project and its projects.
+        fields of the model, the changes of the project and its projects,
+        and what its view type allows (operations, attributes, layout).
         ``pick_project``: see ``_project``."""
         self._check_studio_access()
         view = self._resolve_view(model, view_id, view_type)
@@ -146,19 +286,6 @@ class ErplibreStudioEditor(models.AbstractModel):
         else:
             arch, errors = view._get_combined_arch(), {}
         fields_info = self._fields_payload(model, project)
-        in_view = studio_arch.arch_field_names(arch)
-        palette = sorted(
-            (
-                {
-                    "name": name,
-                    "string": f.get("string") or name,
-                    "type": f.get("type"),
-                }
-                for name, f in fields_info.items()
-                if name not in in_view and name != "id" and not name.startswith("__")
-            ),
-            key=lambda f: (f["string"] or "").lower(),
-        )
         changes = []
         if project:
             for change in project._view_changes(view):
@@ -172,19 +299,30 @@ class ErplibreStudioEditor(models.AbstractModel):
                     }
                 )
         Model = self.env[model]
-        sample = Model.search([], limit=1).id if view_type == "form" else False
+        sample = Model.search([], limit=1).id if view.type == "form" else False
         return {
             "model": model,
             "model_name": self.env["ir.model"]._get(model).name,
             "view_type": view.type,
+            "view_types": list(Project._view_types()),
             "view": {
                 "id": view.id,
                 "name": view.name,
                 "xml_id": view.xml_id or False,
             },
             "blocks": studio_arch.arch_blocks(arch, view.type, fields_info),
+            "layout": self._layout(view.type, arch),
+            "operations": list(studio_arch.VIEW_OPERATIONS[view.type]),
+            "hide_mode": studio_arch.hide_mode(view.type),
+            "settable": studio_arch.SETTABLE_ATTRIBUTES.get(view.type, {}),
+            "required_attributes": {
+                tag: list(names)
+                for (vtype, tag), names in studio_arch.REQUIRED_ATTRIBUTES.items()
+                if vtype == view.type
+            },
+            "choices": self._choices(fields_info),
             "fields": fields_info,
-            "palette": palette,
+            "palette": self._palette(view.type, arch, fields_info),
             "field_types": list(NEW_FIELD_TYPES),
             "changes": changes,
             "errors": [e for e in errors.values()],

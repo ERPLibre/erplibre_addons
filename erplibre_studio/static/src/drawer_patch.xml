@@ -12,6 +12,14 @@
             >
                 <i class="fa fa-paint-brush" />
             </button>
+            <button
+                t-if="canCustomizeSearch"
+                class="btn btn-sm btn-secondary o_erplibre_studio_customize_search"
+                title="Customize the search view"
+                t-on-click="customizeSearchView"
+            >
+                <i class="fa fa-search" />
+            </button>
         </xpath>
     </t>
 </templates>

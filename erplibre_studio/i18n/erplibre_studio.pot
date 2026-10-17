@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 00:51+0000\n"
-"PO-Revision-Date: 2026-10-17 00:51+0000\n"
+"POT-Creation-Date: 2026-10-17 03:48+0000\n"
+"PO-Revision-Date: 2026-10-17 03:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -25,6 +25,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "%(model)s has no %(type)s view to inherit."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(name)s cannot be a measure: a measure adds up a number field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(name)s does not fit this attribute: a stored %(types)s field is needed."
 msgstr ""
 
 #. module: erplibre_studio
@@ -52,13 +65,61 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "A field cannot be dropped inside <%(tag)s>."
+msgid "%(value)s is not a value of the field %(name)s."
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "A field cannot be dropped there."
+msgid "<%(tag)s> cannot be hidden."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "<%(tag)s> cannot move."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "<%(tag)s> replaces its content: nothing dropped into it shows."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A change cannot add <%(tag)s>."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A change cannot write the attribute %(attribute)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A color rule cannot compare %(name)s, a %(type)s field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A filter needs at least one condition."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A measure takes no interval."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A measure takes no interval: remove the interval first."
 msgstr ""
 
 #. module: erplibre_studio
@@ -86,9 +147,43 @@ msgid "A node cannot move into itself."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A node of a t-if chain cannot move."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A node of a template cannot move out of the templates."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "A project makes one module:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A removed node comes back with Undo, or by deleting the change that removed "
+"it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A timeline groups its items by a many2one or a many2many field only, not by "
+"%(name)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A timeline item cannot show %(name)s: its type is %(type)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -97,8 +192,25 @@ msgid "Add a new field"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__add_node
+msgid "Add an element"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__add_existing_field
 msgid "Add an existing field"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Add columns"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Add the filter"
 msgstr ""
 
 #. module: erplibre_studio
@@ -110,6 +222,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Always shown"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "And"
 msgstr ""
 
 #. module: erplibre_studio
@@ -142,8 +260,20 @@ msgid "Apply"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Archive the records of a column"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__position__attributes
 msgid "Attributes"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Axis"
 msgstr ""
 
 #. module: erplibre_studio
@@ -165,6 +295,12 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__position__before
 msgid "Before"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Cancel"
 msgstr ""
 
 #. module: erplibre_studio
@@ -205,9 +341,33 @@ msgid "Choose or create a studio project first."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Choose the axis of the field: row, column or measure."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Close"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Colors"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Column"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Columns"
 msgstr ""
 
 #. module: erplibre_studio
@@ -244,6 +404,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/debug_items.js:0
 #: code:addons/erplibre_studio/static/src/drawer_patch.xml:0
+msgid "Customize the search view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/debug_items.js:0
+#: code:addons/erplibre_studio/static/src/drawer_patch.xml:0
 msgid "Customize this view"
 msgstr ""
 
@@ -267,7 +434,43 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Day"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Decimal"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Default"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Default grouping"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Default order"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Default scale"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Delete columns"
 msgstr ""
 
 #. module: erplibre_studio
@@ -285,6 +488,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Domain"
 msgstr ""
 
 #. module: erplibre_studio
@@ -307,6 +516,18 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Drag the records"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Duration"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model,name:erplibre_studio.model_erplibre_studio_change
 msgid "ERPLibre studio change"
 msgstr ""
@@ -322,8 +543,32 @@ msgid "ERPLibre studio project"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Edit columns"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Edit the colors"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Edit the default view of another type"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__user_id
 msgid "Editor"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "End date"
 msgstr ""
 
 #. module: erplibre_studio
@@ -345,7 +590,37 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Fields loaded for the templates"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Fields on no axis"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Field…"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Filter"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Filters"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Fit"
 msgstr ""
 
 #. module: erplibre_studio
@@ -358,6 +633,13 @@ msgstr ""
 msgid ""
 "Generating a module needs ERPLibre studio generate, on a database started "
 "with --dev."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Group by"
 msgstr ""
 
 #. module: erplibre_studio
@@ -405,9 +687,62 @@ msgid "Integer"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Interval"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Interval of a date grouping"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Invalid XPath %(xpath)s: %(error)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid color %(color)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid field %(field)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid operator %(operator)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid order %(order)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid value %(value)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid widget %(name)s."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__kanban
+msgid "Kanban"
 msgstr ""
 
 #. module: erplibre_studio
@@ -436,6 +771,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Loaded by the view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Loading…"
 msgstr ""
 
@@ -443,6 +784,18 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Many2one"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Measure"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Measures"
 msgstr ""
 
 #. module: erplibre_studio
@@ -464,6 +817,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Monetary"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Month"
 msgstr ""
 
 #. module: erplibre_studio
@@ -509,13 +868,38 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "New filter"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "New project…"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "No"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "No change."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "No color."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "No link to the records"
 msgstr ""
 
 #. module: erplibre_studio
@@ -537,6 +921,30 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Nothing can be dropped between the nodes of a t-if chain."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Nothing can be dropped inside <%(tag)s>."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Nothing can be dropped there."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Only a date field takes an interval."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Only a list column can be optional."
 msgstr ""
 
@@ -548,7 +956,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "Open the editor from the debug menu of a form or a list."
+msgid "Open the editor from the debug menu of a view."
 msgstr ""
 
 #. module: erplibre_studio
@@ -560,7 +968,13 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
-msgid "Open the studio from the debug menu of a form or a list."
+msgid "Open the records in a dialog"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Open the studio from the debug menu of a view."
 msgstr ""
 
 #. module: erplibre_studio
@@ -583,8 +997,19 @@ msgid "Optional, shown"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Other"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__payload
 msgid "Payload"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__pivot
+msgid "Pivot"
 msgstr ""
 
 #. module: erplibre_studio
@@ -614,6 +1039,18 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Quarter"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Quick create"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__readonly
 msgid "Read-only"
@@ -633,6 +1070,13 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__remove
+msgid "Remove"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Remove from the view"
 msgstr ""
 
@@ -647,6 +1091,23 @@ msgstr ""
 msgid ""
 "Remove the views and the custom fields of this project from the database? "
 "The values of these fields are lost."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Remove this condition"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Remove this rule"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__position__replace
+msgid "Replace"
 msgstr ""
 
 #. module: erplibre_studio
@@ -675,8 +1136,73 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Ribbon"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Ribbon on the card"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Ribbon text"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Row"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Rows"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Rule"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Save"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Saving replaces the rules above."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__search
+msgid "Search"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Search fields"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Selection"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Separator"
 msgstr ""
 
 #. module: erplibre_studio
@@ -685,9 +1211,32 @@ msgid "Sequence"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__set_attribute
+msgid "Set an attribute"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Show the count"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Show the view as its editor sees the draft"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Stack the items"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Start date"
 msgstr ""
 
 #. module: erplibre_studio
@@ -733,6 +1282,18 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The attribute %(attribute)s of <%(tag)s> cannot be set here."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The draft changed since the filter form opened: drop the field again."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid ""
 "The draft of the project changed since this page loaded it: reload the "
@@ -765,6 +1326,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The filter does not apply: %(error)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "The installed generated module defines these fields: their new definition "
 "takes effect once the module is regenerated and upgraded: %(fields)s"
@@ -776,15 +1343,51 @@ msgid "The only user who sees the draft in the views."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The operation %(type)s does not apply to a %(view_type)s view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The operator %(operator)s does not apply to a %(type)s field."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_change__view_id
 msgid "The primary view the change inherits."
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The records cannot be grouped by %(name)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The records cannot be searched by %(name)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The records cannot be sorted by %(name)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The search view already groups by %(group_by)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "The studio edits form and list views only."
+msgid "The studio does not edit %(type)s views."
 msgstr ""
 
 #. module: erplibre_studio
@@ -796,13 +1399,80 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The t-if or the t-elif of a chain cannot be hidden."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The type of a field cannot change."
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The value %(value)s cannot be used in a timeline color: it holds « : » or « "
+"; »."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The view itself cannot be hidden."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The view itself cannot be removed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid ""
+"The view loads this field for its templates: it cannot move nor be hidden "
+"here."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The view needs the attribute %(attribute)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "These fields of a studio project are managed by the studio: %(fields)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"This field is loaded by the view for its templates: it cannot move nor be "
+"hidden."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "This view has no item template: its items show their name."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "This view has no template."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__timeline
+msgid "Timeline"
 msgstr ""
 
 #. module: erplibre_studio
@@ -869,6 +1539,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unknown interval %(interval)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "Unknown model %(model)s."
 msgstr ""
@@ -882,13 +1558,13 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "Unknown position %(pos)s."
+msgid "Unknown position %(position)s."
 msgstr ""
 
 #. module: erplibre_studio
-#. odoo-python
-#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "Unknown position %(position)s."
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Value"
 msgstr ""
 
 #. module: erplibre_studio
@@ -915,6 +1591,12 @@ msgid "View Type"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "View properties"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__studio_view_ids
 msgid "Views created"
 msgstr ""
@@ -922,7 +1604,44 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Week"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Widget"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Year"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Yes"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "hidden"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "hidden when %(condition)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "name asc, id desc"
 msgstr ""
 
 #. module: erplibre_studio

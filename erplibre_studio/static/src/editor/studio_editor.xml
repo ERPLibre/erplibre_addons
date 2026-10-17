@@ -2,39 +2,79 @@
 <!-- © 2026 TechnoLibre (http://www.technolibre.ca)
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <templates xml:space="preserve">
+    <!-- A drop hook: « target », « position », and « zone » when the hook
+         belongs to a column, an axis or the loaded fields. -->
     <t t-name="erplibre_studio.Hook">
         <div
             class="o_erplibre_studio_hook"
-            t-att-class="{'o_erplibre_studio_hook_active': editor.state.hook === editor.hookKey(target, position)}"
+            t-att-class="{'o_erplibre_studio_hook_active': editor.state.hook === editor.hookKey(target, position, zone)}"
             t-att-data-target="target"
             t-att-data-position="position"
-            t-on-dragenter="(ev) => editor.overHook(ev, target, position)"
-            t-on-dragover="(ev) => editor.overHook(ev, target, position)"
-            t-on-dragleave="() => editor.leaveHook(target, position)"
-            t-on-drop="(ev) => editor.dropOnHook(ev, target, position)"
+            t-att-data-zone="zone or ''"
+            t-on-dragenter="(ev) => editor.overHook(ev, target, position, zone)"
+            t-on-dragover="(ev) => editor.overHook(ev, target, position, zone)"
+            t-on-dragleave="() => editor.leaveHook(target, position, zone)"
+            t-on-drop="(ev) => editor.dropOnHook(ev, target, position, zone)"
         />
+    </t>
+
+    <!-- A list of blocks with a hook before each one and one at the end,
+         for « blocks » in « zone »; « end » is the {target, position} of
+         the last hook. -->
+    <t t-name="erplibre_studio.Lane">
+        <div class="o_erplibre_studio_lane d-flex flex-column" t-att-data-zone="zone">
+            <t t-foreach="blocks" t-as="child" t-key="child.path">
+                <t t-call="erplibre_studio.Hook">
+                    <t t-set="target" t-value="child.path" />
+                    <t t-set="position" t-value="'before'" />
+                </t>
+                <StudioBlock block="child" editor="editor" viewType="editor.viewType" />
+            </t>
+            <t t-call="erplibre_studio.Hook">
+                <t t-set="target" t-value="end.target" />
+                <t t-set="position" t-value="end.position" />
+            </t>
+        </div>
     </t>
 
     <t t-name="erplibre_studio.Block">
         <div
-            t-if="block.kind === 'field'"
-            class="o_erplibre_studio_field d-flex flex-wrap align-items-center gap-1 rounded border px-2 py-1"
-            t-att-class="{'o_erplibre_studio_selected': isSelected, 'o_erplibre_studio_project_field': field.project}"
+            t-if="['field', 'widget', 'filter', 'group_by', 'separator'].includes(block.kind)"
+            class="o_erplibre_studio_field o_erplibre_studio_node d-flex flex-wrap align-items-center gap-1 rounded border px-2 py-1"
+            t-att-class="{
+                'o_erplibre_studio_selected': isSelected,
+                'o_erplibre_studio_project_field': field.project,
+                'o_erplibre_studio_fixed': !canDrag,
+            }"
             t-att-data-path="block.path"
             t-att-data-name="block.name"
-            draggable="true"
-            t-on-dragstart="(ev) => editor.startDrag(ev, {kind: 'node', path: block.path, name: block.name})"
+            t-att-data-kind="block.kind"
+            t-att-draggable="canDrag ? 'true' : 'false'"
+            t-on-dragstart="(ev) => this.startDrag(ev)"
             t-on-dragend="() => editor.endDrag()"
-            t-on-click.stop="() => editor.select(block.path)"
+            t-on-click.stop="() => this.select()"
         >
-            <i class="fa fa-arrows text-muted" />
-            <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
-            <code class="small text-muted" t-esc="block.name" />
-            <span class="badge text-bg-light" t-if="field.type" t-esc="field.type" />
+            <i t-if="canDrag" class="fa fa-arrows text-muted" />
+            <i t-elif="block.kind === 'field'" class="fa fa-lock text-muted" title="Loaded by the view" />
+            <t t-if="block.kind === 'separator'">
+                <span class="o_erplibre_studio_label text-muted">Separator</span>
+            </t>
+            <t t-elif="block.kind === 'widget'">
+                <i class="fa fa-bookmark text-muted" />
+                <span class="o_erplibre_studio_label fw-bold" t-esc="block.attrs.title or block.label" />
+                <code class="small text-muted" t-esc="block.name" />
+            </t>
+            <t t-else="">
+                <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
+                <code t-if="block.kind === 'field'" class="small text-muted" t-esc="block.name" />
+                <code t-if="block.kind === 'filter'" class="small text-muted text-truncate" t-esc="block.domain" />
+                <code t-if="block.kind === 'group_by'" class="small text-muted" t-esc="block.group_by" />
+                <span class="badge text-bg-light" t-if="field.type and block.kind === 'field'" t-esc="field.type" />
+            </t>
             <span
                 t-foreach="flags"
                 t-as="flag"
-                t-key="flag.key"
+                t-key="flag_index"
                 class="badge text-bg-secondary o_erplibre_studio_flag"
                 t-att-data-flag="flag.key"
                 t-esc="flag.label"
@@ -59,31 +99,45 @@
             <StudioBlock t-if="activePage" block="activePage" editor="editor" viewType="props.viewType" />
         </div>
         <div
-            t-elif="block.kind === 'container'"
+            t-elif="block.kind === 'container' or block.kind === 'template'"
             class="o_erplibre_studio_container"
-            t-att-class="{'o_erplibre_studio_row': isRow}"
+            t-att-class="{'o_erplibre_studio_row': isRow, 'o_erplibre_studio_selected': isSelected}"
             t-att-data-path="block.path"
             t-att-data-tag="block.tag"
+            t-att-data-kind="block.kind"
         >
             <div
-                t-if="!['form', 'list', 'page', 'sheet'].includes(block.tag)"
+                t-if="block.kind !== 'template' and !['form', 'list', 'page', 'sheet'].includes(block.tag)"
                 class="o_erplibre_studio_container_title small text-muted"
+                t-att-draggable="canDrag ? 'true' : 'false'"
+                t-on-dragstart="(ev) => this.startDrag(ev)"
+                t-on-dragend="() => editor.endDrag()"
+                t-on-click.stop="() => this.select()"
             >
+                <i t-if="canDrag" class="fa fa-arrows" />
                 <t t-esc="block.tag" />
                 <t t-if="block.label !== block.tag">
                     ·
                     <t t-esc="block.label" />
                 </t>
+                <span
+                    t-foreach="flags"
+                    t-as="flag"
+                    t-key="flag_index"
+                    class="badge text-bg-secondary ms-1 o_erplibre_studio_flag"
+                    t-att-data-flag="flag.key"
+                    t-esc="flag.label"
+                />
             </div>
             <div class="o_erplibre_studio_children">
                 <t t-foreach="block.children" t-as="child" t-key="child.path">
-                    <t t-if="block.drop and !isRow" t-call="erplibre_studio.Hook">
+                    <t t-if="hookBefore(child)" t-call="erplibre_studio.Hook">
                         <t t-set="target" t-value="child.path" />
                         <t t-set="position" t-value="'before'" />
                     </t>
                     <StudioBlock block="child" editor="editor" viewType="props.viewType" />
                 </t>
-                <t t-if="block.drop and !isRow" t-call="erplibre_studio.Hook">
+                <t t-if="showHooks" t-call="erplibre_studio.Hook">
                     <t t-set="target" t-value="block.path" />
                     <t t-set="position" t-value="'inside'" />
                 </t>
@@ -92,9 +146,15 @@
         <div
             t-else=""
             class="o_erplibre_studio_other small text-muted rounded px-2 py-1"
+            t-att-class="{'o_erplibre_studio_selected': isSelected}"
             t-att-data-path="block.path"
             t-att-data-tag="block.tag"
+            t-att-draggable="canDrag ? 'true' : 'false'"
+            t-on-dragstart="(ev) => this.startDrag(ev)"
+            t-on-dragend="() => editor.endDrag()"
+            t-on-click.stop="() => this.select()"
         >
+            <i t-if="canDrag" class="fa fa-arrows me-1" />
             <t t-esc="block.tag" />
             <t t-if="block.label !== block.tag">
                 ·
@@ -103,18 +163,387 @@
         </div>
     </t>
 
+    <!-- The canvas of a kanban view: its templates, the card first, and
+         the fields it only loads. -->
+    <t t-name="erplibre_studio.Canvas.kanban">
+        <div class="o_erplibre_studio_kanban">
+            <ul t-if="templates.length > 1" class="nav nav-tabs mb-2">
+                <li class="nav-item" t-foreach="templates" t-as="item" t-key="item.name">
+                    <a
+                        href="#"
+                        class="nav-link py-1 px-2 o_erplibre_studio_template_tab"
+                        t-att-class="{'active': item === activeTemplate}"
+                        t-att-data-template="item.name"
+                        t-on-click.prevent.stop="() => this.selectTemplate(item.name)"
+                        t-esc="item.name"
+                    />
+                </li>
+            </ul>
+            <div t-if="activeTemplate" class="o_erplibre_studio_card border rounded p-2 shadow-sm">
+                <StudioBlock block="activeTemplate.block" editor="editor" viewType="viewType" />
+            </div>
+            <div t-else="" class="text-muted small">This view has no template.</div>
+            <t t-call="erplibre_studio.Canvas.loaded" />
+        </div>
+    </t>
+
+    <t t-name="erplibre_studio.Canvas.loaded">
+        <div class="o_erplibre_studio_loaded mt-3" t-att-data-zone="'loaded'">
+            <div class="small text-muted mb-1">Fields loaded for the templates</div>
+            <div class="d-flex flex-wrap align-items-center gap-1">
+                <t t-foreach="loadedBlocks" t-as="child" t-key="child.path">
+                    <StudioBlock block="child" editor="editor" viewType="viewType" />
+                </t>
+                <t t-if="viewType === 'timeline'" t-call="erplibre_studio.Hook">
+                    <t t-set="target" t-value="root.path" />
+                    <t t-set="position" t-value="'inside'" />
+                    <t t-set="zone" t-value="'loaded'" />
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- The canvas of a search view: its fields, filters and group-bys. -->
+    <t t-name="erplibre_studio.Canvas.search">
+        <div class="o_erplibre_studio_search">
+            <t t-if="state.filterForm" t-call="erplibre_studio.FilterForm" />
+            <div class="o_erplibre_studio_columns d-flex gap-2">
+                <div
+                    t-foreach="searchColumnList"
+                    t-as="column"
+                    t-key="column.key"
+                    class="o_erplibre_studio_column flex-grow-1 border rounded p-2"
+                    t-att-data-column="column.key"
+                >
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="fw-bold small" t-esc="column.label" />
+                        <button
+                            t-if="column.key === 'filters'"
+                            class="btn btn-sm btn-link ms-auto p-0 o_erplibre_studio_new_filter"
+                            t-att-disabled="state.busy or !project"
+                            t-on-click.stop="() => this.openFilterForm()"
+                        >
+                            <i class="fa fa-plus" />
+                            New filter
+                        </button>
+                    </div>
+                    <t t-call="erplibre_studio.Lane">
+                        <t t-set="zone" t-value="column.key" />
+                        <t t-set="blocks" t-value="searchColumns[column.key]" />
+                        <t t-set="end" t-value="searchEndHook(column.key)" />
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- A new filter: a label and conditions joined by AND. -->
+    <t t-name="erplibre_studio.FilterForm">
+        <t t-set="form" t-value="state.filterForm" />
+        <div class="o_erplibre_studio_filter_form border rounded p-2 mb-2 bg-light">
+            <div class="fw-bold small mb-1">New filter</div>
+            <input
+                class="form-control form-control-sm mb-2 o_erplibre_studio_filter_label"
+                placeholder="Label"
+                t-model="form.label"
+            />
+            <div
+                t-foreach="form.conditions"
+                t-as="condition"
+                t-key="condition_index"
+                class="o_erplibre_studio_condition d-flex flex-wrap gap-1 mb-1"
+            >
+                <select
+                    class="form-select form-select-sm w-auto o_erplibre_studio_condition_field"
+                    t-on-change="(ev) => this.setConditionField(condition, ev.target.value)"
+                >
+                    <option value="" t-att-selected="!condition.field">Field…</option>
+                    <option
+                        t-foreach="data.choices.search_field"
+                        t-as="item"
+                        t-key="item[0]"
+                        t-att-value="item[0]"
+                        t-att-selected="item[0] === condition.field"
+                        t-esc="item[1]"
+                    />
+                </select>
+                <select
+                    class="form-select form-select-sm w-auto o_erplibre_studio_condition_operator"
+                    t-model="condition.operator"
+                >
+                    <option
+                        t-foreach="operatorsOf(condition.field)"
+                        t-as="operator"
+                        t-key="operator"
+                        t-att-value="operator"
+                        t-esc="operator"
+                    />
+                </select>
+                <t t-set="input" t-value="valueInput(condition)" />
+                <select
+                    t-if="input === 'boolean'"
+                    class="form-select form-select-sm w-auto o_erplibre_studio_condition_value"
+                    t-model="condition.value"
+                >
+                    <option value="True">Yes</option>
+                    <option value="False">No</option>
+                </select>
+                <select
+                    t-elif="input === 'selection'"
+                    class="form-select form-select-sm w-auto o_erplibre_studio_condition_value"
+                    t-model="condition.value"
+                >
+                    <option value="" />
+                    <option
+                        t-foreach="fieldInfo(condition.field).selection or []"
+                        t-as="item"
+                        t-key="item[0]"
+                        t-att-value="item[0]"
+                        t-esc="item[1]"
+                    />
+                </select>
+                <input
+                    t-elif="input !== 'none'"
+                    class="form-control form-control-sm w-auto o_erplibre_studio_condition_value"
+                    t-att-type="input === 'datetime' ? 'datetime-local' : input"
+                    t-model="condition.value"
+                />
+                <button
+                    t-if="form.conditions.length > 1"
+                    class="btn btn-sm btn-link text-danger p-0"
+                    title="Remove this condition"
+                    t-on-click="() => this.removeCondition(condition_index)"
+                >
+                    <i class="fa fa-times" />
+                </button>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+                <button class="btn btn-sm btn-link p-0 o_erplibre_studio_add_condition" t-on-click="addCondition">
+                    <i class="fa fa-plus" />
+                    And
+                </button>
+                <button class="btn btn-sm btn-secondary ms-auto" t-on-click="closeFilterForm">Cancel</button>
+                <button
+                    class="btn btn-sm btn-primary o_erplibre_studio_create_filter"
+                    t-att-disabled="state.busy or !form.conditions.some((c) => c.field)"
+                    t-on-click="createFilter"
+                >
+                    Add the filter
+                </button>
+            </div>
+        </div>
+    </t>
+
+    <!-- The canvas of a pivot view: one lane per axis. -->
+    <t t-name="erplibre_studio.Canvas.pivot">
+        <div class="o_erplibre_studio_pivot">
+            <t t-set="lanes" t-value="pivotLanes" />
+            <div class="o_erplibre_studio_columns d-flex gap-2">
+                <div
+                    t-foreach="pivotLaneList"
+                    t-as="lane"
+                    t-key="lane.key"
+                    class="o_erplibre_studio_column o_erplibre_studio_axis flex-grow-1 border rounded p-2"
+                    t-att-data-axis="lane.key"
+                    t-att-class="{'o_erplibre_studio_axis_refused': state.dragging and !accepts(state.dragging, lane.key)}"
+                >
+                    <div class="fw-bold small mb-1" t-esc="lane.label" />
+                    <t t-call="erplibre_studio.Lane">
+                        <t t-set="zone" t-value="lane.key" />
+                        <t t-set="blocks" t-value="lanes[lane.key]" />
+                        <t t-set="end" t-value="endHook(lanes[lane.key], root.path)" />
+                    </t>
+                </div>
+            </div>
+            <div t-if="lanes.others.length" class="o_erplibre_studio_pivot_others mt-2">
+                <div class="small text-muted mb-1">Fields on no axis</div>
+                <div class="d-flex flex-wrap gap-1">
+                    <t t-foreach="lanes.others" t-as="child" t-key="child.path">
+                        <StudioBlock block="child" editor="editor" viewType="viewType" />
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- The canvas of a timeline view: its main attributes, the template
+         of an item and the fields it loads. -->
+    <t t-name="erplibre_studio.Canvas.timeline">
+        <div class="o_erplibre_studio_timeline">
+            <div
+                class="o_erplibre_studio_timeline_summary border rounded p-2 mb-2 small"
+                t-on-click.stop="() => this.select(null)"
+            >
+                <span class="fw-bold me-2">Timeline</span>
+                <t
+                    t-foreach="['date_start', 'date_stop', 'date_delay', 'default_group_by', 'mode']"
+                    t-as="name"
+                    t-key="name"
+                >
+                    <span t-if="root.attrs[name]" class="me-2" t-att-data-attribute="name">
+                        <span class="text-muted" t-esc="attributeLabel(name)" />
+                        :
+                        <code t-esc="root.attrs[name]" />
+                    </span>
+                </t>
+            </div>
+            <div t-if="timelineTemplate" class="o_erplibre_studio_card border rounded p-2 shadow-sm">
+                <StudioBlock block="timelineTemplate" editor="editor" viewType="viewType" />
+            </div>
+            <div t-else="" class="text-muted small">This view has no item template: its items show their name.</div>
+            <t t-call="erplibre_studio.Canvas.loaded" />
+        </div>
+    </t>
+
+    <t t-name="erplibre_studio.Palette">
+        <ul class="nav nav-tabs mb-2">
+            <li class="nav-item" t-if="allows('add_field')">
+                <a
+                    href="#"
+                    class="nav-link py-1 px-2"
+                    t-att-class="{'active': paletteTab === 'new'}"
+                    data-tab="new"
+                    t-on-click.prevent="() => this.setTab('new')"
+                >
+                    New fields
+                </a>
+            </li>
+            <li class="nav-item">
+                <a
+                    href="#"
+                    class="nav-link py-1 px-2"
+                    t-att-class="{'active': paletteTab === 'existing'}"
+                    data-tab="existing"
+                    t-on-click.prevent="() => this.setTab('existing')"
+                >
+                    Existing fields
+                </a>
+            </li>
+            <li class="nav-item" t-if="allows('add_widget') or allows('add_separator')">
+                <a
+                    href="#"
+                    class="nav-link py-1 px-2"
+                    t-att-class="{'active': paletteTab === 'other'}"
+                    data-tab="other"
+                    t-on-click.prevent="() => this.setTab('other')"
+                >
+                    Other
+                </a>
+            </li>
+        </ul>
+        <t t-if="paletteTab === 'new'">
+            <div
+                t-foreach="fieldTypes"
+                t-as="item"
+                t-key="item.ttype"
+                class="o_erplibre_studio_palette_item o_erplibre_studio_new_field border rounded px-2 py-1 mb-1"
+                t-att-data-type="item.ttype"
+                draggable="true"
+                t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'new', ttype: item.ttype})"
+                t-on-dragend="() => this.endDrag()"
+            >
+                <i class="fa fa-plus-circle text-muted" />
+                <t t-esc="item.label" />
+            </div>
+        </t>
+        <t t-elif="paletteTab === 'other'">
+            <t t-if="allows('add_widget')">
+                <div class="small text-muted mb-1">Ribbon on the card</div>
+                <input
+                    class="form-control form-control-sm mb-1 o_erplibre_studio_ribbon_title"
+                    placeholder="Ribbon text"
+                    t-model="state.ribbon.title"
+                />
+                <select
+                    class="form-select form-select-sm mb-1 o_erplibre_studio_ribbon_color"
+                    t-model="state.ribbon.bg_color"
+                >
+                    <option t-foreach="ribbonColors" t-as="color" t-key="color" t-att-value="color" t-esc="color" />
+                </select>
+                <div
+                    class="o_erplibre_studio_palette_item o_erplibre_studio_widget border rounded px-2 py-1 mb-1"
+                    data-widget="web_ribbon"
+                    draggable="true"
+                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'widget', widget: 'web_ribbon'})"
+                    t-on-dragend="() => this.endDrag()"
+                >
+                    <i class="fa fa-bookmark text-muted" />
+                    Ribbon
+                </div>
+            </t>
+            <div
+                t-if="allows('add_separator')"
+                class="o_erplibre_studio_palette_item o_erplibre_studio_separator border rounded px-2 py-1 mb-1"
+                draggable="true"
+                t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'separator'})"
+                t-on-dragend="() => this.endDrag()"
+            >
+                <i class="fa fa-minus text-muted" />
+                Separator
+            </div>
+        </t>
+        <t t-else="">
+            <div t-if="offersInterval" class="mb-2 small">
+                <label class="form-label mb-0">Interval of a date grouping</label>
+                <select class="form-select form-select-sm o_erplibre_studio_interval" t-model="state.interval">
+                    <option t-foreach="intervals" t-as="item" t-key="item[0]" t-att-value="item[0]" t-esc="item[1]" />
+                </select>
+            </div>
+            <input
+                class="form-control form-control-sm mb-2 o_erplibre_studio_palette_filter"
+                placeholder="Filter"
+                t-model="state.filter"
+            />
+            <div
+                t-foreach="existingFields"
+                t-as="item"
+                t-key="item.name"
+                class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field border rounded px-2 py-1 mb-1"
+                t-att-data-name="item.name"
+                t-att-title="item.name"
+                draggable="true"
+                t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes})"
+                t-on-dragend="() => this.endDrag()"
+            >
+                <t t-esc="item.string" />
+                <span class="small text-muted" t-esc="item.type" />
+                <span
+                    t-foreach="item.axes or []"
+                    t-as="axis"
+                    t-key="axis"
+                    class="badge text-bg-light ms-1 o_erplibre_studio_axis_badge"
+                    t-esc="axisLabel(axis)"
+                />
+            </div>
+        </t>
+    </t>
+
     <t t-name="erplibre_studio.Editor">
-        <div class="o_erplibre_studio o_action d-flex flex-column h-100 bg-view">
+        <div class="o_erplibre_studio o_action d-flex flex-column h-100 bg-view" t-att-data-view-type="viewType">
             <div class="o_erplibre_studio_toolbar d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom">
                 <i class="fa fa-paint-brush" />
                 <span class="fw-bold">Studio</span>
                 <span class="text-muted small o_erplibre_studio_title" t-if="data.view">
                     <t t-esc="data.model_name" />
                     ·
-                    <t t-esc="data.view_type" />
-                    ·
                     <t t-esc="data.view.xml_id or data.view.name" />
                 </span>
+                <select
+                    t-if="!state.loading and !state.error and (data.view_types or []).length"
+                    class="form-select form-select-sm w-auto o_erplibre_studio_view_type"
+                    title="Edit the default view of another type"
+                    t-att-disabled="state.busy"
+                    t-on-change="switchViewType"
+                >
+                    <option
+                        t-foreach="data.view_types"
+                        t-as="type"
+                        t-key="type"
+                        t-att-value="type"
+                        t-att-selected="type === viewType"
+                        t-esc="type"
+                    />
+                </select>
                 <select
                     class="form-select form-select-sm w-auto o_erplibre_studio_project_select"
                     t-att-disabled="state.busy"
@@ -217,66 +646,7 @@
             <div t-elif="state.error" class="alert alert-warning m-3 o_erplibre_studio_error" t-esc="state.error" />
             <div t-else="" class="d-flex flex-grow-1 overflow-hidden">
                 <aside class="o_erplibre_studio_palette border-end p-2 overflow-auto">
-                    <ul class="nav nav-tabs mb-2">
-                        <li class="nav-item">
-                            <a
-                                href="#"
-                                class="nav-link py-1 px-2"
-                                t-att-class="{'active': state.tab === 'new'}"
-                                data-tab="new"
-                                t-on-click.prevent="() => this.setTab('new')"
-                            >
-                                New fields
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                href="#"
-                                class="nav-link py-1 px-2"
-                                t-att-class="{'active': state.tab === 'existing'}"
-                                data-tab="existing"
-                                t-on-click.prevent="() => this.setTab('existing')"
-                            >
-                                Existing fields
-                            </a>
-                        </li>
-                    </ul>
-                    <t t-if="state.tab === 'new'">
-                        <div
-                            t-foreach="fieldTypes"
-                            t-as="item"
-                            t-key="item.ttype"
-                            class="o_erplibre_studio_palette_item o_erplibre_studio_new_field border rounded px-2 py-1 mb-1"
-                            t-att-data-type="item.ttype"
-                            draggable="true"
-                            t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'new', ttype: item.ttype})"
-                            t-on-dragend="() => this.endDrag()"
-                        >
-                            <i class="fa fa-plus-circle text-muted" />
-                            <t t-esc="item.label" />
-                        </div>
-                    </t>
-                    <t t-else="">
-                        <input
-                            class="form-control form-control-sm mb-2 o_erplibre_studio_palette_filter"
-                            placeholder="Filter"
-                            t-model="state.filter"
-                        />
-                        <div
-                            t-foreach="existingFields"
-                            t-as="item"
-                            t-key="item.name"
-                            class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field border rounded px-2 py-1 mb-1"
-                            t-att-data-name="item.name"
-                            t-att-title="item.name"
-                            draggable="true"
-                            t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name})"
-                            t-on-dragend="() => this.endDrag()"
-                        >
-                            <t t-esc="item.string" />
-                            <span class="small text-muted" t-esc="item.type" />
-                        </div>
-                    </t>
+                    <t t-call="erplibre_studio.Palette" />
                 </aside>
                 <main
                     class="o_erplibre_studio_canvas flex-grow-1 overflow-auto p-3"
@@ -286,6 +656,10 @@
                     <div t-if="state.preview" class="o_erplibre_studio_preview border rounded">
                         <View t-props="previewProps" t-key="previewKey" />
                     </div>
+                    <t
+                        t-elif="['kanban', 'search', 'pivot', 'timeline'].includes(viewType)"
+                        t-call="erplibre_studio.Canvas.{{viewType}}"
+                    />
                     <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
                 </main>
                 <aside class="o_erplibre_studio_sidebar border-start p-2 overflow-auto">
@@ -315,19 +689,178 @@
         </div>
     </t>
 
+    <!-- The attributes « set_attribute » writes on « block ». -->
+    <t t-name="erplibre_studio.Editor.Settable">
+        <div
+            t-foreach="settableOf(block)"
+            t-as="entry"
+            t-key="entry.attribute"
+            class="o_erplibre_studio_settable mb-2"
+            t-att-data-attribute="entry.attribute"
+        >
+            <label class="form-label mb-0" t-esc="entry.label" />
+            <t t-if="entry.kind === 'colors'">
+                <ul class="list-unstyled mb-1 o_erplibre_studio_colors">
+                    <li t-foreach="layout.colors or []" t-as="rule" t-key="rule_index">
+                        <span
+                            class="o_erplibre_studio_swatch d-inline-block rounded me-1"
+                            t-att-style="'background-color: ' + rule.color"
+                        />
+                        <code t-esc="rule.expression" />
+                    </li>
+                    <li t-if="!(layout.colors or []).length" class="text-muted">No color.</li>
+                </ul>
+                <div t-if="state.colors" class="o_erplibre_studio_colors_form border rounded p-1">
+                    <div class="text-muted mb-1">Saving replaces the rules above.</div>
+                    <div
+                        t-foreach="state.colors"
+                        t-as="rule"
+                        t-key="rule_index"
+                        class="d-flex flex-wrap gap-1 mb-1 o_erplibre_studio_color_rule"
+                    >
+                        <input
+                            type="color"
+                            class="form-control form-control-sm form-control-color"
+                            t-model="rule.color"
+                        />
+                        <select
+                            class="form-select form-select-sm w-auto o_erplibre_studio_color_field"
+                            t-model="rule.field"
+                        >
+                            <option value="">Field…</option>
+                            <option
+                                t-foreach="colorFields"
+                                t-as="item"
+                                t-key="item[0]"
+                                t-att-value="item[0]"
+                                t-esc="item[1]"
+                            />
+                        </select>
+                        <select
+                            class="form-select form-select-sm w-auto o_erplibre_studio_color_operator"
+                            t-model="rule.operator"
+                        >
+                            <option
+                                t-foreach="layout.color_operators or []"
+                                t-as="op"
+                                t-key="op"
+                                t-att-value="op"
+                                t-esc="op"
+                            />
+                        </select>
+                        <input
+                            class="form-control form-control-sm w-auto o_erplibre_studio_color_value"
+                            placeholder="Value"
+                            t-model="rule.value"
+                        />
+                        <button
+                            class="btn btn-sm btn-link text-danger p-0"
+                            title="Remove this rule"
+                            t-on-click="() => this.removeColorRule(rule_index)"
+                        >
+                            <i class="fa fa-times" />
+                        </button>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-link p-0" t-on-click="addColorRule">
+                            <i class="fa fa-plus" />
+                            Rule
+                        </button>
+                        <button class="btn btn-sm btn-secondary ms-auto" t-on-click="cancelColors">Cancel</button>
+                        <button
+                            class="btn btn-sm btn-primary o_erplibre_studio_save_colors"
+                            t-att-disabled="state.busy"
+                            t-on-click="() => this.saveColors(state.colors)"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+                <div t-else="" class="d-flex gap-1">
+                    <button
+                        class="btn btn-sm btn-secondary o_erplibre_studio_edit_colors"
+                        t-att-disabled="state.busy"
+                        t-on-click="editColors"
+                    >
+                        Edit the colors
+                    </button>
+                    <button
+                        t-if="(layout.colors or []).length"
+                        class="btn btn-sm btn-outline-danger o_erplibre_studio_clear_colors"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.saveColors([])"
+                    >
+                        Remove
+                    </button>
+                </div>
+            </t>
+            <input
+                t-elif="entry.kind === 'order'"
+                class="form-control form-control-sm o_erplibre_studio_attribute"
+                placeholder="name asc, id desc"
+                t-att-value="entry.value"
+                t-att-disabled="state.busy"
+                t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value)"
+            />
+            <select
+                t-else=""
+                class="form-select form-select-sm o_erplibre_studio_attribute"
+                t-att-disabled="state.busy"
+                t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value)"
+            >
+                <option t-if="!entry.required" value="" t-att-selected="!entry.value">Default</option>
+                <option
+                    t-foreach="choicesOf(entry, block)"
+                    t-as="item"
+                    t-key="item[0]"
+                    t-att-value="item[0]"
+                    t-att-selected="item[0] === entry.value"
+                    t-esc="item[1]"
+                />
+            </select>
+        </div>
+    </t>
+
     <t t-name="erplibre_studio.Editor.Properties">
-        <t t-set="block" t-value="selectedBlock" />
-        <div t-if="!block" class="small text-muted o_erplibre_studio_help">
+        <t t-set="block" t-value="propertiesBlock" />
+        <div t-if="!selectedBlock" class="small text-muted o_erplibre_studio_help mb-2">
             Drag a field to move it, or drag a field from the left into the view. Click a field to edit its properties.
         </div>
-        <div t-elif="block.kind === 'field'" class="o_erplibre_studio_properties small" t-att-data-name="block.name">
+        <div
+            t-if="block and isRoot(block)"
+            class="o_erplibre_studio_properties o_erplibre_studio_view_properties small"
+            t-att-data-tag="block.tag"
+        >
+            <div class="fw-bold mb-2">View properties</div>
+            <t t-call="erplibre_studio.Editor.Settable" />
+        </div>
+        <div
+            t-elif="block"
+            class="o_erplibre_studio_properties small"
+            t-att-data-name="block.name"
+            t-att-data-kind="block.kind"
+        >
             <t t-set="field" t-value="selectedField or {}" />
-            <div class="fw-bold" t-esc="block.label" />
+            <div class="fw-bold" t-esc="block.attrs.title or block.label" />
             <div class="mb-2">
-                <code t-esc="block.name" />
-                <span class="badge text-bg-light ms-1" t-esc="field.type" />
+                <code t-esc="block.name or block.tag" />
+                <span t-if="field.type" class="badge text-bg-light ms-1" t-esc="field.type" />
             </div>
-            <t t-if="field.project">
+            <div
+                t-if="block.kind === 'field' and block.in_template === false"
+                class="text-muted mb-2 o_erplibre_studio_loaded_note"
+            >
+                The view loads this field for its templates: it cannot move nor be hidden here.
+            </div>
+            <div t-if="block.kind === 'filter'" class="mb-2">
+                <span class="text-muted">Domain</span>
+                <code class="d-block text-break" t-esc="block.domain" />
+            </div>
+            <div t-if="block.kind === 'group_by'" class="mb-2">
+                <span class="text-muted">Group by</span>
+                <code class="d-block" t-esc="block.group_by" />
+            </div>
+            <t t-if="field.project and allows('update_field') and block.kind === 'field'">
                 <label class="form-label mb-0">Label</label>
                 <input
                     class="form-control form-control-sm mb-2 o_erplibre_studio_prop_label"
@@ -380,23 +913,27 @@
                 </t>
             </t>
             <t t-else="">
-                <label class="form-label mb-0">Label</label>
-                <input
-                    class="form-control form-control-sm mb-2 o_erplibre_studio_prop_label"
-                    t-att-value="attr('string')"
-                    t-att-placeholder="field.string"
-                    t-on-change="(ev) => this.setAttribute('relabel', ev.target.value)"
-                    t-att-disabled="state.busy"
-                />
-                <label class="form-label mb-0">Tooltip</label>
-                <input
-                    class="form-control form-control-sm mb-2 o_erplibre_studio_prop_help"
-                    t-att-value="attr('help')"
-                    t-att-placeholder="field.help"
-                    t-on-change="(ev) => this.setAttribute('help', ev.target.value)"
-                    t-att-disabled="state.busy"
-                />
-                <div class="form-check">
+                <t t-if="allows('relabel') and ['field', 'filter', 'group_by'].includes(block.kind)">
+                    <label class="form-label mb-0">Label</label>
+                    <input
+                        class="form-control form-control-sm mb-2 o_erplibre_studio_prop_label"
+                        t-att-value="attr('string')"
+                        t-att-placeholder="field.string"
+                        t-on-change="(ev) => this.setAttribute('relabel', ev.target.value)"
+                        t-att-disabled="state.busy"
+                    />
+                </t>
+                <t t-if="allows('help') and block.kind === 'field'">
+                    <label class="form-label mb-0">Tooltip</label>
+                    <input
+                        class="form-control form-control-sm mb-2 o_erplibre_studio_prop_help"
+                        t-att-value="attr('help')"
+                        t-att-placeholder="field.help"
+                        t-on-change="(ev) => this.setAttribute('help', ev.target.value)"
+                        t-att-disabled="state.busy"
+                    />
+                </t>
+                <div t-if="allows('readonly') and block.kind === 'field'" class="form-check">
                     <input
                         type="checkbox"
                         class="form-check-input o_erplibre_studio_prop_readonly"
@@ -407,7 +944,7 @@
                     <label class="form-check-label">Read-only in this view</label>
                 </div>
             </t>
-            <div class="form-check">
+            <div t-if="allows('required') and block.kind === 'field'" class="form-check">
                 <input
                     type="checkbox"
                     class="form-check-input o_erplibre_studio_prop_required"
@@ -417,7 +954,7 @@
                 />
                 <label class="form-check-label">Required in this view</label>
             </div>
-            <div class="form-check">
+            <div t-if="hidesByAttribute and canRemove(block)" class="form-check">
                 <input
                     type="checkbox"
                     class="form-check-input o_erplibre_studio_prop_hidden"
@@ -427,7 +964,7 @@
                 />
                 <label class="form-check-label">Hidden</label>
             </div>
-            <t t-if="data.view_type === 'list'">
+            <t t-if="allows('optional')">
                 <label class="form-label mb-0 mt-2">Optional column</label>
                 <select
                     class="form-select form-select-sm mb-2 o_erplibre_studio_prop_optional"
@@ -439,7 +976,11 @@
                     <option value="hide" t-att-selected="attr('optional') === 'hide'">Optional, hidden</option>
                 </select>
             </t>
+            <div class="mt-2">
+                <t t-call="erplibre_studio.Editor.Settable" />
+            </div>
             <button
+                t-if="canRemove(block)"
                 class="btn btn-sm btn-outline-danger mt-2 o_erplibre_studio_remove"
                 t-att-disabled="state.busy"
                 t-on-click="removeSelected"

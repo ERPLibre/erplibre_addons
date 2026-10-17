@@ -8,7 +8,7 @@
     "website": "https://technolibre.ca",
     "license": "AGPL-3",
     "category": "Extra Tools",
-    "summary": "Drag-and-drop editor of form and list views, applied to the database",
+    "summary": "Drag-and-drop editor of views, applied to the database",
     "depends": [
         "erplibre_developer",
     ],

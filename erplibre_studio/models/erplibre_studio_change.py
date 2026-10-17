@@ -19,6 +19,18 @@ CHANGE_TYPES = [
     ("readonly", "Read-only"),
     ("help", "Tooltip"),
     ("optional", "Optional column"),
+    ("add_node", "Add an element"),
+    ("remove", "Remove"),
+    ("set_attribute", "Set an attribute"),
+]
+
+VIEW_TYPES = [
+    ("form", "Form"),
+    ("list", "List"),
+    ("kanban", "Kanban"),
+    ("search", "Search"),
+    ("pivot", "Pivot"),
+    ("timeline", "Timeline"),
 ]
 
 
@@ -48,7 +60,7 @@ class ErplibreStudioChange(models.Model):
         ondelete="cascade",
         help="The primary view the change inherits.",
     )
-    view_type = fields.Selection([("form", "Form"), ("list", "List")], required=True)
+    view_type = fields.Selection(VIEW_TYPES, required=True)
     xpath = fields.Char(string="Node path", required=True)
     position = fields.Selection(
         [
@@ -56,6 +68,7 @@ class ErplibreStudioChange(models.Model):
             ("after", "After"),
             ("inside", "Inside"),
             ("attributes", "Attributes"),
+            ("replace", "Replace"),
         ],
         required=True,
         default="after",
@@ -157,11 +170,24 @@ class ErplibreStudioChange(models.Model):
         labels = dict(self._fields["change_type"]._description_selection(self.env))
         for change in self:
             payload = change._payload()
-            target = payload.get("field_name") or change.xpath
+            target = (
+                payload.get("field_name") or payload.get("node_name") or change.xpath
+            )
             value = payload.get("value")
             text = f"{labels.get(change.change_type)}: {target}"
             if change.change_type == "move":
                 text = f"{labels.get('move')}: {payload.get('source')} → {change.xpath}"
+                attrs = payload.get("attrs") or {}
+                if attrs.get("type"):
+                    text += f" ({attrs['type']})"
+            elif change.change_type == "add_node" and not payload.get("node_name"):
+                text = (
+                    f"{labels.get('add_node')}: {payload.get('kind')} → {change.xpath}"
+                )
+            elif change.change_type == "set_attribute":
+                text += f" · {payload.get('attribute')}"
+                if value not in (None, ""):
+                    text += f" = {value}"
             elif value not in (None, ""):
                 text += f" = {value}"
             change.summary = text
