@@ -1,0 +1,120 @@
+// © 2026 TechnoLibre (http://www.technolibre.ca)
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+.o_erplibre_studio {
+    .o_erplibre_studio_palette {
+        width: 230px;
+        flex-shrink: 0;
+    }
+
+    .o_erplibre_studio_sidebar {
+        width: 300px;
+        flex-shrink: 0;
+    }
+
+    .o_erplibre_studio_palette_item,
+    .o_erplibre_studio_field {
+        cursor: grab;
+        background-color: $o-view-background-color;
+    }
+
+    .o_erplibre_studio_field {
+        margin: 1px 0;
+
+        &:hover {
+            border-color: $primary !important;
+        }
+    }
+
+    .o_erplibre_studio_selected {
+        outline: 2px solid $primary;
+        background-color: rgba($primary, 0.08);
+    }
+
+    .o_erplibre_studio_project_field {
+        border-style: dashed !important;
+    }
+
+    .o_erplibre_studio_container {
+        &[data-tag="group"],
+        &[data-tag="div"],
+        &[data-tag="header"],
+        &[data-tag="footer"] {
+            border: 1px solid $border-color;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem 0;
+        }
+
+        &.o_erplibre_studio_row > .o_erplibre_studio_children {
+            display: flex;
+            gap: 0.5rem;
+
+            > * {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+        }
+
+        &[data-tag="list"] > .o_erplibre_studio_children {
+            display: flex;
+            align-items: stretch;
+            overflow-x: auto;
+
+            > .o_erplibre_studio_field,
+            > .o_erplibre_studio_other {
+                flex: 0 0 auto;
+                min-width: 120px;
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            > .o_erplibre_studio_hook {
+                width: 6px;
+                height: auto;
+                min-height: 3rem;
+                margin: 0 2px;
+            }
+        }
+    }
+
+    .o_erplibre_studio_other {
+        background-color: $gray-100;
+        margin: 1px 0;
+    }
+
+    .o_erplibre_studio_hook {
+        height: 6px;
+        margin: 1px 0;
+        border-radius: 3px;
+        transition: height 0.1s;
+    }
+
+    .o_erplibre_studio_hook_active {
+        background-color: $primary !important;
+    }
+
+    .o_erplibre_studio_preview {
+        min-height: 300px;
+    }
+
+    // An operation is running: no drag nor drop until its answer.
+    .o_erplibre_studio_busy {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+}
+
+// While a field is dragged, the drop hooks open up.
+body.o_erplibre_studio_dragging .o_erplibre_studio {
+    .o_erplibre_studio_hook {
+        height: 1.25rem;
+        border: 1px dashed $primary;
+        background-color: rgba($primary, 0.06);
+    }
+
+    [data-tag="list"] > .o_erplibre_studio_children > .o_erplibre_studio_hook {
+        width: 1.25rem;
+        height: auto;
+    }
+}

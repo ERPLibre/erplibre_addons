@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-inherit="erplibre_developer.DeveloperDrawer" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o_erplibre_dev_inspect')]" position="before">
+            <button
+                t-if="canCustomize"
+                class="btn btn-sm btn-secondary o_erplibre_studio_customize"
+                title="Customize this view"
+                t-on-click="customizeView"
+            >
+                <i class="fa fa-paint-brush" />
+            </button>
+        </xpath>
+    </t>
+</templates>
