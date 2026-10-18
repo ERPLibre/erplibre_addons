@@ -14,6 +14,7 @@ the part of the project and the editor.
 """
 
 import copy
+import hashlib
 import re
 import unicodedata
 
@@ -294,6 +295,17 @@ ITEM_KINDS = ("many2one", "raw", "text")
 
 # The tags « add_node » inserts; the attributes come from the operation.
 NODE_TAGS = ("filter", "separator", "widget")
+# The tags of the sub-view an added x2many field holds (``node_children``).
+SUBVIEW_TAGS = ("list", "field")
+# The relational field types a project adds; a one2many shows in a form only,
+# a many2many in a form (a sub-list), a list or a kanban (tags).
+X2MANY_TYPES = ("one2many", "many2many")
+X2MANY_VIEW_TYPES = {
+    "one2many": ("form",),
+    "many2many": ("form", "list", "kanban"),
+}
+# The longest name of a PostgreSQL table.
+TABLE_NAME_SIZE = 63
 
 # The leaf elements of a form that stay where the view puts them: the
 # chatter is laid out by the web client beside or under the sheet, from
@@ -640,6 +652,19 @@ def _set_attributes(node, attrs):
         node.set(key, str(value))
 
 
+def _add_child(parent, child):
+    """Append the element ``child`` {tag, attrs, children} to ``parent``: the
+    sub-view of an added x2many field, made of SUBVIEW_TAGS only."""
+    tag = (child or {}).get("tag")
+    if tag not in SUBVIEW_TAGS:
+        raise ArchError(f"A change cannot add <{tag}>.", "unknown_node", tag=tag)
+    node = etree.SubElement(parent, tag)
+    _set_attributes(node, child.get("attrs"))
+    for item in child.get("children") or []:
+        _add_child(node, item)
+    return node
+
+
 def _attributes_spec(xpath, attrs):
     """An ``attributes`` spec: an empty value removes the attribute."""
     spec = etree.Element("xpath", expr=xpath, position="attributes")
@@ -701,6 +726,8 @@ def change_spec(change, view_type):
         else:
             node = etree.SubElement(spec, "field", name=payload["field_name"])
             _set_attributes(node, payload.get("node_attrs"))
+            for child in payload.get("node_children") or []:
+                _add_child(node, child)
         return spec
     if ctype == "remove":
         return etree.Element("xpath", expr=change["xpath"], position="replace")
@@ -1080,6 +1107,12 @@ def _slug(label):
     return re.sub(r"[^a-z0-9]+", "_", text.decode().lower()).strip("_")
 
 
+def slug(label, default="item"):
+    """``label`` in ASCII lower case letters, digits and underscores, at
+    most 40 characters; ``default`` when nothing is left."""
+    return _slug(label)[:40].rstrip("_") or default
+
+
 def _free_name(base, taken):
     name, count = base, 2
     while name in taken:
@@ -1137,8 +1170,73 @@ def default_model_arch(view_type, label, chatter=False):
     return etree.tostring(root, encoding="unicode", pretty_print=True)
 
 
+def x2many_refusal(view_type, ttype):
+    """Why a new field of type ``ttype`` cannot be added to a ``view_type``
+    view (an ArchError), or None when it can."""
+    if ttype in X2MANY_TYPES and view_type not in X2MANY_VIEW_TYPES[ttype]:
+        if ttype == "one2many":
+            return ArchError("A one2many shows in a form only.", "x2many_view")
+        return ArchError(
+            "A many2many shows in a form, a list or a kanban only.",
+            "many2many_view",
+        )
+    return None
+
+
+def x2many_node(view_type, ttype, display_field):
+    """(node attributes, children) of a new x2many field in a
+    ``view_type`` view: in a form, an inline sub-list of the field
+    ``display_field`` of the comodel, editable for a one2many; in a list or
+    a kanban, a many2many shows as tags. An inline sub-list loads no view of
+    the comodel."""
+    if view_type != "form":
+        return {"widget": "many2many_tags"}, []
+    attrs = {"editable": "bottom"} if ttype == "one2many" else {}
+    sub_list = {
+        "tag": "list",
+        "attrs": attrs,
+        "children": [{"tag": "field", "attrs": {"name": display_field}}],
+    }
+    return {}, [sub_list]
+
+
+def many2many_names(module_name, model, comodel, field_name, taken):
+    """(table, column1, column2) of a new many2many ``field_name`` of
+    ``model`` to ``comodel``: the table « x_<module>_<model>_<field>_rel »,
+    the model without « x_ » and the field without « x_ », or, when it
+    leaves no room for a « _2 » suffix under TABLE_NAME_SIZE,
+    « x_<module>_<digest>_rel »; a « _2 »... suffix keeps it out of
+    ``taken``. The columns are « <table of the model>_id » and
+    « <table of the comodel>_id », « id1 » and « id2 » for a relation of a
+    model to itself."""
+    short_model = model[2:] if model.startswith("x_") else model
+    short_field = field_name[2:] if field_name.startswith("x_") else field_name
+    table = f"x_{module_name}_{_slug(short_model)}_{_slug(short_field)}_rel"
+    if len(table) > TABLE_NAME_SIZE - 4:
+        digest = hashlib.sha1(f"{model}.{field_name}".encode()).hexdigest()[:10]
+        table = f"x_{module_name[:24]}_{digest}_rel"
+    base = table[: -len("_rel")]
+    count = 2
+    while table in taken:
+        table = f"{base}_{count}_rel"
+        count += 1
+    if model == comodel:
+        return table, "id1", "id2"
+    return (
+        table,
+        f"{model.replace('.', '_')}_id",
+        f"{comodel.replace('.', '_')}_id",
+    )
+
+
 def valid_field_name(name):
     return bool(name and len(name) <= 63 and _FIELD_NAME.match(name))
+
+
+def valid_column_name(name):
+    """Whether ``name`` can be a column of a relation table: lower case
+    letters, digits and underscores, starting with a letter."""
+    return bool(isinstance(name, str) and len(name) <= 63 and _MODULE_NAME.match(name))
 
 
 def valid_module_name(name):

@@ -4,3 +4,6 @@ access_erplibre_studio_change_system,erplibre.studio.change system,model_erplibr
 access_erplibre_studio_model_system,erplibre.studio.model system,model_erplibre_studio_model,base.group_system,1,1,1,1
 access_erplibre_studio_access_system,erplibre.studio.access system,model_erplibre_studio_access,base.group_system,1,1,1,1
 access_erplibre_studio_rule_system,erplibre.studio.rule system,model_erplibre_studio_rule,base.group_system,1,1,1,1
+access_erplibre_studio_app_system,erplibre.studio.app system,model_erplibre_studio_app,base.group_system,1,1,1,1
+access_erplibre_studio_group_system,erplibre.studio.group system,model_erplibre_studio_group,base.group_system,1,1,1,1
+access_erplibre_studio_revert_wizard_system,erplibre.studio.revert.wizard system,model_erplibre_studio_revert_wizard,base.group_system,1,1,1,1

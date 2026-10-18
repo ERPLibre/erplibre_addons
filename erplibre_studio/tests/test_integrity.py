@@ -57,12 +57,16 @@ class TestIntegrity(StudioCase):
         )
 
     def save_rule(self, project, domain, groups=None, model="res.partner"):
+        """A rule of ``groups`` (the internal users when None); no group
+        makes it global."""
+        groups = groups if groups is not None else self.user_group
         return project._studio_save_rule(
             {
                 "name": "Studio test rule",
                 "model": model,
                 "domain": domain,
-                "group_ids": (groups if groups is not None else self.user_group).ids,
+                "group_ids": groups.ids,
+                "global_rule": not groups,
                 "perm_read": True,
             }
         )
@@ -111,12 +115,10 @@ class TestIntegrity(StudioCase):
             with self.env.cr.savepoint():
                 self.project.action_revert()
 
-    def test_a_global_rule_of_another_project_refuses_revert(self):
+    def test_a_rule_of_another_project_refuses_revert(self):
         name = self.add_field(self.project, "Studio shared")
         self.project.action_apply()
-        self.save_rule(
-            self.other, f"[('{name}', '!=', 'secret')]", groups=self.env["res.groups"]
-        )
+        self.save_rule(self.other, f"[('{name}', '!=', 'secret')]")
         self.other.action_apply()
         with self.assertRaisesRegex(
             UserError, r"Studio test rule \(Studio test other\)"
@@ -202,14 +204,10 @@ class TestIntegrity(StudioCase):
         hand = self.env["ir.model"].create(
             {"name": "Studio test hand", "model": "x_studio_test_hand"}
         )
-        group = self.env["res.groups"].create({"name": "Studio test group"})
-        self.env["ir.model.data"].create(
-            {
-                "module": "studio_test_data",
-                "name": "group_studio_test",
-                "model": "res.groups",
-                "res_id": group.id,
-            }
+        group = self.bind_group(
+            self.env["res.groups"].create({"name": "Studio test group"}),
+            "studio_test_data",
+            "group_studio_test",
         )
         view = self.make_view(
             "list",
@@ -240,15 +238,21 @@ class TestIntegrity(StudioCase):
         hand.unlink()
         self.project.created_rule_ids.unlink()
         group.unlink()
-        self.project.app_name = "Studio test draft"
+        self.project._studio_save_app({"name": "Studio test draft"})
         result = self.project.action_discard()
         message = result["params"]["message"]
-        for text in ("x_studio_test_hand", "Studio test rule", "res.partner"):
+        for text in ("x_studio_test_hand", "res.partner"):
             self.assertIn(text, message)
         self.assertFalse(self.project.change_ids)
         self.assertFalse(self.project.access_line_ids)
-        self.assertFalse(self.project.rule_line_ids)
-        self.assertFalse(self.project.app_name)
+        self.assertFalse(self.project.app_ids)
+        # The rule is back without the group it lost, which it names.
+        rule = self.project.rule_line_ids
+        self.assertFalse(rule.group_ids)
+        self.assertEqual(rule.missing_groups, "studio_test_data.group_studio_test")
+        with self.assertRaisesRegex(UserError, "group_studio_test"):
+            with self.env.cr.savepoint():
+                self.project.action_apply()
 
     # ── external ids ────────────────────────────────────────────────────
 

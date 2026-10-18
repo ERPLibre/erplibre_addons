@@ -83,11 +83,16 @@ class TestModels(StudioCase):
         line = self.item_line(
             menu={"mode": "app", "app_icon": "base,static/description/icon.png"}
         )
-        self.assertEqual(self.project.app_name, "Studio test item")
-        self.assertEqual(self.project.app_icon, "base,static/description/icon.png")
-        # A model in the app needs the app.
+        app = self.project.app_ids
+        self.assertEqual(
+            (app.name, app.icon, app.xml_name, line.app_id),
+            ("Studio test item", "base,static/description/icon.png", "menu_app", app),
+        )
+        # A model in an app needs the app, an app its name.
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
-            self.project.app_name = False
+            line.app_id = False
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            app.name = " "
         for icon in (
             "base,static/description/settings.png",
             "base,static/src/img/icon.png",
@@ -96,7 +101,7 @@ class TestModels(StudioCase):
         ):
             with self.subTest(icon=icon), self.assertRaises(ValidationError):
                 with self.env.cr.savepoint():
-                    self.project.app_icon = icon
+                    app.icon = icon
         icons = self.Project._studio_app_icons()
         self.assertEqual(icons[0]["value"], DEFAULT_APP_ICON)
         self.assertEqual(
@@ -107,8 +112,9 @@ class TestModels(StudioCase):
         second = self.make_model(
             self.project, "Second", menu={"mode": "app", "app_name": "Ignored"}
         )
-        self.assertEqual(self.project.app_name, "Studio test item")
+        self.assertEqual(self.project.app_ids, app)
         self.assertEqual((line | second).mapped("menu_mode"), ["app", "app"])
+        self.assertEqual(second.app_id, app)
 
     def test_menu_parent(self):
         loose = self.env["ir.ui.menu"].create({"name": "Studio test loose"})
@@ -123,7 +129,7 @@ class TestModels(StudioCase):
         line = self.item_line(
             menu={"mode": "menu", "parent_id": parent.id, "name": "Items"}
         )
-        self.assertFalse(self.project.app_name)
+        self.assertFalse(self.project.app_ids)
         self.project.action_apply()
         menu = self.ref(f"menu_{MODEL}", "ir.ui.menu")
         self.assertEqual((menu.parent_id, menu.name), (parent, "Items"))
@@ -159,7 +165,8 @@ class TestModels(StudioCase):
         self.assertNotIn(MODEL, self.env)
         self.assertFalse(self.env["ir.model"]._get(MODEL))
         self.assertFalse(line.applied)
-        self.assertEqual(self.project.item_count, 2)
+        # The model, its access row and its app.
+        self.assertEqual(self.project.item_count, 3)
         self.assertEqual(self.project.state, "draft")
         self.assertEqual(len(self.project.access_line_ids), 1)
 
@@ -242,7 +249,7 @@ class TestModels(StudioCase):
         line.write(
             {"name": "Studio test thing", "menu_name": "Things", "menu_sequence": 7}
         )
-        self.project.app_name = "Studio test app"
+        self.project.app_ids.name = "Studio test app"
         self.assertEqual(self.project.state, "draft")
         self.project.action_apply()
         self.assertEqual(self.project.state, "applied")
@@ -447,13 +454,14 @@ class TestModels(StudioCase):
         self.project.action_apply()
         snapshot = self.project.applied_snapshot
         self.assertEqual(
-            set(json.loads(snapshot)), {"app", "changes", "models", "access", "rules"}
+            set(json.loads(snapshot)),
+            {"apps", "groups", "changes", "models", "access", "rules"},
         )
         line.name = "Studio test renamed"
         self.project._studio_set_access([])
         self.project.rule_line_ids.unlink()
         self.make_model(self.project, "Studio test extra", model="x_studio_test_extra")
-        self.project.app_name = "Studio test other app"
+        self.project.app_ids.name = "Studio test other app"
         self.assertEqual(self.project.state, "draft")
         self.project.action_discard()
         self.assertEqual(self.project.state, "applied")
@@ -461,13 +469,14 @@ class TestModels(StudioCase):
         self.assertEqual(self.project.new_model_ids.mapped("model"), [MODEL])
         self.assertEqual(self.project.rule_line_ids.xml_name, f"rule_{MODEL}_1")
         self.assertEqual(self.project.rule_line_ids.group_ids, group)
-        self.assertEqual(self.project.app_name, "Studio test item")
+        self.assertEqual(self.project.app_ids.name, "Studio test item")
+        self.assertEqual(self.project.new_model_ids.app_id, self.project.app_ids)
         self.assertTrue(self.project.new_model_ids.applied)
         # Without an Apply, discarding empties the draft.
         fresh = self.make_project("studio_test_models_fresh")
         self.make_model(fresh, "Studio test fresh", model="x_studio_test_fresh")
         fresh.action_discard()
-        self.assertFalse(fresh.item_count or fresh.app_name)
+        self.assertFalse(fresh.item_count or fresh.app_ids)
 
     def test_project_of_views_keeps_its_snapshot(self):
         """A project with changes of views only keeps the snapshot of the
@@ -538,8 +547,12 @@ class TestModels(StudioCase):
 
     def test_open_editor_on_the_new_model(self):
         line = self.item_line()
-        with self.assertRaises(UserError):
-            self.project.action_open_editor()
+        # Before Apply, on the default form of the model, not created yet.
+        action = self.project.action_open_editor()
+        self.assertEqual(
+            (action["params"]["res_model"], action["params"]["view_id"]),
+            (MODEL, False),
+        )
         self.project.action_apply()
         action = self.project.action_open_editor()
         self.assertEqual(action["params"]["res_model"], MODEL)

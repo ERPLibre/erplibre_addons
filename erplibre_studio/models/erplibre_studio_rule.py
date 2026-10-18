@@ -1,6 +1,8 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import json
+
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -38,7 +40,30 @@ class ErplibreStudioRule(models.Model):
         "rule_id",
         "group_id",
         string="Groups",
-        help="Empty: a global rule, for every user.",
+        help="Existing groups, with an external id.",
+    )
+    group_line_ids = fields.Many2many(
+        "erplibre.studio.group",
+        "erplibre_studio_rule_group_line_rel",
+        "rule_id",
+        "group_line_id",
+        string="Groups of the project",
+    )
+    global_rule = fields.Boolean(
+        string="Global",
+        help="Applies to every user; a rule without this flag needs at least "
+        "one group.",
+    )
+    group_refs = fields.Text(
+        readonly=True,
+        copy=False,
+        help="The external ids of the existing groups of the rule, as last "
+        "chosen: a group that leaves the database leaves the rule without a "
+        "word, these keep what was chosen.",
+    )
+    missing_groups = fields.Char(
+        compute="_compute_missing_groups",
+        help="The groups of the rule that left the database since they were " "chosen.",
     )
     perm_read = fields.Boolean(string="Read", default=True)
     perm_write = fields.Boolean(string="Write", default=True)
@@ -66,12 +91,43 @@ class ErplibreStudioRule(models.Model):
 
     @api.model
     def _server_fields(self):
-        return super()._server_fields() | {"xml_name"}
+        return super()._server_fields() | {"xml_name", "group_refs"}
+
+    def _studio_group_refs(self):
+        """The JSON list of the external ids of the groups of the rule."""
+        self.ensure_one()
+        xmlids = self.group_ids.sudo().get_external_id()
+        return json.dumps(sorted(x for x in xmlids.values() if x))
+
+    def _write_group_refs(self):
+        for rule in self:
+            refs = rule._studio_group_refs()
+            if rule.group_refs != refs:
+                super(ErplibreStudioRule, rule._server_writing()).write(
+                    {"group_refs": refs}
+                )
+
+    def _studio_missing_group_refs(self):
+        """The external ids of ``group_refs`` that no group of the rule has
+        any longer."""
+        self.ensure_one()
+        try:
+            refs = json.loads(self.group_refs or "[]")
+        except ValueError:
+            return []
+        present = set(self.group_ids.sudo().get_external_id().values())
+        return [ref for ref in refs if ref not in present]
+
+    @api.depends("group_refs", "group_ids")
+    def _compute_missing_groups(self):
+        for rule in self:
+            rule.missing_groups = ", ".join(rule._studio_missing_group_refs())
 
     @api.model_create_multi
     def create(self, vals_list):
         """The external id name comes from the server: a free one, or the
-        one Discard restores."""
+        one Discard restores; so do the external ids of the groups, unless
+        Discard restores them."""
         vals_list = [self._drop_server_fields(vals) for vals in vals_list]
         taken = {}
         for vals in vals_list:
@@ -83,14 +139,20 @@ class ErplibreStudioRule(models.Model):
             )
             vals["xml_name"] = self._free_xml_name(project, vals.get("model"), names)
         rules = super(ErplibreStudioRule, self._server_writing()).create(vals_list)
+        for rule, vals in zip(rules, vals_list):
+            if "group_refs" not in vals:
+                rule._write_group_refs()
         return rules.with_env(self.env)
 
     def write(self, vals):
         """A rule moved to another model gets the external id of a new rule:
-        Apply removes the ir.rule of the former one."""
+        Apply removes the ir.rule of the former one. Its groups written, the
+        external ids of its groups are recorded again."""
         vals = self._drop_server_fields(vals)
         moved = self.filtered(lambda r: "model" in vals and r.model != vals["model"])
         res = super().write(vals)
+        if "group_ids" in vals and "group_refs" not in vals:
+            self._write_group_refs()
         for rule in moved:
             names = set((rule.project_id.rule_line_ids - rule).mapped("xml_name"))
             name = self._free_xml_name(rule.project_id, rule.model, names)
@@ -110,7 +172,15 @@ class ErplibreStudioRule(models.Model):
                     )
                 )
 
-    @api.constrains("model", "domain_force", "group_ids", "xml_name", *PERMS)
+    @api.constrains(
+        "model",
+        "domain_force",
+        "group_ids",
+        "group_line_ids",
+        "global_rule",
+        "xml_name",
+        *PERMS,
+    )
     def _check_studio_rule_line(self):
         self._check_studio_xml_name()
         for rule in self:
@@ -118,6 +188,22 @@ class ErplibreStudioRule(models.Model):
             project._studio_check_rights_model(rule.model)
             for group in rule.group_ids:
                 project._studio_check_group(group)
+            if rule.global_rule and (rule.group_ids or rule.group_line_ids):
+                raise ValidationError(
+                    self.env._(
+                        "The global rule %(name)s names no group: uncheck « Global "
+                        "» or remove its groups.",
+                        name=rule.name,
+                    )
+                )
+            project._studio_check_global_rule(rule)
+            if rule.group_line_ids - project.group_line_ids:
+                raise ValidationError(
+                    self.env._(
+                        "The rule %(name)s names a group of another project.",
+                        name=rule.name,
+                    )
+                )
             project._studio_check_rule(rule)
 
     def _snapshot(self):
@@ -127,6 +213,9 @@ class ErplibreStudioRule(models.Model):
                 "model": rule.model,
                 "domain_force": rule.domain_force,
                 "group_ids": sorted(rule.group_ids.ids),
+                "group_lines": sorted(rule.group_line_ids.mapped("xml_name")),
+                "group_refs": rule.group_refs or "[]",
+                "global_rule": rule.global_rule,
                 "xml_name": rule.xml_name,
                 "sequence": rule.sequence,
                 **{perm: rule[perm] for perm in PERMS},
@@ -135,13 +224,23 @@ class ErplibreStudioRule(models.Model):
         ]
 
     @api.model
-    def _studio_line_vals(self, item):
-        return {
+    def _studio_line_vals(self, item, project):
+        """The values of a rule from ``item``; the groups of the project are
+        found by their external id names."""
+        lines = project.group_line_ids.filtered(
+            lambda g: g.xml_name in (item.get("group_lines") or [])
+        )
+        vals = {
             "name": item.get("name"),
             "model": item.get("model"),
             "domain_force": item.get("domain_force") or "[]",
             "group_ids": [(6, 0, item.get("group_ids") or [])],
+            "group_line_ids": [(6, 0, lines.ids)],
+            "global_rule": bool(item.get("global_rule")),
             "xml_name": item.get("xml_name"),
             "sequence": item.get("sequence") or 10,
             **{perm: bool(item.get(perm)) for perm in PERMS},
         }
+        if item.get("group_refs"):
+            vals["group_refs"] = item["group_refs"]
+        return vals

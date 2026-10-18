@@ -170,7 +170,7 @@ class TestStudioModelsUi(HttpCase):
         )
         self.assertEqual(project.state, "applied")
         self.assertEqual(
-            (project.app_name, project.app_icon),
+            (project.app_ids.name, project.app_ids.icon),
             ("Tour item", "base,static/description/icon.png"),
         )
         line = project.new_model_ids
@@ -198,8 +198,13 @@ class TestStudioModelsUi(HttpCase):
         )
         rule = project.created_rule_ids
         self.assertEqual(
-            (rule.name, rule.model_id, rule.domain_force),
-            ("Tour own items", model, "[('create_uid', '=', user.id)]"),
+            (rule.name, rule.model_id, rule.domain_force, rule.groups),
+            (
+                "Tour own items",
+                model,
+                "[('create_uid', '=', user.id)]",
+                self.env.ref("base.group_user"),
+            ),
         )
         form = project.created_view_ids.filtered(lambda v: v.type == "form")
         studio = project.studio_view_ids
@@ -211,3 +216,80 @@ class TestStudioModelsUi(HttpCase):
         )
         left = arch.xpath("//group[@name='studio_left']/field")
         self.assertEqual([n.get("name") for n in left], [new_field.name])
+
+
+@tagged("post_install", "-at_install")
+class TestStudioJ4Ui(HttpCase):
+    """The J4 editor end to end: a class of its own, Apply adds models to
+    the registry until the cleanup of the class."""
+
+    def test_j4_tour(self):
+        """Two apps, a model in each, a one2many whose inverse the studio
+        creates, both previews, two groups, a global rule, Apply, then the
+        Revert confirmation. Apply creates what the editor showed."""
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?debug=1&view_type=list",
+            "erplibre_studio_j4",
+            login="admin",
+            timeout=300,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_j4")]
+        )
+        self.assertEqual(project.state, "applied")
+        # The real preview left nothing behind; Apply created the models the
+        # approval was for, and cleared it.
+        self.assertFalse(project.approved_uid or project.approved_snapshot)
+        self.assertEqual(
+            [(app.name, app.xml_name, app.icon) for app in project.app_ids],
+            [
+                ("Tour shop", "menu_app", "base,static/description/icon.png"),
+                ("Tour stock", "menu_app_tour_stock", False),
+            ],
+        )
+        lines = {line.model: line for line in project.new_model_ids}
+        self.assertEqual(sorted(lines), ["x_tour_line", "x_tour_order"])
+        self.assertEqual(lines["x_tour_order"].app_id.name, "Tour shop")
+        self.assertEqual(lines["x_tour_line"].app_id.name, "Tour stock")
+        roots = project.created_menu_ids.filtered(lambda m: not m.parent_id)
+        self.assertEqual(sorted(roots.mapped("name")), ["Tour shop", "Tour stock"])
+        shop = self.env.ref("studio_tour_j4.menu_app")
+        self.assertEqual(shop.web_icon, "base,static/description/icon.png")
+        # The relation pair: the one2many and the inverse it created.
+        Fields = self.env["ir.model.fields"]
+        inverse = Fields._get("x_tour_line", "x_tour_order_id")
+        self.assertEqual(
+            (inverse.ttype, inverse.relation, inverse.on_delete),
+            ("many2one", "x_tour_order", "cascade"),
+        )
+        one2many = Fields._get("x_tour_order", "x_tour_line")
+        self.assertEqual(
+            (one2many.ttype, one2many.relation, one2many.relation_field),
+            ("one2many", "x_tour_line", "x_tour_order_id"),
+        )
+        # The change recorded on the pending form went to the created view.
+        form = self.env.ref("studio_tour_j4.view_x_tour_order_form")
+        arch = etree.fromstring(
+            self.env["x_tour_order"].get_view(form.id, "form")["arch"]
+        )
+        left = arch.xpath("//group[@name='studio_left']/field[@name='x_tour_line']")
+        self.assertEqual(len(left), 1)
+        self.assertTrue(left[0].xpath("./list/field[@name='x_name']"))
+        self.assertIn(form, project.studio_view_ids.inherit_id)
+        # The groups, in the category of their app.
+        user = self.env.ref("studio_tour_j4.group_tour_shop_tour_user")
+        admin = self.env.ref("studio_tour_j4.group_tour_shop_tour_admin")
+        self.assertEqual(user.category_id.name, "Tour shop")
+        self.assertEqual(admin.category_id, user.category_id)
+        self.assertIn(user, admin.implied_ids)
+        self.assertIn(self.env.ref("base.group_user"), user.implied_ids)
+        rule = project.created_rule_ids
+        self.assertEqual(
+            (rule.name, rule.model_id.model, rule.groups),
+            ("Tour all orders", "x_tour_order", self.env["res.groups"]),
+        )
+        # The confirmation was cancelled: everything stays.
+        self.assertIn("x_tour_order", self.env)
+        self.assertTrue(project.applied_snapshot)

@@ -96,6 +96,9 @@ function contactBlocks() {
     ]);
 }
 
+// The app of the project its models go in.
+const LOANS_APP = {id: 1, name: "Loans", icon: false, xml_name: "menu_app", menu_sequence: 50, models: [7], groups: []};
+
 function modelLine(extra = {}) {
     return {
         id: 7,
@@ -103,6 +106,7 @@ function modelLine(extra = {}) {
         name: "Loan item",
         chatter: true,
         menu_mode: "app",
+        app_id: 1,
         menu_parent: false,
         menu_name: "",
         applied: false,
@@ -151,6 +155,8 @@ function payload(project = {}, {model = "res.partner", chatter = true, viewId = 
             item_count: 0,
             applied: false,
             app: false,
+            apps: [],
+            groups: [],
             models: [],
             access: [],
             rules: [],
@@ -308,7 +314,12 @@ describe("erplibre_studio models", () => {
         await contains("#o_erplibre_studio_menu_app").click();
         expect(".o_erplibre_studio_app_form").toHaveCount(1);
         respond.create_model = () =>
-            payload({revision: 1, item_count: 2, app: {name: "Loan item", icon: BASE_ICON}, models: [modelLine()]});
+            payload({
+                revision: 1,
+                item_count: 2,
+                apps: [{...LOANS_APP, name: "Loan item", icon: BASE_ICON}],
+                models: [modelLine()],
+            });
         await contains(".o_erplibre_studio_model_save").click();
         const call = lastCall("create_model");
         expect(call.args.slice(0, 1).concat(call.args.slice(2))).toEqual([3, "res.partner", 12, "form"]);
@@ -316,7 +327,7 @@ describe("erplibre_studio models", () => {
             name: "Loan item",
             model: MODEL,
             chatter: true,
-            menu: {mode: "app", name: "", app_name: "Loan item", app_icon: BASE_ICON},
+            menu: {mode: "app", name: "", new_app: {name: "Loan item", icon: BASE_ICON}},
         });
         expect(call.kwargs.revision).toBe(0);
         expect(".o_erplibre_studio_model_dialog").toHaveCount(0);
@@ -327,18 +338,23 @@ describe("erplibre_studio models", () => {
             "0"
         );
         expect(".o_erplibre_studio_apply_open").toHaveCount(1);
-        expect(".o_erplibre_studio_open_model").toHaveCount(0);
+        // Its default views are edited before Apply creates them.
+        expect(".o_erplibre_studio_open_model.o_erplibre_studio_open_pending").toHaveCount(3);
+        expect(".o_erplibre_studio_model_menu_place").toHaveText("App Loan item");
         expect(".o_erplibre_studio_apply").toBeEnabled();
     });
 
     test("without mail, no chatter; the app of the project; under a menu", async () => {
-        answer = payload({app: {name: "Loans", icon: false}, models: [modelLine({chatter: false})], item_count: 2});
+        answer = payload({apps: [LOANS_APP], models: [modelLine({chatter: false})], item_count: 2});
         choices.mail_available = false;
         await openEditor();
         await contains(".o_erplibre_studio_new_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_chatter").toHaveCount(0);
-        expect("label[for=o_erplibre_studio_menu_app]").toHaveText("In the app « Loans » of the project");
+        expect("label[for=o_erplibre_studio_menu_app]").toHaveText("In an app of the project");
+        // The app of the project first, then a new one.
+        expect(".o_erplibre_studio_model_app").toHaveValue("1");
+        expect(".o_erplibre_studio_model_app option").toHaveCount(2);
         expect(".o_erplibre_studio_app_form").toHaveCount(0);
         await contains(".o_erplibre_studio_model_label").edit("Loan tag");
         await contains("#o_erplibre_studio_menu_under").click();
@@ -382,24 +398,22 @@ describe("erplibre_studio models", () => {
     });
 
     test("a model of the project is edited and removed", async () => {
-        answer = payload({app: {name: "Loans", icon: false}, models: [modelLine()], item_count: 2});
+        answer = payload({apps: [LOANS_APP], models: [modelLine()], item_count: 2});
         await openEditor();
         await contains(".o_erplibre_studio_edit_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_name").toHaveValue(MODEL);
         await contains(".o_erplibre_studio_model_label").edit("Loaned item");
         expect(".o_erplibre_studio_model_name").toHaveValue(MODEL);
-        await contains(".o_erplibre_studio_app_name").edit("Lending");
-        respond.update_app = () => payload({...answer.project, revision: 1, app: {name: "Lending", icon: false}});
+        expect(".o_erplibre_studio_model_app").toHaveValue("1");
         respond.update_model = () => payload({...answer.project, revision: 2});
         await contains(".o_erplibre_studio_model_save").click();
-        expect(calls.map((c) => c.method)).toEqual(["update_app", "update_model"]);
-        expect(lastCall("update_app").args[1]).toEqual({name: "Lending", icon: false});
+        expect(calls.map((c) => c.method)).toEqual(["update_model"]);
         expect(lastCall("update_model").args.slice(1, 3)).toEqual([
             7,
-            {name: "Loaned item", model: MODEL, chatter: true, menu: {mode: "app", name: ""}},
+            {name: "Loaned item", model: MODEL, chatter: true, menu: {mode: "app", name: "", app_id: 1}},
         ]);
-        expect(lastCall("update_model").kwargs.revision).toBe(1);
+        expect(lastCall("update_model").kwargs.revision).toBe(0);
 
         respond.remove_model = () => payload({revision: 3});
         await contains(".o_erplibre_studio_remove_model").click();
@@ -533,6 +547,8 @@ describe("erplibre_studio models", () => {
             model: MODEL,
             domain: rule.domain,
             group_ids: [1],
+            group_line_ids: [],
+            global_rule: false,
             ...ALL_PERMS,
             perm_unlink: false,
         });
@@ -606,12 +622,13 @@ describe("erplibre_studio models", () => {
     });
 
     test("the model dialog: an app needs a name, a taken name is skipped", async () => {
-        answer = payload({app: {name: "Loans", icon: false}, models: [modelLine()], item_count: 2});
+        answer = payload({apps: [LOANS_APP], models: [modelLine()], item_count: 2});
         await openEditor();
         await contains(".o_erplibre_studio_edit_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_save").toBeEnabled();
-        await contains(".o_erplibre_studio_app_name").edit("");
+        // A new app for the model: it needs a name.
+        await contains(".o_erplibre_studio_model_app").select("new");
         expect(".o_erplibre_studio_model_save").not.toBeEnabled();
         expect(".o_erplibre_studio_app_name").toHaveClass("is-invalid");
         expect(".o_erplibre_studio_app_name").toHaveAttribute("aria-invalid", "true");

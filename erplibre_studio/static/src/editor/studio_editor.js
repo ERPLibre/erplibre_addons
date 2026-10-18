@@ -9,7 +9,11 @@ import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 import {View} from "@web/views/view";
-import {PERMS, StudioModelDialog, accessGrid, accessRows, permLabel} from "./studio_models";
+import {StudioConfirmDialog} from "./studio_confirm";
+import {StudioAppsPanel, groupValue, parseGroupValue} from "./studio_groups";
+import {PERMS, StudioModelDialog, accessGrid, accessGroup, accessRows, permLabel} from "./studio_models";
+import {StudioModelPreview} from "./studio_preview";
+import {StudioRelationDialog, X2MANY_TYPES, fieldTypeFits} from "./studio_relations";
 
 const {DateTime} = luxon;
 
@@ -46,6 +50,8 @@ export function fieldTypeLabel(ttype) {
             text: _t("Multiline text"),
             html: _t("HTML"),
             monetary: _t("Monetary"),
+            one2many: _t("One2many"),
+            many2many: _t("Many2many"),
         }[ttype] || ttype
     );
 }
@@ -328,6 +334,21 @@ export class StudioBlock extends Component {
         return flags;
     }
 
+    /**
+     * The sub-list an x2many field shows in a form: {comodel, label}, or
+     * null. The editor does not descend into it: it is part of the field.
+     */
+    get subList() {
+        if (this.props.viewType !== "form" || this.block.kind !== "field") {
+            return null;
+        }
+        const field = this.field;
+        if (!X2MANY_TYPES.includes(field.type) || !field.relation) {
+            return null;
+        }
+        return {comodel: field.relation, label: this.editor.modelLabel(field.relation)};
+    }
+
     startDrag(ev) {
         ev.stopPropagation();
         this.editor.startDrag(ev, {kind: "node", path: this.block.path, name: this.block.name});
@@ -355,7 +376,7 @@ StudioBlock.components = {StudioBlock};
  */
 export class StudioEditor extends Component {
     static template = "erplibre_studio.Editor";
-    static components = {StudioBlock, View};
+    static components = {StudioBlock, View, StudioModelPreview, StudioAppsPanel};
     static props = ["*"];
 
     setup() {
@@ -405,7 +426,13 @@ export class StudioEditor extends Component {
             ruleCheck: null,
             // Why the server refused the last Save of the rule form.
             ruleError: null,
+            // The preview of a model not created yet: {lineId, viewType,
+            // mode, data, key}, shown by the panel « preview ».
+            modelPreview: null,
+            // Why the server refused the last call of the panel « apps ».
+            panelError: null,
         });
+        this.previewCount = 0;
         this.ribbonColors = RIBBON_COLORS;
         this.perms = PERMS;
         onWillStart(() => this.load());
@@ -467,16 +494,9 @@ export class StudioEditor extends Component {
      */
     async call(method, args, kwargs = {}, onError = null) {
         this.state.busy = true;
+        let data;
         try {
-            const data = await this.orm.call(MODEL, method, args, kwargs);
-            this.state.data = data;
-            this.state.projectId = (data.project && data.project.id) || false;
-            this.state.error = null;
-            if (!this.formIsCurrent(this.state.filterForm, data.project)) {
-                // Its target was located in a draft that is gone.
-                this.state.filterForm = null;
-            }
-            return data;
+            data = await this.orm.call(MODEL, method, args, kwargs);
         } catch (error) {
             const message = this.errorMessage(error);
             if (onError) {
@@ -488,6 +508,15 @@ export class StudioEditor extends Component {
         } finally {
             this.state.busy = false;
         }
+        this.state.data = data;
+        this.state.projectId = (data.project && data.project.id) || false;
+        this.state.error = null;
+        if (!this.formIsCurrent(this.state.filterForm, data.project)) {
+            // Its target was located in a draft that is gone.
+            this.state.filterForm = null;
+        }
+        await this.refreshModelPreview();
+        return data;
     }
 
     async load() {
@@ -521,6 +550,7 @@ export class StudioEditor extends Component {
     /** Back to a canvas without selection, form or preview. */
     resetCanvas() {
         this.state.panel = null;
+        this.state.modelPreview = null;
         Object.assign(this.state, {selected: null, filterForm: null, colors: null, template: null, preview: false});
     }
 
@@ -596,18 +626,24 @@ export class StudioEditor extends Component {
         return menus(before) !== menus(after);
     }
 
-    async projectAction(action) {
+    /**
+     * Run ``action`` on the project and show the payload it answers.
+     * ``digest``: the digest of the removal report the user confirmed, for
+     * Apply and Revert.
+     */
+    async projectAction(action, {digest} = {}) {
         if (this.state.busy || !this.project) {
             return null;
         }
         const before = this.project;
         this.state.busy = true;
         let data = null;
+        const kwargs = {revision: this.project.revision, fallback: this.launchArgs};
+        if (digest) {
+            kwargs.digest = digest;
+        }
         try {
-            data = await this.orm.call(MODEL, "project_action", [this.project.id, action, ...this.viewArgs()], {
-                revision: this.project.revision,
-                fallback: this.launchArgs,
-            });
+            data = await this.orm.call(MODEL, "project_action", [this.project.id, action, ...this.viewArgs()], kwargs);
         } catch (error) {
             this.notification.add(this.errorMessage(error), {type: "danger"});
             return null;
@@ -629,9 +665,13 @@ export class StudioEditor extends Component {
             await this.action.doAction("home");
             return null;
         }
-        if (data.view_changed) {
+        if (data.view_changed || data.model !== this.params.resModel || data.view.id !== this.params.viewId) {
+            // Another view, or the view of a model not created yet that
+            // Apply created.
             Object.assign(this.params, {resModel: data.model, viewType: data.view_type, viewId: data.view.id});
-            this.resetCanvas();
+            if (data.view_changed) {
+                this.resetCanvas();
+            }
         }
         this.state.data = data;
         this.state.projectId = (data.project && data.project.id) || false;
@@ -642,7 +682,96 @@ export class StudioEditor extends Component {
         if (action !== "action_apply") {
             this.state.selected = null;
         }
+        await this.refreshModelPreview();
         return data;
+    }
+
+    /**
+     * Apply the project. When Apply would remove records, values or group
+     * members, its removal report shows first and Apply runs once the user
+     * confirmed it, with its digest. A project never applied removes
+     * nothing. Answer the payload, or null.
+     */
+    async applyProject() {
+        if (this.state.busy || !this.project) {
+            return null;
+        }
+        let answer = null;
+        if (this.project.applied) {
+            answer = await this.readReport("get_apply_report");
+            if (!answer) {
+                return null;
+            }
+        }
+        if (!answer || !answer.confirm) {
+            return this.projectAction("action_apply", {digest: answer && answer.digest});
+        }
+        return new Promise((resolve) => {
+            this.dialog.add(
+                StudioConfirmDialog,
+                {
+                    title: _t("Apply the project"),
+                    intro: _t("Apply removes from the database what the draft no longer has, with its data:"),
+                    report: answer.report,
+                    digest: answer.digest,
+                    refused: false,
+                    confirmLabel: _t("Apply"),
+                    confirm: async (digest) => {
+                        const data = await this.projectAction("action_apply", {digest});
+                        if (data) {
+                            resolve(data);
+                        }
+                        return Boolean(data);
+                    },
+                    reload: () => this.readReport("get_apply_report"),
+                },
+                {onClose: () => resolve(null)}
+            );
+        });
+    }
+
+    /**
+     * Revert the project, once the user confirmed what it removes from the
+     * database: the report of the server, its digest sent with Revert.
+     */
+    async revertProject() {
+        if (this.state.busy || !this.project) {
+            return;
+        }
+        const answer = await this.readReport("get_revert_report");
+        if (!answer) {
+            return;
+        }
+        this.dialog.add(StudioConfirmDialog, {
+            title: _t("Revert the project"),
+            intro: _t(
+                "Revert removes from the database everything the project created; its lines and its changes stay as a draft:"
+            ),
+            report: answer.report,
+            digest: answer.digest,
+            refused: answer.refused || false,
+            confirmLabel: _t("Revert"),
+            confirm: async (digest) => Boolean(await this.projectAction("action_revert", {digest})),
+            reload: () => this.readReport("get_revert_report"),
+        });
+    }
+
+    /** The answer of the report ``method`` (get_apply_report, get_revert_report), or null. */
+    async readReport(method) {
+        this.state.busy = true;
+        try {
+            return await this.orm.call(MODEL, method, [this.project.id]);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return null;
+        } finally {
+            this.state.busy = false;
+        }
+    }
+
+    /** Whether the project has something in the database to revert. */
+    get canRevert() {
+        return Boolean(this.project && (this.project.applied || this.project.state !== "draft"));
     }
 
     async selectProject(ev) {
@@ -717,6 +846,9 @@ export class StudioEditor extends Component {
         const viewType = this.viewType;
         if (item.kind === "widget") {
             return viewType === "kanban" && !zone;
+        }
+        if (item.kind === "new" && !fieldTypeFits(item.ttype, viewType)) {
+            return false;
         }
         if (item.kind === "separator") {
             return viewType === "search" && zone !== "fields";
@@ -809,6 +941,11 @@ export class StudioEditor extends Component {
         if (item.kind === "existing" && this.viewType === "search" && zone === "filters") {
             // A filter on a field needs its condition first.
             this.openFilterForm(target, position, item.name);
+            return;
+        }
+        if (item.kind === "new" && X2MANY_TYPES.includes(item.ttype)) {
+            // A relation needs its comodel, and its inverse or its table.
+            await this.openRelationDialog(item.ttype, target, position);
             return;
         }
         const operation = this.dropOperation(item, target, position, zone);
@@ -1038,8 +1175,43 @@ export class StudioEditor extends Component {
         return tabs.includes(this.state.tab) ? this.state.tab : tabs[0];
     }
 
+    /** The new field types the palette offers: an x2many only where it shows. */
     get fieldTypes() {
-        return (this.data.field_types || []).map((ttype) => ({ttype, label: fieldTypeLabel(ttype)}));
+        return (this.data.field_types || [])
+            .filter((ttype) => fieldTypeFits(ttype, this.viewType))
+            .map((ttype) => ({ttype, label: fieldTypeLabel(ttype)}));
+    }
+
+    // ── relation fields ─────────────────────────────────────────────────
+
+    /**
+     * The dialog of a new ``ttype`` field (one2many, many2many) dropped on
+     * the hook ``target`` / ``position``: Create adds it there.
+     */
+    async openRelationDialog(ttype, target, position) {
+        if (!this.project) {
+            return;
+        }
+        let comodels;
+        try {
+            comodels = await this.orm.call(MODEL, "get_comodels", [this.project.id]);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return;
+        }
+        const projectId = this.project.id;
+        const model = this.params.resModel;
+        this.dialog.add(StudioRelationDialog, {
+            ttype,
+            model,
+            modelLabel: this.data.model_name || model,
+            comodels,
+            projectModels: this.projectModels.map((m) => m.model),
+            loadChoices: (comodel, label) =>
+                this.orm.call(MODEL, "get_relation_choices", [projectId, model, comodel, ttype], {label}),
+            save: async (field) =>
+                Boolean(await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"})),
+        });
     }
 
     get existingFields() {
@@ -1364,7 +1536,7 @@ export class StudioEditor extends Component {
                 ...choices.models.map((m) => m[0]),
                 ...this.projectModels.map((m) => m.model),
             ],
-            save: (values, app) => (line ? this.updateModel(line, values, app) : this.createModel(values)),
+            save: (values) => (line ? this.updateModel(line, values) : this.createModel(values)),
         });
     }
 
@@ -1372,11 +1544,26 @@ export class StudioEditor extends Component {
         return Boolean(await this.projectCall("create_model", [values]));
     }
 
-    async updateModel(line, values, app) {
-        if (app && !(await this.projectCall("update_app", [app]))) {
-            return false;
-        }
+    async updateModel(line, values) {
         return Boolean(await this.projectCall("update_model", [line.id, values]));
+    }
+
+    /** The apps of the project, as the payload lists them. */
+    get projectApps() {
+        return (this.project && this.project.apps) || [];
+    }
+
+    /** Where the menu of the model line ``line`` goes: its app, or its parent menu. */
+    menuPlace(line) {
+        if (line.menu_mode === "menu") {
+            return line.menu_parent ? line.menu_parent[1] : _t("Under a menu");
+        }
+        const app = this.projectApps.find((a) => a.id === line.app_id);
+        return app ? _t("App %(name)s", {name: app.name}) : _t("No app");
+    }
+
+    get pendingViewTitle() {
+        return _t("Edit this view before Apply creates the model");
     }
 
     removeModel(line) {
@@ -1407,11 +1594,15 @@ export class StudioEditor extends Component {
 
     /**
      * Edit the default ``viewType`` view of the model line ``line``: the
-     * views Apply created for it.
+     * view Apply created for it, or, before Apply, the default view the
+     * model will have, whose changes Apply moves to the created view.
      */
     async openModel(line, viewType = "form") {
+        if (!line.applied) {
+            return this.openView(line.model, false, viewType);
+        }
         const viewId = line.views && line.views[viewType];
-        if (!line.applied || !viewId) {
+        if (!viewId) {
             return false;
         }
         return this.openView(line.model, viewId, viewType);
@@ -1419,7 +1610,7 @@ export class StudioEditor extends Component {
 
     /** Apply the project, then edit the form of the model line ``line``. */
     async applyAndOpen(line) {
-        const data = await this.projectAction("action_apply");
+        const data = await this.applyProject();
         const applied = data && data.project && (data.project.models || []).find((m) => m.id === line.id);
         if (applied && applied.applied) {
             await this.openModel(applied, "form");
@@ -1447,6 +1638,8 @@ export class StudioEditor extends Component {
             ruleForm: null,
             ruleCheck: null,
             ruleError: null,
+            modelPreview: null,
+            panelError: null,
         });
         this.state.accessExisting = {};
         if (panel === "access") {
@@ -1455,7 +1648,14 @@ export class StudioEditor extends Component {
     }
 
     closePanel() {
-        Object.assign(this.state, {panel: null, ruleForm: null, ruleCheck: null, ruleError: null});
+        Object.assign(this.state, {
+            panel: null,
+            ruleForm: null,
+            ruleCheck: null,
+            ruleError: null,
+            modelPreview: null,
+            panelError: null,
+        });
     }
 
     get choiceModels() {
@@ -1471,6 +1671,40 @@ export class StudioEditor extends Component {
         return group ? group.name : String(groupId);
     }
 
+    /** The value of ``group`` (of the choices) in a group select. */
+    groupValue(group) {
+        return groupValue(group);
+    }
+
+    /** [value, name] of the group of the access row ``row`` of the payload. */
+    accessGroup(row) {
+        return accessGroup(row);
+    }
+
+    get projectGroupSuffix() {
+        return _t("project");
+    }
+
+    /** The name of the group of the project ``lineId``, from the payload. */
+    groupLineName(lineId) {
+        const line = ((this.project && this.project.groups) || []).find((g) => g.id === lineId);
+        if (line) {
+            const app = this.projectApps.find((a) => a.id === line.app_id);
+            return app ? `${app.name} / ${line.name}` : line.name;
+        }
+        const choice = this.choiceGroups.find((g) => g.project && g.line_id === lineId);
+        return choice ? choice.name : String(lineId);
+    }
+
+    missingGroupText(xmlid) {
+        return _t("This group no longer exists: %(group)s", {group: xmlid});
+    }
+
+    /** Whether Apply refuses the rule ``rule`` of the payload: no group, not global. */
+    ruleNeedsGroup(rule) {
+        return !rule.global_rule && !rule.groups.length && !(rule.group_lines || []).length;
+    }
+
     permLabel(perm) {
         return permLabel(perm);
     }
@@ -1479,6 +1713,7 @@ export class StudioEditor extends Component {
         return this.project ? accessGrid(this.project) : [];
     }
 
+    /** The row being added; ``group_id`` holds the value of the group select. */
     newAccessRow() {
         return {model: "", group_id: "", perm_read: true, perm_write: false, perm_create: false, perm_unlink: false};
     }
@@ -1522,17 +1757,18 @@ export class StudioEditor extends Component {
 
     async addAccess() {
         const add = this.state.accessAdd;
-        const groupId = parseInt(add.group_id) || false;
-        if (!add.model || !groupId) {
+        const group = parseGroupValue(add.group_id);
+        if (!add.model || !group) {
             return;
         }
-        if (this.project.access.some((r) => r.model === add.model && r.group[0] === groupId)) {
+        const value = String(add.group_id);
+        if (this.project.access.some((r) => r.model === add.model && accessGroup(r)[0] === value)) {
             this.notification.add(_t("This group has a row on this model already: change its rights in the grid."), {
                 type: "warning",
             });
             return;
         }
-        const row = {model: add.model, group_id: groupId};
+        const row = {model: add.model, ...group};
         for (const perm of PERMS) {
             row[perm] = Boolean(add[perm]);
         }
@@ -1556,6 +1792,11 @@ export class StudioEditor extends Component {
                   model: rule.model,
                   domain: rule.domain,
                   group_ids: rule.groups.map((g) => g[0]),
+                  group_line_ids: (rule.group_lines || []).map((g) => g[0]),
+                  global_rule: Boolean(rule.global_rule),
+                  // The groups the rule names that left the database:
+                  // saving the rule from the form records its groups again.
+                  missing_groups: [...(rule.missing_groups || [])],
                   ...Object.fromEntries(PERMS.map((perm) => [perm, rule[perm]])),
               }
             : {
@@ -1564,6 +1805,9 @@ export class StudioEditor extends Component {
                   model: models[0] || "",
                   domain: "[]",
                   group_ids: [],
+                  group_line_ids: [],
+                  global_rule: false,
+                  missing_groups: [],
                   ...Object.fromEntries(PERMS.map((perm) => [perm, true])),
               };
         this.state.ruleCheck = null;
@@ -1576,21 +1820,51 @@ export class StudioEditor extends Component {
         this.state.ruleError = null;
     }
 
+    /**
+     * The groups of the rule form: [{value, name, project}], the existing
+     * groups then those of the project.
+     */
+    get ruleFormGroups() {
+        const form = this.state.ruleForm;
+        if (!form) {
+            return [];
+        }
+        return [
+            ...form.group_ids.map((id) => ({value: String(id), name: this.groupName(id), project: false})),
+            ...form.group_line_ids.map((id) => ({value: `line:${id}`, name: this.groupLineName(id), project: true})),
+        ];
+    }
+
     addRuleGroup(ev) {
-        const groupId = parseInt(ev.target.value) || false;
+        const group = parseGroupValue(ev.target.value);
         ev.target.value = "";
-        if (groupId && !this.state.ruleForm.group_ids.includes(groupId)) {
-            this.state.ruleForm.group_ids.push(groupId);
+        const form = this.state.ruleForm;
+        if (group && group.group_id && !form.group_ids.includes(group.group_id)) {
+            form.group_ids.push(group.group_id);
+        } else if (group && group.group_line_id && !form.group_line_ids.includes(group.group_line_id)) {
+            form.group_line_ids.push(group.group_line_id);
         }
     }
 
-    removeGroupLabel(groupId) {
-        return _t("Remove the group %(group)s", {group: this.groupName(groupId)});
+    removeGroupLabel(name) {
+        return _t("Remove the group %(group)s", {group: name});
     }
 
-    removeRuleGroup(groupId) {
+    removeRuleGroup(value) {
         const form = this.state.ruleForm;
-        form.group_ids = form.group_ids.filter((id) => id !== groupId);
+        const group = parseGroupValue(value) || {};
+        form.group_ids = form.group_ids.filter((id) => id !== group.group_id);
+        form.group_line_ids = form.group_line_ids.filter((id) => id !== group.group_line_id);
+    }
+
+    /** « Global »: the rule applies to every user, and names no group. */
+    setRuleGlobal(checked) {
+        const form = this.state.ruleForm;
+        form.global_rule = checked;
+        if (checked) {
+            form.group_ids = [];
+            form.group_line_ids = [];
+        }
     }
 
     get domainPlaceholder() {
@@ -1640,7 +1914,8 @@ export class StudioEditor extends Component {
             return;
         }
         this.state.ruleError = null;
-        const data = await this.projectCall("save_rule", [{...form}], (message) => {
+        const {missing_groups, ...values} = form; // eslint-disable-line no-unused-vars
+        const data = await this.projectCall("save_rule", [values], (message) => {
             this.state.ruleError = message;
         });
         if (data) {
@@ -1655,9 +1930,106 @@ export class StudioEditor extends Component {
         await this.projectCall("remove_rule", [rule.id]);
     }
 
+    // ── preview of a model not created yet ──────────────────────────────
+
+    /** The model line of the project whose model is ``model``, or null. */
+    modelLine(model) {
+        return this.projectModels.find((line) => line.model === model) || null;
+    }
+
+    /**
+     * Show the preview of the model line ``line``, not created yet, in
+     * ``viewType`` and ``mode`` (« simulation », « real »). The server
+     * answers its views and fields; nothing is written.
+     */
+    async openModelPreview(line, viewType = "form", mode = "simulation") {
+        if (this.state.busy || !this.project) {
+            return;
+        }
+        this.state.busy = true;
+        let data;
+        try {
+            data = await this.orm.call(MODEL, "get_model_preview", [this.project.id, line.id, viewType, mode]);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return;
+        } finally {
+            this.state.busy = false;
+        }
+        Object.assign(this.state, {
+            selected: null,
+            preview: false,
+            panel: "preview",
+            ruleForm: null,
+            filterForm: null,
+            modelPreview: {lineId: line.id, viewType, mode, data, key: ++this.previewCount},
+        });
+    }
+
+    /**
+     * After a change of the draft, the preview on screen follows it: shown
+     * again from the new draft (the real mode while the approval stands),
+     * or closed, with a notice, once its model left the project or Apply
+     * created it.
+     */
+    async refreshModelPreview() {
+        const preview = this.state.modelPreview;
+        if (!preview || this.state.panel !== "preview" || !this.project) {
+            return;
+        }
+        const line = this.previewLine;
+        if (!line || line.applied) {
+            this.closePanel();
+            this.notification.add(
+                line
+                    ? _t("The model %(model)s exists now: its preview is closed.", {model: line.model})
+                    : _t("The model of the preview left the project: its preview is closed."),
+                {type: "info"}
+            );
+            return;
+        }
+        const mode = preview.mode === "real" && this.project.approved ? "real" : "simulation";
+        await this.openModelPreview(line, preview.viewType, mode);
+    }
+
+    /** The model line of the preview on screen, while it is in the project. */
+    get previewLine() {
+        const preview = this.state.modelPreview;
+        return (preview && this.projectModels.find((line) => line.id === preview.lineId)) || null;
+    }
+
+    /** Show the preview on screen in another view type or mode. */
+    async switchModelPreview(viewType, mode) {
+        const line = this.previewLine;
+        if (line) {
+            await this.openModelPreview(line, viewType, mode);
+        }
+    }
+
+    /** Approve, or withdraw the approval of, the real preview; then show the preview again. */
+    async approvePreview(approve = true) {
+        // The preview follows: back to the simulation once the approval is withdrawn.
+        await this.projectAction(approve ? "action_approve" : "action_unapprove");
+    }
+
     // ── toolbar ─────────────────────────────────────────────────────────
 
-    togglePreview() {
+    /**
+     * The preview of the view on screen: the real view with the draft, or
+     * for a model not created yet, its model preview.
+     */
+    async togglePreview() {
+        if (this.data.view && this.data.view.pending) {
+            if (this.state.panel === "preview") {
+                this.closePanel();
+                return;
+            }
+            const line = this.modelLine(this.params.resModel);
+            if (line) {
+                await this.openModelPreview(line, this.viewType);
+            }
+            return;
+        }
         this.state.preview = !this.state.preview;
     }
 
@@ -1683,6 +2055,14 @@ export class StudioEditor extends Component {
             Object.assign(props, {type: "list", viewId: false, searchViewId: this.params.viewId, display: {}});
         }
         return props;
+    }
+
+    get draftPreviewTitle() {
+        return _t("Show the view as its editor sees the draft");
+    }
+
+    get pendingPreviewTitle() {
+        return _t("Preview the model before Apply creates it: nothing is saved");
     }
 
     get previewKey() {

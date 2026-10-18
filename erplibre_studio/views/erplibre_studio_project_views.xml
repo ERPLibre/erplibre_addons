@@ -37,7 +37,7 @@
                         invisible="not change_count and not created_model_ids"
                     />
                     <button
-                        name="action_apply"
+                        name="action_apply_wizard"
                         type="object"
                         string="Apply"
                         class="btn-primary"
@@ -51,11 +51,10 @@
                         confirm="Back to the changes of the last Apply?"
                     />
                     <button
-                        name="action_revert"
+                        name="action_revert_wizard"
                         type="object"
                         string="Revert"
                         invisible="state == 'draft' and not applied_snapshot"
-                        confirm="Remove what this project created from the database: its models and their records, its fields and their values, its views, menus, actions and rights?"
                     />
                     <field name="state" widget="statusbar" />
                 </header>
@@ -78,11 +77,6 @@
                             <field name="module_id" invisible="not module_id" />
                             <field name="module_state" invisible="not module_id" />
                         </group>
-                        <group name="app">
-                            <field name="app_name" />
-                            <field name="app_icon" invisible="not app_name" />
-                            <field name="app_sequence" invisible="not app_name" />
-                        </group>
                     </group>
                     <notebook>
                         <page string="Changes" name="changes">
@@ -91,6 +85,7 @@
                             <field name="change_ids" readonly="1">
                                 <list create="0" edit="0" delete="0">
                                     <field name="view_id" />
+                                    <field name="model_line_id" optional="hide" />
                                     <field name="change_type" />
                                     <field name="summary" />
                                     <field name="xpath" optional="hide" />
@@ -100,6 +95,7 @@
                                         <field name="change_type" />
                                         <field name="model" />
                                         <field name="view_id" />
+                                        <field name="model_line_id" />
                                         <field name="xpath" />
                                         <field name="position" />
                                         <field name="payload" />
@@ -117,6 +113,12 @@
                                     <field name="chatter" />
                                     <field name="menu_mode" />
                                     <field
+                                        name="app_id"
+                                        invisible="menu_mode != 'app'"
+                                        required="menu_mode == 'app'"
+                                        domain="[('project_id', '=', parent.id)]"
+                                    />
+                                    <field
                                         name="menu_parent_id"
                                         invisible="menu_mode != 'menu'"
                                         required="menu_mode == 'menu'"
@@ -127,11 +129,52 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Apps and groups" name="apps">
+                            <field name="app_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="icon" />
+                                    <field name="menu_sequence" optional="hide" />
+                                    <field name="xml_name" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                            <field name="group_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field
+                                        name="app_id"
+                                        domain="[('project_id', '=', parent.id)]"
+                                    />
+                                    <field name="name" />
+                                    <field
+                                        name="implied_line_ids"
+                                        widget="many2many_tags"
+                                        domain="[('project_id', '=', parent.id)]"
+                                    />
+                                    <field name="implied_group_ids" widget="many2many_tags" />
+                                    <field
+                                        name="missing_implied"
+                                        decoration-danger="missing_implied"
+                                        optional="show"
+                                    />
+                                    <field name="comment" optional="hide" />
+                                    <field name="xml_name" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                        </page>
                         <page string="Access rights" name="access_rights">
                             <field name="access_line_ids">
                                 <list editable="bottom">
                                     <field name="model" />
                                     <field name="group_id" />
+                                    <field
+                                        name="group_line_id"
+                                        domain="[('project_id', '=', parent.id)]"
+                                        optional="show"
+                                    />
                                     <field name="perm_read" />
                                     <field name="perm_write" />
                                     <field name="perm_create" />
@@ -146,7 +189,18 @@
                                     <field name="sequence" widget="handle" />
                                     <field name="name" />
                                     <field name="model" />
+                                    <field name="global_rule" />
                                     <field name="group_ids" widget="many2many_tags" />
+                                    <field
+                                        name="group_line_ids"
+                                        widget="many2many_tags"
+                                        optional="show"
+                                    />
+                                    <field
+                                        name="missing_groups"
+                                        decoration-danger="missing_groups"
+                                        optional="show"
+                                    />
                                     <field name="perm_read" />
                                     <field name="perm_write" />
                                     <field name="perm_create" />
@@ -157,7 +211,23 @@
                                         <group>
                                             <field name="name" />
                                             <field name="model" />
-                                            <field name="group_ids" widget="many2many_tags" />
+                                            <field name="global_rule" />
+                                            <field
+                                                name="group_ids"
+                                                widget="many2many_tags"
+                                                invisible="global_rule"
+                                            />
+                                            <field
+                                                name="group_line_ids"
+                                                widget="many2many_tags"
+                                                invisible="global_rule"
+                                                domain="[('project_id', '=', parent.id)]"
+                                            />
+                                            <field
+                                                name="missing_groups"
+                                                invisible="not missing_groups"
+                                                decoration-danger="1"
+                                            />
                                             <field name="xml_name" />
                                         </group>
                                         <group>
@@ -175,6 +245,9 @@
                             <group>
                                 <field name="applied_date" />
                                 <field name="applied_snapshot" invisible="1" />
+                                <field name="approved" />
+                                <field name="approved_uid" invisible="not approved_uid" />
+                                <field name="approved_date" invisible="not approved_uid" />
                                 <field name="field_ids">
                                     <list>
                                         <field name="model" />
@@ -233,10 +306,59 @@
                                         <field name="domain_force" />
                                     </list>
                                 </field>
+                                <field name="created_group_ids">
+                                    <list>
+                                        <field name="full_name" />
+                                    </list>
+                                </field>
+                                <field name="created_category_ids">
+                                    <list>
+                                        <field name="name" />
+                                    </list>
+                                </field>
                             </group>
                         </page>
                     </notebook>
                 </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_studio_revert_wizard_view_form" model="ir.ui.view">
+        <field name="name">erplibre.studio.revert.wizard.form</field>
+        <field name="model">erplibre.studio.revert.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="mode" invisible="1" />
+                <div class="alert alert-danger" role="alert" invisible="not refused">
+                    <field name="refused" />
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="refused or mode != 'revert'">
+                    Revert removes from the database what the project created:
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="refused or mode != 'apply'">
+                    Apply removes from the database what the draft no longer has:
+                </div>
+                <field name="report_html" nolabel="1" />
+                <footer>
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Revert"
+                        class="btn-danger"
+                        invisible="refused or mode != 'revert'"
+                        data-hotkey="q"
+                    />
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Apply"
+                        class="btn-danger"
+                        invisible="refused or mode != 'apply'"
+                        data-hotkey="q"
+                    />
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
+                </footer>
             </form>
         </field>
     </record>

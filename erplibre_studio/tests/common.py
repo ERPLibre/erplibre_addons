@@ -101,6 +101,18 @@ class StudioMixin(DeveloperMixin):
     def mail_available(self):
         return self.Project._studio_mail_available()
 
+    def bind_group(self, group, module, name):
+        """``group`` under the external id ``module.name``, ``module`` an
+        installed module made for the test: an existing group a project can
+        name."""
+        Module = self.env["ir.module.module"]
+        if not Module.search_count([("name", "=", module)]):
+            Module.create({"name": module, "state": "installed"})
+        self.env["ir.model.data"].create(
+            {"module": module, "name": name, "model": "res.groups", "res_id": group.id}
+        )
+        return group
+
     def module_records(self, module_name, model=None):
         """The ir.model.data of ``module_name`` (of ``model`` when given)."""
         domain = [("module", "=", module_name)]

@@ -5,10 +5,15 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 from .. import arch as studio_arch
-from .erplibre_studio_project import NO_TOUCH_KEY, RESTORE_KEY, SERVER_VALUES
+from .erplibre_studio_project import (
+    NO_TOUCH_KEY,
+    RESTORE_KEY,
+    SERVER_VALUES,
+    check_studio_write,
+)
 
 MENU_MODES = [
-    ("app", "In the app of the project"),
+    ("app", "In an app of the project"),
     ("menu", "Under a menu"),
 ]
 
@@ -35,8 +40,7 @@ class ErplibreStudioLine(models.AbstractModel):
             projects.exists()._touch()
 
     def _check_line_access(self):
-        if not self.env.su:
-            self.env["erplibre.studio.project"]._check_studio_access()
+        check_studio_write(self.env)
 
     @api.model
     def _server_fields(self):
@@ -106,6 +110,13 @@ class ErplibreStudioModel(models.Model):
         "Once applied, the chatter cannot be removed.",
     )
     menu_mode = fields.Selection(MENU_MODES, required=True, default="app")
+    app_id = fields.Many2one(
+        "erplibre.studio.app",
+        string="App",
+        ondelete="set null",
+        help="The app of the project the menu of the model goes in, with « In "
+        "an app of the project ».",
+    )
     menu_parent_id = fields.Many2one(
         "ir.ui.menu",
         string="Parent menu",
@@ -172,6 +183,7 @@ class ErplibreStudioModel(models.Model):
                 "name": line.name,
                 "chatter": line.chatter,
                 "menu_mode": line.menu_mode,
+                "app": line.app_id.xml_name or "",
                 "menu_parent_id": line.menu_parent_id.id,
                 "menu_name": line.menu_name or "",
                 "menu_sequence": line.menu_sequence,
@@ -231,7 +243,7 @@ class ErplibreStudioModel(models.Model):
                     self.env._("A chatter needs the module mail (Discuss).")
                 )
 
-    @api.constrains("menu_mode", "menu_parent_id")
+    @api.constrains("menu_mode", "menu_parent_id", "app_id")
     def _check_studio_menu(self):
         for line in self:
             line.project_id._studio_check_menu(line)
@@ -263,6 +275,9 @@ class ErplibreStudioModel(models.Model):
         ).write(vals)
         for line, old in renamed.items():
             project = line.project_id.with_context(**{NO_TOUCH_KEY: True})
+            project.change_ids.filtered(lambda c: c.model_line_id == line).write(
+                {"model": line.model}
+            )
             project.access_line_ids.filtered(lambda a: a.model == old).write(
                 {"model": line.model}
             )
@@ -271,8 +286,9 @@ class ErplibreStudioModel(models.Model):
             )
             for change in project._project_field_changes():
                 payload = change._payload()
-                if (payload.get("field") or {}).get("relation") == old:
-                    payload["field"]["relation"] = line.model
+                field = payload.get("field") or {}
+                if field.get("relation") == old:
+                    field["relation"] = line.model
                     change._set_payload(payload)
         self._touch_projects(projects | self.project_id)
         return res
@@ -290,18 +306,24 @@ class ErplibreStudioModel(models.Model):
                 lambda c: c.change_type == "add_field"
                 and (c._payload().get("field") or {}).get("relation") == line.model
             )
+            own = project.change_ids.filtered(lambda c: c.model == line.model)
             names = {}
-            for change in pointing:
+            for change in pointing | own.filtered(
+                lambda c: c.change_type == "add_field"
+            ):
                 names.setdefault(change.model, set()).add(change.field_name)
-            (
-                project.change_ids.filtered(lambda c: c.model == line.model)
-                | project._studio_changes_of_fields(names)
-            ).unlink()
+                definition = change._payload().get("field") or {}
+                inverse = project._studio_inverse_definition(change.model, definition)
+                if inverse:
+                    names.setdefault(definition["relation"], set()).add(inverse[0])
+            (own | project._studio_changes_of_fields(names)).unlink()
         return super().unlink()
 
     @api.model
-    def _studio_line_vals(self, item):
-        """The values of a line from ``item``, one entry of ``_snapshot``."""
+    def _studio_line_vals(self, item, project):
+        """The values of a line from ``item``, one entry of ``_snapshot``;
+        its app is the app of ``project`` of that external id."""
+        app = project.app_ids.filtered(lambda a: a.xml_name == item.get("app"))
         return {
             key: item.get(key)
             for key in (
@@ -313,4 +335,7 @@ class ErplibreStudioModel(models.Model):
                 "menu_sequence",
                 "sequence",
             )
-        } | {"menu_parent_id": item.get("menu_parent_id") or False}
+        } | {
+            "menu_parent_id": item.get("menu_parent_id") or False,
+            "app_id": app[:1].id,
+        }

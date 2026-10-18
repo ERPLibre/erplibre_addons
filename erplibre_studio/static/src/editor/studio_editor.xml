@@ -79,6 +79,17 @@
                 t-att-data-flag="flag.key"
                 t-esc="flag.label"
             />
+            <t t-set="sub" t-value="subList" />
+            <div
+                t-if="sub"
+                class="o_erplibre_studio_sublist w-100 border rounded small text-muted px-2 py-1 mt-1"
+                t-att-data-comodel="sub.comodel"
+            >
+                <i class="fa fa-list me-1" />
+                Sub-list of
+                <span class="fw-bold" t-esc="sub.label" />
+                <code class="ms-1" t-esc="sub.comodel" />
+            </div>
         </div>
         <div
             t-elif="block.tag === 'notebook'"
@@ -596,6 +607,16 @@
                             Access rights
                         </button>
                         <button
+                            class="btn btn-sm o_erplibre_studio_apps_toggle"
+                            t-att-class="state.panel === 'apps' ? 'btn-primary' : 'btn-secondary'"
+                            title="The apps of the project and the groups of their users"
+                            t-att-disabled="state.busy"
+                            t-on-click="() => this.togglePanel('apps')"
+                        >
+                            <i class="fa fa-th-large" />
+                            Apps and groups
+                        </button>
+                        <button
                             class="btn btn-sm o_erplibre_studio_rules_toggle"
                             t-att-class="state.panel === 'rules' ? 'btn-primary' : 'btn-secondary'"
                             title="The record rules of the project"
@@ -607,9 +628,9 @@
                         </button>
                         <button
                             class="btn btn-sm o_erplibre_studio_preview_toggle"
-                            t-att-class="state.preview ? 'btn-primary' : 'btn-secondary'"
-                            title="Show the view as its editor sees the draft"
-                            t-att-disabled="state.panel"
+                            t-att-class="state.preview or state.panel === 'preview' ? 'btn-primary' : 'btn-secondary'"
+                            t-att-title="data.view and data.view.pending ? pendingPreviewTitle : draftPreviewTitle"
+                            t-att-disabled="state.busy or (state.panel and state.panel !== 'preview')"
                             t-on-click="togglePreview"
                         >
                             <i class="fa fa-eye" />
@@ -636,9 +657,17 @@
                             class="btn btn-sm btn-primary o_erplibre_studio_apply"
                             t-att-disabled="state.busy or project.state !== 'draft' or !project.item_count"
                             title="Create the models, fields, views, menus and rights in the database"
-                            t-on-click="() => this.projectAction('action_apply')"
+                            t-on-click="applyProject"
                         >
                             Apply
+                        </button>
+                        <button
+                            class="btn btn-sm btn-outline-danger o_erplibre_studio_revert"
+                            t-att-disabled="state.busy or !canRevert"
+                            title="Remove from the database everything the project created, once confirmed"
+                            t-on-click="revertProject"
+                        >
+                            Revert
                         </button>
                         <button
                             class="btn btn-sm btn-secondary o_erplibre_studio_open_project"

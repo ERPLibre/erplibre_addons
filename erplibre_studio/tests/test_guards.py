@@ -57,6 +57,20 @@ class TestGuards(StudioCase):
             lambda: editor.remove_rule(project_id, 0, "res.partner", False, "list"),
             lambda: editor.check_rule_domain(project_id, "res.partner", "[]"),
             lambda: editor.get_access_existing(project_id, "res.partner"),
+            lambda: editor.save_app(
+                project_id, {"name": "Guard"}, "res.partner", False, "list"
+            ),
+            lambda: editor.remove_app(project_id, 0, "res.partner", False, "list"),
+            lambda: editor.save_group(
+                project_id, {"name": "Guard"}, "res.partner", False, "list"
+            ),
+            lambda: editor.remove_group(project_id, 0, "res.partner", False, "list"),
+            lambda: editor.get_relation_choices(
+                project_id, "res.partner", "res.partner.category", "many2many"
+            ),
+            lambda: editor.get_revert_report(project_id),
+            lambda: editor.get_apply_report(project_id),
+            lambda: editor.get_model_preview(project_id, 0, "form"),
         ]
 
     def test_settings_administrator_runs_the_editor(self):
@@ -118,6 +132,7 @@ class TestGuards(StudioCase):
                 "name": "Guard rule",
                 "model": "x_studio_test_guard",
                 "domain": "[('create_uid', '=', user.id)]",
+                "global_rule": True,
                 "perm_read": True,
             },
             "res.partner",
@@ -144,6 +159,7 @@ class TestGuards(StudioCase):
             False,
             "list",
             self.project.draft_revision,
+            digest=editor.get_revert_report(self.project.id)["digest"],
         )
         self.assertNotIn("x_studio_test_guard", self.env)
 
@@ -203,3 +219,55 @@ class TestGuards(StudioCase):
                 with self.assertRaisesRegex(UserError, "developer mode"):
                     record.unlink()
         self.assertTrue(line.exists() and access.exists() and rule.exists())
+
+    def test_changes_need_the_developer_mode(self):
+        """The changes of a project, written through the ORM, under the
+        guard of the editor; server code in sudo skips it."""
+        change = self.project.change_ids
+        vals = {
+            "project_id": self.project.id,
+            "change_type": "hide",
+            "model": "res.partner",
+            "view_id": self.list.id,
+            "view_type": "list",
+            "xpath": "//field[@name='email']",
+            "position": "attributes",
+            "payload": '{"value": true}',
+        }
+        Change = self.env["erplibre.studio.change"]
+        with self.assertRaises(AccessError):
+            Change.with_user(self.user).create(vals)
+        self._debug = False
+        admin = self.env.ref("base.user_admin")
+        with self.assertRaisesRegex(UserError, "developer mode"):
+            Change.with_user(admin).create(vals)
+        with self.assertRaisesRegex(UserError, "developer mode"):
+            change.with_user(admin).write({"sequence": 5})
+        with self.assertRaisesRegex(UserError, "developer mode"):
+            change.with_user(admin).unlink()
+        self.assertTrue(change.exists())
+        created = Change.with_user(admin).sudo().create(vals)
+        created.with_user(admin).sudo().unlink()
+        self.assertFalse(created.exists())
+
+    def test_the_project_needs_the_developer_mode(self):
+        """Deleting a project, renaming its module or writing its lines from
+        the project record are changes of the draft as well: under the guard
+        of the editor; its plain fields are not."""
+        self._debug = False
+        admin = self.env.ref("base.user_admin")
+        project = self.project.with_user(admin)
+        project.write({"name": "Studio test guard renamed"})
+        for vals in (
+            {"module_name": "studio_test_guard_renamed"},
+            {"change_ids": [(5, 0, 0)]},
+            {"group_line_ids": [(5, 0, 0)]},
+        ):
+            with self.subTest(vals=vals), self.assertRaisesRegex(
+                UserError, "developer mode"
+            ):
+                project.write(vals)
+        with self.assertRaisesRegex(UserError, "developer mode"):
+            project.unlink()
+        self.assertEqual(self.project.module_name, "studio_test_guard")
+        self.assertTrue(self.project.change_ids)

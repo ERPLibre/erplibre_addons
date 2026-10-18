@@ -64,7 +64,8 @@ class TestEditorModels(StudioCase):
             (MODEL, "Studio test task", False, {}, "app"),
         )
         project = data["project"]
-        self.assertEqual(project["item_count"], 2)
+        # The model, its access row and the app it made.
+        self.assertEqual(project["item_count"], 3)
         self.assertEqual(project["app"], {"name": "Studio test task", "icon": False})
         self.assertEqual(
             project["access"],
@@ -262,7 +263,8 @@ class TestEditorModels(StudioCase):
     def test_action_that_removes_the_model_on_screen(self):
         """Apply or Revert from the form of a model of the project, which
         the action removes: the payload of the view the editor was opened
-        on, else no view."""
+        on; once reverted, the form of the model waiting for Apply; without
+        the model line, no view."""
         data = self.create_task()
         data = self.call("project_action", "action_apply")
         form_id = data["project"]["models"][0]["views"]["form"]
@@ -286,14 +288,20 @@ class TestEditorModels(StudioCase):
         self.assertNotIn(MODEL, self.env)
         self.assertTrue(data["view_changed"])
         self.assertEqual((data["model"], data["view_type"]), ("res.partner", "form"))
-        # Revert, without a view to go back to.
+        # Revert: the model waits for Apply again, its form is the one of a
+        # model not created yet.
         data = self.create_task()
         data = self.call("project_action", "action_apply")
         form_id = data["project"]["models"][0]["views"]["form"]
         data = on_form("project_action", "action_revert", fallback=[MODEL, form_id])
         self.assertNotIn(MODEL, self.env)
-        self.assertTrue(data["view_gone"])
+        self.assertTrue(data["view_changed"])
+        self.assertTrue(data["view"]["pending"])
         self.assertEqual(data["project"]["id"], self.project.id)
+        # Without the model line either, no view is left.
+        self.project._studio_remove_model(self.project.new_model_ids)
+        data = self.Editor._fallback_data(self.project, [MODEL, False, "form"])
+        self.assertTrue(data["view_gone"])
 
     def test_check_of_a_domain_keeps_the_draft(self):
         """A check reads: it neither opens the project for the user nor

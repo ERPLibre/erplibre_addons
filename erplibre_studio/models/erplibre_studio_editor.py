@@ -1,16 +1,18 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 from .. import arch as studio_arch
 from .erplibre_studio_project import (
     NEW_FIELD_TYPES,
+    PENDING_VIEW_OPERATIONS,
     PERMS,
     PREVIEW_KEY,
     protected_model,
 )
+from .studio_pending import is_pending_view, pending_view
 
 FIELD_ATTRIBUTES = [
     "string",
@@ -32,7 +34,13 @@ PROJECT_ACTIONS = (
     "action_discard",
     "action_revert",
     "action_undo",
+    "action_approve",
+    "action_unapprove",
 )
+# The actions that remove from the database what the user confirmed.
+DIGEST_ACTIONS = ("action_apply", "action_revert")
+# The modes of the preview of a model not created yet.
+PREVIEW_MODES = ("simulation", "real")
 
 
 class ErplibreStudioEditor(models.AbstractModel):
@@ -48,15 +56,27 @@ class ErplibreStudioEditor(models.AbstractModel):
         self.env["erplibre.developer"]._check_panel_access()
 
     @api.model
-    def _resolve_view(self, model, view_id, view_type):
+    def _resolve_view(self, model, view_id, view_type, project=None):
         """The primary view the editor inherits: ``view_id``, or the default
-        view of ``model`` for ``view_type``."""
-        if view_type not in self.env["erplibre.studio.project"]._view_types():
+        view of ``model`` for ``view_type``; for a model of ``project`` not
+        created yet, its pending default view (``StudioPendingView``)."""
+        Project = self.env["erplibre.studio.project"]
+        if view_type not in Project._view_types():
             raise UserError(
                 self.env._("The studio does not edit %(type)s views.", type=view_type)
             )
         if model not in self.env:
-            raise UserError(self.env._("Unknown model %(model)s.", model=model))
+            line = project._studio_pending_line(model) if project else None
+            if not line:
+                raise UserError(self.env._("Unknown model %(model)s.", model=model))
+            if view_type not in studio_arch.MODEL_VIEW_TYPES:
+                raise UserError(
+                    self.env._(
+                        "Apply the model first: %(type)s needs its records.",
+                        type=view_type,
+                    )
+                )
+            return pending_view(line, view_type)
         View = self.env["ir.ui.view"].sudo()
         view = View.browse(int(view_id)).exists() if view_id else View
         if not view:
@@ -77,6 +97,16 @@ class ErplibreStudioEditor(models.AbstractModel):
                 )
             )
         return view
+
+    @api.model
+    def _read_project(self, project_id):
+        """The project ``project_id`` as a read sees it: not opened, its
+        editor and its revision unchanged."""
+        Project = self.env["erplibre.studio.project"]
+        project = Project.browse(int(project_id or 0)).exists()
+        if not project:
+            raise UserError(self.env._("Choose or create a studio project first."))
+        return project
 
     @api.model
     def _project(self, project_id, pick_project=True, model=None):
@@ -107,9 +137,12 @@ class ErplibreStudioEditor(models.AbstractModel):
         action_id=False,
         project_id=False,
     ):
-        """The client action of the editor on a view."""
+        """The client action of the editor on a view; on the default view of
+        a model of the project ``project_id`` not created yet."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
+        Project = self.env["erplibre.studio.project"]
+        project = Project.browse(int(project_id or 0)).exists()
+        view = self._resolve_view(model, view_id, view_type, project)
         return {
             "type": "ir.actions.client",
             "tag": "erplibre_studio.editor",
@@ -126,12 +159,22 @@ class ErplibreStudioEditor(models.AbstractModel):
 
     @api.model
     def _fields_payload(self, model, project):
-        Model = self.env[model]
-        info = Model.fields_get(attributes=FIELD_ATTRIBUTES)
-        for change in project._project_field_changes(model) if project else []:
-            definition = change._payload().get("field") or {}
+        """The fields of ``model`` (simulated for a model of the project not
+        created yet) with the new fields of the project on it, flagged
+        ``project``, ``pending`` until Apply creates them, and their
+        ``definition``."""
+        line = project._studio_pending_line(model) if project else None
+        if line:
+            info = project._studio_simulated_fields(line)
+            names = set()
+        else:
+            Model = self.env[model]
+            info = Model.fields_get(attributes=FIELD_ATTRIBUTES)
+            names = set(Model._fields)
+        definitions = project._studio_field_definitions(model) if project else {}
+        for name, (definition, _change) in definitions.items():
             entry = info.setdefault(
-                change.field_name,
+                name,
                 {
                     "string": definition.get("field_description"),
                     "type": definition.get("ttype"),
@@ -149,7 +192,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                 },
             )
             entry["project"] = True
-            entry["pending"] = change.field_name not in Model._fields
+            entry["pending"] = name not in names
             entry["definition"] = definition
         return info
 
@@ -290,9 +333,9 @@ class ErplibreStudioEditor(models.AbstractModel):
         and what its view type allows (operations, attributes, layout).
         ``pick_project``: see ``_project``."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
-        project = self._project(project_id, pick_project, model)
         Project = self.env["erplibre.studio.project"]
+        project = self._project(project_id, pick_project, model)
+        view = self._resolve_view(model, view_id, view_type, project)
         if project:
             arch, errors = project._draft_arch(view)
         else:
@@ -310,21 +353,35 @@ class ErplibreStudioEditor(models.AbstractModel):
                         "error": errors.get(change.id) or False,
                     }
                 )
-        Model = self.env[model]
-        sample = Model.search([], limit=1).id if view.type == "form" else False
+        pending = is_pending_view(view)
+        if pending:
+            sample = False
+            model_name = view.line.name
+            view_types = list(studio_arch.MODEL_VIEW_TYPES)
+        else:
+            Model = self.env[model]
+            sample = Model.search([], limit=1).id if view.type == "form" else False
+            model_name = self.env["ir.model"]._get(model).name
+            view_types = list(Project._view_types())
         return {
             "model": model,
-            "model_name": self.env["ir.model"]._get(model).name,
+            "model_name": model_name,
             "view_type": view.type,
-            "view_types": list(Project._view_types()),
+            "view_types": view_types,
             "view": {
                 "id": view.id,
                 "name": view.name,
                 "xml_id": view.xml_id or False,
+                "pending": pending,
+                "model_line_id": view.line.id if pending else False,
             },
             "blocks": studio_arch.arch_blocks(arch, view.type, fields_info),
             "layout": self._layout(view.type, arch),
-            "operations": list(studio_arch.VIEW_OPERATIONS[view.type]),
+            "operations": [
+                op
+                for op in studio_arch.VIEW_OPERATIONS[view.type]
+                if not pending or op in PENDING_VIEW_OPERATIONS.get(view.type, ())
+            ],
             "hide_mode": studio_arch.hide_mode(view.type),
             "settable": studio_arch.SETTABLE_ATTRIBUTES.get(view.type, {}),
             "required_attributes": {
@@ -356,8 +413,12 @@ class ErplibreStudioEditor(models.AbstractModel):
     @api.model
     def _project_payload(self, project):
         """The project as the editor shows it; ``state_label`` is the label
-        of its state in the language of the user."""
+        of its state in the language of the user. ``app`` is its first app,
+        for an editor of a single app."""
         states = dict(project._fields["state"]._description_selection(self.env))
+        first = project.app_ids[:1]
+        pending_models = project.new_model_ids.filtered(lambda m: not m.applied)
+        approver = project.approved_uid
         return {
             "id": project.id,
             "name": project.name,
@@ -370,10 +431,10 @@ class ErplibreStudioEditor(models.AbstractModel):
             "item_count": project.item_count,
             "applied": bool(project.applied_snapshot),
             "app": (
-                {"name": project.app_name, "icon": project.app_icon or False}
-                if project.app_name
-                else False
+                {"name": first.name, "icon": first.icon or False} if first else False
             ),
+            "apps": [self._app_payload(app) for app in project.app_ids],
+            "groups": [self._group_payload(group) for group in project.group_line_ids],
             "models": [self._model_payload(line) for line in project.new_model_ids],
             # The menus Apply made, as the web client shows them: when they
             # change, the editor reloads the menus of the web client.
@@ -381,44 +442,105 @@ class ErplibreStudioEditor(models.AbstractModel):
                 [menu.id, menu.name, menu.web_icon or False, menu.parent_id.id]
                 for menu in project.created_menu_ids.sudo().sorted("id")
             ],
-            "access": [
-                {
-                    "id": line.id,
-                    "model": line.model,
-                    "group": [line.group_id.id, line.group_id.full_name],
-                    **{perm: line[perm] for perm in PERMS},
-                }
-                for line in project.access_line_ids
+            "access": [self._access_payload(line) for line in project.access_line_ids],
+            "rules": [self._rule_payload(rule) for rule in project.rule_line_ids],
+            "approved": project.approved,
+            "approved_by": [approver.id, approver.name] if approver else False,
+            "approved_date": (
+                fields.Datetime.to_string(project.approved_date)
+                if project.approved_date
+                else False
+            ),
+            "real_preview_available": bool(project.approved and pending_models),
+        }
+
+    @api.model
+    def _app_payload(self, app):
+        return {
+            "id": app.id,
+            "name": app.name,
+            "icon": app.icon or False,
+            "xml_name": app.xml_name,
+            "menu_sequence": app.menu_sequence,
+            "sequence": app.sequence,
+            "applied": app.applied,
+            "models": app.model_line_ids.ids,
+            "groups": app.group_line_ids.ids,
+            "chain": app._studio_chain(),
+        }
+
+    @api.model
+    def _group_payload(self, group):
+        return {
+            "id": group.id,
+            "app_id": group.app_id.id,
+            "name": group.name,
+            "xml_name": group.xml_name,
+            "comment": group.comment or "",
+            "implied": [[g.id, g.name] for g in group.implied_line_ids],
+            "implied_groups": [
+                [g.id, g.full_name] for g in group.implied_group_ids.sudo()
             ],
-            "rules": [
-                {
-                    "id": rule.id,
-                    "name": rule.name,
-                    "model": rule.model,
-                    "domain": rule.domain_force,
-                    "groups": [[g.id, g.full_name] for g in rule.group_ids],
-                    **{perm: rule[perm] for perm in PERMS},
-                }
-                for rule in project.rule_line_ids
+            "missing_implied": group._studio_missing_implied_refs(),
+            "applied": group.applied,
+        }
+
+    @api.model
+    def _access_payload(self, line):
+        item = {
+            "id": line.id,
+            "model": line.model,
+            "group": (
+                [line.group_id.id, line.group_id.full_name] if line.group_id else False
+            ),
+            **{perm: line[perm] for perm in PERMS},
+        }
+        if line.group_line_id:
+            group = line.group_line_id
+            item["group_line"] = [group.id, f"{group.app_id.name} / {group.name}"]
+        return item
+
+    @api.model
+    def _rule_payload(self, rule):
+        return {
+            "id": rule.id,
+            "name": rule.name,
+            "model": rule.model,
+            "domain": rule.domain_force,
+            "groups": [[g.id, g.full_name] for g in rule.group_ids],
+            "group_lines": [
+                [g.id, f"{g.app_id.name} / {g.name}"] for g in rule.group_line_ids
             ],
+            "global_rule": rule.global_rule,
+            "missing_groups": rule._studio_missing_group_refs(),
+            **{perm: rule[perm] for perm in PERMS},
         }
 
     @api.model
     def _model_payload(self, line):
         """A model line as the editor shows it; ``views`` holds the ids of
-        its default views once applied."""
+        its default views once applied; ``pending_views`` says which default
+        views hold changes recorded before Apply."""
         views = line._studio_views() if line.applied else {}
         parent = line.menu_parent_id
+        changes = line.project_id.change_ids.filtered(lambda c: c.model_line_id == line)
         return {
             "id": line.id,
             "model": line.model,
             "name": line.name,
             "chatter": line.chatter,
             "menu_mode": line.menu_mode,
+            "app_id": line.app_id.id,
             "menu_parent": [parent.id, parent.complete_name] if parent else False,
             "menu_name": line.menu_name or "",
             "applied": line.applied,
             "views": {view_type: view.id for view_type, view in views.items()},
+            "pending_views": {
+                view_type: bool(
+                    changes.filtered(lambda c, t=view_type: c.view_type == t)
+                )
+                for view_type in studio_arch.MODEL_VIEW_TYPES
+            },
         }
 
     @api.model
@@ -454,8 +576,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         """Record ``operation`` on the draft; return the new payload.
         ``revision``: see ``_edited_project``."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         project._apply_operation(view, operation or {})
         return self.get_editor_data(model, view.id, view_type, project.id)
 
@@ -469,25 +591,37 @@ class ErplibreStudioEditor(models.AbstractModel):
         view_type,
         revision=None,
         fallback=None,
+        digest=None,
     ):
-        """Run ``action`` (apply, discard, revert, undo) on the project;
-        return the new payload, with the ``notice`` of the action when it
-        answered a notification. When the action removed the model or the
-        view on screen (a model of the project), the payload is the one of
-        ``fallback`` ([model, view id, view type], the view the editor was
-        opened on) with ``view_changed``; without such a view left, only
-        {view_gone, project, notice}."""
+        """Run ``action`` (apply, discard, revert, undo, approve, unapprove)
+        on the project; return the new payload, with the ``notice`` of the
+        action when it answered a notification. ``digest``: the digest of
+        the report the user confirmed, for Apply and Revert. When the action
+        removed the model or the view on screen (a model of the project),
+        the payload is the one of ``fallback`` ([model, view id, view type],
+        the view the editor was opened on) with ``view_changed``; without
+        such a view left, only {view_gone, project, notice}. A view of a
+        model not created yet that Apply created is answered as the view it
+        became."""
         self._check_studio_access()
         if action not in PROJECT_ACTIONS:
             raise UserError(self.env._("Unknown action %(action)s.", action=action))
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         if action == "action_undo":
             result = project.action_undo(view)
+        elif action in DIGEST_ACTIONS:
+            result = getattr(project, action)(digest=digest)
         else:
             result = getattr(project, action)()
-        if model in self.env and view.exists():
-            data = self.get_editor_data(model, view.id, view_type, project.id)
+        if is_pending_view(view):
+            alive = model in self.env or bool(project._studio_pending_line(model))
+            view_id = False
+        else:
+            alive = model in self.env and bool(view.exists())
+            view_id = view.id
+        if alive:
+            data = self.get_editor_data(model, view_id, view_type, project.id)
         else:
             data = self._fallback_data(project, fallback)
         if isinstance(result, dict) and result.get("tag") == "display_notification":
@@ -500,7 +634,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         flagged ``view_changed``, or {view_gone, project} when it is gone
         too."""
         model, view_id, view_type = (list(fallback or []) + [False] * 3)[:3]
-        if model and model in self.env:
+        if model and (model in self.env or project._studio_pending_line(model)):
             try:
                 data = self.get_editor_data(
                     model, view_id, view_type or "form", project.id
@@ -546,9 +680,11 @@ class ErplibreStudioEditor(models.AbstractModel):
     def get_studio_choices(self, project_id=False):
         """What the dialogs of the models, the access grid and the rules
         offer: the menus a model can go under (with an external id, no
-        action, outside the project), the groups (with an external id), the
-        icons of an app, the models rights can name, and the model names a
-        new model cannot take (``taken_models``)."""
+        action, outside the project), the groups (with an external id; then
+        the groups of the project, ``project`` true, by ``line_id``), the
+        apps of the project and the icons of an app, the models rights can
+        name, and the model names a new model cannot take
+        (``taken_models``)."""
         self._check_studio_access()
         Project = self.env["erplibre.studio.project"]
         project = Project.browse(int(project_id)).exists() if project_id else Project
@@ -581,11 +717,30 @@ class ErplibreStudioEditor(models.AbstractModel):
                         "name": group.full_name,
                         "xml_id": group_xmlids[group.id],
                     }
-                    for group in groups
+                    for group in groups - project.created_group_ids
                     if group_xmlids.get(group.id)
                 ),
                 key=lambda g: g["name"].lower(),
-            ),
+            )
+            + [
+                {
+                    "id": False,
+                    "line_id": line.id,
+                    "name": f"{line.app_id.name} / {line.name}",
+                    "xml_id": f"{project.module_name}.{line.xml_name}",
+                    "project": True,
+                }
+                for line in project.group_line_ids
+            ],
+            "apps": [
+                {
+                    "id": app.id,
+                    "name": app.name,
+                    "icon": app.icon or False,
+                    "xml_name": app.xml_name,
+                }
+                for app in project.app_ids
+            ],
             "models": [
                 item for item in self._registry_models() if not protected_model(item[0])
             ]
@@ -606,8 +761,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         """Add a model to the project (see ``_studio_create_model``); the
         payload of the current view, with ``created_model``."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         line = project._studio_create_model(values or {})
         return self._answer(
             project,
@@ -622,8 +777,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         self, project_id, line_id, values, model, view_id, view_type, revision=None
     ):
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         project._studio_update_model(project._studio_model_line(line_id), values or {})
         return self._answer(project, model, view.id, view_type)
 
@@ -632,17 +787,18 @@ class ErplibreStudioEditor(models.AbstractModel):
         self, project_id, line_id, model, view_id, view_type, revision=None
     ):
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         project._studio_remove_model(project._studio_model_line(line_id))
         return self._answer(project, model, view.id, view_type)
 
     @api.model
     def update_app(self, project_id, values, model, view_id, view_type, revision=None):
-        """Rename the app of the project or change its icon."""
+        """Rename the first app of the project or change its icon (an editor
+        of a single app); ``save_app`` edits any app."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         project._studio_update_app(values or {})
         return self._answer(project, model, view.id, view_type)
 
@@ -650,8 +806,8 @@ class ErplibreStudioEditor(models.AbstractModel):
     def set_access(self, project_id, rows, model, view_id, view_type, revision=None):
         """Replace the access rows of the project (``_studio_set_access``)."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         project._studio_set_access(rows or [])
         return self._answer(project, model, view.id, view_type)
 
@@ -659,8 +815,8 @@ class ErplibreStudioEditor(models.AbstractModel):
     def save_rule(self, project_id, rule, model, view_id, view_type, revision=None):
         """Create or update a rule of the project (``_studio_save_rule``)."""
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         line = project._studio_save_rule(rule or {})
         return self._answer(project, model, view.id, view_type, saved_rule=line.id)
 
@@ -669,8 +825,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         self, project_id, rule_id, model, view_id, view_type, revision=None
     ):
         self._check_studio_access()
-        view = self._resolve_view(model, view_id, view_type)
         project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
         project._studio_remove_rule(project._studio_rule_line(rule_id))
         return self._answer(project, model, view.id, view_type)
 
@@ -722,3 +878,144 @@ class ErplibreStudioEditor(models.AbstractModel):
             }
             for row in rows
         ]
+
+    # ── apps and groups ─────────────────────────────────────────────────
+
+    @api.model
+    def save_app(self, project_id, values, model, view_id, view_type, revision=None):
+        """Create or update an app of the project (``_studio_save_app``); the
+        payload with ``saved_app``."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
+        app = project._studio_save_app(values or {})
+        return self._answer(project, model, view.id, view_type, saved_app=app.id)
+
+    @api.model
+    def remove_app(self, project_id, app_id, model, view_id, view_type, revision=None):
+        """Remove an app of the project: refused while a model or a group
+        goes in it."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
+        project._studio_remove_app(project._studio_app_line(app_id))
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def save_group(self, project_id, values, model, view_id, view_type, revision=None):
+        """Create or update a group of the project (``_studio_save_group``);
+        the payload with ``saved_group``."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
+        group = project._studio_save_group(values or {})
+        return self._answer(project, model, view.id, view_type, saved_group=group.id)
+
+    @api.model
+    def remove_group(
+        self, project_id, group_id, model, view_id, view_type, revision=None
+    ):
+        """Remove a group of the project with its access rows; the rules and
+        the groups that named it lose it."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
+        project._studio_remove_group(project._studio_group_line(group_id))
+        return self._answer(project, model, view.id, view_type)
+
+    # ── relations ───────────────────────────────────────────────────────
+
+    @api.model
+    def get_relation_choices(
+        self, project_id, model, comodel, ttype="one2many", label=None
+    ):
+        """What the dialog of a new one2many or many2many of ``model`` to
+        ``comodel`` offers: {inverses: [{name, label, pending}],
+        inverse_name, inverse_label, on_delete, protected} for a one2many
+        (the inverse many2one to choose, else the one the studio creates),
+        {relation_table, column1, column2} for a many2many labelled
+        ``label``. A read."""
+        self._check_studio_access()
+        project = self._read_project(project_id)
+        known = model in self.env or project._studio_pending_line(model)
+        if not known:
+            raise UserError(self.env._("Unknown model %(model)s.", model=model))
+        comodel = project._clean_relation({"relation": comodel})
+        if ttype == "many2many":
+            table, column1, column2 = studio_arch.many2many_names(
+                project.module_name,
+                model,
+                comodel,
+                project._studio_proposed_field_name(model, comodel, label),
+                project._studio_relation_table_names(),
+            )
+            return {
+                "relation_table": table,
+                "column1": column1,
+                "column2": column2,
+            }
+        name, label = project._studio_proposed_inverse(model, comodel)
+        return {
+            "inverses": project._studio_inverse_choices(model, comodel),
+            "inverse_name": name,
+            "inverse_label": label,
+            "on_delete": (
+                "cascade" if comodel in project._studio_new_models() else "set null"
+            ),
+            "protected": protected_model(comodel),
+        }
+
+    # ── confirmations ───────────────────────────────────────────────────
+
+    @api.model
+    def get_revert_report(self, project_id):
+        """{report, digest, refused}: what Revert removes, the digest Revert
+        then asks, and why it is refused (or False). A read."""
+        self._check_studio_access()
+        return self._read_project(project_id)._studio_revert_report()
+
+    @api.model
+    def get_apply_report(self, project_id):
+        """{report, digest, confirm}: what Apply removes; ``confirm`` when it
+        holds records, values or group members, and Apply then asks the
+        digest. A read."""
+        self._check_studio_access()
+        return self._read_project(project_id)._studio_apply_report()
+
+    # ── preview of a model not created yet ──────────────────────────────
+
+    @api.model
+    def get_model_preview(
+        self, project_id, line_id, view_type="form", mode="simulation"
+    ):
+        """The preview of the model line ``line_id``, not created yet, in the
+        shape of get_views: « simulation » computes it from the draft and
+        writes nothing; « real », once the project is approved, renders it
+        from the model created in a savepoint, then rolled back. Not a
+        readonly call: the real mode needs a cursor that writes."""
+        self._check_studio_access()
+        if mode not in PREVIEW_MODES:
+            raise UserError(self.env._("Unknown preview mode %(mode)s.", mode=mode))
+        if view_type not in studio_arch.MODEL_VIEW_TYPES:
+            raise UserError(
+                self.env._(
+                    "Apply the model first: %(type)s needs its records.",
+                    type=view_type,
+                )
+            )
+        project = self._read_project(project_id)
+        line = project._studio_model_line(line_id)
+        if line.applied:
+            raise UserError(
+                self.env._(
+                    "The model %(model)s exists: its preview is the one of its "
+                    "views.",
+                    model=line.model,
+                )
+            )
+        if mode == "real":
+            data = project._studio_real_views(line)
+        else:
+            data = project._studio_simulated_views(line)
+        data["view_type"] = view_type
+        return data

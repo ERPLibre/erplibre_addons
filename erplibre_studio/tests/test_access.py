@@ -212,7 +212,8 @@ class TestAccess(StudioCase):
         self.project._studio_set_access(
             [self.row(model="res.partner.category", group=self.system, perm_read=True)]
         )
-        self.assertEqual(self.project.item_count, 1)
+        # The row, and the app the removed model made.
+        self.assertEqual(self.project.item_count, 2)
         self.project.action_apply()
         self.assertEqual(self.project.state, "applied")
         self.assertTrue(self.access("access_res_partner_category_base_group_system"))

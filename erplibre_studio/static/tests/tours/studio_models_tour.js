@@ -11,8 +11,8 @@ const UNLINK =
 
 // From the contact list: a new project, a new model in a new app with the
 // icon of base, Apply and open its form, a text field dropped into it, the
-// right to delete taken from the internal users, a record rule checked and
-// saved, then Apply. Back on the contacts, the new app is in the home menu
+// right to delete taken from the internal users, a record rule of the
+// internal users checked and saved, then Apply. Back on the contacts, the new app is in the home menu
 // without a reload of the page.
 registry.category("web_tour.tours").add("erplibre_studio_models", {
     steps: () => [
@@ -47,6 +47,9 @@ registry.category("web_tour.tours").add("erplibre_studio_models", {
         {trigger: ".o_erplibre_studio_rule_domain", run: "edit [('create_uid', '=', user.id)]"},
         {trigger: ".o_erplibre_studio_check_rule", run: "click"},
         {trigger: ".o_erplibre_studio_rule_check[data-ok='1']"},
+        // A rule names its groups: Apply refuses a rule without a group.
+        {trigger: ".o_erplibre_studio_rule_add_group", run: "selectByLabel Internal User"},
+        {trigger: ".o_erplibre_studio_rule_group"},
         {trigger: ".o_erplibre_studio_save_rule", run: "click"},
         {trigger: ".o_erplibre_studio_rule:contains(Tour own items)"},
         {trigger: ".o_erplibre_studio_state[data-state=draft]"},

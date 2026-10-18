@@ -15,3 +15,13 @@ form says so where the generation buttons would be.
 Timeline views are edited once *web_timeline* (OCA/web) is installed:
 the studio reads the view types of the database and offers *timeline*
 only when that module adds it; this module does not depend on it.
+
+The real preview of a model not created yet, once approved, creates the
+model inside a savepoint of the database and rolls it back: while it
+renders, the writers of the users table and of the tables the new models
+point to wait, at most its lock timeout (2 s) per lock and its statement
+timeout (15 s) per statement. One real preview runs at a time in a
+process. On a threaded server (`--workers 0`), the other requests of the
+process share its registry and may see the temporary model for that
+time; with workers, each one has its own. The simulation, the default,
+writes nothing.

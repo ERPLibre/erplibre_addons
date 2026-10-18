@@ -5,9 +5,10 @@ import json
 
 from lxml import etree
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 from .. import arch as studio_arch
-from .erplibre_studio_project import NO_TOUCH_KEY
+from .erplibre_studio_project import NO_TOUCH_KEY, check_studio_write
 
 CHANGE_TYPES = [
     ("add_field", "Add a new field"),
@@ -56,9 +57,16 @@ class ErplibreStudioChange(models.Model):
     view_id = fields.Many2one(
         "ir.ui.view",
         string="View",
-        required=True,
         ondelete="cascade",
         help="The primary view the change inherits.",
+    )
+    model_line_id = fields.Many2one(
+        "erplibre.studio.model",
+        string="Model not created yet",
+        ondelete="cascade",
+        index=True,
+        help="The model line whose default view the change is on, before "
+        "Apply creates the model: Apply then binds the change to the view.",
     )
     view_type = fields.Selection(VIEW_TYPES, required=True)
     xpath = fields.Char(string="Node path", required=True)
@@ -93,21 +101,53 @@ class ErplibreStudioChange(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        check_studio_write(self.env)
         changes = super().create(vals_list)
         self._touch_projects(changes.project_id)
         return changes
 
     def write(self, vals):
+        check_studio_write(self.env)
         projects = self.project_id
         res = super().write(vals)
         self._touch_projects(projects | self.project_id)
         return res
 
     def unlink(self):
+        check_studio_write(self.env)
         projects = self.project_id
         res = super().unlink()
         self._touch_projects(projects)
         return res
+
+    @api.constrains("view_id", "model_line_id")
+    def _check_change_target(self):
+        for change in self:
+            if bool(change.view_id) == bool(change.model_line_id):
+                raise ValidationError(
+                    self.env._(
+                        "A change is on a view, or on the default view of a model "
+                        "not created yet: one of them."
+                    )
+                )
+            line = change.model_line_id
+            if line and (
+                line.project_id != change.project_id
+                or change.view_type not in studio_arch.MODEL_VIEW_TYPES
+            ):
+                raise ValidationError(
+                    self.env._(
+                        "A change of a model not created yet is on its form, list "
+                        "or search view, in its project."
+                    )
+                )
+
+    def _studio_view_label(self):
+        """The name of the view of the change, for a message."""
+        self.ensure_one()
+        if self.view_id:
+            return self.view_id.sudo().name
+        return f"{self.model}.{self.view_type}"
 
     @api.depends("payload")
     def _compute_field_name(self):
@@ -139,18 +179,21 @@ class ErplibreStudioChange(models.Model):
     def _snapshot(self):
         """The fields that define the change, to compare two states of a
         project."""
-        return [
-            {
-                "type": c.change_type,
-                "model": c.model,
-                "view_id": c.view_id.id,
-                "view_type": c.view_type,
-                "xpath": c.xpath,
-                "position": c.position,
-                "payload": c._payload(),
+        items = []
+        for change in self.sorted(lambda c: (c.sequence, c.id)):
+            item = {
+                "type": change.change_type,
+                "model": change.model,
+                "view_id": change.view_id.id,
+                "view_type": change.view_type,
+                "xpath": change.xpath,
+                "position": change.position,
+                "payload": change._payload(),
             }
-            for c in self.sorted(lambda c: (c.sequence, c.id))
-        ]
+            if change.model_line_id:
+                item["model_line"] = change.model_line_id.model
+            items.append(item)
+        return items
 
     @api.depends("change_type", "xpath", "position", "payload", "view_type")
     def _compute_spec(self):

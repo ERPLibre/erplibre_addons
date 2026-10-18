@@ -55,40 +55,62 @@
                         t-att-checked="state.mode === 'app'"
                         t-on-change="() => this.setMode('app')"
                     />
-                    <label class="form-check-label" for="o_erplibre_studio_menu_app" t-esc="appLabel" />
+                    <label class="form-check-label" for="o_erplibre_studio_menu_app">In an app of the project</label>
                 </div>
-                <div t-if="state.mode === 'app' and editsApp" class="ms-4 mt-2 o_erplibre_studio_app_form">
-                    <label class="form-label mb-0" for="o_erplibre_studio_app_name">Name of the app</label>
-                    <input
-                        id="o_erplibre_studio_app_name"
-                        class="form-control form-control-sm mb-2 o_erplibre_studio_app_name"
-                        t-att-class="{'is-invalid': appNameMissing}"
-                        aria-required="true"
-                        t-att-aria-invalid="appNameMissing ? 'true' : 'false'"
-                        t-att-value="state.appName"
-                        t-on-input="(ev) => this.setAppName(ev.target.value)"
-                    />
-                    <div t-if="appNameMissing" class="invalid-feedback d-block mt-n2 mb-2">The app needs a name.</div>
-                    <div id="o_erplibre_studio_icons_label" class="form-label mb-1">Icon of the app</div>
-                    <div
-                        class="d-flex flex-wrap gap-1 o_erplibre_studio_icons"
-                        role="group"
-                        aria-labelledby="o_erplibre_studio_icons_label"
+                <div t-if="state.mode === 'app'" class="ms-4 mt-2 o_erplibre_studio_app_choice">
+                    <select
+                        class="form-select form-select-sm w-auto mb-2 o_erplibre_studio_model_app"
+                        aria-label="App of the model"
+                        t-on-change="(ev) => this.setApp(ev.target.value)"
                     >
-                        <button
-                            t-foreach="choices.icons or []"
-                            t-as="icon"
-                            t-key="icon.value"
-                            type="button"
-                            class="btn btn-light p-1 border o_erplibre_studio_icon"
-                            t-att-class="{'border-primary border-2 o_erplibre_studio_icon_selected': isIcon(icon.value)}"
-                            t-att-data-value="icon.value"
-                            t-att-title="icon.label"
-                            t-att-aria-pressed="isIcon(icon.value) ? 'true' : 'false'"
-                            t-on-click="() => this.setIcon(icon.value)"
+                        <option
+                            t-foreach="apps"
+                            t-as="app"
+                            t-key="app.id"
+                            t-att-value="app.id"
+                            t-att-selected="app.id === state.appId"
+                            t-esc="app.name"
+                        />
+                        <option value="new" t-att-selected="isNewApp">New app…</option>
+                    </select>
+                    <div t-if="isNewApp" class="o_erplibre_studio_app_form">
+                        <label class="form-label mb-0" for="o_erplibre_studio_app_name">Name of the app</label>
+                        <input
+                            id="o_erplibre_studio_app_name"
+                            class="form-control form-control-sm mb-2 o_erplibre_studio_app_name"
+                            t-att-class="{'is-invalid': appNameMissing}"
+                            aria-required="true"
+                            t-att-aria-invalid="appNameMissing ? 'true' : 'false'"
+                            t-att-value="state.appName"
+                            t-on-input="(ev) => this.setAppName(ev.target.value)"
+                        />
+                        <div t-if="appNameMissing" class="invalid-feedback d-block mt-n2 mb-2">
+                            The app needs a name.
+                        </div>
+                        <div id="o_erplibre_studio_icons_label" class="form-label mb-1">Icon of the app</div>
+                        <div
+                            class="d-flex flex-wrap gap-1 o_erplibre_studio_icons"
+                            role="group"
+                            aria-labelledby="o_erplibre_studio_icons_label"
                         >
-                            <img t-att-src="icon.url" t-att-alt="icon.label" width="40" height="40" />
-                        </button>
+                            <button
+                                t-foreach="choices.icons or []"
+                                t-as="icon"
+                                t-key="icon.value"
+                                type="button"
+                                class="btn btn-light p-1 border o_erplibre_studio_icon"
+                                t-att-class="{'border-primary border-2 o_erplibre_studio_icon_selected': isIcon(icon.value)}"
+                                t-att-data-value="icon.value"
+                                t-att-title="icon.label"
+                                t-att-aria-pressed="isIcon(icon.value) ? 'true' : 'false'"
+                                t-on-click="() => this.setIcon(icon.value)"
+                            >
+                                <img t-att-src="icon.url" t-att-alt="icon.label" width="40" height="40" />
+                            </button>
+                        </div>
+                    </div>
+                    <div t-else="" class="form-text mt-0">
+                        The name and the icon of an app change in « Apps and groups ».
                     </div>
                 </div>
                 <div class="form-check mt-2">
@@ -168,11 +190,6 @@
                     New model
                 </button>
             </div>
-            <div t-if="project.app" class="text-muted mb-1 o_erplibre_studio_app">
-                <i class="fa fa-th-large me-1" />
-                App:
-                <span t-esc="project.app.name" />
-            </div>
             <div t-if="!projectModels.length" class="text-muted o_erplibre_studio_no_model">No new model.</div>
             <div
                 t-foreach="projectModels"
@@ -194,21 +211,41 @@
                     </span>
                 </div>
                 <code class="d-block text-truncate" t-esc="line.model" />
+                <div class="text-muted text-truncate o_erplibre_studio_model_menu_place">
+                    <i class="fa fa-th-large me-1" />
+                    <t t-esc="menuPlace(line)" />
+                </div>
                 <div class="d-flex flex-wrap gap-1 mt-1">
-                    <t t-if="line.applied">
-                        <button
-                            t-foreach="['form', 'list', 'search']"
-                            t-as="type"
-                            t-key="type"
-                            class="btn btn-sm btn-secondary py-0 o_erplibre_studio_open_model"
-                            t-att-data-view-type="type"
-                            t-att-disabled="state.busy or !line.views[type]"
-                            t-on-click="() => this.openModel(line, type)"
-                            t-esc="viewTypeLabel(type)"
-                        />
-                    </t>
                     <button
-                        t-else=""
+                        t-foreach="['form', 'list', 'search']"
+                        t-as="type"
+                        t-key="type"
+                        class="btn btn-sm btn-secondary py-0 o_erplibre_studio_open_model"
+                        t-att-class="{'o_erplibre_studio_open_pending': !line.applied}"
+                        t-att-data-view-type="type"
+                        t-att-title="line.applied ? '' : pendingViewTitle"
+                        t-att-disabled="state.busy or (line.applied and !line.views[type])"
+                        t-on-click="() => this.openModel(line, type)"
+                    >
+                        <t t-esc="viewTypeLabel(type)" />
+                        <i
+                            t-if="!line.applied and line.pending_views and line.pending_views[type]"
+                            class="fa fa-circle ms-1 small o_erplibre_studio_pending_changes"
+                            title="Changes wait for Apply"
+                        />
+                    </button>
+                    <button
+                        t-if="!line.applied"
+                        class="btn btn-sm btn-secondary py-0 o_erplibre_studio_model_preview_open"
+                        title="Preview the model before Apply creates it: nothing is saved"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.openModelPreview(line, 'form')"
+                    >
+                        <i class="fa fa-eye" />
+                        Preview
+                    </button>
+                    <button
+                        t-if="!line.applied"
                         class="btn btn-sm btn-primary py-0 o_erplibre_studio_apply_open"
                         title="Apply the project, then edit the form of the model"
                         t-att-disabled="state.busy or project.state !== 'draft'"
@@ -279,14 +316,22 @@
                             t-as="row"
                             t-key="row.id"
                             class="o_erplibre_studio_access_row"
-                            t-att-data-group="row.group[0]"
+                            t-att-data-group="accessGroup(row)[0]"
                         >
-                            <td t-esc="row.group[1]" />
+                            <td>
+                                <t t-esc="accessGroup(row)[1]" />
+                                <span
+                                    t-if="row.group_line"
+                                    class="badge text-bg-primary ms-1 o_erplibre_studio_project_badge"
+                                >
+                                    project
+                                </span>
+                            </td>
                             <td t-foreach="perms" t-as="perm" t-key="perm" class="text-center">
                                 <input
                                     type="checkbox"
                                     class="form-check-input o_erplibre_studio_access_perm"
-                                    t-att-aria-label="permLabel(perm) + ' – ' + row.group[1]"
+                                    t-att-aria-label="permLabel(perm) + ' – ' + accessGroup(row)[1]"
                                     t-att-data-perm="perm"
                                     t-att-checked="row[perm]"
                                     t-att-disabled="state.busy"
@@ -350,13 +395,7 @@
                     t-model="state.accessAdd.group_id"
                 >
                     <option value="">Group…</option>
-                    <option
-                        t-foreach="choiceGroups"
-                        t-as="group"
-                        t-key="group.id"
-                        t-att-value="group.id"
-                        t-esc="group.name"
-                    />
+                    <t t-call="erplibre_studio.GroupOptions" />
                 </select>
                 <div t-foreach="perms" t-as="perm" t-key="perm" class="form-check form-check-inline mb-0">
                     <input
@@ -390,7 +429,7 @@
             <div class="d-flex align-items-center mb-2">
                 <h5 class="mb-0">Record rules</h5>
                 <span class="text-muted small ms-2">
-                    Which records the groups reach; a rule without group applies to every user.
+                    Which records the groups reach; a global rule applies to every user.
                 </span>
                 <button
                     class="btn btn-sm btn-secondary ms-auto o_erplibre_studio_new_rule"
@@ -430,6 +469,9 @@
                             <code t-esc="rule.model" />
                         </td>
                         <td>
+                            <span t-if="rule.global_rule" class="badge text-bg-info me-1 o_erplibre_studio_rule_global">
+                                Global: every user
+                            </span>
                             <span
                                 t-foreach="rule.groups"
                                 t-as="group"
@@ -437,7 +479,27 @@
                                 class="badge text-bg-light me-1"
                                 t-esc="group[1]"
                             />
-                            <span t-if="!rule.groups.length" class="text-muted small">Every user</span>
+                            <span
+                                t-foreach="rule.group_lines or []"
+                                t-as="group"
+                                t-key="group[0]"
+                                class="badge text-bg-primary me-1 o_erplibre_studio_rule_group_line"
+                                t-esc="group[1]"
+                            />
+                            <span
+                                t-foreach="rule.missing_groups or []"
+                                t-as="xmlid"
+                                t-key="xmlid"
+                                class="badge text-bg-danger me-1 o_erplibre_studio_missing_group"
+                                role="alert"
+                                t-esc="missingGroupText(xmlid)"
+                            />
+                            <span
+                                t-if="ruleNeedsGroup(rule)"
+                                class="text-danger small o_erplibre_studio_rule_no_group"
+                            >
+                                Needs a group or « Global »
+                            </span>
                         </td>
                         <td class="small">
                             <t t-foreach="perms" t-as="perm" t-key="perm">
@@ -506,44 +568,66 @@
                         </select>
                     </div>
                 </div>
-                <div id="o_erplibre_studio_rule_groups_label" class="form-label mb-0 mt-2">Groups</div>
-                <div
-                    class="d-flex flex-wrap align-items-center gap-1 mb-1 o_erplibre_studio_rule_groups"
-                    role="group"
-                    aria-labelledby="o_erplibre_studio_rule_groups_label"
-                >
-                    <span
-                        t-foreach="form.group_ids"
-                        t-as="groupId"
-                        t-key="groupId"
-                        class="badge text-bg-secondary o_erplibre_studio_rule_group"
-                        t-att-data-group="groupId"
-                    >
-                        <t t-esc="groupName(groupId)" />
-                        <button
-                            type="button"
-                            class="btn-close btn-close-white ms-1 align-middle o_erplibre_studio_rule_group_remove"
-                            t-att-aria-label="removeGroupLabel(groupId)"
-                            t-att-title="removeGroupLabel(groupId)"
-                            t-on-click="() => this.removeRuleGroup(groupId)"
-                        />
-                    </span>
-                    <select
-                        class="form-select form-select-sm w-auto o_erplibre_studio_rule_add_group"
-                        aria-label="Add a group"
-                        t-on-change="(ev) => this.addRuleGroup(ev)"
-                    >
-                        <option value="">Add a group…</option>
-                        <t t-foreach="choiceGroups" t-as="group" t-key="group.id">
-                            <option
-                                t-if="!form.group_ids.includes(group.id)"
-                                t-att-value="group.id"
-                                t-esc="group.name"
-                            />
-                        </t>
-                    </select>
-                    <span t-if="!form.group_ids.length" class="text-muted small">No group: every user.</span>
+                <div class="form-check mt-2">
+                    <input
+                        id="o_erplibre_studio_rule_global"
+                        type="checkbox"
+                        class="form-check-input o_erplibre_studio_rule_global_check"
+                        t-att-checked="form.global_rule"
+                        t-on-change="(ev) => this.setRuleGlobal(ev.target.checked)"
+                    />
+                    <label class="form-check-label" for="o_erplibre_studio_rule_global">Global</label>
+                    <div class="form-text mt-0">
+                        Applies to every user; a rule without this flag needs at least one group.
+                    </div>
                 </div>
+                <div
+                    t-foreach="form.missing_groups or []"
+                    t-as="xmlid"
+                    t-key="xmlid"
+                    class="badge text-bg-danger me-1 o_erplibre_studio_rule_missing_group"
+                    role="alert"
+                    t-esc="missingGroupText(xmlid)"
+                />
+                <t t-if="!form.global_rule">
+                    <div id="o_erplibre_studio_rule_groups_label" class="form-label mb-0 mt-2">Groups</div>
+                    <div
+                        class="d-flex flex-wrap align-items-center gap-1 mb-1 o_erplibre_studio_rule_groups"
+                        role="group"
+                        aria-labelledby="o_erplibre_studio_rule_groups_label"
+                    >
+                        <span
+                            t-foreach="ruleFormGroups"
+                            t-as="group"
+                            t-key="group.value"
+                            class="badge o_erplibre_studio_rule_group"
+                            t-att-class="group.project ? 'text-bg-primary' : 'text-bg-secondary'"
+                            t-att-data-group="group.value"
+                        >
+                            <t t-esc="group.name" />
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white ms-1 align-middle o_erplibre_studio_rule_group_remove"
+                                t-att-aria-label="removeGroupLabel(group.name)"
+                                t-att-title="removeGroupLabel(group.name)"
+                                t-on-click="() => this.removeRuleGroup(group.value)"
+                            />
+                        </span>
+                        <select
+                            class="form-select form-select-sm w-auto o_erplibre_studio_rule_add_group"
+                            aria-label="Add a group"
+                            t-on-change="(ev) => this.addRuleGroup(ev)"
+                        >
+                            <option value="">Add a group…</option>
+                            <t t-call="erplibre_studio.GroupOptions">
+                                <t t-set="skipped" t-value="ruleFormGroups.map((g) => g.value)" />
+                            </t>
+                        </select>
+                        <span t-if="!ruleFormGroups.length" class="text-danger small o_erplibre_studio_rule_no_group">
+                            No group: choose one, or check « Global ».
+                        </span>
+                    </div>
+                </t>
                 <label class="form-label mb-0 mt-2" for="o_erplibre_studio_rule_domain">Domain</label>
                 <textarea
                     id="o_erplibre_studio_rule_domain"
@@ -596,5 +680,18 @@
                 </div>
             </div>
         </div>
+    </t>
+
+    <!-- The options of a group select: the existing groups, then those of
+         the project; « skipped » leaves out the values already chosen. -->
+    <t t-name="erplibre_studio.GroupOptions">
+        <t t-foreach="choiceGroups" t-as="group" t-key="groupValue(group)">
+            <option
+                t-if="!(skipped or []).includes(groupValue(group))"
+                t-att-value="groupValue(group)"
+                t-att-class="{'o_erplibre_studio_project_group': group.project}"
+                t-esc="group.project ? group.name + ' · ' + projectGroupSuffix : group.name"
+            />
+        </t>
     </t>
 </templates>

@@ -6,14 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 21:47+0000\n"
-"PO-Revision-Date: 2026-10-17 21:47+0000\n"
+"POT-Creation-Date: 2026-10-18 08:48+0000\n"
+"PO-Revision-Date: 2026-10-18 08:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(count)s change(s) of the default views go with these views."
+msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
@@ -36,6 +44,14 @@ msgid "%(kind)s %(name)s (%(why)s)"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(label)s (%(model)s.%(name)s): %(filled)s value(s)"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s cannot be the comodel."
@@ -52,6 +68,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "%(model)s has no %(type)s view to inherit."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s (%(model)s): %(count)s record(s)"
 msgstr ""
 
 #. module: erplibre_studio
@@ -75,8 +99,28 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"%(name)s is not a many2one of %(comodel)s to %(model)s: choose an inverse, "
+"or let the studio create one."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "%(name)s is not a valid external id for a group."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_rule.py:0
 msgid "%(name)s is not a valid external id for a rule."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_app.py:0
+msgid "%(name)s is not a valid external id for an app."
 msgstr ""
 
 #. module: erplibre_studio
@@ -88,6 +132,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid ""
 "%(name)s is not a valid field name: x_ then lower case letters, digits and "
 "underscores."
@@ -107,6 +152,28 @@ msgstr ""
 msgid ""
 "%(name)s is not a valid technical name: lower case letters, digits and "
 "underscores, starting with a letter."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s: %(users)s member(s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s: %(users)s member(s) of %(via)s lose it"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(table)s is not a valid relation table for the field %(name)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -147,6 +214,22 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_change.py:0
+msgid ""
+"A change is on a view, or on the default view of a model not created yet: "
+"one of them."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_change.py:0
+msgid ""
+"A change of a model not created yet is on its form, list or search view, in "
+"its project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A chatter needs the module mail (Discuss)."
@@ -165,8 +248,32 @@ msgid "A filter needs at least one condition."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A group goes in an app of the project: choose it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A group needs a name."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_access__group_line_id
+msgid "A group the project creates, instead of an existing group."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_access__group_id
 msgid "A group with an external id: the module refers to it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A many2many shows in a form, a list or a kanban only."
 msgstr ""
 
 #. module: erplibre_studio
@@ -244,6 +351,34 @@ msgid "A node of a template cannot move out of the templates."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid ""
+"A one2many lists the records of the comodel whose many2one points to this "
+"record."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A one2many shows in a form only."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "A project group cannot imply %(group)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "A project group cannot imply %(group)s: it grants %(admin)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_access.py:0
 #: model:ir.model.constraint,message:erplibre_studio.constraint_erplibre_studio_access_model_group_uniq
 msgid "A project has one access row per model and group."
 msgstr ""
@@ -269,6 +404,13 @@ msgid "A rule needs a name."
 msgstr ""
 
 #. module: erplibre_studio
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.view_base_module_uninstall_studio
+msgid ""
+"A studio project generated these modules: uninstalling them deletes\n"
+"                        what it created, with the records and the values below."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
@@ -284,6 +426,15 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "A user of the group also gets the groups it implies."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__access_line_ids
@@ -294,6 +445,14 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__created_access_ids
 msgid "Access rights created"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Actions"
 msgstr ""
 
 #. module: erplibre_studio
@@ -309,8 +468,21 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Add a group"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Add a group of the project"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Add a group of the project…"
 msgstr ""
 
 #. module: erplibre_studio
@@ -332,6 +504,18 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__add_existing_field
 msgid "Add an existing field"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Add an existing group"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Add an existing group…"
 msgstr ""
 
 #. module: erplibre_studio
@@ -370,9 +554,36 @@ msgid "An access row on %(model)s gives at least one right."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_access.py:0
+msgid ""
+"An access row on %(model)s names one group: an existing group or a group of "
+"the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_app.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "An app needs a name."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "An existing many2one of the comodel"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "And"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid "Another real preview is running: try again."
 msgstr ""
 
 #. module: erplibre_studio
@@ -392,29 +603,28 @@ msgid "Another studio project generates this module."
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__app_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__app_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__app_id
 msgid "App"
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__app_icon
-msgid "App Icon"
-msgstr ""
-
-#. module: erplibre_studio
-#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__app_sequence
-msgid "App Sequence"
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "App %(name)s"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
-msgid "App:"
+msgid "App of the model"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__applied
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__applied
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__applied
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__state__applied
 msgid "Applied"
@@ -432,9 +642,26 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_rule__global_rule
+msgid ""
+"Applies to every user; a rule without this flag needs at least one group."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_revert_wizard__mode__apply
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
 msgid "Apply"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "Apply %(name)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -453,8 +680,86 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"Apply removes from the database what the draft no longer has, with its data:"
+msgstr ""
+
+#. module: erplibre_studio
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
+msgid "Apply removes from the database what the draft no longer has:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid ""
+"Apply removes records, values or group members: review what it removes and "
+"confirm it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Apply the model first: %(type)s needs its records."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Apply the project"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Apply the project, then edit the form of the model"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Approve for a real preview"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__approved
+msgid "Approved"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__approved_date
+msgid "Approved Date"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__approved_snapshot
+msgid "Approved Snapshot"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__approved_uid
+msgid "Approved by"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
+msgid "Approved by %(user)s on %(date)s"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__app_ids
+msgid "Apps"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
+msgid "Apps and groups"
 msgstr ""
 
 #. module: erplibre_studio
@@ -504,9 +809,26 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
 msgid "Cancel"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__created_category_ids
+msgid "Categories created"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Categories of groups"
 msgstr ""
 
 #. module: erplibre_studio
@@ -527,6 +849,14 @@ msgid "Changes of this view"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "Changes wait for Apply"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__chatter
 msgid "Chatter"
 msgstr ""
@@ -542,6 +872,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Check"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/base_module_uninstall.py:0
+msgid ""
+"Check « I understand » first: uninstalling %(modules)s deletes what the "
+"report lists."
 msgstr ""
 
 #. module: erplibre_studio
@@ -584,6 +922,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Close the preview"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Colors"
 msgstr ""
@@ -597,12 +941,21 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Columns"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__comment
+msgid "Comment"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Comodel"
 msgstr ""
 
@@ -611,9 +964,16 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__perm_create
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__perm_create
 msgid "Create"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.js:0
+msgid "Create the field %(name)s on %(comodel)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -624,18 +984,24 @@ msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__create_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__create_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__create_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__create_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__create_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__create_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__create_date
 msgid "Created on"
 msgstr ""
@@ -728,6 +1094,23 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Deleting a record deletes its lines."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Deleting a record empties the many2one of its lines."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__digest
+msgid "Digest"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Discard"
 msgstr ""
@@ -745,9 +1128,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__display_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__display_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__display_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__display_name
 msgid "Display Name"
 msgstr ""
@@ -797,13 +1183,28 @@ msgid "ERPLibre studio access right"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model,name:erplibre_studio.model_erplibre_studio_app
+msgid "ERPLibre studio app"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model,name:erplibre_studio.model_erplibre_studio_change
 msgid "ERPLibre studio change"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model,name:erplibre_studio.model_erplibre_studio_revert_wizard
+msgid "ERPLibre studio confirmation of what leaves the database"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model,name:erplibre_studio.model_erplibre_studio_editor
 msgid "ERPLibre studio editor"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model,name:erplibre_studio.model_erplibre_studio_group
+msgid "ERPLibre studio group"
 msgstr ""
 
 #. module: erplibre_studio
@@ -828,8 +1229,22 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid ""
+"Each app is a top-level menu and the category of its groups; users get the "
+"groups in their form."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Edit columns"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Edit the app"
 msgstr ""
 
 #. module: erplibre_studio
@@ -842,6 +1257,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Edit the default view of another type"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Edit the group"
 msgstr ""
 
 #. module: erplibre_studio
@@ -863,13 +1284,14 @@ msgid "Edit the rule"
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__user_id
-msgid "Editor"
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Edit this view before Apply creates the model"
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_rule__group_ids
-msgid "Empty: a global rule, for every user."
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__user_id
+msgid "Editor"
 msgstr ""
 
 #. module: erplibre_studio
@@ -897,8 +1319,28 @@ msgid "Existing fields"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_group__implied_group_ids
+msgid ""
+"Existing groups, with an external id, that the members of the group get with"
+" it."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_rule__group_ids
+msgid "Existing groups, with an external id."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__field_name
 msgid "Field Name"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Fields and their values"
 msgstr ""
 
 #. module: erplibre_studio
@@ -938,6 +1380,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Filter the models"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Filters"
 msgstr ""
@@ -951,6 +1399,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__form
 msgid "Form"
 msgstr ""
@@ -965,8 +1414,26 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__global_rule
+msgid "Global"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "Global: every user"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__group_id
 msgid "Group"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__group_refs
+msgid "Group Refs"
 msgstr ""
 
 #. module: erplibre_studio
@@ -983,10 +1450,36 @@ msgid "Group of the new row"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__group_line_id
+msgid "Group of the project"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__group_line_ids
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__group_line_ids
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__group_ids
 msgid "Groups"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Groups and their members"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__created_group_ids
+msgid "Groups created"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__group_line_ids
+msgid "Groups of the project"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1013,29 +1506,68 @@ msgid "Hide or show"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_understood
+msgid ""
+"I understand that these models, their records, the fields and their values, "
+"the menus, the access rights, the rules and the groups are deleted."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__id
 msgid "ID"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__icon
+msgid "Icon"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Icon of the app"
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_model__menu_mode__app
-msgid "In the app of the project"
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__implied_refs
+msgid "Implied Refs"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__implied_group_ids
+msgid "Implied groups"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__implied_line_ids
+msgid "Implied groups of the project"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
-msgid "In the app « %(name)s » of the project"
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Implies these existing groups"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Implies these groups of the project"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_model__menu_mode__app
+msgid "In an app of the project"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1115,6 +1647,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Inverse field"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "It may name user, company_id, company_ids and time."
 msgstr ""
@@ -1133,8 +1671,15 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__name
 msgid "Label"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Label of the many2one"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1145,18 +1690,24 @@ msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__write_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__write_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__write_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__write_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__write_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__write_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -1164,6 +1715,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__list
 msgid "List"
 msgstr ""
@@ -1177,7 +1729,14 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Loading…"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Many2many"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1200,6 +1759,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Members who lose a group"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Menu"
 msgstr ""
@@ -1215,8 +1782,17 @@ msgid "Menu Name"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__menu_sequence
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__menu_sequence
 msgid "Menu Sequence"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Menus"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1229,6 +1805,27 @@ msgstr ""
 msgid ""
 "Messages, followers and activities on the records (mail). Once applied, the "
 "chatter cannot be removed."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__missing_groups
+msgid "Missing Groups"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__missing_implied
+msgid "Missing Implied"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__mode
+msgid "Mode"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Mode of the preview"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1246,9 +1843,27 @@ msgid "Model in the database"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__model_line_id
+msgid "Model not created yet"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Model of the new row"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__model_line_ids
+msgid "Models"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Models and their records"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1265,6 +1880,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Model…"
 msgstr ""
 
@@ -1275,8 +1891,18 @@ msgid "Module"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model,name:erplibre_studio.model_base_module_uninstall
+msgid "Module Uninstall"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__module_state
 msgid "Module state"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_module_ids
+msgid "Modules generated by the studio"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1309,7 +1935,10 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__name
 msgid "Name"
@@ -1330,8 +1959,26 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Named after the module; it cannot change once created."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "Needs a group or « Global »"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 msgid "New app"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "New app…"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1354,6 +2001,18 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "New group"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.js:0
+msgid "New many2many field"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
@@ -1364,6 +2023,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__new_model_ids
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
 msgid "New models"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.js:0
+msgid "New one2many field"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1393,6 +2058,20 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "No app"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid ""
+"No app: a model goes under an existing menu, or in an app made by its "
+"dialog."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "No change."
 msgstr ""
@@ -1405,8 +2084,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "No group."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
-msgid "No group: every user."
+msgid "No group: choose one, or check « Global »."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1469,8 +2154,34 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Nothing is saved: the model does not exist yet."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
+msgid "Nothing."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "On"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Once applied, the chatter cannot be removed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "One2many"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1541,6 +2252,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Other records deleted with them"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__menu_parent_id
 msgid "Parent menu"
@@ -1563,17 +2282,40 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Position of the menu"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Preview"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "Preview the model before Apply creates it: nothing is saved"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
+msgid "Preview: nothing is saved."
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__project_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__project_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_line__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__project_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__project_id
 msgid "Project"
 msgstr ""
@@ -1620,6 +2362,27 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Real"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
+msgid "Real (rolled back)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Real: approve the draft first."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__rule_line_ids
@@ -1633,8 +2396,27 @@ msgid "Record rules created"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__refused
+msgid "Refused"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__relabel
 msgid "Relabel"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Relation table"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Relation tables"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1643,6 +2425,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__remove
 msgid "Remove"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
+msgid "Remove %(group)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1656,7 +2444,26 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid ""
+"Remove from the database everything the project created, once confirmed"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Remove from the view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Remove the app"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "Remove the group"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1708,15 +2515,13 @@ msgid "Remove this rule"
 msgstr ""
 
 #. module: erplibre_studio
-#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
-msgid ""
-"Remove what this project created from the database: its models and their "
-"records, its fields and their values, its views, menus, actions and rights?"
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__position__replace
+msgid "Replace"
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__position__replace
-msgid "Replace"
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__report_html
+msgid "Report"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1731,8 +2536,38 @@ msgid "Required in this view"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_revert_wizard__mode__revert
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
 msgid "Revert"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "Revert %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"Revert removes from the database everything the project created; its lines "
+"and its changes stay as a draft:"
+msgstr ""
+
+#. module: erplibre_studio
+#: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
+msgid "Revert removes from the database what the project created:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Revert the project"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1809,6 +2644,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Save"
 msgstr ""
@@ -1822,6 +2658,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__search
 msgid "Search"
 msgstr ""
@@ -1845,7 +2682,9 @@ msgid "Separator"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__sequence
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__sequence
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__sequence
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__sequence
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__sequence
 msgid "Sequence"
@@ -1864,8 +2703,15 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Show the view as its editor sees the draft"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Simulation"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1903,14 +2749,31 @@ msgid "Studio"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_report
+msgid "Studio Report"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.actions.act_window,name:erplibre_studio.erplibre_studio_project_action
 #: model:ir.ui.menu,name:erplibre_studio.erplibre_studio_project_menu
 msgid "Studio projects"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Sub-list of"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__summary
 msgid "Summary"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Table"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1947,9 +2810,52 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_access.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The access row on %(model)s names a group of another project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The access row on %(model)s names no group."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_app.py:0
+msgid "The app %(app)s cannot be removed: %(items)s go in it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "The app %(app)s has a group %(name)s already."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "The app needs a name."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__app_id
+msgid ""
+"The app of the project the menu of the model goes in, with « In an app of "
+"the project »."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_group__app_id
+msgid "The app whose category holds the group."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "The apps of the project and the groups of their users"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1960,9 +2866,41 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The categories %(categories)s cannot be removed: the groups %(groups)s are "
+"in them."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The change « %(change)s » is on no view of the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The chatter of %(name)s cannot be removed once applied."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "The comodel %(model)s of the field %(name)s does not exist."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "The comodel has no many2one to this model."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid "The database is busy: try the real preview again."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1985,6 +2923,20 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid ""
+"The draft changed since its approval, or was never approved: approve it "
+"again for a real preview."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "The draft changed since its approval: approve it again."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "The draft changed since the filter form opened: drop the field again."
@@ -1999,8 +2951,30 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_rule__group_refs
+msgid ""
+"The external ids of the existing groups of the rule, as last chosen: a group"
+" that leaves the database leaves the rule without a word, these keep what "
+"was chosen."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_group__implied_refs
+msgid "The external ids of the implied existing groups, as last chosen."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The field %(field)s creates %(inverse)s, the inverse of %(other)s: remove "
+"%(other)s first."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid "The field %(name)s already exists."
 msgstr ""
 
@@ -2014,6 +2988,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s is already in the view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s is not a field of %(model)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2036,9 +3016,18 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_rule.py:0
+msgid ""
+"The global rule %(name)s names no group: uncheck « Global » or remove its "
+"groups."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
-"The group %(group)s has no external id: the module could not refer to it."
+"The group %(group)s has no external id under an installed module: the "
+"generated module could not refer to it."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2050,10 +3039,44 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__app_icon
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "The group %(name)s goes in an app of its project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "The group %(name)s implies a group of another project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
-"The icon of the app: « <module>,static/description/icon.png », the icon of "
-"an installed module; empty: the icon of the studio."
+"The group %(name)s lost the implied groups %(groups)s: choose them again."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The groups %(groups)s cannot be removed: %(items)s still need them."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_group.py:0
+msgid "The groups %(groups)s imply each other."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_rule__missing_groups
+msgid "The groups of the rule that left the database since they were chosen."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_group__missing_implied
+msgid "The implied groups that left the database since they were chosen."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2063,6 +3086,19 @@ msgid ""
 "The installed generated module defines these fields, models or views: their "
 "new definition takes effect once the module is regenerated and upgraded: "
 "%(fields)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The inverse %(inverse)s of the field %(name)s is no longer a many2one to "
+"%(model)s."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__name
+msgid "The label of the menu, and of the category of the groups of the app."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2081,7 +3117,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
-"The menu %(menu)s is a menu of this project: choose « In the app of the "
+"The menu %(menu)s is a menu of this project: choose « In an app of the "
 "project »."
 msgstr ""
 
@@ -2106,9 +3142,26 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid "The model %(model)s exists already."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The model %(model)s exists now: its preview is closed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "The model %(model)s exists: its preview is the one of its views."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid ""
-"The model %(model)s goes in the app of the project: name the app first."
+msgid "The model %(model)s goes in an app of the project: choose the app."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2125,22 +3178,35 @@ msgid "The model %(name)s needs at least one access right."
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_change__model_line_id
+msgid ""
+"The model line whose default view the change is on, before Apply creates the"
+" model: Apply then binds the change to the view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The model of the preview left the project: its preview is closed."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The models %(models)s cannot be removed: %(items)s."
 msgstr ""
 
 #. module: erplibre_studio
-#. odoo-python
-#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
-msgid "The models %(models)s go in the app of the project: it needs a name."
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__approved
+msgid ""
+"The models not created yet, as approved for a real preview: any change of "
+"them withdraws the approval."
 msgstr ""
 
 #. module: erplibre_studio
-#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__app_name
-msgid ""
-"The name of the top-level menu of the project, where its models « In the app"
-" of the project » go."
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "The name and the icon of an app change in « Apps and groups »."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2161,6 +3227,13 @@ msgid "The operator %(operator)s does not apply to a %(type)s field."
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__sequence
+msgid ""
+"The order of the apps in the project: the first one gives the icon of the "
+"generated module."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_change__view_id
 msgid "The primary view the change inherits."
 msgstr ""
@@ -2169,6 +3242,21 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The project %(project)s creates the model %(name)s already."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid ""
+"The project has no model waiting for Apply: there is nothing to preview."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid ""
+"The real preview creates the models in the database for a moment: approve "
+"what it creates"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2205,7 +3293,50 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "The relation of the field %(name)s cannot change."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The relation table %(table)s of the field %(name)s is used by another field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The rule %(name)s applies to at least one operation."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The rule %(name)s has no group: check « Global » to apply it to every user, "
+"or choose its groups."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The rule %(name)s is on %(model)s, which the project does not create: only a"
+" rule on a model of the project can be global; choose its groups."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The rule %(name)s lost the groups %(groups)s: choose its groups again."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_rule.py:0
+msgid "The rule %(name)s names a group of another project."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2221,6 +3352,40 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The search view already groups by %(group_by)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid ""
+"The server creates the model in a savepoint, renders its views, then rolls "
+"everything back"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
+msgid "The server rendered the real preview, not the simulation asked for."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
+msgid "The server rendered the simulation, not the real preview asked for."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The studio does not add fields to %(model)s: choose an existing inverse."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid ""
+"The studio does not add fields to this model: choose an existing inverse."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2252,6 +3417,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 msgid "The technical name of the model %(name)s cannot change once applied."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__app_ids
+msgid ""
+"The top-level menus of the project, where its models « In an app of the "
+"project » go, and the categories of its groups."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2301,6 +3473,28 @@ msgid "These fields of a studio project are managed by the studio: %(fields)s"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid ""
+"These groups show as checkboxes in developer mode only in the user form: make each one imply\n"
+"                        the previous one to get a selection."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"These records would be deleted with what the project removes: %(items)s. "
+"Delete them first, or move them to another model."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "This app is not an app of the project."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
@@ -2318,7 +3512,34 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "This group is not a group of the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
+msgid "This group no longer exists: %(group)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "This model is no longer in the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "This model is not a model of the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid ""
+"This request changed the models of the database: reload the editor before a "
+"real preview."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2369,6 +3590,16 @@ msgid "Tooltip"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.constraint,message:erplibre_studio.constraint_erplibre_studio_app_xml_name_uniq
+msgid "Two apps of a project have the same external id."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.constraint,message:erplibre_studio.constraint_erplibre_studio_group_xml_name_uniq
+msgid "Two groups of a project have the same external id."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.constraint,message:erplibre_studio.constraint_erplibre_studio_rule_xml_name_uniq
 msgid "Two rules of a project have the same external id."
 msgstr ""
@@ -2380,6 +3611,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_model__menu_mode__menu
 msgid "Under a menu"
@@ -2398,8 +3630,25 @@ msgid "Uninstall the module %(module)s first: it owns its models."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid ""
+"Uninstall the module %(module)s first: what the project applied belongs to "
+"it."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__module_state__uninstallable
 msgid "Uninstallable"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/ir_module_module.py:0
+msgid ""
+"Uninstalling %(module)s deletes what other studio projects applied on its "
+"models: %(items)s. Revert these projects first, or remove these lines from "
+"them and apply."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2451,6 +3700,12 @@ msgid "Unknown position %(position)s."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Unknown preview mode %(mode)s."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Value"
@@ -2481,8 +3736,22 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "View of the preview"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "View properties"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Views"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2497,10 +3766,23 @@ msgid "Week"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "What Revert removes changed since it was shown: review it again."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
+msgid ""
+"What the action removes changed since it was shown: check it again before "
+"confirming."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
-msgid ""
-"Which records the groups reach; a rule without group applies to every user."
+msgid "Which records the groups reach; a global rule applies to every user."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2512,9 +3794,20 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_refused
+msgid "Why the uninstall is refused"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Widget"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
+msgid "Withdraw the approval"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2527,6 +3820,8 @@ msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__xml_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__xml_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__xml_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__xml_name
 msgid "Xml Name"
 msgstr ""
@@ -2583,6 +3878,18 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "action %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "app icon %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "change of the project %(project)s"
 msgstr ""
 
@@ -2594,14 +3901,39 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "created by Apply"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "default"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "field %(field)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "field %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "group %(group)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "group of the project %(project)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2618,8 +3950,21 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "implies"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "in the database"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "inherited"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2638,6 +3983,24 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "longer than %(size)s characters"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "menu %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid "messages and activities, created by Apply"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+msgid "model(s)"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2660,6 +4023,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "new field, created by Apply"
 msgstr ""
@@ -2674,6 +4038,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "optional, hidden"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+msgid "project"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2721,6 +4092,18 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the app"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the group"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "the model"
 msgstr ""
 
@@ -2728,6 +4111,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "the rule"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "view %(name)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2741,4 +4130,11 @@ msgstr ""
 msgid ""
 "x_ then lower case letters, digits and underscores; it cannot change once "
 "applied."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__icon
+msgid ""
+"« <module>,static/description/icon.png », the icon of an installed module; "
+"empty: the icon of the studio."
 msgstr ""

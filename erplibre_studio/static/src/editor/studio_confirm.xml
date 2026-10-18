@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- What an action removes from the database, section by section, then
+         the action; a refusal of the server replaces its button. -->
+    <t t-name="erplibre_studio.ConfirmDialog">
+        <Dialog title="props.title" size="'lg'" contentClass="'o_erplibre_studio_confirm_dialog'">
+            <div
+                t-if="state.stale"
+                class="alert alert-warning o_erplibre_studio_confirm_stale"
+                role="alert"
+            >
+                What the action removes changed since it was shown: check it again before confirming.
+            </div>
+            <div
+                t-if="state.refused"
+                class="alert alert-danger o_erplibre_studio_confirm_refused"
+                role="alert"
+                t-esc="state.refused"
+            />
+            <p t-esc="props.intro" />
+            <div t-if="!sections.length and !changesRemoved" class="text-muted o_erplibre_studio_confirm_empty">
+                Nothing.
+            </div>
+            <section
+                t-foreach="sections"
+                t-as="section"
+                t-key="section.key"
+                class="o_erplibre_studio_confirm_section mb-2"
+                t-att-data-section="section.key"
+            >
+                <h6 class="mb-1">
+                    <t t-esc="section.title" />
+                    <span
+                        class="badge text-bg-light ms-1 o_erplibre_studio_confirm_count"
+                        t-esc="section.items.length"
+                    />
+                </h6>
+                <ul class="mb-1 small">
+                    <li
+                        t-foreach="section.items"
+                        t-as="item"
+                        t-key="item_index"
+                        class="o_erplibre_studio_confirm_item"
+                        t-att-class="{'text-danger fw-bold': item.warn}"
+                        t-esc="item.text"
+                    />
+                </ul>
+            </section>
+            <p t-if="changesRemoved" class="small o_erplibre_studio_confirm_changes" t-esc="changesText" />
+            <t t-set-slot="footer">
+                <button
+                    t-if="!state.refused"
+                    class="btn btn-danger o_erplibre_studio_confirm_button"
+                    t-att-disabled="state.running"
+                    t-on-click="confirm"
+                    t-esc="props.confirmLabel"
+                />
+                <button class="btn btn-secondary o_erplibre_studio_confirm_cancel" t-on-click="props.close">
+                    Cancel
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

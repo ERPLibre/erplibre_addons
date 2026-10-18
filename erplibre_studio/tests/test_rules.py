@@ -1,7 +1,9 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.exceptions import UserError
+import json
+
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import new_test_user, tagged
 
 from .common import StudioCase
@@ -147,6 +149,7 @@ class TestRules(StudioCase):
                 "name": "Own notes",
                 "model": MODEL,
                 "domain": OWN,
+                "global_rule": True,
                 "perm_read": True,
                 "perm_write": True,
             }
@@ -160,3 +163,106 @@ class TestRules(StudioCase):
         self.assertFalse(record.exists())
         self.assertFalse(self.module_records("studio_test_rules", "ir.rule"))
         self.assertEqual(len(Note.with_user(first).search([])), 2)
+
+    def test_a_rule_names_its_groups_or_is_global(self):
+        loose = self.rule(name="Studio test loose rule", group_ids=[])
+        self.assertFalse(loose.global_rule)
+        with self.assertRaisesRegex(UserError, "Studio test loose rule"):
+            with self.env.cr.savepoint():
+                self.project.action_apply()
+        self.assertFalse(self.module_records("studio_test_rules"))
+        with self.assertRaisesRegex(ValidationError, "Global"):
+            with self.env.cr.savepoint():
+                self.rule(name="Studio test both", global_rule=True)
+        # Global: every user, each one his own notes.
+        self.project._studio_save_rule(
+            {
+                "id": loose.id,
+                "name": "Studio test loose rule",
+                "model": MODEL,
+                "domain": OWN,
+                "group_ids": [],
+                "global_rule": True,
+                "perm_read": True,
+            }
+        )
+        self.project.action_apply()
+        record = self.project.created_rule_ids
+        self.assertTrue(record["global"])
+        self.assertFalse(record.groups)
+        first = new_test_user(
+            self.env, login="studio_test_global_first", groups="base.group_user"
+        )
+        second = new_test_user(
+            self.env, login="studio_test_global_second", groups="base.group_user"
+        )
+        Note = self.env[MODEL]
+        mine = Note.with_user(first).create({"x_name": "First"})
+        Note.with_user(second).create({"x_name": "Second"})
+        self.assertEqual(Note.with_user(first).search([]), mine)
+
+    def test_a_vanished_group_is_flagged(self):
+        """A group a draft rule names leaves the database: the rule keeps its
+        external id, the editor shows it, Apply names it; choosing the
+        groups again clears it."""
+        group = self.bind_group(
+            self.env["res.groups"].create({"name": "Studio test vanishing"}),
+            "studio_test_invented",
+            "group_vanishing",
+        )
+        rule = self.rule(name="Studio test watched", group_ids=[group.id])
+        xmlid = "studio_test_invented.group_vanishing"
+        self.assertEqual(json.loads(rule.group_refs), [xmlid])
+        self.assertFalse(rule.missing_groups)
+        group.unlink()
+        rule.invalidate_recordset()
+        self.assertFalse(rule.group_ids)
+        self.assertEqual(rule.missing_groups, xmlid)
+        data = self.Editor.get_editor_data(
+            "res.partner", False, "form", self.project.id
+        )
+        payload = data["project"]["rules"][0]
+        self.assertEqual(payload["missing_groups"], [xmlid])
+        self.assertFalse(payload["global_rule"])
+        with self.assertRaisesRegex(UserError, "group_vanishing"):
+            with self.env.cr.savepoint():
+                self.project.action_apply()
+        # Neither a client can write the external ids.
+        rule.write({"group_refs": "[]"})
+        self.assertEqual(rule.missing_groups, xmlid)
+        self.rule(id=rule.id, name="Studio test watched")
+        self.assertFalse(rule.missing_groups)
+        self.project.action_apply()
+        self.assertEqual(self.project.created_rule_ids.groups, self.user_group)
+
+    def test_a_global_rule_only_on_a_model_of_the_project(self):
+        """A global rule restricts every user but the superuser, the Settings
+        users included, in every database that installs the module: on a
+        model of the database, a rule names its groups."""
+        with self.assertRaisesRegex(ValidationError, "only a rule on a model"):
+            with self.env.cr.savepoint():
+                self.rule(
+                    name="Studio test hide partners",
+                    model="res.partner",
+                    domain="[(0, '=', 1)]",
+                    group_ids=[],
+                    global_rule=True,
+                )
+        # The models of the studio take no rule from a project.
+        with self.assertRaisesRegex(ValidationError, "erplibre.studio.project"):
+            with self.env.cr.savepoint():
+                self.rule(
+                    name="Studio test hide projects",
+                    model="erplibre.studio.project",
+                    group_ids=[self.env.ref("base.group_user").id],
+                )
+        rule = self.rule(name="Studio test partners", model="res.partner", group_ids=[])
+        # A rule of a project that read as global before: Apply names it.
+        self.env.cr.execute(
+            "UPDATE erplibre_studio_rule SET global_rule = true WHERE id = %s",
+            [rule.id],
+        )
+        rule.invalidate_recordset(["global_rule"])
+        with self.assertRaisesRegex(UserError, "Studio test partners"):
+            with self.env.cr.savepoint():
+                self.project.action_apply()
