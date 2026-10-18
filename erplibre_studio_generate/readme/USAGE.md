@@ -25,3 +25,20 @@
    upgrade of the installed module keeps it, and each version ships the
    migration that takes over the models created since. A module older
    than its database refuses to load instead of deleting these models.
+7. Once the module is installed, the menu of each app shows the icon of
+   the module, the copy made at the generation: **Apply** keeps it, and a
+   new icon chosen for an app waits for the next generation and upgrade;
+   an app the installed module does not hold yet keeps its chosen icon
+   until then, and **Apply** says it waits.
+8. Each record rule and each group of the module holds its whole state
+   (the groups of a rule, empty for a global one, its four permissions,
+   the comment of a group, empty included): an upgrade writes only what a
+   record names. The generation checks the groups and the rules again, as
+   Apply does: a group of the project never implies a group that grants
+   the Settings, and an existing group goes into the module by its
+   external id under an installed module.
+9. Uninstalling the generated module deletes its models with their
+   records, its fields, menus, access rights, rules and groups; the
+   uninstall wizard lists them and asks to confirm (*ERPLibre studio*).
+   In the database of its project, the project is back to a draft with
+   its lines, and its next generation starts from a new **Apply**.

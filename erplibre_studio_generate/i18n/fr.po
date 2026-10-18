@@ -56,6 +56,16 @@ msgid "Apply the draft before generating the module."
 msgstr "Appliquez le brouillon avant de générer le module."
 
 #. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid ""
+"Apply the draft first: %(count)s change(s) are on the views of models not "
+"created yet."
+msgstr ""
+"Appliquez d'abord le brouillon : %(count)s modification(s) portent sur les "
+"vues de modèles pas encore créés."
+
+#. module: erplibre_studio_generate
 #: model:ir.model.fields,field_description:erplibre_studio_generate.field_erplibre_studio_project__author
 msgid "Author"
 msgstr "Auteur"
@@ -313,8 +323,26 @@ msgstr "droit d'accès %(perms)s pour %(group)s"
 #. module: erplibre_studio_generate
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "app %(app)s, groups: %(groups)s"
+msgstr "application %(app)s, groupes : %(groups)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid "every user"
 msgstr "tous les utilisateurs"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "group %(group)s of the app %(app)s, implies %(implied)s"
+msgstr "groupe %(group)s de l'application %(app)s, implique %(implied)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "inverse %(field)s"
+msgstr "inverse %(field)s"
 
 #. module: erplibre_studio_generate
 #. odoo-python
@@ -331,8 +359,26 @@ msgstr "nouveau modèle, menu %(menu)s sous %(parent)s"
 #. module: erplibre_studio_generate
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "no group"
+msgstr "aucun groupe"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "none"
+msgstr "aucun"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid "record rule %(name)s for %(groups)s: `%(domain)s`"
 msgstr "règle d'enregistrement %(name)s pour %(groups)s : `%(domain)s`"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "table %(table)s"
+msgstr "table %(table)s"
 
 #. module: erplibre_studio_generate
 #. odoo-python

@@ -445,7 +445,7 @@ class TestGenerateModels(StudioCase):
             {
                 "id": "menu_app",
                 "name": "Studio test app",
-                "web_icon": f"{MODULE},static/description/icon.png",
+                "web_icon": f"{MODULE},static/description/menu_app.png",
                 "sequence": "50",
             },
         )
@@ -527,7 +527,7 @@ class TestGenerateModels(StudioCase):
             self.project.action_generate()
 
     def test_icon_of_the_studio_without_app_icon(self):
-        self.project.app_icon = False
+        self.project.app_ids.icon = False
         self.project.action_apply()
         self.generate()
         with file_open("erplibre_studio/static/description/icon.png", "rb") as fh:

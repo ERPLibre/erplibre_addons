@@ -14,6 +14,10 @@ from odoo import api, fields, models, release
 from odoo.addons.erplibre_info import runner
 from odoo.addons.erplibre_studio import arch as studio_arch
 from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
+    DEFAULT_APP_ICON,
+    MARKER_FILE,
+)
+from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
     PERMS as studio_perms,
 )
 from odoo.exceptions import UserError, ValidationError
@@ -21,14 +25,11 @@ from odoo.tools import file_open
 from odoo.tools.safe_eval import safe_eval
 
 from .. import version as studio_version
-from .code_generator_writer import project_migration_file
+from .code_generator_writer import app_icon_bytes, project_migration_file
 
 _logger = logging.getLogger(__name__)
 
 PARAM_DEFAULT_DESTINATION = "erplibre_studio.default_destination"
-# The file written into a generated module that names the project and the
-# database it comes from.
-MARKER_FILE = ".erplibre_studio"
 
 # The fields of a project only its own methods write: they decide what the
 # generation may replace on the disk.
@@ -132,6 +133,28 @@ class ErplibreStudioProject(models.Model):
             return "generated"
         return super()._applied_state(snapshot)
 
+    def _studio_uninstall_reset_vals(self):
+        """Once the generated module is uninstalled, the last generation no
+        longer is what the database holds."""
+        vals = super()._studio_uninstall_reset_vals()
+        vals["generated_snapshot"] = False
+        return vals
+
+    # ── app icons ───────────────────────────────────────────────────────
+
+    def _studio_generated_icon(self, app):
+        """The icon ``app`` had at the last generation, from the snapshot
+        of that generation (the empty string for the studio's), or None
+        when the module was never generated or the app is not in it."""
+        self.ensure_one()
+        if not self.generated_snapshot:
+            return None
+        snapshot = self._studio_load_snapshot(self.generated_snapshot)
+        for item in snapshot["apps"]:
+            if item.get("xml_name") == app.xml_name:
+                return item.get("icon") or ""
+        return None
+
     # ── constraints ─────────────────────────────────────────────────────
 
     @api.constrains("module_name")
@@ -202,17 +225,23 @@ class ErplibreStudioProject(models.Model):
         """The checks of ``_check_manifest_text`` and ``_check_field_texts``
         again, on the texts as they are: a project recorded before this
         module was installed went through none of them. The label of a new
-        model becomes its ``_description``."""
+        model becomes its ``_description``; the label of the inverse
+        many2one a one2many creates, a field label; the names of the apps
+        and of the groups and the comments of the groups go into the data
+        files and take the same rule."""
         self.ensure_one()
         self._check_manifest_text()
         for line in self.new_model_ids:
             self._check_field_texts((line.name or "").strip(), "")
-        for change in self._project_field_changes():
-            definition = change._payload().get("field") or {}
+        for _model, _name, definition, _change in self._studio_all_definitions():
             self._check_field_texts(
                 definition.get("field_description") or "",
                 definition.get("help") or "",
             )
+        for app in self.app_ids:
+            self._check_field_texts((app.name or "").strip(), "")
+        for group in self.group_line_ids:
+            self._check_field_texts((group.name or "").strip(), group.comment or "")
 
     @api.model
     def _arch_message(self, exc):
@@ -274,9 +303,10 @@ class ErplibreStudioProject(models.Model):
 
     def _generation_models(self):
         """The models of the generated module: the new models and the
-        models the new fields extend."""
+        models the new fields extend, the comodels that receive the inverse
+        many2one of a one2many included."""
         return sorted(
-            set(self._project_field_changes().mapped("model"))
+            {model for model, *_rest in self._studio_all_definitions()}
             | self._studio_new_models()
         )
 
@@ -320,11 +350,13 @@ class ErplibreStudioProject(models.Model):
         """The modules the generated module depends on: those of the edited
         views, of their view types and of the nodes the changes locate
         (read from the branding of the combined arch), of the models
-        extended, of the fields added or named by the changes (a filter
-        domain, a group-by, a timeline date) and of the comodels; mail for
-        a chatter; those of the parent menus, of the groups and of the
-        existing models of the access rights and record rules, and of the
-        fields their domains name."""
+        extended (by a field or by the inverse of a one2many), of the
+        fields added or named by the changes (a filter domain, a group-by,
+        a timeline date) and of the comodels; mail for a chatter; those of
+        the parent menus, of the groups, of the groups the groups of the
+        project imply, of the existing models of the access rights and
+        record rules, and of the fields their domains name. The icons of
+        the apps are copied into the module: no dependency."""
         self.ensure_one()
         IrModel = self.env["ir.model"].sudo()
         names = {"base"}
@@ -362,9 +394,9 @@ class ErplibreStudioProject(models.Model):
                     field = Fields._get(change.model, name)
                     if field:
                         names.add(self._module_of("ir.model.fields", field.id))
-        for change in self._project_field_changes():
-            names.add(self._module_of("ir.model", IrModel._get_id(change.model)))
-            relation = change._payload()["field"].get("relation")
+        for model, _name, definition, _change in self._studio_all_definitions():
+            names.add(self._module_of("ir.model", IrModel._get_id(model)))
+            relation = definition.get("relation")
             if relation:
                 names.add(self._module_of("ir.model", IrModel._get_id(relation)))
         names |= self._model_line_dependencies()
@@ -373,10 +405,11 @@ class ErplibreStudioProject(models.Model):
         return sorted(names)
 
     def _model_line_dependencies(self):
-        """The modules the new models, the access rights and the record
-        rules of the project need: mail for a chatter, those of the parent
-        menus, of the groups, of the existing models and of the fields the
-        domains name. A set that may hold False."""
+        """The modules the new models, the groups, the access rights and the
+        record rules of the project need: mail for a chatter, those of the
+        parent menus, of the existing groups (named by a row, a rule, or
+        implied by a group of the project), of the existing models and of
+        the fields the domains name. A set that may hold False."""
         IrModel = self.env["ir.model"].sudo()
         names = set()
         if self.new_model_ids.filtered("chatter"):
@@ -385,8 +418,14 @@ class ErplibreStudioProject(models.Model):
             lambda m: m.menu_mode == "menu"
         ).menu_parent_id:
             names.add(self._module_of("ir.ui.menu", menu.id))
-        for group in self.access_line_ids.group_id | self.rule_line_ids.group_ids:
-            names.add(self._module_of("res.groups", group.id))
+        groups = (
+            self.access_line_ids.group_id
+            | self.rule_line_ids.group_ids
+            | self.group_line_ids.implied_group_ids
+        )
+        for group in groups:
+            xmlid = self._studio_group_xmlid(group)
+            names.add(xmlid.split(".", 1)[0] if xmlid else False)
         models_named = set(self.access_line_ids.mapped("model"))
         models_named |= set(self.rule_line_ids.mapped("model"))
         for model in models_named - self._studio_new_models():
@@ -398,15 +437,16 @@ class ErplibreStudioProject(models.Model):
 
     def _code_generator_module(self, dependencies):
         """The code.generator.module of the project, created or updated. Its
-        icon is the one of the app of the project, else the studio's; it is
-        an application when it has an app."""
+        icon is the one of the first app of the project, else the studio's;
+        it is an application when an app of the project has its top-level
+        menu (a model goes in it)."""
         self.ensure_one()
-        has_app = bool(self.new_model_ids.filtered(lambda m: m.menu_mode == "app"))
-        icon_module = "erplibre_studio"
-        if has_app and self.app_icon:
-            icon_module = self._studio_icon_module(self.app_icon)
-        with file_open(f"{icon_module}/static/description/icon.png", "rb") as icon:
-            icon_data = base64.b64encode(icon.read())
+        has_app = any(app._studio_menu_models() for app in self.app_ids)
+        if self.app_ids:
+            icon_data = base64.b64encode(app_icon_bytes(self.app_ids[0]))
+        else:
+            with file_open(DEFAULT_APP_ICON.replace(",", "/"), "rb") as icon:
+                icon_data = base64.b64encode(icon.read())
         vals = {
             "name": self.module_name,
             "shortdesc": self.name,
@@ -517,11 +557,9 @@ class ErplibreStudioProject(models.Model):
             self.env._("Changes made with ERPLibre studio:"),
             "",
         ]
-        for change in self._project_field_changes():
-            definition = change._payload()["field"]
+        for model, name, definition, _change in self._studio_all_definitions():
             lines.append(
-                f"- `{change.model}`: field `{change.field_name}` "
-                f"({definition['ttype']}, {definition['field_description']})"
+                f"- `{model}`: field `{name}` " f"({self._readme_field(definition)})"
             )
         for view in self.change_ids.mapped("view_id"):
             count = len(self._view_changes(view))
@@ -529,13 +567,36 @@ class ErplibreStudioProject(models.Model):
                 f"- {view.type} view `{view.xml_id or view.name}`: "
                 + self.env._("%(count)s change(s)", count=count)
             )
+        for app in self.app_ids:
+            lines.append(
+                "- "
+                + self.env._(
+                    "app %(app)s, groups: %(groups)s",
+                    app=app.name.strip(),
+                    groups=", ".join(app.group_line_ids.mapped("name"))
+                    or self.env._("none"),
+                )
+            )
+        for group in self.group_line_ids:
+            implied = group.implied_line_ids.mapped(
+                "name"
+            ) + group.implied_group_ids.mapped("full_name")
+            lines.append(
+                "- "
+                + self.env._(
+                    "group %(group)s of the app %(app)s, implies %(implied)s",
+                    group=group.name.strip(),
+                    app=group.app_id.name.strip(),
+                    implied=", ".join(implied) or self.env._("no group"),
+                )
+            )
         for line in self.new_model_ids:
             label = (line.menu_name or "").strip() or line.name.strip()
             if line.menu_mode == "app":
                 text = self.env._(
                     "new model, menu %(menu)s in the app %(app)s",
                     menu=label,
-                    app=self.app_name,
+                    app=line.app_id.name,
                 )
             else:
                 text = self.env._(
@@ -556,11 +617,13 @@ class ErplibreStudioProject(models.Model):
                 + self.env._(
                     "access right %(perms)s for %(group)s",
                     perms=perms,
-                    group=access.group_id.full_name,
+                    group=access.group_id.full_name or access.group_line_id.name,
                 )
             )
         for rule in self.rule_line_ids:
-            groups = ", ".join(rule.group_ids.mapped("full_name"))
+            groups = ", ".join(
+                rule.group_ids.mapped("full_name") + rule.group_line_ids.mapped("name")
+            )
             lines.append(
                 f"- `{rule.model}`: "
                 + self.env._(
@@ -571,6 +634,23 @@ class ErplibreStudioProject(models.Model):
                 )
             )
         return "\n".join(lines) + "\n"
+
+    def _readme_field(self, definition):
+        """The type and label of a new field in the readme, with its relation:
+        the comodel, the inverse of a one2many, the table of a many2many."""
+        text = f"{definition['ttype']}, {definition['field_description']}"
+        ttype = definition["ttype"]
+        if ttype in ("many2one", "one2many", "many2many"):
+            text += f", `{definition['relation']}`"
+        if ttype == "one2many":
+            text += ", " + self.env._(
+                "inverse %(field)s", field=f"`{definition['relation_field']}`"
+            )
+        elif ttype == "many2many":
+            text += ", " + self.env._(
+                "table %(table)s", table=f"`{definition['relation_table']}`"
+            )
+        return text
 
     def _marker_text(self):
         """The content of ``MARKER_FILE``: a digest of the database, the
@@ -607,6 +687,22 @@ class ErplibreStudioProject(models.Model):
         self._check_generation_texts()
         if self.state == "draft":
             raise UserError(self.env._("Apply the draft before generating the module."))
+        # The groups and the rules go into every database that installs the
+        # module: what the groups imply and where a rule is global, checked
+        # again as Apply checks them.
+        self._studio_check_apply_groups()
+        self._studio_check_apply_rules()
+        pending = self.change_ids.filtered("model_line_id")
+        if pending:
+            # Apply binds them to the views it creates: an applied project
+            # has none.
+            raise UserError(
+                self.env._(
+                    "Apply the draft first: %(count)s change(s) are on the views "
+                    "of models not created yet.",
+                    count=len(pending),
+                )
+            )
         missing = self.change_ids.mapped("view_id").filtered(lambda v: not v.xml_id)
         if missing:
             raise UserError(

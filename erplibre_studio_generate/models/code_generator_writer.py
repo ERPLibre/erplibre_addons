@@ -16,7 +16,11 @@ actions and every view of the model. Under the context key
   and on the existing models, whether the project adds fields to them or
   not;
 - studio writes the views file itself: the default views of the new
-  models, the inherited views, the window actions and the menus.
+  models, the inherited views, the window actions, the menu of each app
+  and the menus of the models;
+- studio writes the groups file itself: the category of each app that
+  has groups, then the groups, each after the groups it implies; and the
+  icon of each app, a copy of the icon chosen for it.
 
 The definition of a field of the project comes from the project, not from
 ``ir.model.fields``: once the generated module is installed, the database
@@ -35,11 +39,16 @@ from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
     MODEL_VIEW_PRIORITY,
     STUDIO_PRIORITY,
 )
+from odoo.tools import file_open
 
 VIEWS_FILE = "views/erplibre_studio_views.xml"
+GROUPS_FILE = "security/erplibre_studio_groups.xml"
 HOOKS_FILE = "hooks.py"
 # The pre_init_hook of a generated module that defines new models.
 TAKE_OVER_HOOK = "erplibre_studio_take_over"
+
+# The permissions of a record rule, as the writer names its fields.
+RULE_PERMS = ("perm_read", "perm_create", "perm_write", "perm_unlink")
 
 # Class attributes the writer copies from the extended model.
 _COPIED_ATTRIBUTE = re.compile(r"^\s+_(order|rec_name) = .*$\n?", re.M)
@@ -49,8 +58,10 @@ _WRITER_IMPORT = re.compile(r"^from odoo import .*$", re.M)
 
 class PayloadField:
     """An ``ir.model.fields`` record read with the definition of the
-    project: label, tooltip, read-only flag, selection, comodel and
-    currency field. Every other attribute is the record's."""
+    project: label, tooltip, read-only flag, selection, comodel, currency
+    field, and the relation of a relational field (the inverse of a
+    one2many, the table and columns of a many2many, what a many2one does
+    when its record is deleted). Every other attribute is the record's."""
 
     def __init__(self, record, definition):
         self._record = record
@@ -69,6 +80,14 @@ class PayloadField:
             self._values["relation"] = definition["relation"]
         if definition.get("currency_field"):
             self._values["currency_field"] = definition["currency_field"]
+        ttype = definition.get("ttype")
+        if ttype == "many2one":
+            self._values["on_delete"] = definition.get("on_delete") or "set null"
+        elif ttype == "one2many" and definition.get("relation_field"):
+            self._values["relation_field"] = definition["relation_field"]
+        elif ttype == "many2many" and definition.get("relation_table"):
+            for key in ("relation_table", "column1", "column2"):
+                self._values[key] = definition[key]
 
     def __getattr__(self, name):
         if name in self._values:
@@ -135,12 +154,25 @@ class CodeGeneratorWriter(models.Model):
         project = self._studio_project()
         if project and not isinstance(model, StudioModelProxy):
             model = self._studio_proxy(project, model)
-        return super()._get_model_rules(module, model)
+        lines = super()._get_model_rules(module, model)
+        return full_rules(lines, model.rule_ids) if project else lines
+
+    def _get_group_data_name(self, group):
+        """Under a studio project, an existing group by its external id under
+        an installed module (``_studio_group_xmlid``): never one under
+        « __export__ » or a module the generated module cannot depend on."""
+        if self._studio_project():
+            xmlid = self.env["erplibre.studio.project"]._studio_group_xmlid(group)
+            if xmlid:
+                return xmlid
+        return super()._get_group_data_name(group)
 
     def _set_module_security(self, module, l_model_rules, l_model_csv_access):
         """Add the access rights and record rules of the project on the
         existing models it adds no field to: the writer reads those of the
-        models of the module only."""
+        models of the module only. Then the groups file of the project,
+        first in the data of the manifest: the access rights and the rules
+        name its groups."""
         project = self._studio_project()
         if project:
             others = (
@@ -150,7 +182,16 @@ class CodeGeneratorWriter(models.Model):
                 l_model_csv_access += self._get_model_access(module, model)
                 l_model_rules += self._get_model_rules(module, model)
             l_model_csv_access[:] = sorted(set(l_model_csv_access))
-        return super()._set_module_security(module, l_model_rules, l_model_csv_access)
+        res = super()._set_module_security(module, l_model_rules, l_model_csv_access)
+        content = project_groups_file(project) if project else ""
+        if content:
+            cg_data = code_generator_data.get_code_generator_data(self.env)
+            cg_data.write_file_str(
+                GROUPS_FILE, content, data_file=True, insert_first=True
+            )
+            # The names and comments of the groups keep their value.
+            cg_data.keep_xml_text(GROUPS_FILE)
+        return res
 
     def _set_model_xmlview_file(self, module, model, model_model):
         if self._studio_project():
@@ -176,7 +217,7 @@ class CodeGeneratorWriter(models.Model):
         project = self._studio_project()
         if not project:
             return super()._get_model_fields_f2export(model, module)
-        names = set(project._project_field_changes(model.model).mapped("field_name"))
+        names = set(project._studio_field_definitions(model.model))
         if not self._studio_extends(model):
             names.add("x_name")
         return (
@@ -190,9 +231,9 @@ class CodeGeneratorWriter(models.Model):
     ):
         project = self._studio_project()
         if project:
-            change = project._field_add_change(f2export.model, f2export.name)
-            if change:
-                f2export = PayloadField(f2export, change._payload().get("field") or {})
+            definitions = project._studio_field_definitions(f2export.model)
+            if f2export.name in definitions:
+                f2export = PayloadField(f2export, definitions[f2export.name][0])
         return super()._generate_field_from_model(
             f2export, model_name, lst_field_inherit, dct_field_attr_diff
         )
@@ -218,15 +259,21 @@ class CodeGeneratorWriter(models.Model):
         return path
 
     def set_xml_views_file(self, module):
+        """The views file of the project, and the icon of each of its apps,
+        which the menu of the app names."""
         super().set_xml_views_file(module)
         project = self._studio_project()
         if project:
+            cg_data = code_generator_data.get_code_generator_data(self.env)
             content = project_views_file(project)
             if content:
-                cg_data = code_generator_data.get_code_generator_data(self.env)
                 cg_data.write_file_str(VIEWS_FILE, content, data_file=True)
                 # The names of the actions and views keep their value.
                 cg_data.keep_xml_text(VIEWS_FILE)
+            for app in project.app_ids:
+                cg_data.write_file_binary(
+                    app._studio_xml_names()["icon_path"], app_icon_bytes(app)
+                )
 
     def set_manifest_file_extra(self, cw, module):
         super().set_manifest_file_extra(cw, module)
@@ -348,7 +395,9 @@ def project_views_file(project):
     """The XML data file of the views, actions and menus of ``project``,
     under the external ids the database already uses, in the order their
     references need: the default views of the new models, one inherited
-    view per edited view, the window actions, then the app and the menus."""
+    view per edited view, the window actions, then the top-level menu of
+    each app a model goes in, with the icon the generation copies into
+    the module, and the menus of the models."""
     root = etree.Element("odoo")
     parser = etree.XMLParser(remove_blank_text=True)
     lines = project.new_model_ids
@@ -388,19 +437,20 @@ def project_views_file(project):
         _field(record, "res_model", line.model)
         _field(record, "view_mode", "list,form")
         _field(record, "search_view_id", ref=names["search"])
-    if lines.filtered(lambda m: m.menu_mode == "app"):
+    for app in project.app_ids.filtered(lambda a: a._studio_menu_models()):
+        names = app._studio_xml_names()
         etree.SubElement(
             root,
             "menuitem",
-            id="menu_app",
-            name=project.app_name.strip(),
-            web_icon=f"{project.module_name},static/description/icon.png",
-            sequence=str(project.app_sequence),
+            id=names["menu"],
+            name=app.name.strip(),
+            web_icon=f"{project.module_name},{names['icon_path']}",
+            sequence=str(app.menu_sequence),
         )
     for line in lines:
         names = line._studio_xml_names()
         if line.menu_mode == "app":
-            parent = "menu_app"
+            parent = line.app_id.xml_name
         else:
             parent = _menu_ref(project, line.menu_parent_id)
         etree.SubElement(
@@ -414,5 +464,100 @@ def project_views_file(project):
         )
     if not len(root):
         return ""
+    body = etree.tostring(root, encoding="unicode", pretty_print=True)
+    return '<?xml version="1.0" encoding="utf-8" ?>\n' + body
+
+
+def app_icon_bytes(app):
+    """The bytes of the icon chosen for ``app``, else of the studio's."""
+    module = "erplibre_studio"
+    if app.icon:
+        module = app.project_id._studio_icon_module(app.icon)
+    with file_open(f"{module}/static/description/icon.png", "rb") as fh:
+        return fh.read()
+
+
+def full_rules(lines, rules):
+    """``lines``, the XML lines of the records of ``rules`` the writer gives
+    (``_get_model_rules``), each record with every field the studio sets:
+    the writer leaves out ``groups`` for a rule without groups and each
+    permission that is True, and an upgrade writes only the fields a record
+    names, so that a rule made global, or a permission given back, would
+    keep its former value in a database that upgrades the module."""
+    result = []
+    record = []
+    rules = iter(rules)
+    for line in lines:
+        record.append(line)
+        if line != "</record>\n":
+            continue
+        rule = next(rules)
+        text = "".join(record)
+        missing = []
+        if '<field name="groups"' not in text:
+            missing.append('<field name="groups" eval="[(6, 0, [])]" />')
+        for perm in RULE_PERMS:
+            if f'<field name="{perm}"' not in text:
+                missing.append(f'<field name="{perm}" eval="{bool(rule[perm])}" />')
+        result += record[:-1] + missing + record[-1:]
+        record = []
+    return result + record
+
+
+def _group_ref(group):
+    """The full external id of the existing group ``group``: its first under
+    an installed module."""
+    return group.env["erplibre.studio.project"]._studio_group_xmlid(group)
+
+
+def _implication_order(groups):
+    """``groups`` (group lines of a project) so that each one comes after
+    the groups of the project it implies: a data file creates them in that
+    order. The groups imply each other in no cycle (``_check_studio_group``)."""
+    ordered = groups.browse()
+    todo = groups
+    while todo:
+        ready = todo.filtered(lambda g: not (g.implied_line_ids & todo))
+        if not ready:
+            # A cycle, which the constraint refuses: keep the given order.
+            ready = todo
+        ordered |= ready
+        todo -= ready
+    return ordered
+
+
+def project_groups_file(project):
+    """The XML data file of the groups of ``project``: the category of each
+    app that has groups, then each group in its category, after the groups
+    it implies. ``implied_ids`` lists exactly the groups the project gives
+    it (``(6, 0, ...)``): an upgrade drops an implication the project
+    dropped; the users keep their groups. Empty without group."""
+    groups = project.group_line_ids
+    if not groups:
+        return ""
+    root = etree.Element("odoo")
+    for app in project.app_ids.filtered("group_line_ids"):
+        record = etree.SubElement(
+            root,
+            "record",
+            id=app._studio_xml_names()["category"],
+            model="ir.module.category",
+        )
+        _field(record, "name", app.name.strip())
+        _field(record, "sequence", str(app.menu_sequence))
+    for group in _implication_order(groups):
+        record = etree.SubElement(root, "record", id=group.xml_name, model="res.groups")
+        _field(record, "name", group.name.strip())
+        _field(record, "category_id", ref=group.app_id._studio_xml_names()["category"])
+        refs = [_group_ref(g) for g in group.implied_group_ids.sorted("id")]
+        refs += group.implied_line_ids.sorted(lambda g: g.xml_name).mapped("xml_name")
+        implied = ", ".join(f"ref({ref!r})" for ref in refs)
+        _field(record, "implied_ids", eval=f"[(6, 0, [{implied}])]")
+        # Written empty as well: an upgrade writes only the fields a record
+        # names, and would keep a comment the project cleared.
+        if (group.comment or "").strip():
+            _field(record, "comment", group.comment.strip())
+        else:
+            _field(record, "comment", eval="False")
     body = etree.tostring(root, encoding="unicode", pretty_print=True)
     return '<?xml version="1.0" encoding="utf-8" ?>\n' + body
