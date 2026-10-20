@@ -271,10 +271,320 @@ APPLY = {
     "error": None,
 }
 
+PULL_STAMP = "20000101T0000"
+PULL_DIR = f"tasks/git_repo_pull/{PULL_STAMP}"
+REPO_SHALLOW = "odooX/shallow"
+REPO_NEW = "odooX/new"
+REPO_BUSY = "odooX/busy"
+
+
+def _pull_repo(path, verdict, **values):
+    """One repository of a pull dry run, with the keys of the script."""
+    repo = {
+        "chemin": path,
+        "nom": None,
+        "branche": None,
+        "detache": True,
+        "remote": "Example",
+        "cible": f"refs/remotes/Example/{SERIES}",
+        "source_cible": "manifeste_regenere",
+        "head": None,
+        "cible_sha": None,
+        "nos": 0,
+        "retard": 0,
+        "base": None,
+        "diverge": False,
+        "superficiel": False,
+        "approfondissement_requis": False,
+        "sale": False,
+        "non_suivis": 0,
+        "stash_prevu": False,
+        "operation_en_cours": None,
+        "entrants": [],
+        "entrants_total": 0,
+        "entrants_tronques": False,
+        "verdict": verdict,
+        "applicable": False,
+        "sauvegarde_prefixe": f"{SERIES}_avant_pull_",
+        "fetch": "ok",
+        "motif": None,
+        "erreur": None,
+    }
+    repo.update(values)
+    return repo
+
+
+PULL_DRY_RUN = {
+    "schema": 1,
+    "command": "dry-run",
+    "generated_at": "2000-01-01T00:00:00+00:00",
+    "root": "",
+    "version": SERIES,
+    "mode": "manifeste",
+    "strategie": "rebase",
+    "chemin_seul": None,
+    "depots": [
+        _pull_repo(
+            ".",
+            "avance_rapide",
+            branche="example",
+            detache=False,
+            cible="refs/remotes/origin/example",
+            source_cible="suivi",
+            head="0" * 40,
+            cible_sha="d" * 40,
+            retard=1,
+            applicable=True,
+            entrants=[
+                {
+                    "sha": "d" * 40,
+                    "author": "A",
+                    "date": "2000-01-01",
+                    "subject": "root update",
+                }
+            ],
+            entrants_total=1,
+            sauvegarde_prefixe="example_avant_pull_",
+        ),
+        _pull_repo(
+            REPO,
+            "diverge",
+            head="1" * 40,
+            cible_sha="c" * 40,
+            nos=1,
+            retard=3,
+            base="b" * 40,
+            diverge=True,
+            applicable=True,
+            sale=True,
+            stash_prevu=True,
+            non_suivis=2,
+            entrants=[
+                {
+                    "sha": "c" * 40,
+                    "author": "A",
+                    "date": "2000-01-02",
+                    "subject": "<b>incoming</b>",
+                }
+            ],
+            entrants_total=3,
+            entrants_tronques=True,
+        ),
+        _pull_repo(
+            REPO_SHALLOW,
+            "superficiel",
+            head="f" * 40,
+            cible_sha="e" * 40,
+            nos=1,
+            retard=1,
+            superficiel=True,
+            approfondissement_requis=True,
+        ),
+        _pull_repo(
+            REPO_BUSY,
+            "operation_en_cours",
+            head="4" * 40,
+            operation_en_cours="rebase",
+            fetch="saute",
+        ),
+    ],
+    "manifeste": {
+        "etat_actuel": "branches",
+        "regenere": True,
+        "ecrit": None,
+        "copie_avant": None,
+        "changements": [
+            {"chemin": REPO_NEW, "genre": "ajout", "avant": None, "apres": SERIES}
+        ],
+        "erreur": None,
+    },
+    "nouveaux": [
+        {
+            "chemin": REPO_NEW,
+            "nom": "new.git",
+            "remote": "Example",
+            "url": "https://git.example.invalid/new.git",
+            "revision": SERIES,
+            "occupe": False,
+        }
+    ],
+    "retires": [],
+    "dependances": {
+        "fichiers": [f"requirement/poetry.odoo{SERIES}.lock"],
+        "changement_de_version": False,
+        "a_installer": True,
+        "venv": f".venv.odoo{SERIES}_python3.0.0",
+        "commande": f"source .venv.odoo{SERIES}_python3.0.0/bin/activate"
+        " && poetry install --no-root",
+        "venv_erplibre_a_revoir": False,
+        "requirements_addons": [],
+    },
+    "plan": [".", REPO],
+    "plan_superficiel": [REPO_SHALLOW],
+    "plan_nouveaux": [REPO_NEW],
+    "attendus": [f".={'d' * 40}:{'0' * 40}", f"{REPO}={'c' * 40}:{'1' * 40}"],
+    "attendus_superficiel": [f"{REPO_SHALLOW}={'e' * 40}:{'f' * 40}"],
+    "counts": {
+        "avance_rapide": 1,
+        "diverge": 1,
+        "superficiel": 1,
+        "operation_en_cours": 1,
+    },
+    "errors": [],
+}
+
+
+def _pull_result(path, state, start, end, backup, **values):
+    """One repository of a pull apply, with the keys of the script."""
+    result = {
+        "chemin": path,
+        "verdict_avant": None,
+        "etat": state,
+        "branche": None,
+        "detache": True,
+        "cible": None,
+        "cible_sha": end,
+        "depart": start,
+        "arrivee": end,
+        "sauvegarde": backup,
+        "stash": {"etat": "aucun", "sha": None, "commande": None},
+        "approfondi": None,
+        "conflits": [],
+        "sortie": "",
+        "motif": None,
+    }
+    result.update(values)
+    return result
+
+
+PULL_APPLY = {
+    "schema": 1,
+    "command": "apply",
+    "version": SERIES,
+    "mode": "manifeste",
+    "strategie": "rebase",
+    "chemin_seul": None,
+    "horodatage": PULL_STAMP,
+    "dossier": PULL_DIR,
+    "plan": [".", REPO],
+    "attendus": [".", REPO],
+    "derives": [],
+    "approuve": {"approfondir": False, "cloner": False, "dependances": False},
+    "resultats": [
+        _pull_result(
+            ".",
+            "avance",
+            "0" * 40,
+            "d" * 40,
+            f"example_avant_pull_{PULL_STAMP}",
+            branche="example",
+            detache=False,
+        ),
+        _pull_result(
+            REPO,
+            "stash_garde",
+            "1" * 40,
+            "c" * 40,
+            f"{SERIES}_avant_pull_{PULL_STAMP}",
+            stash={
+                "etat": "garde",
+                "sha": "5" * 40,
+                "commande": f"git -C {REPO} stash apply {'5' * 40}",
+            },
+        ),
+    ],
+    "manifeste": {
+        "etat_actuel": "branches",
+        "regenere": True,
+        "ecrit": True,
+        "copie_avant": f"{PULL_DIR}/erplibre_manifest.avant.xml",
+        "changements": [],
+        "erreur": None,
+    },
+    "clones": [],
+    "dependances": dict(PULL_DRY_RUN["dependances"]),
+    "deps": None,
+    "error": None,
+}
+
+PULL_RESTORE = {
+    "schema": 1,
+    "command": "restore-backup",
+    "resultats": [
+        {
+            "chemin": REPO,
+            "etat": "revenu",
+            "depart": "c" * 40,
+            "arrivee": "1" * 40,
+            "sauvegarde": f"{SERIES}_avant_pull_{PULL_STAMP}",
+            "manifeste_restaure": False,
+        }
+    ],
+}
+
+PULL_DELETE = {
+    "schema": 1,
+    "command": "delete-backup",
+    "resultats": [
+        {
+            "chemin": REPO,
+            "sauvegarde": f"{SERIES}_avant_pull_{PULL_STAMP}",
+            "etat": "supprime",
+        }
+    ],
+}
+
+PULL_DEPS = {
+    "schema": 1,
+    "command": "install-deps",
+    "venv": f".venv.odoo{SERIES}_python3.0.0",
+    "commande": f"source .venv.odoo{SERIES}_python3.0.0/bin/activate"
+    " && poetry install --no-root",
+    "code": 0,
+    "sortie": "Installing dependencies from lock file",
+    "dossier": PULL_DIR,
+    "error": None,
+}
+
+PULL_LIST_BACKUPS = {
+    "schema": 1,
+    "command": "list-backups",
+    "sauvegardes": [
+        {
+            "chemin": REPO,
+            "nom": f"{SERIES}_avant_pull_{PULL_STAMP}",
+            "sha": "1" * 40,
+            "horodatage": PULL_STAMP,
+            "actuel": False,
+            "branche": None,
+            "detache": True,
+        },
+        {
+            "chemin": REPO,
+            "nom": f"{SERIES}_avant_pull_19990101T0000",
+            "sha": "2" * 40,
+            "horodatage": "19990101T0000",
+            "actuel": False,
+            "branche": None,
+            "detache": True,
+        },
+    ],
+}
+
+# The answer of « repo_pull.py » to each action flag.
+PULL_ANSWERS = {
+    "--list-backups": PULL_LIST_BACKUPS,
+    "--dry-run": PULL_DRY_RUN,
+    "--apply": PULL_APPLY,
+    "--restore-backup": PULL_RESTORE,
+    "--delete-backup": PULL_DELETE,
+    "--install-deps": PULL_DEPS,
+}
+
 
 class FakeScripts:
-    """Stand-in for ``subprocess.run`` in the runner: answers each script
-    call with a recorded JSON and keeps the argument lists."""
+    """Stand-in for ``runner._run_process``: answers each script call with
+    a recorded JSON and keeps the argument lists."""
 
     def __init__(self):
         self.calls = []
@@ -289,6 +599,8 @@ class FakeScripts:
         self.calls.append((script, args, kwargs))
         key = (script, args[0] if args else "")
         if key in self.answers:
+            if isinstance(self.answers[key], BaseException):
+                raise self.answers[key]
             code, data = self.answers[key]
         elif script == "repo_state.py" and args[0] == "snapshot":
             code, data = 0, self.snapshot
@@ -314,6 +626,8 @@ class FakeScripts:
             code, data = 0, DIAGNOSTIC
         elif script == "repo_apply.py":
             code, data = 0, APPLY
+        elif script == "repo_pull.py" and args and args[0] in PULL_ANSWERS:
+            code, data = 0, copy.deepcopy(PULL_ANSWERS[args[0]])
         else:
             raise AssertionError(f"unexpected script call {cmd}")
         return subprocess.CompletedProcess(cmd, code, json.dumps(data), "")
@@ -335,6 +649,7 @@ class ErplibreInfoCase(TransactionCase):
             runner.SCRIPT_STATE,
             runner.SCRIPT_UPGRADE,
             runner.SCRIPT_APPLY,
+            runner.SCRIPT_PULL,
         ):
             os.makedirs(os.path.join(cls.root, os.path.dirname(rel)), exist_ok=True)
             with open(os.path.join(cls.root, rel), "w") as fh:
@@ -351,7 +666,7 @@ class ErplibreInfoCase(TransactionCase):
         self.env["ir.config_parameter"].sudo().set_param(runner.PARAM_ROOT, self.root)
         self.fake = FakeScripts()
         self.fake.snapshot["root"] = self.root
-        patcher = patch.object(runner.subprocess, "run", self.fake)
+        patcher = patch.object(runner, "_run_process", self.fake)
         patcher.start()
         self.addCleanup(patcher.stop)
         self.Snapshot = self.env["erplibre.code.snapshot"]

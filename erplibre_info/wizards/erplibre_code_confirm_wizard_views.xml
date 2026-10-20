@@ -13,13 +13,29 @@
                     a new dated branch. A repository that conflicts is put back
                     where it was. Nothing is pushed.
                 </div>
-                <div class="alert alert-warning" role="alert" invisible="action == 'apply'">
+                <div class="alert alert-warning" role="alert" invisible="action != 'pull_apply'">
+                    Each repository gets a backup branch on its HEAD, then
+                    integrates its target with the chosen strategy. A conflicting
+                    repository is put back where it was. Nothing is pushed.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'pull_restore'">
+                    The repository moves back to the backup commit.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'deps_install'">
+                    poetry install --no-root runs in the Odoo virtual environment.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action not in ('restart', 'restart_upgrade')">
                     The server stops and starts again: every user loses the
                     request in progress.
                 </div>
                 <group>
                     <field name="run_id" invisible="not run_id" />
-                    <field name="plan_paths" invisible="action != 'apply'" />
+                    <field name="backup_id" invisible="not backup_id" />
+                    <field name="plan_paths" invisible="action not in ('apply', 'pull_apply')" />
+                    <field name="shallow_paths" invisible="action != 'pull_apply' or not shallow_paths" />
+                    <field name="approve_deepen" invisible="action != 'pull_apply' or not shallow_paths" />
+                    <field name="clone_paths" invisible="action != 'pull_apply' or not clone_paths" />
+                    <field name="approve_clone" invisible="action != 'pull_apply' or not clone_paths" />
                     <field name="module_ids" widget="many2many_tags" invisible="action != 'restart_upgrade'" />
                     <field name="database_name" />
                     <field name="typed_database_name" />

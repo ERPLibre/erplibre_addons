@@ -26,11 +26,50 @@ PARAM_STARTUP = "erplibre_info.snapshot_on_startup"
 PARAM_PERIODIC = "erplibre_info.snapshot_periodic"
 PARAM_STARTUP_KEY = "erplibre_info.startup_key"
 CRON_XMLID = "erplibre_info.ir_cron_erplibre_code"
+PARAM_PULL_STRATEGY = "erplibre_info.pull_strategy"
 
 # Verdicts of « repo_upgrade.py --diagnostic » that the apply step takes:
 # no conflict predicted. The others go to the TODO menu.
 VERDICTS_CLEAN = ("a_rebaser", "en_retard")
 VERDICTS_MENU = ("en_conflit", "absorbe")
+
+PULL_MODES = [("manifeste", "Manifest"), ("branche", "Branches")]
+PULL_STRATEGIES = [
+    ("rebase", "Rebase"),
+    ("ff", "Fast-forward only"),
+    ("merge", "Merge"),
+]
+
+# The run types that run git on the checkout: one of them at a time.
+GIT_RUN_TYPES = (
+    "dry_run",
+    "apply",
+    "pull_dry_run",
+    "pull_apply",
+    "pull_restore",
+    "deps_install",
+)
+
+# The apply type of each dry run type.
+APPLY_OF = {"dry_run": "apply", "pull_dry_run": "pull_apply"}
+
+# The fields of a run that decide what its background step runs: only the
+# launch methods set them, through ``_create_launched``.
+LAUNCH_FIELDS = (
+    "run_type",
+    "parent_id",
+    "backup_id",
+    "pull_mode",
+    "pull_strategy",
+    "pull_path",
+    "approve_deepen",
+    "approve_clone",
+    "user_id",
+)
+
+# The exit code of « repo_apply.py » and « repo_pull.py » when the plan or
+# a pinned commit changed since the dry run: nothing is written.
+EXIT_PLAN_CHANGED = 4
 
 TRIGGERS = [
     ("manual", "Manual"),
@@ -66,6 +105,10 @@ class ErplibreCodeRun(models.Model):
             ("dry_run", "Fetch + rebase: dry run"),
             ("apply", "Fetch + rebase: apply"),
             ("restart", "Server restart"),
+            ("pull_dry_run", "Pull: dry run"),
+            ("pull_apply", "Pull: apply"),
+            ("pull_restore", "Pull: restore a backup"),
+            ("deps_install", "Python dependencies install"),
         ],
         string="Type",
         required=True,
@@ -116,14 +159,60 @@ class ErplibreCodeRun(models.Model):
     plan_paths = fields.Text(
         string="Repositories to apply",
         readonly=True,
-        help="Forks without predicted conflict, one path per line.",
+        help="The repositories that the apply step integrates, one per line.",
     )
     plan_count = fields.Integer(compute="_compute_plan_count")
     left_paths = fields.Text(
-        string="Repositories left to the TODO menu",
+        string="Repositories left as they are",
         readonly=True,
-        help="Forks with a predicted conflict: they are resolved in the "
-        "TODO menu, never from Odoo.",
+        help="A fork with a predicted conflict, resolved in the TODO menu; "
+        "a pull that the chosen strategy cannot make, or a repository "
+        "with an operation in progress. The apply step never touches "
+        "them.",
+    )
+    pull_mode = fields.Selection(PULL_MODES, string="Pull mode", readonly=True)
+    pull_strategy = fields.Selection(
+        PULL_STRATEGIES, string="Pull strategy", readonly=True
+    )
+    pull_path = fields.Char(
+        string="Single repository",
+        readonly=True,
+        help="The pull is restricted to this repository.",
+    )
+    shallow_paths = fields.Text(
+        string="Shallow clones to deepen",
+        readonly=True,
+        help="Shallow clones without a known common base with their target: "
+        "the apply step deepens them only when it is allowed to.",
+    )
+    clone_paths = fields.Text(
+        string="New repositories to clone",
+        readonly=True,
+        help="Projects of the regenerated manifest not cloned yet: the "
+        "apply step clones them only when it is allowed to.",
+    )
+    approve_deepen = fields.Boolean(string="Deepening allowed", readonly=True)
+    approve_clone = fields.Boolean(string="Cloning allowed", readonly=True)
+    deps_to_install = fields.Boolean(
+        string="Python dependencies to install",
+        readonly=True,
+        help="The pull changed the Python dependencies of the Odoo "
+        "virtual environment.",
+    )
+    pull_blocked = fields.Boolean(
+        string="A repository is left mid-operation",
+        readonly=True,
+        help="Putting a repository back where it was failed: it is fixed "
+        "in a terminal before the server restarts.",
+    )
+    backup_ids = fields.One2many(
+        "erplibre.code.pull.backup", "run_id", string="Backups"
+    )
+    backup_id = fields.Many2one(
+        "erplibre.code.pull.backup",
+        string="Restored backup",
+        readonly=True,
+        ondelete="set null",
     )
     pass_dir = fields.Char(string="Pass record", readonly=True)
     upgrade_module_ids = fields.Many2many(
@@ -168,25 +257,41 @@ class ErplibreCodeRun(models.Model):
             run.plan_count = len(run._plan())
 
     @api.depends(
-        "run_type", "state", "plan_paths", "child_ids.state", "child_ids.exit_code"
+        "run_type",
+        "state",
+        "plan_paths",
+        "shallow_paths",
+        "clone_paths",
+        "child_ids.run_type",
+        "child_ids.state",
+        "child_ids.exit_code",
     )
     def _compute_can_apply(self):
-        """A dry run is applied once, while it is the last done dry run and
-        no apply found the upstream moved since (exit code 4)."""
+        """A dry run is applied once, while it is the last done dry run of
+        its type and no apply found the remote moved since (exit code 4)."""
         for run in self:
             run.can_apply = False
             run.apply_note = False
-            if run.run_type != "dry_run" or run.state != "done":
+            apply_type = APPLY_OF.get(run.run_type)
+            if not apply_type or run.state != "done":
                 continue
-            if run.child_ids.filtered(
-                lambda c: c.state == "failed" and c.exit_code == 4
+            applies = run.child_ids.filtered(lambda c: c.run_type == apply_type)
+            if applies.filtered(
+                lambda c: c.state == "failed" and c.exit_code == EXIT_PLAN_CHANGED
             ):
-                run.apply_note = self.env._(
-                    "The upstream moved since this dry run: run a new dry run."
+                run.apply_note = (
+                    self.env._(
+                        "The upstream moved since this dry run: run a new dry run."
+                    )
+                    if run.run_type == "dry_run"
+                    else self.env._(
+                        "A remote or a HEAD moved since this dry run: run a "
+                        "new dry run."
+                    )
                 )
             elif run.id and self.search_count(
                 [
-                    ("run_type", "=", "dry_run"),
+                    ("run_type", "=", run.run_type),
                     ("state", "=", "done"),
                     ("id", ">", run.id),
                 ]
@@ -194,8 +299,8 @@ class ErplibreCodeRun(models.Model):
                 run.apply_note = self.env._("A newer dry run exists: apply that one.")
             run.can_apply = (
                 not run.apply_note
-                and bool(run._plan())
-                and not run.child_ids.filtered(
+                and run._has_work()
+                and not applies.filtered(
                     lambda c: c.state in ("queued", "running", "done")
                 )
             )
@@ -212,20 +317,72 @@ class ErplibreCodeRun(models.Model):
                 data = json.loads(run.result_json) if run.result_json else None
             except ValueError:
                 data = None
-            if not data:
-                run.report_html = False
-            elif run.run_type == "dry_run":
-                run.report_html = run._render_dry_run(data)
-            elif run.run_type == "apply":
-                run.report_html = run._render_apply(data)
-            else:
-                run.report_html = False
+            render = getattr(run, f"_render_{run.run_type}", None)
+            run.report_html = render(data) if data and render else False
+
+    @api.model
+    def _lines(self, text):
+        return [p for p in (text or "").splitlines() if p.strip()]
 
     def _plan(self):
         self.ensure_one()
-        return [p for p in (self.plan_paths or "").splitlines() if p.strip()]
+        return self._lines(self.plan_paths)
+
+    def _has_work(self):
+        """Whether the apply step of this dry run has something to do: a
+        repository of its plan, and for a pull a shallow clone to deepen
+        or a new repository to clone, both subject to approval."""
+        self.ensure_one()
+        if self.run_type == "pull_dry_run":
+            return bool(
+                self._plan()
+                or self._lines(self.shallow_paths)
+                or self._lines(self.clone_paths)
+            )
+        return bool(self._plan())
 
     # ── guards ──────────────────────────────────────────────────────────
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """A run of a git type is created only by a launch method
+        (``_create_launched``), after the checks and the confirmations of
+        its button: created through the ORM or RPC, its background step
+        would skip them."""
+        if not self.env.su and any(
+            vals.get("run_type") in GIT_RUN_TYPES for vals in vals_list
+        ):
+            raise AccessError(
+                self.env._(
+                    "A git run is started only from its button, after its "
+                    "confirmations."
+                )
+            )
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """The fields that decide what a run executes, and its return to
+        the queue, are set only by the launch methods."""
+        if not self.env.su and (
+            any(field in vals for field in LAUNCH_FIELDS)
+            or vals.get("state") == "queued"
+        ):
+            raise AccessError(
+                self.env._(
+                    "What a run executes is set when it is started, never "
+                    "changed afterwards."
+                )
+            )
+        return super().write(vals)
+
+    @api.model
+    def _create_launched(self, vals):
+        """Create the run ``vals`` of a launch method, which checked the
+        server actions and the confirmations before; the requester stays
+        the current user. Return the run, in the caller's environment."""
+        vals = dict(vals)
+        vals.setdefault("user_id", self.env.user.id)
+        return self.sudo().create(vals).with_env(self.env)
 
     @api.model
     def _flag_enabled(self):
@@ -620,8 +777,18 @@ class ErplibreCodeRun(models.Model):
             self.write(vals)
             return
         self.write(vals)
-        # The pass is on disk: a snapshot that fails must not erase its
-        # record, so the failure only goes to the log.
+        self._record_code_change(res.data)
+
+    def _record_code_change(self, data):
+        """After a run that moved repositories: take a snapshot, then
+        record the installed modules whose code changed (from the
+        ``chemin``/``depart``/``arrivee`` of ``data["resultats"]``) and
+        those whose version waits for an upgrade.
+
+        The pass is already on disk: a snapshot that fails must not erase
+        its record, so the failure only goes to the log.
+        """
+        self.ensure_one()
         try:
             snapshot = self.env["erplibre.code.snapshot"]._capture(
                 "upgrade", run=self, force=True
@@ -629,7 +796,7 @@ class ErplibreCodeRun(models.Model):
         except runner.RunnerError as exc:
             self.log = self._append_log(str(exc))
             return
-        changed = self._changed_modules(res.data, snapshot)
+        changed = self._changed_modules(data, snapshot)
         pending = snapshot.module_ids.filtered("pending_update").module_id
         self.write(
             {
@@ -645,7 +812,8 @@ class ErplibreCodeRun(models.Model):
 
     def _check_flag_in_background(self):
         """The background step of a server action re-reads the odoo.conf
-        flag: removing it stops a queued run."""
+        flag, and the group of its requester: removing either stops a
+        queued run."""
         if not self._flag_enabled():
             raise UserError(
                 self.env._(
@@ -654,6 +822,11 @@ class ErplibreCodeRun(models.Model):
                     flag=FLAG_SERVER_ACTIONS,
                 )
             )
+        for run in self:
+            if not (run.user_id and run.user_id.sudo().has_group("base.group_system")):
+                raise AccessError(
+                    self.env._("Only the Settings administrators run server actions.")
+                )
 
     # ── actions ─────────────────────────────────────────────────────────
 
@@ -671,23 +844,21 @@ class ErplibreCodeRun(models.Model):
     def action_start_dry_run(self):
         self._check_server_actions()
         self._check_no_git_run()
-        run = self.create({"run_type": "dry_run"})
+        run = self._create_launched({"run_type": "dry_run"})
         run._enqueue()
         return run._action_open()
 
     @api.model
     def _check_no_git_run(self):
-        """One fetch + rebase at a time: two passes would rebase the same
-        clones concurrently."""
+        """One git run at a time, whatever its type: two passes would move
+        the same clones concurrently."""
         if self.search_count(
             [
-                ("run_type", "in", ("dry_run", "apply")),
+                ("run_type", "in", GIT_RUN_TYPES),
                 ("state", "in", ("queued", "running")),
             ]
         ):
-            raise UserError(
-                self.env._("A fetch + rebase is already queued or running.")
-            )
+            raise UserError(self.env._("A git run is already queued or running."))
 
     def action_apply(self):
         """Open the confirmation of the apply step: the first validation."""
@@ -705,7 +876,7 @@ class ErplibreCodeRun(models.Model):
         if not self.can_apply:
             raise UserError(self.env._("This dry run has nothing left to apply."))
         self._check_no_git_run()
-        run = self.create(
+        run = self._create_launched(
             {
                 "run_type": "apply",
                 "parent_id": self.id,
@@ -717,8 +888,42 @@ class ErplibreCodeRun(models.Model):
         run._enqueue()
         return run._action_open()
 
+    def _check_not_blocked(self):
+        if self.filtered("pull_blocked"):
+            raise UserError(
+                self.env._(
+                    "A repository is left mid-operation: fix it in a terminal "
+                    "before restarting."
+                )
+            )
+        self._check_no_blocked_pull()
+
+    @api.model
+    def _check_no_blocked_pull(self):
+        """Refuse a restart while the last pull left a repository
+        mid-operation, whichever button asks for it: the last finished
+        pull dry run or apply is an apply marked ``pull_blocked``. A new
+        dry run, after the repository is fixed in a terminal, lifts it."""
+        last = self.sudo().search(
+            [
+                ("run_type", "in", ("pull_dry_run", "pull_apply")),
+                ("state", "in", ("done", "failed")),
+            ],
+            order="id desc",
+            limit=1,
+        )
+        if last.run_type == "pull_apply" and last.pull_blocked:
+            raise UserError(
+                self.env._(
+                    "The last pull left a repository mid-operation: fix it in "
+                    "a terminal, then run a new pull dry run before "
+                    "restarting."
+                )
+            )
+
     def action_restart(self):
         self._check_server_actions()
+        self._check_not_blocked()
         return self.env["erplibre.code.confirm.wizard"]._action_open(
             "restart", run=self[:1]
         )
@@ -726,6 +931,7 @@ class ErplibreCodeRun(models.Model):
     def action_restart_upgrade(self):
         self.ensure_one()
         self._check_server_actions()
+        self._check_not_blocked()
         return self.env["erplibre.code.confirm.wizard"]._action_open(
             "restart_upgrade", run=self, modules=self.upgrade_module_ids
         )
@@ -743,6 +949,7 @@ class ErplibreCodeRun(models.Model):
         run it with the Python already loaded in this process.
         """
         self._check_server_actions()
+        self._check_no_blocked_pull()
         modules = modules or self.env["ir.module.module"]
         log = self.env._("Restart requested by %(user)s.", user=self.env.user.name)
         if modules:

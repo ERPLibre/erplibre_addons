@@ -4,7 +4,12 @@
 from odoo import api, fields, models
 
 from .. import runner
-from .erplibre_code_run import PARAM_PERIODIC, PARAM_STARTUP
+from .erplibre_code_run import (
+    PARAM_PERIODIC,
+    PARAM_PULL_STRATEGY,
+    PARAM_STARTUP,
+    PULL_STRATEGIES,
+)
 from .erplibre_code_snapshot import PARAM_DIRTY
 
 
@@ -36,6 +41,15 @@ class ResConfigSettings(models.TransientModel):
         config_parameter=PARAM_DIRTY,
         help="Also run git status in every clone: slower, and shows "
         "uncommitted changes.",
+    )
+    erplibre_pull_strategy = fields.Selection(
+        PULL_STRATEGIES,
+        string="Pull strategy",
+        default="rebase",
+        config_parameter=PARAM_PULL_STRATEGY,
+        help="How a repository with commits of its own integrates its "
+        "target when the code is pulled. The pull wizard starts with it "
+        "and lets it change for one pull.",
     )
     erplibre_last_snapshot_id = fields.Many2one(
         "erplibre.code.snapshot",
@@ -156,7 +170,11 @@ class ResConfigSettings(models.TransientModel):
     def action_erplibre_restart(self):
         run = self.env["erplibre.code.run"]
         run._check_server_actions()
+        run._check_no_blocked_pull()
         return self.env["erplibre.code.confirm.wizard"]._action_open("restart")
 
     def action_erplibre_fetch_rebase(self):
         return self.env["erplibre.code.run"].action_start_dry_run()
+
+    def action_erplibre_pull(self):
+        return self.env["erplibre.code.pull.wizard"]._action_open()

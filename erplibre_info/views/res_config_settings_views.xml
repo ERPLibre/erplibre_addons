@@ -115,12 +115,23 @@
                             groups="base.group_no_one"
                         >
                             <div class="mt8" invisible="not erplibre_server_actions_allowed">
+                                <div class="mb8">
+                                    <span class="o_form_label me-2">Pull strategy</span>
+                                    <field name="erplibre_pull_strategy" class="oe_inline" />
+                                </div>
                                 <button
                                     name="action_erplibre_fetch_rebase"
                                     type="object"
                                     string="Fetch + rebase from upstream"
                                     class="btn-secondary"
                                     icon="fa-code-fork"
+                                />
+                                <button
+                                    name="action_erplibre_pull"
+                                    type="object"
+                                    string="Pull the code"
+                                    class="btn-secondary ms-2"
+                                    icon="fa-download"
                                 />
                                 <button
                                     name="action_erplibre_restart"

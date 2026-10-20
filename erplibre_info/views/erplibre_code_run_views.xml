@@ -32,6 +32,8 @@
                 <header>
                     <field name="server_actions_allowed" invisible="1" />
                     <field name="can_apply" invisible="1" />
+                    <field name="pull_blocked" invisible="1" />
+                    <field name="deps_to_install" invisible="1" />
                     <button
                         name="action_refresh"
                         type="object"
@@ -44,7 +46,23 @@
                         string="Apply"
                         class="btn-primary"
                         groups="base.group_no_one"
-                        invisible="not can_apply or not server_actions_allowed"
+                        invisible="run_type != 'dry_run' or not can_apply or not server_actions_allowed"
+                    />
+                    <button
+                        name="action_pull_apply"
+                        type="object"
+                        string="Apply the pull"
+                        class="btn-primary"
+                        groups="base.group_no_one"
+                        invisible="run_type != 'pull_dry_run' or not can_apply or not server_actions_allowed"
+                    />
+                    <button
+                        name="action_deps_install"
+                        type="object"
+                        string="Install the Python dependencies"
+                        class="btn-primary"
+                        groups="base.group_no_one"
+                        invisible="run_type != 'pull_apply' or state != 'done' or not deps_to_install or pull_blocked or not server_actions_allowed"
                     />
                     <button
                         name="action_restart_upgrade"
@@ -52,14 +70,14 @@
                         string="Upgrade the modules and restart"
                         class="btn-primary"
                         groups="base.group_no_one"
-                        invisible="run_type != 'apply' or state != 'done' or not upgrade_module_ids or not server_actions_allowed"
+                        invisible="run_type not in ('apply', 'pull_apply', 'pull_restore', 'deps_install') or state != 'done' or not upgrade_module_ids or pull_blocked or not server_actions_allowed"
                     />
                     <button
                         name="action_restart"
                         type="object"
                         string="Restart the server"
                         groups="base.group_no_one"
-                        invisible="run_type != 'apply' or state != 'done' or not server_actions_allowed"
+                        invisible="run_type not in ('apply', 'pull_apply', 'pull_restore', 'deps_install') or state != 'done' or pull_blocked or not server_actions_allowed"
                     />
                     <field name="state" widget="statusbar" />
                 </header>
@@ -67,9 +85,17 @@
                     <div
                         class="alert alert-warning"
                         role="alert"
-                        invisible="run_type != 'dry_run' or not apply_note"
+                        invisible="run_type not in ('dry_run', 'pull_dry_run') or not apply_note"
                     >
                         <field name="apply_note" readonly="1" />
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="not pull_blocked">
+                        A repository is left mid-operation: fix it in a terminal
+                        before restarting.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="not deps_to_install or pull_blocked">
+                        The Python dependencies changed: install them, or restart
+                        without installing.
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -82,14 +108,26 @@
                             <field name="trigger" invisible="run_type != 'snapshot'" />
                             <field name="user_id" />
                             <field name="odoo_version" invisible="not odoo_version" />
-                            <field name="parent_id" invisible="not parent_id" />
+                            <field name="pull_mode" invisible="not pull_mode" />
+                            <field name="pull_strategy" invisible="not pull_strategy" />
+                            <field name="pull_path" invisible="not pull_path" />
+                            <field name="backup_id" invisible="not backup_id" />
+                            <field
+                                name="parent_id"
+                                invisible="not parent_id or run_type in ('pull_restore', 'deps_install')"
+                            />
+                            <field
+                                name="parent_id"
+                                string="Applied pull"
+                                invisible="not parent_id or run_type not in ('pull_restore', 'deps_install')"
+                            />
                             <field name="snapshot_id" invisible="not snapshot_id" />
                         </group>
                         <group>
                             <field name="create_date" string="Queued" />
                             <field name="date_start" />
                             <field name="date_end" />
-                            <field name="exit_code" invisible="run_type not in ('dry_run', 'apply')" />
+                            <field name="exit_code" invisible="run_type in ('snapshot', 'restart')" />
                             <field name="pass_dir" invisible="not pass_dir" />
                         </group>
                     </group>
@@ -97,15 +135,64 @@
                         <page string="Report" name="report" invisible="not report_html">
                             <field name="report_html" nolabel="1" />
                         </page>
-                        <page string="Plan" name="plan" invisible="run_type not in ('dry_run', 'apply')">
+                        <page
+                            string="Plan"
+                            name="plan"
+                            invisible="run_type not in ('dry_run', 'apply', 'pull_dry_run', 'pull_apply')"
+                        >
                             <group>
                                 <field name="plan_count" />
                                 <field name="plan_paths" />
+                                <field name="shallow_paths" invisible="not shallow_paths" />
+                                <field name="approve_deepen" invisible="run_type != 'pull_apply' or not shallow_paths" />
+                                <field name="clone_paths" invisible="not clone_paths" />
+                                <field name="approve_clone" invisible="run_type != 'pull_apply' or not clone_paths" />
                                 <field name="left_paths" />
                             </group>
-                            <field name="child_ids" invisible="run_type != 'dry_run'" />
+                            <field name="child_ids" invisible="run_type not in ('dry_run', 'pull_dry_run')" />
                         </page>
-                        <page string="Modules to upgrade" name="modules" invisible="run_type != 'apply'">
+                        <page
+                            string="Backups"
+                            name="backups"
+                            invisible="run_type != 'pull_apply' or not backup_ids"
+                            groups="base.group_no_one"
+                        >
+                            <p class="text-muted">
+                                Each pulled repository keeps a branch on its HEAD of
+                                before the pull. Restore moves the repository back to
+                                it; Delete removes the branch.
+                            </p>
+                            <field name="backup_ids" nolabel="1">
+                                <list create="0" delete="0" edit="0">
+                                    <field name="path" />
+                                    <field name="branch_name" />
+                                    <field name="original_branch" />
+                                    <field name="detached" optional="hide" />
+                                    <field name="sha" optional="hide" />
+                                    <field name="state" widget="badge" />
+                                    <button
+                                        name="action_restore"
+                                        type="object"
+                                        string="Restore"
+                                        icon="fa-undo"
+                                        invisible="state != 'kept' or not parent.server_actions_allowed"
+                                    />
+                                    <button
+                                        name="action_delete"
+                                        type="object"
+                                        string="Delete"
+                                        icon="fa-trash"
+                                        confirm="Delete the backup branch?"
+                                        invisible="state not in ('kept', 'restored') or not parent.server_actions_allowed"
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                        <page
+                            string="Modules to upgrade"
+                            name="modules"
+                            invisible="run_type not in ('apply', 'pull_apply', 'pull_restore', 'deps_install')"
+                        >
                             <p class="text-muted">
                                 These installed modules are upgraded at the next start
                                 of the server, once marked with "Upgrade the modules
@@ -174,8 +261,8 @@
             <p class="o_view_nocontent_empty_folder">No run yet</p>
             <p>
                 A run is a long action on the code: a snapshot in the
-                background, the dry run and the apply step of a fetch + rebase,
-                a server restart.
+                background, the dry run and the apply step of a fetch + rebase
+                or of a pull, a server restart.
             </p>
         </field>
     </record>

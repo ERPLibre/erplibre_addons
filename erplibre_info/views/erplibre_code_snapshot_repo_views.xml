@@ -53,12 +53,22 @@
         <field name="arch" type="xml">
             <form create="0" edit="0">
                 <header>
+                    <field name="server_actions_allowed" invisible="1" />
+                    <field name="is_active_version" invisible="1" />
                     <button
                         name="action_load_commits"
                         type="object"
                         string="Load the commits"
                         class="btn-primary"
                         invisible="change != 'changed'"
+                    />
+                    <button
+                        name="action_pull"
+                        type="object"
+                        string="Pull"
+                        icon="fa-download"
+                        groups="base.group_no_one"
+                        invisible="not server_actions_allowed or not is_active_version or state in ('absent', 'erreur')"
                     />
                     <button
                         name="action_cross_version"

@@ -19,6 +19,7 @@ run with the ERPLibre interpreter `.venv.erplibre/bin/python`. It only
 reads the clones. The module ships no data: installing it runs nothing.
 
 For an administrator, and only when the Odoo configuration file allows
-it, the module also restarts the server and runs a fetch + rebase of the
-forks from their upstream: a dry run first, then an apply step after a
-double validation. Nothing is ever pushed.
+it, the module also restarts the server, runs a fetch + rebase of the
+forks from their upstream, and pulls the deployed code with
+`script/git/repo_pull.py`: each time a dry run first, then an apply step
+after a double validation. Nothing is ever pushed.

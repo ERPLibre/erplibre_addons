@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import re
+import signal
 import subprocess
 from collections import namedtuple
 
@@ -22,6 +23,7 @@ _logger = logging.getLogger(__name__)
 SCRIPT_STATE = "script/git/repo_state.py"
 SCRIPT_UPGRADE = "script/git/repo_upgrade.py"
 SCRIPT_APPLY = "script/git/repo_apply.py"
+SCRIPT_PULL = "script/git/repo_pull.py"
 PYTHON = ".venv.erplibre/bin/python"
 
 PARAM_ROOT = "erplibre_info.root"
@@ -42,6 +44,11 @@ Result = namedtuple("Result", "returncode data stderr command")
 
 class RunnerError(Exception):
     """The script cannot run, or its output is not the JSON expected."""
+
+
+class RunnerTimeout(RunnerError):
+    """The script did not finish within its timeout; its process group was
+    killed."""
 
 
 def strip_credentials(text):
@@ -135,14 +142,46 @@ def checkout_problem(env, script=SCRIPT_STATE):
     return None
 
 
+def _run_process(argv, cwd, env, timeout):
+    """``subprocess.run`` of ``argv`` in a session of its own, output
+    captured as text; return the ``CompletedProcess``.
+
+    On timeout the whole process group is killed, not only the script: the
+    git, repo and poetry processes it started do not outlive it, and the
+    checkout lock they would keep busy is released with them. Raise
+    ``subprocess.TimeoutExpired`` then.
+    """
+    with subprocess.Popen(
+        argv,
+        cwd=cwd,
+        env=env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        start_new_session=True,
+    ) as proc:
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except OSError:
+                pass
+            proc.communicate()
+            raise
+    return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
+
+
 def run(env, script, args, timeout_s=None):
     """Run ``script`` of the checkout with ``args``; return a ``Result``.
 
     ``data`` is the decoded JSON of stdout, or None when stdout is not
     JSON. ``stderr`` is stripped of URL credentials. Raise ``RunnerError``
     when the checkout, its interpreter or the script is missing (see
-    ``checkout_problem``), or when the call exceeds ``timeout_s``. stdin is
-    closed: no prompt can wait.
+    ``checkout_problem``), and ``RunnerTimeout`` when the call exceeds
+    ``timeout_s`` (see ``_run_process``). stdin is closed: no prompt can
+    wait.
     """
     problem = checkout_problem(env, script)
     if problem:
@@ -156,18 +195,14 @@ def run(env, script, args, timeout_s=None):
     timeout_s = timeout_s or timeout(env)
     _logger.info("ERPLibre script: %s", command)
     try:
-        proc = subprocess.run(
+        proc = _run_process(
             [python, script_path, *args],
             cwd=root,
             env=variables,
-            stdin=subprocess.DEVNULL,
-            capture_output=True,
-            text=True,
             timeout=timeout_s,
-            check=False,
         )
     except subprocess.TimeoutExpired as exc:
-        raise RunnerError(
+        raise RunnerTimeout(
             env._(
                 "%(command)s did not finish within %(seconds)s seconds.",
                 command=command,
