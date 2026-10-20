@@ -19,7 +19,12 @@ parameters `erplibre_info.timeout` (default 120 s) and
 `erplibre_info.long_timeout` (default 3600 s, fetch + rebase) bound each
 script call.
 
-The server actions (restart, fetch + rebase) need all three of:
+**Pull strategy** (in the *Server actions* setting) is the default way
+a repository with commits of its own integrates its target when the
+code is pulled: rebase (default), fast-forward only, or merge. The pull
+wizard starts with it and lets it change for one pull.
+
+The server actions (restart, fetch + rebase, pull) need all three of:
 
 - `erplibre_info_allow_server_actions = True` in the `[options]` section
   of the Odoo configuration file;

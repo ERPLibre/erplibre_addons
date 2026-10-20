@@ -3,7 +3,7 @@
 
 {
     "name": "ERPLibre info",
-    "version": "18.0.2.0.0",
+    "version": "18.0.2.1.0",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "license": "AGPL-3",
@@ -21,6 +21,7 @@
         "views/erplibre_code_cross_version_views.xml",
         "views/erplibre_code_run_views.xml",
         "wizards/erplibre_code_confirm_wizard_views.xml",
+        "wizards/erplibre_code_pull_wizard_views.xml",
         "views/res_config_settings_views.xml",
         "views/menus.xml",
     ],

@@ -5,3 +5,5 @@ access_erplibre_code_snapshot_module_system,erplibre.code.snapshot.module system
 access_erplibre_code_cross_version_system,erplibre.code.cross.version system,model_erplibre_code_cross_version,base.group_system,1,1,1,1
 access_erplibre_code_run_system,erplibre.code.run system,model_erplibre_code_run,base.group_system,1,1,1,1
 access_erplibre_code_confirm_wizard_system,erplibre.code.confirm.wizard system,model_erplibre_code_confirm_wizard,base.group_system,1,1,1,1
+access_erplibre_code_pull_backup_system,erplibre.code.pull.backup system,model_erplibre_code_pull_backup,base.group_system,1,1,1,1
+access_erplibre_code_pull_wizard_system,erplibre.code.pull.wizard system,model_erplibre_code_pull_wizard,base.group_system,1,1,1,1

@@ -75,6 +75,12 @@ class ErplibreCodeSnapshotRepo(models.Model):
         "repo_line_id",
         string="Installed modules",
     )
+    server_actions_allowed = fields.Boolean(compute="_compute_server_actions_allowed")
+
+    def _compute_server_actions_allowed(self):
+        allowed = self.env["erplibre.code.run"]._server_actions_allowed()
+        for line in self:
+            line.server_actions_allowed = allowed
 
     @api.depends("head", "previous_head")
     def _compute_short(self):
@@ -169,6 +175,11 @@ class ErplibreCodeSnapshotRepo(models.Model):
             }
         )
         return self._action_open()
+
+    def action_pull(self):
+        """Open the pull wizard restricted to this repository."""
+        self.ensure_one()
+        return self.env["erplibre.code.pull.wizard"]._action_open(repo_line=self)
 
     def action_cross_version(self):
         self.ensure_one()

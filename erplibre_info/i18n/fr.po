@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 12:33+0000\n"
-"PO-Revision-Date: 2026-10-16 11:54+0000\n"
+"POT-Creation-Date: 2026-10-19 14:18+0000\n"
+"PO-Revision-Date: 2026-10-19 12:50+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -44,9 +44,27 @@ msgstr "%(count)s fichiers"
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "%(count)s incoming commits"
+msgstr "%(count)s commits entrants"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "%(count)s untracked"
+msgstr "%(count)s non suivis"
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
 msgid "%(shown)s of %(count)s files are listed."
 msgstr "%(shown)s fichiers listés sur %(count)s."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "<date of the apply>"
+msgstr "<date de l'application>"
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
@@ -75,14 +93,13 @@ msgstr "<span class=\"o_form_label me-2\">Modules à mettre à niveau</span>"
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
-msgid "<span class=\"text-muted\">No snapshot yet.</span>"
-msgstr "<span class=\"text-muted\">Aucun instantané pour l'instant.</span>"
+msgid "<span class=\"o_form_label me-2\">Pull strategy</span>"
+msgstr "<span class=\"o_form_label me-2\">Stratégie de tirage</span>"
 
 #. module: erplibre_info
-#. odoo-python
-#: code:addons/erplibre_info/models/erplibre_code_run.py:0
-msgid "A fetch + rebase is already queued or running."
-msgstr "Un fetch + rebase est déjà en file ou en cours."
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "<span class=\"text-muted\">No snapshot yet.</span>"
+msgstr "<span class=\"text-muted\">Aucun instantané pour l'instant.</span>"
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
@@ -95,22 +112,84 @@ msgstr ""
 "l'application, quelle que soit sa version."
 
 #. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__left_paths
+msgid ""
+"A fork with a predicted conflict, resolved in the TODO menu; a pull that the "
+"chosen strategy cannot make, or a repository with an operation in progress. "
+"The apply step never touches them."
+msgstr ""
+"Un fork dont un conflit est prédit, résolu dans le menu TODO ; un tirage que "
+"la stratégie choisie ne peut pas faire, ou un dépôt où une opération est en "
+"cours. L'application n'y touche jamais."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A git run is already queued or running."
+msgstr "Une exécution git est déjà en file ou en cours."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A git run is started only from its button, after its confirmations."
+msgstr ""
+"Une exécution git ne se lance que par son bouton, après ses confirmations."
+
+#. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "A newer dry run exists: apply that one."
 msgstr "Un essai à sec plus récent existe : appliquez celui-là."
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A remote or a HEAD moved since this dry run: run a new dry run."
+msgstr ""
+"Un distant ou une HEAD a bougé depuis cet essai à sec : lancez un nouvel "
+"essai à sec."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__pull_blocked
+msgid "A repository is left mid-operation"
+msgstr "Un dépôt est resté en pleine opération"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid ""
+"A repository is left mid-operation: fix it in a terminal\n"
+"                        before restarting."
+msgstr ""
+"Un dépôt est resté en pleine opération : réparez-le dans un terminal avant "
+"de redémarrer."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"A repository is left mid-operation: fix it in a terminal before restarting."
+msgstr ""
+"Un dépôt est resté en pleine opération : réparez-le dans un terminal avant "
+"de redémarrer."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "A requirements.txt changes in:"
+msgstr "Un requirements.txt change dans :"
+
+#. module: erplibre_info
 #: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_run_action
 msgid ""
 "A run is a long action on the code: a snapshot in the\n"
 "                background, the dry run and the apply step of a fetch + "
-"rebase,\n"
-"                a server restart."
+"rebase\n"
+"                or of a pull, a server restart."
 msgstr ""
 "Une exécution est une action longue sur le code : un instantané en arrière-"
-"plan, l'essai à sec et l'application d'un fetch + rebase, un redémarrage du "
-"serveur."
+"plan, l'essai à sec et l'application d'un fetch + rebase ou d'un tirage, un "
+"redémarrage du serveur."
 
 #. module: erplibre_info
 #: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_snapshot_action
@@ -150,6 +229,12 @@ msgid "Added"
 msgstr "Ajoutées"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "After"
+msgstr "Après"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_en_avance
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__ahead
 msgid "Ahead"
@@ -186,9 +271,20 @@ msgstr ""
 "modifications non commitées."
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Another pull is running on this checkout."
+msgstr "Un autre tirage tourne sur ce checkout."
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__child_ids
 msgid "Applied"
 msgstr "Appliqué"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Applied pull"
+msgstr "Tirage appliqué"
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
@@ -201,6 +297,12 @@ msgid "Apply Note"
 msgstr "Note d'application"
 
 #. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__pull_apply
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Apply the pull"
+msgstr "Appliquer le tirage"
+
+#. module: erplibre_info
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__apply
 msgid "Apply the rebase"
 msgstr "Appliquer le rebase"
@@ -208,9 +310,40 @@ msgstr "Appliquer le rebase"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
 msgid "Author"
 msgstr "Auteur"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__backup_id
+msgid "Backup"
+msgstr "Sauvegarde"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__branch_name
+msgid "Backup branch"
+msgstr "Branche de sauvegarde"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Backup branches of this pass read back: %(count)s."
+msgstr "Branches de sauvegarde de cette passe relues : %(count)s."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__backup_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Backups"
+msgstr "Sauvegardes"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Before"
+msgstr "Avant"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__behind
@@ -228,11 +361,20 @@ msgid "Between Loaded"
 msgstr "Commits chargés"
 
 #. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__original_branch
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__branch
 msgid "Branch"
 msgstr "Branche"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Branch → target"
+msgstr "Branche → cible"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_wizard__mode__branche
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__pull_mode__branche
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot__mode__branches
 msgid "Branches"
 msgstr "Branches"
@@ -250,6 +392,7 @@ msgstr "Applicable"
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_pull_wizard_view_form
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -259,6 +402,12 @@ msgstr "Annuler"
 #: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
 msgid "Capture now"
 msgstr "Capturer"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Change"
+msgstr "Changement"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__changed_repo_count
@@ -280,6 +429,26 @@ msgstr "Vérifier l'arbre modifié"
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
 msgid "Clone"
 msgstr "Clone"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__approve_clone
+msgid "Clone the new repositories"
+msgstr "Cloner les nouveaux dépôts"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"Cloned only when it is allowed at the apply, by a repo sync restricted to "
+"their paths."
+msgstr ""
+"Clonés seulement si l'application le permet, par un repo sync restreint à "
+"leurs chemins."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__approve_clone
+msgid "Cloning allowed"
+msgstr "Clonage permis"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__code_fingerprint
@@ -327,7 +496,9 @@ msgstr "Instantanés du code"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__sha
 msgid "Commit"
 msgstr "Commit"
 
@@ -361,8 +532,16 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Conflicts"
+msgstr "Conflits"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__create_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__create_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__create_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__create_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__create_uid
@@ -373,6 +552,8 @@ msgstr "Créé par"
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__create_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__create_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__create_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__create_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__create_date
@@ -398,6 +579,7 @@ msgstr "Nom de la base"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__date
@@ -424,6 +606,53 @@ msgid "Decision"
 msgstr "Décision"
 
 #. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__approve_deepen
+msgid "Deepen the shallow clones"
+msgstr "Approfondir les clones superficiels"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__approve_deepen
+msgid "Deepening allowed"
+msgstr "Approfondissement permis"
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_confirm_wizard__approve_deepen
+msgid ""
+"Deepening downloads history from the remote, by steps, until the common base "
+"appears."
+msgstr ""
+"L'approfondissement télécharge l'historique du distant, par paliers, jusqu'à "
+"ce que la base commune apparaisse."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Deepening downloads history: tick the box at the apply to allow it."
+msgstr ""
+"L'approfondissement télécharge de l'historique : cochez la case à "
+"l'application pour le permettre."
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Delete"
+msgstr "Supprimer"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Delete the backup branch?"
+msgstr "Supprimer la branche de sauvegarde ?"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_backup__state__deleted
+msgid "Deleted"
+msgstr "Supprimée"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__detached
+msgid "Detached HEAD"
+msgstr "HEAD détachée"
+
+#. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
 msgid ""
 "Developer mode, Settings group and erplibre_info_allow_server_actions = True "
@@ -444,6 +673,8 @@ msgstr ""
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__display_name
@@ -535,6 +766,16 @@ msgid "ERPLibre modules to upgrade"
 msgstr "Modules ERPLibre à mettre à niveau"
 
 #. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_pull_backup
+msgid "ERPLibre pull backup branch"
+msgstr "Branche de sauvegarde d'un tirage ERPLibre"
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_pull_wizard
+msgid "ERPLibre pull of the code"
+msgstr "Tirage du code ERPLibre"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_state_summary
 msgid "ERPLibre repositories"
 msgstr "Dépôts ERPLibre"
@@ -559,6 +800,29 @@ msgstr "Version d'ERPLibre"
 #: model:ir.actions.server,name:erplibre_info.ir_cron_erplibre_code_ir_actions_server
 msgid "ERPLibre: code environment"
 msgstr "ERPLibre : environnement du code"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid ""
+"Each pulled repository keeps a branch on its HEAD of\n"
+"                                before the pull. Restore moves the "
+"repository back to\n"
+"                                it; Delete removes the branch."
+msgstr ""
+"Chaque dépôt tiré garde une branche sur sa HEAD d'avant le tirage. Revenir "
+"ramène le dépôt dessus ; Supprimer retire la branche."
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid ""
+"Each repository gets a backup branch on its HEAD, then\n"
+"                    integrates its target with the chosen strategy. A "
+"conflicting\n"
+"                    repository is put back where it was. Nothing is pushed."
+msgstr ""
+"Chaque dépôt reçoit une branche de sauvegarde sur sa HEAD, puis intègre sa "
+"cible avec la stratégie choisie. Un dépôt en conflit est remis où il était. "
+"Rien n'est poussé."
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__date_end
@@ -599,6 +863,13 @@ msgid "Failed"
 msgstr "Échoué"
 
 #. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_wizard__strategy__ff
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__pull_strategy__ff
+#: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_pull_strategy__ff
+msgid "Fast-forward only"
+msgstr "Avance rapide seulement"
+
+#. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
 msgid "Fetch + rebase from upstream"
 msgstr "Fetch + rebase depuis l'amont"
@@ -632,21 +903,6 @@ msgid "Fingerprint"
 msgstr "Empreinte"
 
 #. module: erplibre_info
-#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__left_paths
-msgid ""
-"Forks with a predicted conflict: they are resolved in the TODO menu, never "
-"from Odoo."
-msgstr ""
-"Forks dont un conflit est prédit : ils se résolvent dans le menu TODO, "
-"jamais depuis Odoo."
-
-#. module: erplibre_info
-#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_confirm_wizard__plan_paths
-#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__plan_paths
-msgid "Forks without predicted conflict, one path per line."
-msgstr "Forks sans conflit prédit, un chemin par ligne."
-
-#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__found_in_code
 msgid "Found In Code"
 msgstr "Trouvé dans le code"
@@ -659,6 +915,7 @@ msgstr "Révision gelée"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "From"
 msgstr "Départ"
 
@@ -734,6 +991,25 @@ msgid "Hours"
 msgstr "Heures"
 
 #. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_res_config_settings__erplibre_pull_strategy
+msgid ""
+"How a repository with commits of its own integrates its target when the code "
+"is pulled. The pull wizard starts with it and lets it change for one pull."
+msgstr ""
+"Comment un dépôt qui a ses propres commits intègre sa cible quand le code "
+"est tiré. L'assistant de tirage part de cette valeur et permet de la changer "
+"pour un tirage."
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_pull_wizard__strategy
+msgid ""
+"How a repository with commits of its own integrates its target. A repository "
+"that is only behind is fast-forwarded whatever the strategy."
+msgstr ""
+"Comment un dépôt qui a ses propres commits intègre sa cible. Un dépôt "
+"seulement en retard avance rapidement, quelle que soit la stratégie."
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__understood
 msgid "I understand what this action does"
 msgstr "Je comprends ce que fait cette action"
@@ -741,12 +1017,42 @@ msgstr "Je comprends ce que fait cette action"
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__id
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__id
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__id
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__id
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__id
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__id
 msgid "ID"
 msgstr "ID"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Ignored files overwritten, copied first to %(path)s: %(files)s"
+msgstr "Fichiers ignorés écrasés, copiés d'abord dans %(path)s : %(files)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Incoming"
+msgstr "Entrants"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__deps_install
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Install the Python dependencies"
+msgstr "Installer les dépendances Python"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"Install them with « Install the Python dependencies », or restart without "
+"installing."
+msgstr ""
+"Installez-les avec « Installer les dépendances Python », ou redémarrez sans "
+"installer."
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__installed_version
@@ -762,6 +1068,12 @@ msgid "Installed modules"
 msgstr "Modules installés"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Installed only when approved after the apply:"
+msgstr "Installées seulement sur approbation après l'application :"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__data_json
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__raw_json
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
@@ -773,6 +1085,11 @@ msgstr "JSON"
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__result_json
 msgid "JSON result"
 msgstr "Résultat JSON"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_backup__state__kept
+msgid "Kept"
+msgstr "Gardée"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_last_snapshot_id
@@ -792,6 +1109,8 @@ msgstr "Dernier échec d'instantané ERPLibre"
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__write_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__write_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__write_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__write_uid
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__write_uid
@@ -802,6 +1121,8 @@ msgstr "Dernière mise à jour par"
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__write_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__write_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__write_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__write_date
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__write_date
@@ -830,12 +1151,15 @@ msgid "Local Manifest"
 msgstr "Manifeste local"
 
 #. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__log
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__log
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
 msgid "Log"
 msgstr "Journal"
 
 #. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_wizard__mode__manifeste
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__pull_mode__manifeste
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
 msgid "Manifest"
 msgstr "Manifeste"
@@ -849,6 +1173,17 @@ msgstr "Branche du manifeste"
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__mode_total
 msgid "Manifest repositories"
 msgstr "Dépôts du manifeste"
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_pull_wizard__mode
+msgid ""
+"Manifest: the ERPLibre root is pulled, the local manifest is regenerated, "
+"then each repository integrates its new target. Branches: each repository "
+"pulls the branch it tracks."
+msgstr ""
+"Manifeste : la racine ERPLibre est tirée, le manifeste local est régénéré, "
+"puis chaque dépôt intègre sa nouvelle cible. Branches : chaque dépôt tire la "
+"branche qu'il suit."
 
 #. module: erplibre_info
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__trigger__manual
@@ -875,18 +1210,35 @@ msgid "Matching"
 msgstr "Conformes"
 
 #. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_wizard__strategy__merge
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__pull_strategy__merge
+#: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_pull_strategy__merge
+msgid "Merge"
+msgstr "Fusion"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_absent
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_backup__state__missing
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__absent
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__state__absent
 msgid "Missing"
 msgstr "Absent"
 
 #. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__mode
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__mode
 msgid "Mode"
 msgstr "Mode"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Mode: %(mode)s"
+msgstr "Mode : %(mode)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__count_sale
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__dirty
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_snapshot_repo__alignment__sale
@@ -953,6 +1305,25 @@ msgstr "Nouveau"
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "New repositories"
+msgstr "Nouveaux dépôts"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__clone_paths
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__clone_paths
+msgid "New repositories to clone"
+msgstr "Nouveaux dépôts à cloner"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "No backup to restore."
+msgstr "Aucune sauvegarde à restaurer."
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
 msgid "No difference."
 msgstr "Aucune différence."
@@ -968,6 +1339,12 @@ msgstr "Aucun essai à sec à appliquer."
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
 msgid "No other Odoo version of this checkout holds this path."
 msgstr "Aucune autre version d'Odoo de ce checkout ne porte ce chemin."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "No pull to install the dependencies of."
+msgstr "Aucun tirage dont installer les dépendances."
 
 #. module: erplibre_info
 #. odoo-python
@@ -1022,6 +1399,12 @@ msgstr "Non conformes au manifeste"
 #: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_cross_version_action
 msgid "Nothing compared yet"
 msgstr "Rien de comparé pour l'instant"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Nothing to pull: nothing was written."
+msgstr "Rien à tirer : rien n'a été écrit."
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_view_form
@@ -1086,6 +1469,7 @@ msgstr "Seuls les administrateurs des Paramètres lancent les actions serveur."
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
 msgid "Only the first %(max)s commits are shown."
 msgstr "Seuls les %(max)s premiers commits sont affichés."
@@ -1131,6 +1515,7 @@ msgstr ""
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "Ours"
 msgstr "Nôtres"
 
@@ -1140,6 +1525,7 @@ msgid "Pass record"
 msgstr "Enregistrement de la passe"
 
 #. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__path
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__path
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__path
 msgid "Path"
@@ -1199,6 +1585,80 @@ msgid "Project"
 msgstr "Projet"
 
 #. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_confirm_wizard__clone_paths
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__clone_paths
+msgid ""
+"Projects of the regenerated manifest not cloned yet: the apply step clones "
+"them only when it is allowed to."
+msgstr ""
+"Projets du manifeste régénéré pas encore clonés : l'application ne les clone "
+"que si elle en a la permission."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__run_id
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
+msgid "Pull"
+msgstr "Tirer"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__pull_mode
+msgid "Pull mode"
+msgstr "Mode de tirage"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__pull_strategy
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_pull_strategy
+msgid "Pull strategy"
+msgstr "Stratégie de tirage"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_pull_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Pull the code"
+msgstr "Tirer le code"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__pull_apply
+msgid "Pull: apply"
+msgstr "Tirage : application"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__pull_dry_run
+msgid "Pull: dry run"
+msgstr "Tirage : essai à sec"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__pull_restore
+msgid "Pull: restore a backup"
+msgstr "Tirage : retour à une sauvegarde"
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__pull_blocked
+msgid ""
+"Putting a repository back where it was failed: it is fixed in a terminal "
+"before the server restarts."
+msgstr ""
+"La remise d'un dépôt à son point de départ a échoué : il se répare dans un "
+"terminal avant que le serveur redémarre."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Python dependencies"
+msgstr "Dépendances Python"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__deps_install
+msgid "Python dependencies install"
+msgstr "Installation des dépendances Python"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__deps_to_install
+msgid "Python dependencies to install"
+msgstr "Dépendances Python à installer"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__odoo_python
 msgid "Python version"
 msgstr "Version de Python"
@@ -1241,15 +1701,34 @@ msgstr "Lu dans le dernier instantané : ouvrir cette page ne lance rien."
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Reason"
+msgstr "Raison"
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "Reason / conflicts"
 msgstr "Motif / conflits"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_wizard__strategy__rebase
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__pull_strategy__rebase
+#: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_pull_strategy__rebase
+msgid "Rebase"
+msgstr "Rebase"
 
 #. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_cross_version_view_form
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
 msgid "Refresh"
 msgstr "Actualiser"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Regenerated manifest"
+msgstr "Manifeste régénéré"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__remote
@@ -1287,8 +1766,8 @@ msgstr "Dépôts"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__left_paths
-msgid "Repositories left to the TODO menu"
-msgstr "Dépôts laissés au menu TODO"
+msgid "Repositories left as they are"
+msgstr "Dépôts laissés tels quels"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__plan_paths
@@ -1299,7 +1778,10 @@ msgstr "Dépôts à appliquer"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__repo_path
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__path
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__repo_line_id
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_module__repo_line_id
 msgid "Repository"
 msgstr "Dépôt"
@@ -1339,10 +1821,37 @@ msgid "Restarting"
 msgstr "Redémarrage"
 
 #. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Restore"
+msgstr "Revenir"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__pull_restore
+msgid "Restore the backup"
+msgstr "Revenir à la sauvegarde"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_pull_backup__state__restored
+msgid "Restored"
+msgstr "Restaurée"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__backup_id
+msgid "Restored backup"
+msgstr "Sauvegarde restaurée"
+
+#. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "Result"
 msgstr "Résultat"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Retired from the manifest (kept on disk)"
+msgstr "Retirés du manifeste (gardés sur le disque)"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__revision
@@ -1373,6 +1882,7 @@ msgstr "Exécutions"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__server_actions_allowed
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__server_actions_allowed
 msgid "Server Actions Allowed"
 msgstr "Actions serveur permises"
 
@@ -1415,10 +1925,43 @@ msgid "Settings"
 msgstr "Paramètres"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Shallow"
+msgstr "Superficiel"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__shallow_paths
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__shallow_paths
+msgid "Shallow clones to deepen"
+msgstr "Clones superficiels à approfondir"
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_confirm_wizard__shallow_paths
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__shallow_paths
+msgid ""
+"Shallow clones without a known common base with their target: the apply step "
+"deepens them only when it is allowed to."
+msgstr ""
+"Clones superficiels sans base commune connue avec leur cible : l'application "
+"ne les approfondit que si elle en a la permission."
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__change
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_snapshot_repo_view_form
 msgid "Since the previous snapshot"
 msgstr "Depuis l'instantané précédent"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__pull_path
+msgid "Single repository"
+msgstr "Dépôt seul"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Single repository: %(path)s"
+msgstr "Dépôt seul : %(path)s"
 
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__snapshot_id
@@ -1470,11 +2013,23 @@ msgid "Snapshots cannot run:"
 msgstr "Les instantanés ne peuvent pas s'exécuter :"
 
 #. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_pull_wizard_view_form
+msgid "Start the dry run"
+msgstr "Lancer l'essai à sec"
+
+#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__date_start
 msgid "Started"
 msgstr "Début"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Stash"
+msgstr "Stash"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__state
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__state
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot_repo__state
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
@@ -1488,8 +2043,20 @@ msgid "State Summary"
 msgstr "Résumé des états"
 
 #. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_wizard__strategy
+msgid "Strategy"
+msgstr "Stratégie"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "Strategy: %(strategy)s"
+msgstr "Stratégie : %(strategy)s"
+
+#. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 #: code:addons/erplibre_info/models/erplibre_code_snapshot_repo.py:0
 msgid "Subject"
 msgstr "Sujet"
@@ -1542,6 +2109,40 @@ msgstr "L'interpréteur ERPLibre %(python)s est absent."
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "The Python dependencies are installed."
+msgstr "Les dépendances Python sont installées."
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid ""
+"The Python dependencies changed: install them, or restart\n"
+"                        without installing."
+msgstr ""
+"Les dépendances Python ont changé : installez-les, ou redémarrez sans "
+"installer."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "The Python/Odoo couple changes: run make install."
+msgstr "Le couple Python/Odoo change : lancez make install."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "The backup was not restored: %(reason)s"
+msgstr "La sauvegarde n'a pas été restaurée : %(reason)s"
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_pull_backup__original_branch
+msgid ""
+"The branch the repository was on before the pull; empty for a detached HEAD."
+msgstr ""
+"La branche où était le dépôt avant le tirage ; vide pour une HEAD détachée."
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "The code did not change: no new snapshot."
 msgstr "Le code n'a pas changé : aucun nouvel instantané."
@@ -1556,6 +2157,30 @@ msgstr ""
 "une mise à niveau (-u)."
 
 #. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_pull_wizard_view_form
+msgid ""
+"The dry run fetches the remotes and shows what the pull would\n"
+"                    do: the incoming commits, the modified trees, the "
+"shallow\n"
+"                    clones, the new repositories. Nothing moves until its "
+"apply\n"
+"                    step is confirmed."
+msgstr ""
+"L'essai à sec récupère les distants et montre ce que ferait le tirage : les "
+"commits entrants, les arbres modifiés, les clones superficiels, les nouveaux "
+"dépôts. Rien ne bouge tant que son application n'est pas confirmée."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"The dry run is out of date: a remote or a HEAD moved, or the list of "
+"repositories changed. Nothing was written; run a new dry run."
+msgstr ""
+"L'essai à sec est périmé : un distant ou une HEAD a bougé, ou la liste des "
+"dépôts a changé. Rien n'a été écrit ; lancez un nouvel essai à sec."
+
+#. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid ""
@@ -1566,9 +2191,32 @@ msgstr ""
 "ou les commits montrés. Rien n'a été écrit ; lancez un nouvel essai à sec."
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"The last pull left a repository mid-operation: fix it in a terminal, then "
+"run a new pull dry run before restarting."
+msgstr ""
+"Le dernier tirage a laissé un dépôt au milieu d'une opération : le corriger "
+"dans un terminal, puis lancer un nouvel essai à sec du tirage avant de "
+"redémarrer."
+
+#. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
 msgid "The last snapshot failed:"
 msgstr "Le dernier instantané a échoué :"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "The local manifest of before the pull is put back."
+msgstr "Le manifeste local d'avant le tirage est remis en place."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "The local manifest was written; the previous one is kept in %(path)s."
+msgstr "Le manifeste local a été écrit ; le précédent est gardé dans %(path)s."
 
 #. module: erplibre_info
 #: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__upgrade_module_ids
@@ -1595,6 +2243,34 @@ msgstr ""
 "l'historique."
 
 #. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__deps_to_install
+msgid ""
+"The pull changed the Python dependencies of the Odoo virtual environment."
+msgstr ""
+"Le tirage a changé les dépendances Python de l'environnement virtuel d'Odoo."
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__pull_path
+msgid "The pull is restricted to this repository."
+msgstr "Le tirage se restreint à ce dépôt."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"The regenerated manifest differs from the dry run: it was not written and no "
+"clone was integrated."
+msgstr ""
+"Le manifeste régénéré diffère de l'essai à sec : il n'a pas été écrit et "
+"aucun clone n'a été intégré."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "The regenerated manifest equals the local manifest."
+msgstr "Le manifeste régénéré est identique au manifeste local."
+
+#. module: erplibre_info
 #: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
 msgid ""
 "The repositories below are rebased on their upstream, each in\n"
@@ -1606,11 +2282,30 @@ msgstr ""
 "branche datée. Un dépôt en conflit est remis où il était. Rien n'est poussé."
 
 #. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_confirm_wizard__plan_paths
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__plan_paths
+msgid "The repositories that the apply step integrates, one per line."
+msgstr "Les dépôts que l'application intègre, un par ligne."
+
+#. module: erplibre_info
 #: model:ir.model.fields,help:erplibre_info.field_erplibre_code_snapshot_repo__is_active_version
 msgid ""
 "The repository lies under the tree of the Odoo version that runs this "
 "database."
 msgstr "Le dépôt est sous l'arbre de la version d'Odoo qui sert cette base."
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid "The repository moves back to the backup commit."
+msgstr "Le dépôt revient sur le commit de la sauvegarde."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"The requirements of the ERPLibre virtual environment changed: review it."
+msgstr ""
+"Les dépendances de l'environnement virtuel ERPLibre ont changé : revoyez-le."
 
 #. module: erplibre_info
 #. odoo-python
@@ -1632,6 +2327,16 @@ msgid ""
 msgstr ""
 "Le serveur s'arrête et redémarre : chaque utilisateur perd la requête en "
 "cours."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"The time budget of the pass ran out: the repositories marked « not started » "
+"were left as they are; run a new pull for them."
+msgstr ""
+"Le délai de la passe est épuisé : les dépôts marqués « non commencé » sont "
+"restés tels quels ; lancer un nouveau tirage pour eux."
 
 #. module: erplibre_info
 #. odoo-python
@@ -1672,7 +2377,14 @@ msgstr ""
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_pull_backup.py:0
+msgid "This backup branch is no longer kept."
+msgstr "Cette branche de sauvegarde n'est plus gardée."
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "This dry run has nothing left to apply."
 msgstr "Cet essai à sec n'a plus rien à appliquer."
 
@@ -1684,6 +2396,12 @@ msgstr "Ce dépôt n'a pas de HEAD précédente à comparer."
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "This run has no Python dependencies to install."
+msgstr "Cette exécution n'a aucune dépendance Python à installer."
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
 msgid "Tick the box to confirm."
 msgstr "Cocher la case pour confirmer."
@@ -1691,6 +2409,7 @@ msgstr "Cocher la case pour confirmer."
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "To"
 msgstr "Arrivée"
 
@@ -1812,6 +2531,7 @@ msgstr "Utilisateur"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "Verdict"
 msgstr "Verdict"
 
@@ -1835,6 +2555,14 @@ msgstr "Version inscrite dans la base."
 #: model:ir.model.fields.selection,name:erplibre_info.selection__res_config_settings__erplibre_snapshot_interval_type__weeks
 msgid "Weeks"
 msgstr "Semaines"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"What a run executes is set when it is started, never changed afterwards."
+msgstr ""
+"Ce qu'une exécution lance se fixe à son démarrage et ne change plus ensuite."
 
 #. module: erplibre_info
 #: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__executor
@@ -1863,15 +2591,141 @@ msgstr "absent"
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "added"
+msgstr "ajouté"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "ahead of the target"
+msgstr "en avance sur la cible"
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "applied"
 msgstr "appliqué"
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "backup already exists"
+msgstr "sauvegarde déjà existante"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "backup missing"
+msgstr "sauvegarde absente"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "changed"
+msgstr "changé"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "clone failed"
+msgstr "clonage échoué"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "clone refused"
+msgstr "clonage refusé"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "cloned"
+msgstr "cloné"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "conflict: put back"
+msgstr "conflit : remis en place"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "deleted"
+msgstr "supprimée"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "detached"
+msgstr "détachée"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "detached HEAD: skipped"
+msgstr "HEAD détachée : sauté"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "diverged"
+msgstr "divergé"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "diverged: fast-forward refused"
+msgstr "divergé : avance rapide refusée"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "error"
+msgstr "erreur"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "fast-forward possible"
+msgstr "avance rapide possible"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "fast-forwarded"
+msgstr "avancé rapidement"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "fetch failed"
+msgstr "fetch échoué"
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
 msgid "fork"
 msgstr "fork"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "ignored files the target overwrites, copied first: %(files)s"
+msgstr "fichiers ignorés que la cible écrase, copiés d'abord : %(files)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "kept"
+msgstr "gardé"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "no target"
+msgstr "aucune cible"
 
 #. module: erplibre_info
 #. odoo-python
@@ -1886,12 +2740,152 @@ msgid "not a fork: no upstream base separates our commits"
 msgstr "pas un fork : aucune base amont ne sépare nos commits"
 
 #. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "not cloned"
+msgstr "non cloné"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "not started: time budget exhausted"
+msgstr "non commencé : délai épuisé"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "operation in progress: skipped"
+msgstr "opération en cours : sauté"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "path already occupied"
+msgstr "chemin déjà occupé"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid "poetry install --no-root runs in the Odoo virtual environment."
+msgstr "poetry install --no-root tourne dans l'environnement virtuel d'Odoo."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "pulled"
+msgstr "tiré"
+
+#. module: erplibre_info
 #: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__executor__queue_job
 msgid "queue_job"
 msgstr "queue_job"
 
 #. module: erplibre_info
 #. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "reapplied"
+msgstr "réappliqué"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid ""
+"refused: HEAD moved since the pull, its new commits would leave the branch"
+msgstr ""
+"refusé : HEAD a bougé depuis le tirage, ses nouveaux commits quitteraient la "
+"branche"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "refused: the backup branch is checked out"
+msgstr "refusé : la branche de sauvegarde est extraite"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "refused: the repository is on another branch"
+msgstr "refusé : le dépôt est sur une autre branche"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "refused: the tree has modified files"
+msgstr "refusé : l'arbre a des fichiers modifiés"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "removed"
+msgstr "retiré"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "restore failed: fix by hand"
+msgstr "remise en place échouée : réparer à la main"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "restored"
+msgstr "restauré"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "shallow: deepening needed"
+msgstr "superficiel : approfondissement nécessaire"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "shallow: no base found"
+msgstr "superficiel : aucune base trouvée"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "shallow: not deepened"
+msgstr "superficiel : non approfondi"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "stash kept"
+msgstr "stash gardé"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "switch to the manifest target"
+msgstr "bascule sur la cible du manifeste"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "target missing"
+msgstr "cible absente"
+
+#. module: erplibre_info
+#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_cross_version.py:0
 msgid "the upstream base is unknown (shallow clone or upstream not fetched)"
 msgstr "la base amont est inconnue (clone superficiel ou amont non récupéré)"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "up to date"
+msgstr "à jour"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "yes"
+msgstr "oui"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
+msgid "yes (stash)"
+msgstr "oui (stash)"
