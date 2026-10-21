@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre - Mathieu Benoit
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <!-- General settings, before « Permissions ». A theme module that adds
+         its own blocks there (a backend theme, for one) applies first at the
+         default priority: this block then lands below them. The values belong
+         to the website the Website section has selected. -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.erplibre.signature</field>
+        <field name="model">res.config.settings</field>
+        <field
+      name="inherit_id"
+      ref="base_setup.res_config_settings_view_form"
+    />
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='user_default_rights']" position="before">
+                <block
+          title="ERPLibre website signature"
+          id="erplibre_signature_settings"
+          invisible="not website_id"
+        >
+                    <setting
+            string="Style"
+            help="Footer credit of the website, in one of eleven styles"
+          >
+                        <div class="mt8">
+                            <field
+                name="erplibre_signature_style"
+                required="website_id"
+              />
+                        </div>
+                        <div class="mt8">
+                            <field
+                name="erplibre_signature_background"
+                widget="radio"
+                required="website_id"
+              />
+                        </div>
+                    </setting>
+                    <setting
+            string="Colors"
+            help="Those of the mockups, those of the website, or your own"
+          >
+                        <div class="mt8">
+                            <field
+                name="erplibre_signature_color_mode"
+                widget="radio"
+                required="website_id"
+              />
+                        </div>
+                        <div
+              class="content-group mt8"
+              invisible="erplibre_signature_color_mode != 'custom'"
+            >
+                            <div class="row">
+                                <label
+                  for="erplibre_signature_accent_color"
+                  string="Accent"
+                  class="col-4"
+                />
+                                <field
+                  name="erplibre_signature_accent_color"
+                  widget="color"
+                  class="col-2"
+                  required="erplibre_signature_color_mode == 'custom'"
+                />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="erplibre_signature_text_color"
+                  string="Text"
+                  class="col-4"
+                />
+                                <field
+                  name="erplibre_signature_text_color"
+                  widget="color"
+                  class="col-2"
+                  required="erplibre_signature_color_mode == 'custom'"
+                />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="erplibre_signature_background_color"
+                  string="Background"
+                  class="col-4"
+                />
+                                <field
+                  name="erplibre_signature_background_color"
+                  widget="color"
+                  class="col-2"
+                  required="erplibre_signature_color_mode == 'custom'"
+                />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="erplibre_signature_logo_background"
+                  string="Logo background"
+                  class="col-4"
+                />
+                                <field
+                  name="erplibre_signature_logo_background"
+                  class="col-1"
+                />
+                                <field
+                  name="erplibre_signature_logo_background_color"
+                  widget="color"
+                  class="col-2"
+                  invisible="not erplibre_signature_logo_background"
+                  required="erplibre_signature_color_mode == 'custom' and erplibre_signature_logo_background"
+                />
+                            </div>
+                        </div>
+                    </setting>
+                    <setting string="Preview" help="As the footer shows it">
+                        <field
+              name="erplibre_signature_preview"
+              class="w-100"
+            />
+                    </setting>
+                    <setting
+            string="Logo"
+            help="Left empty, the ERPLibre logo shipped with the module"
+          >
+                        <field
+              name="erplibre_signature_logo"
+              widget="image"
+              class="w-25 mt8"
+            />
+                    </setting>
+                    <setting
+            string="Phrase"
+            help="Words before « ERPLibre », translated per language"
+          >
+                        <field
+              name="erplibre_signature_text"
+              placeholder="Built with"
+              class="mt8 w-100"
+            />
+                    </setting>
+                    <setting
+            string="Text of the style"
+            help="The style's own text besides the phrase, translated per language"
+            invisible="erplibre_signature_style not in ('seal', 'circular_seal', 'builder', 'accelerated', 'band', 'tooltip')"
+          >
+                        <field
+              name="erplibre_signature_seal_text"
+              placeholder="Free software · Digital sovereignty"
+              class="mt8 w-100"
+              invisible="erplibre_signature_style != 'seal'"
+            />
+                        <field
+              name="erplibre_signature_circular_seal_text"
+              placeholder="Free software"
+              class="mt8 w-100"
+              invisible="erplibre_signature_style != 'circular_seal'"
+            />
+                        <field
+              name="erplibre_signature_builder_text"
+              placeholder="Site built with the website builder"
+              class="mt8 w-100"
+              invisible="erplibre_signature_style != 'builder'"
+            />
+                        <field
+              name="erplibre_signature_accelerated_text"
+              placeholder="AI integration"
+              class="mt8 w-100"
+              invisible="erplibre_signature_style != 'accelerated'"
+            />
+                        <field
+              name="erplibre_signature_band_text"
+              placeholder="Free software"
+              class="mt8 w-100"
+              invisible="erplibre_signature_style != 'band'"
+            />
+                        <field
+              name="erplibre_signature_tooltip_text"
+              placeholder="This site is built with ERPLibre, a free business platform."
+              class="mt8 w-100"
+              invisible="erplibre_signature_style != 'tooltip'"
+            />
+                    </setting>
+                    <setting
+            string="Link"
+            help="Address the signature links to"
+          >
+                        <field
+              name="erplibre_signature_url"
+              widget="url"
+              placeholder="https://erplibre.ca"
+              class="mt8 w-100"
+            />
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

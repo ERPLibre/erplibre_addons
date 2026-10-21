@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre - Mathieu Benoit
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+
+    <record id="view_website_form" model="ir.ui.view">
+        <field name="name">website.form.erplibre.signature.page</field>
+        <field name="model">website</field>
+        <field name="inherit_id" ref="website.view_website_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="ERPLibre signature" name="erplibre_signature">
+                    <group>
+                        <field name="erplibre_signature_style" />
+                        <field
+              name="erplibre_signature_background"
+              widget="radio"
+            />
+                        <field
+              name="erplibre_signature_color_mode"
+              widget="radio"
+            />
+                        <field
+              name="erplibre_signature_accent_color"
+              widget="color"
+              invisible="erplibre_signature_color_mode != 'custom'"
+              required="erplibre_signature_color_mode == 'custom'"
+            />
+                        <field
+              name="erplibre_signature_text_color"
+              widget="color"
+              invisible="erplibre_signature_color_mode != 'custom'"
+              required="erplibre_signature_color_mode == 'custom'"
+            />
+                        <field
+              name="erplibre_signature_background_color"
+              widget="color"
+              invisible="erplibre_signature_color_mode != 'custom'"
+              required="erplibre_signature_color_mode == 'custom'"
+            />
+                        <field
+              name="erplibre_signature_logo_background"
+              invisible="erplibre_signature_color_mode != 'custom'"
+            />
+                        <field
+              name="erplibre_signature_logo_background_color"
+              widget="color"
+              invisible="erplibre_signature_color_mode != 'custom' or not erplibre_signature_logo_background"
+              required="erplibre_signature_color_mode == 'custom' and erplibre_signature_logo_background"
+            />
+                        <field
+              name="erplibre_signature_text"
+              placeholder="Built with"
+            />
+                        <field
+              name="erplibre_signature_seal_text"
+              placeholder="Free software · Digital sovereignty"
+              invisible="erplibre_signature_style != 'seal'"
+            />
+                        <field
+              name="erplibre_signature_circular_seal_text"
+              placeholder="Free software"
+              invisible="erplibre_signature_style != 'circular_seal'"
+            />
+                        <field
+              name="erplibre_signature_builder_text"
+              placeholder="Site built with the website builder"
+              invisible="erplibre_signature_style != 'builder'"
+            />
+                        <field
+              name="erplibre_signature_accelerated_text"
+              placeholder="AI integration"
+              invisible="erplibre_signature_style != 'accelerated'"
+            />
+                        <field
+              name="erplibre_signature_band_text"
+              placeholder="Free software"
+              invisible="erplibre_signature_style != 'band'"
+            />
+                        <field
+              name="erplibre_signature_tooltip_text"
+              placeholder="This site is built with ERPLibre, a free business platform."
+              invisible="erplibre_signature_style != 'tooltip'"
+            />
+                        <field
+              name="erplibre_signature_url"
+              widget="url"
+              placeholder="https://erplibre.ca"
+            />
+                        <field
+              name="erplibre_signature_logo"
+              widget="image"
+              class="w-25"
+            />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

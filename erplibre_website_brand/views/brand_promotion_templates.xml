@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre - Mathieu Benoit
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <!-- The signature, one of eleven styles. Values: style, dark (bool),
+         palette (bool: the website's colors), custom (bool) and
+         color_style (inline custom colors, may be empty), logo_url, url, text (empty: the translated
+         « Built with »), texts (a style's own text, by style; missing: its
+         translated default). Each style links to « url » in a new tab. -->
+    <template id="signature" name="ERPLibre signature">
+        <t t-set="default_text">Built with</t>
+        <t t-set="phrase" t-value="text or default_text" />
+        <t t-set="texts" t-value="texts or {}" />
+        <t t-set="free_software">Free software</t>
+        <t t-set="digital_sovereignty">Digital sovereignty</t>
+        <t t-set="block_word">block</t>
+        <t t-set="builder_text">Site built with the website builder</t>
+        <t t-set="accelerated_text">Development accelerated by</t>
+        <t t-set="ai_text">AI integration</t>
+        <t t-set="tooltip_text">This site is built with <strong
+      >ERPLibre</strong>, a free business platform.</t>
+        <!-- Below, brand names and markup only: nothing to translate. -->
+        <div
+      t-translation="off"
+      t-attf-class="o_erplibre_signature o_erplibre_signature_#{style}#{' o_erplibre_signature_dark' if dark else ''}#{' o_erplibre_signature_palette' if palette else ''}#{' o_erplibre_signature_custom' if custom else ''}"
+      t-att-style="color_style or None"
+    >
+            <a
+        t-if="style == 'pill'"
+        class="o_erplibre_signature_link"
+        t-att-href="url"
+        target="_blank"
+        rel="noopener"
+      >
+                <img
+          class="o_erplibre_signature_logo"
+          t-att-src="logo_url"
+          alt=""
+        />
+                <span><t t-out="phrase" /> <strong>ERPLibre</strong></span>
+            </a>
+            <a
+        t-elif="style == 'seal'"
+        class="o_erplibre_signature_link"
+        t-att-href="url"
+        target="_blank"
+        rel="noopener"
+      >
+                <img
+          class="o_erplibre_signature_logo"
+          t-att-src="logo_url"
+          alt=""
+        />
+                <span class="o_erplibre_signature_lines">
+                    <span class="o_erplibre_signature_kicker" t-out="phrase" />
+                    <span class="o_erplibre_signature_name">ERPLibre</span>
+                    <span
+            class="o_erplibre_signature_tagline"
+            t-out="texts.get('seal') or '%s · %s' % (free_software, digital_sovereignty)"
+          />
+                </span>
+            </a>
+            <span t-elif="style == 'line'" class="o_erplibre_signature_row">
+                <span class="o_erplibre_signature_dash" />
+                <span t-out="phrase" />
+                <img
+          class="o_erplibre_signature_logo"
+          t-att-src="logo_url"
+          alt=""
+        />
+                <a
+          class="o_erplibre_signature_name"
+          t-att-href="url"
+          target="_blank"
+          rel="noopener"
+        >ERPLibre</a>
+            </span>
+            <a
+        t-elif="style == 'circular_seal'"
+        class="o_erplibre_signature_link"
+        t-att-href="url"
+        target="_blank"
+        rel="noopener"
+        t-att-aria-label="'%s ERPLibre' % phrase"
+      >
+                <svg
+          width="104"
+          height="104"
+          viewBox="0 0 100 100"
+          aria-hidden="true"
+        >
+                    <defs>
+                        <path
+              id="o_erplibre_signature_ring"
+              d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"
+            />
+                    </defs>
+                    <circle
+            class="o_erplibre_signature_stroke"
+            cx="50"
+            cy="50"
+            r="48"
+            stroke-width="1.5"
+          />
+                    <circle
+            class="o_erplibre_signature_stroke"
+            cx="50"
+            cy="50"
+            r="30"
+            stroke-width="1"
+            stroke-dasharray="3 3"
+          />
+                    <text class="o_erplibre_signature_ring_text">
+                        <!-- textLength: the ring's circumference less a gap, so that any
+                             phrase, in any language, closes the circle
+                             without running over its start. -->
+                        <textPath
+              href="#o_erplibre_signature_ring"
+              textLength="240"
+              lengthAdjust="spacing"
+              t-out="('%s · ERPLibre · %s ·' % (phrase, texts.get('circular_seal') or free_software)).upper()"
+            />
+                    </text>
+                    <circle
+            class="o_erplibre_signature_logo_disc"
+            cx="50"
+            cy="50"
+            r="22"
+          />
+                    <image
+            t-att-href="logo_url"
+            x="32"
+            y="32"
+            width="36"
+            height="36"
+          />
+                </svg>
+            </a>
+            <div t-elif="style == 'builder'" class="o_erplibre_signature_frame">
+                <span
+          class="o_erplibre_signature_tab"
+          t-out="'&lt;%s&gt; signature' % block_word"
+        />
+                <a
+          class="o_erplibre_signature_link"
+          t-att-href="url"
+          target="_blank"
+          rel="noopener"
+        >
+                    <svg
+            width="10"
+            height="16"
+            viewBox="0 0 10 16"
+            aria-hidden="true"
+          >
+                        <g class="o_erplibre_signature_grip">
+                            <circle cx="2" cy="2" r="1.5" />
+                            <circle cx="8" cy="2" r="1.5" />
+                            <circle cx="2" cy="8" r="1.5" />
+                            <circle cx="8" cy="8" r="1.5" />
+                            <circle cx="2" cy="14" r="1.5" />
+                            <circle cx="8" cy="14" r="1.5" />
+                        </g>
+                    </svg>
+                    <img
+            class="o_erplibre_signature_logo"
+            t-att-src="logo_url"
+            alt=""
+          />
+                    <span class="o_erplibre_signature_lines">
+                        <span
+              class="o_erplibre_signature_small"
+              t-out="texts.get('builder') or builder_text"
+            />
+                        <span
+              class="o_erplibre_signature_name"
+            >ERPLibre Website</span>
+                    </span>
+                </a>
+                <span class="o_erplibre_signature_handle" />
+            </div>
+            <a
+        t-elif="style == 'accelerated'"
+        class="o_erplibre_signature_link"
+        t-att-href="url"
+        target="_blank"
+        rel="noopener"
+      >
+                <svg
+          width="46"
+          height="24"
+          viewBox="0 0 46 24"
+          aria-hidden="true"
+          fill="none"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+                    <path
+            class="o_erplibre_signature_stroke"
+            d="M4 4l8 8-8 8"
+            opacity=".3"
+          />
+                    <path
+            class="o_erplibre_signature_stroke"
+            d="M17 4l8 8-8 8"
+            opacity=".6"
+          />
+                    <path
+            class="o_erplibre_signature_stroke"
+            d="M30 4l8 8-8 8"
+          />
+                </svg>
+                <span class="o_erplibre_signature_lines">
+                    <span class="o_erplibre_signature_main"><t
+              t-out="accelerated_text"
+            /> <strong>ERPLibre</strong></span>
+                    <span class="o_erplibre_signature_mono">
+                        <span class="o_erplibre_signature_accent">+</span> <t
+              t-out="texts.get('accelerated') or ai_text"
+            />
+                    </span>
+                </span>
+            </a>
+            <a
+        t-elif="style == 'badge'"
+        class="o_erplibre_signature_link"
+        t-att-href="url"
+        target="_blank"
+        rel="noopener"
+      >
+                <span class="o_erplibre_signature_left" t-out="phrase" />
+                <span class="o_erplibre_signature_right">
+                    <img
+            class="o_erplibre_signature_logo"
+            t-att-src="logo_url"
+            alt=""
+          />
+                    ERPLibre
+                </span>
+            </a>
+            <div t-elif="style == 'stack'" class="o_erplibre_signature_column">
+                <span class="o_erplibre_signature_main">
+                    <t t-out="phrase" />
+                    <a
+            class="o_erplibre_signature_name"
+            t-att-href="url"
+            target="_blank"
+            rel="noopener"
+          >ERPLibre</a>
+                </span>
+                <span class="o_erplibre_signature_mono">
+                    <span
+            class="o_erplibre_signature_chip o_erplibre_signature_chip_main"
+          >ERPLibre</span>
+                    <span class="o_erplibre_signature_sep">›</span>
+                    <span class="o_erplibre_signature_chip">Odoo</span>
+                    <span class="o_erplibre_signature_sep">›</span>
+                    <span class="o_erplibre_signature_chip">Python</span>
+                    <span class="o_erplibre_signature_sep">›</span>
+                    <span class="o_erplibre_signature_chip">PostgreSQL</span>
+                </span>
+            </div>
+            <a
+        t-elif="style == 'editorial'"
+        class="o_erplibre_signature_link"
+        t-att-href="url"
+        target="_blank"
+        rel="noopener"
+      >
+                <span class="o_erplibre_signature_serif" t-out="phrase" />
+                <span class="o_erplibre_signature_name">ERPLibre</span>
+            </a>
+            <div t-elif="style == 'band'" class="o_erplibre_signature_strip">
+                <span
+          class="o_erplibre_signature_mono"
+          t-out="texts.get('band') or free_software"
+        />
+                <a
+          class="o_erplibre_signature_link"
+          t-att-href="url"
+          target="_blank"
+          rel="noopener"
+        >
+                    <t t-out="phrase" />
+                    <strong>ERPLibre</strong>
+                    <span
+            class="o_erplibre_signature_accent"
+            aria-hidden="true"
+          >→</span>
+                </a>
+            </div>
+            <div t-else="" class="o_erplibre_signature_column">
+                <span
+          class="o_erplibre_signature_bubble"
+          role="tooltip"
+          t-out="texts.get('tooltip') or tooltip_text"
+        />
+                <a
+          class="o_erplibre_signature_link"
+          t-att-href="url"
+          target="_blank"
+          rel="noopener"
+          t-att-aria-label="'%s ERPLibre' % phrase"
+        >
+                    <img
+            class="o_erplibre_signature_logo"
+            t-att-src="logo_url"
+            alt=""
+          />
+                    <span class="o_erplibre_signature_name">ERPLibre</span>
+                </a>
+            </div>
+        </div>
+    </template>
+
+    <!-- web.brand_promotion_message is the one message every credit calls:
+         the website footer, with the variant website_sale gives it, the
+         portal and the survey pages. Replacing it here covers them all and
+         ignores the « _message » they pass. A high priority applies it after
+         the other modules that edit the same template. -->
+    <template
+    id="brand_promotion_message"
+    inherit_id="web.brand_promotion_message"
+    name="Built with ERPLibre"
+    priority="1000"
+  >
+        <xpath expr="//t[@t-set='odoo_logo']" position="replace" />
+        <xpath expr="//t[@t-set='final_message']" position="replace" />
+        <xpath expr="//t[@t-out]" position="replace">
+            <t
+        t-set="signature_website"
+        t-value="website or request and request.website"
+      />
+            <t
+        t-if="signature_website"
+        t-call="erplibre_website_brand.signature"
+      >
+                <t
+          t-set="signature_values"
+          t-value="signature_website._erplibre_signature_values()"
+        />
+                <t t-set="style" t-value="signature_values['style']" />
+                <t t-set="dark" t-value="signature_values['dark']" />
+                <t t-set="palette" t-value="signature_values['palette']" />
+                <t t-set="custom" t-value="signature_values['custom']" />
+                <t
+          t-set="color_style"
+          t-value="signature_values['color_style']"
+        />
+                <t t-set="logo_url" t-value="signature_values['logo_url']" />
+                <t t-set="url" t-value="signature_values['url']" />
+                <t t-set="text" t-value="signature_values['text']" />
+                <t t-set="texts" t-value="signature_values['texts']" />
+            </t>
+        </xpath>
+    </template>
+</odoo>

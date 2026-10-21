@@ -1,0 +1,544 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_website_brand
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: erplibre_website_brand
+#. odoo-python
+#: code:addons/erplibre_website_brand/models/website.py:0
+msgid ""
+"A signature color is a hexadecimal value such as #1F6F54, or rgb()/rgba(): «"
+" %s » is not."
+msgstr ""
+"Une couleur de signature est une valeur hexadécimale comme #1F6F54, ou "
+"rgb()/rgba() : « %s » n'en est pas une."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__pill
+msgid "A · Pill"
+msgstr "A · Pastille"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "AI integration"
+msgstr "intégration IA"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Accent"
+msgstr "Accent"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Address the signature links to"
+msgstr "Adresse vers laquelle mène la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_url
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_url
+msgid "Address the signature links to."
+msgstr "Adresse vers laquelle mène la signature."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "As the footer shows it"
+msgstr "Telle que le pied de page l'affiche"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__seal
+msgid "B · Seal"
+msgstr "B · Sceau"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Background"
+msgstr "Fond"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_background_color
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_background_color
+msgid ""
+"Background of the parts drawn on a surface (pill, builder frame, band, badge"
+" label, tooltip), in custom mode."
+msgstr ""
+"Fond des parties dessinées sur une surface (pastille, cadre du constructeur,"
+" bande, libellé du badge, infobulle), en mode personnalisé."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_background
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_background
+msgid ""
+"Background the signature sits on: each style has a version drawn for a light"
+" footer and one for a dark footer."
+msgstr ""
+"Fond sur lequel repose la signature : chaque style a une version dessinée "
+"pour un pied de page clair et une pour un pied de page sombre."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "Built with"
+msgstr "Créé grâce à"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__line
+msgid "C · Line"
+msgstr "C · Ligne"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_logo_background_color
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_logo_background_color
+msgid "Color behind the logo, in custom mode with a logo background."
+msgstr "Couleur derrière le logo, en mode personnalisé avec un fond de logo."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_text_color
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_text_color
+msgid "Color of the phrase and of the other text, in custom mode."
+msgstr "Couleur de la phrase et du reste du texte, en mode personnalisé."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_accent_color
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_accent_color
+msgid "Color of « ERPLibre » and of the drawn details, in custom mode."
+msgstr ""
+"Couleur de « ERPLibre » et des détails dessinés, en mode personnalisé."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Colors"
+msgstr "Couleurs"
+
+#. module: erplibre_website_brand
+#: model:ir.model,name:erplibre_website_brand.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_color_mode__custom
+msgid "Custom"
+msgstr "Personnalisées"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__circular_seal
+msgid "D · Circular seal"
+msgstr "D · Sceau circulaire"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_background__dark
+msgid "Dark background"
+msgstr "Fond sombre"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_color_mode__default
+msgid "Default"
+msgstr "Par défaut"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_color_mode
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_color_mode
+msgid ""
+"Default: the colors of the mockups. Website palette: the accent comes from "
+"the website's colors (first one on a light background, second one on a dark "
+"background) and the text takes the color of the footer. Custom: the three "
+"colors below."
+msgstr ""
+"Par défaut : les couleurs des maquettes. Palette du site : l'accent vient "
+"des couleurs du site (la première sur fond clair, la deuxième sur fond "
+"sombre) et le texte prend la couleur du pied de page. Personnalisées : les "
+"trois couleurs ci-dessous."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+msgid "Development accelerated by"
+msgstr "Développement accéléré par"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+msgid "Digital sovereignty"
+msgstr "Souveraineté numérique"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__builder
+msgid "E · Website builder"
+msgstr "E · Constructeur de site"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "ERPLibre signature"
+msgstr "Signature ERPLibre"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "ERPLibre website signature"
+msgstr "Signature ERPLibre du site web"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_circular_seal_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_circular_seal_text
+msgid ""
+"End of the ring, after « ERPLibre », style D. Left empty: « Free software »,"
+" translated."
+msgstr ""
+"Fin du cercle, après « ERPLibre », style D. Laissé vide : « Logiciel libre "
+"», traduit."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__accelerated
+msgid "F · Accelerated development"
+msgstr "F · Développement accéléré"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Footer credit of the website, in one of eleven styles"
+msgstr "Mention du pied de page du site, en un de onze styles"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "Free software"
+msgstr "Logiciel libre"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "Free software · Digital sovereignty"
+msgstr "Logiciel libre · Souveraineté numérique"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__badge
+msgid "G · Two-tone badge"
+msgstr "G · Badge bicolore"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__stack
+msgid "H · Technology stack"
+msgstr "H · Pile technologique"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__editorial
+msgid "I · Editorial"
+msgstr "I · Éditorial"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_logo_background
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_logo_background
+msgid ""
+"In custom mode, draws the color below behind the logo. Unchecked, the"
+" logo has a transparent background."
+msgstr ""
+"En mode personnalisé, dessine la couleur ci-dessous derrière le logo."
+" Décochée, le logo a un fond transparent."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__band
+msgid "J · Band"
+msgstr "J · Bande"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_style__tooltip
+msgid "K · Logo and tooltip"
+msgstr "K · Logo et infobulle"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_band_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_band_text
+msgid ""
+"Label on the left of the band, style J. Left empty: « Free software », "
+"translated."
+msgstr ""
+"Libellé à gauche de la bande, style J. Laissé vide : « Logiciel libre », "
+"traduit."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Left empty, the ERPLibre logo shipped with the module"
+msgstr "Laissé vide, le logo ERPLibre fourni avec le module"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_logo
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_logo
+msgid "Left empty, the ERPLibre logo shipped with the module is used."
+msgstr "Laissé vide, le logo ERPLibre fourni avec le module est utilisé."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_background__light
+msgid "Light background"
+msgstr "Fond clair"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_builder_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_builder_text
+msgid ""
+"Line above « ERPLibre Website », style E. Left empty: « Site built with the "
+"website builder », translated."
+msgstr ""
+"Ligne au-dessus de « ERPLibre Website », style E. Laissé vide : « Site bâti "
+"avec le constructeur », traduit."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_accelerated_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_accelerated_text
+msgid ""
+"Line under the main one, after « + », style F. Left empty: « AI integration "
+"», translated."
+msgstr ""
+"Ligne sous la principale, après « + », style F. Laissé vide : « intégration "
+"IA », traduit."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_seal_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_seal_text
+msgid ""
+"Line under « ERPLibre », style B. Left empty: « Free software · Digital "
+"sovereignty », translated."
+msgstr ""
+"Ligne sous « ERPLibre », style B. Laissé vide : « Logiciel libre · "
+"Souveraineté numérique », traduit."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Link"
+msgstr "Lien"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Logo"
+msgstr "Logo"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Logo background"
+msgstr "Fond du logo"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Phrase"
+msgstr "Phrase"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Preview"
+msgstr "Aperçu"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_tooltip_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_tooltip_text
+msgid ""
+"Sentence of the tooltip, style K. Left empty: « This site is built with "
+"ERPLibre, a free business platform. », translated."
+msgstr ""
+"Phrase de l'infobulle, style K. Laissé vide : « Ce site est créé grâce à "
+"ERPLibre, une plateforme d'affaires libre. », traduit."
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_accent_color
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_accent_color
+msgid "Signature accent color"
+msgstr "Couleur d'accent de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_background
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_background
+msgid "Signature background"
+msgstr "Fond de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_background_color
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_background_color
+msgid "Signature background color"
+msgstr "Couleur de fond de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_color_mode
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_color_mode
+msgid "Signature colors"
+msgstr "Couleurs de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_url
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_url
+msgid "Signature link"
+msgstr "Lien de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_logo
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_logo
+msgid "Signature logo"
+msgstr "Logo de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_logo_background
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_logo_background
+msgid "Signature logo background"
+msgstr "Fond du logo de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_logo_background_color
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_logo_background_color
+msgid "Signature logo background color"
+msgstr "Couleur du fond du logo de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_text
+msgid "Signature phrase"
+msgstr "Phrase de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_preview
+msgid "Signature preview"
+msgstr "Aperçu de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_style
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_style
+msgid "Signature style"
+msgstr "Style de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_text_color
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_text_color
+msgid "Signature text color"
+msgstr "Couleur du texte de la signature"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_seal_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_seal_text
+msgid "Signature text, B · Seal"
+msgstr "Texte de la signature, B · Sceau"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_circular_seal_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_circular_seal_text
+msgid "Signature text, D · Circular seal"
+msgstr "Texte de la signature, D · Sceau circulaire"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_builder_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_builder_text
+msgid "Signature text, E · Website builder"
+msgstr "Texte de la signature, E · Constructeur de site"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_accelerated_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_accelerated_text
+msgid "Signature text, F · Accelerated development"
+msgstr "Texte de la signature, F · Développement accéléré"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_band_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_band_text
+msgid "Signature text, J · Band"
+msgstr "Texte de la signature, J · Bande"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_res_config_settings__erplibre_signature_tooltip_text
+#: model:ir.model.fields,field_description:erplibre_website_brand.field_website__erplibre_signature_tooltip_text
+msgid "Signature text, K · Logo and tooltip"
+msgstr "Texte de la signature, K · Logo et infobulle"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "Site built with the website builder"
+msgstr "Site bâti avec le constructeur"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Style"
+msgstr "Style"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Text"
+msgstr "Texte"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Text of the style"
+msgstr "Texte du style"
+
+#. module: erplibre_website_brand
+#. odoo-python
+#: code:addons/erplibre_website_brand/models/website.py:0
+msgid "The signature link must start with https://, http:// or /."
+msgstr "Le lien de la signature doit commencer par https://, http:// ou /."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "The style's own text besides the phrase, translated per language"
+msgstr "Le texte propre au style, en plus de la phrase, traduit par langue"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+msgid ""
+"This site is built with <strong>ERPLibre</strong>, a free business platform."
+msgstr ""
+"Ce site est créé grâce à <strong>ERPLibre</strong>, une plateforme "
+"d'affaires libre."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "This site is built with ERPLibre, a free business platform."
+msgstr "Ce site est créé grâce à ERPLibre, une plateforme d'affaires libre."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Those of the mockups, those of the website, or your own"
+msgstr "Celles des maquettes, celles du site, ou les vôtres"
+
+#. module: erplibre_website_brand
+#: model:ir.model,name:erplibre_website_brand.model_website
+msgid "Website"
+msgstr ""
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields.selection,name:erplibre_website_brand.selection__website__erplibre_signature_color_mode__palette
+msgid "Website palette"
+msgstr "Palette du site"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+msgid "Words before « ERPLibre », translated per language"
+msgstr "Mots devant « ERPLibre », traduits par langue"
+
+#. module: erplibre_website_brand
+#: model:ir.model.fields,help:erplibre_website_brand.field_res_config_settings__erplibre_signature_text
+#: model:ir.model.fields,help:erplibre_website_brand.field_website__erplibre_signature_text
+msgid ""
+"Words before « ERPLibre ». Left empty, the translated default « Built with »"
+" is used."
+msgstr ""
+"Mots devant « ERPLibre ». Laissé vide, la valeur par défaut traduite « Créé "
+"grâce à » est utilisée."
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.signature
+msgid "block"
+msgstr "bloc"
+
+#. module: erplibre_website_brand
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_website_brand.view_website_form
+msgid "https://erplibre.ca"
+msgstr "https://erplibre.ca"

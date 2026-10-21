@@ -1,0 +1,620 @@
+/* Copyright 2026 TechnoLibre - Mathieu Benoit
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). */
+
+// The fonts ship with the module (static/src/fonts, SIL OFL 1.1): nothing
+// is fetched from a third party. Family names of their own keep a website
+// font of the same name, loaded another way, out of the signature.
+@font-face {
+    font-family: "ERPLibre Signature Sans";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../fonts/PublicSans.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "ERPLibre Signature Mono";
+    font-style: normal;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url("../fonts/JetBrainsMono.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "ERPLibre Signature Serif";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/Fraunces-Italic.woff2") format("woff2");
+}
+
+$o-erplibre-sans: "ERPLibre Signature Sans", system-ui, sans-serif;
+$o-erplibre-mono: "ERPLibre Signature Mono", SFMono-Regular, Menlo, Consolas, monospace;
+$o-erplibre-serif: "ERPLibre Signature Serif", Georgia, serif;
+
+// Eleven signature styles, each drawn for a light and a dark footer. The
+// accent is the only colour that changes between them: --o-erplibre-accent
+// holds the one in use, overridable from a theme.
+.o_erplibre_signature {
+    --o-erplibre-accent-on-light: #1f6f54;
+    --o-erplibre-accent-on-dark: #6fd3a8;
+    --o-erplibre-accent: var(--o-erplibre-accent-on-light);
+    --o-erplibre-ink: #1b1f23;
+    --o-erplibre-text: #4a535b;
+    --o-erplibre-muted: #5a636b;
+    --o-erplibre-surface: #ffffff;
+    --o-erplibre-border: #d5dad6;
+    --o-erplibre-link: var(--o-erplibre-text);
+    display: inline-flex;
+    max-width: 100%;
+    vertical-align: middle;
+    text-align: left;
+    font-family: $o-erplibre-sans;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--o-erplibre-text);
+
+    &.o_erplibre_signature_dark {
+        --o-erplibre-accent: var(--o-erplibre-accent-on-dark);
+        --o-erplibre-ink: #ffffff;
+        --o-erplibre-text: #c3cad0;
+        --o-erplibre-muted: #9aa3ab;
+        --o-erplibre-surface: #1e2328;
+        --o-erplibre-border: #343b42;
+
+        // The logo is drawn for a light background: it keeps one.
+        .o_erplibre_signature_logo {
+            background: #ffffff;
+            padding: 2px;
+        }
+    }
+
+    // Website palette: the accent is the website's first color on a light
+    // background, its second on a dark one; the text follows the footer.
+    // The fallbacks apply where the palette is not defined, in the backend.
+    &.o_erplibre_signature_palette {
+        --o-erplibre-accent-on-light: var(--o-color-1, #1f6f54);
+        --o-erplibre-accent-on-dark: var(--o-color-2, #6fd3a8);
+        --o-erplibre-text: currentColor;
+        --o-erplibre-ink: currentColor;
+        --o-erplibre-muted: color-mix(in srgb, currentColor 75%, transparent);
+    }
+
+    // A website color combination colors every link of its section with
+    // selectors stronger than a component's (.o_cc5 a:not(.btn) and the
+    // like), hover included: a link of the signature takes its color from
+    // --o-erplibre-link instead, which only the signature sets.
+    a,
+    a:hover,
+    a:focus {
+        color: var(--o-erplibre-link) !important;
+    }
+
+    a {
+        text-decoration: none;
+
+        &:hover {
+            opacity: 0.85;
+        }
+    }
+
+    .o_erplibre_signature_link,
+    .o_erplibre_signature_row {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .o_erplibre_signature_logo {
+        flex: none;
+        object-fit: contain;
+    }
+
+    .o_erplibre_signature_lines,
+    .o_erplibre_signature_column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .o_erplibre_signature_name,
+    strong {
+        font-weight: 700;
+        color: var(--o-erplibre-accent);
+    }
+
+    a.o_erplibre_signature_name {
+        --o-erplibre-link: var(--o-erplibre-accent);
+    }
+
+    .o_erplibre_signature_accent {
+        color: var(--o-erplibre-accent);
+    }
+
+    .o_erplibre_signature_stroke {
+        fill: none;
+        stroke: var(--o-erplibre-accent);
+    }
+
+    .o_erplibre_signature_mono {
+        font-family: $o-erplibre-mono;
+        font-size: 11px;
+    }
+}
+
+// A · Pill
+.o_erplibre_signature_pill {
+    .o_erplibre_signature_link {
+        gap: 10px;
+        min-height: 44px;
+        padding: 8px 16px 8px 8px;
+        border: 1px solid var(--o-erplibre-border);
+        border-radius: 999px;
+        background: var(--o-erplibre-surface);
+    }
+
+    .o_erplibre_signature_logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+    }
+
+    &.o_erplibre_signature_dark strong {
+        color: #ffffff;
+    }
+}
+
+// B · Seal
+.o_erplibre_signature_seal {
+    .o_erplibre_signature_link {
+        gap: 14px;
+        --o-erplibre-link: var(--o-erplibre-ink);
+    }
+
+    .o_erplibre_signature_logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+    }
+
+    .o_erplibre_signature_lines {
+        gap: 3px;
+    }
+
+    .o_erplibre_signature_kicker {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--o-erplibre-muted);
+    }
+
+    .o_erplibre_signature_name {
+        font-size: 18px;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+    }
+
+    .o_erplibre_signature_tagline {
+        font-size: 11px;
+        color: var(--o-erplibre-muted);
+    }
+}
+
+// C · Line
+.o_erplibre_signature_line {
+    .o_erplibre_signature_row {
+        gap: 10px;
+    }
+
+    .o_erplibre_signature_dash {
+        width: 18px;
+        height: 2px;
+        background: var(--o-erplibre-accent);
+    }
+
+    .o_erplibre_signature_logo {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+
+    a.o_erplibre_signature_name {
+        --o-erplibre-link: var(--o-erplibre-ink);
+        text-decoration: underline;
+        text-decoration-color: var(--o-erplibre-accent);
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+    }
+}
+
+// D · Circular seal
+.o_erplibre_signature_circular_seal {
+    .o_erplibre_signature_logo_disc {
+        fill: transparent;
+    }
+
+    &.o_erplibre_signature_dark .o_erplibre_signature_logo_disc {
+        fill: #ffffff;
+    }
+
+    .o_erplibre_signature_ring_text {
+        font-family: $o-erplibre-mono;
+        font-size: 8.2px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
+        fill: var(--o-erplibre-accent);
+    }
+}
+
+// E · Website builder
+.o_erplibre_signature_builder {
+    .o_erplibre_signature_frame {
+        position: relative;
+        padding-top: 14px;
+    }
+
+    .o_erplibre_signature_tab {
+        position: absolute;
+        top: 0;
+        left: 12px;
+        padding: 3px 8px;
+        border-radius: 4px 4px 0 0;
+        background: var(--o-erplibre-accent);
+        color: #ffffff;
+        font-family: $o-erplibre-mono;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .o_erplibre_signature_link {
+        gap: 12px;
+        padding: 12px 18px 12px 10px;
+        border: 1.5px dashed var(--o-erplibre-accent);
+        border-radius: 6px;
+        background: var(--o-erplibre-surface);
+        --o-erplibre-link: var(--o-erplibre-ink);
+    }
+
+    .o_erplibre_signature_grip {
+        fill: #9aa3ab;
+    }
+
+    .o_erplibre_signature_logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+    }
+
+    .o_erplibre_signature_lines {
+        gap: 2px;
+    }
+
+    .o_erplibre_signature_small {
+        font-size: 11px;
+        color: var(--o-erplibre-muted);
+    }
+
+    .o_erplibre_signature_name {
+        font-size: 16px;
+        line-height: 1.2;
+    }
+
+    .o_erplibre_signature_handle {
+        position: absolute;
+        right: -5px;
+        bottom: -5px;
+        width: 9px;
+        height: 9px;
+        border: 1.5px solid var(--o-erplibre-accent);
+        border-radius: 2px;
+        background: var(--o-erplibre-surface);
+    }
+
+    &.o_erplibre_signature_dark {
+        .o_erplibre_signature_tab {
+            color: #0e2a20;
+        }
+
+        .o_erplibre_signature_grip {
+            fill: #6b747c;
+        }
+    }
+}
+
+// F · Accelerated development
+.o_erplibre_signature_accelerated {
+    .o_erplibre_signature_link {
+        gap: 14px;
+        --o-erplibre-link: var(--o-erplibre-ink);
+    }
+
+    .o_erplibre_signature_lines {
+        gap: 4px;
+    }
+
+    .o_erplibre_signature_main {
+        font-size: 15px;
+        color: var(--o-erplibre-text);
+
+        strong {
+            font-weight: 800;
+        }
+    }
+
+    .o_erplibre_signature_mono {
+        color: var(--o-erplibre-muted);
+    }
+
+    &.o_erplibre_signature_dark strong {
+        color: #ffffff;
+    }
+}
+
+// G · Two-tone badge
+.o_erplibre_signature_badge {
+    .o_erplibre_signature_link {
+        align-items: stretch;
+        min-height: 32px;
+        overflow: hidden;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .o_erplibre_signature_left,
+    .o_erplibre_signature_right {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+    }
+
+    .o_erplibre_signature_left {
+        background: #3a4148;
+        color: #ffffff;
+        text-transform: lowercase;
+    }
+
+    .o_erplibre_signature_right {
+        gap: 8px;
+        background: var(--o-erplibre-accent);
+        color: #ffffff;
+    }
+
+    .o_erplibre_signature_logo {
+        width: 16px;
+        height: 16px;
+        padding: 1px;
+        border-radius: 3px;
+        background: #ffffff;
+    }
+
+    &.o_erplibre_signature_dark {
+        .o_erplibre_signature_left {
+            background: #2c3238;
+            color: #e6eaed;
+        }
+
+        .o_erplibre_signature_right {
+            color: #0e2a20;
+        }
+    }
+}
+
+// H · Technology stack
+.o_erplibre_signature_stack {
+    .o_erplibre_signature_column {
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .o_erplibre_signature_mono {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .o_erplibre_signature_chip {
+        padding: 3px 8px;
+        border: 1px solid #c9cfcb;
+        border-radius: 4px;
+    }
+
+    .o_erplibre_signature_chip_main {
+        border-color: var(--o-erplibre-accent);
+        color: var(--o-erplibre-accent);
+        font-weight: 700;
+    }
+
+    .o_erplibre_signature_sep {
+        color: #9aa3ab;
+    }
+
+    &.o_erplibre_signature_dark {
+        .o_erplibre_signature_chip:not(.o_erplibre_signature_chip_main) {
+            border-color: #3a4148;
+        }
+
+        .o_erplibre_signature_sep {
+            color: #6b747c;
+        }
+    }
+}
+
+// I · Editorial
+.o_erplibre_signature_editorial {
+    .o_erplibre_signature_link {
+        align-items: baseline;
+        gap: 10px;
+    }
+
+    .o_erplibre_signature_serif {
+        font-family: $o-erplibre-serif;
+        font-style: italic;
+        font-size: 20px;
+    }
+
+    .o_erplibre_signature_name {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+}
+
+// J · Band
+.o_erplibre_signature_band {
+    display: flex;
+    width: 100%;
+
+    .o_erplibre_signature_strip {
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        gap: 8px 24px;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        border-top: 3px solid var(--o-erplibre-accent);
+        background: var(--o-erplibre-surface);
+        font-size: 12px;
+    }
+
+    .o_erplibre_signature_mono {
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .o_erplibre_signature_link {
+        gap: 8px;
+    }
+
+    &.o_erplibre_signature_dark .o_erplibre_signature_strip {
+        background: #0d1012;
+    }
+}
+
+// K · Logo and tooltip: the sentence shows on hover or keyboard focus.
+.o_erplibre_signature_tooltip {
+    .o_erplibre_signature_column {
+        position: relative;
+        align-items: flex-end;
+    }
+
+    .o_erplibre_signature_bubble {
+        position: absolute;
+        right: 0;
+        bottom: calc(100% + 8px);
+        width: max-content;
+        max-width: 240px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: #1b1f23;
+        color: #ffffff;
+        font-size: 12px;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.15s;
+
+        strong {
+            color: inherit;
+        }
+    }
+
+    .o_erplibre_signature_column:hover .o_erplibre_signature_bubble,
+    .o_erplibre_signature_column:focus-within .o_erplibre_signature_bubble {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .o_erplibre_signature_link {
+        gap: 8px;
+        min-height: 44px;
+    }
+
+    .o_erplibre_signature_logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .o_erplibre_signature_name {
+        font-size: 13px;
+        color: var(--o-erplibre-ink);
+    }
+
+    &.o_erplibre_signature_dark .o_erplibre_signature_bubble {
+        background: #f4f5f2;
+        color: #1b1f23;
+    }
+}
+
+// Custom colors: the parts the mockups draw in fixed colors follow the
+// three chosen ones, text, accent and background (--o-erplibre-surface).
+// The logo, white-backed on a dark background and in the badge otherwise,
+// is transparent unless a logo background is chosen
+// (--o-erplibre-logo-surface, with --o-erplibre-logo-padding around it).
+// The extra class outweighs the dark variant of each style.
+.o_erplibre_signature.o_erplibre_signature_custom {
+    .o_erplibre_signature_logo {
+        padding: var(--o-erplibre-logo-padding, 0);
+        background: var(--o-erplibre-logo-surface, transparent);
+    }
+
+    &.o_erplibre_signature_circular_seal .o_erplibre_signature_logo_disc {
+        fill: var(--o-erplibre-logo-surface, transparent);
+    }
+
+    &.o_erplibre_signature_pill strong,
+    &.o_erplibre_signature_accelerated strong {
+        color: var(--o-erplibre-accent);
+    }
+
+    &.o_erplibre_signature_builder .o_erplibre_signature_tab {
+        color: var(--o-erplibre-surface);
+    }
+
+    &.o_erplibre_signature_badge {
+        .o_erplibre_signature_left {
+            background: var(--o-erplibre-surface);
+            color: var(--o-erplibre-text);
+        }
+
+        .o_erplibre_signature_right {
+            color: var(--o-erplibre-surface);
+        }
+    }
+
+    &.o_erplibre_signature_band .o_erplibre_signature_strip {
+        background: var(--o-erplibre-surface);
+    }
+
+    &.o_erplibre_signature_tooltip .o_erplibre_signature_bubble {
+        border: 1px solid var(--o-erplibre-border);
+        background: var(--o-erplibre-surface);
+        color: var(--o-erplibre-text);
+    }
+}
+
+// Settings preview: the backgrounds the mockups use.
+.o_erplibre_signature_preview {
+    display: flex;
+    justify-content: flex-end;
+    padding: 28px;
+    border-radius: 12px;
+    background: #f4f5f2;
+    color: #4a535b;
+
+    &.o_erplibre_signature_preview_dark {
+        background: #15191c;
+        color: #c3cad0;
+    }
+
+    // Room for the tooltip of style K, always shown here.
+    .o_erplibre_signature_tooltip {
+        padding-top: 64px;
+
+        .o_erplibre_signature_bubble {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
