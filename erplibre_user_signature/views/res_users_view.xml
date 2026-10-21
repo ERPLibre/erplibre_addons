@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- La signature est réservée aux administrateurs : son bouton
+         d'effacement la suit dans le formulaire d'administration. -->
+    <record id="res_users_form_digital_signature_groups" model="ir.ui.view">
+        <field name="name">res.users.form.digital.signature.groups</field>
+        <field name="model">res.users</field>
+        <field
+            name="inherit_id"
+            ref="base_user_signature.inherited_res_users_form"
+        />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//button[@name='clear_digital_signature']"
+                position="attributes"
+            >
+                <attribute name="groups">base.group_system</attribute>
+            </xpath>
+            <xpath expr="//field[@name='digital_signature']" position="attributes">
+                <attribute name="options">{'full_name': 'name'}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Le widget de signature n'offre le mode « Auto » que s'il connaît un
+         nom à dessiner : « full_name » le prend dans le champ « name ». -->
+    <record id="res_users_preferences_digital_signature_name" model="ir.ui.view">
+        <field name="name">res.users.preferences.digital.signature.name</field>
+        <field name="model">res.users</field>
+        <field
+            name="inherit_id"
+            ref="base_user_signature.inherited_res_users_preferences_form"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='digital_signature']" position="attributes">
+                <attribute name="options">{'full_name': 'name'}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
