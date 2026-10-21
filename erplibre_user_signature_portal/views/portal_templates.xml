@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- La section vit hors du formulaire des coordonnées : ses propres
+         formulaires ne s'y imbriquent pas, et l'enregistrement des
+         coordonnées ne touche pas à la signature. -->
+    <template
+        id="portal_my_details_signature"
+        inherit_id="portal.portal_my_details"
+        name="User Signature"
+    >
+        <xpath expr="//form[@action='/my/account']" position="after">
+            <div class="row o_portal_user_signature mb-5">
+                <div class="col-lg-8">
+                    <h4>Signature</h4>
+                    <t t-if="user_digital_signature">
+                        <img
+                            t-att-src="user_digital_signature"
+                            class="img-fluid border rounded mb-3 d-block"
+                            style="max-height: 120px;"
+                            alt="Signature"
+                        />
+                    </t>
+                    <p t-else="" class="text-muted">
+                        You have no signature yet.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal_user_signature"
+                        >
+                            <t t-if="user_digital_signature">Change</t>
+                            <t t-else="">Sign</t>
+                        </button>
+                        <form
+                            t-if="user_digital_signature"
+                            action="/my/signature/delete"
+                            method="post"
+                        >
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                t-att-value="request.csrf_token()"
+                            />
+                            <button type="submit" class="btn btn-light">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                    <div
+                        id="modal_user_signature"
+                        class="modal fade"
+                        tabindex="-1"
+                        role="dialog"
+                        aria-hidden="true"
+                    >
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <header class="modal-header">
+                                    <h4 class="modal-title">My signature</h4>
+                                    <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close"
+                                    />
+                                </header>
+                                <main class="modal-body">
+                                    <t t-call="portal.signature_form">
+                                        <t
+                                            t-set="call_url"
+                                            t-value="'/my/signature'"
+                                        />
+                                        <t
+                                            t-set="default_name"
+                                            t-value="request.env.user.name"
+                                        />
+                                        <t t-set="send_label">Save</t>
+                                    </t>
+                                </main>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>
