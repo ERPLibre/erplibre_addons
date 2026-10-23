@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dolibarr_website_import_system,dolibarr.website.import system,model_dolibarr_website_import,base.group_system,1,1,1,1
+access_dolibarr_website_import_page_system,dolibarr.website.import.page system,model_dolibarr_website_import_page,base.group_system,1,1,1,1
+access_dolibarr_website_import_line_system,dolibarr.website.import.line system,model_dolibarr_website_import_line,base.group_system,1,1,1,1
+access_dolibarr_website_import_map_system,dolibarr.website.import.map system,model_dolibarr_website_import_map,base.group_system,1,1,1,1
+access_dolibarr_website_import_wizard_system,dolibarr.website.import.wizard system,model_dolibarr_website_import_wizard,base.group_system,1,1,1,1

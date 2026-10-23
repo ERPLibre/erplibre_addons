@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre (https://technolibre.ca)
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="dolibarr_website_import_list" model="ir.ui.view">
+        <field name="name">dolibarr.website.import.list</field>
+        <field name="model">dolibarr.website.import</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-danger="state == 'failed'" decoration-info="state == 'to_review'">
+                <field name="name" />
+                <field name="website_id" />
+                <field name="source_key" />
+                <field name="state" />
+                <field name="date_start" />
+                <field name="page_count" />
+                <field name="warning_count" />
+                <field name="error_count" />
+            </list>
+        </field>
+    </record>
+
+    <record id="dolibarr_website_import_search" model="ir.ui.view">
+        <field name="name">dolibarr.website.import.search</field>
+        <field name="model">dolibarr.website.import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="source_key" />
+                <field name="website_id" />
+                <filter name="to_review" string="To review" domain="[('state', '=', 'to_review')]" />
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]" />
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="dolibarr_website_import_form" model="ir.ui.view">
+        <field name="name">dolibarr.website.import.form</field>
+        <field name="model">dolibarr.website.import</field>
+        <field name="arch" type="xml">
+            <form string="Dolibarr import" create="0">
+                <header>
+                    <button
+                        name="action_import"
+                        type="object"
+                        string="Import"
+                        class="btn-primary"
+                        invisible="state != 'to_review'"
+                    />
+                    <button
+                        name="action_start_over"
+                        type="object"
+                        string="Start over"
+                        invisible="state not in ('to_review', 'failed', 'cancelled', 'done')"
+                    />
+                    <button
+                        name="action_resume"
+                        type="object"
+                        string="Resume"
+                        invisible="state not in ('failed', 'cancelled', 'running')"
+                    />
+                    <button
+                        name="action_cancel"
+                        type="object"
+                        string="Cancel"
+                        invisible="state not in ('running', 'to_review')"
+                    />
+                    <button name="action_reimport" type="object" string="Reimport" invisible="state != 'done'" />
+                    <button
+                        name="action_open_website"
+                        type="object"
+                        string="Open website"
+                        invisible="state == 'draft'"
+                    />
+                    <button
+                        name="action_open_blog"
+                        type="object"
+                        string="Open blog"
+                        invisible="state == 'draft'"
+                    />
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,running,to_review,done"
+                        readonly="1"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-file-o" disabled="1">
+                            <field name="page_count" widget="statinfo" string="Pages" />
+                        </button>
+                        <button class="oe_stat_button" icon="fa-newspaper-o" disabled="1">
+                            <field name="post_count" widget="statinfo" string="Posts" />
+                        </button>
+                        <button class="oe_stat_button" icon="fa-picture-o" disabled="1">
+                            <field name="media_count" widget="statinfo" string="Media" />
+                        </button>
+                        <button class="oe_stat_button" icon="fa-share" disabled="1">
+                            <field name="redirect_count" widget="statinfo" string="Redirects" />
+                        </button>
+                        <button class="oe_stat_button" icon="fa-exclamation-triangle" disabled="1">
+                            <field name="warning_count" widget="statinfo" string="Warnings" />
+                        </button>
+                        <button class="oe_stat_button" icon="fa-times-circle" disabled="1">
+                            <field name="error_count" widget="statinfo" string="Errors" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="website_id" readonly="state != 'draft'" />
+                            <field name="source_key" readonly="state != 'draft'" />
+                            <field name="phase" readonly="1" />
+                            <field name="error" readonly="1" invisible="not error" />
+                        </group>
+                        <group string="Write options">
+                            <field name="blog_name" readonly="state not in ('draft', 'to_review')" />
+                            <field name="import_menu" readonly="state not in ('draft', 'to_review')" />
+                            <field name="set_homepage" readonly="state not in ('draft', 'to_review')" />
+                            <field name="style_blog_posts" readonly="state not in ('draft', 'to_review')" />
+                            <field name="overwrite_local_edits" readonly="state not in ('draft', 'to_review')" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Review" name="review">
+                            <p class="text-muted">
+                                Pages linked by a translation are never proposed, and a
+                                container is never listed for its language. Tick Import to
+                                bring a page in another language without a translation link.
+                            </p>
+                            <field name="page_ids">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="ref" readonly="1" />
+                                    <field name="title" readonly="1" />
+                                    <field name="lang" readonly="1" />
+                                    <field name="kind" readonly="1" />
+                                    <field name="status" readonly="1" />
+                                    <field
+                                        name="include"
+                                        string="Import"
+                                        readonly="status != 'foreign_unlinked' or parent.state != 'to_review'"
+                                    />
+                                    <field name="imported_before" readonly="1" />
+                                    <field name="source_url" readonly="1" />
+                                    <field name="target_url" readonly="1" />
+                                    <field name="php_plan" readonly="1" />
+                                    <field name="php_unknown_blocks" readonly="1" />
+                                    <field name="php_removed_bytes" readonly="1" />
+                                    <field name="translates_ref" readonly="1" optional="hide" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Scripts" name="scripts">
+                            <p class="text-muted">
+                                A kept script runs on the website origin, which is also the
+                                origin of the Odoo backend, with the session of whoever opens
+                                the page.
+                            </p>
+                            <group>
+                                <field name="keep_scripts" readonly="state != 'to_review'" />
+                                <field name="site_script_count" />
+                                <field name="site_script_detail" />
+                            </group>
+                            <field name="page_ids" readonly="1">
+                                <list>
+                                    <field name="ref" />
+                                    <field name="script_count" />
+                                    <field name="script_detail" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Summary" name="summary">
+                            <group>
+                                <group string="Records">
+                                    <field name="page_count" />
+                                    <field name="post_count" />
+                                    <field name="media_count" />
+                                    <field name="redirect_count" />
+                                </group>
+                                <group string="PHP and languages">
+                                    <field name="php_translated_count" />
+                                    <field name="php_removed_count" />
+                                    <field name="foreign_proposed" />
+                                    <field name="foreign_imported" />
+                                    <field name="foreign_skipped" />
+                                    <field name="scripts_kept_count" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Findings" name="findings">
+                            <field name="line_ids" readonly="1">
+                                <list
+                                    decoration-danger="severity == 'error'"
+                                    decoration-warning="severity == 'warning'"
+                                >
+                                    <field name="severity" />
+                                    <field name="code" />
+                                    <field name="page_ref" />
+                                    <field name="lang" optional="hide" />
+                                    <field name="url" optional="hide" />
+                                    <field name="message" />
+                                    <field name="res_model" column_invisible="1" />
+                                    <button name="action_open" type="object" string="Open" invisible="not res_model" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Records" name="records">
+                            <field name="map_ids" readonly="1">
+                                <list>
+                                    <field name="kind" />
+                                    <field name="ref" />
+                                    <field name="res_model" />
+                                    <field name="res_id" />
+                                    <field name="last_action" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Source" name="source">
+                            <group>
+                                <field name="zip_file" filename="zip_filename" readonly="state != 'draft'" />
+                                <field name="zip_filename" readonly="1" />
+                                <field name="zip_sha256" />
+                                <field name="dolibarr_version" />
+                                <field name="main_lang" />
+                                <field name="other_langs" />
+                                <field name="langs_source" />
+                                <field name="date_start" />
+                                <field name="date_end" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="dolibarr_website_import_action" model="ir.actions.act_window">
+        <field name="name">Dolibarr import reports</field>
+        <field name="res_model">dolibarr.website.import</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
