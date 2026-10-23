@@ -18,6 +18,9 @@
     "data": [
         "security/ir.model.access.csv",
         "views/templates.xml",
+        "views/dolibarr_website_import_views.xml",
+        "wizards/dolibarr_website_import_wizard_views.xml",
+        "views/menus.xml",
     ],
     "application": False,
     "installable": True,

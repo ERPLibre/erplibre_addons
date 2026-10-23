@@ -7,5 +7,6 @@ from . import (
     test_models,
     test_process,
     test_templates,
+    test_wizard_review,
     test_writer,
 )
