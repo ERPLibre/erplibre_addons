@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre (https://technolibre.ca)
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <menuitem
+        id="menu_dolibarr_website_import_wizard"
+        name="Import from Dolibarr"
+        parent="website.menu_website_global_configuration"
+        action="dolibarr_website_import_wizard_action"
+        groups="base.group_system"
+        sequence="90"
+    />
+    <menuitem
+        id="menu_dolibarr_website_import_runs"
+        name="Dolibarr import reports"
+        parent="website.menu_website_global_configuration"
+        action="dolibarr_website_import_action"
+        groups="base.group_system"
+        sequence="91"
+    />
+</odoo>
