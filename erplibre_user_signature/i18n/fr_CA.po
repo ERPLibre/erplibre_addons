@@ -1,0 +1,39 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_user_signature
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-21 00:26+0000\n"
+"PO-Revision-Date: 2026-10-21 00:26+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: erplibre_user_signature
+#. odoo-python
+#: code:addons/erplibre_user_signature/models/res_users.py:0
+msgid "A signature must be a PNG or JPEG image."
+msgstr "Une signature doit être une image PNG ou JPEG."
+
+#. module: erplibre_user_signature
+#: model:ir.model.fields,field_description:erplibre_user_signature.field_res_users__digital_signature
+msgid "Digital Signature"
+msgstr "Signature numérique"
+
+#. module: erplibre_user_signature
+#. odoo-python
+#: code:addons/erplibre_user_signature/models/res_users.py:0
+msgid "Invalid search criterion"
+msgstr "Critère de recherche invalide"
+
+#. module: erplibre_user_signature
+#: model:ir.model,name:erplibre_user_signature.model_res_users
+msgid "User"
+msgstr "Utilisateur"
