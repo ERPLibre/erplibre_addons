@@ -3,6 +3,7 @@
 
 from . import (
     test_access,
+    test_cli,
     test_engine,
     test_models,
     test_process,
