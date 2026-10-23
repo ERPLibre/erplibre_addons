@@ -6,6 +6,7 @@ from . import (
     test_cli,
     test_editor_save,
     test_engine,
+    test_i18n,
     test_import_zip,
     test_models,
     test_process,
