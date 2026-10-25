@@ -5,10 +5,9 @@
 import zlib
 
 from odoo import api, fields, models
+from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError, UserError
 from odoo.tools.translate import _
-
-from odoo.addons.mail.tools.discuss import Store
 
 # Premier entier de la paire de pg_advisory_xact_lock : un espace par
 # famille de verrous, pour qu'un canal et un message de même clé ne se
@@ -25,7 +24,13 @@ def erplibre_lock_uuid(env, namespace, uuid):
     n'est pas unique) : sans verrou, un renvoi qui arrive pendant que la
     première transaction est ouverte ne voit rien et crée un second
     enregistrement. Avec le verrou, le renvoi attend le commit de la
-    première puis la trouve. Le hash CRC32 peut collisionner : une collision
+    première puis la trouve. Le verrou sérialise ; il ne garantit pas : les
+    curseurs Odoo lisent en REPEATABLE READ, l'instantané date du premier
+    ordre de la transaction, avant le verrou, et la recherche qui suit peut
+    ne pas voir la ligne que l'autre transaction vient de valider. L'index
+    unique partiel de chaque modèle garantit : un renvoi qui chevauche
+    ainsi échoue en erreur d'intégrité (ValidationError côté client) au
+    lieu de doubler. Le hash CRC32 peut collisionner : une collision
     ne fait qu'attendre à tort, jamais confondre deux enregistrements.
     """
     key = zlib.crc32(f"{env.uid}:{uuid}".encode())
@@ -46,6 +51,18 @@ class DiscussChannel(models.Model):
         " même identifiant par le même utilisateur ne crée pas de second"
         " canal.",
     )
+
+    def init(self):
+        # Dernière garde du dédoublonnage (voir erplibre_lock_uuid). L'index
+        # btree_not_null du champ reste : il sert la recherche par seul
+        # identifiant, que l'index unique, mené par create_uid, ne sert pas.
+        super().init()
+        self.env.cr.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS"
+            " discuss_channel_erplibre_client_uuid_uniq"
+            " ON discuss_channel (create_uid, erplibre_client_uuid)"
+            " WHERE erplibre_client_uuid IS NOT NULL"
+        )
 
     def _erplibre_existing_by_uuid(self):
         """Rend le canal créé par l'utilisateur courant avec l'identifiant
@@ -160,10 +177,14 @@ class DiscussChannel(models.Model):
         env.user : l'auteur comparé est donc l'utilisateur qui requiert.
         L'utilisateur public n'est jamais comparé : son partenaire est le
         même pour quiconque publie sans compte, et l'un adopterait le message
-        d'un autre.
+        d'un autre. Son identifiant n'est pas non plus enregistré : l'index
+        unique de mail.message refuserait un second message du même
+        partenaire partagé.
         """
         uuid = kwargs.get("erplibre_client_uuid")
-        if uuid and not self.env.user._is_public():
+        if uuid and self.env.user._is_public():
+            kwargs.pop("erplibre_client_uuid")
+        elif uuid:
             self.ensure_one()
             erplibre_lock_uuid(self.env, LOCK_NAMESPACE_MESSAGE, uuid)
             existing = (

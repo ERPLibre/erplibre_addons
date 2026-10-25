@@ -4,13 +4,14 @@
 
 from unittest.mock import patch
 
-from odoo.exceptions import AccessError, UserError
-from odoo.tests import new_test_user, tagged
-from odoo.tests.common import HttpCase
-
 from odoo.addons.bus.models.bus import channel_with_db, json_dump
 from odoo.addons.erplibre_mobile_chat.models import discuss_channel as dc
 from odoo.addons.mail.tools.discuss import Store
+from odoo.exceptions import AccessError, UserError
+from odoo.tests import new_test_user, tagged
+from odoo.tests.common import HttpCase
+from odoo.tools import mute_logger
+from psycopg2 import IntegrityError
 
 
 @tagged("post_install", "-at_install")
@@ -120,7 +121,8 @@ class TestErplibreMobileChat(HttpCase):
         first = channel.message_post(**post)
         second = channel.message_post(**post)
         self.assertNotEqual(first, second)
-        self.assertEqual(len(self._with_uuid(self.channel, "u-guest")), 2)
+        self.assertFalse(first.erplibre_client_uuid)
+        self.assertFalse(second.erplibre_client_uuid)
 
 
 @tagged("post_install", "-at_install")
@@ -322,3 +324,43 @@ class TestErplibreMobileChatCreate(HttpCase):
             )
         )
         self.assertEqual(len(channel.channel_member_ids), 3)
+
+    def test_unique_index_refuses_duplicate_channel(self):
+        first = self._group(self.user_a, "g-9", self.user_b.partner_id).sudo()
+        other = self._group(self.user_a, None, self.user_b.partner_id).sudo()
+        with self.assertRaises(IntegrityError), mute_logger("odoo.sql_db"):
+            with self.env.cr.savepoint():
+                other.erplibre_client_uuid = first.erplibre_client_uuid
+                other.flush_recordset()
+
+    def test_unique_index_refuses_duplicate_message(self):
+        channel = self._group(self.user_a, None, self.user_b.partner_id).sudo()
+        vals = {
+            "model": "discuss.channel",
+            "res_id": channel.id,
+            "author_id": self.user_a.partner_id.id,
+            "body": "hi",
+            "message_type": "comment",
+            "erplibre_client_uuid": "m-9",
+        }
+        # Création directe : elle contourne le dédoublonnage de message_post.
+        self.env["mail.message"].create(vals)
+        with self.assertRaises(IntegrityError), mute_logger("odoo.sql_db"):
+            with self.env.cr.savepoint():
+                self.env["mail.message"].create(vals)
+
+    def test_message_post_locks_only_with_uuid(self):
+        channel = self._group(
+            self.user_a, None, self.user_b.partner_id
+        ).with_user(self.user_a)
+        with patch.object(
+            dc, "erplibre_lock_uuid", wraps=dc.erplibre_lock_uuid
+        ) as lock:
+            channel.message_post(body="hi", message_type="comment")
+            lock.assert_not_called()
+            channel.message_post(
+                body="hi", message_type="comment", erplibre_client_uuid="m-8"
+            )
+        lock.assert_called_once_with(
+            channel.env, dc.LOCK_NAMESPACE_MESSAGE, "m-8"
+        )
