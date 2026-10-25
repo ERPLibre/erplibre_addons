@@ -364,3 +364,52 @@ class TestErplibreMobileChatCreate(HttpCase):
         lock.assert_called_once_with(
             channel.env, dc.LOCK_NAMESPACE_MESSAGE, "m-8"
         )
+
+    def _check_init_dedupes(self, model, table, index, make):
+        cr = self.env.cr
+        cr.execute(f"DROP INDEX {index}")
+        ids = [make(i) for i in range(2)]
+        self.env[model].sudo().init()
+        cr.execute(
+            f"SELECT id FROM {table} WHERE id IN %s"
+            " AND erplibre_client_uuid = 'dup'",
+            (tuple(ids),),
+        )
+        self.assertEqual([r[0] for r in cr.fetchall()], [min(ids)])
+        cr.execute("SELECT 1 FROM pg_indexes WHERE indexname = %s", (index,))
+        self.assertTrue(cr.fetchone())
+
+    def test_init_clears_duplicate_channel_uuid(self):
+        def make(i):
+            self.env.cr.execute(
+                "INSERT INTO discuss_channel (name, channel_type, create_uid,"
+                " erplibre_client_uuid) VALUES ('d', 'group', %s, 'dup')"
+                " RETURNING id",
+                (self.user_a.id,),
+            )
+            return self.env.cr.fetchone()[0]
+
+        self._check_init_dedupes(
+            "discuss.channel",
+            "discuss_channel",
+            "discuss_channel_erplibre_client_uuid_uniq",
+            make,
+        )
+
+    def test_init_clears_duplicate_message_uuid(self):
+        def make(i):
+            self.env.cr.execute(
+                "INSERT INTO mail_message (model, res_id, author_id,"
+                " message_type, erplibre_client_uuid) VALUES"
+                " ('discuss.channel', 1, %s, 'comment', 'dup')"
+                " RETURNING id",
+                (self.user_a.partner_id.id,),
+            )
+            return self.env.cr.fetchone()[0]
+
+        self._check_init_dedupes(
+            "mail.message",
+            "mail_message",
+            "mail_message_erplibre_client_uuid_uniq",
+            make,
+        )

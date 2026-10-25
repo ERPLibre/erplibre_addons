@@ -6,6 +6,8 @@ import zlib
 
 from odoo import api, fields, models
 from odoo.addons.mail.tools.discuss import Store
+
+from .mail_message import erplibre_ensure_unique_uuid_index
 from odoo.exceptions import AccessError, UserError
 from odoo.tools.translate import _
 
@@ -57,11 +59,11 @@ class DiscussChannel(models.Model):
         # btree_not_null du champ reste : il sert la recherche par seul
         # identifiant, que l'index unique, mené par create_uid, ne sert pas.
         super().init()
-        self.env.cr.execute(
-            "CREATE UNIQUE INDEX IF NOT EXISTS"
-            " discuss_channel_erplibre_client_uuid_uniq"
-            " ON discuss_channel (create_uid, erplibre_client_uuid)"
-            " WHERE erplibre_client_uuid IS NOT NULL"
+        erplibre_ensure_unique_uuid_index(
+            self.env.cr,
+            "discuss_channel",
+            "discuss_channel_erplibre_client_uuid_uniq",
+            ["create_uid", "erplibre_client_uuid"],
         )
 
     def _erplibre_existing_by_uuid(self):
