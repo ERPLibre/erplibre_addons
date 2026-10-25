@@ -16,3 +16,26 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_message__erplibre_client_uuid
 msgid "Client UUID"
 msgstr "UUID client"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_discuss_channel__erplibre_client_uuid
+msgid "Client UUID"
+msgstr "UUID client"
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "A client UUID identifies a single channel."
+msgstr "Un UUID client désigne un seul canal."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "Only an administrator can remove a member."
+msgstr "Seul un administrateur peut retirer un membre."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "A direct message has no member to remove."
+msgstr "Un message direct n'a pas de membre à retirer."

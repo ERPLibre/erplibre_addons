@@ -2,11 +2,106 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Publication idempotente dans un canal par identifiant client."""
 
-from odoo import api, models
+from odoo import api, fields, models
+from odoo.exceptions import AccessError, UserError
+from odoo.tools.translate import _
+
+from odoo.addons.mail.tools.discuss import Store
 
 
 class DiscussChannel(models.Model):
     _inherit = "discuss.channel"
+
+    erplibre_client_uuid = fields.Char(
+        string="Client UUID",
+        index="btree_not_null",
+        copy=False,
+        readonly=True,
+        help="Identifiant généré par l'application mobile ; un renvoi du"
+        " même identifiant par le même utilisateur ne crée pas de second"
+        " canal.",
+    )
+
+    def _erplibre_existing_by_uuid(self):
+        """Rend le canal créé par l'utilisateur courant avec l'identifiant
+        client du contexte, ou un recordset vide si le contexte n'en porte
+        pas ou si aucun canal ne correspond.
+
+        La recherche est sous sudo : l'ACL de création de l'utilisateur ne
+        couvre pas un canal dont il a été retiré, mais le créateur reste
+        celui qui a émis l'identifiant. Le résultat reprend l'environnement
+        courant, donc les droits de lecture de l'appelant.
+        """
+        uuid = self.env.context.get("erplibre_client_uuid")
+        if not uuid or self.env.user._is_public():
+            return self.browse()
+        found = (
+            self.env["discuss.channel"]
+            .sudo()
+            .search(
+                [
+                    ("erplibre_client_uuid", "=", uuid),
+                    ("create_uid", "=", self.env.uid),
+                ],
+                limit=1,
+            )
+        )
+        return self.browse(found.ids)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Crée les canaux ; avec `erplibre_client_uuid` dans le contexte,
+        rend le canal déjà créé par le même utilisateur avec cet
+        identifiant, sinon enregistre l'identifiant sur le canal créé.
+
+        L'identifiant désigne un seul canal : une création de plusieurs
+        enregistrements avec un identifiant dans le contexte est refusée.
+        """
+        uuid = self.env.context.get("erplibre_client_uuid")
+        if uuid and not self.env.user._is_public():
+            if len(vals_list) != 1:
+                raise UserError(
+                    _("A client UUID identifies a single channel.")
+                )
+            existing = self._erplibre_existing_by_uuid()
+            if existing:
+                return existing
+            vals_list = [dict(vals_list[0], erplibre_client_uuid=uuid)]
+        return super().create(vals_list)
+
+    @api.model
+    @api.returns("self", lambda channels: Store(channels).get_result())
+    def channel_create(self, name, group_id):
+        # Le message « created this channel » et la diffusion de la
+        # création ne se rejouent pas sur un renvoi.
+        existing = self._erplibre_existing_by_uuid()
+        if existing:
+            return existing
+        return super().channel_create(name, group_id)
+
+    @api.model
+    @api.returns("self", lambda channels: Store(channels).get_result())
+    def create_group(self, partners_to, default_display_mode=False, name=""):
+        # La diffusion de la création ne se rejoue pas sur un renvoi.
+        existing = self._erplibre_existing_by_uuid()
+        if existing:
+            return existing
+        return super().create_group(
+            partners_to, default_display_mode=default_display_mode, name=name
+        )
+
+    def erplibre_remove_member(self, partner_id):
+        """Retire une personne d'un groupe ou d'un canal par le chemin du
+        départ d'Odoo : la personne reçoit `discuss.channel/leave` et le
+        fil affiche qu'elle a quitté. Réservé aux administrateurs ; un
+        `chat` n'a pas de membres à retirer.
+        """
+        self.ensure_one()
+        if not self.env.user._is_system():
+            raise AccessError(_("Only an administrator can remove a member."))
+        if self.channel_type == "chat":
+            raise UserError(_("A direct message has no member to remove."))
+        self._action_unfollow(self.env["res.partner"].browse(partner_id))
 
     def _get_allowed_message_post_params(self):
         return super()._get_allowed_message_post_params() | {

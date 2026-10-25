@@ -2,8 +2,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Publication idempotente dans Discuss par identifiant client."""
 
+from odoo.exceptions import AccessError, UserError
 from odoo.tests import new_test_user, tagged
 from odoo.tests.common import HttpCase
+
+from odoo.addons.bus.models.bus import channel_with_db, json_dump
 
 
 @tagged("post_install", "-at_install")
@@ -114,3 +117,160 @@ class TestErplibreMobileChat(HttpCase):
         second = channel.message_post(**post)
         self.assertNotEqual(first, second)
         self.assertEqual(len(self._with_uuid(self.channel, "u-guest")), 2)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreMobileChatCreate(HttpCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user_a = new_test_user(
+            cls.env, login="chat_user_a", groups="base.group_user"
+        )
+        cls.user_b = new_test_user(
+            cls.env, login="chat_user_b", groups="base.group_user"
+        )
+        cls.user_c = new_test_user(
+            cls.env, login="chat_user_c", groups="base.group_user"
+        )
+        cls.admin = new_test_user(
+            cls.env, login="chat_admin", groups="base.group_system"
+        )
+
+    def _channels(self, user, uuid):
+        return (
+            self.env["discuss.channel"]
+            .sudo()
+            .search([("erplibre_client_uuid", "=", uuid)])
+        )
+
+    def _group(self, user, uuid, partners):
+        model = self.env["discuss.channel"].with_user(user)
+        if uuid:
+            model = model.with_context(erplibre_client_uuid=uuid)
+        return model.create_group(partners.ids)
+
+    def _count(self, model):
+        if model == "bus.bus":
+            return len(self._bus_values())
+        return self.env[model].sudo().search_count([])
+
+    def _bus_values(self):
+        # Les notifications attendent le précommit : elles ne sont pas
+        # encore des lignes bus.bus pendant le test.
+        return list(self.env.cr.precommit.data.get("bus.bus.values", []))
+
+    def test_create_group_same_uuid_twice_gives_one_group(self):
+        partners = self.user_b.partner_id
+        first = self._group(self.user_a, "g-1", partners)
+        second = self._group(self.user_a, "g-1", partners)
+        self.assertEqual(first, second)
+        self.assertEqual(len(self._channels(self.user_a, "g-1")), 1)
+
+    def test_channel_create_same_uuid_twice_gives_one_channel(self):
+        model = self.env["discuss.channel"].with_user(self.user_a)
+        model = model.with_context(erplibre_client_uuid="c-1")
+        first = model.channel_create("room", False)
+        second = model.channel_create("room", False)
+        self.assertEqual(first, second)
+        self.assertEqual(len(self._channels(self.user_a, "c-1")), 1)
+
+    def test_retry_posts_no_second_created_message(self):
+        model = self.env["discuss.channel"].with_user(self.user_a)
+        model = model.with_context(erplibre_client_uuid="c-2")
+        channel = model.channel_create("room", False)
+        messages = self._count("mail.message")
+        bus = self._count("bus.bus")
+        model.channel_create("room", False)
+        self.assertEqual(self._count("mail.message"), messages)
+        self.assertEqual(self._count("bus.bus"), bus)
+        self.assertEqual(
+            len(
+                channel.sudo().message_ids.filtered(
+                    lambda m: "created this channel" in (m.body or "")
+                )
+            ),
+            1,
+        )
+
+    def test_group_retry_broadcasts_nothing(self):
+        partners = self.user_b.partner_id
+        self._group(self.user_a, "g-2", partners)
+        bus = self._count("bus.bus")
+        messages = self._count("mail.message")
+        self._group(self.user_a, "g-2", partners)
+        self.assertEqual(self._count("bus.bus"), bus)
+        self.assertEqual(self._count("mail.message"), messages)
+
+    def test_uuid_of_other_user_not_adopted(self):
+        partners = self.user_c.partner_id
+        first = self._group(self.user_a, "g-3", partners)
+        second = self._group(self.user_b, "g-3", partners)
+        self.assertNotEqual(first, second)
+        self.assertEqual(len(self._channels(self.user_a, "g-3")), 2)
+
+    def test_create_without_uuid_unchanged(self):
+        partners = self.user_b.partner_id
+        first = self._group(self.user_a, None, partners)
+        second = self._group(self.user_a, None, partners)
+        self.assertNotEqual(first, second)
+        self.assertFalse(first.sudo().erplibre_client_uuid)
+
+    def test_uuid_with_several_records_refused(self):
+        model = self.env["discuss.channel"].with_context(
+            erplibre_client_uuid="m-1"
+        )
+        with self.assertRaises(UserError):
+            model.create(
+                [
+                    {"name": "a", "channel_type": "channel"},
+                    {"name": "b", "channel_type": "channel"},
+                ]
+            )
+
+    def _group_of_two(self):
+        return self._group(
+            self.admin, None, self.user_a.partner_id | self.user_b.partner_id
+        )
+
+    def test_remove_member_by_admin_leaves_with_notice(self):
+        channel = self._group_of_two().sudo()
+        partner = self.user_b.partner_id
+        bus_before = len(self._bus_values())
+        channel.with_user(self.admin).erplibre_remove_member(partner.id)
+        self.assertNotIn(partner, channel.channel_member_ids.partner_id)
+        self.assertTrue(
+            channel.message_ids.filtered(
+                lambda m: "left the channel" in (m.body or "")
+                and m.author_id == partner
+            )
+        )
+        leave = [
+            v
+            for v in self._bus_values()[bus_before:]
+            if '"type":"discuss.channel/leave"' in v["message"]
+        ]
+        target = json_dump(channel_with_db(self.env.cr.dbname, partner))
+        self.assertTrue(any(v["channel"] == target for v in leave))
+
+    def test_remove_member_refused_for_non_admin(self):
+        channel = self._group_of_two().sudo()
+        with self.assertRaises(AccessError):
+            channel.with_user(self.user_a).erplibre_remove_member(
+                self.user_b.partner_id.id
+            )
+        self.assertIn(
+            self.user_b.partner_id, channel.channel_member_ids.partner_id
+        )
+
+    def test_remove_member_refused_in_chat(self):
+        chat = (
+            self.env["discuss.channel"]
+            .with_user(self.user_a)
+            .channel_get([self.user_b.partner_id.id])
+        )
+        chat = self.env["discuss.channel"].browse(chat.id)
+        with self.assertRaises(UserError):
+            chat.with_user(self.admin).erplibre_remove_member(
+                self.user_b.partner_id.id
+            )
