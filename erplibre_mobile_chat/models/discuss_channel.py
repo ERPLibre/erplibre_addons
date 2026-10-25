@@ -27,9 +27,12 @@ class DiscussChannel(models.Model):
 
         Le contrôleur appelle message_post sous sudo, qui conserve
         env.user : l'auteur comparé est donc l'utilisateur qui requiert.
+        L'utilisateur public n'est jamais comparé : son partenaire est le
+        même pour quiconque publie sans compte, et l'un adopterait le message
+        d'un autre.
         """
         uuid = kwargs.get("erplibre_client_uuid")
-        if uuid:
+        if uuid and not self.env.user._is_public():
             self.ensure_one()
             existing = (
                 self.env["mail.message"]

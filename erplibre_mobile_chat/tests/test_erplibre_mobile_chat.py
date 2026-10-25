@@ -100,3 +100,17 @@ class TestErplibreMobileChat(HttpCase):
         msg = self.env["mail.message"].browse(r["mail.message"][0]["id"])
         self.assertTrue(msg.exists())
         self.assertFalse(msg.erplibre_client_uuid)
+
+    def test_public_user_never_adopts(self):
+        # Quiconque publie sans compte le fait sous ce même partenaire
+        public = self.env.ref("base.public_user")
+        channel = self.channel.with_user(public).sudo()
+        post = {
+            "body": "hi",
+            "message_type": "comment",
+            "erplibre_client_uuid": "u-guest",
+        }
+        first = channel.message_post(**post)
+        second = channel.message_post(**post)
+        self.assertNotEqual(first, second)
+        self.assertEqual(len(self._with_uuid(self.channel, "u-guest")), 2)
