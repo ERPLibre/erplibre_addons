@@ -2,11 +2,15 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Publication idempotente dans Discuss par identifiant client."""
 
+from unittest.mock import patch
+
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import new_test_user, tagged
 from odoo.tests.common import HttpCase
 
 from odoo.addons.bus.models.bus import channel_with_db, json_dump
+from odoo.addons.erplibre_mobile_chat.models import discuss_channel as dc
+from odoo.addons.mail.tools.discuss import Store
 
 
 @tagged("post_install", "-at_install")
@@ -137,7 +141,7 @@ class TestErplibreMobileChatCreate(HttpCase):
             cls.env, login="chat_admin", groups="base.group_system"
         )
 
-    def _channels(self, user, uuid):
+    def _channels(self, uuid):
         return (
             self.env["discuss.channel"]
             .sudo()
@@ -156,8 +160,9 @@ class TestErplibreMobileChatCreate(HttpCase):
         return self.env[model].sudo().search_count([])
 
     def _bus_values(self):
-        # Les notifications attendent le précommit : elles ne sont pas
-        # encore des lignes bus.bus pendant le test.
+        # Dépend de l'interne de bus.bus._sendone : les notifications
+        # attendent le précommit, elles ne sont pas encore des lignes
+        # bus.bus pendant le test.
         return list(self.env.cr.precommit.data.get("bus.bus.values", []))
 
     def test_create_group_same_uuid_twice_gives_one_group(self):
@@ -165,7 +170,7 @@ class TestErplibreMobileChatCreate(HttpCase):
         first = self._group(self.user_a, "g-1", partners)
         second = self._group(self.user_a, "g-1", partners)
         self.assertEqual(first, second)
-        self.assertEqual(len(self._channels(self.user_a, "g-1")), 1)
+        self.assertEqual(len(self._channels("g-1")), 1)
 
     def test_channel_create_same_uuid_twice_gives_one_channel(self):
         model = self.env["discuss.channel"].with_user(self.user_a)
@@ -173,7 +178,7 @@ class TestErplibreMobileChatCreate(HttpCase):
         first = model.channel_create("room", False)
         second = model.channel_create("room", False)
         self.assertEqual(first, second)
-        self.assertEqual(len(self._channels(self.user_a, "c-1")), 1)
+        self.assertEqual(len(self._channels("c-1")), 1)
 
     def test_retry_posts_no_second_created_message(self):
         model = self.env["discuss.channel"].with_user(self.user_a)
@@ -207,7 +212,7 @@ class TestErplibreMobileChatCreate(HttpCase):
         first = self._group(self.user_a, "g-3", partners)
         second = self._group(self.user_b, "g-3", partners)
         self.assertNotEqual(first, second)
-        self.assertEqual(len(self._channels(self.user_a, "g-3")), 2)
+        self.assertEqual(len(self._channels("g-3")), 2)
 
     def test_create_without_uuid_unchanged(self):
         partners = self.user_b.partner_id
@@ -274,3 +279,46 @@ class TestErplibreMobileChatCreate(HttpCase):
             chat.with_user(self.admin).erplibre_remove_member(
                 self.user_b.partner_id.id
             )
+
+    def test_retry_store_equals_first_store(self):
+        model = self.env["discuss.channel"].with_user(self.user_a)
+        model = model.with_context(erplibre_client_uuid="c-3")
+        first = model.channel_create("room", False)
+        second = model.channel_create("room", False)
+        self.assertEqual(Store(first).get_result(), Store(second).get_result())
+
+    def test_create_takes_advisory_lock(self):
+        # Un test à deux curseurs ne tient pas dans la transaction unique
+        # du test ; on vérifie que le verrou est pris avant la recherche.
+        model = self.env["discuss.channel"].with_user(self.user_a)
+        model = model.with_context(erplibre_client_uuid="c-4")
+        with patch.object(
+            dc, "erplibre_lock_uuid", wraps=dc.erplibre_lock_uuid
+        ) as lock:
+            model.channel_create("room", False)
+        lock.assert_called_with(model.env, dc.LOCK_NAMESPACE_CHANNEL, "c-4")
+
+    def test_lock_statement_executes(self):
+        with patch.object(
+            self.env.cr, "execute", wraps=self.env.cr.execute
+        ) as execute:
+            dc.erplibre_lock_uuid(self.env, dc.LOCK_NAMESPACE_MESSAGE, "x")
+        self.assertIn("pg_advisory_xact_lock", execute.call_args[0][0])
+
+    def test_remove_member_missing_partner_refused(self):
+        channel = self._group_of_two().sudo()
+        with self.assertRaises(UserError):
+            channel.with_user(self.admin).erplibre_remove_member(999999999)
+
+    def test_remove_member_non_member_refused(self):
+        channel = self._group_of_two().sudo()
+        with self.assertRaises(UserError):
+            channel.with_user(self.admin).erplibre_remove_member(
+                self.user_c.partner_id.id
+            )
+        self.assertFalse(
+            channel.message_ids.filtered(
+                lambda m: "left the channel" in (m.body or "")
+            )
+        )
+        self.assertEqual(len(channel.channel_member_ids), 3)

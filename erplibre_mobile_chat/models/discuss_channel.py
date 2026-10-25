@@ -2,11 +2,36 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Publication idempotente dans un canal par identifiant client."""
 
+import zlib
+
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 from odoo.tools.translate import _
 
 from odoo.addons.mail.tools.discuss import Store
+
+# Premier entier de la paire de pg_advisory_xact_lock : un espace par
+# famille de verrous, pour qu'un canal et un message de même clé ne se
+# bloquent pas.
+LOCK_NAMESPACE_CHANNEL = 0x45524C01
+LOCK_NAMESPACE_MESSAGE = 0x45524C02
+
+
+def erplibre_lock_uuid(env, namespace, uuid):
+    """Prend, jusqu'à la fin de la transaction, le verrou consultatif
+    (namespace, hash 32 bits signé de « uid:uuid »).
+
+    La recherche d'un doublon puis la création ne sont pas atomiques (l'index
+    n'est pas unique) : sans verrou, un renvoi qui arrive pendant que la
+    première transaction est ouverte ne voit rien et crée un second
+    enregistrement. Avec le verrou, le renvoi attend le commit de la
+    première puis la trouve. Le hash CRC32 peut collisionner : une collision
+    ne fait qu'attendre à tort, jamais confondre deux enregistrements.
+    """
+    key = zlib.crc32(f"{env.uid}:{uuid}".encode())
+    if key >= 2**31:
+        key -= 2**32
+    env.cr.execute("SELECT pg_advisory_xact_lock(%s, %s)", (namespace, key))
 
 
 class DiscussChannel(models.Model):
@@ -27,6 +52,13 @@ class DiscussChannel(models.Model):
         client du contexte, ou un recordset vide si le contexte n'en porte
         pas ou si aucun canal ne correspond.
 
+        Prend d'abord le verrou de l'identifiant (voir erplibre_lock_uuid).
+        Un renvoi avec d'autres valeurs rend quand même le premier canal. Un
+        canal archivé n'est pas retrouvé, volontairement : un nouvel appel
+        en crée un autre. Si le créateur n'a plus accès au canal trouvé,
+        la lecture du résultat lève AccessError (l'application le traite
+        comme refusé ou disparu).
+
         La recherche est sous sudo : l'ACL de création de l'utilisateur ne
         couvre pas un canal dont il a été retiré, mais le créateur reste
         celui qui a émis l'identifiant. Le résultat reprend l'environnement
@@ -35,6 +67,7 @@ class DiscussChannel(models.Model):
         uuid = self.env.context.get("erplibre_client_uuid")
         if not uuid or self.env.user._is_public():
             return self.browse()
+        erplibre_lock_uuid(self.env, LOCK_NAMESPACE_CHANNEL, uuid)
         found = (
             self.env["discuss.channel"]
             .sudo()
@@ -101,7 +134,10 @@ class DiscussChannel(models.Model):
             raise AccessError(_("Only an administrator can remove a member."))
         if self.channel_type == "chat":
             raise UserError(_("A direct message has no member to remove."))
-        self._action_unfollow(self.env["res.partner"].browse(partner_id))
+        partner = self.env["res.partner"].browse(partner_id).exists()
+        if not partner or partner not in self.channel_member_ids.partner_id:
+            raise UserError(_("This person is not a member of the channel."))
+        self._action_unfollow(partner)
 
     def _get_allowed_message_post_params(self):
         return super()._get_allowed_message_post_params() | {
@@ -129,6 +165,7 @@ class DiscussChannel(models.Model):
         uuid = kwargs.get("erplibre_client_uuid")
         if uuid and not self.env.user._is_public():
             self.ensure_one()
+            erplibre_lock_uuid(self.env, LOCK_NAMESPACE_MESSAGE, uuid)
             existing = (
                 self.env["mail.message"]
                 .sudo()

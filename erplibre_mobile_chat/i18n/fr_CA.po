@@ -39,3 +39,9 @@ msgstr "Seul un administrateur peut retirer un membre."
 #: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
 msgid "A direct message has no member to remove."
 msgstr "Un message direct n'a pas de membre à retirer."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "This person is not a member of the channel."
+msgstr "Cette personne n'est pas membre du canal."
