@@ -6,10 +6,10 @@ import zlib
 
 from odoo import api, fields, models
 from odoo.addons.mail.tools.discuss import Store
-
-from .mail_message import erplibre_ensure_unique_uuid_index
 from odoo.exceptions import AccessError, UserError
 from odoo.tools.translate import _
+
+from .mail_message import erplibre_ensure_unique_uuid_index
 
 # Premier entier de la paire de pg_advisory_xact_lock : un espace par
 # famille de verrous, pour qu'un canal et un message de même clé ne se
