@@ -161,3 +161,17 @@ class DiscussChannel(models.Model):
         if not partner or partner not in self.channel_member_ids.partner_id:
             raise UserError(_("This person is not a member of the channel."))
         self._action_unfollow(partner)
+
+    @api.returns("mail.message", lambda value: value.id)
+    def message_post(self, **kwargs):
+        # Le message déjà publié avec l'identifiant client est rendu avant
+        # message_post de mail, qui écrit last_interest_dt : un renvoi ne
+        # diffuse rien et ne rouvre pas la conversation qu'un membre a
+        # fermée. Sinon la publication suit son cours, et la surcharge de
+        # mail.thread refait la recherche sous le même verrou.
+        uuid = kwargs.get("erplibre_client_uuid")
+        if uuid and self and not self.env.user._is_public():
+            existing = self._erplibre_posted_message(uuid)
+            if existing:
+                return existing
+        return super().message_post(**kwargs)

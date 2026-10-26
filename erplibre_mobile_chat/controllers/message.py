@@ -9,6 +9,7 @@ from odoo.addons.mail.tools.discuss import Store
 from odoo.http import request
 from werkzeug.exceptions import NotFound
 
+SEARCH_LIMIT_DEFAULT = 30
 SEARCH_LIMIT_MAX = 100
 
 
@@ -116,7 +117,9 @@ class ErplibreMessageController(ThreadController):
         auth="user",
         readonly=True,
     )
-    def erplibre_search_messages(self, search_term, before=None, limit=30):
+    def erplibre_search_messages(
+        self, search_term, before=None, limit=SEARCH_LIMIT_DEFAULT
+    ):
         """Cherche `search_term` dans les messages des canaux dont
         l'utilisateur est membre et rend `{count, messages, data}` au format
         des routes de boîte d'Odoo : `count` compte toutes les
@@ -127,8 +130,9 @@ class ErplibreMessageController(ThreadController):
         Un message correspond par son corps, son sujet ou le nom d'une de
         ses pièces jointes, `ilike` sur chacun (voir erplibre_html_term et
         erplibre_like_term). `before` borne la page aux ids inférieurs ;
-        `limit` est ramené entre 1 et SEARCH_LIMIT_MAX. Les canaux sont ceux
-        dont le partenaire courant est membre : ni un canal public où il
+        `limit` à None vaut SEARCH_LIMIT_DEFAULT ; il est ramené entre 1
+        et SEARCH_LIMIT_MAX. Les canaux sont ceux dont le partenaire
+        courant est membre : ni un canal public où il
         n'est pas, ni la discussion d'autres personnes, même pour un
         administrateur que les règles d'Odoo laisseraient lire. La
         recherche passe en plus par les droits de l'utilisateur
@@ -142,7 +146,8 @@ class ErplibreMessageController(ThreadController):
             raise NotFound()
         try:
             before = int(before) if before else None
-            limit = max(1, min(int(limit), SEARCH_LIMIT_MAX))
+            limit = SEARCH_LIMIT_DEFAULT if limit is None else int(limit)
+            limit = max(1, min(limit, SEARCH_LIMIT_MAX))
         except (TypeError, ValueError):
             raise NotFound() from None
         raw = str(search_term or "").strip()

@@ -12,9 +12,12 @@ enregistrement), avec le même identifiant, sans publier ni notifier de
 nouveau. Un autre auteur ou un autre fil n'adopte pas le message. Les droits
 de publication restent ceux d'Odoo (`_mail_post_access` du modèle, `write` par
 défaut) : hors sudo, un message retrouvé exige le même droit qu'une
-publication. Ce qu'une surcharge de `message_post` d'un modèle fait avant
-`super()` se rejoue sur un renvoi (pour un canal, la mise à jour de
-`last_interest_dt`).
+publication. Dans un canal, le message déjà publié est rendu avant le
+`message_post` de mail : un renvoi ne touche pas `last_interest_dt`, ne
+diffuse rien et ne rouvre pas une conversation qu'un membre a fermée. Sur un
+autre modèle, ce qu'une surcharge de `message_post` du modèle, ou d'une
+extension de `mail.thread` chargée après ce module (`rating`, par exemple),
+fait avant `super()` se rejoue sur un renvoi.
 
 Le module ajoute aussi `discuss.channel.erplibre_client_uuid`. Avec
 `erplibre_client_uuid` dans le contexte, `create`, `create_group` et
@@ -59,18 +62,18 @@ concurrentes ne passent pas toutes deux. Le champ figure dans `fields_get` de
 module.
 
 `POST /erplibre_mobile_chat/message/search` (JSON-RPC, utilisateur interne,
-`search_term`, `before`, `limit` de 1 à 100, 30 par défaut) cherche dans les
-messages des seuls canaux dont l'utilisateur est membre : jamais un canal
-public où il n'est pas, jamais la discussion d'autres personnes, même pour un
-administrateur. Un message correspond par son corps, son sujet ou le nom d'une
-pièce jointe. Le terme est cherché tel que le corps est stocké : pour le
-corps, `&`, `<` et `>` deviennent `&amp;`, `&lt;` et `&gt;` (l'apostrophe, le
-guillemet et les accents restent tels quels) ; le sujet et les noms prennent
-le terme brut ; partout `\`, `%` et `_` sont des caractères, pas des jokers,
-et une espace accepte n'importe quel intervalle. La réponse reprend la forme
-des routes de boîte d'Odoo : `count` (toutes les correspondances, sans tenir
-compte de `before`), `messages` (ids de la page, du plus récent au plus
-ancien) et `data` (Store). Rien n'est marqué lu : aucun `set_message_done`.
+`search_term`, `before`, `limit` de 1 à 100, 30 par défaut ou à `null`) cherche
+dans les messages des seuls canaux dont l'utilisateur est membre : jamais un
+canal public où il n'est pas, jamais la discussion d'autres personnes, même
+pour un administrateur. Un message correspond par son corps, son sujet ou le
+nom d'une pièce jointe. Le terme est cherché tel que le corps est stocké : pour
+le corps, `&`, `<` et `>` deviennent `&amp;`, `&lt;` et `&gt;` (l'apostrophe,
+le guillemet et les accents restent tels quels) ; le sujet et les noms prennent
+le terme brut ; partout `\`, `%` et `_` sont des caractères, pas des jokers, et
+une espace accepte n'importe quel intervalle. La réponse reprend la forme des
+routes de boîte d'Odoo : `count` (toutes les correspondances, sans tenir compte
+de `before`), `messages` (ids de la page, du plus récent au plus ancien) et
+`data` (Store). Rien n'est marqué lu : aucun `set_message_done`.
 
 `mail.message.erplibre_set_starred(starred)` met les messages en favori ou les
 en retire pour l'utilisateur courant. Contrairement à `toggle_message_starred`,

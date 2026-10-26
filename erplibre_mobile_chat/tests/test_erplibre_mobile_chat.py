@@ -2,8 +2,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Publication idempotente dans Discuss par identifiant client."""
 
-from unittest.mock import ANY, patch
+from datetime import timedelta
+from unittest.mock import patch
 
+from odoo import fields
 from odoo.addons.bus.models.bus import channel_with_db, json_dump
 from odoo.addons.erplibre_mobile_chat.models import discuss_channel as dc
 from odoo.addons.erplibre_mobile_chat.models import mail_thread as mt
@@ -109,6 +111,38 @@ class TestErplibreMobileChat(HttpCase):
         msg = self.env["mail.message"].browse(r["mail.message"][0]["id"])
         self.assertTrue(msg.exists())
         self.assertFalse(msg.erplibre_client_uuid)
+
+    def test_channel_resend_leaves_channel_untouched(self):
+        # Le renvoi ne remonte pas la conversation : last_interest_dt ne
+        # bouge pas, un membre qui l'a fermée la garde fermée, et rien ne
+        # part sur le bus.
+        channel = self.channel.with_user(self.user_a).sudo()
+        post = {
+            "body": "hi",
+            "message_type": "comment",
+            "erplibre_client_uuid": "u-9",
+        }
+        first = channel.message_post(**post)
+        past = fields.Datetime.now() - timedelta(days=2)
+        member_b = self.channel.channel_member_ids.filtered(
+            lambda m: m.partner_id == self.user_b.partner_id
+        )
+        self.channel.last_interest_dt = past
+        member_b.write(
+            {"last_interest_dt": past, "unpin_dt": past + timedelta(days=1)}
+        )
+        self.env.flush_all()
+        self.assertFalse(member_b.is_pinned)
+        bus = len(self.env.cr.precommit.data.get("bus.bus.values", []))
+        second = channel.message_post(**post)
+        self.env.flush_all()
+        self.env.invalidate_all()
+        self.assertEqual(second, first)
+        self.assertEqual(self.channel.last_interest_dt, past)
+        self.assertFalse(member_b.is_pinned)
+        self.assertEqual(
+            len(self.env.cr.precommit.data.get("bus.bus.values", [])), bus
+        )
 
     def test_public_user_never_adopts(self):
         # Quiconque publie sans compte le fait sous ce même partenaire
@@ -362,10 +396,14 @@ class TestErplibreMobileChatCreate(HttpCase):
             channel.message_post(
                 body="hi", message_type="comment", erplibre_client_uuid="m-8"
             )
-        # discuss.channel.message_post passe à super() un contexte
-        # enrichi : seul l'utilisateur de l'environnement compte pour la clé.
-        lock.assert_called_once_with(ANY, dc.LOCK_NAMESPACE_MESSAGE, "m-8")
-        self.assertEqual(lock.call_args.args[0].uid, self.user_a.id)
+        # Sur un canal, la recherche précède message_post de mail puis se
+        # refait dans mail.thread : le verrou est pris une ou deux fois,
+        # toujours avec la même clé. Le contexte de l'environnement change
+        # entre les deux ; seul l'utilisateur compte pour la clé.
+        self.assertIn(lock.call_count, (1, 2))
+        for call in lock.call_args_list:
+            self.assertEqual(call.args[1:], (dc.LOCK_NAMESPACE_MESSAGE, "m-8"))
+            self.assertEqual(call.args[0].uid, self.user_a.id)
 
     def _check_init_dedupes(self, model, table, index, make):
         cr = self.env.cr

@@ -131,6 +131,9 @@ class TestErplibreMessageSearch(HttpCase):
         self.assertEqual(self._ids("chat_user_a", "a_b"), [underscore.id])
         self.assertNotIn(other.id, self._ids("chat_user_a", "a_b"))
         self.assertEqual(self._ids("chat_user_a", "r&d"), [by_file.id])
+        # Le sujet est un texte brut : il prend le terme non échappé.
+        by_subject = self._post("Voir le sujet", subject="Projet Q&A démo")
+        self.assertEqual(self._ids("chat_user_a", "Q&A"), [by_subject.id])
 
     def test_search_never_returns_non_member_public_channel(self):
         public = self.env["discuss.channel"].create(
@@ -186,6 +189,9 @@ class TestErplibreMessageSearch(HttpCase):
         self.assertEqual(second["messages"], ids[2:4])
         self.assertEqual(
             self._ids("chat_user_a", "page démo", limit=0), ids[:1]
+        )
+        self.assertEqual(
+            self._ids("chat_user_a", "page démo", limit=None), ids
         )
 
     def test_search_refuses_portal_user(self):
