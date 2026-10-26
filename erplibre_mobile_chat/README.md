@@ -29,3 +29,20 @@ seconde métadonnée vocale. Sinon la route d'Odoo fait le travail, avec ses
 contrôles et sa réponse, mais l'image est gardée originale (aucune réduction à
 1920 px). Seul `discuss.channel` est accepté ; une session expirée ou un
 utilisateur portail reçoit 404.
+
+`POST /erplibre_mobile_chat/message/update_content` (JSON-RPC, utilisateur
+interne) reprend les paramètres de `/mail/message/update_content`
+(`message_id`, `body`, `attachment_ids`, `attachment_tokens`, `partner_ids`)
+avec un `expected_fingerprint` obligatoire : la valeur de
+`mail.message.erplibre_body_fingerprint`, le SHA-256 hexadécimal du corps HTML
+tel que le rend la réponse d'Odoo, encodé en UTF-8. Si l'empreinte actuelle
+diffère, ou si le message a été vidé (supprimé) et que `body` n'est pas vide,
+rien n'est écrit et la réponse porte `erplibre_conflict` (`"deleted"` pour un
+message vide, sinon `"changed"`) avec le message actuel au format de la
+réponse d'Odoo. Sinon la route d'Odoo fait le travail, avec ses contrôles, la
+marque « modifié », le bus et sa réponse. Un message absent ou que
+l'utilisateur ne peut pas modifier selon Odoo rend 404. `attachment_ids` à
+`null` garde les pièces jointes, `[]` les supprime toutes. La ligne du message
+est verrouillée avant la comparaison : deux modifications concurrentes ne
+passent pas toutes deux. Le champ figure dans `fields_get` de `mail.message`
+pour tout utilisateur interne, ce qui signale ce niveau du module.

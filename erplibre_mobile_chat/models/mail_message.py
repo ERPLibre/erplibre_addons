@@ -1,10 +1,12 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-"""L'identifiant client d'un message publié depuis l'application mobile."""
+"""L'identifiant client d'un message publié depuis l'application mobile
+et l'empreinte de son corps."""
 
+import hashlib
 import logging
 
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.tools.sql import index_exists
 
 _logger = logging.getLogger(__name__)
@@ -53,6 +55,24 @@ class MailMessage(models.Model):
         " même identifiant par le même auteur dans le même canal ne crée"
         " pas de second message.",
     )
+
+    erplibre_body_fingerprint = fields.Char(
+        string="Body Fingerprint",
+        compute="_compute_erplibre_body_fingerprint",
+        help="SHA-256 hexadécimal du corps HTML tel que le rend Store,"
+        " encodé en UTF-8 ; la modification gardée le compare à"
+        " l'empreinte attendue par l'application.",
+    )
+
+    @api.depends("body")
+    def _compute_erplibre_body_fingerprint(self):
+        # Le champ, non stocké et sans groupe, figure dans fields_get pour
+        # tout utilisateur interne : sa présence signale aussi le niveau
+        # du module qui offre la modification gardée.
+        for message in self:
+            message.erplibre_body_fingerprint = hashlib.sha256(
+                str(message.body or "").encode()
+            ).hexdigest()
 
     def init(self):
         # Garantie du dédoublonnage de message_post (voir
