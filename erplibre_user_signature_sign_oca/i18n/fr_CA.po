@@ -1,0 +1,52 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_user_signature_sign_oca
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-26 15:36+0000\n"
+"PO-Revision-Date: 2026-10-26 15:36+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: erplibre_user_signature_sign_oca
+#. odoo-javascript
+#: code:addons/erplibre_user_signature_sign_oca/static/src/user_signature_dialog.xml:0
+msgid "Adopt my signature"
+msgstr "Adopter ma signature"
+
+#. module: erplibre_user_signature_sign_oca
+#. odoo-javascript
+#: code:addons/erplibre_user_signature_sign_oca/static/src/user_signature_dialog.xml:0
+msgid "My signature"
+msgstr "Ma signature"
+
+#. module: erplibre_user_signature_sign_oca
+#. odoo-javascript
+#: code:addons/erplibre_user_signature_sign_oca/static/src/user_signature_dialog.xml:0
+msgid "Save as my signature"
+msgstr "Enregistrer comme ma signature"
+
+#. module: erplibre_user_signature_sign_oca
+#: model:ir.model,name:erplibre_user_signature_sign_oca.model_sign_oca_request_signer
+msgid "Sign Request Value"
+msgstr "Signataire de la demande"
+
+#. module: erplibre_user_signature_sign_oca
+#. odoo-python
+#: code:addons/erplibre_user_signature_sign_oca/controllers/main.py:0
+msgid "The signature cannot be read as an image."
+msgstr "La signature ne peut pas être lue comme une image."
+
+#. module: erplibre_user_signature_sign_oca
+#. odoo-python
+#: code:addons/erplibre_user_signature_sign_oca/controllers/main.py:0
+msgid "The signature is empty."
+msgstr "La signature est vide."
