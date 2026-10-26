@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<templates xml:space="preserve">
+    <t
+        t-name="erplibre_user_signature_sign_oca.UserSignatureDialog"
+        t-inherit="web.SignatureDialog"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//NameAndSignature" position="before">
+            <div
+                t-if="props.userSignature.image"
+                class="o_user_signature_sign_oca_mine d-flex flex-wrap align-items-center gap-3 mb-3 pb-3 border-bottom"
+            >
+                <img
+                    t-att-src="props.userSignature.image"
+                    alt="My signature"
+                    class="border rounded"
+                    style="max-height: 80px; max-width: 60%;"
+                />
+                <button
+                    type="button"
+                    class="btn btn-primary o_user_signature_sign_oca_adopt"
+                    t-on-click="onClickAdoptMine"
+                >Adopt my signature</button>
+            </div>
+        </xpath>
+        <xpath expr="//NameAndSignature" position="after">
+            <div class="form-check mt-3">
+                <label class="form-check-label">
+                    <input
+                        type="checkbox"
+                        class="form-check-input o_user_signature_sign_oca_save"
+                        t-model="userSignatureState.saveAsMine"
+                    />
+                    Save as my signature
+                </label>
+            </div>
+        </xpath>
+        <xpath expr="//button[@t-on-click='onClickConfirm']" position="attributes">
+            <attribute
+                name="t-att-disabled"
+            >signature.isSignatureEmpty or userSignatureState.saving</attribute>
+        </xpath>
+    </t>
+</templates>
