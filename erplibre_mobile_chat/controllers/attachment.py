@@ -42,11 +42,17 @@ class ErplibreAttachmentController(AttachmentController):
         la route d'Odoo fait le travail : droits sur le fil, société, pièce
         jointe en attente (`is_pending`), `voice` et forme de la réponse.
 
-        Le jeton CSRF est exigé comme pour la route d'Odoo. L'utilisateur
-        public (session expirée) reçoit NotFound, la réponse d'Odoo à une
-        session expirée ; seul `discuss.channel` est accepté comme fil.
+        Le jeton CSRF est exigé comme pour la route d'Odoo. Seul un
+        utilisateur interne est servi : l'utilisateur public (session
+        expirée) reçoit NotFound, la réponse d'Odoo à une session expirée,
+        et un utilisateur portail aussi, car la lecture d'une pièce jointe
+        lui est refusée hors sudo et un renvoi ne pourrait pas lui rendre
+        la première. Seul `discuss.channel` est accepté comme fil.
         """
-        if request.env.user._is_public() or thread_model != "discuss.channel":
+        if (
+            not request.env.user._is_internal()
+            or thread_model != "discuss.channel"
+        ):
             raise NotFound()
         if not client_uuid:
             raise BadRequest()

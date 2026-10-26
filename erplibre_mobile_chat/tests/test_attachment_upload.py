@@ -120,6 +120,33 @@ class TestErplibreAttachmentUpload(HttpCase):
         self.assertEqual(response.status_code, 404)
         self.assertFalse(self._with_uuid("a-3"))
 
+    def test_upload_without_csrf_token_refused(self):
+        self.authenticate("chat_user_a", "chat_user_a")
+        response = self.url_open(
+            UPLOAD_URL,
+            {
+                "thread_id": self.channel.id,
+                "thread_model": "discuss.channel",
+                "is_pending": "true",
+                "client_uuid": "a-14",
+            },
+            files={"ufile": ("note.txt", b"hello")},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(self._with_uuid("a-14"))
+
+    def test_portal_user_gets_not_found(self):
+        portal = new_test_user(
+            self.env, login="chat_portal", groups="base.group_portal"
+        )
+        self.channel.channel_member_ids = [
+            (0, 0, {"partner_id": portal.partner_id.id})
+        ]
+        for _attempt in range(2):
+            response = self._upload("chat_portal", "a-15")
+            self.assertEqual(response.status_code, 404)
+        self.assertFalse(self._with_uuid("a-15"))
+
     def test_other_thread_model_gets_not_found(self):
         response = self._upload(
             "chat_user_a",
@@ -191,7 +218,8 @@ class TestErplibreAttachmentUpload(HttpCase):
 
     def test_upload_takes_advisory_lock(self):
         # Un test à deux curseurs ne tient pas dans la transaction unique
-        # du test ; on vérifie que le verrou est pris avant la recherche.
+        # du test ; on vérifie que le téléversement demande le verrou de
+        # l'identifiant dans l'espace des pièces jointes.
         with patch(LOCK_TARGET, wraps=dc.erplibre_lock_uuid) as lock:
             self._attachment_id(self._upload("chat_user_a", "a-10"))
         lock.assert_called_once_with(ANY, dc.LOCK_NAMESPACE_ATTACHMENT, "a-10")

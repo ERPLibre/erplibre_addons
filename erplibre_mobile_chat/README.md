@@ -27,4 +27,5 @@ quitté). Réservé aux administrateurs ; refusé dans un `chat`.
 même utilisateur rend la pièce jointe déjà créée, sans seconde pièce jointe ni
 seconde métadonnée vocale. Sinon la route d'Odoo fait le travail, avec ses
 contrôles et sa réponse, mais l'image est gardée originale (aucune réduction à
-1920 px). Seul `discuss.channel` est accepté ; une session expirée reçoit 404.
+1920 px). Seul `discuss.channel` est accepté ; une session expirée ou un
+utilisateur portail reçoit 404.

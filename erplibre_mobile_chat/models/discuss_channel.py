@@ -23,18 +23,20 @@ def erplibre_lock_uuid(env, namespace, uuid):
     """Prend, jusqu'à la fin de la transaction, le verrou consultatif
     (namespace, hash 32 bits signé de « uid:uuid »).
 
-    La recherche d'un doublon puis la création ne sont pas atomiques (l'index
-    n'est pas unique) : sans verrou, un renvoi qui arrive pendant que la
-    première transaction est ouverte ne voit rien et crée un second
-    enregistrement. Avec le verrou, le renvoi attend le commit de la
-    première puis la trouve. Le verrou sérialise ; il ne garantit pas : les
-    curseurs Odoo lisent en REPEATABLE READ, l'instantané date du premier
-    ordre de la transaction, avant le verrou, et la recherche qui suit peut
-    ne pas voir la ligne que l'autre transaction vient de valider. L'index
-    unique partiel de chaque modèle garantit : un renvoi qui chevauche
-    ainsi échoue en erreur d'intégrité (ValidationError côté client) au
-    lieu de doubler. Le hash CRC32 peut collisionner : une collision
-    ne fait qu'attendre à tort, jamais confondre deux enregistrements.
+    La recherche d'un doublon puis la création ne sont pas atomiques : sans
+    verrou, un renvoi qui arrive pendant que la première transaction est
+    ouverte ne voit rien et tente un second enregistrement. Avec le verrou,
+    le renvoi attend le commit de la première puis, le plus souvent, la
+    trouve. Le verrou sérialise ; il ne garantit pas : les curseurs Odoo
+    lisent en REPEATABLE READ, l'instantané date du premier ordre de la
+    transaction, avant le verrou, et la recherche qui suit peut ne pas voir
+    la ligne que l'autre transaction vient de valider. L'index unique
+    partiel de chaque modèle garantit : un renvoi qui chevauche ainsi échoue
+    sur l'index au lieu de doubler. Odoo change l'erreur d'intégrité en
+    ValidationError, qu'une route JSON-RPC rend en erreur et une route http
+    en HTTP 400 (BadRequest) ; le renvoi suivant trouve la ligne. Le hash
+    CRC32 peut collisionner : une collision ne fait qu'attendre à tort,
+    jamais confondre deux enregistrements.
     """
     key = zlib.crc32(f"{env.uid}:{uuid}".encode())
     if key >= 2**31:
