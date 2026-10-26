@@ -1,6 +1,7 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-"""Téléversement idempotent d'une pièce jointe dans un canal."""
+"""Téléversement idempotent d'une pièce jointe sur un fil : canal ou
+enregistrement."""
 
 from odoo import http
 from odoo.addons.mail.controllers.attachment import AttachmentController
@@ -47,11 +48,22 @@ class ErplibreAttachmentController(AttachmentController):
         expirée) reçoit NotFound, la réponse d'Odoo à une session expirée,
         et un utilisateur portail aussi, car la lecture d'une pièce jointe
         lui est refusée hors sudo et un renvoi ne pourrait pas lui rendre
-        la première. Seul `discuss.channel` est accepté comme fil.
+        la première.
+
+        Le fil est tout modèle `mail.thread` du registre qui a des
+        enregistrements, canal ou autre ; un autre nom, ou un modèle
+        abstrait, rend NotFound. Les droits sur le fil
+        sont ceux d'Odoo : la route d'Odoo exige le droit de publier
+        (`_get_mail_message_access(thread_id, "create")`, soit
+        `_mail_post_access` du modèle, `write` par défaut) et rend NotFound
+        sans lui.
         """
-        if (
-            not request.env.user._is_internal()
-            or thread_model != "discuss.channel"
+        if not request.env.user._is_internal() or not (
+            thread_model in request.env
+            and isinstance(
+                request.env[thread_model], type(request.env["mail.thread"])
+            )
+            and not request.env[thread_model]._abstract
         ):
             raise NotFound()
         if not client_uuid:

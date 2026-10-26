@@ -147,15 +147,73 @@ class TestErplibreAttachmentUpload(HttpCase):
             self.assertEqual(response.status_code, 404)
         self.assertFalse(self._with_uuid("a-15"))
 
-    def test_other_thread_model_gets_not_found(self):
+    def test_upload_on_non_thread_model_not_found(self):
+        country = self.env.ref("base.ca")
+        for thread_model in (
+            "res.country",
+            "mail.thread",
+            "erplibre.absent.model",
+        ):
+            with self.subTest(thread_model=thread_model):
+                response = self._upload(
+                    "chat_user_a",
+                    "a-5",
+                    thread_model=thread_model,
+                    thread_id=country.id,
+                )
+                self.assertEqual(response.status_code, 404)
+        self.assertFalse(self._with_uuid("a-5"))
+
+    def test_upload_on_record_is_idempotent(self):
+        manager = new_test_user(
+            self.env,
+            login="chat_manager",
+            groups="base.group_user,base.group_partner_manager",
+        )
+        record = self.env["res.partner"].create({"name": "Alice Martin"})
+        ids = [
+            self._attachment_id(
+                self._upload(
+                    manager.login,
+                    "a-16",
+                    thread_model="res.partner",
+                    thread_id=record.id,
+                    is_pending="false",
+                )
+            )
+            for _attempt in range(2)
+        ]
+        self.assertEqual(ids[0], ids[1])
+        attachment = self._with_uuid("a-16")
+        self.assertEqual(attachment.ids, ids[:1])
+        self.assertEqual(attachment.res_model, "res.partner")
+        self.assertEqual(attachment.res_id, record.id)
+
+    def test_upload_on_record_respects_post_access(self):
+        record = self.env["res.partner"].create({"name": "Alice Martin"})
+        self.assertFalse(record.with_user(self.user_a).has_access("write"))
         response = self._upload(
             "chat_user_a",
-            "a-5",
+            "a-17",
             thread_model="res.partner",
-            thread_id=self.user_a.partner_id.id,
+            thread_id=record.id,
         )
         self.assertEqual(response.status_code, 404)
-        self.assertFalse(self._with_uuid("a-5"))
+        self.assertFalse(self._with_uuid("a-17"))
+
+    def test_upload_on_record_refuses_portal_user(self):
+        new_test_user(
+            self.env, login="chat_portal", groups="base.group_portal"
+        )
+        record = self.env["res.partner"].create({"name": "Alice Martin"})
+        response = self._upload(
+            "chat_portal",
+            "a-18",
+            thread_model="res.partner",
+            thread_id=record.id,
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(self._with_uuid("a-18"))
 
     def test_pending_upload_is_placeholder(self):
         attachment = self.env["ir.attachment"].browse(

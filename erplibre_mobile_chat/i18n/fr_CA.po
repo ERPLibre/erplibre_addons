@@ -23,6 +23,11 @@ msgid "Body Fingerprint"
 msgstr "Empreinte du corps"
 
 #. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_message__erplibre_chat_level
+msgid "ERPLibre Chat Level"
+msgstr "Niveau du clavardage ERPLibre"
+
+#. module: erplibre_mobile_chat
 #: model:ir.model.fields,field_description:erplibre_mobile_chat.field_discuss_channel__erplibre_client_uuid
 msgid "Client UUID"
 msgstr "UUID client"

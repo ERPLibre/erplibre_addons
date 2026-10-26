@@ -2,10 +2,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Publication idempotente dans Discuss par identifiant client."""
 
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from odoo.addons.bus.models.bus import channel_with_db, json_dump
 from odoo.addons.erplibre_mobile_chat.models import discuss_channel as dc
+from odoo.addons.erplibre_mobile_chat.models import mail_thread as mt
 from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import new_test_user, tagged
@@ -354,16 +355,17 @@ class TestErplibreMobileChatCreate(HttpCase):
             self.user_a, None, self.user_b.partner_id
         ).with_user(self.user_a)
         with patch.object(
-            dc, "erplibre_lock_uuid", wraps=dc.erplibre_lock_uuid
+            mt, "erplibre_lock_uuid", wraps=dc.erplibre_lock_uuid
         ) as lock:
             channel.message_post(body="hi", message_type="comment")
             lock.assert_not_called()
             channel.message_post(
                 body="hi", message_type="comment", erplibre_client_uuid="m-8"
             )
-        lock.assert_called_once_with(
-            channel.env, dc.LOCK_NAMESPACE_MESSAGE, "m-8"
-        )
+        # discuss.channel.message_post passe à super() un contexte
+        # enrichi : seul l'utilisateur de l'environnement compte pour la clé.
+        lock.assert_called_once_with(ANY, dc.LOCK_NAMESPACE_MESSAGE, "m-8")
+        self.assertEqual(lock.call_args.args[0].uid, self.user_a.id)
 
     def _check_init_dedupes(self, model, table, index, make):
         cr = self.env.cr
