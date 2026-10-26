@@ -19,3 +19,12 @@ nouvelle diffusion. Un autre utilisateur n'adopte pas le canal.
 `discuss.channel.erplibre_remove_member(partner_id)` retire une personne par
 le départ d'Odoo (elle reçoit `discuss.channel/leave`, le fil montre qu'elle a
 quitté). Réservé aux administrateurs ; refusé dans un `chat`.
+
+`POST /erplibre_mobile_chat/attachment/upload` reprend les champs de
+`/mail/attachment/upload` (`ufile`, `thread_id`, `thread_model`, `is_pending`,
+`voice`, jeton CSRF) avec un `client_uuid` obligatoire, enregistré dans
+`ir.attachment.erplibre_client_uuid`. Un renvoi du même identifiant par le
+même utilisateur rend la pièce jointe déjà créée, sans seconde pièce jointe ni
+seconde métadonnée vocale. Sinon la route d'Odoo fait le travail, avec ses
+contrôles et sa réponse, mais l'image est gardée originale (aucune réduction à
+1920 px). Seul `discuss.channel` est accepté ; une session expirée reçoit 404.

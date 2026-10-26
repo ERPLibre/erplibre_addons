@@ -23,6 +23,11 @@ msgid "Client UUID"
 msgstr "UUID client"
 
 #. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_ir_attachment__erplibre_client_uuid
+msgid "Client UUID"
+msgstr "UUID client"
+
+#. module: erplibre_mobile_chat
 #. odoo-python
 #: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
 msgid "A client UUID identifies a single channel."
@@ -45,3 +50,9 @@ msgstr "Un message direct n'a pas de membre à retirer."
 #: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
 msgid "This person is not a member of the channel."
 msgstr "Cette personne n'est pas membre du canal."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/controllers/attachment.py:0
+msgid "You are not allowed to upload an attachment here."
+msgstr "Vous n'êtes pas autorisé à téléverser une pièce jointe ici."

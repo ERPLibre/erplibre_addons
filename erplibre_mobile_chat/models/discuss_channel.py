@@ -12,10 +12,11 @@ from odoo.tools.translate import _
 from .mail_message import erplibre_ensure_unique_uuid_index
 
 # Premier entier de la paire de pg_advisory_xact_lock : un espace par
-# famille de verrous, pour qu'un canal et un message de même clé ne se
-# bloquent pas.
+# famille de verrous, pour qu'un canal, un message et une pièce jointe de
+# même clé ne se bloquent pas.
 LOCK_NAMESPACE_CHANNEL = 0x45524C01
 LOCK_NAMESPACE_MESSAGE = 0x45524C02
+LOCK_NAMESPACE_ATTACHMENT = 0x45524C03
 
 
 def erplibre_lock_uuid(env, namespace, uuid):
