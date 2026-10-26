@@ -38,25 +38,33 @@ class ErplibreMessageController(ThreadController):
         pièces jointes, assainissement, marque « modifié », bus et réponse.
 
         `attachment_ids` à None garde les pièces jointes ; [] les supprime
-        toutes, comme chez Odoo. Le verrou de ligne pris en premier fait
-        attendre une modification concurrente entre la comparaison et
-        l'écriture ; en isolation REPEATABLE READ, celle qui attendait
-        échoue en sérialisation et Odoo rejoue la requête, qui relit alors
-        le corps à jour. Seul un utilisateur interne est servi ; un message
-        absent, illisible ou que l'utilisateur ne peut modifier selon Odoo
-        rend NotFound.
+        toutes, comme chez Odoo. Seul un utilisateur interne est servi ; un
+        `message_id` non numérique, un message absent, illisible ou que
+        l'utilisateur ne peut modifier selon Odoo rend NotFound, sans
+        verrou. Le verrou de ligne, pris après ces contrôles et avant la
+        relecture du corps, fait attendre une modification concurrente
+        entre la comparaison et l'écriture ; en isolation REPEATABLE READ,
+        celle qui attendait échoue en sérialisation et Odoo rejoue la
+        requête, qui relit alors le corps à jour.
         """
         if not request.env.user._is_internal():
             raise NotFound()
-        request.env.cr.execute(
-            "SELECT id FROM mail_message WHERE id = %s FOR UPDATE",
-            (int(message_id),),
-        )
+        try:
+            message_id = int(message_id)
+        except (TypeError, ValueError):
+            raise NotFound() from None
         message = request.env["mail.message"]._get_with_access(
             message_id, "create", **kwargs
         )
         if not message or not self._is_message_editable(message, **kwargs):
             raise NotFound()
+        request.env.cr.execute(
+            "SELECT id FROM mail_message WHERE id = %s FOR UPDATE",
+            (message_id,),
+        )
+        # Les contrôles ont lu le message avant le verrou : le corps et les
+        # pièces jointes sont relus après lui.
+        message.invalidate_recordset()
         # sudo: mail.message - accès vérifié par _get_with_access et
         # _is_message_editable, comme la route d'Odoo avant sa réponse.
         message = message.sudo()

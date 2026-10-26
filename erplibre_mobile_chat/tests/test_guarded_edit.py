@@ -236,6 +236,37 @@ class TestErplibreGuardedEdit(HttpCase):
         )
         self.assertLess(lock, write)
 
+    def test_inaccessible_message_takes_no_lock(self):
+        message = self._message()
+        with patch.object(
+            self.env.cr, "execute", wraps=self.env.cr.execute
+        ) as execute:
+            with self.assertRaises(JsonRpcException) as caught:
+                self._guarded(
+                    message,
+                    "Autre",
+                    message.erplibre_body_fingerprint,
+                    login="chat_user_b",
+                )
+        self.assertEqual(caught.exception.code, 404)
+        queries = [_sql(c.args[0]) for c in execute.call_args_list]
+        self.assertFalse([q for q in queries if "FOR UPDATE" in q])
+
+    def test_non_numeric_message_id_not_found(self):
+        self.authenticate("chat_user_a", "chat_user_a")
+        for message_id in ("abc", None, [1]):
+            with self.subTest(message_id=message_id):
+                with self.assertRaises(JsonRpcException) as caught:
+                    self.make_jsonrpc_request(
+                        GUARDED_URL,
+                        {
+                            "message_id": message_id,
+                            "body": "Autre",
+                            "expected_fingerprint": _sha256(""),
+                        },
+                    )
+                self.assertEqual(caught.exception.code, 404)
+
     def test_fingerprint_field_in_fields_get_for_internal_user(self):
         fields = (
             self.env["mail.message"]

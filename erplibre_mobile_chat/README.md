@@ -34,15 +34,18 @@ utilisateur portail reçoit 404.
 interne) reprend les paramètres de `/mail/message/update_content`
 (`message_id`, `body`, `attachment_ids`, `attachment_tokens`, `partner_ids`)
 avec un `expected_fingerprint` obligatoire : la valeur de
-`mail.message.erplibre_body_fingerprint`, le SHA-256 hexadécimal du corps HTML
-tel que le rend la réponse d'Odoo, encodé en UTF-8. Si l'empreinte actuelle
-diffère, ou si le message a été vidé (supprimé) et que `body` n'est pas vide,
-rien n'est écrit et la réponse porte `erplibre_conflict` (`"deleted"` pour un
-message vide, sinon `"changed"`) avec le message actuel au format de la
+`mail.message.erplibre_body_fingerprint`, le SHA-256 hexadécimal des octets
+UTF-8 du corps HTML tel que Store le rend (champ `body` de la réponse d'Odoo),
+un corps vide ou `false` étant haché comme la chaîne vide `""`. Si l'empreinte
+actuelle diffère, ou si le message a été vidé (supprimé) et que `body` n'est
+pas vide, rien n'est écrit et la réponse porte `erplibre_conflict` (`"deleted"`
+pour un message vide, sinon `"changed"`) avec le message actuel au format de la
 réponse d'Odoo. Sinon la route d'Odoo fait le travail, avec ses contrôles, la
-marque « modifié », le bus et sa réponse. Un message absent ou que
-l'utilisateur ne peut pas modifier selon Odoo rend 404. `attachment_ids` à
-`null` garde les pièces jointes, `[]` les supprime toutes. La ligne du message
-est verrouillée avant la comparaison : deux modifications concurrentes ne
-passent pas toutes deux. Le champ figure dans `fields_get` de `mail.message`
-pour tout utilisateur interne, ce qui signale ce niveau du module.
+marque « modifié », le bus et sa réponse. Un `message_id` non numérique, un
+message absent ou que l'utilisateur ne peut pas modifier selon Odoo rend 404,
+sans verrou. `attachment_ids` à `null` garde les pièces jointes, `[]` les
+supprime toutes. Après les contrôles d'accès, la ligne du message est
+verrouillée avant la relecture du corps et la comparaison : deux modifications
+concurrentes ne passent pas toutes deux. Le champ figure dans `fields_get` de
+`mail.message` pour tout utilisateur interne, ce qui signale ce niveau du
+module.
