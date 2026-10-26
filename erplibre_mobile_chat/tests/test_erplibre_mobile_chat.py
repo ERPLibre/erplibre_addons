@@ -144,6 +144,19 @@ class TestErplibreMobileChat(HttpCase):
             len(self.env.cr.precommit.data.get("bus.bus.values", [])), bus
         )
 
+    def test_resend_by_removed_member_refused(self):
+        post = {
+            "body": "hi",
+            "message_type": "comment",
+            "erplibre_client_uuid": "u-10",
+        }
+        self.channel.with_user(self.user_a).message_post(**post)
+        self.channel.channel_member_ids.filtered(
+            lambda m: m.partner_id == self.user_a.partner_id
+        ).unlink()
+        with self.assertRaises(AccessError):
+            self.channel.with_user(self.user_a).message_post(**post)
+
     def test_public_user_never_adopts(self):
         # Quiconque publie sans compte le fait sous ce même partenaire
         public = self.env.ref("base.public_user")
@@ -397,10 +410,10 @@ class TestErplibreMobileChatCreate(HttpCase):
                 body="hi", message_type="comment", erplibre_client_uuid="m-8"
             )
         # Sur un canal, la recherche précède message_post de mail puis se
-        # refait dans mail.thread : le verrou est pris une ou deux fois,
-        # toujours avec la même clé. Le contexte de l'environnement change
-        # entre les deux ; seul l'utilisateur compte pour la clé.
-        self.assertIn(lock.call_count, (1, 2))
+        # refait dans mail.thread : un premier envoi prend le verrou deux
+        # fois, toujours avec la même clé. Le contexte de l'environnement
+        # change entre les deux ; seul l'utilisateur compte pour la clé.
+        self.assertEqual(lock.call_count, 2)
         for call in lock.call_args_list:
             self.assertEqual(call.args[1:], (dc.LOCK_NAMESPACE_MESSAGE, "m-8"))
             self.assertEqual(call.args[0].uid, self.user_a.id)
