@@ -2087,16 +2087,6 @@ msgstr "Nom technique"
 
 #. module: erplibre_info
 #. odoo-python
-#: code:addons/erplibre_info/runner.py:0
-msgid ""
-"The ERPLibre checkout was not found. Set the system parameter %(param)s to "
-"the directory that holds %(script)s."
-msgstr ""
-"Le checkout ERPLibre est introuvable. Mettre dans le paramètre système %"
-"(param)s le dossier qui contient %(script)s."
-
-#. module: erplibre_info
-#. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "The ERPLibre cron is missing."
 msgstr "Le cron ERPLibre est absent."
@@ -2306,12 +2296,6 @@ msgid ""
 "The requirements of the ERPLibre virtual environment changed: review it."
 msgstr ""
 "Les dépendances de l'environnement virtuel ERPLibre ont changé : revoyez-le."
-
-#. module: erplibre_info
-#. odoo-python
-#: code:addons/erplibre_info/runner.py:0
-msgid "The script %(script)s is missing from the ERPLibre checkout."
-msgstr "Le script %(script)s est absent du checkout ERPLibre."
 
 #. module: erplibre_info
 #. odoo-python
@@ -2889,3 +2873,33 @@ msgstr "oui"
 #: code:addons/erplibre_info/models/erplibre_code_run_pull.py:0
 msgid "yes (stash)"
 msgstr "oui (stash)"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"ERPLibre is missing this feature, are you on the right version? Set the "
+"system parameter %(param)s to the directory that holds %(script)s."
+msgstr ""
+"Il manque la fonctionnalité dans ERPLibre, êtes-vous sur la bonne version? "
+"Mettre dans le paramètre système %(param)s le dossier qui contient "
+"%(script)s."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"ERPLibre is missing this feature, are you on the right version? The script "
+"%(script)s does not exist in %(root)s."
+msgstr ""
+"Il manque la fonctionnalité dans ERPLibre, êtes-vous sur la bonne version? "
+"Le script %(script)s n'existe pas dans %(root)s."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"The directory %(root)s, set in the system parameter %(param)s, does not "
+"exist."
+msgstr ""
+"Le dossier %(root)s, mis dans le paramètre système %(param)s, n'existe pas."

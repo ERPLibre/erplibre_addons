@@ -25,6 +25,9 @@ SCRIPT_UPGRADE = "script/git/repo_upgrade.py"
 SCRIPT_APPLY = "script/git/repo_apply.py"
 SCRIPT_PULL = "script/git/repo_pull.py"
 PYTHON = ".venv.erplibre/bin/python"
+# A file every ERPLibre checkout holds, old releases included: it tells a
+# checkout too old for a script from no checkout at all.
+CHECKOUT_MARKER = "env_var.sh"
 
 PARAM_ROOT = "erplibre_info.root"
 PARAM_TIMEOUT = "erplibre_info.timeout"
@@ -67,15 +70,16 @@ def scrub(data):
     return strip_credentials(data)
 
 
-def find_root(start):
-    """The first parent of ``start`` that holds ``script/git/repo_state.py``.
+def find_root(start, rel=SCRIPT_STATE):
+    """The first parent of ``start`` that holds the file ``rel``, by default
+    ``script/git/repo_state.py``.
 
     The Odoo package sits at ``<root>/odoo<V>/odoo/odoo``: three levels
     under the checkout. Six levels bound the walk.
     """
     path = os.path.realpath(start)
     for _level in range(6):
-        if os.path.isfile(os.path.join(path, SCRIPT_STATE)):
+        if os.path.isfile(os.path.join(path, rel)):
             return path
         parent = os.path.dirname(path)
         if parent == path:
@@ -122,9 +126,24 @@ def checkout_problem(env, script=SCRIPT_STATE):
     file system only."""
     root = erplibre_root(env)
     if not root:
+        configured = env["ir.config_parameter"].sudo().get_param(PARAM_ROOT)
+        if configured:
+            checkout = os.path.realpath(configured)
+            if not os.path.isdir(checkout):
+                return env._(
+                    "The directory %(root)s, set in the system parameter "
+                    "%(param)s, does not exist.",
+                    root=checkout,
+                    param=PARAM_ROOT,
+                )
+        else:
+            checkout = find_root(os.path.dirname(odoo.__file__), CHECKOUT_MARKER)
+        if checkout:
+            return _missing_feature(env, checkout, SCRIPT_STATE)
         return env._(
-            "The ERPLibre checkout was not found. Set the system "
-            "parameter %(param)s to the directory that holds %(script)s.",
+            "ERPLibre is missing this feature, are you on the right "
+            "version? Set the system parameter %(param)s to the directory "
+            "that holds %(script)s.",
             param=PARAM_ROOT,
             script=SCRIPT_STATE,
         )
@@ -135,11 +154,19 @@ def checkout_problem(env, script=SCRIPT_STATE):
             python=python,
         )
     if not os.path.isfile(os.path.join(root, script)):
-        return env._(
-            "The script %(script)s is missing from the ERPLibre checkout.",
-            script=script,
-        )
+        return _missing_feature(env, root, script)
     return None
+
+
+def _missing_feature(env, checkout, script):
+    """The message for a checkout ``checkout`` that exists but lacks
+    ``script``: an ERPLibre older than the feature that needs it."""
+    return env._(
+        "ERPLibre is missing this feature, are you on the right version? "
+        "The script %(script)s does not exist in %(root)s.",
+        script=script,
+        root=checkout,
+    )
 
 
 def _run_process(argv, cwd, env, timeout):

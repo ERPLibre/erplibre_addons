@@ -1,4 +1,5 @@
 from . import (
+    test_checkout,
     test_cross_version,
     test_integration,
     test_pull,
