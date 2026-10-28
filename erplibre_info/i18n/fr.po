@@ -2903,3 +2903,37 @@ msgid ""
 "exist."
 msgstr ""
 "Le dossier %(root)s, mis dans le paramètre système %(param)s, n'existe pas."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"Missing permissions: the account %(account)s cannot read %(count)s git "
+"repositories owned by %(owner)s. Give it read access to their .git "
+"directories."
+msgstr ""
+"Il manque des permissions : le compte %(account)s ne peut pas lire "
+"%(count)s dépôts git appartenant à %(owner)s. Donnez-lui l'accès en lecture "
+"à leurs dossiers .git."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"Missing permissions: the account %(account)s cannot read %(count)s git "
+"repositories owned by %(owner)s. Run as root: %(command)s"
+msgstr ""
+"Il manque des permissions : le compte %(account)s ne peut pas lire "
+"%(count)s dépôts git appartenant à %(owner)s. En root, lancer : %(command)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "From the Docker host: docker exec -u root %(container)s %(command)s"
+msgstr ""
+"Depuis l'hôte Docker : docker exec -u root %(container)s %(command)s"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__permission_warning
+msgid "Permission Warning"
+msgstr "Avertissement de permissions"

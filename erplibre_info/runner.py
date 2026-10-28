@@ -169,6 +169,41 @@ def _missing_feature(env, checkout, script):
     )
 
 
+def permission_warning(env, data):
+    """The translated warning for the ``permissions`` key of a script's
+    JSON, or False when it is empty: the account that cannot read the
+    clones, their owner, and the command that makes them readable."""
+    advice = (data or {}).get("permissions")
+    if not advice:
+        return False
+    values = {
+        "account": advice.get("account") or "?",
+        "owner": advice.get("owner") or "?",
+        "count": advice.get("count") or 0,
+        "command": advice.get("command"),
+        "container": advice.get("container"),
+    }
+    if not values["command"]:
+        return env._(
+            "Missing permissions: the account %(account)s cannot read "
+            "%(count)s git repositories owned by %(owner)s. Give it read "
+            "access to their .git directories.",
+            **values,
+        )
+    text = env._(
+        "Missing permissions: the account %(account)s cannot read "
+        "%(count)s git repositories owned by %(owner)s. Run as root: "
+        "%(command)s",
+        **values,
+    )
+    if values["container"]:
+        text += " " + env._(
+            "From the Docker host: docker exec -u root %(container)s " "%(command)s",
+            **values,
+        )
+    return text
+
+
 def _run_process(argv, cwd, env, timeout):
     """``subprocess.run`` of ``argv`` in a session of its own, output
     captured as text; return the ``CompletedProcess``.

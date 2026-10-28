@@ -246,13 +246,19 @@ class ErplibreCodeCrossVersion(models.Model):
         ]
 
     def _render(self, data):
+        warning = runner.permission_warning(self.env, data)
+        alert = (
+            Markup("<div class='alert alert-warning' role='alert'>%s</div>") % warning
+            if warning
+            else ""
+        )
         if data.get("error") and not data.get("others"):
-            return self._p(data["error"], "text-danger")
-        parts = [
+            return _join([alert, self._p(data["error"], "text-danger")])
+        parts = [alert] + [
             self._render_other(other, data.get("version"))
             for other in data.get("others") or []
         ]
-        if not parts:
+        if not data.get("others"):
             parts.append(
                 self._p(
                     self.env._(

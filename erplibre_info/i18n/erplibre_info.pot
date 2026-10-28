@@ -2784,3 +2784,31 @@ msgid ""
 "The directory %(root)s, set in the system parameter %(param)s, does not "
 "exist."
 msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"Missing permissions: the account %(account)s cannot read %(count)s git "
+"repositories owned by %(owner)s. Give it read access to their .git "
+"directories."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"Missing permissions: the account %(account)s cannot read %(count)s git "
+"repositories owned by %(owner)s. Run as root: %(command)s"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "From the Docker host: docker exec -u root %(container)s %(command)s"
+msgstr ""
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__permission_warning
+msgid "Permission Warning"
+msgstr ""

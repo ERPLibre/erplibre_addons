@@ -1,8 +1,10 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 """``runner.checkout_problem``: the message tells an ERPLibre too old for
-the feature from a parameter that points nowhere."""
+the feature from a parameter that points nowhere. ``permission_warning``:
+the clones the Odoo account cannot read, and the command that fixes it."""
 
+import copy
 import os
 import shutil
 import tempfile
@@ -12,7 +14,16 @@ from unittest.mock import patch
 from odoo.tests import tagged
 
 from .. import runner
-from .common import ErplibreInfoCase
+from .common import CROSS_VERSION, REPO, ErplibreInfoCase
+
+PERMISSIONS = {
+    "account": "service",
+    "owner": "root",
+    "count": 140,
+    "path": "/srv/erplibre/.repo",
+    "command": "chmod -R go+rX /srv/erplibre/.repo",
+    "container": None,
+}
 
 
 @tagged("post_install", "-at_install")
@@ -89,3 +100,58 @@ class TestCheckoutProblem(ErplibreInfoCase):
             problem,
         )
         self.assertIn("n'existe pas dans", problem)
+
+
+@tagged("post_install", "-at_install")
+class TestPermissionWarning(ErplibreInfoCase):
+    def test_nothing_to_report(self):
+        self.assertFalse(runner.permission_warning(self.env, {}))
+        self.assertFalse(runner.permission_warning(self.env, {"permissions": None}))
+
+    def test_command_outside_and_inside_docker(self):
+        text = runner.permission_warning(self.env, {"permissions": PERMISSIONS})
+        self.assertIn("service", text)
+        self.assertIn("140", text)
+        self.assertIn("root", text)
+        self.assertIn("chmod -R go+rX /srv/erplibre/.repo", text)
+        self.assertNotIn("docker", text)
+        advice = dict(PERMISSIONS, container="c0ffee")
+        text = runner.permission_warning(self.env, {"permissions": advice})
+        self.assertIn(
+            "docker exec -u root c0ffee chmod -R go+rX /srv/erplibre/.repo", text
+        )
+
+    def test_no_command_outside_the_checkout(self):
+        advice = dict(PERMISSIONS, path=None, command=None)
+        text = runner.permission_warning(self.env, {"permissions": advice})
+        self.assertIn("Missing permissions", text)
+        self.assertNotIn("chmod", text)
+
+    def test_snapshot_stores_and_shows_it(self):
+        self.fake.snapshot["permissions"] = PERMISSIONS
+        with self.assertLogs(
+            "odoo.addons.erplibre_info.models.erplibre_code_snapshot", "WARNING"
+        ):
+            snap = self.Snapshot._capture("manual")
+        self.assertIn("chmod -R go+rX", snap.permission_warning)
+        self.fake.snapshot["permissions"] = None
+        snap = self.Snapshot._capture("manual", force=True)
+        self.assertFalse(snap.permission_warning)
+
+    def test_cross_version_report_shows_it(self):
+        data = copy.deepcopy(CROSS_VERSION)
+        data["permissions"] = PERMISSIONS
+        self.fake.answers[("repo_state.py", "cross-version")] = (0, data)
+        rec = self.env["erplibre.code.cross.version"]._fetch(REPO)
+        self.assertIn("alert-warning", rec.report_html)
+        self.assertIn("chmod -R go+rX", rec.report_html)
+
+    def test_in_french(self):
+        self.env["res.lang"]._activate_lang("fr_FR")
+        self.env["ir.module.module"]._load_module_terms(["erplibre_info"], ["fr_FR"])
+        advice = dict(PERMISSIONS, container="c0ffee")
+        text = runner.permission_warning(
+            self.env(context={"lang": "fr_FR"}), {"permissions": advice}
+        )
+        self.assertIn("Il manque des permissions", text)
+        self.assertIn("Depuis l'hôte Docker", text)

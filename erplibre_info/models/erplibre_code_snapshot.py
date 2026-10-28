@@ -4,6 +4,7 @@
 import base64
 import hashlib
 import json
+import logging
 import os
 import re
 
@@ -13,6 +14,8 @@ from odoo.modules.module import adapt_version, get_module_path
 
 from .. import runner
 from .erplibre_code_run import TRIGGERS
+
+_logger = logging.getLogger(__name__)
 
 PARAM_DIRTY = "erplibre_info.check_dirty"
 
@@ -88,6 +91,7 @@ class ErplibreCodeSnapshot(models.Model):
     code_fingerprint = fields.Char(readonly=True)
     duration_ms = fields.Integer(string="Duration (ms)", readonly=True)
     errors = fields.Text(readonly=True)
+    permission_warning = fields.Text(readonly=True)
     repo_count = fields.Integer(string="Repository count", readonly=True)
     code_module_count = fields.Integer(string="Modules in the code", readonly=True)
     count_conforme = fields.Integer(string="Matching", readonly=True)
@@ -222,6 +226,7 @@ class ErplibreCodeSnapshot(models.Model):
             "code_fingerprint": data.get("fingerprint"),
             "duration_ms": data.get("duration_ms") or 0,
             "errors": "\n".join(str(e) for e in data.get("errors") or []) or False,
+            "permission_warning": runner.permission_warning(self.env, data),
             "repo_count": len(repos),
             "code_module_count": (data.get("counts") or {}).get("modules") or 0,
             "changed_repo_count": len(
@@ -237,6 +242,8 @@ class ErplibreCodeSnapshot(models.Model):
         }
         for key, _label in REPO_STATES:
             vals[f"count_{key}"] = states.get(key, 0)
+        if vals["permission_warning"]:
+            _logger.warning("ERPLibre snapshot: %s", vals["permission_warning"])
         snapshot = self.create(vals)
         snapshot._create_module_lines(data, modules)
         return snapshot

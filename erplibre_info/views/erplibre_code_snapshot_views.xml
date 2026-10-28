@@ -46,6 +46,9 @@
                     <button name="action_capture_now" type="object" string="Capture now" class="btn-primary" />
                 </header>
                 <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not permission_warning">
+                        <field name="permission_warning" nolabel="1" />
+                    </div>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_open_repos" type="object" class="oe_stat_button" icon="fa-code-fork">
                             <field name="repo_count" widget="statinfo" string="Repositories" />
