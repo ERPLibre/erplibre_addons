@@ -4,6 +4,7 @@
 import base64
 import json
 
+from odoo.api import call_kw
 from odoo.exceptions import UserError
 from odoo.tests import tagged
 
@@ -144,6 +145,16 @@ class TestSnapshot(ErplibreInfoCase):
         with self.assertRaises(UserError):
             self.Snapshot.action_capture_now()
         self.assertEqual(self.fake.calls, [])
+
+    def test_capture_now_from_the_buttons(self):
+        """The buttons go through ``call_kw`` with the ids shown: none from
+        the list header, the open snapshot from the form."""
+        action = call_kw(self.Snapshot, "action_capture_now", [[]], {})
+        first = self.Snapshot.browse(action["res_id"])
+        self.assertEqual(first.trigger, "manual")
+        action = call_kw(self.Snapshot, "action_capture_now", [first.ids], {})
+        self.assertNotEqual(action["res_id"], first.id)
+        self.assertEqual(self.Snapshot.search_count([]), 2)
 
     def test_script_failure(self):
         self.fake.answers[("repo_state.py", "snapshot")] = (

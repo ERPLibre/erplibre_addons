@@ -339,10 +339,14 @@ class ErplibreCodeSnapshot(models.Model):
 
     # ── actions ─────────────────────────────────────────────────────────
 
-    @api.model
     def action_capture_now(self):
         """The manual snapshot: always stored, read synchronously (about a
-        second; the script bounds every git call)."""
+        second; the script bounds every git call).
+
+        A record method, not ``@api.model``: the list and form buttons pass
+        the ids of the records shown, which ``call_kw`` hands to an
+        ``@api.model`` method as an extra argument. Those records are
+        ignored."""
         try:
             snapshot = self._capture("manual", force=True)
         except runner.RunnerError as exc:

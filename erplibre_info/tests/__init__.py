@@ -7,4 +7,5 @@ from . import (
     test_server_actions,
     test_settings,
     test_snapshot,
+    test_views,
 )
