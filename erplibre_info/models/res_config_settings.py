@@ -82,6 +82,9 @@ class ResConfigSettings(models.TransientModel):
     erplibre_server_actions_allowed = fields.Boolean(
         compute="_compute_erplibre_server_actions_allowed"
     )
+    erplibre_server_actions_problem = fields.Char(
+        compute="_compute_erplibre_server_actions_allowed"
+    )
     erplibre_last_failed_run_id = fields.Many2one(
         "erplibre.code.run",
         string="Last failed ERPLibre snapshot",
@@ -119,9 +122,12 @@ class ResConfigSettings(models.TransientModel):
             settings.erplibre_checkout_problem = problem
 
     def _compute_erplibre_server_actions_allowed(self):
-        allowed = self.env["erplibre.code.run"]._server_actions_allowed()
+        Run = self.env["erplibre.code.run"]
+        allowed = Run._server_actions_allowed()
+        problem = False if allowed else Run._server_actions_problem()
         for settings in self:
             settings.erplibre_server_actions_allowed = allowed
+            settings.erplibre_server_actions_problem = problem
 
     @api.model
     def get_values(self):

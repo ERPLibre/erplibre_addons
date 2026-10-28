@@ -626,13 +626,6 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_info
-#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
-msgid ""
-"Disabled: set erplibre_info_allow_server_actions = True\n"
-"                                in the Odoo configuration file."
-msgstr ""
-
-#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__display_name
@@ -1828,14 +1821,6 @@ msgstr ""
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
-msgid ""
-"Server actions are disabled. Set %(flag)s = True in the Odoo configuration "
-"file to allow them."
-msgstr ""
-
-#. module: erplibre_info
-#. odoo-python
-#: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "Server actions require the developer mode."
 msgstr ""
 
@@ -2811,4 +2796,30 @@ msgstr ""
 #. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__permission_warning
 msgid "Permission Warning"
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: this Odoo server started without a "
+"configuration file. Start it with -c <file>, the file holding %(flag)s = "
+"True."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: %(flag)s reads %(value)s in %(file)s. Set it "
+"to True, then restart Odoo."
+msgstr ""
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: add %(flag)s = True to the [options] section "
+"of %(file)s, the configuration file this Odoo server read at startup, then "
+"restart Odoo."
 msgstr ""

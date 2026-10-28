@@ -662,15 +662,6 @@ msgstr ""
 "True dans le fichier de configuration d'Odoo."
 
 #. module: erplibre_info
-#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
-msgid ""
-"Disabled: set erplibre_info_allow_server_actions = True\n"
-"                                in the Odoo configuration file."
-msgstr ""
-"Désactivé : mettre erplibre_info_allow_server_actions = True dans le fichier "
-"de configuration d'Odoo."
-
-#. module: erplibre_info
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_cross_version__display_name
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_pull_backup__display_name
@@ -1894,16 +1885,6 @@ msgstr "Actions serveur"
 #. module: erplibre_info
 #. odoo-python
 #: code:addons/erplibre_info/models/erplibre_code_run.py:0
-msgid ""
-"Server actions are disabled. Set %(flag)s = True in the Odoo configuration "
-"file to allow them."
-msgstr ""
-"Les actions serveur sont désactivées. Mettre %(flag)s = True dans le fichier "
-"de configuration d'Odoo pour les permettre."
-
-#. module: erplibre_info
-#. odoo-python
-#: code:addons/erplibre_info/models/erplibre_code_run.py:0
 msgid "Server actions require the developer mode."
 msgstr "Les actions serveur exigent le mode développeur."
 
@@ -2937,3 +2918,37 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_snapshot__permission_warning
 msgid "Permission Warning"
 msgstr "Avertissement de permissions"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: this Odoo server started without a "
+"configuration file. Start it with -c <file>, the file holding %(flag)s = "
+"True."
+msgstr ""
+"Les actions serveur sont désactivées : ce serveur Odoo a démarré sans "
+"fichier de configuration. Le lancer avec -c <fichier>, le fichier qui "
+"porte %(flag)s = True."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: %(flag)s reads %(value)s in %(file)s. Set it "
+"to True, then restart Odoo."
+msgstr ""
+"Les actions serveur sont désactivées : %(flag)s vaut %(value)s dans "
+"%(file)s. Le mettre à True, puis redémarrer Odoo."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: add %(flag)s = True to the [options] section "
+"of %(file)s, the configuration file this Odoo server read at startup, then "
+"restart Odoo."
+msgstr ""
+"Les actions serveur sont désactivées : ajouter %(flag)s = True dans la "
+"section [options] de %(file)s, le fichier de configuration que ce serveur "
+"Odoo a lu au démarrage, puis redémarrer Odoo."

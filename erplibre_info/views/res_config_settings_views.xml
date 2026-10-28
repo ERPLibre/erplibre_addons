@@ -148,9 +148,8 @@
                                     icon="fa-arrow-right"
                                 />
                             </div>
-                            <div class="text-muted mt8" invisible="erplibre_server_actions_allowed">
-                                Disabled: set erplibre_info_allow_server_actions = True
-                                in the Odoo configuration file.
+                            <div class="text-warning mt8" invisible="erplibre_server_actions_allowed">
+                                <field name="erplibre_server_actions_problem" />
                             </div>
                         </setting>
                     </block>

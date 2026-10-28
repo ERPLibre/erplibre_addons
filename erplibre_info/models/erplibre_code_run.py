@@ -406,17 +406,56 @@ class ErplibreCodeRun(models.Model):
         )
 
     @api.model
+    def _flag_problem(self):
+        """Why the odoo.conf flag is off, naming the configuration file this
+        server read at startup (``config.rcfile``), which is not always the
+        one the admin edited; False when the flag is on."""
+        if self._flag_enabled():
+            return False
+        rcfile = config.rcfile
+        if not rcfile or not os.path.isfile(rcfile):
+            return self.env._(
+                "Server actions are disabled: this Odoo server started "
+                "without a configuration file. Start it with -c <file>, the "
+                "file holding %(flag)s = True.",
+                flag=FLAG_SERVER_ACTIONS,
+            )
+        if FLAG_SERVER_ACTIONS in config.options:
+            return self.env._(
+                "Server actions are disabled: %(flag)s reads %(value)s in "
+                "%(file)s. Set it to True, then restart Odoo.",
+                flag=FLAG_SERVER_ACTIONS,
+                value=config.options[FLAG_SERVER_ACTIONS],
+                file=rcfile,
+            )
+        return self.env._(
+            "Server actions are disabled: add %(flag)s = True to the "
+            "[options] section of %(file)s, the configuration file this Odoo "
+            "server read at startup, then restart Odoo.",
+            flag=FLAG_SERVER_ACTIONS,
+            file=rcfile,
+        )
+
+    @api.model
+    def _server_actions_problem(self):
+        """The first of the three conditions that fails, as a translated
+        message, or False when the server actions are allowed."""
+        flag = self._flag_problem()
+        if flag:
+            return flag
+        if not self.env.user.has_group("base.group_system"):
+            return self.env._("Only the Settings administrators run server actions.")
+        if not self._is_debug_mode():
+            return self.env._("Server actions require the developer mode.")
+        return False
+
+    @api.model
     def _check_server_actions(self):
         """Raise unless the three conditions of the server actions hold:
         the odoo.conf flag, the Settings group, the developer mode."""
-        if not self._flag_enabled():
-            raise UserError(
-                self.env._(
-                    "Server actions are disabled. Set %(flag)s = True in the "
-                    "Odoo configuration file to allow them.",
-                    flag=FLAG_SERVER_ACTIONS,
-                )
-            )
+        flag = self._flag_problem()
+        if flag:
+            raise UserError(flag)
         if not self.env.user.has_group("base.group_system"):
             raise AccessError(
                 self.env._("Only the Settings administrators run server actions.")
@@ -814,14 +853,9 @@ class ErplibreCodeRun(models.Model):
         """The background step of a server action re-reads the odoo.conf
         flag, and the group of its requester: removing either stops a
         queued run."""
-        if not self._flag_enabled():
-            raise UserError(
-                self.env._(
-                    "Server actions are disabled. Set %(flag)s = True in the "
-                    "Odoo configuration file to allow them.",
-                    flag=FLAG_SERVER_ACTIONS,
-                )
-            )
+        flag = self._flag_problem()
+        if flag:
+            raise UserError(flag)
         for run in self:
             if not (run.user_id and run.user_id.sudo().has_group("base.group_system")):
                 raise AccessError(
