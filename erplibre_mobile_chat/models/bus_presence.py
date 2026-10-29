@@ -14,29 +14,37 @@ class BusPresence(models.Model):
 
     erplibre_browser_poll = fields.Datetime(
         string="Last Browser Poll",
+        groups="base.group_system",
         help="Last presence update of a browser of this user; the bus of the"
         " ERPLibre mobile app does not count.",
     )
     erplibre_browser_presence = fields.Datetime(
         string="Last Browser Presence",
+        groups="base.group_system",
         help="Last activity in a browser of this user; the bus of the"
         " ERPLibre mobile app does not count.",
     )
 
     @api.model
-    def erplibre_update_browser_presence(self, inactivity_period, user_id):
+    def _erplibre_update_browser_presence(self, inactivity_period):
         """Écrit, comme update_presence d'Odoo, le dernier sondage (now) et
-        la dernière activité (now − `inactivity_period` millisecondes) d'un
-        navigateur de `user_id` dans sa présence existante, puis valide.
+        la dernière activité (now − `inactivity_period` millisecondes, 0
+        au moins) d'un navigateur de l'utilisateur de l'environnement
+        (`env.uid`, que sudo garde) dans sa présence existante, puis valide.
+
+        Privée : aucun appel RPC ne l'atteint, et l'utilisateur n'est jamais
+        un paramètre. Les deux champs ne sont lisibles et modifiables que
+        par l'administrateur ; l'appelant passe par sudo.
 
         Une erreur de concurrence (deux onglets en même temps) annule la
         transaction et est ignorée, comme chez Odoo : la présence n'est pas
         essentielle. Sans ligne de présence, rien n'est écrit : celle
         d'Odoo, écrite juste avant, a alors cédé à la même concurrence.
         """
+        inactivity_period = max(0, int(inactivity_period))
         try:
             with tools.mute_logger("odoo.sql_db"):
-                presence = self.search([("user_id", "=", user_id)])
+                presence = self.search([("user_id", "=", self.env.uid)])
                 if presence:
                     now = fields.Datetime.now()
                     presence.write(

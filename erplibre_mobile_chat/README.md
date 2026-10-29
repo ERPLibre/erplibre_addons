@@ -126,7 +126,10 @@ appareil de l'application de cet utilisateur (`erplibre_session_hash`) : le
 bus de l'application ne compte jamais comme un navigateur. Un navigateur est
 en ligne quand son dernier sondage date de moins de 65 secondes et sa dernière
 activité de moins de 30 minutes, les délais d'Odoo pour « hors ligne » et
-« absent ».
+« absent ». Seul l'administrateur lit ou modifie ces deux champs, et la
+méthode qui les écrit est privée (aucun appel RPC) et prend l'utilisateur de
+la session du bus : un utilisateur ne peut pas faire taire les appareils d'un
+autre.
 
 Quand le dernier message vu d'un membre avance (`_set_last_seen_message` de
 `discuss.channel.member` : marquage comme lu, ou sa propre publication), les

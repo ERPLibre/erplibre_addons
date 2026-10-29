@@ -11,11 +11,13 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import requests
-from odoo import fields
+from odoo import api, fields
 from odoo.addons.bus.websocket import _wsrequest_stack
+from odoo.exceptions import AccessError
 from odoo.tests import new_test_user, tagged
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import HttpCase, JsonRpcException
 
+from ..tools import app_push as app_push_module
 from .test_app_push import APP_PUSH, ENDPOINT, answer, device_keys
 
 APP_SID = "sid-de-l-application-exemple"
@@ -23,7 +25,7 @@ BROWSER_SID = "sid-du-navigateur-exemple"
 
 
 @tagged("post_install", "-at_install")
-class TestErplibreReadPush(TransactionCase):
+class TestErplibreReadPush(HttpCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -460,3 +462,125 @@ class TestErplibreReadPush(TransactionCase):
             self._member(self.chat, self.user_b)._mark_as_read(message.id)
             self.env.cr.postcommit.run()
         self.assertEqual(sent, [self._read_payload(self.chat, message)])
+
+    # Transactions
+
+    def test_rollback_sends_no_read_push(self):
+        message = self._post(self.chat)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        self.env.flush_all()
+        member = self._member(self.chat, self.user_b)
+        with (
+            self._capture() as sent,
+            self.registry.cursor() as cr,
+        ):
+            env = api.Environment(cr, self.user_b.id, {})
+            env["discuss.channel.member"].browse(member.id)._mark_as_read(
+                message.id
+            )
+            self.assertTrue(cr.postcommit.data)
+            cr.rollback()
+            cr.postcommit.run()
+        self.assertEqual(sent, [])
+
+    def test_two_transactions_send_two_batches(self):
+        first = self._post(self.chat)
+        second = self._post(self.chat, body="Encore")
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        member = self._member(self.chat, self.user_b)
+        with (
+            self._capture() as sent,
+            patch(
+                f"{APP_PUSH}._deliver", wraps=app_push_module._deliver
+            ) as deliver,
+        ):
+            member._mark_as_read(first.id)
+            self.env.cr.postcommit.run()
+            member._mark_as_read(second.id)
+            self.env.cr.postcommit.run()
+        self.assertEqual(deliver.call_count, 2)
+        self.assertEqual(
+            sent,
+            [
+                self._read_payload(self.chat, first),
+                self._read_payload(self.chat, second),
+            ],
+        )
+
+    # Droits
+
+    def test_presence_update_is_not_callable_over_rpc(self):
+        self._presence(self.user_b, poll_age=3600, presence_age=3600)
+        # La requête lit la base : l'écriture du test doit y être.
+        self.env.flush_all()
+        self.authenticate("read_user_a", "read_user_a")
+        for method in (
+            "erplibre_update_browser_presence",
+            "_erplibre_update_browser_presence",
+        ):
+            with (
+                self.subTest(method=method),
+                self.assertLogs("odoo.http", "WARNING"),
+                self.assertRaises(JsonRpcException),
+            ):
+                self.make_jsonrpc_request(
+                    f"/web/dataset/call_kw/bus.presence/{method}",
+                    {
+                        "model": "bus.presence",
+                        "method": method,
+                        "args": [0, self.user_b.id],
+                        "kwargs": {},
+                    },
+                )
+        self.env.invalidate_all()
+        self.assertFalse(self.user_b._erplibre_browser_online())
+
+    def test_a_user_cannot_write_the_browser_presence(self):
+        self._presence(self.user_b, poll_age=3600, presence_age=3600)
+        self._presence(self.user_a, poll_age=3600, presence_age=3600)
+        now = fields.Datetime.now()
+        for user in (self.user_b, self.user_a):
+            presence = (
+                self.env["bus.presence"]
+                .with_user(self.user_a)
+                .search([("user_id", "=", user.id)])
+            )
+            with (
+                self.subTest(user=user.login),
+                self.assertRaises(AccessError),
+            ):
+                presence.write(
+                    {
+                        "erplibre_browser_poll": now,
+                        "erplibre_browser_presence": now,
+                    }
+                )
+        self.assertFalse(self.user_b._erplibre_browser_online())
+
+    def test_a_user_cannot_write_device_marks(self):
+        for user in (self.user_b, self.user_a):
+            device = self._device(user, f"{ENDPOINT}{user.id}")
+            with (
+                self.subTest(user=user.login),
+                self.assertRaises(AccessError),
+            ):
+                device.with_user(self.user_a).write(
+                    {
+                        "erplibre_app": True,
+                        "erplibre_quiet_while_online": True,
+                        "erplibre_session_hash": "0" * 64,
+                    }
+                )
+
+    def test_negative_inactivity_counts_as_now(self):
+        with self._websocket(self.user_b, BROWSER_SID) as env:
+            env["ir.websocket"]._update_bus_presence(-600000, {})
+        presence = self.env["bus.presence"].search(
+            [("user_id", "=", self.user_b.id)]
+        )
+        self.assertLessEqual(
+            presence.erplibre_browser_presence, fields.Datetime.now()
+        )
+        self.assertTrue(self.user_b._erplibre_browser_online())

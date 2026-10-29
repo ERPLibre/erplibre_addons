@@ -203,6 +203,8 @@ def schedule_read(env, devices, channel_id, message_id):
     validation ; les clés VAPID et l'URL de base sont celles lues à ce
     moment. Sans clés VAPID, rien n'est inscrit.
     """
+    # cr.rollback() efface l'inscription ; le retour à un point de
+    # sauvegarde ne l'efface pas, comme pour tout postcommit d'Odoo.
     postcommit = env.cr.postcommit
     pending = postcommit.data.get(READ_DATA_KEY)
     if pending is None:

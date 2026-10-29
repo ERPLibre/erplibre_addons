@@ -15,7 +15,7 @@ class IrWebsocket(models.AbstractModel):
 
     def _update_bus_presence(self, inactivity_period, im_status_ids_by_model):
         """Après la mise à jour d'Odoo, écrit la présence d'un navigateur
-        de l'utilisateur connecté (`erplibre_update_browser_presence` de
+        de l'utilisateur connecté (`_erplibre_update_browser_presence` de
         bus.presence), sauf quand la session du bus est celle qui a marqué
         un de ses appareils de l'application (`erplibre_session_hash`) : le
         bus de l'application ne compte jamais comme un navigateur.
@@ -37,8 +37,8 @@ class IrWebsocket(models.AbstractModel):
         )
         if session_hash in devices.mapped("erplibre_session_hash"):
             return
-        # sudo: bus.presence - la ligne de l'utilisateur courant, seule
-        # cherchée, est écrite quels que soient ses droits.
-        self.env["bus.presence"].sudo().erplibre_update_browser_presence(
-            int(inactivity_period), user.id
+        # sudo: bus.presence - les champs du navigateur sont réservés à
+        # l'administrateur ; seule la ligne de env.uid est écrite.
+        self.env["bus.presence"].sudo()._erplibre_update_browser_presence(
+            inactivity_period
         )
