@@ -118,7 +118,29 @@ porte le sujet secret.
 
 Un appareil marqué `erplibre_quiet_while_online` ne reçoit pas les
 notifications de message pendant qu'un navigateur de son utilisateur est en
-ligne (`res.users._erplibre_browser_online`).
+ligne (`res.users._erplibre_browser_online`). La présence des navigateurs
+tient en deux champs de `bus.presence`, `erplibre_browser_poll` et
+`erplibre_browser_presence`, que `ir.websocket._update_bus_presence` écrit
+après la présence d'Odoo, pour toute session du bus sauf celle qui a marqué un
+appareil de l'application de cet utilisateur (`erplibre_session_hash`) : le
+bus de l'application ne compte jamais comme un navigateur. Un navigateur est
+en ligne quand son dernier sondage date de moins de 65 secondes et sa dernière
+activité de moins de 30 minutes, les délais d'Odoo pour « hors ligne » et
+« absent ».
+
+Quand le dernier message vu d'un membre avance (`_set_last_seen_message` de
+`discuss.channel.member` : marquage comme lu, ou sa propre publication), les
+appareils de l'application de son partenaire reçoivent, après la validation,
+`{"erplibre": {"v": 1, "type": "read", "channel_id": <canal>,
+"last_message_id": <message>}}` : une seule notification par appareil, par
+canal et par transaction, avec le plus grand id. `set_message_done` et
+`mark_all_as_read` de `mail.message` envoient aux appareils de l'application
+du lecteur `{"erplibre": {"v": 1, "type": "inbox_done", "threads":
+[[<modèle>, <id>], …]}}` : les fils hors des canaux des messages marqués,
+triés, ou `threads` à `null` au-delà de 40 fils ; rien quand aucun tel fil ne
+reste. Ces deux notifications ne vont jamais à un autre appareil (le service
+worker d'Odoo afficherait une notification vide) et passent même pendant
+qu'un navigateur est en ligne : elles retirent des notifications.
 
 Tout autre appareil, un navigateur ou l'application sans le module, suit le
 code d'Odoo inchangé : même appel de `push_to_end_point`, même charge, même

@@ -380,3 +380,53 @@ class TestErplibreAppPush(HttpCase):
             sorted(c.args[0] for c in post.call_args_list),
             sorted(app_devices.mapped("endpoint")),
         )
+
+    def test_marked_500_warns_with_the_device_id_only(self):
+        device = self._app_device(self.user_b)
+        with (
+            patch.object(requests.Session, "post", return_value=answer(500)),
+            self.assertLogs(APP_PUSH, "WARNING") as logs,
+        ):
+            self._post()
+            self.env.cr.postcommit.run()
+        self.assertEqual(len(logs.records), 1)
+        text = logs.records[0].getMessage()
+        self.assertIn(str(device.id), text)
+        self.assertIn("500", text)
+        self.assertNotIn("ntfy.exemple.test", text)
+        self.assertNotIn("upab12cd34", text)
+        self.assertTrue(device.exists())
+
+    def test_cron_keeps_app_rows_without_vapid_keys(self):
+        device = self._app_device(self.user_b)
+        Push = self.env["mail.push"].sudo()
+        row = Push.create({"mail_push_device_id": device.id, "payload": "{}"})
+        self.env["ir.config_parameter"].sudo().set_param(
+            "mail.web_push_vapid_private_key", False
+        )
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            Push._push_notification_to_endpoint()
+            self.env.cr.postcommit.run()
+        post.assert_not_called()
+        self.assertTrue(row.exists())
+
+    def test_quiet_device_receives_while_only_the_app_polls(self):
+        device = self._device(
+            self.user_b, erplibre_app=True, erplibre_quiet_while_online=True
+        )
+        # Le bus de l'application tient la présence d'Odoo à jour sans
+        # toucher celle des navigateurs.
+        self.env["bus.presence"].sudo().create(
+            {"user_id": self.user_b.id, "status": "online"}
+        )
+        self.assertFalse(self.user_b._erplibre_browser_online())
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._post()
+            self.env.cr.postcommit.run()
+        self.assertEqual(
+            [c.args[0] for c in post.call_args_list], [device.endpoint]
+        )

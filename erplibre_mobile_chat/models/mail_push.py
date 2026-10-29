@@ -30,28 +30,22 @@ class MailPush(models.Model):
         les supprime et confie leurs envois à app_push.schedule, puis laisse
         Odoo traiter les autres lignes, sous `erplibre_skip_app_devices`.
 
-        Les envois partent après la validation de la transaction du cron :
-        un appareil disparu est alors supprimé dans un curseur neuf sans
-        attendre les lignes que cette transaction a supprimées. Le cron est
-        relancé tant qu'il reste des lignes de l'application.
+        Sans clés VAPID, les lignes restent, comme chez Odoo, pour un
+        prochain passage. Les envois partent après la validation de la
+        transaction du cron : un appareil disparu est alors supprimé dans un
+        curseur neuf sans attendre les lignes que cette transaction a
+        supprimées. Le cron est relancé tant qu'il reste des lignes de
+        l'application.
         """
-        rows = self.sudo().search_fetch(
-            APP_ROWS, ["mail_push_device_id", "payload"], limit=batch_size
-        )
+        rows = self.browse()
+        if app_push.vapid_keys_present(self.env):
+            rows = self.sudo().search_fetch(
+                APP_ROWS, ["mail_push_device_id", "payload"], limit=batch_size
+            )
         if rows:
-            items = [
-                (
-                    {
-                        "id": row.mail_push_device_id.id,
-                        "endpoint": row.mail_push_device_id.endpoint,
-                        "keys": row.mail_push_device_id.keys,
-                    },
-                    row.payload,
-                )
-                for row in rows
-            ]
-            rows.unlink()
+            items = [(row.mail_push_device_id, row.payload) for row in rows]
             app_push.schedule(self.env, items)
+            rows.unlink()
             if self.sudo().search_count(APP_ROWS):
                 self.env.ref("mail.ir_cron_web_push_notification")._trigger()
         return super(

@@ -1,16 +1,24 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """L'identifiant client d'un message publié depuis l'application mobile,
-l'empreinte de son corps, le favori idempotent et le niveau du module."""
+l'empreinte de son corps, le favori idempotent, le niveau du module et la
+notification « traité » vers les appareils de l'application."""
 
 import hashlib
+import json
 import logging
 
 from odoo import api, fields, models
 from odoo.addons.mail.tools.discuss import Store
 from odoo.tools.sql import index_exists
 
+from ..tools import app_push
+
 _logger = logging.getLogger(__name__)
+
+# Au-delà de ce nombre de fils, la notification « traité » porte
+# `threads: null` : l'application revoit alors toute sa boîte.
+INBOX_DONE_MAX_THREADS = 40
 
 
 def erplibre_ensure_unique_uuid_index(cr, table, index, columns):
@@ -119,6 +127,83 @@ class MailMessage(models.Model):
                 {"message_ids": changed.ids, "starred": starred},
             )
         return Store(self, {"starred": starred}).get_result()
+
+    def _erplibre_unread_for_me(self, message_ids=None):
+        """Rend, sous sudo, les messages dont le partenaire courant a une
+        notification de boîte non lue, parmi `message_ids` quand il est
+        donné : ceux que set_message_done et mark_all_as_read marquent."""
+        domain = [
+            ("res_partner_id", "=", self.env.user.partner_id.id),
+            ("is_read", "=", False),
+        ]
+        if message_ids is not None:
+            domain.append(("mail_message_id", "in", message_ids))
+        # sudo: mail.notification - comme Odoo, les notifications du
+        # partenaire courant seulement.
+        return (
+            self.env["mail.notification"]
+            .sudo()
+            .search_fetch(domain, ["mail_message_id"])
+            .mail_message_id
+        )
+
+    def _erplibre_send_inbox_done(self):
+        """Envoie aux appareils de l'application du partenaire courant la
+        notification « traité » des fils de ces messages hors des canaux :
+        `{"erplibre": {"v", "type": "inbox_done", "threads": [[modèle,
+        id], …]}}`, triés, ou `threads` à null au-delà de
+        INBOX_DONE_MAX_THREADS fils. Rien quand aucun fil ne reste : un
+        canal a sa notification « lu »."""
+        threads = sorted(
+            {
+                (message.model, message.res_id)
+                for message in self
+                if message.model
+                and message.res_id
+                and message.model != "discuss.channel"
+            }
+        )
+        if not threads:
+            return
+        devices = self.env["mail.push.device"]._erplibre_app_devices(
+            self.env.user.partner_id.ids
+        )
+        if not devices:
+            return
+        if len(threads) > INBOX_DONE_MAX_THREADS:
+            threads = None
+        else:
+            threads = [list(thread) for thread in threads]
+        payload = json.dumps(
+            {
+                "erplibre": {
+                    "v": app_push.PAYLOAD_VERSION,
+                    "type": "inbox_done",
+                    "threads": threads,
+                }
+            }
+        )
+        app_push.schedule(self.env, [(device, payload) for device in devices])
+
+    def set_message_done(self):
+        """Comme Odoo, puis envoie la notification « traité » des messages
+        que l'appel a marqués pour le partenaire courant."""
+        done = self._erplibre_unread_for_me(self.ids)
+        result = super().set_message_done()
+        done._erplibre_send_inbox_done()
+        return result
+
+    @api.model
+    def mark_all_as_read(self, domain=None):
+        """Comme Odoo, puis envoie la notification « traité » des messages
+        marqués. Avec `domain`, Odoo passe par set_message_done, qui
+        l'envoie."""
+        if domain:
+            return super().mark_all_as_read(domain=domain)
+        done = self._erplibre_unread_for_me()
+        result = super().mark_all_as_read(domain=domain)
+        done._erplibre_send_inbox_done()
+        return result
 
     def init(self):
         # Garantie du dédoublonnage de message_post (voir

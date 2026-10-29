@@ -11,9 +11,6 @@ from odoo.addons.mail.models.mail_thread import MAX_DIRECT_PUSH
 from ..tools import app_push
 from .discuss_channel import LOCK_NAMESPACE_MESSAGE, erplibre_lock_uuid
 
-# Version de la clé `erplibre` des charges envoyées à l'application.
-APP_PAYLOAD_VERSION = 1
-
 
 class MailThread(models.AbstractModel):
     _inherit = "mail.thread"
@@ -114,7 +111,7 @@ class MailThread(models.AbstractModel):
             self[:1].channel_type if self._name == "discuss.channel" else None
         )
         payload["options"]["data"]["erplibre"] = {
-            "v": APP_PAYLOAD_VERSION,
+            "v": app_push.PAYLOAD_VERSION,
             "message_id": message.id,
             "channel_type": channel_type or None,
         }
@@ -180,17 +177,7 @@ class MailThread(models.AbstractModel):
         if len(devices) < MAX_DIRECT_PUSH:
             app_push.schedule(
                 self.env,
-                [
-                    (
-                        {
-                            "id": device.id,
-                            "endpoint": device.endpoint,
-                            "keys": device.keys,
-                        },
-                        payload,
-                    )
-                    for device in devices
-                ],
+                [(device, payload) for device in devices],
             )
             return
         self.env["mail.push"].sudo().create(

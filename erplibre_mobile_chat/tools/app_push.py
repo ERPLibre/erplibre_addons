@@ -9,6 +9,7 @@ de terminaison, qui porte le sujet secret : un appareil y est désigné par
 son id.
 """
 
+import json
 import logging
 from urllib.parse import urlsplit
 
@@ -18,6 +19,13 @@ from odoo.addons.mail.tools import jwt
 from odoo.addons.mail.tools.web_push import _encrypt_payload
 
 _logger = logging.getLogger(__name__)
+
+# Version de la clé `erplibre` des charges envoyées à l'application.
+PAYLOAD_VERSION = 1
+
+# Clé de `cr.postcommit.data` qui regroupe les notifications « lu » d'une
+# transaction.
+READ_DATA_KEY = "erplibre.read"
 
 SENT = "sent"
 GONE = "gone"
@@ -130,27 +138,32 @@ def _deliver(registry, base_url, private, public, items):
         _logger.exception("App push: unlinking devices %s failed", gone)
 
 
-def send_all(env, items):
-    """Envoie maintenant `items`, liste de (appareil {id, endpoint, keys},
-    charge JSON), avec les clés VAPID et l'URL de base lues dans `env` ;
-    sans clés VAPID, n'envoie rien. Les appareils disparus sont supprimés
-    dans un curseur neuf, validé à part : l'appelant ne doit tenir aucun
-    verrou sur ces appareils ni sur leurs lignes `mail.push`, sinon les
-    deux transactions s'attendent."""
-    private, public, base_url = _vapid_and_base_url(env)
-    if not private or not items:
-        return
-    _deliver(env.registry, base_url, private, public, items)
+def vapid_keys_present(env):
+    """Rend vrai quand les deux clés VAPID d'Odoo sont renseignées."""
+    return _vapid_and_base_url(env)[0] is not None
+
+
+def device_data(device):
+    """Rend {id, endpoint, keys} de `device` (enregistrement ou dict),
+    seule forme que reçoit une fonction différée."""
+    return {
+        "id": device["id"],
+        "endpoint": device["endpoint"],
+        "keys": device["keys"],
+    }
 
 
 def schedule(env, items):
-    """Comme send_all, mais après la validation de la transaction de `env`
+    """Envoie `items`, liste de (appareil {id, endpoint, keys}, charge
+    JSON), après la validation de la transaction de `env`
     (`cr.postcommit`) : rien ne part si elle est annulée, et l'appareil ne
     reçoit pas une notification d'un message encore illisible par RPC.
+    Sans clés VAPID, n'envoie rien.
 
     Les clés, l'URL de base et les appareils sont lus maintenant : la
     fonction différée ne reçoit que des données simples (dict et str) et le
-    registre, jamais un enregistrement dont le curseur serait fermé.
+    registre, jamais un enregistrement dont le curseur serait fermé. Les
+    appareils disparus sont supprimés dans un curseur neuf (voir _deliver).
     """
     private, public, base_url = _vapid_and_base_url(env)
     if not private:
@@ -158,18 +171,59 @@ def schedule(env, items):
         return
     if not items:
         return
-    items = [
-        (
-            {
-                "id": device["id"],
-                "endpoint": device["endpoint"],
-                "keys": device["keys"],
-            },
-            str(payload),
-        )
-        for device, payload in items
-    ]
+    items = [(device_data(device), str(payload)) for device, payload in items]
     registry = env.registry
     env.cr.postcommit.add(
         lambda: _deliver(registry, base_url, private, public, items)
     )
+
+
+def read_payload(channel_id, message_id):
+    """Rend la charge JSON (str) de la notification « lu » : le canal
+    `channel_id` est lu jusqu'au message `message_id` inclus."""
+    return json.dumps(
+        {
+            "erplibre": {
+                "v": PAYLOAD_VERSION,
+                "type": "read",
+                "channel_id": channel_id,
+                "last_message_id": message_id,
+            }
+        }
+    )
+
+
+def schedule_read(env, devices, channel_id, message_id):
+    """Inscrit la notification « lu » de (`channel_id`, `message_id`) pour
+    `devices` dans `cr.postcommit.data[READ_DATA_KEY]`, qui garde par
+    (appareil, canal) le plus grand id de message de la transaction.
+
+    La première inscription d'une transaction ajoute l'unique fonction
+    différée, qui envoie une charge par (appareil, canal) après la
+    validation ; les clés VAPID et l'URL de base sont celles lues à ce
+    moment. Sans clés VAPID, rien n'est inscrit.
+    """
+    postcommit = env.cr.postcommit
+    pending = postcommit.data.get(READ_DATA_KEY)
+    if pending is None:
+        private, public, base_url = _vapid_and_base_url(env)
+        if not private:
+            return
+        pending = postcommit.data[READ_DATA_KEY] = {}
+        registry = env.registry
+
+        def deliver():
+            items = [
+                (device, read_payload(channel, message))
+                for (_device_id, channel), (device, message) in sorted(
+                    pending.items()
+                )
+            ]
+            _deliver(registry, base_url, private, public, items)
+
+        postcommit.add(deliver)
+    for device in devices:
+        key = (device["id"], channel_id)
+        known = pending.get(key)
+        if known is None or known[1] < message_id:
+            pending[key] = (device_data(device), message_id)

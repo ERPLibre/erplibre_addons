@@ -96,3 +96,23 @@ msgstr "Empreinte de la session de l'application"
 #: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_session_hash
 msgid "SHA-256 (hexadecimal) of the id of the session that marked this device as the app's."
 msgstr "SHA-256 (hexadécimal) de l'identifiant de la session qui a marqué cet appareil comme celui de l'application."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_bus_presence__erplibre_browser_poll
+msgid "Last Browser Poll"
+msgstr "Dernier sondage d'un navigateur"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_poll
+msgid "Last presence update of a browser of this user; the bus of the ERPLibre mobile app does not count."
+msgstr "Dernière mise à jour de la présence d'un navigateur de cet utilisateur ; le bus de l'application mobile ERPLibre ne compte pas."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_bus_presence__erplibre_browser_presence
+msgid "Last Browser Presence"
+msgstr "Dernière présence d'un navigateur"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_presence
+msgid "Last activity in a browser of this user; the bus of the ERPLibre mobile app does not count."
+msgstr "Dernière activité dans un navigateur de cet utilisateur ; le bus de l'application mobile ERPLibre ne compte pas."
