@@ -116,3 +116,13 @@ msgstr "Dernière présence d'un navigateur"
 #: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_presence
 msgid "Last activity in a browser of this user; the bus of the ERPLibre mobile app does not count."
 msgstr "Dernière activité dans un navigateur de cet utilisateur ; le bus de l'application mobile ERPLibre ne compte pas."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_bus_presence__erplibre_browser_user_id
+msgid "Browser User"
+msgstr "Utilisateur du navigateur"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_user_id
+msgid "User whose browser wrote the two browser fields; a row moved to another user keeps it."
+msgstr "Utilisateur dont le navigateur a écrit les deux champs du navigateur ; une ligne passée à un autre utilisateur le garde."

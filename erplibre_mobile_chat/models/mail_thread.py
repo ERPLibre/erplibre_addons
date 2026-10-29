@@ -154,20 +154,20 @@ class MailThread(models.AbstractModel):
 
     def _erplibre_drop_quiet(self, devices):
         """Rend `devices` sans les appareils silencieux dont un navigateur
-        de l'utilisateur du partenaire est en ligne."""
-        online = {}
-
-        def keep(device):
-            if not device.erplibre_quiet_while_online:
-                return True
-            partner = device.partner_id
-            if partner.id not in online:
-                online[partner.id] = (
-                    partner.sudo().user_ids._erplibre_browser_online()
-                )
-            return not online[partner.id]
-
-        return devices.filtered(keep)
+        de l'utilisateur du partenaire est en ligne, en une seule
+        recherche de présence pour tous les partenaires."""
+        quiet = devices.filtered("erplibre_quiet_while_online")
+        if not quiet:
+            return devices
+        online = (
+            quiet.partner_id.sudo()
+            .user_ids._erplibre_browser_online_users()
+            .partner_id
+        )
+        return devices.filtered(
+            lambda device: not device.erplibre_quiet_while_online
+            or device.partner_id not in online
+        )
 
     def _erplibre_push_to_app(self, devices, message, msg_vals):
         """Envoie la charge de l'application de `message` à `devices`

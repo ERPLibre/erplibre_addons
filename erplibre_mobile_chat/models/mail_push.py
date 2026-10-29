@@ -28,14 +28,17 @@ class MailPush(models.Model):
     def _push_notification_to_endpoint(self, batch_size=50):
         """Prend jusqu'à `batch_size` lignes des appareils de l'application,
         les supprime et confie leurs envois à app_push.schedule, puis laisse
-        Odoo traiter les autres lignes, sous `erplibre_skip_app_devices`.
+        Odoo traiter les autres lignes, sous `erplibre_skip_app_devices`,
+        dans ce qui reste du lot : un passage ne traite jamais plus de
+        `batch_size` lignes. Quand celles de l'application remplissent le
+        lot, Odoo n'est pas appelé (une limite de 0 ne bornerait rien) et
+        le cron est relancé s'il reste des lignes.
 
         Sans clés VAPID, les lignes restent, comme chez Odoo, pour un
         prochain passage. Les envois partent après la validation de la
         transaction du cron : un appareil disparu est alors supprimé dans un
         curseur neuf sans attendre les lignes que cette transaction a
-        supprimées. Le cron est relancé tant qu'il reste des lignes de
-        l'application.
+        supprimées.
         """
         rows = self.browse()
         if app_push.vapid_keys_present(self.env):
@@ -46,8 +49,11 @@ class MailPush(models.Model):
             items = [(row.mail_push_device_id, row.payload) for row in rows]
             app_push.schedule(self.env, items)
             rows.unlink()
-            if self.sudo().search_count(APP_ROWS):
-                self.env.ref("mail.ir_cron_web_push_notification")._trigger()
+            if len(rows) >= batch_size:
+                if self.sudo().search_count([]):
+                    cron = self.env.ref("mail.ir_cron_web_push_notification")
+                    cron._trigger()
+                return
         return super(
             MailPush, self.with_context(erplibre_skip_app_devices=True)
-        )._push_notification_to_endpoint(batch_size=batch_size)
+        )._push_notification_to_endpoint(batch_size=batch_size - len(rows))

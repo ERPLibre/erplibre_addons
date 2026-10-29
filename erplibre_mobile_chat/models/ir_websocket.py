@@ -20,6 +20,13 @@ class IrWebsocket(models.AbstractModel):
         un de ses appareils de l'application (`erplibre_session_hash`) : le
         bus de l'application ne compte jamais comme un navigateur.
 
+        Rien n'est écrit pour l'utilisateur dont aucun appareil de
+        l'application ne se tait pendant qu'un navigateur est en ligne
+        (`erplibre_quiet_while_online`) : la présence ne sert qu'à eux, et
+        cette écriture validée suivrait chaque mise à jour de présence de
+        chaque onglet. Un appareil qui vient de passer en silencieux compte
+        le navigateur à sa prochaine mise à jour, au plus une minute après.
+
         La session est celle de la requête websocket, ou de la requête HTTP
         de /websocket/update_bus_presence.
         """
@@ -35,6 +42,8 @@ class IrWebsocket(models.AbstractModel):
         devices = self.env["mail.push.device"]._erplibre_app_devices(
             user.partner_id.ids
         )
+        if not devices.filtered("erplibre_quiet_while_online"):
+            return
         if session_hash in devices.mapped("erplibre_session_hash"):
             return
         # sudo: bus.presence - les champs du navigateur sont réservés à

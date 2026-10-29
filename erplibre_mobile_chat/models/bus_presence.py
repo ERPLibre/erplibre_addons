@@ -24,17 +24,29 @@ class BusPresence(models.Model):
         help="Last activity in a browser of this user; the bus of the"
         " ERPLibre mobile app does not count.",
     )
+    erplibre_browser_user_id = fields.Many2one(
+        "res.users",
+        string="Browser User",
+        groups="base.group_system",
+        ondelete="cascade",
+        help="User whose browser wrote the two browser fields; a row moved"
+        " to another user keeps it.",
+    )
 
     @api.model
     def _erplibre_update_browser_presence(self, inactivity_period):
         """Écrit, comme update_presence d'Odoo, le dernier sondage (now) et
         la dernière activité (now − `inactivity_period` millisecondes, 0
         au moins) d'un navigateur de l'utilisateur de l'environnement
-        (`env.uid`, que sudo garde) dans sa présence existante, puis valide.
+        (`env.uid`, que sudo garde) dans sa présence existante, avec cet
+        utilisateur (`erplibre_browser_user_id`), puis valide.
 
         Privée : aucun appel RPC ne l'atteint, et l'utilisateur n'est jamais
-        un paramètre. Les deux champs ne sont lisibles et modifiables que
-        par l'administrateur ; l'appelant passe par sudo.
+        un paramètre. Les trois champs ne sont lisibles et modifiables que
+        par l'administrateur ; l'appelant passe par sudo. Un utilisateur
+        peut changer le `user_id` d'une présence (Odoo lui en donne
+        l'écriture) ; `erplibre_browser_user_id`, lui, reste celui du
+        navigateur qui a écrit.
 
         Une erreur de concurrence (deux onglets en même temps) annule la
         transaction et est ignorée, comme chez Odoo : la présence n'est pas
@@ -49,6 +61,7 @@ class BusPresence(models.Model):
                     now = fields.Datetime.now()
                     presence.write(
                         {
+                            "erplibre_browser_user_id": self.env.uid,
                             "erplibre_browser_poll": now,
                             "erplibre_browser_presence": now
                             - timedelta(milliseconds=inactivity_period),

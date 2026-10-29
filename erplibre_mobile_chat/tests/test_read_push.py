@@ -145,6 +145,7 @@ class TestErplibreReadPush(HttpCase):
         dernière activité il y a `poll_age` et `presence_age` secondes."""
         now = fields.Datetime.now()
         values = {
+            "erplibre_browser_user_id": user.id,
             "erplibre_browser_poll": now - timedelta(seconds=poll_age),
             "erplibre_browser_presence": now - timedelta(seconds=presence_age),
         }
@@ -367,11 +368,37 @@ class TestErplibreReadPush(HttpCase):
             self.env.cr.postcommit.run()
         self.assertEqual(sent, [])
 
+    def test_inbox_done_work_skipped_without_an_app_device(self):
+        message = self._post(
+            self.records[0], partner_ids=self.user_b.partner_id.ids
+        )
+        self._needaction(message, self.user_b)
+        self._device(self.user_b)
+        Message = type(self.env["mail.message"])
+        with patch.object(
+            Message,
+            "_erplibre_unread_for_me",
+            autospec=True,
+            side_effect=Message._erplibre_unread_for_me,
+        ) as unread:
+            message.with_user(self.user_b).set_message_done()
+            self.env["mail.message"].with_user(self.user_b).mark_all_as_read()
+        unread.assert_not_called()
+        self.assertFalse(
+            self.env["mail.notification"].search_count(
+                [
+                    ("res_partner_id", "=", self.user_b.partner_id.id),
+                    ("is_read", "=", False),
+                ]
+            )
+        )
+
     # Présence des navigateurs
 
     def test_browser_presence_written_for_a_browser_session(self):
         self._app_device(
             self.user_b,
+            erplibre_quiet_while_online=True,
             erplibre_session_hash=hashlib.sha256(APP_SID.encode()).hexdigest(),
         )
         with self._websocket(self.user_b, BROWSER_SID) as env:
@@ -397,6 +424,7 @@ class TestErplibreReadPush(HttpCase):
     def test_the_apps_own_session_never_counts_as_a_browser(self):
         self._app_device(
             self.user_b,
+            erplibre_quiet_while_online=True,
             erplibre_session_hash=hashlib.sha256(APP_SID.encode()).hexdigest(),
         )
         with self._websocket(self.user_b, APP_SID) as env:
@@ -408,6 +436,70 @@ class TestErplibreReadPush(HttpCase):
         self.assertFalse(presence.erplibre_browser_poll)
         self.assertFalse(presence.erplibre_browser_presence)
         self.assertFalse(self.user_b._erplibre_browser_online())
+
+    def test_no_browser_presence_write_without_a_quiet_device(self):
+        self._app_device(self.user_b)
+        Presence = type(self.env["bus.presence"])
+        for user in (self.user_a, self.user_b):
+            with (
+                self.subTest(user=user.login),
+                patch.object(
+                    Presence, "_erplibre_update_browser_presence"
+                ) as write,
+                self._websocket(user, BROWSER_SID) as env,
+            ):
+                env["ir.websocket"]._update_bus_presence(0, {})
+                write.assert_not_called()
+            presence = self.env["bus.presence"].search(
+                [("user_id", "=", user.id)]
+            )
+            self.assertTrue(presence.last_poll)
+            self.assertFalse(presence.erplibre_browser_poll)
+
+    def test_quiet_recipients_cost_one_presence_search(self):
+        users = self.env["res.users"]
+        devices = self.env["mail.push.device"]
+        for index in range(3):
+            user = new_test_user(
+                self.env, login=f"read_quiet_{index}", groups="base.group_user"
+            )
+            users |= user
+            devices |= self._app_device(
+                user, f"{ENDPOINT}q{index}", erplibre_quiet_while_online=True
+            )
+        group = self.env["discuss.channel"].create(
+            {
+                "name": "Groupe discret",
+                "channel_type": "group",
+                "channel_member_ids": [
+                    (0, 0, {"partner_id": p.id})
+                    for p in (self.user_a | users).partner_id
+                ],
+            }
+        )
+        self._presence(users[0], poll_age=10, presence_age=60)
+        Presence = type(self.env["bus.presence"])
+        searches = []
+        original = Presence._search
+
+        def spy(model, domain, *args, **kwargs):
+            if "erplibre_browser_poll" in str(domain):
+                searches.append(domain)
+            return original(model, domain, *args, **kwargs)
+
+        with (
+            patch.object(Presence, "_search", autospec=True, side_effect=spy),
+            patch.object(
+                requests.Session, "post", return_value=answer(201)
+            ) as post,
+        ):
+            self._post(group)
+            self.env.cr.postcommit.run()
+        self.assertEqual(len(searches), 1)
+        self.assertEqual(
+            sorted(c.args[0] for c in post.call_args_list),
+            sorted(devices[1:].mapped("endpoint")),
+        )
 
     def test_quiet_device_skipped_while_browser_online(self):
         quiet = self._app_device(self.user_b, erplibre_quiet_while_online=True)
@@ -559,6 +651,33 @@ class TestErplibreReadPush(HttpCase):
                 )
         self.assertFalse(self.user_b._erplibre_browser_online())
 
+    def test_a_reassigned_presence_row_never_counts_for_another_user(self):
+        self._app_device(
+            self.user_a, f"{ENDPOINT}a", erplibre_quiet_while_online=True
+        )
+        device = self._app_device(
+            self.user_b, erplibre_quiet_while_online=True
+        )
+        with self._websocket(self.user_a, BROWSER_SID) as env:
+            env["ir.websocket"]._update_bus_presence(0, {})
+        self.assertTrue(self.user_a._erplibre_browser_online())
+        Presence = self.env["bus.presence"].with_user(self.user_a)
+        Presence.search([("user_id", "=", self.user_b.id)]).unlink()
+        Presence.search([("user_id", "=", self.user_a.id)]).write(
+            {"user_id": self.user_b.id}
+        )
+        self.assertFalse(self.user_b._erplibre_browser_online())
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._post(self.chat)
+            self.env.cr.postcommit.run()
+        # Le message atteint l'appareil silencieux de B ; celui de A reçoit
+        # la notification « lu » de sa propre publication.
+        self.assertIn(
+            device.endpoint, [c.args[0] for c in post.call_args_list]
+        )
+
     def test_a_user_cannot_write_device_marks(self):
         for user in (self.user_b, self.user_a):
             device = self._device(user, f"{ENDPOINT}{user.id}")
@@ -575,6 +694,7 @@ class TestErplibreReadPush(HttpCase):
                 )
 
     def test_negative_inactivity_counts_as_now(self):
+        self._app_device(self.user_b, erplibre_quiet_while_online=True)
         with self._websocket(self.user_b, BROWSER_SID) as env:
             env["ir.websocket"]._update_bus_presence(-600000, {})
         presence = self.env["bus.presence"].search(

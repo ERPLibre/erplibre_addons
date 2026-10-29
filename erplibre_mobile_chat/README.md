@@ -110,8 +110,13 @@ reçoivent la charge d'Odoo augmentée de `options.data.erplibre` :
 de cinq appareils marqués reçoivent l'envoi après la validation de la
 transaction (`cr.postcommit`) : rien ne part pour une publication annulée.
 Au-delà, des lignes `mail.push` attendent le cron de mail, que le module
-traite en premier pour ses appareils, après la validation du cron lui aussi.
-L'envoi reprend le chiffrement et l'en-tête VAPID d'Odoo, tient 200 (la
+traite en premier pour ses appareils, après la validation du cron lui aussi ;
+un passage du cron ne traite jamais plus de lignes que son lot, celles des
+appareils marqués comprises. Le seuil d'Odoo entre l'envoi direct et la file
+ne compte que les appareils non marqués : trois navigateurs et deux appareils
+marqués partent ainsi en direct, avec la charge d'Odoo inchangée. Chaque envoi
+du module attend au plus 2 secondes, puisque la réponse de la requête attend
+les envois faits après sa validation. L'envoi reprend le chiffrement et l'en-tête VAPID d'Odoo, tient 200 (la
 réponse de ntfy) comme 201 pour un succès, supprime l'appareil sur 404 ou 410
 et ne journalise qu'un id d'appareil, jamais le point de terminaison, qui
 porte le sujet secret.
@@ -123,13 +128,19 @@ tient en deux champs de `bus.presence`, `erplibre_browser_poll` et
 `erplibre_browser_presence`, que `ir.websocket._update_bus_presence` écrit
 après la présence d'Odoo, pour toute session du bus sauf celle qui a marqué un
 appareil de l'application de cet utilisateur (`erplibre_session_hash`) : le
-bus de l'application ne compte jamais comme un navigateur. Un navigateur est
+bus de l'application ne compte jamais comme un navigateur. Rien n'est écrit
+pour l'utilisateur qui n'a aucun appareil marqué silencieux : un appareil qui
+vient de le devenir compte le navigateur à sa prochaine mise à jour de
+présence, au plus une minute après. Un navigateur est
 en ligne quand son dernier sondage date de moins de 65 secondes et sa dernière
 activité de moins de 30 minutes, les délais d'Odoo pour « hors ligne » et
-« absent ». Seul l'administrateur lit ou modifie ces deux champs, et la
-méthode qui les écrit est privée (aucun appel RPC) et prend l'utilisateur de
-la session du bus : un utilisateur ne peut pas faire taire les appareils d'un
-autre.
+« absent ». La présence porte aussi l'utilisateur du navigateur qui l'a
+écrite, `erplibre_browser_user_id`, sur lequel porte la décision : Odoo laisse
+tout utilisateur changer le `user_id` d'une présence, et une présence passée à
+un autre utilisateur reste celle du navigateur qui l'a écrite. Seul
+l'administrateur lit ou modifie ces trois champs, et la méthode qui les écrit
+est privée (aucun appel RPC) et prend l'utilisateur de la session du bus : un
+utilisateur ne peut pas faire taire les appareils d'un autre.
 
 Quand le dernier message vu d'un membre avance (`_set_last_seen_message` de
 `discuss.channel.member` : marquage comme lu, ou sa propre publication), les

@@ -42,12 +42,16 @@ def send(
     payload,
     vapid_private_key,
     vapid_public_key,
-    timeout=5,
+    timeout=2,
 ):
     """Envoie `payload` (JSON, str) chiffré à `device` ({id, endpoint,
     keys}) par `session` et rend SENT (200 ou 201), GONE (404, 410 ou un
     hôte en `.invalid`, l'appareil est à supprimer) ou FAILED (toute autre
     réponse, ou une erreur de transport).
+
+    Chaque envoi attend au plus `timeout` secondes : envoyés après la
+    validation, ils retiennent la réponse de la requête qui les a
+    inscrits.
 
     Le jeton VAPID a les revendications de push_to_end_point : `aud`,
     schéma et hôte du point de terminaison, et `sub`, `base_url`. Un échec

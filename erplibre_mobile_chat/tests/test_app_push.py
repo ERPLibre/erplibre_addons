@@ -381,6 +381,60 @@ class TestErplibreAppPush(HttpCase):
             sorted(app_devices.mapped("endpoint")),
         )
 
+    def test_marked_send_waits_two_seconds_at_most(self):
+        self._app_device(self.user_b)
+        with patch.object(
+            requests.Session, "post", return_value=answer(200)
+        ) as post:
+            self._post()
+            self.env.cr.postcommit.run()
+        self.assertEqual(post.call_args.kwargs["timeout"], 2)
+
+    def test_cron_batch_full_of_app_rows_leaves_odoo_rows(self):
+        app_devices = self.env["mail.push.device"]
+        for index in range(2):
+            app_devices |= self._app_device(self.user_b, f"{ENDPOINT}{index}")
+        browser = self._device(self.user_c, "https://push.exemple.test/b1")
+        Push = self.env["mail.push"].sudo()
+        Push.create(
+            [
+                {"mail_push_device_id": device.id, "payload": "{}"}
+                for device in app_devices | browser
+            ]
+        )
+        cron = self.env.ref("mail.ir_cron_web_push_notification")
+        with (
+            patch.object(requests.Session, "post", return_value=answer(201)),
+            patch.object(mail_push_module, "push_to_end_point") as odoo_push,
+            patch.object(type(cron), "_trigger") as trigger,
+        ):
+            Push._push_notification_to_endpoint(batch_size=2)
+        odoo_push.assert_not_called()
+        self.assertEqual(Push.search([]).mail_push_device_id, browser)
+        trigger.assert_called()
+
+    def test_cron_odoo_rows_take_what_the_app_rows_leave(self):
+        device = self._app_device(self.user_b)
+        browsers = self.env["mail.push.device"]
+        for index in range(3):
+            browsers |= self._device(
+                self.user_c, f"https://push.exemple.test/b{index}"
+            )
+        Push = self.env["mail.push"].sudo()
+        Push.create(
+            [
+                {"mail_push_device_id": d.id, "payload": "{}"}
+                for d in device | browsers
+            ]
+        )
+        with (
+            patch.object(requests.Session, "post", return_value=answer(201)),
+            patch.object(mail_push_module, "push_to_end_point") as odoo_push,
+        ):
+            Push._push_notification_to_endpoint(batch_size=2)
+        self.assertEqual(odoo_push.call_count, 1)
+        self.assertEqual(len(Push.search([])), 2)
+
     def test_marked_500_warns_with_the_device_id_only(self):
         device = self._app_device(self.user_b)
         with (

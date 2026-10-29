@@ -147,13 +147,19 @@ class MailMessage(models.Model):
             .mail_message_id
         )
 
-    def _erplibre_send_inbox_done(self):
-        """Envoie aux appareils de l'application du partenaire courant la
-        notification « traité » des fils de ces messages hors des canaux :
-        `{"erplibre": {"v", "type": "inbox_done", "threads": [[modèle,
-        id], …]}}`, triés, ou `threads` à null au-delà de
-        INBOX_DONE_MAX_THREADS fils. Rien quand aucun fil ne reste : un
-        canal a sa notification « lu »."""
+    def _erplibre_my_app_devices(self):
+        """Rend, sous sudo, les appareils de l'application du partenaire
+        courant."""
+        return self.env["mail.push.device"]._erplibre_app_devices(
+            self.env.user.partner_id.ids
+        )
+
+    def _erplibre_send_inbox_done(self, devices):
+        """Envoie à `devices` la notification « traité » des fils de ces
+        messages hors des canaux : `{"erplibre": {"v", "type":
+        "inbox_done", "threads": [[modèle, id], …]}}`, triés, ou `threads`
+        à null au-delà de INBOX_DONE_MAX_THREADS fils. Rien quand aucun fil
+        ne reste : un canal a sa notification « lu »."""
         threads = sorted(
             {
                 (message.model, message.res_id)
@@ -164,11 +170,6 @@ class MailMessage(models.Model):
             }
         )
         if not threads:
-            return
-        devices = self.env["mail.push.device"]._erplibre_app_devices(
-            self.env.user.partner_id.ids
-        )
-        if not devices:
             return
         if len(threads) > INBOX_DONE_MAX_THREADS:
             threads = None
@@ -187,22 +188,29 @@ class MailMessage(models.Model):
 
     def set_message_done(self):
         """Comme Odoo, puis envoie la notification « traité » des messages
-        que l'appel a marqués pour le partenaire courant."""
+        que l'appel a marqués pour le partenaire courant, s'il a un
+        appareil de l'application ; sans appareil, rien n'est cherché."""
+        devices = self._erplibre_my_app_devices()
+        if not devices:
+            return super().set_message_done()
         done = self._erplibre_unread_for_me(self.ids)
         result = super().set_message_done()
-        done._erplibre_send_inbox_done()
+        done._erplibre_send_inbox_done(devices)
         return result
 
     @api.model
     def mark_all_as_read(self, domain=None):
         """Comme Odoo, puis envoie la notification « traité » des messages
-        marqués. Avec `domain`, Odoo passe par set_message_done, qui
-        l'envoie."""
+        marqués, comme set_message_done. Avec `domain`, Odoo passe par
+        set_message_done, qui l'envoie."""
         if domain:
+            return super().mark_all_as_read(domain=domain)
+        devices = self._erplibre_my_app_devices()
+        if not devices:
             return super().mark_all_as_read(domain=domain)
         done = self._erplibre_unread_for_me()
         result = super().mark_all_as_read(domain=domain)
-        done._erplibre_send_inbox_done()
+        done._erplibre_send_inbox_done(devices)
         return result
 
     def init(self):
