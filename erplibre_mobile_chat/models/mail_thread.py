@@ -1,10 +1,18 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-"""Publication idempotente sur tout fil par identifiant client."""
+"""Publication idempotente sur tout fil par identifiant client et
+notifications vers les appareils de l'application."""
+
+import json
 
 from odoo import api, models
+from odoo.addons.mail.models.mail_thread import MAX_DIRECT_PUSH
 
+from ..tools import app_push
 from .discuss_channel import LOCK_NAMESPACE_MESSAGE, erplibre_lock_uuid
+
+# Version de la clé `erplibre` des charges envoyées à l'application.
+APP_PAYLOAD_VERSION = 1
 
 
 class MailThread(models.AbstractModel):
@@ -92,3 +100,103 @@ class MailThread(models.AbstractModel):
         return self._erplibre_posted_message(uuid) or super().message_post(
             **kwargs
         )
+
+    def _erplibre_app_payload(self, message, msg_vals):
+        """Rend la charge d'Odoo pour `message` (celle du canal sur un
+        discuss.channel) avec `options.data.erplibre` = {"v", "message_id",
+        "channel_type"}, `channel_type` valant le type du canal ou None
+        hors d'un canal, tronquée ensuite par `_truncate_payload` pour que
+        le JSON chiffré tienne dans un enregistrement de 4096 octets."""
+        payload = self._notify_by_web_push_prepare_payload(
+            message, msg_vals=msg_vals
+        )
+        channel_type = (
+            self[:1].channel_type if self._name == "discuss.channel" else None
+        )
+        payload["options"]["data"]["erplibre"] = {
+            "v": APP_PAYLOAD_VERSION,
+            "message_id": message.id,
+            "channel_type": channel_type or None,
+        }
+        return self._truncate_payload(payload)
+
+    def _notify_thread_by_web_push(
+        self, message, recipients_data, msg_vals=False, **kwargs
+    ):
+        """Envoie aux appareils de l'application des destinataires la
+        charge de _erplibre_app_payload, puis rend la main au code d'Odoo
+        sous `erplibre_skip_app_devices`, qui lui cache ces appareils : tout
+        autre appareil reçoit exactement ce qu'Odoo lui enverrait.
+
+        Les destinataires sont ceux d'Odoo
+        (`_extract_partner_ids_for_notifications`) ; sur un canal, le filtre
+        de discuss.channel (« web_push » seulement) est déjà passé. Un
+        appareil qui se tait pendant qu'un navigateur est en ligne
+        (`erplibre_quiet_while_online`) est sauté quand
+        `res.users._erplibre_browser_online` le dit. Moins de
+        MAX_DIRECT_PUSH appareils partent après la validation
+        (app_push.schedule) ; au-delà, des lignes mail.push et le cron de
+        mail, que ce module traite (voir mail.push).
+        """
+        values = dict(msg_vals or {})
+        partner_ids = self._extract_partner_ids_for_notifications(
+            message, values, recipients_data
+        )
+        if partner_ids:
+            devices = self.env["mail.push.device"]._erplibre_app_devices(
+                partner_ids
+            )
+            devices = self._erplibre_drop_quiet(devices)
+            if devices:
+                self._erplibre_push_to_app(devices, message, values)
+        return super(
+            MailThread, self.with_context(erplibre_skip_app_devices=True)
+        )._notify_thread_by_web_push(
+            message, recipients_data, msg_vals=msg_vals, **kwargs
+        )
+
+    def _erplibre_drop_quiet(self, devices):
+        """Rend `devices` sans les appareils silencieux dont un navigateur
+        de l'utilisateur du partenaire est en ligne."""
+        online = {}
+
+        def keep(device):
+            if not device.erplibre_quiet_while_online:
+                return True
+            partner = device.partner_id
+            if partner.id not in online:
+                online[partner.id] = (
+                    partner.sudo().user_ids._erplibre_browser_online()
+                )
+            return not online[partner.id]
+
+        return devices.filtered(keep)
+
+    def _erplibre_push_to_app(self, devices, message, msg_vals):
+        """Envoie la charge de l'application de `message` à `devices`
+        (sudo) : après la validation sous MAX_DIRECT_PUSH appareils, par
+        des lignes mail.push et le cron de mail au-delà."""
+        payload = json.dumps(self._erplibre_app_payload(message, msg_vals))
+        if len(devices) < MAX_DIRECT_PUSH:
+            app_push.schedule(
+                self.env,
+                [
+                    (
+                        {
+                            "id": device.id,
+                            "endpoint": device.endpoint,
+                            "keys": device.keys,
+                        },
+                        payload,
+                    )
+                    for device in devices
+                ],
+            )
+            return
+        self.env["mail.push"].sudo().create(
+            [
+                {"mail_push_device_id": device.id, "payload": payload}
+                for device in devices
+            ]
+        )
+        self.env.ref("mail.ir_cron_web_push_notification")._trigger()

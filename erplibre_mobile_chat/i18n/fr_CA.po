@@ -66,3 +66,33 @@ msgstr "Cette personne n'est pas membre du canal."
 #: code:addons/erplibre_mobile_chat/controllers/attachment.py:0
 msgid "You are not allowed to upload an attachment here."
 msgstr "Vous n'êtes pas autorisé à téléverser une pièce jointe ici."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_app
+msgid "ERPLibre App"
+msgstr "Application ERPLibre"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_app
+msgid "The ERPLibre mobile app receives the notifications of this device: they carry the message id and the channel type, and Odoo's own sending skips it."
+msgstr "L'application mobile ERPLibre reçoit les notifications de cet appareil : elles portent l'identifiant du message et le type du canal, et l'envoi d'Odoo le saute."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_quiet_while_online
+msgid "Quiet While a Browser Is Online"
+msgstr "Silencieux quand un navigateur est en ligne"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_quiet_while_online
+msgid "No message notification reaches this device while a browser of its user is online."
+msgstr "Aucune notification de message n'atteint cet appareil pendant qu'un navigateur de son utilisateur est en ligne."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_session_hash
+msgid "App Session Hash"
+msgstr "Empreinte de la session de l'application"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_session_hash
+msgid "SHA-256 (hexadecimal) of the id of the session that marked this device as the app's."
+msgstr "SHA-256 (hexadécimal) de l'identifiant de la session qui a marqué cet appareil comme celui de l'application."

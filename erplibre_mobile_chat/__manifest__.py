@@ -3,7 +3,7 @@
     "name": "ERPLibre — Clavardage mobile",
     "summary": "Publication et téléversement idempotents par identifiant"
     " client dans Discuss et le fil d'un enregistrement, modification"
-    " gardée, recherche, favoris",
+    " gardée, recherche, favoris, notifications de l'application",
     "description": """
 Clavardage mobile
 =================
@@ -25,11 +25,18 @@ message supprimé.
 La recherche de messages ne parcourt que les canaux dont l'utilisateur est
 membre et ne marque rien comme lu. La mise en favori fixe l'état voulu : un
 renvoi ne la défait pas.
+
+Les notifications de l'application : l'application marque son appareil de
+notification comme le sien. Ses notifications portent l'identifiant du
+message et le type du canal, et partent après la validation de la
+transaction, sans qu'aucun journal ne nomme le point de terminaison. Tout
+autre appareil, un navigateur par exemple, reçoit exactement ce qu'Odoo lui
+envoie.
 """,
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",
     "category": "Technical",
-    "version": "18.0.1.4.0",
+    "version": "18.0.1.5.0",
     "license": "AGPL-3",
     "depends": ["mail"],
     "installable": True,

@@ -149,7 +149,8 @@ class TestErplibreStarAndRecordPost(HttpCase):
             },
         )
         self.assertEqual(
-            fields["erplibre_chat_level"]["selection"], [["1.4", "1.4"]]
+            fields["erplibre_chat_level"]["selection"],
+            [["1.4", "1.4"], ["1.5", "1.5"]],
         )
         message = self._message().with_user(self.user_b)
-        self.assertEqual(message.erplibre_chat_level, "1.4")
+        self.assertEqual(message.erplibre_chat_level, "1.5")

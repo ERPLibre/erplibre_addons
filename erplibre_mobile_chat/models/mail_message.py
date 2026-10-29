@@ -66,7 +66,7 @@ class MailMessage(models.Model):
     )
 
     erplibre_chat_level = fields.Selection(
-        [("1.4", "1.4")],
+        [("1.4", "1.4"), ("1.5", "1.5")],
         string="ERPLibre Chat Level",
         compute="_compute_erplibre_chat_level",
         help="Niveau du module : la plus haute clé de la sélection. Un"
