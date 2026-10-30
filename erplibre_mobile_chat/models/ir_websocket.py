@@ -9,6 +9,8 @@ from odoo import models
 from odoo.addons.bus.websocket import wsrequest
 from odoo.http import request
 
+from .mail_push_device import WATCHED_MODES
+
 
 class IrWebsocket(models.AbstractModel):
     _inherit = "ir.websocket"
@@ -21,11 +23,12 @@ class IrWebsocket(models.AbstractModel):
         bus de l'application ne compte jamais comme un navigateur.
 
         Rien n'est écrit pour l'utilisateur dont aucun appareil de
-        l'application ne se tait pendant qu'un navigateur est en ligne
-        (`erplibre_quiet_while_online`) : la présence ne sert qu'à eux, et
-        cette écriture validée suivrait chaque mise à jour de présence de
-        chaque onglet. Un appareil qui vient de passer en silencieux compte
-        le navigateur à sa prochaine mise à jour, au plus une minute après.
+        l'application n'attend ni ne se tait pendant qu'un navigateur est
+        actif (`erplibre_browser_mode` dans WATCHED_MODES) : la présence ne
+        sert qu'à eux, et cette écriture validée suivrait chaque mise à
+        jour de présence de chaque onglet. Un appareil qui vient de passer
+        à l'un de ces modes compte le navigateur à sa prochaine mise à
+        jour, au plus une minute après.
 
         La session est celle de la requête websocket, ou de la requête HTTP
         de /websocket/update_bus_presence.
@@ -42,7 +45,9 @@ class IrWebsocket(models.AbstractModel):
         devices = self.env["mail.push.device"]._erplibre_app_devices(
             user.partner_id.ids
         )
-        if not devices.filtered("erplibre_quiet_while_online"):
+        if not devices.filtered(
+            lambda device: device.erplibre_browser_mode in WATCHED_MODES
+        ):
             return
         if session_hash in devices.mapped("erplibre_session_hash"):
             return

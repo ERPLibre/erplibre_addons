@@ -82,31 +82,46 @@ le bus `mail.message/toggle_star` (même charge que chez Odoo) ne part que pour
 eux. Un message illisible lève `AccessError`.
 
 `mail.message.erplibre_chat_level` est une sélection dont la plus haute clé
-donne le niveau du module (`1.5`). Elle figure dans `fields_get` de
+donne le niveau du module (`1.6`). Elle figure dans `fields_get` de
 `mail.message` pour tout utilisateur interne, avec ses clés dans `selection` ;
 un niveau suivant y ajoute sa clé.
 
 ## Notifications de l'application
 
 `POST /erplibre_mobile_chat/push/device` (JSON-RPC, utilisateur connecté,
-`endpoint`, `quiet_while_online` faux par défaut) marque l'appareil de
-notification (`mail.push.device`) du partenaire courant dont le point de
-terminaison est `endpoint` comme celui de l'application, et répond
-`{"ok": true}`. Le partenaire qui n'a pas d'appareil de ce point de
-terminaison reçoit `{"ok": false}` ; l'appareil d'un autre partenaire reste
-intact. La marque tient en trois champs : `erplibre_app`,
-`erplibre_quiet_while_online` (la valeur reçue) et `erplibre_session_hash`, le
-SHA-256 hexadécimal de l'id de la session qui appelle. L'application appelle
-la route après chaque `register_devices` et après chaque nouvelle session. Un
-`register_devices` qui passe le point de terminaison à un autre partenaire
-efface les trois champs.
+`endpoint`, `quiet_while_online` faux par défaut, `browser_mode` absent par
+défaut) marque l'appareil de notification (`mail.push.device`) du partenaire
+courant dont le point de terminaison est `endpoint` comme celui de
+l'application, et répond `{"ok": true}`. Le partenaire qui n'a pas d'appareil
+de ce point de terminaison reçoit `{"ok": false}` ; l'appareil d'un autre
+partenaire reste intact. La marque tient en quatre champs : `erplibre_app`,
+`erplibre_browser_mode`, `erplibre_payload_v` et `erplibre_session_hash`, le
+SHA-256 hexadécimal de l'id de la session qui appelle. `browser_mode`
+(application 1.6) vaut `ring`, `wait` ou `quiet` et devient le mode de
+l'appareil, avec la charge v 2 ; toute autre valeur reçoit `{"ok": false}`
+sans rien écrire. Sans `browser_mode` (application 1.5), `quiet_while_online`
+vrai donne le mode `quiet`, faux le mode `ring`, avec la charge v 1.
+L'application appelle la route après chaque `register_devices` et après
+chaque nouvelle session. Un `register_devices` qui passe le point de
+terminaison à un autre partenaire remet les quatre champs à leur valeur par
+défaut (non marqué, `ring`, v 1, sans empreinte). Le passage de 1.5 à 1.6
+donne le mode `quiet` aux appareils marqués silencieux, `ring` aux autres, et
+supprime la colonne `erplibre_quiet_while_online`.
 
 À chaque notification d'un message, les appareils marqués des destinataires
 d'Odoo (les mêmes partenaires, après le filtre « web_push » des canaux)
-reçoivent la charge d'Odoo augmentée de `options.data.erplibre` :
-`{"v": 1, "message_id": <id du message>, "channel_type": "chat" | "group" |
-"channel" | null}`, `null` hors d'un canal. La charge repasse par
-`_truncate_payload` : son JSON chiffré tient toujours dans 4096 octets. Moins
+reçoivent la charge d'Odoo augmentée de `options.data.erplibre`. Un appareil
+en charge v 1 reçoit `{"v": 1, "message_id": <id du message>,
+"channel_type": "chat" | "group" | "channel" | null}`, `null` hors d'un
+canal. Un appareil en charge v 2 reçoit `{"v": 2, "message_id",
+"channel_type", "mentioned", "browser_online"}` : `mentioned` est vrai quand
+son partenaire est parmi les partenaires du message (`partner_ids`, où un
+`@everyone` met tous les membres du canal), `browser_online` quand l'appareil
+est en mode `wait` ou `quiet` et qu'un navigateur de son utilisateur est
+actif (voir plus bas) ; un appareil `ring` reçoit toujours faux. La charge
+repasse par `_truncate_payload`, une fois par version, la v 2 avec les deux
+drapeaux à faux : `true` étant plus court que `false`, son JSON chiffré tient
+toujours dans 4096 octets. Moins
 de cinq appareils marqués reçoivent l'envoi après la validation de la
 transaction (`cr.postcommit`) : rien ne part pour une publication annulée.
 Au-delà, des lignes `mail.push` attendent le cron de mail, que le module
@@ -121,20 +136,23 @@ réponse de ntfy) comme 201 pour un succès, supprime l'appareil sur 404 ou 410
 et ne journalise qu'un id d'appareil, jamais le point de terminaison, qui
 porte le sujet secret.
 
-Un appareil marqué `erplibre_quiet_while_online` ne reçoit pas les
-notifications de message pendant qu'un navigateur de son utilisateur est en
-ligne (`res.users._erplibre_browser_online`). La présence des navigateurs
+Un appareil en mode `quiet` ne reçoit pas les notifications de message
+pendant qu'un navigateur de son utilisateur est actif
+(`res.users._erplibre_browser_online`) ; un appareil en mode `wait` les
+reçoit toujours, avec `browser_online` pour que l'application les retienne.
+La présence des navigateurs
 tient en deux champs de `bus.presence`, `erplibre_browser_poll` et
 `erplibre_browser_presence`, que `ir.websocket._update_bus_presence` écrit
 après la présence d'Odoo, pour toute session du bus sauf celle qui a marqué un
 appareil de l'application de cet utilisateur (`erplibre_session_hash`) : le
 bus de l'application ne compte jamais comme un navigateur. Rien n'est écrit
-pour l'utilisateur qui n'a aucun appareil marqué silencieux : un appareil qui
-vient de le devenir compte le navigateur à sa prochaine mise à jour de
-présence, au plus une minute après. Un navigateur est
-en ligne quand son dernier sondage date de moins de 65 secondes et sa dernière
-activité de moins de 30 minutes, les délais d'Odoo pour « hors ligne » et
-« absent ». La présence porte aussi l'utilisateur du navigateur qui l'a
+ni lu pour l'utilisateur qui n'a aucun appareil en mode `wait` ou `quiet` :
+un appareil qui vient de passer à l'un de ces modes compte le navigateur à sa
+prochaine mise à jour de présence, au plus une minute après. Un navigateur
+est actif quand son dernier sondage date de moins de 65 secondes, le délai
+d'Odoo pour « hors ligne », et sa dernière activité de moins de 5 minutes
+(`BROWSER_ACTIVE_S`) ; le statut qu'Odoo affiche garde son délai de 30
+minutes. La présence porte aussi l'utilisateur du navigateur qui l'a
 écrite, `erplibre_browser_user_id`, sur lequel porte la décision : Odoo laisse
 tout utilisateur changer le `user_id` d'une présence, et une présence passée à
 un autre utilisateur reste celle du navigateur qui l'a écrite. Seul
@@ -152,9 +170,10 @@ canal et par transaction, avec le plus grand id. `set_message_done` et
 du lecteur `{"erplibre": {"v": 1, "type": "inbox_done", "threads":
 [[<modèle>, <id>], …]}}` : les fils hors des canaux des messages marqués,
 triés, ou `threads` à `null` au-delà de 40 fils ; rien quand aucun tel fil ne
-reste. Ces deux notifications ne vont jamais à un autre appareil (le service
-worker d'Odoo afficherait une notification vide) et passent même pendant
-qu'un navigateur est en ligne : elles retirent des notifications.
+reste. Ces deux notifications restent en v 1 pour tout appareil, ne vont
+jamais à un autre appareil (le service worker d'Odoo afficherait une
+notification vide) et passent même pendant qu'un navigateur est actif :
+elles retirent des notifications.
 
 Tout autre appareil, un navigateur ou l'application sans le module, suit le
 code d'Odoo inchangé : même appel de `push_to_end_point`, même charge, même

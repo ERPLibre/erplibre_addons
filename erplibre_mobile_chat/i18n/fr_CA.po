@@ -78,14 +78,39 @@ msgid "The ERPLibre mobile app receives the notifications of this device: they c
 msgstr "L'application mobile ERPLibre reçoit les notifications de cet appareil : elles portent l'identifiant du message et le type du canal, et l'envoi d'Odoo le saute."
 
 #. module: erplibre_mobile_chat
-#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_quiet_while_online
-msgid "Quiet While a Browser Is Online"
-msgstr "Silencieux quand un navigateur est en ligne"
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_browser_mode
+msgid "While a Browser Is Active"
+msgstr "Quand un navigateur est actif"
 
 #. module: erplibre_mobile_chat
-#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_quiet_while_online
-msgid "No message notification reaches this device while a browser of its user is online."
-msgstr "Aucune notification de message n'atteint cet appareil pendant qu'un navigateur de son utilisateur est en ligne."
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_browser_mode
+msgid "Ring: message notifications reach this device as usual. Wait: they say whether a browser of its user is active, and the app holds them. Quiet: none reaches this device while a browser of its user is active."
+msgstr "Sonner : les notifications de message atteignent cet appareil comme d'habitude. Attendre : elles disent si un navigateur de son utilisateur est actif, et l'application les retient. Se taire : aucune n'atteint cet appareil pendant qu'un navigateur de son utilisateur est actif."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields.selection,name:erplibre_mobile_chat.selection__mail_push_device__erplibre_browser_mode__ring
+msgid "Ring"
+msgstr "Sonner"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields.selection,name:erplibre_mobile_chat.selection__mail_push_device__erplibre_browser_mode__wait
+msgid "Wait"
+msgstr "Attendre"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields.selection,name:erplibre_mobile_chat.selection__mail_push_device__erplibre_browser_mode__quiet
+msgid "Quiet"
+msgstr "Se taire"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_payload_v
+msgid "App Payload Version"
+msgstr "Version de la charge de l'application"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_payload_v
+msgid "Version of the message notifications this device receives: 2 adds whether its user is mentioned and whether a browser of its user is active."
+msgstr "Version des notifications de message que reçoit cet appareil : 2 ajoute si son utilisateur est mentionné et si un navigateur de son utilisateur est actif."
 
 #. module: erplibre_mobile_chat
 #: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_session_hash

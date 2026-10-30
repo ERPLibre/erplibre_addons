@@ -1,12 +1,17 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Présence d'un navigateur des utilisateurs, pour les appareils de
-l'application qui se taisent pendant ce temps."""
+l'application qui attendent ou se taisent pendant ce temps."""
 
 from datetime import timedelta
 
 from odoo import fields, models
-from odoo.addons.bus.models.bus_presence import AWAY_TIMER, DISCONNECTION_TIMER
+from odoo.addons.bus.models.bus_presence import DISCONNECTION_TIMER
+
+# Délai, en secondes, après la dernière activité d'un navigateur au-delà
+# duquel il ne compte plus comme actif. Le statut qu'Odoo affiche garde son
+# propre délai (AWAY_TIMER).
+BROWSER_ACTIVE_S = 300
 
 
 class ResUsers(models.Model):
@@ -19,9 +24,9 @@ class ResUsers(models.Model):
         ir.websocket._update_bus_presence).
 
         En ligne : un sondage depuis moins de DISCONNECTION_TIMER secondes
-        (`erplibre_browser_poll`) et une activité depuis moins de AWAY_TIMER
-        secondes (`erplibre_browser_presence`), les délais d'Odoo pour
-        « hors ligne » et « absent ». L'utilisateur comparé est celui du
+        (`erplibre_browser_poll`), le délai d'Odoo pour « hors ligne », et
+        une activité depuis moins de BROWSER_ACTIVE_S secondes
+        (`erplibre_browser_presence`). L'utilisateur comparé est celui du
         navigateur qui a écrit (`erplibre_browser_user_id`), jamais le
         `user_id` de la présence, que tout utilisateur peut changer.
         """
@@ -36,7 +41,7 @@ class ResUsers(models.Model):
             (
                 "erplibre_browser_presence",
                 ">=",
-                now - timedelta(seconds=AWAY_TIMER),
+                now - timedelta(seconds=BROWSER_ACTIVE_S),
             ),
         ]
 

@@ -27,12 +27,14 @@ class MailPush(models.Model):
     @api.model
     def _push_notification_to_endpoint(self, batch_size=50):
         """Prend jusqu'à `batch_size` lignes des appareils de l'application,
-        les supprime et confie leurs envois à app_push.schedule, puis laisse
-        Odoo traiter les autres lignes, sous `erplibre_skip_app_devices`,
-        dans ce qui reste du lot : un passage ne traite jamais plus de
-        `batch_size` lignes. Quand celles de l'application remplissent le
-        lot, Odoo n'est pas appelé (une limite de 0 ne bornerait rien) et
-        le cron est relancé s'il reste des lignes.
+        les supprime et confie leurs envois à app_push.schedule, chaque
+        ligne avec sa propre charge (celle de son appareil, v 1 ou v 2,
+        envoyée telle quelle), puis laisse Odoo traiter les autres lignes,
+        sous `erplibre_skip_app_devices`, dans ce qui reste du lot : un
+        passage ne traite jamais plus de `batch_size` lignes. Quand celles
+        de l'application remplissent le lot, Odoo n'est pas appelé (une
+        limite de 0 ne bornerait rien) et le cron est relancé s'il reste
+        des lignes.
 
         Sans clés VAPID, les lignes restent, comme chez Odoo, pour un
         prochain passage. Les envois partent après la validation de la

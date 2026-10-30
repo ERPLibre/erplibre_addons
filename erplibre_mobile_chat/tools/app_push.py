@@ -20,8 +20,15 @@ from odoo.addons.mail.tools.web_push import _encrypt_payload
 
 _logger = logging.getLogger(__name__)
 
-# Version de la clé `erplibre` des charges envoyées à l'application.
+# Version de la clé `erplibre` des charges envoyées à l'application : les
+# notifications « lu » et « traité », et celles des messages pour un
+# appareil marqué sans mode (application 1.5).
 PAYLOAD_VERSION = 1
+
+# Version de la clé `erplibre` des notifications de message pour un
+# appareil marqué avec un mode (application 1.6) : elle ajoute `mentioned`
+# et `browser_online`.
+MESSAGE_PAYLOAD_VERSION = 2
 
 # Clé de `cr.postcommit.data` qui regroupe les notifications « lu » d'une
 # transaction.

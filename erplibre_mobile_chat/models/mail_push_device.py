@@ -6,11 +6,20 @@ d'Odoo."""
 from odoo import api, fields, models
 from odoo.osv import expression
 
+# Modes d'un appareil de l'application pendant qu'un navigateur de son
+# utilisateur est actif : sonner, attendre (l'application retient la
+# notification) ou se taire (le module ne l'envoie pas).
+BROWSER_MODES = [("ring", "Ring"), ("wait", "Wait"), ("quiet", "Quiet")]
+
+# Modes pour lesquels le module écrit et lit la présence des navigateurs.
+WATCHED_MODES = ("wait", "quiet")
+
 # Champs que la route /erplibre_mobile_chat/push/device renseigne et
-# qu'un changement de partenaire efface.
+# qu'un changement de partenaire remet à leur valeur par défaut.
 APP_FIELDS = {
     "erplibre_app": False,
-    "erplibre_quiet_while_online": False,
+    "erplibre_browser_mode": "ring",
+    "erplibre_payload_v": 1,
     "erplibre_session_hash": False,
 }
 
@@ -25,11 +34,23 @@ class MailPushDevice(models.Model):
         " device: they carry the message id and the channel type, and"
         " Odoo's own sending skips it.",
     )
-    erplibre_quiet_while_online = fields.Boolean(
-        string="Quiet While a Browser Is Online",
+    erplibre_browser_mode = fields.Selection(
+        BROWSER_MODES,
+        string="While a Browser Is Active",
+        default="ring",
         copy=False,
-        help="No message notification reaches this device while a browser"
-        " of its user is online.",
+        help="Ring: message notifications reach this device as usual."
+        " Wait: they say whether a browser of its user is active, and the"
+        " app holds them. Quiet: none reaches this device while a browser"
+        " of its user is active.",
+    )
+    erplibre_payload_v = fields.Integer(
+        string="App Payload Version",
+        default=1,
+        copy=False,
+        help="Version of the message notifications this device receives:"
+        " 2 adds whether its user is mentioned and whether a browser of"
+        " its user is active.",
     )
     erplibre_session_hash = fields.Char(
         string="App Session Hash",
