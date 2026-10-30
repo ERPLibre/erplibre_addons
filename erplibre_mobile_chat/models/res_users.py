@@ -45,19 +45,6 @@ class ResUsers(models.Model):
             ),
         ]
 
-    def _erplibre_browser_online(self):
-        """Rend vrai quand un navigateur d'un de ces utilisateurs est en
-        ligne (voir _erplibre_browser_domain)."""
-        if not self:
-            return False
-        # sudo: bus.presence - seules les présences de ces utilisateurs sont
-        # comptées, sans rien en rendre.
-        return bool(
-            self.env["bus.presence"]
-            .sudo()
-            .search_count(self._erplibre_browser_domain(), limit=1)
-        )
-
     def _erplibre_browser_online_users(self):
         """Rend, en une recherche, ceux de ces utilisateurs dont un
         navigateur est en ligne (voir _erplibre_browser_domain)."""

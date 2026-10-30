@@ -110,10 +110,12 @@ class MailThread(models.AbstractModel):
         `channel_type` valant le type du canal ou None hors d'un canal ;
         un appareil en charge v 2 reçoit en plus `mentioned`, vrai quand
         son partenaire est dans `message.partner_ids` (un @everyone y met
-        tous les membres), et `browser_online`, vrai quand l'appareil
-        attend ou se tait (WATCHED_MODES) et que son partenaire est dans
-        `online` (voir _erplibre_online_partners, appelée quand `online`
-        vaut None).
+        tous les membres) et que le message n'est pas un `user_notification`
+        (message_notify, l'assignation d'une activité par exemple, qui
+        nomme son destinataire sans le mentionner), et `browser_online`,
+        vrai quand l'appareil attend ou se tait (WATCHED_MODES) et que son
+        partenaire est dans `online` (voir _erplibre_online_partners,
+        appelée quand `online` vaut None).
 
         `_truncate_payload` tourne une fois par version pour que le JSON
         chiffré tienne dans un enregistrement de 4096 octets : la v 1 comme
@@ -155,7 +157,12 @@ class MailThread(models.AbstractModel):
             payload = self._truncate_payload(payload)
             # sudo: mail.message - l'appartenance d'un partenaire aux
             # mentionnés ne dépend pas des règles d'accès aux partenaires.
-            mentioned = message.sudo().partner_ids
+            message_sudo = message.sudo()
+            mentioned = (
+                message_sudo.partner_ids
+                if message_sudo.message_type != "user_notification"
+                else self.env["res.partner"]
+            )
             for device in v2_devices:
                 flags["mentioned"] = device.partner_id in mentioned
                 flags["browser_online"] = (

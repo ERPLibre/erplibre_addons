@@ -116,9 +116,11 @@ en charge v 1 reçoit `{"v": 1, "message_id": <id du message>,
 canal. Un appareil en charge v 2 reçoit `{"v": 2, "message_id",
 "channel_type", "mentioned", "browser_online"}` : `mentioned` est vrai quand
 son partenaire est parmi les partenaires du message (`partner_ids`, où un
-`@everyone` met tous les membres du canal), `browser_online` quand l'appareil
-est en mode `wait` ou `quiet` et qu'un navigateur de son utilisateur est
-actif (voir plus bas) ; un appareil `ring` reçoit toujours faux. La charge
+`@everyone` met tous les membres du canal) et que le message n'est pas un
+`user_notification` (`message_notify`, l'assignation d'une activité par
+exemple, nomme son destinataire sans le mentionner), `browser_online` quand
+l'appareil est en mode `wait` ou `quiet` et qu'un navigateur de son
+utilisateur est actif (voir plus bas) ; un appareil `ring` reçoit toujours faux. La charge
 repasse par `_truncate_payload`, une fois par version, la v 2 avec les deux
 drapeaux à faux : `true` étant plus court que `false`, son JSON chiffré tient
 toujours dans 4096 octets. Moins
@@ -138,7 +140,7 @@ porte le sujet secret.
 
 Un appareil en mode `quiet` ne reçoit pas les notifications de message
 pendant qu'un navigateur de son utilisateur est actif
-(`res.users._erplibre_browser_online`) ; un appareil en mode `wait` les
+(`res.users._erplibre_browser_online_users`) ; un appareil en mode `wait` les
 reçoit toujours, avec `browser_online` pour que l'application les retienne.
 La présence des navigateurs
 tient en deux champs de `bus.presence`, `erplibre_browser_poll` et
@@ -148,8 +150,12 @@ appareil de l'application de cet utilisateur (`erplibre_session_hash`) : le
 bus de l'application ne compte jamais comme un navigateur. Rien n'est écrit
 ni lu pour l'utilisateur qui n'a aucun appareil en mode `wait` ou `quiet` :
 un appareil qui vient de passer à l'un de ces modes compte le navigateur à sa
-prochaine mise à jour de présence, au plus une minute après. Un navigateur
-est actif quand son dernier sondage date de moins de 65 secondes, le délai
+prochaine mise à jour de présence, au plus une minute après. Cette cadence
+vient du module : le client web d'Odoo 18 n'envoie `update_presence` qu'à la
+connexion et aux passages à « absent », et
+`static/src/im_status_service_patch.js` (dans `web.assets_backend`) le
+renvoie toutes les 60 secondes (`UPDATE_BUS_PRESENCE_DELAY`) avec la durée
+d'inactivité réelle de l'utilisateur. Un navigateur est actif quand son dernier sondage date de moins de 65 secondes, le délai
 d'Odoo pour « hors ligne », et sa dernière activité de moins de 5 minutes
 (`BROWSER_ACTIVE_S`) ; le statut qu'Odoo affiche garde son délai de 30
 minutes. La présence porte aussi l'utilisateur du navigateur qui l'a

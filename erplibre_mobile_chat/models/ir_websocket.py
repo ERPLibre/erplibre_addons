@@ -28,7 +28,8 @@ class IrWebsocket(models.AbstractModel):
         sert qu'à eux, et cette écriture validée suivrait chaque mise à
         jour de présence de chaque onglet. Un appareil qui vient de passer
         à l'un de ces modes compte le navigateur à sa prochaine mise à
-        jour, au plus une minute après.
+        jour, au plus une minute après : le client web l'envoie toutes les
+        60 secondes (static/src/im_status_service_patch.js).
 
         La session est celle de la requête websocket, ou de la requête HTTP
         de /websocket/update_bus_presence.

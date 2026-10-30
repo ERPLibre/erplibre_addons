@@ -576,7 +576,7 @@ class TestErplibreAppPush(HttpCase):
         self.env["bus.presence"].sudo().create(
             {"user_id": self.user_b.id, "status": "online"}
         )
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
         with patch.object(
             requests.Session, "post", return_value=answer(201)
         ) as post:
@@ -728,6 +728,40 @@ class TestErplibreAppPush(HttpCase):
                     self._flags_of(sent, device),
                     self._v2(message, None, mentioned=mentioned),
                 )
+
+    def test_activity_assignment_is_not_a_mention(self):
+        self.user_b.notification_type = "inbox"
+        device = self._v2_device(self.user_b)
+        activity = (
+            self.env["mail.activity"]
+            .with_context(mail_activity_quick_update=True)
+            .create(
+                {
+                    "res_model_id": self.env["ir.model"]._get_id(
+                        "res.partner"
+                    ),
+                    "res_id": self.record.id,
+                    "activity_type_id": self.env.ref(
+                        "mail.mail_activity_data_todo"
+                    ).id,
+                    "user_id": self.user_b.id,
+                }
+            )
+        )
+        with self._sent_by_device() as sent:
+            activity.action_notify()
+            self.env.cr.postcommit.run()
+        message = self.env["mail.message"].search(
+            [
+                ("model", "=", "res.partner"),
+                ("res_id", "=", self.record.id),
+                ("message_type", "=", "user_notification"),
+            ],
+            order="id desc",
+            limit=1,
+        )
+        self.assertIn(self.user_b.partner_id, message.partner_ids)
+        self.assertEqual(self._flags_of(sent, device), self._v2(message, None))
 
     def test_browser_online_true_for_a_wait_device_with_an_active_browser(
         self,

@@ -397,7 +397,7 @@ class TestErplibreReadPush(HttpCase):
             ),
             timedelta(seconds=5),
         )
-        self.assertTrue(self.user_b._erplibre_browser_online())
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
 
     def test_the_apps_own_session_never_counts_as_a_browser(self):
         self._app_device(
@@ -413,7 +413,7 @@ class TestErplibreReadPush(HttpCase):
         self.assertTrue(presence.last_poll)
         self.assertFalse(presence.erplibre_browser_poll)
         self.assertFalse(presence.erplibre_browser_presence)
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
 
     def test_no_browser_presence_write_without_a_quiet_device(self):
         self._app_device(self.user_b)
@@ -495,7 +495,7 @@ class TestErplibreReadPush(HttpCase):
     def test_an_away_browser_lets_the_push_through(self):
         device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
         self._presence(self.user_b, poll_age=10, presence_age=31 * 60)
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
         with patch.object(
             requests.Session, "post", return_value=answer(201)
         ) as post:
@@ -508,7 +508,7 @@ class TestErplibreReadPush(HttpCase):
     def test_a_stale_browser_lets_the_push_through(self):
         device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
         self._presence(self.user_b, poll_age=66, presence_age=66)
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
         with patch.object(
             requests.Session, "post", return_value=answer(201)
         ) as post:
@@ -522,7 +522,7 @@ class TestErplibreReadPush(HttpCase):
         message = self._post(self.chat)
         self._app_device(self.user_b, erplibre_browser_mode="quiet")
         self._presence(self.user_b, poll_age=10, presence_age=60)
-        self.assertTrue(self.user_b._erplibre_browser_online())
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
         self.env.cr.postcommit.clear()
         with self._capture() as sent:
             self._member(self.chat, self.user_b)._mark_as_read(message.id)
@@ -601,7 +601,7 @@ class TestErplibreReadPush(HttpCase):
                     },
                 )
         self.env.invalidate_all()
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
 
     def test_a_user_cannot_write_the_browser_presence(self):
         self._presence(self.user_b, poll_age=3600, presence_age=3600)
@@ -623,7 +623,7 @@ class TestErplibreReadPush(HttpCase):
                         "erplibre_browser_presence": now,
                     }
                 )
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
 
     def test_a_reassigned_presence_row_never_counts_for_another_user(self):
         self._app_device(
@@ -632,13 +632,13 @@ class TestErplibreReadPush(HttpCase):
         device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
         with self._websocket(self.user_a, BROWSER_SID) as env:
             env["ir.websocket"]._update_bus_presence(0, {})
-        self.assertTrue(self.user_a._erplibre_browser_online())
+        self.assertTrue(self.user_a._erplibre_browser_online_users())
         Presence = self.env["bus.presence"].with_user(self.user_a)
         Presence.search([("user_id", "=", self.user_b.id)]).unlink()
         Presence.search([("user_id", "=", self.user_a.id)]).write(
             {"user_id": self.user_b.id}
         )
-        self.assertFalse(self.user_b._erplibre_browser_online())
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
         with patch.object(
             requests.Session, "post", return_value=answer(201)
         ) as post:
@@ -675,7 +675,7 @@ class TestErplibreReadPush(HttpCase):
         self.assertLessEqual(
             presence.erplibre_browser_presence, fields.Datetime.now()
         )
-        self.assertTrue(self.user_b._erplibre_browser_online())
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
 
     # Module 1.6 : modes de l'appareil
 
@@ -702,7 +702,9 @@ class TestErplibreReadPush(HttpCase):
                 )
                 self.assertTrue(presence.last_poll)
                 self.assertEqual(bool(presence.erplibre_browser_poll), written)
-                self.assertEqual(user._erplibre_browser_online(), written)
+                self.assertEqual(
+                    bool(user._erplibre_browser_online_users()), written
+                )
 
     def test_quiet_device_dropped_while_browser_active_five_minutes(self):
         device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
@@ -728,7 +730,7 @@ class TestErplibreReadPush(HttpCase):
             self.user_b, erplibre_browser_mode="wait", erplibre_payload_v=2
         )
         self._presence(self.user_b, poll_age=10, presence_age=60)
-        self.assertTrue(self.user_b._erplibre_browser_online())
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
         with self._capture() as sent:
             message = self._post(self.chat)
             self.env.cr.postcommit.run()

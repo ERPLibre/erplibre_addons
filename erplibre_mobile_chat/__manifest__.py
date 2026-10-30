@@ -41,6 +41,14 @@ navigateur par exemple, reçoit exactement ce qu'Odoo lui envoie.
     "version": "18.0.1.6.0",
     "license": "AGPL-3",
     "depends": ["mail"],
+    "assets": {
+        "web.assets_backend": [
+            "erplibre_mobile_chat/static/src/im_status_service_patch.js",
+        ],
+        "web.assets_unit_tests": [
+            "erplibre_mobile_chat/static/tests/**/*",
+        ],
+    },
     "installable": True,
     "application": False,
 }
