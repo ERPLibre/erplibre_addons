@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field
+            name="name"
+        >res.config.settings.view.form (in erplibre_sign_oca_signature_stamp)</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sign_oca.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='sign_oca_requests']" position="after">
+                <block id="sign_oca_signature_stamp" title="Signature Stamp">
+                    <setting
+                        id="sign_stamp_enabled"
+                        string="Signature Stamp"
+                        help="Draw a frame and metadata around each signature of the signed documents. A template can force it on or off."
+                    >
+                        <field name="sign_stamp_enabled" />
+                    </setting>
+                    <setting
+                        id="sign_stamp_content"
+                        string="Content"
+                        help="What the stamp shows. The signature code is the start of a SHA-256 kept on the signer."
+                        invisible="not sign_stamp_enabled"
+                    >
+                        <div class="row mt8">
+                            <label
+                                for="sign_stamp_frame"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_frame" />
+                        </div>
+                        <div class="row">
+                            <label
+                                for="sign_stamp_show_date"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_show_date" />
+                        </div>
+                        <div class="row">
+                            <label
+                                for="sign_stamp_show_code"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_show_code" />
+                        </div>
+                        <div class="row">
+                            <label
+                                for="sign_stamp_show_name"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_show_name" />
+                        </div>
+                        <div class="row">
+                            <label
+                                for="sign_stamp_show_role"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_show_role" />
+                        </div>
+                    </setting>
+                    <setting
+                        id="sign_stamp_placement"
+                        string="Lines Placement"
+                        help="Inside the box shrinks the signature to make room; below the box keeps it and writes the lines under the box, over what the document shows there."
+                        invisible="not sign_stamp_enabled"
+                    >
+                        <field name="sign_stamp_placement" widget="radio" />
+                    </setting>
+                    <setting
+                        id="sign_stamp_colors"
+                        string="Colors"
+                        help="ERPLibre purple and orange, the colors of the document layout, or two colors of your own."
+                        invisible="not sign_stamp_enabled or not sign_stamp_frame"
+                    >
+                        <field name="sign_stamp_color_mode" widget="radio" />
+                        <div
+                            class="row mt8"
+                            invisible="sign_stamp_color_mode != 'custom'"
+                        >
+                            <label
+                                for="sign_stamp_color_1"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_color_1" widget="color" />
+                        </div>
+                        <div
+                            class="row"
+                            invisible="sign_stamp_color_mode != 'custom'"
+                        >
+                            <label
+                                for="sign_stamp_color_2"
+                                class="col-lg-5 o_light_label"
+                            />
+                            <field name="sign_stamp_color_2" widget="color" />
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
