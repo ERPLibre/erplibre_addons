@@ -26,9 +26,13 @@ import { patch } from "@web/core/utils/patch";
  * second, après un arrêt propre (hors ligne puis en ligne). Le premier
  * « connect » est laissé à l'écouteur { once: true } d'Odoo, qui l'envoie
  * déjà. Les envois du service d'Odoo faits pendant la coupure restent en
- * file et partent avant elle : le passage à « absent » (AWAY_DELAY) et le
- * retour d'activité qui le suit, au plus deux par onglet et par AWAY_DELAY
- * de coupure (im_status_updated arrive par le bus, donc jamais pendant elle).
+ * file et partent avant elle ; le correctif ne les borne pas. Le passage à
+ * « absent » (AWAY_DELAY) en met un, le retour d'activité un autre, et ce
+ * retour envoie une inactivité de 0 : l'écouteur « presence » d'Odoo lit 0
+ * comme « jamais envoyé » et renvoie alors à chaque événement d'activité,
+ * jusqu'au prochain envoi d'une inactivité non nulle, que le battement ne
+ * fait qu'une fois reconnecté (im_status_updated arrive par le bus, donc
+ * jamais pendant la coupure).
  *
  * Côté serveur, ir.websocket._update_bus_presence du module en tire la
  * présence d'un navigateur : en ligne tant que le dernier envoi date de
