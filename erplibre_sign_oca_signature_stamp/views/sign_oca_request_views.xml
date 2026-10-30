@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="sign_oca_request_form_view" model="ir.ui.view">
+        <field
+            name="name"
+        >sign.oca.request.form (in erplibre_sign_oca_signature_stamp)</field>
+        <field name="model">sign.oca.request</field>
+        <field name="inherit_id" ref="sign_oca.sign_oca_request_form_view" />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//field[@name='signer_ids']/list/field[@name='signed_on']"
+                position="after"
+            >
+                <field name="stamp_code" optional="show" />
+            </xpath>
+        </field>
+    </record>
+    <record id="sign_oca_request_search_view" model="ir.ui.view">
+        <field
+            name="name"
+        >sign.oca.request.search (in erplibre_sign_oca_signature_stamp)</field>
+        <field name="model">sign.oca.request</field>
+        <field name="inherit_id" ref="sign_oca.sign_oca_request_search_view" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="signature_code" />
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,222 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_sign_oca_signature_stamp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-30 09:50+0000\n"
+"PO-Revision-Date: 2026-10-30 09:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: erplibre_sign_oca_signature_stamp
+#. odoo-python
+#: code:addons/erplibre_sign_oca_signature_stamp/models/res_company.py:0
+msgid "%s is not a #rrggbb color."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__sign_oca_template__sign_stamp_policy__enabled
+msgid "Always"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__sign_oca_template__sign_stamp_policy__company
+msgid "As the company"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__res_company__sign_stamp_placement__below
+msgid "Below the box"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#. odoo-python
+#: code:addons/erplibre_sign_oca_signature_stamp/models/sign_oca_request.py:0
+msgid "Code %s"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid "Colors"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model,name:erplibre_sign_oca_signature_stamp.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model,name:erplibre_sign_oca_signature_stamp.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid "Content"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__res_company__sign_stamp_color_mode__custom
+msgid "Custom"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__res_company__sign_stamp_color_mode__company
+msgid "Document layout colors"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid ""
+"Draw a frame and metadata around each signature of the signed documents. A "
+"template can force it on or off."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__res_company__sign_stamp_color_mode__erplibre
+msgid "ERPLibre"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid ""
+"ERPLibre purple and orange, the colors of the document layout, or two colors"
+" of your own."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_frame
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_frame
+msgid "Guilloche Frame"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__res_company__sign_stamp_placement__inside
+msgid "Inside the box"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid ""
+"Inside the box shrinks the signature to make room; below the box keeps it "
+"and writes the lines under the box, over what the document shows there."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid "Lines Placement"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields.selection,name:erplibre_sign_oca_signature_stamp.selection__sign_oca_template__sign_stamp_policy__disabled
+msgid "Never"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,help:erplibre_sign_oca_signature_stamp.field_sign_oca_request_signer__stamp_code
+msgid ""
+"SHA-256 of the signature images, the signer, the role, the signing date and "
+"the document as it stood before this signature. The stamp prints its first "
+"16 characters."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,help:erplibre_sign_oca_signature_stamp.field_sign_oca_request__signature_code
+msgid ""
+"Search the request whose signer printed this code; the 16 characters of the "
+"document are enough, spaces are ignored."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model,name:erplibre_sign_oca_signature_stamp.model_sign_oca_template
+msgid "Sign Oca Template"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model,name:erplibre_sign_oca_signature_stamp.model_sign_oca_request
+msgid "Sign Request"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model,name:erplibre_sign_oca_signature_stamp.model_sign_oca_request_signer
+msgid "Sign Request Value"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_show_code
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_show_code
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_sign_oca_request__signature_code
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_sign_oca_request_signer__stamp_code
+msgid "Signature Code"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_enabled
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_enabled
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_sign_oca_template__sign_stamp_policy
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid "Signature Stamp"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_show_name
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_show_name
+msgid "Signer Name"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_show_role
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_show_role
+msgid "Signer Role"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_show_date
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_show_date
+msgid "Signing Date"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_color_1
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_color_1
+msgid "Stamp Color 1"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_color_2
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_color_2
+msgid "Stamp Color 2"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_color_mode
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_color_mode
+msgid "Stamp Colors"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_company__sign_stamp_placement
+#: model:ir.model.fields,field_description:erplibre_sign_oca_signature_stamp.field_res_config_settings__sign_stamp_placement
+msgid "Stamp Lines Placement"
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model_terms:ir.ui.view,arch_db:erplibre_sign_oca_signature_stamp.res_config_settings_view_form
+msgid ""
+"What the stamp shows. The signature code is the start of a SHA-256 kept on "
+"the signer."
+msgstr ""
+
+#. module: erplibre_sign_oca_signature_stamp
+#: model:ir.model.fields,help:erplibre_sign_oca_signature_stamp.field_sign_oca_template__sign_stamp_policy
+msgid ""
+"Whether the signatures of the requests of this template carry the stamp set "
+"in the Sign settings of their company."
+msgstr ""

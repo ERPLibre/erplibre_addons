@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="sign_oca_template_form_view" model="ir.ui.view">
+        <field
+            name="name"
+        >sign.oca.template.form (in erplibre_sign_oca_signature_stamp)</field>
+        <field name="model">sign.oca.template</field>
+        <field name="inherit_id" ref="sign_oca.sign_oca_template_form_view" />
+        <field name="arch" type="xml">
+            <field name="ask_location" position="after">
+                <field name="sign_stamp_policy" />
+            </field>
+        </field>
+    </record>
+</odoo>
