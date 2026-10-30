@@ -158,8 +158,10 @@ renvoie toutes les 60 secondes (`UPDATE_BUS_PRESENCE_DELAY`) avec la durée
 d'inactivité réelle de l'utilisateur. Ce renvoi ne part que tant que le bus
 est connecté : pendant une coupure, le worker du bus mettrait chaque envoi en
 file et viderait la file d'un coup à la reconnexion, au risque de dépasser la
-limite de débit du websocket côté serveur. Chaque reconnexion envoie aussitôt
-une mise à jour, une seule. Un navigateur est actif quand son dernier sondage date de moins de 65 secondes, le délai
+limite de débit du websocket côté serveur. Le module ajoute une mise à jour,
+une seule, à chaque reconnexion ; les envois d'Odoo lui-même faits pendant la
+coupure (passage à « absent » après 30 minutes, retour d'activité) restent en
+file et partent avant elle. Un navigateur est actif quand son dernier sondage date de moins de 65 secondes, le délai
 d'Odoo pour « hors ligne », et sa dernière activité de moins de 5 minutes
 (`BROWSER_ACTIVE_S`) ; le statut qu'Odoo affiche garde son délai de 30
 minutes. La présence porte aussi l'utilisateur du navigateur qui l'a

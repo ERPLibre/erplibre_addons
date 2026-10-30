@@ -21,10 +21,14 @@ import { patch } from "@web/core/utils/patch";
  * « reconnect », et « disconnect », seul signal d'un arrêt par l'événement
  * « offline » du navigateur, après lequel le worker garde l'état CONNECTED.
  *
- * Chaque connexion rétablie envoie une présence, une seule : « reconnect »
- * après une coupure du websocket, et « connect » à partir du second, après
- * un arrêt propre (hors ligne puis en ligne). Le premier « connect » est
- * laissé à l'écouteur { once: true } d'Odoo, qui l'envoie déjà.
+ * Le correctif ajoute une présence, une seule, à chaque connexion rétablie :
+ * « reconnect » après une coupure du websocket, et « connect » à partir du
+ * second, après un arrêt propre (hors ligne puis en ligne). Le premier
+ * « connect » est laissé à l'écouteur { once: true } d'Odoo, qui l'envoie
+ * déjà. Les envois du service d'Odoo faits pendant la coupure restent en
+ * file et partent avant elle : le passage à « absent » (AWAY_DELAY) et le
+ * retour d'activité qui le suit, au plus deux par onglet et par AWAY_DELAY
+ * de coupure (im_status_updated arrive par le bus, donc jamais pendant elle).
  *
  * Côté serveur, ir.websocket._update_bus_presence du module en tire la
  * présence d'un navigateur : en ligne tant que le dernier envoi date de
