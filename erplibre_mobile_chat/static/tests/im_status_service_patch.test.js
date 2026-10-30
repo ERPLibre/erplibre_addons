@@ -111,7 +111,8 @@ test("pas d'update_presence pendant une coupure, un seul à la reconnexion", asy
     allowRetry();
     worker._start();
     await expect.waitForSteps(["update_presence"], ARRIVAL);
-    // Pas de second envoi pour la même reconnexion.
+    // Pas d'envoi plus tardif pour la même reconnexion. Deux envois à moins
+    // de 300 ms l'un de l'autre ne font qu'une étape ici : voir stepTabSends.
     await arrivalWindow();
     expect.verifySteps([]);
     await advanceTime(UPDATE_BUS_PRESENCE_DELAY);
@@ -135,8 +136,51 @@ test("pas d'update_presence hors ligne, un seul au retour en ligne", async () =>
     await manuallyDispatchProgrammaticEvent(window, "online");
     await advanceTime(BACK_ONLINE_RECONNECT_DELAY);
     await expect.waitForSteps(["update_presence"], ARRIVAL);
+    // Pas d'envoi plus tardif pour la même connexion (voir stepTabSends).
     await arrivalWindow();
     expect.verifySteps([]);
     await advanceTime(UPDATE_BUS_PRESENCE_DELAY);
     await expect.waitForSteps(["update_presence"], ARRIVAL);
+});
+
+/**
+ * Fait une étape « onglet » de chaque update_presence que l'onglet confie au
+ * worker. onWebsocketEvent ne voit que la sortie de l'anti-rebond de 300 ms
+ * du worker, qui fond deux envois proches en une seule trame : seul ce
+ * compte, pris avant, distingue un envoi d'un envoi doublé.
+ */
+function stepTabSends() {
+    const bus = getService("bus_service");
+    const send = bus.send;
+    patchWithCleanup(bus, {
+        send(eventName, data) {
+            if (eventName === "update_presence") {
+                expect.step("onglet");
+            }
+            return send(eventName, data);
+        },
+    });
+}
+
+test("un seul update_presence par connexion, compté avant l'anti-rebond", async () => {
+    onWebsocketEvent("update_presence", () => expect.step("serveur"));
+    await makeMockEnv();
+    stepTabSends();
+    await getService("bus_service").start();
+    // Premier « connect » : l'écouteur { once: true } d'Odoo envoie, seul.
+    await expect.waitForSteps(["onglet", "serveur"], ARRIVAL);
+    await arrivalWindow();
+    expect.verifySteps([]);
+    await firstSendFlushed();
+    // Second « connect », après un arrêt propre : le correctif envoie, seul.
+    const disconnected = nextDisconnect();
+    patchWithCleanup(navigator, { onLine: false });
+    await manuallyDispatchProgrammaticEvent(window, "offline");
+    await disconnected;
+    patchWithCleanup(navigator, { onLine: true });
+    await manuallyDispatchProgrammaticEvent(window, "online");
+    await advanceTime(BACK_ONLINE_RECONNECT_DELAY);
+    await expect.waitForSteps(["onglet", "serveur"], ARRIVAL);
+    await arrivalWindow();
+    expect.verifySteps([]);
 });
