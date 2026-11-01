@@ -163,6 +163,25 @@ class TestErplibreTurn(TransactionCase):
             servers = self.ice_servers()
         self.assertEqual([s["urls"] for s in servers], urls)
 
+    def test_a_module_list_past_five_leaves_no_room_for_hand_rows(self):
+        urls = URLS + ["turn:autre.exemple.test:3478", "stun:autre.test"]
+        self.configure(urls=urls)
+        self.hand_rows(2)
+        with self.assertLogs(MODULE, level="WARNING") as logs:
+            servers = self.ice_servers()
+        self.assertEqual([s["urls"] for s in servers], urls)
+        self.assertIn("2 mail.ice.server row(s) dropped", logs.output[-1])
+
+    def test_the_dropped_count_covers_rows_past_the_mail_limit(self):
+        # mail ne lit que cinq lignes ; le compte des lignes écartées porte
+        # sur toutes.
+        self.configure()
+        self.hand_rows(7)
+        with self.assertLogs(MODULE, level="WARNING") as logs:
+            servers = self.ice_servers()
+        self.assertEqual(len(servers), 5)
+        self.assertIn("6 mail.ice.server row(s) dropped", logs.output[0])
+
     def test_blank_lines_in_urls_are_ignored(self):
         self.configure(urls=["", URLS[1], "   ", URLS[2], ""])
         servers = self.ice_servers()

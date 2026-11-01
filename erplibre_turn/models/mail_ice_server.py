@@ -122,10 +122,12 @@ class MailIceServer(models.Model):
         local = self._get_local_ice_servers()
         room = max(MAX_ICE_SERVERS - len(servers), 0)
         if len(local) > room:
+            # mail ne lit que cinq lignes : le compte écarté porte sur
+            # toutes celles de la table.
             _logger.warning(
                 "%d mail.ice.server row(s) dropped: %d entries from %s"
                 " leave room for %d of %d",
-                len(local) - room,
+                self.sudo().search_count([]) - room,
                 len(servers),
                 PARAM_URLS,
                 room,
