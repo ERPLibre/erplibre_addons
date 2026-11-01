@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Le réglage « Custom ICE server list » de mail n'a pas d'id, et un
+         attribut traduit (`string`, `help`) ne peut servir d'ancre : on le
+         retrouve par son bouton vers l'action des serveurs ICE. -->
+    <record id="res_config_settings_view_form_erplibre_turn" model="ir.ui.view">
+        <field name="name">res.config.settings.form.erplibre.turn</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="mail.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(mail.action_ice_servers)d']/ancestor::setting[1]" position="after">
+                <setting
+                    id="erplibre_turn_setting"
+                    string="Identifiants TURN temporaires"
+                    help="Chaque participant reçoit des identifiants signés par le secret partagé avec coturn"
+                >
+                    <div class="content-group">
+                        <div class="row mt16">
+                            <label for="erplibre_turn_ttl_hours" class="col-lg-6 o_light_label" />
+                            <field name="erplibre_turn_ttl_hours" />
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
