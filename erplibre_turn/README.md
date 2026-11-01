@@ -27,13 +27,14 @@ apparaît dans le journal de coturn. Le secret ne quitte pas le serveur Odoo.
 | `erplibre_turn.ttl_hours` | durée de validité en heures, 24 par défaut, au moins 1 |
 
 Les deux premiers sont écrits par l'outil `todo.py` d'ERPLibre
-(`TODO › Deploy › Call infrastructure › Ajouter un serveur Odoo`), qui ajoute
-le même secret à coturn. La durée se règle dans Configuration › Discuss,
-« Durée des identifiants TURN (heures) », sous la liste des serveurs ICE.
+(`TODO › Déployer › Infrastructure d'appel › Ajouter un serveur Odoo`), qui
+ajoute le même secret à coturn. La durée se règle dans Paramètres ›
+Discussion, « Durée des identifiants TURN (heures) », sous la liste des
+serveurs ICE.
 
 ## Liste rendue
 
-- Twilio activé dans les réglages de Discuss : la liste d'Odoo, inchangée.
+- Twilio activé dans les réglages de Discussion : la liste d'Odoo, inchangée.
 - Secret ou liste d'URL vide : la liste d'Odoo, inchangée (une base sans
   réglage rend toujours aucun serveur, et le navigateur prend son STUN par
   défaut).
@@ -46,9 +47,11 @@ le même secret à coturn. La durée se règle dans Configuration › Discuss,
 ## Durée de vie
 
 Le navigateur reçoit ses identifiants en entrant dans l'appel et ne les
-renouvelle pas pendant l'appel. Un pair qui arrive, ou une connexion
-reconstruite, après l'expiration n'obtient plus de relais. La durée par
-défaut, 24 heures, couvre les appels ordinaires.
+renouvelle pas pendant l'appel. Un participant entré depuis plus longtemps
+que cette durée n'obtient plus de nouveau relais, vers un nouvel arrivant ou
+pour reconstruire une connexion, avant d'être revenu dans l'appel ; celui qui
+arrive reçoit des identifiants neufs. La durée par défaut, 24 heures, couvre
+les appels ordinaires.
 
 Quand `todo.py` remplace le secret, l'ancien reste valide dans coturn une
 durée de vie de plus, le temps que les identifiants déjà remis expirent.

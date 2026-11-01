@@ -17,7 +17,8 @@ class ResConfigSettings(models.TransientModel):
         config_parameter=PARAM_TTL,
         default=DEFAULT_TTL_HOURS,
         help="Durée de validité des identifiants TURN remis à chaque entrée"
-        " dans un appel. Un participant qui rejoint un appel ouvert depuis"
-        " plus longtemps n'obtient plus de relais. Une valeur inférieure à 1"
-        " compte pour 1.",
+        " dans un appel. Un participant entré dans l'appel depuis plus"
+        " longtemps n'obtient plus de nouveau relais, vers un nouvel arrivant"
+        " par exemple, avant d'être revenu dans l'appel. Une valeur"
+        " inférieure à 1 compte pour 1.",
     )
