@@ -58,6 +58,18 @@
         </field>
     </record>
 
+    <!-- The ERPLibre block of the About section, under Odoo's own. -->
+    <record id="res_config_settings_view_form_about" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.erplibre.info.about</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <widget name="res_config_edition" position="after">
+                <widget name="erplibre_about" />
+            </widget>
+        </field>
+    </record>
+
     <record id="erplibre_info_config_settings_action" model="ir.actions.act_window">
         <field name="name">ERPLibre settings</field>
         <field name="res_model">res.config.settings</field>

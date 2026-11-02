@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2021-2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_info.ErplibreAbout.value">
+        <t t-if="value" t-esc="value" />
+        <span t-else="" class="fst-italic">unknown</span>
+    </t>
+
+    <t t-name="erplibre_info.ErplibreAbout.state">
+        <t t-if="value === true">active</t>
+        <t t-elif="value === false">inactive</t>
+        <span t-else="" class="fst-italic">unknown</span>
+    </t>
+
+    <div t-name="erplibre_info.ErplibreAbout" class="o_erplibre_about">
+        <Setting addLabel="false">
+            <div class="user-heading">
+                <h3 class="px-0 erplibre-semver-version">
+                    ERPLibre
+                    <t t-esc="info.semver or ''" />
+                </h3>
+            </div>
+            <table class="table table-sm table-borderless small mb-2 o_erplibre_about_table">
+                <tbody>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Python version (Odoo)</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.value">
+                                <t t-set="value" t-value="info.python_odoo" />
+                            </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Python version (tooling)</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.value">
+                                <t t-set="value" t-value="info.python_tooling" />
+                            </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Odoo version</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.value">
+                                <t t-set="value" t-value="info.odoo_version" />
+                            </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Poetry version</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.value">
+                                <t t-set="value" t-value="info.poetry_version" />
+                            </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Mobile context</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.state">
+                                <t t-set="value" t-value="info.mobile" />
+                            </t>
+                            <span t-if="info.mobile" class="text-muted">
+                                (
+                                <t t-esc="info.mobile_path" />
+                                )
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Extra modules (CybroOdoo)</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.state">
+                                <t t-set="value" t-value="info.extra" />
+                            </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">ERPLibre version key</th>
+                        <td>
+                            <t t-call="erplibre_info.ErplibreAbout.value">
+                                <t t-set="value" t-value="info.version_key" />
+                            </t>
+                        </td>
+                    </tr>
+                    <tr t-if="info.installed_versions.length">
+                        <th class="fw-normal text-muted ps-0">Installed Odoo versions</th>
+                        <td t-esc="info.installed_versions.join(', ')" />
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Commit</th>
+                        <td>
+                            <code t-if="info.commit.short" t-esc="info.commit.short" />
+                            <span t-else="" class="fst-italic">unknown</span>
+                            <span t-if="info.commit.branch" class="text-muted">
+                                on
+                                <t t-esc="info.commit.branch" />
+                            </span>
+                        </td>
+                    </tr>
+                    <tr t-if="info.commit.describe">
+                        <th class="fw-normal text-muted ps-0">git describe --tags</th>
+                        <td>
+                            <code t-esc="info.commit.describe" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="fw-normal text-muted ps-0">Code mode</th>
+                        <td>
+                            <t t-if="info.mode === 'frozen'">production, frozen commits (freeze-revision)</t>
+                            <t t-elif="info.mode === 'branches'">development, branches</t>
+                            <span t-else="" class="fst-italic">unknown</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-muted o_web_settings_compact_subtitle">
+                <small>
+                    Copyright © 2021-2026
+                    <a target="_blank" href="https://technolibre.ca" style="text-decoration: underline;">TechnoLibre</a>
+                    <a
+                        target="_blank"
+                        href="https://www.gnu.org/licenses/agpl-3.0.html"
+                        style="text-decoration: underline;"
+                    >
+                        GNU AGPLv3 Licensed
+                    </a>
+                </small>
+            </div>
+        </Setting>
+    </div>
+</templates>
