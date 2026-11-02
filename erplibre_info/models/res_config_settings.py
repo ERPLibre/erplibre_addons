@@ -1,9 +1,12 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import os
+
+import odoo
 from odoo import api, fields, models
 
-from .. import runner
+from .. import about, runner
 
 
 class ResConfigSettings(models.TransientModel):
@@ -62,6 +65,18 @@ class ResConfigSettings(models.TransientModel):
         res = super().get_values()
         res.update(self._erplibre_status())
         return res
+
+    @api.model
+    def erplibre_about(self):
+        """The values of the ERPLibre block of the About section, read from
+        the checkout by ``about.read``: file reads and read-only git
+        commands, nothing written. The checkout is the one the scripts run
+        in, else the one above the running Odoo that holds env_var.sh."""
+        self.check_access("read")
+        root = runner.erplibre_root(self.env) or runner.find_root(
+            os.path.dirname(odoo.__file__), runner.CHECKOUT_MARKER
+        )
+        return about.read(root)
 
     def action_erplibre_restart(self):
         run = self.env["erplibre.code.run"]

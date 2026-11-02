@@ -3,7 +3,7 @@
 
 {
     "name": "ERPLibre info",
-    "version": "18.0.3.0.0",
+    "version": "18.0.3.1.0",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "license": "AGPL-3",
@@ -20,5 +20,13 @@
         "views/res_config_settings_views.xml",
         "views/menus.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "erplibre_info/static/src/settings/*",
+        ],
+        "web.assets_tests": [
+            "erplibre_info/static/tests/tours/*.js",
+        ],
+    },
     "installable": True,
 }
