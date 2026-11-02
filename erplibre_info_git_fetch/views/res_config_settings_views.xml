@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.erplibre.info.git.fetch</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="erplibre_info.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='erplibre_server_actions']" position="attributes">
+                <attribute name="help">Developer mode, Settings group and erplibre_info_allow_server_actions = True in the Odoo configuration file; fetch + rebase and pull also need a server started with --dev.</attribute>
+            </xpath>
+            <xpath expr="//div[@name='erplibre_server_actions_buttons']" position="before">
+                <field name="erplibre_git_fetch_allowed" invisible="1" />
+                <!-- switches between the fetch buttons and the dev option notice -->
+                <div class="mt8" invisible="not erplibre_git_fetch_allowed">
+                    <div class="mb8">
+                        <span class="o_form_label me-2">Pull strategy</span>
+                        <field name="erplibre_pull_strategy" class="oe_inline" />
+                    </div>
+                    <button
+                        name="action_erplibre_fetch_rebase"
+                        type="object"
+                        string="Fetch + rebase from upstream"
+                        class="btn-secondary"
+                        icon="fa-code-fork"
+                    />
+                    <button
+                        name="action_erplibre_pull"
+                        type="object"
+                        string="Pull the code"
+                        class="btn-secondary ms-2"
+                        icon="fa-download"
+                    />
+                </div>
+                <div
+                    class="text-warning mt8"
+                    invisible="erplibre_git_fetch_allowed or not erplibre_server_actions_allowed"
+                >
+                    <field name="erplibre_git_fetch_problem" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

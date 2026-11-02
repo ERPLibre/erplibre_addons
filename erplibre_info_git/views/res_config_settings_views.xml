@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.erplibre.info.git</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="erplibre_info.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='erplibre_info']" position="attributes">
+                <attribute name="groups">base.group_system</attribute>
+            </xpath>
+            <xpath expr="//block[@name='erplibre_code_environment']" position="attributes">
+                <attribute name="groups">base.group_system</attribute>
+            </xpath>
+            <xpath expr="//setting[@id='erplibre_server_actions']" position="before">
+                <setting
+                    string="Current state"
+                    help="Read from the last snapshot: opening this page runs nothing."
+                >
+                    <div class="mt8">
+                        <div invisible="erplibre_last_snapshot_id">
+                            <span class="text-muted">No snapshot yet.</span>
+                        </div>
+                        <div invisible="not erplibre_last_snapshot_id">
+                            <div>
+                                <span class="o_form_label me-2">ERPLibre</span>
+                                <field name="erplibre_version" class="oe_inline" />
+                                <span class="mx-1">·</span>
+                                <field name="erplibre_commit" class="oe_inline" />
+                                <span class="mx-1">·</span>
+                                <field name="erplibre_mode" class="oe_inline" />
+                            </div>
+                            <div>
+                                <span class="o_form_label me-2">Last snapshot</span>
+                                <field name="erplibre_last_snapshot_date" class="oe_inline" />
+                            </div>
+                            <div>
+                                <field name="erplibre_state_summary" class="oe_inline" />
+                            </div>
+                            <div invisible="not erplibre_pending_update_count">
+                                <span class="o_form_label me-2">Modules to upgrade</span>
+                                <field name="erplibre_pending_update_count" class="oe_inline" />
+                            </div>
+                            <field name="erplibre_last_snapshot_id" invisible="1" />
+                            <!-- switches between the no-snapshot text and the last snapshot -->
+                        </div>
+                        <div
+                            class="alert alert-danger mt8 mb-0"
+                            role="alert"
+                            invisible="not erplibre_last_failed_run_id"
+                        >
+                            <field name="erplibre_last_failed_run_id" invisible="1" />
+                            <!-- shows the warning of a failed last snapshot -->
+                            <div class="fw-bold">The last snapshot failed:</div>
+                            <field name="erplibre_last_failed_log" class="text-danger" />
+                            <button
+                                name="action_erplibre_open_runs"
+                                type="object"
+                                string="Runs"
+                                class="btn-link p-0"
+                                icon="fa-arrow-right"
+                            />
+                        </div>
+                        <div
+                            class="alert alert-warning mt8 mb-0"
+                            role="alert"
+                            invisible="not erplibre_checkout_problem or not (erplibre_snapshot_on_startup or erplibre_snapshot_periodic)"
+                        >
+                            <div class="fw-bold">Snapshots cannot run:</div>
+                            <field name="erplibre_checkout_problem" />
+                        </div>
+                        <div class="mt8">
+                            <button
+                                name="action_erplibre_capture_now"
+                                type="object"
+                                string="Capture now"
+                                class="btn-primary"
+                                icon="fa-camera"
+                            />
+                            <button
+                                name="action_erplibre_open_snapshots"
+                                type="object"
+                                string="History"
+                                class="btn-link"
+                                icon="fa-arrow-right"
+                            />
+                        </div>
+                    </div>
+                </setting>
+                <setting
+                    id="erplibre_snapshot_on_startup"
+                    help="Queue one snapshot each time the server starts."
+                >
+                    <field name="erplibre_snapshot_on_startup" />
+                </setting>
+                <setting
+                    id="erplibre_snapshot_periodic"
+                    help="Take a snapshot at each interval; it is stored only when the code changed."
+                >
+                    <field name="erplibre_snapshot_periodic" />
+                    <div class="mt8" invisible="not erplibre_snapshot_periodic">
+                        <span class="me-2">Every</span>
+                        <field
+                            name="erplibre_snapshot_interval_number"
+                            class="oe_inline text-center"
+                            style="width: 5ch;"
+                        />
+                        <field name="erplibre_snapshot_interval_type" class="oe_inline ms-2" />
+                    </div>
+                </setting>
+                <setting id="erplibre_snapshot_check_dirty" help="Also run git status in every clone (slower).">
+                    <field name="erplibre_snapshot_check_dirty" />
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

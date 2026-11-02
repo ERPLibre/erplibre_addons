@@ -1,0 +1,537 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * erplibre_info
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 06:36+0000\n"
+"PO-Revision-Date: 2026-10-19 12:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.10.3\n"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "%(command)s cannot start: %(error)s"
+msgstr "%(command)s ne peut pas démarrer : %(error)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "%(command)s did not finish within %(seconds)s seconds."
+msgstr "%(command)s n'a pas fini en %(seconds)s secondes."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "%(command)s failed (exit code %(code)s): %(detail)s"
+msgstr "%(command)s a échoué (code de sortie %(code)s) : %(detail)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A git run is already queued or running."
+msgstr "Une exécution git est déjà en file ou en cours."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "A git run is started only from its button, after its confirmations."
+msgstr ""
+"Une exécution git ne se lance que par son bouton, après ses confirmations."
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_run_action
+msgid ""
+"A run is an action on the code or on the server, queued then\n"
+"                executed in the background; its type tells what it does, its\n"
+"                log and its report what it did."
+msgstr ""
+"Une exécution est une action sur le code ou sur le serveur, mise en file "
+"puis exécutée en arrière-plan ; son type dit ce qu'elle fait, son journal et "
+"son rapport ce qu'elle a fait."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__action
+msgid "Action"
+msgstr "Action"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_code_run_action
+#: model:ir.ui.menu,name:erplibre_info.erplibre_code_run_menu
+msgid "Code runs"
+msgstr "Exécutions sur le code"
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid "Confirm"
+msgstr "Confirmer"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__executor__cron
+msgid "Cron"
+msgstr "Cron"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__database_name
+msgid "Database Name"
+msgstr "Nom de la base"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid ""
+"Developer mode, Settings group and erplibre_info_allow_server_actions = True"
+" in the Odoo configuration file."
+msgstr ""
+"Mode développeur, groupe Paramètres et erplibre_info_allow_server_actions = "
+"True dans le fichier de configuration d'Odoo."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__done
+msgid "Done"
+msgstr "Terminé"
+
+#. module: erplibre_info
+#: model:ir.ui.menu,name:erplibre_info.erplibre_info_menu_technical
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "ERPLibre"
+msgstr "ERPLibre"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_checkout_problem
+msgid "ERPLibre checkout problem"
+msgstr "Problème du checkout ERPLibre"
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_run
+msgid "ERPLibre code run"
+msgstr "Exécution sur le code ERPLibre"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"ERPLibre is missing this feature, are you on the right version? Set the "
+"system parameter %(param)s to the directory that holds %(script)s."
+msgstr ""
+"Il manque la fonctionnalité dans ERPLibre, êtes-vous sur la bonne version? "
+"Mettre dans le paramètre système %(param)s le dossier qui contient %"
+"(script)s."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"ERPLibre is missing this feature, are you on the right version? The script "
+"%(script)s does not exist in %(root)s."
+msgstr ""
+"Il manque la fonctionnalité dans ERPLibre, êtes-vous sur la bonne version? "
+"Le script %(script)s n'existe pas dans %(root)s."
+
+#. module: erplibre_info
+#: model:ir.model,name:erplibre_info.model_erplibre_code_confirm_wizard
+msgid "ERPLibre server action confirmation"
+msgstr "Confirmation d'une action serveur ERPLibre"
+
+#. module: erplibre_info
+#: model:ir.actions.act_window,name:erplibre_info.erplibre_info_config_settings_action
+msgid "ERPLibre settings"
+msgstr "Paramètres ERPLibre"
+
+#. module: erplibre_info
+#: model:ir.actions.server,name:erplibre_info.ir_cron_erplibre_code_ir_actions_server
+msgid "ERPLibre: code environment"
+msgstr "ERPLibre : environnement du code"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__date_end
+msgid "Ended"
+msgstr "Fin"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_server_actions_allowed
+msgid "Erplibre Server Actions Allowed"
+msgstr "Actions serveur ERPLibre permises"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_res_config_settings__erplibre_server_actions_problem
+msgid "Erplibre Server Actions Problem"
+msgstr "Problème des actions serveur ERPLibre"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__executor
+msgid "Executor"
+msgstr "Exécutant"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__exit_code
+msgid "Exit Code"
+msgstr "Code de sortie"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__failed
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Failed"
+msgstr "Échoué"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "From the Docker host: docker exec -u root %(container)s %(command)s"
+msgstr "Depuis l'hôte Docker : docker exec -u root %(container)s %(command)s"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__understood
+msgid "I understand what this action does"
+msgstr "Je comprends ce que fait cette action"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__id
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__id
+msgid "ID"
+msgstr "ID"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "JSON"
+msgstr "JSON"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__result_json
+msgid "JSON result"
+msgstr "Résultat JSON"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__log
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Log"
+msgstr "Journal"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"Missing permissions: the account %(account)s cannot read %(count)s git "
+"repositories owned by %(owner)s. Give it read access to their .git "
+"directories."
+msgstr ""
+"Il manque des permissions : le compte %(account)s ne peut pas lire %(count)s "
+"dépôts git appartenant à %(owner)s. Donnez-lui l'accès en lecture à leurs "
+"dossiers .git."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"Missing permissions: the account %(account)s cannot read %(count)s git "
+"repositories owned by %(owner)s. Run as root: %(command)s"
+msgstr ""
+"Il manque des permissions : le compte %(account)s ne peut pas lire %(count)s "
+"dépôts git appartenant à %(owner)s. En root, lancer : %(command)s"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Modules marked to upgrade: %(names)s"
+msgstr "Modules marqués à mettre à niveau : %(names)s"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__module_ids
+msgid "Modules to upgrade"
+msgstr "Modules à mettre à niveau"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: erplibre_info
+#: model_terms:ir.actions.act_window,help:erplibre_info.erplibre_code_run_action
+msgid "No run yet"
+msgstr "Aucune exécution pour l'instant"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Odoo modules environment"
+msgstr "Environnement des modules Odoo"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Only the Settings administrators run server actions."
+msgstr "Seuls les administrateurs des Paramètres lancent les actions serveur."
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__queued
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_list
+msgid "Queued"
+msgstr "En file"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Queued or running"
+msgstr "En file ou en cours"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Refresh"
+msgstr "Actualiser"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_form
+msgid "Report"
+msgstr "Rapport"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__report_html
+msgid "Report Html"
+msgstr "Rapport HTML"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__user_id
+msgid "Requested by"
+msgstr "Demandé par"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Restart requested by %(user)s."
+msgstr "Redémarrage demandé par %(user)s."
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__restart
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Restart the server"
+msgstr "Redémarrer le serveur"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Restarting"
+msgstr "Redémarrage"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__run_id
+msgid "Run"
+msgstr "Exécution"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__state__running
+msgid "Running"
+msgstr "En cours"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Runs"
+msgstr "Exécutions"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__server_actions_allowed
+msgid "Server Actions Allowed"
+msgstr "Actions serveur permises"
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.res_config_settings_view_form
+msgid "Server actions"
+msgstr "Actions serveur"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: %(flag)s reads %(value)s in %(file)s. Set it to"
+" True, then restart Odoo."
+msgstr ""
+"Les actions serveur sont désactivées : %(flag)s vaut %(value)s dans %"
+"(file)s. Le mettre à True, puis redémarrer Odoo."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: add %(flag)s = True to the [options] section of"
+" %(file)s, the configuration file this Odoo server read at startup, then "
+"restart Odoo."
+msgstr ""
+"Les actions serveur sont désactivées : ajouter %(flag)s = True dans la "
+"section [options] de %(file)s, le fichier de configuration que ce serveur "
+"Odoo a lu au démarrage, puis redémarrer Odoo."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"Server actions are disabled: this Odoo server started without a "
+"configuration file. Start it with -c <file>, the file holding %(flag)s = "
+"True."
+msgstr ""
+"Les actions serveur sont désactivées : ce serveur Odoo a démarré sans "
+"fichier de configuration. Le lancer avec -c <fichier>, le fichier qui porte %"
+"(flag)s = True."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "Server actions require the developer mode."
+msgstr "Les actions serveur exigent le mode développeur."
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__run_type__restart
+msgid "Server restart"
+msgstr "Redémarrage du serveur"
+
+#. module: erplibre_info
+#: model:ir.ui.menu,name:erplibre_info.erplibre_info_settings_menu
+msgid "Settings"
+msgstr "Paramètres"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__date_start
+msgid "Started"
+msgstr "Début"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__state
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "State"
+msgstr "État"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "The ERPLibre cron is missing."
+msgstr "Le cron ERPLibre est absent."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid "The ERPLibre interpreter %(python)s is missing."
+msgstr "L'interpréteur ERPLibre %(python)s est absent."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/runner.py:0
+msgid ""
+"The directory %(root)s, set in the system parameter %(param)s, does not "
+"exist."
+msgstr ""
+"Le dossier %(root)s, mis dans le paramètre système %(param)s, n'existe pas."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid "The server restarts. Reload the page in a few seconds."
+msgstr "Le serveur redémarre. Recharger la page dans quelques secondes."
+
+#. module: erplibre_info
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_confirm_wizard_view_form
+msgid ""
+"The server stops and starts again: every user loses the\n"
+"                    request in progress."
+msgstr ""
+"Le serveur s'arrête et redémarre : chaque utilisateur perd la requête en "
+"cours."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "The typed name is not the name of this database."
+msgstr "Le nom tapé n'est pas celui de cette base."
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/wizards/erplibre_code_confirm_wizard.py:0
+msgid "Tick the box to confirm."
+msgstr "Cocher la case pour confirmer."
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_run__run_type
+#: model_terms:ir.ui.view,arch_db:erplibre_info.erplibre_code_run_view_search
+msgid "Type"
+msgstr "Type"
+
+#. module: erplibre_info
+#: model:ir.model.fields,field_description:erplibre_info.field_erplibre_code_confirm_wizard__typed_database_name
+msgid "Type the database name"
+msgstr "Taper le nom de la base"
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_confirm_wizard__action__restart_upgrade
+msgid "Upgrade the modules and restart the server"
+msgstr "Mettre à niveau les modules et redémarrer le serveur"
+
+#. module: erplibre_info
+#. odoo-python
+#: code:addons/erplibre_info/models/erplibre_code_run.py:0
+msgid ""
+"What a run executes is set when it is started, never changed afterwards."
+msgstr ""
+"Ce qu'une exécution lance se fixe à son démarrage et ne change plus ensuite."
+
+#. module: erplibre_info
+#: model:ir.model.fields,help:erplibre_info.field_erplibre_code_run__executor
+msgid ""
+"Who executes the queued run: the ERPLibre cron, or a queue_job job. Each one"
+" only takes its own runs."
+msgstr ""
+"Qui exécute la file : le cron ERPLibre, ou une tâche queue_job. Chacun ne "
+"prend que ses propres exécutions."
+
+#. module: erplibre_info
+#: model:ir.model.fields.selection,name:erplibre_info.selection__erplibre_code_run__executor__queue_job
+msgid "queue_job"
+msgstr "queue_job"
