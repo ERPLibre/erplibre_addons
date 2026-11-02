@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 12:21+0000\n"
-"PO-Revision-Date: 2026-11-01 12:21+0000\n"
+"POT-Creation-Date: 2026-11-02 08:23+0000\n"
+"PO-Revision-Date: 2026-11-02 08:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -30,12 +30,14 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "%(count)s untracked"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "<date of the apply>"
 msgstr ""
 
@@ -61,8 +63,24 @@ msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid ""
+"A modified tree is stashed before the return and the stash is kept, never "
+"reapplied: it is listed in Stashes, where it can be reapplied."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 msgid "A newer dry run exists: apply that one."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model_terms:ir.actions.act_window,help:erplibre_info_git_fetch.erplibre_code_stash_action
+msgid ""
+"A pull or a return to a snapshot that stashes the modified files\n"
+"                of a repository and keeps the stash lists it here, with the\n"
+"                command that reapplies it."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -87,6 +105,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid ""
 "A repository is left mid-operation: fix it in a terminal before restarting."
 msgstr ""
@@ -109,8 +128,14 @@ msgid "After"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__include_root
+msgid "Also return the ERPLibre root"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_stash.py:0
 msgid "Another pull is running on this checkout."
 msgstr ""
 
@@ -180,6 +205,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__backup_id
 msgid "Backup"
 msgstr ""
@@ -208,6 +234,8 @@ msgid "Before"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__original_branch
 msgid "Branch"
 msgstr ""
@@ -215,6 +243,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "Branch → target"
 msgstr ""
 
@@ -231,6 +260,7 @@ msgstr ""
 
 #. module: erplibre_info_git_fetch
 #: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_pull_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_revert_wizard_view_form
 msgid "Cancel"
 msgstr ""
 
@@ -272,8 +302,19 @@ msgid "Commit"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Commits left behind"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model,name:erplibre_info_git_fetch.model_res_config_settings
 msgid "Config Settings"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_stash__state__conflict
+msgid "Conflict: tree put back"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -285,12 +326,16 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__create_uid
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__create_date
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__create_date
 msgid "Created on"
 msgstr ""
 
@@ -302,6 +347,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__date
 msgid "Date"
 msgstr ""
 
@@ -372,6 +418,8 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__display_name
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -381,13 +429,33 @@ msgid "Dry run"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__erplibre_head
+msgid "ERPLibre HEAD"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__erplibre_branch
+msgid "ERPLibre branch"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model,name:erplibre_info_git_fetch.model_erplibre_code_run
 msgid "ERPLibre code run"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model,name:erplibre_info_git_fetch.model_erplibre_code_snapshot
+msgid "ERPLibre code snapshot"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model,name:erplibre_info_git_fetch.model_erplibre_code_snapshot_repo
 msgid "ERPLibre code snapshot repository"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model,name:erplibre_info_git_fetch.model_erplibre_code_stash
+msgid "ERPLibre kept stash"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -401,6 +469,25 @@ msgid "ERPLibre pull of the code"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model,name:erplibre_info_git_fetch.model_erplibre_code_revert_wizard
+msgid "ERPLibre return to a snapshot"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "ERPLibre root left as it is"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__revert_root
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__revert_root
+msgid "ERPLibre root returned too"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model,name:erplibre_info_git_fetch.model_erplibre_code_confirm_wizard
 msgid "ERPLibre server action confirmation"
 msgstr ""
@@ -411,6 +498,16 @@ msgid ""
 "Each pulled repository keeps a branch on its HEAD of\n"
 "                        before the pull. Restore moves the repository back to\n"
 "                        it; Delete removes the branch."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_confirm_wizard_view_form
+msgid ""
+"Each repository below gets a backup branch on its HEAD, then\n"
+"                    goes back to the commit and the branch of the snapshot. A\n"
+"                    modified tree is stashed and the stash is kept, never\n"
+"                    reapplied. The ERPLibre root, when it goes back too, passes\n"
+"                    last. Nothing is pushed."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -442,9 +539,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 msgid ""
-"Fetch + rebase and pull require an Odoo server started with --dev (for "
-"example --dev=all): erplibre_info_git_fetch writes the git clones of the "
-"checkout."
+"Fetch + rebase, pull, return to a snapshot and stash reapply require an "
+"Odoo server started with --dev (for example --dev=all): "
+"erplibre_info_git_fetch writes the git clones of the checkout."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -466,13 +563,26 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "From"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__git_fetch_allowed
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_snapshot__git_fetch_allowed
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_snapshot_repo__git_fetch_allowed
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__git_fetch_allowed
 msgid "Git Fetch Allowed"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_stash_view_search
+msgid "Group By"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__has_newer_modules
+msgid "Has Newer Modules"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -497,12 +607,15 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__id
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__id
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__id
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__id
 msgid "ID"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "Ignored files overwritten, copied first to %(path)s: %(files)s"
 msgstr ""
 
@@ -521,6 +634,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid ""
 "Install them with « Install the Python dependencies », or restart without "
 "installing."
@@ -533,24 +647,51 @@ msgid "Installed only when approved after the apply:"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Installed version"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_pull_backup__state__kept
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_stash__state__kept
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_stash_view_search
 msgid "Kept"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__write_uid
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__write_date
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid ""
+"Local commits are on no remote: after the return, only the backup branch "
+"keeps them."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Local commits only in the backup"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__log
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__log
 msgid "Log"
 msgstr ""
 
@@ -576,7 +717,13 @@ msgid "Merge"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__message
+msgid "Message"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_pull_backup__state__missing
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_stash__state__missing
 msgid "Missing"
 msgstr ""
 
@@ -594,7 +741,29 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "Modified"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Module"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid ""
+"Modules are installed with a newer version than the snapshot: tick the box "
+"that accepts them."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_run__approve_modules
+msgid ""
+"Modules installed with a newer version than the snapshot were listed, and "
+"the return was confirmed anyway."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -612,6 +781,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__clone_paths
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__clone_paths
 msgid "New repositories to clone"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__newer_modules_html
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__newer_modules_html
+msgid "Newer modules"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__approve_modules
+msgid "Newer modules accepted"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -634,6 +814,17 @@ msgid "No pull to install the dependencies of."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model_terms:ir.actions.act_window,help:erplibre_info_git_fetch.erplibre_code_stash_action
+msgid "No stash kept"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/wizards/erplibre_code_confirm_wizard.py:0
+msgid "No stash to reapply."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "Nothing to apply: no apply step was started."
@@ -643,6 +834,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "Nothing to pull: nothing was written."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Nothing to return: nothing was written."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -754,6 +951,33 @@ msgid "Python dependencies to install"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_stash__state__applied
+msgid "Reapplied"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_stash__state
+msgid "Reapplied or not, the stash stays in the list of its clone."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_run_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_stash_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_stash_view_list
+msgid "Reapply"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__command
+msgid "Reapply command"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_confirm_wizard__action__stash_apply
+msgid "Reapply the stash"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "Reason"
@@ -784,17 +1008,32 @@ msgid "Repositories left as they are"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Repositories outside the snapshot (left as they are)"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__plan_paths
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__plan_paths
 msgid "Repositories to apply"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__repo_count
+msgid "Repositories to compare"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__stash_path
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__path
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_wizard__repo_line_id
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__path
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_stash_view_search
 msgid "Repository"
 msgstr ""
 
@@ -827,6 +1066,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "Result"
 msgstr ""
 
@@ -834,6 +1074,39 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "Retired from the manifest (kept on disk)"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__approve_modules
+msgid "Return anyway: these modules run on older code"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_run__run_type__snapshot_revert
+msgid "Return to a snapshot: apply"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_run__run_type__snapshot_revert_dry_run
+msgid "Return to a snapshot: dry run"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields.selection,name:erplibre_info_git_fetch.selection__erplibre_code_confirm_wizard__action__snapshot_revert
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_run_view_form
+msgid "Return to the snapshot"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/wizards/erplibre_code_revert_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_snapshot_view_form
+msgid "Return to this snapshot"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__run_id
+msgid "Run"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -868,7 +1141,36 @@ msgid "Single repository: %(path)s"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__snapshot_id
+msgid "Snapshot"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__revert_targets
+msgid "Snapshot targets"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__revert_snapshot_id
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__revert_snapshot_id
+msgid "Snapshot to return to"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Snapshot version"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "Snapshot: %(name)s"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_pull_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_revert_wizard_view_form
 msgid "Start the dry run"
 msgstr ""
 
@@ -883,11 +1185,28 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__stash_id
 msgid "Stash"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__sha
+msgid "Stash commit"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.actions.act_window,name:erplibre_info_git_fetch.erplibre_code_stash_action
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_run__stash_ids
+#: model:ir.ui.menu,name:erplibre_info_git_fetch.erplibre_code_stash_menu
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_run_view_form
+msgid "Stashes"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_pull_backup__state
+#: model:ir.model.fields,field_description:erplibre_info_git_fetch.field_erplibre_code_stash__state
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_stash_view_search
 msgid "State"
 msgstr ""
 
@@ -912,6 +1231,22 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 msgid "TODO menu"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__revert_root
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_revert_wizard__include_root
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_run__revert_root
+msgid ""
+"The ERPLibre root goes back to the commit of the snapshot, after the other "
+"repositories; the local manifest is then regenerated."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_run__revert_targets
+msgid ""
+"The JSON file of targets given to repo_pull.py: the commit, branch and "
+"remote of each repository of the snapshot."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -952,12 +1287,30 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_revert_wizard_view_form
+msgid ""
+"The dry run compares each repository with the commit and the\n"
+"                    branch the snapshot recorded: the commits the return leaves\n"
+"                    behind, the local commits only a backup branch will keep, the\n"
+"                    modified trees. It may fetch a missing commit; nothing moves\n"
+"                    until its apply step is confirmed."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_pull_wizard_view_form
 msgid ""
 "The dry run fetches the remotes and shows what the pull would\n"
 "                    do: the incoming commits, the modified trees, the shallow\n"
 "                    clones, the new repositories. Nothing moves until its apply\n"
 "                    step is confirmed."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid ""
+"The dry run is out of date: a HEAD moved, or the list of repositories to "
+"return changed. Nothing was written; run a new dry run."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -974,6 +1327,13 @@ msgstr ""
 msgid ""
 "The dry run is out of date: the upstream changed the list of repositories to"
 " apply, or the commits shown. Nothing was written; run a new dry run."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_stash__command
+msgid ""
+"The git command that reapplies the stash from a terminal, in the ERPLibre "
+"root."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -994,6 +1354,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "The local manifest was written; the previous one is kept in %(path)s."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_run_view_form
+msgid ""
+"The modified files of a repository the pass moved, kept\n"
+"                        in the stash list of its clone. Reapply puts them back on\n"
+"                        a clean tree; the stash stays in the list either way."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1049,6 +1417,14 @@ msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid ""
+"The time budget of the pass ran out: the repositories marked « not started »"
+" were left as they are; run a new dry run for them."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid ""
 "The time budget of the pass ran out: the repositories marked « not started »"
@@ -1075,11 +1451,27 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_info_git_fetch
+#: model:ir.model.fields,help:erplibre_info_git_fetch.field_erplibre_code_confirm_wizard__approve_modules
+msgid ""
+"Their data was written by a newer version than the code of the snapshot. An "
+"upgrade of the module does not migrate it back."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
 #: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_run_view_form
 msgid ""
 "These installed modules are upgraded at the next start\n"
 "                        of the server, once marked with \"Upgrade the modules\n"
 "                        and restart\"."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid ""
+"These modules are installed with a newer version than the snapshot: the "
+"returned code is older than their data. The return asks for one more "
+"confirmation."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1092,6 +1484,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "This dry run has nothing left to apply."
 msgstr ""
 
@@ -1099,6 +1492,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "This run has no Python dependencies to install."
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_stash.py:0
+msgid "This stash cannot be reapplied."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1111,6 +1510,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "To"
 msgstr ""
 
@@ -1145,6 +1545,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "Verdict"
 msgstr ""
 
@@ -1181,8 +1582,20 @@ msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "already on the snapshot"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run.py:0
 msgid "applied"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "back to an older commit"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1223,8 +1636,20 @@ msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "commit not found: skipped"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "conflict: put back"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_stash.py:0
+msgid "conflict: the tree is put back on HEAD"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1236,6 +1661,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "detached"
 msgstr ""
 
@@ -1268,6 +1694,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "error"
 msgstr ""
 
@@ -1286,19 +1713,36 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "fetch failed"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#: model_terms:ir.ui.view,arch_db:erplibre_info_git_fetch.erplibre_code_confirm_wizard_view_form
+msgid ""
+"git stash apply puts the stashed files back in the\n"
+"                    repository, whose tree must have no modified file. A conflict\n"
+"                    puts the tree back on HEAD. The stash stays in the list."
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "ignored files the target overwrites, copied first: %(files)s"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "kept"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "move off the current history"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1309,8 +1753,21 @@ msgstr ""
 
 #. module: erplibre_info_git_fetch
 #. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_stash.py:0
+msgid "not a stash of the clone"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "not cloned"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "not installed"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1322,6 +1779,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "operation in progress: skipped"
 msgstr ""
 
@@ -1345,6 +1803,8 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_stash.py:0
 msgid "reapplied"
 msgstr ""
 
@@ -1370,6 +1830,7 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_stash.py:0
 msgid "refused: the tree has modified files"
 msgstr ""
 
@@ -1389,6 +1850,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
 msgid "restored"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "returned to the snapshot"
 msgstr ""
 
 #. module: erplibre_info_git_fetch
@@ -1436,7 +1903,14 @@ msgstr ""
 #. module: erplibre_info_git_fetch
 #. odoo-python
 #: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_pull.py:0
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
 msgid "yes"
+msgstr ""
+
+#. module: erplibre_info_git_fetch
+#. odoo-python
+#: code:addons/erplibre_info_git_fetch/models/erplibre_code_run_revert.py:0
+msgid "yes (stash kept)"
 msgstr ""
 
 #. module: erplibre_info_git_fetch

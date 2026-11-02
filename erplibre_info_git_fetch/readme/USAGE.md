@@ -60,3 +60,39 @@ Pull the code:
    **Restore** moves a repository back to its backup (after the same
    confirmation; refused when commits were made on it since the pull),
    **Delete** removes the branch, restored or not.
+
+Return to a snapshot:
+
+1. **Return to this snapshot** on a snapshot opens a wizard. *Also return
+   the ERPLibre root* is ticked by default: the root then goes back too,
+   after the other repositories, and the local manifest is regenerated.
+   The installed modules whose version is newer than the one the
+   snapshot recorded, or that the snapshot did not have installed, are
+   listed in red: the returned code is older than their data.
+2. The dry run compares each repository of the snapshot with its commit
+   and branch: already there, back to an older commit, or moved off the
+   current history. Its report shows the commits the return leaves
+   behind, the local commits that no remote has (only the backup branch
+   keeps them), a modified tree, and the clones the snapshot does not
+   name, left as they are. A commit missing from a clone is fetched by
+   its SHA; one that no remote has is skipped.
+3. **Return to the snapshot** opens the confirmation: tick the box and
+   type the database name, plus one more box when modules are listed in
+   red. Each repository gets a backup branch
+   `<branch>_avant_retour_<stamp>` on its HEAD, a modified tree is
+   stashed and the stash is kept, never reapplied, then the repository
+   goes back to the branch of the snapshot, or to a detached HEAD. If a
+   HEAD moved since the dry run, nothing is written and a new dry run is
+   needed. The pass is recorded under `tasks/git_repo_pull/`; the
+   *Backups* page restores a repository as after a pull.
+4. After the apply step, a snapshot is taken and the modules to upgrade
+   and the Python dependencies are proposed, as after a pull.
+
+Stashes:
+
+*Settings › Technical › ERPLibre › Stashes*, and the *Stashes* page of a
+run, list the stashes that a pull or a return kept, with the git command
+that reapplies them. **Reapply** runs `repo_pull.py --apply-stash`
+after the same confirmation: the tree of the repository must have no
+modified tracked file, and a conflict puts it back on HEAD. The stash
+stays in the list of its clone whatever the outcome.

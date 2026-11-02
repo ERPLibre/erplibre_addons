@@ -24,10 +24,35 @@
                 <div class="alert alert-warning" role="alert" invisible="action != 'deps_install'">
                     poetry install --no-root runs in the Odoo virtual environment.
                 </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'snapshot_revert'">
+                    Each repository below gets a backup branch on its HEAD, then
+                    goes back to the commit and the branch of the snapshot. A
+                    modified tree is stashed and the stash is kept, never
+                    reapplied. The ERPLibre root, when it goes back too, passes
+                    last. Nothing is pushed.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'stash_apply'">
+                    git stash apply puts the stashed files back in the
+                    repository, whose tree must have no modified file. A conflict
+                    puts the tree back on HEAD. The stash stays in the list.
+                </div>
+                <field name="has_newer_modules" invisible="1" />
+                <!-- shows the newer modules and the box that accepts them -->
+                <field
+                    name="newer_modules_html"
+                    nolabel="1"
+                    readonly="1"
+                    invisible="action != 'snapshot_revert' or not has_newer_modules"
+                />
             </xpath>
             <field name="run_id" position="after">
                 <field name="backup_id" invisible="not backup_id" />
-                <field name="plan_paths" invisible="action not in ('apply', 'pull_apply')" />
+                <field name="stash_id" invisible="not stash_id" />
+                <field name="stash_path" invisible="not stash_id" />
+                <field name="revert_snapshot_id" invisible="action != 'snapshot_revert'" />
+                <field name="revert_root" invisible="action != 'snapshot_revert'" />
+                <field name="plan_paths" invisible="action not in ('apply', 'pull_apply', 'snapshot_revert')" />
+                <field name="approve_modules" invisible="action != 'snapshot_revert' or not has_newer_modules" />
                 <field name="shallow_paths" invisible="action != 'pull_apply' or not shallow_paths" />
                 <field name="approve_deepen" invisible="action != 'pull_apply' or not shallow_paths" />
                 <field name="clone_paths" invisible="action != 'pull_apply' or not clone_paths" />

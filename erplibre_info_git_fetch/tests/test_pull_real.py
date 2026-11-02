@@ -29,9 +29,9 @@ def _git(cwd, *args):
     ).stdout.strip()
 
 
-@tagged("post_install", "-at_install")
-class TestPullRealRepositories(TransactionCase):
-    """The real ``repo_pull.py`` on a throwaway checkout.
+class RealRepositoriesMixin:
+    """The real ``repo_pull.py`` on a throwaway checkout, for a test case
+    class that lists this mixin before its Odoo base class.
 
     A temporary directory holds an ERPLibre root and one addons clone,
     each on a branch that tracks a bare repository beside them. The
@@ -158,6 +158,13 @@ class TestPullRealRepositories(TransactionCase):
         wizard.write({"typed_database_name": self.env.cr.dbname, "understood": True})
         return wizard.action_confirm()
 
+
+class RealRepositoriesCase(RealRepositoriesMixin, TransactionCase):
+    """``RealRepositoriesMixin`` in a transaction case."""
+
+
+@tagged("post_install", "-at_install")
+class TestPullRealRepositories(RealRepositoriesCase):
     def test_pull_restore_delete(self):
         start = self._head()
         target = self._commit("addons", self.sources["addons"], {"a.txt": "two\n"})

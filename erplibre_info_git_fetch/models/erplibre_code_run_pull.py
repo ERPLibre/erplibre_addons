@@ -302,6 +302,7 @@ class ErplibreCodeRunPull(models.Model):
                 if r.get("sauvegarde")
             ]
         )
+        self._import_kept_stashes(results)
         if not data.get("dossier"):
             self.log = self._append_log(
                 self.env._("Nothing to pull: nothing was written.")
@@ -474,7 +475,7 @@ class ErplibreCodeRunPull(models.Model):
     def _check_deps_installable(self):
         self.ensure_one()
         if not (
-            self.run_type == "pull_apply"
+            self.run_type in ("pull_apply", "snapshot_revert")
             and self.state == "done"
             and self.deps_to_install
             and not self.pull_blocked
@@ -492,8 +493,8 @@ class ErplibreCodeRunPull(models.Model):
         )
 
     def _launch_deps_install(self):
-        """Queue ``poetry install`` after this pull; the modules it proposes
-        to upgrade carry over."""
+        """Queue ``poetry install`` after this pull or return to a
+        snapshot; the modules it proposes to upgrade carry over."""
         self.ensure_one()
         self._check_git_fetch()
         self._check_deps_installable()

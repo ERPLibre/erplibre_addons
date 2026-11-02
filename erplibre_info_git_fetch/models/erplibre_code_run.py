@@ -1,7 +1,8 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-"""The run types that write the checkout: the fetch + rebase of the forks
-and the pull of the code (``erplibre_code_run_pull.py``).
+"""The run types that write the checkout: the fetch + rebase of the forks,
+the pull of the code (``erplibre_code_run_pull.py``) and the return to a
+snapshot (``erplibre_code_run_revert.py``).
 
 Every one of them is a server action that, on top of the three conditions
 of ``erplibre_info`` (odoo.conf flag, Settings group, developer mode),
@@ -44,10 +45,25 @@ GIT_RUN_TYPES = (
     "pull_apply",
     "pull_restore",
     "deps_install",
+    "snapshot_revert_dry_run",
+    "snapshot_revert",
 )
 
 # The apply type of each dry run type.
-APPLY_OF = {"dry_run": "apply", "pull_dry_run": "pull_apply"}
+APPLY_OF = {
+    "dry_run": "apply",
+    "pull_dry_run": "pull_apply",
+    "snapshot_revert_dry_run": "snapshot_revert",
+}
+
+# The dry runs and applies of « repo_pull.py » that move the clones: the
+# last finished one decides whether a restart waits (``pull_blocked``).
+PULL_LIKE_TYPES = (
+    "pull_dry_run",
+    "pull_apply",
+    "snapshot_revert_dry_run",
+    "snapshot_revert",
+)
 
 # The fields of these run types that decide what their background step
 # runs, on top of the ``LAUNCH_FIELDS`` of erplibre_info.
@@ -59,6 +75,10 @@ FETCH_LAUNCH_FIELDS = (
     "pull_path",
     "approve_deepen",
     "approve_clone",
+    "revert_snapshot_id",
+    "revert_root",
+    "revert_targets",
+    "approve_modules",
 )
 
 # The exit code of « repo_apply.py » and « repo_pull.py » when the plan or
@@ -78,6 +98,8 @@ class ErplibreCodeRun(models.Model):
             ("pull_apply", "Pull: apply"),
             ("pull_restore", "Pull: restore a backup"),
             ("deps_install", "Python dependencies install"),
+            ("snapshot_revert_dry_run", "Return to a snapshot: dry run"),
+            ("snapshot_revert", "Return to a snapshot: apply"),
         ],
         ondelete={
             "dry_run": "cascade",
@@ -86,6 +108,8 @@ class ErplibreCodeRun(models.Model):
             "pull_apply": "cascade",
             "pull_restore": "cascade",
             "deps_install": "cascade",
+            "snapshot_revert_dry_run": "cascade",
+            "snapshot_revert": "cascade",
         },
     )
     parent_id = fields.Many2one(
@@ -264,9 +288,10 @@ class ErplibreCodeRun(models.Model):
         if config.get("dev_mode"):
             return False
         return self.env._(
-            "Fetch + rebase and pull require an Odoo server started with "
-            "--dev (for example --dev=all): erplibre_info_git_fetch writes "
-            "the git clones of the checkout."
+            "Fetch + rebase, pull, return to a snapshot and stash reapply "
+            "require an Odoo server started with --dev (for example "
+            "--dev=all): erplibre_info_git_fetch writes the git clones of "
+            "the checkout."
         )
 
     @api.model
@@ -460,19 +485,20 @@ class ErplibreCodeRun(models.Model):
 
     @api.model
     def _check_no_blocked_pull(self):
-        """Refuse a restart while the last pull left a repository
-        mid-operation, whichever button asks for it: the last finished
-        pull dry run or apply is an apply marked ``pull_blocked``. A new
-        dry run, after the repository is fixed in a terminal, lifts it."""
+        """Refuse a restart while the last pull or return to a snapshot
+        left a repository mid-operation, whichever button asks for it: the
+        last finished dry run or apply of either is an apply marked
+        ``pull_blocked``. A new dry run, after the repository is fixed in a
+        terminal, lifts it."""
         last = self.sudo().search(
             [
-                ("run_type", "in", ("pull_dry_run", "pull_apply")),
+                ("run_type", "in", PULL_LIKE_TYPES),
                 ("state", "in", ("done", "failed")),
             ],
             order="id desc",
             limit=1,
         )
-        if last.run_type == "pull_apply" and last.pull_blocked:
+        if last.run_type in ("pull_apply", "snapshot_revert") and last.pull_blocked:
             raise UserError(
                 self.env._(
                     "The last pull left a repository mid-operation: fix it in "

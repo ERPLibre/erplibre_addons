@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_snapshot_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.form.git.fetch</field>
+        <field name="model">erplibre.code.snapshot</field>
+        <field name="inherit_id" ref="erplibre_info_git.erplibre_code_snapshot_view_form" />
+        <field name="arch" type="xml">
+            <button name="action_capture_now" position="after">
+                <field name="git_fetch_allowed" invisible="1" />
+                <!-- hides the return button on a server started without the dev option -->
+                <button
+                    name="action_revert"
+                    type="object"
+                    string="Return to this snapshot"
+                    icon="fa-history"
+                    groups="base.group_no_one"
+                    invisible="not git_fetch_allowed"
+                />
+            </button>
+        </field>
+    </record>
+</odoo>
