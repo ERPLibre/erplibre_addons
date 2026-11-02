@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_snapshot_repo_view_list" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.repo.list</field>
+        <field name="model">erplibre.code.snapshot.repo</field>
+        <field name="arch" type="xml">
+            <list
+                create="0"
+                edit="0"
+                decoration-success="state == 'conforme'"
+                decoration-info="state == 'en_avance'"
+                decoration-warning="state in ('decale', 'sale', 'hors_manifeste')"
+                decoration-danger="state in ('absent', 'erreur')"
+            >
+                <field name="snapshot_date" optional="hide" />
+                <field name="path" />
+                <field name="odoo_version" optional="show" />
+                <field name="state" widget="badge" />
+                <field name="branch" optional="show" />
+                <field name="head_short" />
+                <field name="ahead" optional="show" />
+                <field name="behind" optional="show" />
+                <field name="dirty" optional="hide" />
+                <field name="module_count" optional="show" />
+                <field name="change" optional="show" />
+                <field name="previous_head_short" optional="hide" />
+                <field name="is_fork" optional="show" />
+                <field name="upstream_remote" optional="hide" />
+                <field name="upstream_branch" optional="hide" />
+                <field name="upstream_ahead" optional="show" invisible="not upstream_base" />
+                <field name="upstream_behind" optional="show" invisible="not upstream_tracking" />
+                <field name="upstream_base" column_invisible="1" />
+                <!-- hides the commits ahead when no upstream base is known -->
+                <field name="upstream_tracking" column_invisible="1" />
+                <!-- hides the commits behind when no upstream is tracked -->
+                <field name="error" optional="hide" />
+                <button
+                    name="action_load_commits"
+                    type="object"
+                    string="Commits"
+                    icon="fa-list"
+                    invisible="change != 'changed'"
+                />
+                <button
+                    name="action_cross_version"
+                    type="object"
+                    string="Other versions"
+                    icon="fa-exchange"
+                    invisible="not odoo_version"
+                />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_repo_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.repo.form</field>
+        <field name="model">erplibre.code.snapshot.repo</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <field name="is_active_version" invisible="1" />
+                    <!-- read by the buttons that act on the clone of the active Odoo version -->
+                    <button
+                        name="action_load_commits"
+                        type="object"
+                        string="Load the commits"
+                        class="btn-primary"
+                        invisible="change != 'changed'"
+                    />
+                    <button
+                        name="action_cross_version"
+                        type="object"
+                        string="Other Odoo versions"
+                        invisible="not odoo_version"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="path" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Manifest">
+                            <field name="snapshot_id" />
+                            <field name="name" />
+                            <field name="remote" />
+                            <field name="url" />
+                            <field name="revision" />
+                            <field name="manifest_branch" />
+                            <field name="freeze_revision" />
+                        </group>
+                        <group string="Clone">
+                            <field name="head" />
+                            <field name="branch" />
+                            <field name="target" />
+                            <field name="ahead" />
+                            <field name="behind" />
+                            <field name="alignment" />
+                            <field name="dirty" />
+                            <field name="error" invisible="not error" />
+                        </group>
+                        <group string="Upstream (fork-upstream)">
+                            <field name="is_fork" invisible="1" />
+                            <!-- shows the upstream fields of a fork only -->
+                            <div colspan="2" class="text-muted" invisible="is_fork">
+                                Not a fork: the manifest declares no fork-upstream for this repository.
+                            </div>
+                            <field name="upstream_remote" invisible="not is_fork" />
+                            <field name="upstream_name" invisible="not is_fork" />
+                            <field name="upstream_branch" invisible="not is_fork" />
+                            <field name="upstream_freeze_revision" invisible="not is_fork" />
+                            <field name="upstream_declared" invisible="not is_fork" />
+                            <field name="upstream_url" invisible="not is_fork" />
+                            <field name="upstream_base" invisible="not upstream_base" />
+                            <field name="upstream_base_source" invisible="not upstream_base" />
+                            <field name="upstream_base_reason" invisible="not upstream_base_reason" />
+                            <field name="upstream_ahead" invisible="not upstream_base" />
+                            <field name="upstream_tracking" invisible="not is_fork" />
+                            <field name="upstream_behind" invisible="not upstream_tracking" />
+                        </group>
+                        <group string="Since the previous snapshot">
+                            <field name="change" />
+                            <field name="previous_head" invisible="not previous_head" />
+                            <field name="between_count" invisible="not between_loaded" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Commits" name="commits" invisible="not between_loaded">
+                            <field name="between_html" nolabel="1" />
+                        </page>
+                        <page string="Installed modules" name="modules">
+                            <field name="module_line_ids" nolabel="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="installed_version" />
+                                    <field name="code_version" />
+                                    <field name="pending_update" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_repo_view_search" model="ir.ui.view">
+        <field name="name">erplibre.code.snapshot.repo.search</field>
+        <field name="model">erplibre.code.snapshot.repo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="path" />
+                <field name="snapshot_id" />
+                <field name="head" />
+                <field name="upstream_remote" />
+                <filter
+                    name="active_version"
+                    string="Running Odoo version"
+                    domain="[('is_active_version', '=', True)]"
+                />
+                <separator />
+                <filter
+                    name="not_conforming"
+                    string="Not matching the manifest"
+                    domain="[('state', '!=', 'conforme')]"
+                />
+                <filter name="changed" string="HEAD moved" domain="[('change', '=', 'changed')]" />
+                <filter name="dirty" string="Modified" domain="[('dirty', '=', True)]" />
+                <separator />
+                <filter name="forks" string="Forks" domain="[('is_fork', '=', True)]" />
+                <filter
+                    name="upstream_behind"
+                    string="Upstream commits not integrated"
+                    domain="[('upstream_behind', '>', 0)]"
+                />
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}" />
+                    <filter name="group_version" string="Odoo version" context="{'group_by': 'odoo_version'}" />
+                    <filter name="group_snapshot" string="Snapshot" context="{'group_by': 'snapshot_id'}" />
+                    <filter
+                        name="group_upstream"
+                        string="Upstream remote"
+                        context="{'group_by': 'upstream_remote'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_code_snapshot_repo_action" model="ir.actions.act_window">
+        <field name="name">Snapshot repositories</field>
+        <field name="res_model">erplibre.code.snapshot.repo</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active_version': 1}</field>
+    </record>
+</odoo>

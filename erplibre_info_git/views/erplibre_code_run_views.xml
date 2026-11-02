@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_run_view_list" model="ir.ui.view">
+        <field name="name">erplibre.code.run.list.git</field>
+        <field name="model">erplibre.code.run</field>
+        <field name="inherit_id" ref="erplibre_info.erplibre_code_run_view_list" />
+        <field name="arch" type="xml">
+            <field name="run_type" position="after">
+                <field name="trigger" optional="show" />
+            </field>
+        </field>
+    </record>
+
+    <record id="erplibre_code_run_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.run.form.git</field>
+        <field name="model">erplibre.code.run</field>
+        <field name="inherit_id" ref="erplibre_info.erplibre_code_run_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='run_what']/field[@name='run_type']" position="after">
+                <field name="trigger" invisible="run_type != 'snapshot'" />
+            </xpath>
+            <xpath expr="//group[@name='run_what']/field[@name='user_id']" position="after">
+                <field name="snapshot_id" invisible="not snapshot_id" />
+            </xpath>
+            <field name="exit_code" position="attributes">
+                <attribute name="invisible">run_type in ('snapshot', 'restart')</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
