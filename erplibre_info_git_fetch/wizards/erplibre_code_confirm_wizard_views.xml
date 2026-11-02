@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_code_confirm_wizard_view_form" model="ir.ui.view">
+        <field name="name">erplibre.code.confirm.wizard.form.git.fetch</field>
+        <field name="model">erplibre.code.confirm.wizard</field>
+        <field name="inherit_id" ref="erplibre_info.erplibre_code_confirm_wizard_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='restart_alert']" position="before">
+                <div class="alert alert-warning" role="alert" invisible="action != 'apply'">
+                    The repositories below are rebased on their upstream, each in
+                    a new dated branch. A repository that conflicts is put back
+                    where it was. Nothing is pushed.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'pull_apply'">
+                    Each repository gets a backup branch on its HEAD, then
+                    integrates its target with the chosen strategy. A conflicting
+                    repository is put back where it was. Nothing is pushed.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'pull_restore'">
+                    The repository moves back to the backup commit.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="action != 'deps_install'">
+                    poetry install --no-root runs in the Odoo virtual environment.
+                </div>
+            </xpath>
+            <field name="run_id" position="after">
+                <field name="backup_id" invisible="not backup_id" />
+                <field name="plan_paths" invisible="action not in ('apply', 'pull_apply')" />
+                <field name="shallow_paths" invisible="action != 'pull_apply' or not shallow_paths" />
+                <field name="approve_deepen" invisible="action != 'pull_apply' or not shallow_paths" />
+                <field name="clone_paths" invisible="action != 'pull_apply' or not clone_paths" />
+                <field name="approve_clone" invisible="action != 'pull_apply' or not clone_paths" />
+            </field>
+        </field>
+    </record>
+</odoo>
