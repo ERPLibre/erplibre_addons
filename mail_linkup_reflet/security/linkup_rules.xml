@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- Scope of a member over contacts and users: themself, the partners of
+         their companies, and the members of a channel they belong to. A
+         channel counts through its members table, so joining or leaving a
+         channel changes the scope at once while the domain itself only holds
+         the member's own ids, which is what the ir.rule cache keys on.
+
+         The rules apply to every group that implies the member group. Group
+         rules are joined by OR, so the rules of the LinkUp administrators
+         and of the system administrators below give them back the native
+         reading. Group rules are then joined by AND with the global rules:
+         the member rule on res.users narrows the global res_users_rule, which
+         would otherwise open every internal user to every internal user.
+
+         The Discuss searches of people (im_search, get_mention_suggestions,
+         get_mention_suggestions_from_channel, search_for_channel_invite) run
+         without sudo and inherit this scope.
+
+         A direct conversation (channel_type chat) does not count as a
+         channel: the server opens one for the carrier messages of a pair,
+         and the pair would otherwise stay open to each other for as long as
+         that conversation exists. The two members of a chat read each other
+         through a channel they share, or through their link.
+
+         The linked members join the scope through linkup.link: a pending
+         link, created when a reflection is sent, opens the two parties to
+         each other while it waits for an answer; an active link keeps them
+         open; a closed link, whose reflections were all left unconfirmed,
+         and a blocked one close them. The domain walks both sides of the
+         ordered pair from the users of the partner. -->
+    <record id="rule_res_partner_linkup_member" model="ir.rule">
+        <field name="name">LinkUp member: own scope of contacts</field>
+        <field name="model_id" ref="base.model_res_partner" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[
+            '|', '|', '|', '|',
+            ('id', '=', user.partner_id.id),
+            ('id', 'in', user.company_ids.partner_id.ids),
+            ('channel_ids', 'any', [('channel_type', '!=', 'chat'), ('channel_member_ids.partner_id', '=', user.partner_id.id)]),
+            ('user_ids.linkup_link_a_ids', 'any', [('user_b_id', '=', user.id), ('state', 'in', ('pending', 'active'))]),
+            ('user_ids.linkup_link_b_ids', 'any', [('user_a_id', '=', user.id), ('state', 'in', ('pending', 'active'))]),
+        ]</field>
+    </record>
+
+    <record id="rule_res_users_linkup_member" model="ir.rule">
+        <field name="name">LinkUp member: own scope of users</field>
+        <field name="model_id" ref="base.model_res_users" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('id', '=', user.id),
+            ('partner_id.channel_ids', 'any', [('channel_type', '!=', 'chat'), ('channel_member_ids.partner_id', '=', user.partner_id.id)]),
+            ('linkup_link_a_ids', 'any', [('user_b_id', '=', user.id), ('state', 'in', ('pending', 'active'))]),
+            ('linkup_link_b_ids', 'any', [('user_a_id', '=', user.id), ('state', 'in', ('pending', 'active'))]),
+        ]</field>
+    </record>
+
+    <record id="rule_res_partner_linkup_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all contacts</field>
+        <field name="model_id" ref="base.model_res_partner" />
+        <field
+            name="groups"
+            eval="[Command.link(ref('group_linkup_admin')), Command.link(ref('base.group_system'))]"
+        />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_res_users_linkup_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all users</field>
+        <field name="model_id" ref="base.model_res_users" />
+        <field
+            name="groups"
+            eval="[Command.link(ref('group_linkup_admin')), Command.link(ref('base.group_system'))]"
+        />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Reflections: a member reads those they wrote, and those addressed
+         to them once sent. A withdrawn reflection leaves the recipient's
+         reading: its content is no longer theirs to see. A phantom one,
+         sent to a member who blocks its author, never reaches it. -->
+    <record id="rule_linkup_reflet_member" model="ir.rule">
+        <field name="name">LinkUp member: own reflections</field>
+        <field name="model_id" ref="model_linkup_reflet" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[
+            '|',
+            ('author_id', '=', user.id),
+            '&amp;', '&amp;',
+            ('recipient_id', '=', user.id),
+            ('state', 'not in', ('draft', 'withdrawn')),
+            ('phantom', '=', False),
+        ]</field>
+    </record>
+
+    <!-- Links: a member reads the links they are part of. -->
+    <record id="rule_linkup_link_member" model="ir.rule">
+        <field name="name">LinkUp member: own links</field>
+        <field name="model_id" ref="model_linkup_link" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[
+            '|',
+            ('user_a_id', '=', user.id),
+            ('user_b_id', '=', user.id),
+        ]</field>
+    </record>
+
+    <!-- Highlights: a member reads those they sent or received; a LinkUp
+         administrator reads and edits them all. A phantom one, sent to a
+         member who blocks its sender, never reaches its recipient. -->
+    <record id="rule_linkup_highlight_member" model="ir.rule">
+        <field name="name">LinkUp member: own highlights</field>
+        <field name="model_id" ref="model_linkup_highlight" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[
+            '|',
+            ('sender_id', '=', user.id),
+            '&amp;',
+            ('recipient_id', '=', user.id),
+            ('phantom', '=', False),
+        ]</field>
+    </record>
+
+    <record id="rule_linkup_highlight_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all highlights</field>
+        <field name="model_id" ref="model_linkup_highlight" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_admin'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Blocks: a member reads the blocks they hold, never one held on
+         them; moderators and administrators read them all. Nobody writes
+         them outside the methods of linkup.block. -->
+    <record id="rule_linkup_block_member" model="ir.rule">
+        <field name="name">LinkUp member: own blocks</field>
+        <field name="model_id" ref="model_linkup_block" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[('blocker_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_linkup_block_moderator" model="ir.rule">
+        <field name="name">LinkUp moderator: all blocks</field>
+        <field name="model_id" ref="model_linkup_block" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_moderator'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Invitations: a member reads the invitations they sent; a LinkUp
+         administrator reads and manages them all. -->
+    <record id="rule_linkup_invitation_member" model="ir.rule">
+        <field name="name">LinkUp member: own invitations</field>
+        <field name="model_id" ref="model_linkup_invitation" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[('inviter_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_linkup_invitation_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all invitations</field>
+        <field name="model_id" ref="model_linkup_invitation" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_admin'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Reports: a member reads the reports they made; a moderator reads
+         the others too, except those about themself; an administrator
+         reads them all. -->
+    <record id="rule_linkup_report_member" model="ir.rule">
+        <field name="name">LinkUp member: own reports</field>
+        <field name="model_id" ref="model_linkup_report" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_member'))]" />
+        <field name="domain_force">[('reporter_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_linkup_report_moderator" model="ir.rule">
+        <field name="name">LinkUp moderator: reports about others</field>
+        <field name="model_id" ref="model_linkup_report" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_moderator'))]" />
+        <field name="domain_force">[('reported_user_id', '!=', user.id)]</field>
+    </record>
+
+    <record id="rule_linkup_report_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all reports</field>
+        <field name="model_id" ref="model_linkup_report" />
+        <field name="groups" eval="[Command.link(ref('group_linkup_admin'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkup_category_member,linkup.category member,model_linkup_category,group_linkup_member,1,0,0,0
+access_linkup_category_admin,linkup.category admin,model_linkup_category,group_linkup_admin,1,1,1,1
+access_linkup_reflet_member,linkup.reflet member,model_linkup_reflet,group_linkup_member,1,0,0,0
+access_linkup_reflet_secret_none,linkup.reflet.secret server only,model_linkup_reflet_secret,group_linkup_admin,0,0,0,0
+access_linkup_link_member,linkup.link member,model_linkup_link,group_linkup_member,1,0,0,0
+access_linkup_highlight_member,linkup.highlight member,model_linkup_highlight,group_linkup_member,1,0,0,0
+access_linkup_highlight_admin,linkup.highlight admin,model_linkup_highlight,group_linkup_admin,1,1,1,1
+access_linkup_block_member,linkup.block member,model_linkup_block,group_linkup_member,1,0,0,0
+access_linkup_report_member,linkup.report member,model_linkup_report,group_linkup_member,1,0,0,0
+access_linkup_report_moderator,linkup.report moderator,model_linkup_report,group_linkup_moderator,1,1,0,0
+access_linkup_report_admin,linkup.report admin,model_linkup_report,group_linkup_admin,1,1,1,1
+access_linkup_invitation_member,linkup.invitation member,model_linkup_invitation,group_linkup_member,1,0,0,0
+access_linkup_invitation_admin,linkup.invitation admin,model_linkup_invitation,group_linkup_admin,1,1,1,1
+access_linkup_email_blocklist_admin,linkup.email.blocklist admin,model_linkup_email_blocklist,group_linkup_admin,1,0,0,0

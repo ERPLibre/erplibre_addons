@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupCategoryPicker">
+        <div
+            class="o-linkup-CategoryPicker d-flex flex-wrap gap-1"
+            role="toolbar"
+            t-att-aria-label="props.label"
+            t-on-keydown="onKeydown"
+            t-ref="root"
+        >
+            <t t-foreach="props.categories" t-as="category" t-key="category.id">
+                <button
+                    type="button"
+                    class="o-linkup-CategoryPicker-option btn d-inline-flex flex-column align-items-center gap-1"
+                    t-att-class="{
+                        'o-isSelected': isSelected(category),
+                        'o-isUnavailable': isUnavailable(category),
+                    }"
+                    t-att-data-code="category.code"
+                    data-linkup-guide="category"
+                    t-att-data-linkup-guide-context="props.guideContext"
+                    t-att-aria-pressed="isSelected(category) ? 'true' : 'false'"
+                    t-att-aria-disabled="props.disabled or isUnavailable(category) ? 'true' : undefined"
+                    t-att-aria-label="optionLabel(category)"
+                    t-att-title="category.definition or category.name"
+                    t-on-click="() => this.onClick(category)"
+                >
+                    <LinkupCategoryIcon code="category.code" />
+                    <span class="o-linkup-CategoryPicker-name small text-truncate" t-esc="category.name" />
+                </button>
+            </t>
+        </div>
+    </t>
+</templates>

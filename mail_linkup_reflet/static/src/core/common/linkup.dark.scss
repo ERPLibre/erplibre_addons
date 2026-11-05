@@ -1,0 +1,46 @@
+// Tints of the LinkUp views in the dark theme, after the light rules of
+// linkup.scss: mixed with $gray-100 as mail does for its bubbles, so the
+// cards stay distinct from the background of the thread.
+
+$o-linkup-tint-dark: mix($gray-100, $info, 87.5%);
+
+.o-linkup-RefletCard {
+    border-color: lighten($o-linkup-tint-dark, 5%) !important;
+
+    .o-linkup-RefletCard-header {
+        background-color: $o-linkup-tint-dark;
+    }
+
+    .o-linkup-RefletCard-badge,
+    .o-linkup-RefletCard-footer {
+        border-color: lighten($o-linkup-tint-dark, 5%);
+    }
+
+    &.o-linkup-RefletCard-isMuted .o-linkup-RefletCard-header {
+        background-color: mix($gray-100, $gray-400, 75%);
+    }
+}
+
+.o-linkup-RefletForm {
+    background-color: mix($gray-100, $info, 95%);
+    border-color: lighten($o-linkup-tint-dark, 5%) !important;
+
+    .o-linkup-RefletForm-example {
+        &.o-linkup-isDo {
+            background-color: mix($gray-100, $success, 85%);
+        }
+
+        &.o-linkup-isDont {
+            background-color: mix($gray-100, $danger, 85%);
+        }
+    }
+}
+
+.o-linkup-RefletActions {
+    border-top-color: lighten($o-linkup-tint-dark, 5%);
+}
+
+.o-linkup-StartRule {
+    background-color: $o-linkup-tint-dark;
+    border-color: lighten($o-linkup-tint-dark, 5%) !important;
+}

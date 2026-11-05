@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupRefletCard">
+        <!-- An article rather than a section: a named section is a landmark,
+             and a thread holds many cards. -->
+        <article
+            class="o-linkup-RefletCard border rounded-3 overflow-hidden"
+            t-att-class="{
+                'o-linkup-RefletCard-isCompact': props.compact,
+                'o-linkup-RefletCard-isPreview': props.preview,
+                'o-linkup-RefletCard-isMuted': isIgnored or ['rejected', 'expired', 'withdrawn'].includes(reflet.state),
+            }"
+            t-att-data-kind="reflet.kind"
+            t-att-data-state="reflet.state"
+            t-att-data-guess-state="reflet.kind === 'precision' ? reflet.guess_state : undefined"
+            t-att-data-role="role"
+            t-att-aria-label="title"
+            t-att-tabindex="isValidatable ? 0 : undefined"
+            t-att-aria-keyshortcuts="isValidatable ? 'ArrowRight ArrowLeft' : undefined"
+            t-on-keydown="onKeydown"
+            t-ref="root"
+        >
+            <div class="o-linkup-RefletCard-header d-flex align-items-center gap-2 px-3 py-2">
+                <LinkupCategoryIcon
+                    t-if="iconCategory or isThemeHidden"
+                    code="iconCategory?.code"
+                    hidden="isThemeHidden"
+                    label="iconLabel"
+                />
+                <span class="o-linkup-RefletCard-title fw-bold text-break" t-esc="title" />
+                <span
+                    t-if="badge"
+                    class="o-linkup-RefletCard-badge badge rounded-pill ms-auto flex-shrink-0"
+                    t-esc="badge"
+                />
+            </div>
+            <t t-if="showTexts">
+                <div
+                    t-if="reflet.you_said or reflet.understood or bodyText"
+                    class="o-linkup-RefletCard-body d-flex flex-column gap-2 px-3 py-2"
+                >
+                    <div t-if="reflet.you_said" class="o-linkup-RefletCard-youSaid">
+                        <span class="o-linkup-RefletCard-label" t-esc="youSaidLabel" />
+                        <span class="o-linkup-RefletCard-text" t-esc="reflet.you_said" />
+                    </div>
+                    <div t-if="reflet.understood" class="o-linkup-RefletCard-understood">
+                        <span t-if="understoodLabel" class="o-linkup-RefletCard-label" t-esc="understoodLabel" />
+                        <span class="o-linkup-RefletCard-text" t-esc="reflet.understood" />
+                    </div>
+                    <div t-if="bodyText" class="o-linkup-RefletCard-bodyText">
+                        <span t-if="bodyLabel" class="o-linkup-RefletCard-label" t-esc="bodyLabel + ' '" />
+                        <span class="o-linkup-RefletCard-text" t-esc="bodyText" />
+                    </div>
+                </div>
+            </t>
+            <div
+                t-if="status and !props.compact"
+                class="o-linkup-RefletCard-footer d-flex align-items-center gap-2 px-3 py-2 small"
+            >
+                <i
+                    t-if="reflet.state === 'sent' and reflet.kind === 'initial'"
+                    class="fa fa-clock-o"
+                    aria-hidden="true"
+                />
+                <span t-esc="status" />
+            </div>
+            <LinkupRefletActions
+                t-if="props.interactive and !props.compact and !props.preview"
+                reflet="reflet"
+                thread="props.thread"
+                onDone="props.onAction"
+            />
+            <div t-if="showSafety" class="o-linkup-RefletCard-safety px-3 pb-2">
+                <LinkupSafetyActions partnerId="reflet.author.id" name="authorName" refletId="reflet.id" />
+            </div>
+        </article>
+    </t>
+</templates>

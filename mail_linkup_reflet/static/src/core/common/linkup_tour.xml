@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupTour">
+        <section
+            t-if="tour.running and step"
+            class="o-linkup-Tour border rounded-3 shadow p-3 d-flex flex-column gap-2"
+            t-att-style="state.style"
+            t-att-data-step="step.id"
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby="o-linkup-Tour-title"
+            aria-describedby="o-linkup-Tour-text"
+            tabindex="-1"
+            t-on-keydown="onKeydown"
+            t-ref="root"
+        >
+            <span class="o-linkup-Tour-step small fw-bold" t-esc="stepLabel" />
+            <h2 id="o-linkup-Tour-title" class="o-linkup-Tour-title h6 mb-0" t-esc="title" />
+            <p id="o-linkup-Tour-text" class="o-linkup-Tour-text small mb-0" t-esc="text" />
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="o-linkup-Tour-skip btn btn-link btn-sm px-0 me-auto" t-on-click="() => this.tour.stop()">
+                    Skip the tour
+                </button>
+                <button type="button" class="o-linkup-Tour-next btn btn-primary btn-sm" t-on-click="() => this.tour.next()">
+                    <t t-if="isLast">Finish</t>
+                    <t t-else="">Next</t>
+                </button>
+            </div>
+        </section>
+    </t>
+</templates>

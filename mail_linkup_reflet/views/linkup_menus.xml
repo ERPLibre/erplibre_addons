@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- The Reflet view (static/src/views/reflet_view), also the home action
+         of a member (res.users.action_id): the users that point to it follow
+         its tag. -->
+    <record id="action_linkup_home" model="ir.actions.client">
+        <field name="name">Reflet view</field>
+        <field name="tag">linkup.reflet_view</field>
+        <field name="path">linkup</field>
+    </record>
+
+    <!-- The help of the categories (static/src/views/help), also opened
+         from the user menu of a member. -->
+    <record id="action_linkup_help" model="ir.actions.client">
+        <field name="name">LinkUp help</field>
+        <field name="tag">linkup.help</field>
+        <field name="path">linkup-help</field>
+    </record>
+
+    <!-- LinkUp lives under Discuss: the app switcher of a member shows
+         Discuss only. -->
+    <menuitem
+        id="menu_linkup_root"
+        name="LinkUp"
+        parent="mail.menu_root_discuss"
+        groups="group_linkup_member"
+        sequence="2"
+    />
+
+    <menuitem
+        id="menu_linkup_reflet_view"
+        name="Reflet view"
+        parent="menu_linkup_root"
+        action="action_linkup_home"
+        groups="group_linkup_member"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_linkup_help"
+        name="Help"
+        parent="menu_linkup_root"
+        action="action_linkup_help"
+        groups="group_linkup_member"
+        sequence="90"
+    />
+</odoo>

@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupRefletView">
+        <div class="o-linkup-RefletView o_action d-flex flex-column h-100 overflow-auto" t-ref="root">
+            <header class="o-linkup-RefletView-header d-flex align-items-center gap-2 px-3 py-2 border-bottom">
+                <div class="d-flex flex-column">
+                    <h1 class="h4 mb-0">Reflet view</h1>
+                    <span class="small" t-esc="store.self?.name" />
+                </div>
+                <LinkupProfileMenu avatarUrl="selfAvatarUrl" highlighted="highlights.length > 0" />
+                <div
+                    t-if="highlights.length"
+                    class="o-linkup-Highlights o-linkup-RefletView-highlights d-flex align-items-center gap-1 ms-2"
+                    role="status"
+                    t-att-title="highlightsLabel"
+                >
+                    <span class="d-flex">
+                        <img
+                            t-foreach="highlights.slice(0, 3)"
+                            t-as="highlight"
+                            t-key="highlight.id"
+                            class="o-linkup-Highlights-avatar rounded-circle"
+                            t-att-src="highlight.sender?.avatarUrl"
+                            alt=""
+                        />
+                    </span>
+                    <span t-if="highlights.length > 3" class="o-linkup-Highlights-count" t-esc="highlightsMore" />
+                    <span class="visually-hidden" t-esc="highlightsLabel" />
+                </div>
+            </header>
+            <p t-if="state.loadError" class="o-linkup-RefletView-error m-3" role="alert">
+                LinkUp could not be loaded, try again.
+            </p>
+            <p t-elif="!state.loaded" class="o-linkup-RefletView-loading m-3" role="status">Loading…</p>
+            <div t-else="" class="o-linkup-RefletView-body d-flex flex-column flex-md-row gap-3 p-3 flex-grow-1">
+                <section t-if="state.newlink" class="o-linkup-RefletView-main d-flex flex-column gap-3 flex-grow-1">
+                    <t t-call="mail_linkup_reflet.LinkupNewlink" />
+                </section>
+                <section t-else="" class="o-linkup-RefletView-main d-flex flex-column gap-3 flex-grow-1">
+                    <LinkupHelpBar
+                        barCategories="store.linkupBarCategories"
+                        allCategories="store.linkupCategories"
+                        selected="category"
+                        onSelect.bind="onSelectCategory"
+                        label="helpLabel"
+                    />
+                    <p class="o-linkup-RefletView-hint small mb-0" t-esc="hint" />
+                    <div
+                        t-if="state.notice"
+                        class="o-linkup-RefletView-notice d-flex flex-wrap align-items-center gap-2"
+                        role="status"
+                    >
+                        <span>
+                            <i class="fa fa-check me-1" aria-hidden="true" />
+                            <t t-esc="state.notice" />
+                        </span>
+                        <button
+                            t-if="state.lastSent"
+                            type="button"
+                            class="o-linkup-RefletView-sentChat btn btn-link btn-sm p-0"
+                            t-ref="sent"
+                            t-on-click="() => this.openConversation(state.lastSent)"
+                            t-esc="openChatLabel(state.lastSent)"
+                        />
+                    </div>
+                    <div class="o-linkup-RefletView-card d-flex flex-column gap-2">
+                        <p
+                            t-if="!state.formOpen"
+                            class="o-linkup-RefletView-placeholder border rounded-3 p-4 mb-0 text-center"
+                        >
+                            No card yet: choose a category.
+                        </p>
+                        <t t-else="">
+                            <div class="o-linkup-RefletView-recipient d-flex flex-wrap align-items-center gap-2">
+                                <span t-if="recipient" class="fw-bold" t-esc="recipientLabel" />
+                                <span t-else="" class="small">Who told you this?</span>
+                                <button
+                                    type="button"
+                                    class="o-linkup-RefletView-sendTo btn btn-secondary btn-sm"
+                                    data-linkup-guide="reflet-view-send-to"
+                                    aria-haspopup="listbox"
+                                    t-att-aria-expanded="state.pickerOpen ? 'true' : 'false'"
+                                    t-att-disabled="!state.contacts.length"
+                                    t-on-click="() => state.pickerOpen ? this.closePicker() : this.openPicker()"
+                                    t-ref="sendTo"
+                                >
+                                    Send to…
+                                </button>
+                            </div>
+                            <ul
+                                t-if="state.pickerOpen"
+                                class="o-linkup-RefletView-picker list-unstyled border rounded-3 p-1 mb-0"
+                                role="listbox"
+                                tabindex="0"
+                                aria-label="Send to…"
+                                t-att-aria-activedescendant="pickerActiveId"
+                                t-on-keydown="onPickerKeydown"
+                                t-ref="picker"
+                            >
+                                <li
+                                    t-foreach="state.contacts"
+                                    t-as="contact"
+                                    t-key="contact.user_id"
+                                    class="o-linkup-RefletView-option d-flex align-items-center gap-2 rounded-2 px-2 py-1"
+                                    t-att-class="{ 'o-isActive': contact_index === state.pickerIndex }"
+                                    role="option"
+                                    t-att-id="pickerOptionId(contact)"
+                                    t-att-aria-selected="contact_index === state.pickerIndex ? 'true' : 'false'"
+                                    t-att-data-user-id="contact.user_id"
+                                    t-on-click="() => this.pick(contact)"
+                                >
+                                    <img
+                                        class="o-linkup-RefletView-avatar rounded-circle"
+                                        t-att-src="avatarUrl(contact)"
+                                        alt=""
+                                    />
+                                    <span t-esc="contact.name" />
+                                </li>
+                            </ul>
+                            <t t-call="mail_linkup_reflet.LinkupRefletForm" />
+                        </t>
+                    </div>
+                    <section
+                        t-if="sentReflets.length"
+                        class="o-linkup-RefletView-sent d-flex flex-column gap-2"
+                        aria-labelledby="o-linkup-RefletView-sentTitle"
+                    >
+                        <h2 id="o-linkup-RefletView-sentTitle" class="h6 mb-0">Reflections sent, waiting</h2>
+                        <ul class="list-unstyled d-flex flex-column gap-2 mb-0" aria-live="polite">
+                            <li t-foreach="sentReflets" t-as="reflet" t-key="reflet.id">
+                                <LinkupRefletCard reflet="reflet" interactive="true" onAction.bind="onSentAction" />
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+                <aside
+                    class="o-linkup-RefletView-contacts d-flex flex-column gap-2"
+                    aria-labelledby="o-linkup-RefletView-contactsTitle"
+                >
+                    <button
+                        type="button"
+                        class="o-linkup-RefletView-newlink btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center gap-2"
+                        t-att-class="{ 'o-isDropTarget': state.hoverNewlink }"
+                        data-linkup-guide="reflet-view-newlink"
+                        t-att-aria-pressed="state.newlink ? 'true' : 'false'"
+                        t-on-click="() => this.startNewlink()"
+                        t-ref="newlink"
+                    >
+                        <i class="fa fa-user-plus" aria-hidden="true" />
+                        <span>+ NewLink</span>
+                    </button>
+                    <h2 id="o-linkup-RefletView-contactsTitle" class="h6 mb-0">Contacts</h2>
+                    <p t-if="!state.contacts.length" class="o-linkup-RefletView-empty small mb-0">
+                        Nobody here yet. The people you share a conversation or a confirmed reflection with appear here.
+                    </p>
+                    <ul t-else="" class="list-unstyled d-flex flex-column gap-1 mb-0">
+                        <li
+                            t-foreach="state.contacts"
+                            t-as="contact"
+                            t-key="contact.user_id"
+                            class="o-linkup-RefletView-contact d-flex align-items-center gap-1 rounded-3"
+                            t-att-class="{
+                                'o-isDropTarget': state.hoverUserId === contact.user_id,
+                                'o-isSelected': state.recipientUserId === contact.user_id,
+                            }"
+                            t-att-data-user-id="contact.user_id"
+                        >
+                            <button
+                                type="button"
+                                class="o-linkup-RefletView-contactSelect btn d-flex align-items-center gap-2 flex-grow-1 text-start p-1"
+                                data-linkup-guide="reflet-view-contact"
+                                t-att-aria-pressed="state.recipientUserId === contact.user_id ? 'true' : 'false'"
+                                t-on-click="() => this.selectRecipient(contact)"
+                            >
+                                <img
+                                    class="o-linkup-RefletView-avatar rounded-circle"
+                                    t-att-class="{ 'o-linkup-isHighlighted': isHighlightedBy(contact) }"
+                                    t-att-src="avatarUrl(contact)"
+                                    alt=""
+                                />
+                                <span class="o-linkup-RefletView-name text-truncate" t-esc="contact.name" />
+                                <span
+                                    t-if="isHighlightedBy(contact)"
+                                    class="o-linkup-RefletView-highlightedBy visually-hidden"
+                                    t-esc="highlightLabel(contact)"
+                                />
+                                <span
+                                    t-if="isHighlightedByMe(contact)"
+                                    class="o-linkup-RefletView-highlightedByMe"
+                                    t-att-title="highlightedByMeLabel(contact)"
+                                >
+                                    <i class="fa fa-sun-o" aria-hidden="true" />
+                                    <span class="visually-hidden" t-esc="highlightedByMeLabel(contact)" />
+                                </span>
+                                <span
+                                    t-if="contact.unread_count"
+                                    class="o-linkup-RefletView-unread badge rounded-pill text-bg-danger ms-auto"
+                                    t-esc="unreadLabel(contact)"
+                                />
+                            </button>
+                            <button
+                                t-if="canOpenConversation(contact)"
+                                type="button"
+                                class="o-linkup-RefletView-openChat btn btn-link p-1"
+                                t-att-aria-label="openChatLabel(contact)"
+                                t-att-title="openChatLabel(contact)"
+                                t-on-click="() => this.openConversation(contact)"
+                            >
+                                <i class="fa fa-comments" aria-hidden="true" />
+                            </button>
+                        </li>
+                    </ul>
+                    <section
+                        t-if="pendingInvitations.length"
+                        class="o-linkup-RefletView-invitations d-flex flex-column gap-1 mt-2"
+                        aria-labelledby="o-linkup-RefletView-invitationsTitle"
+                    >
+                        <h2 id="o-linkup-RefletView-invitationsTitle" class="h6 mb-0">Pending invitations</h2>
+                        <ul class="list-unstyled d-flex flex-column gap-1 mb-0">
+                            <li t-foreach="pendingInvitations" t-as="invitation" t-key="invitation.id">
+                                <button
+                                    type="button"
+                                    class="o-linkup-RefletView-invitation btn d-flex flex-column align-items-start w-100 text-start p-1"
+                                    t-att-aria-pressed="state.newlink?.invitation?.id === invitation.id ? 'true' : 'false'"
+                                    t-on-click="() => this.openInvitation(invitation)"
+                                >
+                                    <span class="text-truncate mw-100" t-esc="invitationLabel(invitation)" />
+                                    <span class="small">Invitation sent · reflection waiting</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </section>
+                </aside>
+            </div>
+            <footer
+                t-if="state.loaded"
+                class="o-linkup-RefletView-footer d-flex flex-column align-items-start gap-2 px-3 pb-3"
+            >
+                <button
+                    type="button"
+                    class="o-linkup-RefletView-happiness btn d-flex align-items-center gap-2 text-start p-2 border rounded-3"
+                    data-linkup-guide="reflet-view-happiness"
+                    aria-haspopup="listbox"
+                    t-att-aria-expanded="state.happinessOpen ? 'true' : 'false'"
+                    t-att-disabled="!state.contacts.length or state.happinessBusy"
+                    t-on-click="() => state.happinessOpen ? this.closeHappiness() : this.openHappiness()"
+                    t-ref="happiness"
+                >
+                    <i class="fa fa-sun-o fa-lg" aria-hidden="true" />
+                    <span class="d-flex flex-column">
+                        <span class="fw-bold">You add to my happiness</span>
+                        <span class="small" t-esc="happinessHint" />
+                    </span>
+                </button>
+                <ul
+                    t-if="state.happinessOpen"
+                    class="o-linkup-RefletView-happinessList o-linkup-RefletView-picker list-unstyled border rounded-3 p-1 mb-0"
+                    role="listbox"
+                    tabindex="0"
+                    aria-label="Put someone in the light"
+                    t-att-aria-activedescendant="happinessActiveId"
+                    t-on-keydown="onHappinessKeydown"
+                    t-ref="happinessList"
+                >
+                    <li
+                        t-foreach="state.contacts"
+                        t-as="contact"
+                        t-key="contact.user_id"
+                        class="o-linkup-RefletView-option d-flex align-items-center gap-2 rounded-2 px-2 py-1"
+                        t-att-class="{ 'o-isActive': contact_index === state.happinessIndex }"
+                        role="option"
+                        t-att-id="happinessOptionId(contact)"
+                        t-att-aria-selected="contact_index === state.happinessIndex ? 'true' : 'false'"
+                        t-att-data-user-id="contact.user_id"
+                        t-on-click="() => this.highlightContact(contact)"
+                    >
+                        <img class="o-linkup-RefletView-avatar rounded-circle" t-att-src="avatarUrl(contact)" alt="" />
+                        <span t-esc="contact.name" />
+                    </li>
+                </ul>
+                <p
+                    t-if="state.happinessNotice"
+                    class="o-linkup-RefletView-happinessNotice small mb-0"
+                    role="status"
+                    t-esc="state.happinessNotice"
+                />
+                <LinkupErrorAlert
+                    t-if="state.happinessError"
+                    error="state.happinessError"
+                    className="'o-linkup-RefletView-happinessError'"
+                />
+            </footer>
+        </div>
+    </t>
+
+    <!-- NewLink in the Reflet view (reflet_view.js): the address, the card,
+         the preview of the email, then the invitation sent. -->
+    <t t-name="mail_linkup_reflet.LinkupNewlink">
+        <div class="o-linkup-Newlink d-flex flex-column gap-3" t-att-data-step="state.newlink.step">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <h2 class="h5 mb-0">NewLink</h2>
+                <span t-if="newlinkStepLabel" class="o-linkup-Newlink-step small" t-esc="newlinkStepLabel" />
+                <button
+                    type="button"
+                    class="o-linkup-Newlink-close btn btn-link btn-sm ms-auto"
+                    t-on-click="closeNewlink"
+                >
+                    Close
+                </button>
+            </div>
+            <form
+                t-if="state.newlink.step === 'contact'"
+                class="o-linkup-Newlink-contact d-flex flex-column gap-2 border rounded-3 p-3"
+                t-on-submit.prevent="newlinkNext"
+            >
+                <p class="fw-bold mb-0">How can LinkUp reach this person?</p>
+                <label class="d-flex flex-column gap-1 small">
+                    <span>Email</span>
+                    <input
+                        type="email"
+                        name="email"
+                        class="o-linkup-Newlink-email form-control"
+                        autocomplete="off"
+                        t-model="state.newlink.email"
+                        t-att-aria-invalid="state.error?.field === 'email' ? 'true' : undefined"
+                        t-ref="newlinkEmail"
+                    />
+                    <span>LinkUp sends them a personal signup link.</span>
+                </label>
+                <label class="d-flex flex-column gap-1 small">
+                    <span>Name to remember them, seen by you only</span>
+                    <input
+                        type="text"
+                        name="name"
+                        class="o-linkup-Newlink-name form-control"
+                        maxlength="100"
+                        autocomplete="off"
+                        t-model="state.newlink.name"
+                    />
+                </label>
+                <LinkupErrorAlert
+                    t-if="state.error"
+                    error="state.error"
+                    className="'o-linkup-Newlink-error'"
+                />
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary btn-sm" t-on-click="closeNewlink">Cancel</button>
+                    <button type="submit" class="o-linkup-Newlink-next btn btn-primary btn-sm">
+                        Next: the reflection
+                    </button>
+                </div>
+            </form>
+            <t t-elif="state.newlink.step === 'reflet'">
+                <p class="fw-bold mb-0" t-esc="newlinkRefletTitle" />
+                <LinkupHelpBar
+                    barCategories="store.linkupBarCategories"
+                    allCategories="store.linkupCategories"
+                    selected="category"
+                    onSelect.bind="onSelectCategory"
+                    label="helpLabel"
+                />
+                <p t-if="!state.formOpen" class="o-linkup-RefletView-placeholder border rounded-3 p-4 mb-0 text-center">
+                    No card yet: choose a category.
+                </p>
+                <t t-else="" t-call="mail_linkup_reflet.LinkupRefletForm" />
+            </t>
+            <div t-elif="state.newlink.step === 'preview'" class="o-linkup-Newlink-preview d-flex flex-column gap-2">
+                <p class="fw-bold mb-0">The email LinkUp sends</p>
+                <div class="o-linkup-Newlink-mail border rounded-3 p-3 small">
+                    <p class="mb-1">
+                        <span class="fw-bold">To:</span>
+                        <t t-esc="state.newlink.email" />
+                    </p>
+                    <p class="mb-2">
+                        <span class="fw-bold">Subject:</span>
+                        <t t-esc="newlinkMailSubject" />
+                    </p>
+                    <p class="mb-1">Hello,</p>
+                    <p class="mb-2" t-esc="newlinkMailIntro" />
+                    <p class="mb-2">
+                        <span class="o-linkup-Newlink-mailButton d-inline-block rounded-2 px-3 py-1">
+                            See the reflection and sign up
+                        </span>
+                    </p>
+                    <p class="mb-1" t-esc="newlinkMailValidity" />
+                    <p class="mb-0">Privacy policy · Never receive a LinkUp invitation again · Version française</p>
+                </div>
+                <p class="o-linkup-Newlink-noText small mb-0">
+                    <i class="fa fa-lock me-1" aria-hidden="true" />
+                    <t t-esc="newlinkNoText" />
+                </p>
+                <p class="o-linkup-Newlink-quota small mb-0" t-esc="newlinkQuotaLabel" />
+                <LinkupErrorAlert
+                    t-if="state.error"
+                    error="state.error"
+                    className="'o-linkup-Newlink-error'"
+                />
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary btn-sm" t-on-click="newlinkBackToCard">Back</button>
+                    <button
+                        type="button"
+                        class="o-linkup-Newlink-send btn btn-primary btn-sm"
+                        t-att-disabled="state.sending or newlinkAtCap"
+                        t-on-click="sendInvitation"
+                    >
+                        <t t-if="newlinkAtCap">Daily limit reached</t>
+                        <t t-else="">Send the invitation</t>
+                    </button>
+                </div>
+            </div>
+            <div t-elif="state.newlink.step === 'sent'" class="o-linkup-Newlink-sent d-flex flex-column gap-2">
+                <t t-set="invitation" t-value="state.newlink.invitation" />
+                <p class="o-linkup-Newlink-sentTo mb-0" role="status" tabindex="-1" t-ref="newlinkStatus">
+                    <i class="fa fa-check me-1" aria-hidden="true" />
+                    <span>Invitation sent to</span>
+                    <strong t-esc="invitation.email" />
+                </p>
+                <div
+                    t-if="invitation.reflet"
+                    class="o-linkup-Newlink-card border rounded-3 p-3 d-flex flex-column gap-1"
+                >
+                    <t t-set="invitationCat" t-value="invitationCategory(invitation)" />
+                    <div class="d-flex flex-wrap align-items-center gap-2 fw-bold">
+                        <LinkupCategoryIcon t-if="invitationCat" code="invitationCat.code" />
+                        <span t-esc="invitationCat?.reflet_title or invitationCat?.name" />
+                        <span class="badge rounded-pill text-bg-secondary fw-normal">Waiting for the signup</span>
+                    </div>
+                    <p class="small mb-0">
+                        <span class="fw-bold">You told me:</span>
+                        <t t-esc="invitation.reflet.you_said" />
+                    </p>
+                    <p class="small mb-0">
+                        <span class="fw-bold">I understood that:</span>
+                        <t t-esc="invitation.reflet.understood" />
+                    </p>
+                </div>
+                <p class="o-linkup-Newlink-expiry small mb-0" t-esc="invitationExpiry(invitation)" />
+                <p class="small mb-0" t-esc="newlinkNoConversation" />
+                <div t-if="state.notice" class="o-linkup-RefletView-notice small" role="status" t-esc="state.notice" />
+                <LinkupErrorAlert
+                    t-if="state.error"
+                    error="state.error"
+                    className="'o-linkup-Newlink-error'"
+                />
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-Newlink-resend btn btn-secondary btn-sm"
+                        t-att-disabled="state.newlinkBusy or newlinkAtCap"
+                        t-on-click="resendInvitation"
+                    >
+                        Send the link again
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-Newlink-cancel btn btn-outline-danger btn-sm"
+                        t-att-disabled="state.newlinkBusy"
+                        t-on-click="cancelInvitation"
+                    >
+                        Cancel the invitation
+                    </button>
+                </div>
+                <p class="o-linkup-Newlink-quota small mb-0" t-esc="newlinkQuotaLabel" />
+            </div>
+            <div
+                t-elif="state.newlink.step === 'cancelled'"
+                class="o-linkup-Newlink-cancelled d-flex flex-column gap-2"
+            >
+                <p class="mb-0" role="status" tabindex="-1" t-ref="newlinkStatus">
+                    Invitation cancelled. The link no longer works. Your reflection is back in your drafts.
+                </p>
+                <div>
+                    <button
+                        type="button"
+                        class="o-linkup-Newlink-resume btn btn-primary btn-sm"
+                        t-on-click="resumeDraft"
+                    >
+                        Resume the draft
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

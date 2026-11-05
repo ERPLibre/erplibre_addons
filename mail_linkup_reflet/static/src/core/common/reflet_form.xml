@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <!-- The form of a reflection, called from the template of a subclass of
+         LinkupRefletFormBase (reflet_form.js), whose context it uses. -->
+    <t t-name="mail_linkup_reflet.LinkupRefletForm">
+        <form
+            class="o-linkup-RefletForm d-flex flex-column gap-2 border rounded-3 p-3"
+            t-att-aria-label="formTitle"
+            t-on-submit.prevent="send"
+            t-on-keydown="onFormKeydown"
+        >
+            <div class="o-linkup-RefletForm-title d-flex align-items-center gap-2 fw-bold">
+                <LinkupCategoryIcon t-if="category" code="category.code" />
+                <span t-esc="formTitle" />
+            </div>
+            <label class="o-linkup-RefletForm-field d-flex flex-column gap-1 small">
+                <span>You told me:</span>
+                <textarea
+                    name="you_said"
+                    class="o-linkup-RefletForm-youSaid form-control"
+                    rows="2"
+                    t-model="state.you_said"
+                    t-on-input="onInput"
+                    t-att-aria-invalid="state.error?.field === 'you_said' ? 'true' : undefined"
+                    t-ref="youSaid"
+                />
+            </label>
+            <label class="o-linkup-RefletForm-field d-flex flex-column gap-1 small">
+                <span>I understood that:</span>
+                <textarea
+                    name="understood"
+                    class="o-linkup-RefletForm-understood form-control"
+                    rows="2"
+                    t-model="state.understood"
+                    t-on-input="onInput"
+                    t-att-aria-invalid="state.error?.field === 'understood' ? 'true' : undefined"
+                    t-ref="understood"
+                />
+            </label>
+            <p class="o-linkup-RefletForm-hint small mb-0">
+                Rephrase without judgement or evaluation: what you were told, then what you understood.
+            </p>
+            <p t-if="category?.example_do" class="o-linkup-RefletForm-example o-linkup-isDo small mb-0">
+                <span class="fw-bold" t-esc="exampleDoLabel" />
+                <span t-esc="category.example_do" />
+            </p>
+            <p t-if="category?.example_dont" class="o-linkup-RefletForm-example o-linkup-isDont small mb-0">
+                <span class="fw-bold" t-esc="exampleDontLabel" />
+                <span t-esc="category.example_dont" />
+            </p>
+            <div
+                t-if="needsRealWorld"
+                class="o-linkup-RefletForm-realWorld d-flex flex-wrap align-items-center gap-2 small"
+            >
+                <div class="form-check mb-0">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        name="real_world_declared"
+                        t-att-id="'o-linkup-realWorld-' + formId"
+                        t-model="state.real_world_declared"
+                        t-on-change="onInput"
+                        t-att-aria-invalid="state.error?.field === 'real_world_declared' ? 'true' : undefined"
+                        t-ref="realWorld"
+                    />
+                    <label class="form-check-label" t-att-for="'o-linkup-realWorld-' + formId">
+                        I confirm that I had this exchange in person
+                    </label>
+                </div>
+                <label t-if="state.real_world_declared" class="d-flex align-items-center gap-1">
+                    <span>Date of the exchange</span>
+                    <input
+                        type="date"
+                        name="real_world_date"
+                        class="form-control form-control-sm w-auto"
+                        t-att-max="today"
+                        t-model="state.real_world_date"
+                        t-on-change="onInput"
+                    />
+                </label>
+            </div>
+            <LinkupErrorAlert
+                t-if="state.error"
+                error="state.error"
+                className="'o-linkup-RefletForm-error'"
+                onRetry.bind="send"
+            />
+            <div t-if="state.showPreview" class="o-linkup-RefletForm-preview">
+                <LinkupRefletCard reflet="previewReflet" preview="true" />
+            </div>
+            <div class="d-flex flex-wrap align-items-center justify-content-end gap-2">
+                <button
+                    type="button"
+                    class="o-linkup-RefletForm-previewButton btn btn-link btn-sm me-auto px-0"
+                    t-att-aria-expanded="state.showPreview ? 'true' : 'false'"
+                    t-on-click="togglePreview"
+                >
+                    Preview
+                </button>
+                <button type="button" class="o-linkup-RefletForm-cancel btn btn-secondary btn-sm" t-on-click="cancel">
+                    <t t-if="cancelLabel" t-esc="cancelLabel" />
+                    <t t-else="">Cancel</t>
+                </button>
+                <button
+                    type="submit"
+                    class="o-linkup-RefletForm-send btn btn-primary btn-sm"
+                    t-att-disabled="state.sending"
+                >
+                    <t t-if="sendLabel" t-esc="sendLabel" />
+                    <t t-else="">Send the reflection</t>
+                </button>
+            </div>
+        </form>
+    </t>
+</templates>

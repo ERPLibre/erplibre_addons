@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupRefletComposer">
+        <div class="o-linkup-RefletComposer d-flex flex-column gap-2 px-3 pt-2 pb-1">
+            <p t-if="state.loadError" class="o-linkup-RefletComposer-unavailable small text-muted mb-0">
+                LinkUp could not be loaded, try again.
+            </p>
+            <p t-elif="state.info and !available" class="o-linkup-RefletComposer-unavailable small text-muted mb-0">
+                No reflection can be sent in this conversation.
+            </p>
+            <t t-elif="available">
+                <LinkupHelpBar
+                    barCategories="store.linkupBarCategories"
+                    allCategories="store.linkupCategories"
+                    selected="category"
+                    onSelect.bind="onSelectCategory"
+                    label="helpLabel"
+                />
+                <p t-if="state.notice" class="o-linkup-RefletComposer-notice small mb-0" role="status">
+                    <i class="fa fa-check me-1" aria-hidden="true" />
+                    <t t-esc="state.notice" />
+                </p>
+                <t t-if="state.formOpen">
+                    <t t-call="mail_linkup_reflet.LinkupRefletForm" />
+                </t>
+            </t>
+        </div>
+    </t>
+</templates>

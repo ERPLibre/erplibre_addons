@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- Footer of the invitation pages: the page in the other language and
+         the privacy policy, when one is set. -->
+    <template id="linkup_invite_links" name="LinkUp invitation links">
+        <p class="o-linkup-InvitePage-links small text-center mt-3 mb-0">
+            <a t-if="other_lang_url" t-att-href="other_lang_url">Version française</a>
+            <t t-if="privacy_url">
+                ·
+                <a t-att-href="privacy_url">Privacy policy</a>
+            </t>
+        </p>
+    </template>
+
+    <!-- /linkup/invite/<token>: who invites, then the signup form of
+         auth_signup, or the reason why the link no longer serves. The text
+         of the reflection never shows here. -->
+    <template id="linkup_invite_page" name="LinkUp invitation">
+        <t t-call="web.login_layout">
+            <div class="o-linkup-InvitePage" t-att-data-code="code or None">
+                <h1 class="h5">LinkUp</h1>
+                <t t-if="code">
+                    <p class="o-linkup-InvitePage-status alert alert-info" role="status" t-out="message" />
+                    <div class="d-grid gap-2">
+                        <a t-if="signup_enabled" class="btn btn-primary" href="/web/signup">Sign up</a>
+                        <a class="btn btn-link btn-sm" href="/web/login">Log in</a>
+                    </div>
+                </t>
+                <t t-else="">
+                    <p class="o-linkup-InvitePage-intro" t-out="intro" />
+                    <p class="small">
+                        The text of the reflection is not on this page: you will read it in LinkUp once signed up
+                        with the address this invitation was sent to.
+                    </p>
+                    <form class="oe_signup_form o-linkup-InvitePage-form" role="form" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                        <t t-call="auth_signup.fields">
+                            <t t-set="only_passwords" t-value="False" />
+                        </t>
+                        <p class="alert alert-danger" t-if="error" role="alert" t-out="error" />
+                        <div class="text-center oe_login_buttons d-grid pt-3">
+                            <button type="submit" class="btn btn-primary">Sign up and read the reflection</button>
+                            <a t-att-href="login_url" class="btn btn-link btn-sm" role="button">
+                                Already have an account? Log in
+                            </a>
+                        </div>
+                    </form>
+                    <p class="small mt-2 mb-0">
+                        <a t-att-href="optout_url">Never receive a LinkUp invitation again</a>
+                    </p>
+                </t>
+                <t t-call="mail_linkup_reflet.linkup_invite_links" />
+            </div>
+        </t>
+    </template>
+
+    <!-- /linkup/invite/<token>/optout: the refusal of every invitation to
+         the address, asked first then confirmed. -->
+    <template id="linkup_invite_optout_page" name="LinkUp invitation refusal">
+        <t t-call="web.login_layout">
+            <div class="o-linkup-InvitePage" t-att-data-code="code or None">
+                <h1 class="h5">LinkUp</h1>
+                <p t-if="code" class="o-linkup-InvitePage-status alert alert-info" role="status" t-out="message" />
+                <p t-elif="done" class="o-linkup-InvitePage-status alert alert-success" role="status">
+                    Done: LinkUp will no longer send any invitation to this address.
+                </p>
+                <form t-else="" class="o-linkup-InvitePage-optout" role="form" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <p>
+                        LinkUp will no longer send any invitation to the address that received this link, whoever
+                        writes it. Nobody is told.
+                    </p>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Never receive a LinkUp invitation again</button>
+                    </div>
+                </form>
+                <t t-call="mail_linkup_reflet.linkup_invite_links" />
+            </div>
+        </t>
+    </template>
+</odoo>

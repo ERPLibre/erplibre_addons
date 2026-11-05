@@ -1,0 +1,141 @@
+// Guide mode, first-use tour and highlights: variables of web and Bootstrap
+// only, so the dark bundle compiles them with the dark values of the theme.
+
+.o-linkup-GuideButton {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: $border-width solid $primary;
+    background-color: $o-view-background-color;
+    color: $primary;
+
+    &[aria-pressed="true"] {
+        background-color: $primary;
+        color: color-contrast($primary);
+    }
+}
+
+// The number of each element of the guide follows the order of the
+// document, through a counter of the body.
+body.o-linkup-guideActive {
+    counter-reset: linkup-guide;
+
+    [data-linkup-guide] {
+        position: relative;
+        counter-increment: linkup-guide;
+        outline: $border-width * 2 dashed $primary;
+        outline-offset: $border-width;
+
+        &::after {
+            content: counter(linkup-guide);
+            position: absolute;
+            top: -0.6rem;
+            right: -0.6rem;
+            z-index: 1;
+            min-width: 1.25rem;
+            height: 1.25rem;
+            padding: 0 0.25rem;
+            border-radius: 0.625rem;
+            background-color: $primary;
+            color: color-contrast($primary);
+            font-size: $font-size-sm * 0.85;
+            font-weight: $font-weight-bold;
+            line-height: 1.25rem;
+            text-align: center;
+            pointer-events: none;
+        }
+    }
+}
+
+.o-linkup-GuideSheet {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: $zindex-modal;
+    width: 22rem;
+    max-width: calc(100vw - 2rem);
+    max-height: 60vh;
+    overflow-y: auto;
+    background-color: $o-view-background-color;
+    border-color: $primary !important;
+
+    .o-linkup-GuideSheet-cnv {
+        background-color: $o-view-background-color;
+        border: $border-width solid $primary;
+        color: inherit;
+    }
+
+    .o-linkup-GuideSheet-definition p:last-child {
+        margin-bottom: 0;
+    }
+
+    @include media-breakpoint-down(md) {
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        max-width: none;
+        border-bottom-right-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+}
+
+.o-linkup-Tour {
+    position: fixed;
+    z-index: $zindex-modal;
+    width: 20rem;
+    max-width: calc(100vw - 2rem);
+    background-color: $o-view-background-color;
+    border-color: $warning !important;
+
+    &:focus-visible {
+        outline: $border-width * 2 solid $primary;
+    }
+}
+
+.o-linkup-Tour-anchor {
+    outline: $border-width * 3 solid $warning !important;
+    outline-offset: $border-width * 2;
+}
+
+// A member in the light: a golden halo around the avatar.
+.o-linkup-isHighlighted {
+    box-shadow: 0 0 0 0.2rem $warning;
+}
+
+.o-linkup-Highlights {
+    .o-linkup-Highlights-avatar {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-left: -0.35rem;
+        border: $border-width solid $o-view-background-color;
+        object-fit: cover;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+
+    .o-linkup-Highlights-count {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+    }
+}
+
+.o-linkup-Panel-highlight {
+    border-color: $warning !important;
+
+    .o-linkup-Panel-highlightAvatar {
+        width: 2rem;
+        height: 2rem;
+        object-fit: cover;
+    }
+}
+
+.o-linkup-Help {
+    background-color: $o-view-background-color;
+
+    .o-linkup-Help-category {
+        max-width: 48rem;
+    }
+}

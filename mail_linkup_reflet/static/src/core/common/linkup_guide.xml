@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupGuideButton">
+        <button
+            type="button"
+            class="o-linkup-GuideButton btn rounded-circle d-inline-flex align-items-center justify-content-center fw-bold"
+            t-att-class="props.className"
+            t-att-aria-pressed="guide.active ? 'true' : 'false'"
+            t-att-aria-label="label"
+            t-att-title="label"
+            t-on-click="() => this.guide.toggle()"
+        >
+            ?
+        </button>
+    </t>
+
+    <t t-name="mail_linkup_reflet.LinkupGuideSheet">
+        <section
+            t-if="guide.active"
+            class="o-linkup-GuideSheet border rounded-3 shadow p-3 d-flex flex-column gap-2"
+            role="region"
+            aria-labelledby="o-linkup-GuideSheet-title"
+            aria-live="polite"
+            t-ref="root"
+        >
+            <div class="d-flex align-items-center gap-2">
+                <span class="o-linkup-GuideSheet-counter small fw-bold" t-esc="counter" />
+                <button
+                    type="button"
+                    class="o-linkup-GuideSheet-close btn btn-link p-0 ms-auto"
+                    aria-label="Leave the guide"
+                    title="Leave the guide"
+                    t-on-click="() => this.guide.close()"
+                >
+                    <i class="fa fa-times" aria-hidden="true" />
+                </button>
+            </div>
+            <t t-if="el">
+                <h2 id="o-linkup-GuideSheet-title" class="o-linkup-GuideSheet-title h6 d-flex align-items-center gap-2 mb-0">
+                    <LinkupCategoryIcon t-if="category" code="category.code" />
+                    <span t-esc="title" />
+                    <span t-if="category?.is_cnv" class="o-linkup-GuideSheet-cnv badge rounded-pill">NVC</span>
+                </h2>
+                <div t-if="definition" class="o-linkup-GuideSheet-definition small" t-out="definition" />
+                <p t-if="category?.example_do" class="o-linkup-GuideSheet-do small mb-0">
+                    <span class="fw-bold" t-esc="doLabel" />
+                    <span t-esc="category.example_do" />
+                </p>
+                <p t-if="category?.example_dont" class="o-linkup-GuideSheet-dont small mb-0">
+                    <span class="fw-bold" t-esc="dontLabel" />
+                    <span t-esc="category.example_dont" />
+                </p>
+                <p t-if="starter" class="o-linkup-GuideSheet-starter small mb-0">
+                    <span class="fw-bold" t-esc="starterLabel" />
+                    <span t-esc="starter" />
+                </p>
+                <p t-if="behavior" class="o-linkup-GuideSheet-behavior small mb-0">
+                    <span class="fw-bold" t-esc="behaviorLabel" />
+                    <span t-esc="behavior" />
+                </p>
+            </t>
+            <p t-else="" id="o-linkup-GuideSheet-title" class="small mb-0" t-esc="hint" />
+            <div class="d-flex align-items-center gap-2">
+                <button
+                    type="button"
+                    class="o-linkup-GuideSheet-previous btn btn-secondary btn-sm"
+                    aria-label="Previous element"
+                    title="Previous element"
+                    t-on-click="() => this.guide.move(-1)"
+                >
+                    ‹
+                </button>
+                <button
+                    type="button"
+                    class="o-linkup-GuideSheet-next btn btn-secondary btn-sm"
+                    aria-label="Next element"
+                    title="Next element"
+                    t-on-click="() => this.guide.move(1)"
+                >
+                    ›
+                </button>
+                <button
+                    t-if="el"
+                    type="button"
+                    class="o-linkup-GuideSheet-show btn btn-primary btn-sm ms-auto"
+                    t-on-click="() => this.guide.show(noShow)"
+                >
+                    Show
+                </button>
+            </div>
+        </section>
+    </t>
+</templates>

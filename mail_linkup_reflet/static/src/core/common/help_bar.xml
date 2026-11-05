@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupHelpBar">
+        <div
+            class="o-linkup-HelpBar d-flex flex-wrap align-items-center gap-1"
+            role="toolbar"
+            t-att-aria-label="props.label"
+            t-on-keydown="onKeydown"
+            t-ref="root"
+        >
+            <span class="o-linkup-HelpBar-label small fw-bold me-1" aria-hidden="true" t-esc="props.label" />
+            <t t-foreach="categories" t-as="category" t-key="category.id">
+                <button
+                    type="button"
+                    class="o-linkup-HelpBar-category btn d-inline-flex align-items-center justify-content-center"
+                    t-att-class="{ 'o-isSelected': isSelected(category) }"
+                    t-att-data-code="category.code"
+                    data-linkup-guide="category"
+                    data-linkup-guide-context="create"
+                    t-att-aria-label="buttonLabel(category)"
+                    t-att-title="buttonTitle(category)"
+                    t-att-aria-pressed="isSelected(category) ? 'true' : 'false'"
+                    t-on-click="() => props.onSelect(category)"
+                >
+                    <LinkupCategoryIcon code="category.code" />
+                </button>
+            </t>
+            <button
+                type="button"
+                class="o-linkup-HelpBar-toggle btn d-inline-flex align-items-center justify-content-center"
+                data-linkup-guide="help-more"
+                t-att-aria-expanded="state.expanded ? 'true' : 'false'"
+                t-att-aria-label="toggleLabel"
+                t-att-title="toggleLabel"
+                t-on-click="toggle"
+            >
+                <i t-att-class="state.expanded ? 'fa fa-angle-double-left' : 'fa fa-ellipsis-h'" aria-hidden="true" />
+            </button>
+            <LinkupGuideButton className="'ms-1'" />
+        </div>
+    </t>
+</templates>

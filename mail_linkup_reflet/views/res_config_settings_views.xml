@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field
+      name="name"
+    >res.config.settings.view.form.inherit.mail_linkup_reflet</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="mail.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <block id="discuss" position="after">
+                <block title="LinkUp" id="linkup">
+                    <setting
+            id="linkup_start_rule_setting"
+            string="Start rule"
+            help="How a conversation between two members starts: with a confirmed reflection of a real exchange."
+          >
+                        <field name="linkup_start_rule_mode" widget="radio" />
+                    </setting>
+                    <setting
+            id="linkup_invitation_setting"
+            string="NewLink invitations"
+            help="Invitations by email of people who are not members yet."
+          >
+                        <div class="row mt-2">
+                            <label
+                for="linkup_invitation_expiry_days"
+                class="col-lg-6 o_light_label"
+              />
+                            <field name="linkup_invitation_expiry_days" />
+                        </div>
+                        <div class="row">
+                            <label
+                for="linkup_max_invitations_per_day"
+                class="col-lg-6 o_light_label"
+              />
+                            <field name="linkup_max_invitations_per_day" />
+                        </div>
+                        <div class="row">
+                            <label
+                for="linkup_privacy_policy_url"
+                class="col-lg-6 o_light_label"
+              />
+                            <field
+                name="linkup_privacy_policy_url"
+                placeholder="https://"
+              />
+                        </div>
+                    </setting>
+                    <setting
+            id="linkup_first_use_tour_setting"
+            string="First-use tour"
+            help="A short tour starts the first time a member opens Discuss; a member who finished or skipped it no longer sees it."
+          >
+                        <field name="linkup_first_use_tour" />
+                        <div class="mt-2">
+                            <button
+                name="action_linkup_reset_first_use_tour"
+                type="object"
+                string="Reset for all members"
+                icon="fa-refresh"
+                class="btn-link"
+                groups="mail_linkup_reflet.group_linkup_admin"
+              />
+                        </div>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+    <!-- The mode of a conversation, set by a LinkUp administrator. -->
+    <record id="discuss_channel_view_form" model="ir.ui.view">
+        <field
+      name="name"
+    >discuss.channel.form.inherit.mail_linkup_reflet</field>
+        <field name="model">discuss.channel</field>
+        <field name="inherit_id" ref="mail.discuss_channel_view_form" />
+        <field name="arch" type="xml">
+            <field name="description" position="after">
+                <field
+          name="linkup_start_rule"
+          groups="mail_linkup_reflet.group_linkup_admin"
+        />
+                <field
+          name="linkup_effective_start_rule"
+          groups="mail_linkup_reflet.group_linkup_admin"
+        />
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupPanel">
+        <ActionPanel title.translate="LinkUp" icon="'fa fa-link'" minWidth="240" initialWidth="320">
+            <!-- data-reflet-states reads the states of the reflections of the
+                 conversation while rendering, so that a change of one of them
+                 renders the panel again and its effect reloads the link. -->
+            <div
+                class="o-linkup-Panel-content d-flex flex-column gap-3 px-1"
+                t-att-data-reflet-states="refletSignature"
+            >
+                <p t-if="state.loadError" class="small text-muted mb-0">LinkUp could not be loaded, try again.</p>
+                <p t-elif="!state.info" class="small text-muted mb-0">
+                    <i class="fa fa-circle-o-notch fa-spin me-1" aria-hidden="true" />
+                    Loading…
+                </p>
+                <p t-elif="!state.info.available" class="small text-muted mb-0">
+                    LinkUp is not available in this conversation.
+                </p>
+                <t t-else="">
+                    <section
+                        class="o-linkup-Panel-link border rounded-3 p-3 d-flex flex-column gap-1"
+                        t-att-data-state="linkState"
+                    >
+                        <h3 class="fs-6 fw-bold mb-0" t-esc="withLabel" />
+                        <span class="o-linkup-Panel-count fs-4 fw-bold" t-esc="countLabel" />
+                        <span class="o-linkup-Panel-linkState small" t-esc="linkStateLabel" />
+                    </section>
+                    <section
+                        t-if="highlightReceived"
+                        class="o-linkup-Panel-highlight o-linkup-Panel-highlightReceived border rounded-3 p-2 d-flex align-items-center gap-2"
+                        role="status"
+                    >
+                        <img
+                            class="o-linkup-Panel-highlightAvatar o-linkup-isHighlighted rounded-circle"
+                            t-att-src="highlightReceived.sender?.avatarUrl"
+                            alt=""
+                        />
+                        <span class="small fw-bold flex-grow-1" t-esc="highlightReceivedLabel" />
+                        <button
+                            type="button"
+                            class="o-linkup-Panel-highlightDismiss btn btn-link btn-sm p-0"
+                            t-att-disabled="state.highlightBusy"
+                            t-on-click="dismissHighlight"
+                        >
+                            Hide
+                        </button>
+                    </section>
+                    <section class="o-linkup-Panel-highlight o-linkup-Panel-happiness border rounded-3 p-2 d-flex flex-column gap-2">
+                        <button
+                            t-if="!state.confirmHighlight"
+                            type="button"
+                            class="o-linkup-Panel-highlightButton btn d-flex align-items-center gap-2 text-start p-1"
+                            data-linkup-guide="highlight"
+                            t-att-aria-pressed="highlightSent ? 'true' : 'false'"
+                            t-att-disabled="state.highlightBusy"
+                            t-on-click="onClickHighlight"
+                        >
+                            <i class="fa fa-sun-o fa-lg" aria-hidden="true" />
+                            <span class="d-flex flex-column">
+                                <span class="fw-bold">You add to my happiness</span>
+                                <span class="small" t-esc="highlightSubtitle" />
+                            </span>
+                        </button>
+                        <div t-else="" class="o-linkup-Panel-highlightConfirm d-flex flex-column gap-2" role="group" t-att-aria-label="highlightQuestion">
+                            <span class="fw-bold" t-esc="highlightQuestion" />
+                            <span class="small" t-esc="highlightExplanation" />
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button
+                                    type="button"
+                                    class="o-linkup-Panel-highlightCancel btn btn-secondary btn-sm"
+                                    t-on-click="() => this.state.confirmHighlight = false"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    class="o-linkup-Panel-highlightConfirmButton btn btn-primary btn-sm"
+                                    t-att-disabled="state.highlightBusy"
+                                    t-on-click="sendHighlight"
+                                >
+                                    Put in the light
+                                </button>
+                            </div>
+                        </div>
+                        <button
+                            t-if="highlightSent and !state.confirmHighlight"
+                            type="button"
+                            class="o-linkup-Panel-highlightWithdraw btn btn-link btn-sm p-0 align-self-start"
+                            t-att-disabled="state.highlightBusy"
+                            t-on-click="withdrawHighlight"
+                        >
+                            Withdraw my highlight
+                        </button>
+                        <LinkupErrorAlert
+                            t-if="state.highlightError"
+                            error="state.highlightError"
+                            className="'o-linkup-Panel-highlightError'"
+                        />
+                    </section>
+                    <section
+                        t-if="correspondent"
+                        class="o-linkup-Panel-safety border rounded-3 p-2"
+                        t-att-aria-label="safetyLabel"
+                    >
+                        <LinkupSafetyActions
+                            partnerId="correspondent.id"
+                            name="name"
+                            blocked="!!state.info.blocked_by_me"
+                            onChange.bind="onSafetyChange"
+                        />
+                    </section>
+                    <section
+                        class="o-linkup-Panel-reflets d-flex flex-column gap-2"
+                        aria-labelledby="o-linkup-Panel-historyTitle"
+                    >
+                        <h3 id="o-linkup-Panel-historyTitle" class="fs-6 fw-bold text-uppercase small mb-0">
+                            History
+                        </h3>
+                        <div class="o-linkup-Panel-historyFilters d-flex flex-wrap gap-2">
+                            <label class="d-flex flex-column gap-1 small flex-grow-1">
+                                <span>Category</span>
+                                <select
+                                    class="o-linkup-Panel-historyCategory form-select form-select-sm"
+                                    t-on-change="onChangeHistoryCategory"
+                                >
+                                    <option value="" t-att-selected="!state.historyCategoryId">All</option>
+                                    <option
+                                        t-foreach="historyCategories"
+                                        t-as="category"
+                                        t-key="category.id"
+                                        t-att-value="category.id"
+                                        t-att-selected="isHistoryCategory(category)"
+                                        t-esc="category.name"
+                                    />
+                                </select>
+                            </label>
+                            <label class="d-flex flex-column gap-1 small flex-grow-1">
+                                <span>State</span>
+                                <select
+                                    class="o-linkup-Panel-historyState form-select form-select-sm"
+                                    t-on-change="onChangeHistoryState"
+                                >
+                                    <option value="" t-att-selected="!state.historyState">All</option>
+                                    <option
+                                        t-foreach="historyStates"
+                                        t-as="option"
+                                        t-key="option.value"
+                                        t-att-value="option.value"
+                                        t-att-selected="option.value === state.historyState"
+                                        t-esc="option.label"
+                                    />
+                                </select>
+                            </label>
+                        </div>
+                        <p t-if="state.historyError" class="small text-muted mb-0">
+                            LinkUp could not be loaded, try again.
+                        </p>
+                        <p t-elif="!reflets.length and isHistoryFiltered" class="o-linkup-Panel-historyEmpty small text-muted mb-0">
+                            No reflection matches these filters.
+                        </p>
+                        <p t-elif="!reflets.length" class="small text-muted mb-0">No reflection yet.</p>
+                        <ul t-else="" class="o-linkup-Panel-history list-unstyled d-flex flex-column gap-2 mb-0" aria-live="polite">
+                            <li t-foreach="reflets" t-as="reflet" t-key="reflet.id">
+                                <LinkupRefletCard reflet="reflet" />
+                            </li>
+                        </ul>
+                    </section>
+                </t>
+            </div>
+        </ActionPanel>
+    </t>
+</templates>

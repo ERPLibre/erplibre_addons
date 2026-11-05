@@ -1,0 +1,150 @@
+// Reflet view: variables of web and Bootstrap only, so the dark bundle
+// compiles it with the dark values of the theme.
+
+.o-linkup-RefletView {
+    background-color: $o-view-background-color;
+
+    .o-linkup-RefletView-selfAvatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        object-fit: cover;
+    }
+
+    .o-linkup-RefletView-avatar {
+        width: 2rem;
+        height: 2rem;
+        object-fit: cover;
+    }
+
+    .o-linkup-RefletView-main {
+        min-width: 0;
+    }
+
+    .o-linkup-RefletView-placeholder {
+        border-style: dashed !important;
+    }
+
+    .o-linkup-RefletView-picker {
+        max-width: 20rem;
+        max-height: 16rem;
+        overflow-y: auto;
+
+        &:focus-visible {
+            outline: $border-width * 2 solid $primary;
+            outline-offset: $border-width;
+        }
+
+        .o-linkup-RefletView-option {
+            cursor: pointer;
+
+            &.o-isActive {
+                background-color: $primary;
+                color: color-contrast($primary);
+            }
+        }
+    }
+
+    .o-linkup-RefletView-contacts {
+        flex: 0 0 16rem;
+        min-width: 0;
+    }
+
+    .o-linkup-RefletView-contact {
+        border: $border-width solid transparent;
+        transition: transform 0.15s ease-out;
+
+        &.o-isSelected {
+            border-color: $primary;
+        }
+
+        // A category dragged over a contact zooms its row.
+        &.o-isDropTarget {
+            border-color: $primary;
+            transform: scale(1.05);
+        }
+
+        .o-linkup-RefletView-contactSelect {
+            min-width: 0;
+            color: inherit;
+        }
+    }
+
+    .o-linkup-HelpBar-category,
+    .o-linkup-RefletView-happiness {
+        cursor: grab;
+        touch-action: none;
+    }
+
+    .o-linkup-RefletView-happiness {
+        color: inherit;
+        max-width: 24rem;
+    }
+
+    .o-linkup-RefletView-highlightedByMe {
+        color: $warning;
+    }
+
+    .o-linkup-ProfileMenu-avatar {
+        cursor: pointer;
+    }
+
+    // Under the avatar, over the rest of the view.
+    .o-linkup-ProfileMenu-menu {
+        top: 100%;
+        left: 0;
+        z-index: $zindex-dropdown;
+        min-width: 16rem;
+        max-width: 20rem;
+
+        .o-linkup-ProfileMenu-entry[aria-disabled="true"] {
+            color: $text-muted;
+            cursor: default;
+        }
+    }
+
+    // A category dragged over "+ NewLink" zooms it, as a contact.
+    .o-linkup-RefletView-newlink {
+        transition: transform 0.15s ease-out;
+
+        &.o-isDropTarget {
+            transform: scale(1.05);
+        }
+    }
+
+    .o-linkup-RefletView-invitation {
+        color: inherit;
+        border: $border-width solid transparent;
+
+        &[aria-pressed="true"] {
+            border-color: $primary;
+        }
+    }
+
+    .o-linkup-Newlink-mail {
+        background-color: $gray-100;
+    }
+
+    // The button of the email, drawn as text: the preview links nowhere.
+    .o-linkup-Newlink-mailButton {
+        background-color: $primary;
+        color: color-contrast($primary);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .o-linkup-RefletView-newlink {
+            transition: none;
+
+            &.o-isDropTarget {
+                transform: none;
+            }
+        }
+
+        .o-linkup-RefletView-contact {
+            transition: none;
+
+            &.o-isDropTarget {
+                transform: none;
+            }
+        }
+    }
+}

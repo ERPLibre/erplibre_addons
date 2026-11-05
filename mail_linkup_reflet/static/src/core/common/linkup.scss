@@ -1,0 +1,161 @@
+// Colours of the LinkUp views: variables of web and Bootstrap only. The
+// dark bundle compiles them with the dark values of the theme, and
+// linkup.dark.scss adjusts the tints the way mail does for its bubbles.
+// Secondary texts are told apart by their weight and size, never by an
+// opacity: the text colour of web at 75 % falls under the 4.5:1 contrast
+// of AA on a light background, and on a filled button.
+
+$o-linkup-tint: mix($o-view-background-color, $info, 87.5%);
+$o-linkup-tint-border: darken($o-linkup-tint, 10%);
+
+.o-linkup-RefletCard {
+    max-width: 36rem;
+    background-color: $o-view-background-color;
+    border-color: $o-linkup-tint-border !important;
+
+    .o-linkup-RefletCard-header {
+        background-color: $o-linkup-tint;
+    }
+
+    .o-linkup-RefletCard-badge {
+        background-color: $o-view-background-color;
+        border: $border-width solid $o-linkup-tint-border;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .o-linkup-RefletCard-label {
+        font-weight: 500;
+    }
+
+    .o-linkup-RefletCard-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .o-linkup-RefletCard-footer {
+        border-top: $border-width solid $o-linkup-tint-border;
+    }
+
+    &.o-linkup-RefletCard-isMuted .o-linkup-RefletCard-header {
+        background-color: mix($o-view-background-color, $o-gray-400, 75%);
+    }
+
+    &.o-linkup-RefletCard-isPreview {
+        border-style: dashed !important;
+    }
+}
+
+.o-linkup-Message-card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.o-linkup-HelpBar {
+    .o-linkup-HelpBar-category,
+    .o-linkup-HelpBar-toggle {
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        border: $border-width solid $o-gray-300;
+        border-radius: $border-radius-lg;
+        background-color: $o-view-background-color;
+        color: inherit;
+
+        &:hover {
+            border-color: $primary;
+        }
+    }
+
+    .o-linkup-HelpBar-category.o-isSelected {
+        border-color: $primary;
+        background-color: $primary;
+        color: color-contrast($primary);
+    }
+}
+
+.o-linkup-RefletForm {
+    max-width: 40rem;
+    background-color: mix($o-view-background-color, $info, 95%);
+    border-color: $o-linkup-tint-border !important;
+
+    .o-linkup-RefletForm-hint {
+        font-style: italic;
+    }
+
+    .o-linkup-RefletForm-example {
+        padding: map-get($spacers, 1) map-get($spacers, 2);
+        border-radius: $border-radius;
+
+        &.o-linkup-isDo {
+            background-color: mix($o-view-background-color, $success, 90%);
+        }
+
+        &.o-linkup-isDont {
+            background-color: mix($o-view-background-color, $danger, 90%);
+        }
+    }
+}
+
+.o-linkup-Panel-link {
+    background-color: $o-view-background-color;
+}
+
+// A card waiting for its recipient takes the focus: the arrow keys confirm
+// or reject it.
+.o-linkup-RefletCard:focus-visible {
+    outline: $border-width * 2 solid $primary;
+    outline-offset: $border-width * 2;
+}
+
+.o-linkup-RefletActions {
+    border-top: $border-width solid $o-linkup-tint-border;
+
+    .o-linkup-RefletActions-choice {
+        text-align: start;
+        max-width: 20rem;
+    }
+
+    .o-linkup-RefletActions-hint {
+        font-weight: normal;
+    }
+}
+
+.o-linkup-CategoryPicker {
+    .o-linkup-CategoryPicker-option {
+        width: 4.5rem;
+        min-height: 2.75rem;
+        padding: map-get($spacers, 1);
+        border: $border-width solid $o-gray-300;
+        border-radius: $border-radius-lg;
+        background-color: $o-view-background-color;
+        color: inherit;
+
+        &:hover {
+            border-color: $primary;
+        }
+
+        &.o-isSelected {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+
+        &.o-isUnavailable {
+            opacity: 50%;
+            cursor: not-allowed;
+        }
+    }
+
+    .o-linkup-CategoryPicker-name {
+        max-width: 100%;
+        font-size: $font-size-sm * 0.85;
+    }
+}
+
+// Banner of the start rule, in place of the text field in strict mode and
+// above it in incentive mode.
+.o-linkup-StartRule {
+    background-color: $o-linkup-tint;
+    border-color: $o-linkup-tint-border !important;
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- Expires the initial reflections left unanswered for the number of
+         days of the linkup.reflet_expiry_days parameter (30 by default). -->
+    <record id="ir_cron_linkup_reflet_expire" model="ir.cron">
+        <field name="name">LinkUp: expire unanswered reflections</field>
+        <field name="model_id" ref="model_linkup_reflet" />
+        <field name="state">code</field>
+        <field name="code">model._cron_expire_reflets()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+
+    <!-- Expires the NewLink invitations past their date with their waiting
+         reflection, and deletes them one day later (LU-NF-015), with the
+         expired entries of the email blocklist. -->
+    <record id="ir_cron_linkup_invitation_purge" model="ir.cron">
+        <field name="name">LinkUp: expire and purge invitations</field>
+        <field name="model_id" ref="model_linkup_invitation" />
+        <field name="state">code</field>
+        <field name="code">model._cron_linkup_invitations()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+</odoo>

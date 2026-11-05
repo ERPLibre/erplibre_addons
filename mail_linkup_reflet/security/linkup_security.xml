@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="module_category_linkup" model="ir.module.category">
+        <field name="name">LinkUp</field>
+        <field name="description">Access levels of the LinkUp community.</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <!-- Odoo makes every internal user imply the technical features group;
+         a member never holds it. The implication moves from the internal
+         users to the system administrators, so that only they get it. The
+         record is not under noupdate: an update of base links the group
+         back, and the update of this module that follows unlinks it again.
+         The uninstall hook restores the native implication. -->
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[Command.unlink(ref('base.group_no_one'))]" />
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('base.group_no_one'))]" />
+    </record>
+
+    <!-- The three groups form one implication chain, so the user form shows
+         them as a single selection. A member is an internal user and nothing
+         else: every other right comes from the LinkUp groups. -->
+    <record id="group_linkup_member" model="res.groups">
+        <field name="name">Member</field>
+        <field name="category_id" ref="module_category_linkup" />
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]" />
+    </record>
+
+    <record id="group_linkup_moderator" model="res.groups">
+        <field name="name">Moderator</field>
+        <field name="category_id" ref="module_category_linkup" />
+        <field name="implied_ids" eval="[Command.link(ref('group_linkup_member'))]" />
+    </record>
+
+    <record id="group_linkup_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_linkup" />
+        <field name="implied_ids" eval="[Command.link(ref('group_linkup_moderator'))]" />
+        <field
+            name="users"
+            eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]"
+        />
+    </record>
+</odoo>

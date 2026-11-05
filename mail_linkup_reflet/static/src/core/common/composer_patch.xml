@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Composer" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-mail-Composer')]" position="before">
+            <LinkupRefletComposer
+        t-if="hasLinkupReflet and linkupState.open"
+        thread="thread"
+      />
+            <div
+        t-if="linkupStartRule"
+        class="o-linkup-StartRule d-flex flex-wrap align-items-center gap-2 border rounded-3 p-2"
+        t-att-class="env.inChatWindow ? 'mx-2 mb-2' : 'mx-3 mb-2'"
+        t-att-data-mode="linkupStartRule"
+        role="status"
+      >
+                <i
+          class="o-linkup-StartRule-icon fa fa-fw"
+          t-att-class="isLinkupLocked ? 'fa-lock' : 'fa-lightbulb-o'"
+          aria-hidden="true"
+        />
+                <div class="d-flex flex-column flex-grow-1 small">
+                    <span
+            class="o-linkup-StartRule-title fw-bold"
+            t-esc="linkupStartRuleTitle"
+          />
+                    <span
+            class="o-linkup-StartRule-text"
+            t-esc="linkupStartRuleText"
+          />
+                </div>
+                <button
+          t-if="hasLinkupReflet"
+          type="button"
+          class="o-linkup-StartRule-reflet btn btn-primary btn-sm flex-shrink-0"
+          t-on-click="onClickLinkupStart"
+        >
+                    Make a reflection
+                </button>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('o-mail-Composer')]" position="attributes">
+            <attribute
+        name="t-attf-class"
+        add="{{ isLinkupLocked ? 'd-none' : '' }}"
+        separator=" "
+      />
+        </xpath>
+    </t>
+    <t t-inherit="mail.Composer.emojiPicker" t-inherit-mode="extension">
+        <xpath expr="//*[@t-ref='emoji-button']" position="after">
+            <button
+        t-if="hasLinkupReflet"
+        type="button"
+        class="o-linkup-Composer-refletButton btn border-0 rounded-circle p-0"
+        t-att-class="{ 'opacity-100': linkupState.open }"
+        t-att-aria-pressed="linkupState.open ? 'true' : 'false'"
+        title="Write a reflection"
+        aria-label="Write a reflection"
+        t-on-click="onClickLinkupReflet"
+      >
+                <LinkupCategoryIcon code="'reflection'" size="18" />
+            </button>
+        </xpath>
+    </t>
+</templates>

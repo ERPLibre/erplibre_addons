@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupSafetyActions">
+        <div
+            class="o-linkup-Safety d-flex flex-column gap-2"
+            t-att-aria-busy="state.busy ? 'true' : undefined"
+            t-on-keydown="onKeydown"
+        >
+            <div t-if="!state.reportOpen" class="d-flex flex-wrap align-items-center gap-3">
+                <button
+                    t-if="props.refletId and !state.reported"
+                    type="button"
+                    class="o-linkup-Safety-report btn btn-link btn-sm p-0 text-muted"
+                    t-att-disabled="state.busy"
+                    t-on-click="openReport"
+                >
+                    <i class="fa fa-flag me-1" aria-hidden="true" />
+                    Report this reflection
+                </button>
+                <button
+                    t-if="props.blocked"
+                    type="button"
+                    class="o-linkup-Safety-unblock btn btn-link btn-sm p-0"
+                    t-att-disabled="state.busy"
+                    t-on-click="unblock"
+                    t-esc="unblockLabel"
+                />
+                <button
+                    t-else=""
+                    type="button"
+                    class="o-linkup-Safety-block btn btn-link btn-sm p-0 text-muted"
+                    t-att-disabled="state.busy"
+                    t-on-click="askBlock"
+                >
+                    <i class="fa fa-ban me-1" aria-hidden="true" />
+                    <t t-esc="blockLabel" />
+                </button>
+            </div>
+            <form
+                t-else=""
+                class="o-linkup-Safety-reportForm border rounded-3 p-2 d-flex flex-column gap-2"
+                t-att-aria-labelledby="formId + '-title'"
+                t-on-submit.prevent="sendReport"
+            >
+                <span t-att-id="formId + '-title'" class="fw-bold">Why are you reporting this reflection?</span>
+                <label class="visually-hidden" t-att-for="formId + '-reason'">Reason</label>
+                <select
+                    t-att-id="formId + '-reason'"
+                    class="o-linkup-Safety-reason form-select form-select-sm"
+                    t-model="state.reason"
+                    t-ref="reason"
+                >
+                    <option value="">Choose a reason…</option>
+                    <option t-foreach="reasons" t-as="reason" t-key="reason[0]" t-att-value="reason[0]" t-esc="reason[1]" />
+                </select>
+                <label class="small" t-att-for="formId + '-description'">Comment (optional)</label>
+                <textarea
+                    t-att-id="formId + '-description'"
+                    class="o-linkup-Safety-description form-control form-control-sm"
+                    rows="2"
+                    maxlength="2000"
+                    t-model="state.description"
+                />
+                <span class="small text-muted" t-esc="anonymityText" />
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="o-linkup-Safety-cancel btn btn-secondary btn-sm" t-on-click="closeReport">
+                        Cancel
+                    </button>
+                    <button type="submit" class="o-linkup-Safety-send btn btn-primary btn-sm" t-att-disabled="state.busy">
+                        Send the report
+                    </button>
+                </div>
+            </form>
+            <p t-if="state.reported" class="o-linkup-Safety-ack small mb-0" role="status">
+                <i class="fa fa-check me-1" aria-hidden="true" />
+                Thank you, your report is passed on to the moderation.
+            </p>
+            <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-Safety-error'" />
+        </div>
+    </t>
+</templates>
