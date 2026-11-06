@@ -303,6 +303,17 @@ class TestLinkupPointsGamification(LinkupPointsCase):
             {self.france.id},
         )
         self.assertTrue(points["badges"])
+        # The description of a badge is an Html field: the screen prints
+        # its text, never its markup.
+        first_link = next(
+            badge
+            for badge in points["badges"]
+            if badge["id"] == self._badge("badge_first_link").id
+        )
+        self.assertEqual(
+            first_link["description"],
+            "You confirmed a first link with another member.",
+        )
         self.assertEqual(
             Ledger.search([]).user_id, self.sam, "a member reads own lines"
         )

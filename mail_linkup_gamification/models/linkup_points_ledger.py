@@ -11,7 +11,7 @@ from odoo.addons.mail_linkup_reflet.models.res_users import (
     MEMBER_GROUP,
 )
 from odoo.exceptions import AccessError
-from odoo.tools import SQL
+from odoo.tools import SQL, html2plaintext
 from odoo.tools.sql import create_index
 
 from .linkup_points_rule import CAP_REASONS, INELIGIBLE_REASONS
@@ -519,7 +519,10 @@ class LinkupPointsLedger(models.Model):
                 {
                     "id": badge_user.badge_id.id,
                     "name": badge_user.badge_id.name,
-                    "description": badge_user.badge_id.description or "",
+                    # An Html field: the client prints text, never markup.
+                    "description": html2plaintext(
+                        badge_user.badge_id.description or ""
+                    ),
                     "level": badge_user.badge_id.level or False,
                 }
                 for badge_user in me.badge_ids
