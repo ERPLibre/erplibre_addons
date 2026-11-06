@@ -155,6 +155,18 @@ def reference_data(env):
     return reference.id, contacts, category.id
 
 
+def pick_senders(rng, contacts, runs):
+    """``runs`` + 1 distinct contacts, one per sending, the first one for
+    the warm-up. More runs than contacts ends the script with a message
+    instead of an error of ``random.sample``."""
+    if runs + 1 > len(contacts):
+        raise SystemExit(
+            f"--runs {runs} needs {runs + 1} contacts of {REFERENCE_LOGIN}"
+            f" with a conversation, the database has {len(contacts)}."
+        )
+    return rng.sample(contacts, runs + 1)
+
+
 def screens(rng, contacts):
     """The reading points: name, target, and the call, which takes the
     environment of the reference member."""
@@ -243,7 +255,7 @@ def measure_in_process(registry, options):
             note_graph(point, result)
             points.append(point)
         cr.rollback()
-    senders = rng.sample(contacts, options.runs + 1)
+    senders = pick_senders(rng, contacts, options.runs)
     point = Point("send", SEND_TARGET)
     for index, sender_id in enumerate(senders):
         with registry.cursor() as cr:
@@ -400,7 +412,7 @@ def measure_http(registry, options):
     with registry.cursor() as cr:
         env = api.Environment(cr, SUPERUSER_ID, {})
         reference_id, contacts, category_id = reference_data(env)
-    senders = rng.sample(contacts, options.runs + 1)
+    senders = pick_senders(rng, contacts, options.runs)
     passwords = give_passwords(registry, [reference_id] + senders)
     logins = list(passwords)
     reference = Client(url, options.database, logins[0], passwords[logins[0]])
