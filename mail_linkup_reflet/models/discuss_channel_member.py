@@ -126,9 +126,9 @@ class DiscussChannelMember(models.Model):
         yet, a restricted member neither starts nor joins a call: the call
         would carry the free exchange the rule keeps closed. A call started
         or joined in a direct conversation puts out the highlights of the
-        pair (LU-F-052), whether the other party answers or not; the
-        answer of a call opened from the three options ends the turn and
-        reports ``call_answered`` (``linkup.reflet._linkup_call_answered``).
+        pair (LU-F-052), whether the other party answers or not; its
+        answer is reported, and ends the turn when the call opens from the
+        three options (``linkup.reflet._linkup_call_answered``).
         A suspended member calls nobody, and the direct conversation of a
         ``blocked`` pair holds no call (``_linkup_check_reach``).
         """
@@ -150,7 +150,7 @@ class DiscussChannelMember(models.Model):
                     users[0], users[1], "call"
                 )
                 self.env["linkup.reflet"]._linkup_call_answered(
-                    member.channel_id
+                    member.channel_id, member
                 )
         return res
 

@@ -3,6 +3,7 @@
 from . import (
     discuss_channel,
     discuss_channel_member,
+    discuss_channel_rtc_session,
     ir_ui_menu,
     linkup_block,
     linkup_category,

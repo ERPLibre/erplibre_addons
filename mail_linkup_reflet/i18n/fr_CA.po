@@ -587,6 +587,11 @@ msgid "Answered Date"
 msgstr "Date de réponse"
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel_rtc_session__linkup_call_answered
+msgid "Answered call"
+msgstr "Appel répondu"
+
+#. module: mail_linkup_reflet
 #: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__author_id
 msgid "Author"
 msgstr "Auteur"
@@ -1933,6 +1938,11 @@ msgid "Log in"
 msgstr "Se connecter"
 
 #. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_discuss_channel_rtc_session
+msgid "Mail RTC session"
+msgstr "Session RTC de Discussion"
+
+#. module: mail_linkup_reflet
 #: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__primary_category_id
 msgid "Main theme"
 msgstr "Thème principal"
@@ -2447,6 +2457,7 @@ msgid "Personal link, valid %(count)s days, for a single signup."
 msgstr "Lien personnel, valable %(count)s jours, pour une seule inscription."
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__phantom
 #: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__phantom
 msgid "Phantom"
 msgstr "Fantôme"
@@ -3176,6 +3187,15 @@ msgid ""
 msgstr ""
 "La Vue Reflet rassemble tes reflets, personne par personne ; l'aide explique"
 " chaque catégorie."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel_rtc_session__linkup_call_answered
+msgid ""
+"The call this session belongs to was answered: a participant who joins it "
+"again does not answer it a second time."
+msgstr ""
+"L'appel de cette session a été répondu : un participant qui le rejoint de "
+"nouveau n'y répond pas une seconde fois."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_category_code_unique

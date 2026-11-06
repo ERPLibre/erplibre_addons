@@ -6,7 +6,13 @@ import {
   startServer,
 } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { dblclick, press, queryAllTexts, queryFirst } from "@odoo/hoot-dom";
+import {
+  dblclick,
+  press,
+  queryAll,
+  queryAllTexts,
+  queryFirst,
+} from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import {
   Command,
@@ -251,12 +257,13 @@ test("the view restores the draft of the member", async () => {
   await contains(".o-linkup-RefletForm-youSaid", { value: "a garden" });
 });
 
-test("the avatar opens the menu of the settings, its eight entries in order", async () => {
+test("the avatar opens the menu of the settings, its eight entries first", async () => {
   await setupContacts();
   await openRefletView();
   await dblclick(".o-linkup-ProfileMenu-avatar");
   await contains(".o-linkup-ProfileMenu-menu[role='menu']");
-  expect(queryAllTexts(".o-linkup-ProfileMenu-label")).toEqual([
+  // A module that brings a screen adds its entries after these eight.
+  expect(queryAllTexts(".o-linkup-ProfileMenu-label").slice(0, 8)).toEqual([
     "Help",
     "Email",
     "Phone",
@@ -280,7 +287,7 @@ test("the avatar opens the menu of the settings, its eight entries in order", as
   await click(".o-linkup-ProfileMenu-entry[data-entry='phone']");
   await contains(".o-linkup-ProfileMenu-menu");
   await press("End");
-  expect(".o-linkup-ProfileMenu-entry[data-entry='blocked']").toBeFocused();
+  expect(queryAll(".o-linkup-ProfileMenu-entry").at(-1)).toBeFocused();
   await press("Escape");
   await contains(".o-linkup-ProfileMenu-menu", { count: 0 });
   expect(".o-linkup-ProfileMenu-toggle").toBeFocused();

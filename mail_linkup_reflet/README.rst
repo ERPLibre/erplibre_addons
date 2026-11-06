@@ -115,19 +115,24 @@ Reflections
   link never closes, and an inaccurate answer leaves the link ``pending``.
 * A precision keeps its text as written: the server never inserts the
   starter of its hidden theme.
-* ``_linkup_event(code, users, link)`` is called with the scoring code of
-  each event (``reflect_sent``, ``reflect_confirmed``, ``reflect_rejected``,
-  ``reflect_withdrawn``, ``answer_exact``, ``precision_sent``,
-  ``theme_guessed``, ``theme_missed``, ``continue_sent``,
-  ``continue_confirmed``, ``close``, ``call_answered``). It does nothing
-  here.
+* ``_linkup_event(code, users, link, channel, key)`` is called with the
+  scoring code of each event (``reflect_sent``, ``reflect_confirmed``,
+  ``reflect_rejected``, ``reflect_withdrawn``, ``answer_exact``,
+  ``precision_sent``, ``theme_guessed``, ``theme_missed``,
+  ``continue_sent``, ``continue_confirmed``, ``close``,
+  ``call_answered``). It does nothing here; ``key`` identifies an event
+  that no reflection identifies alone, such as one answered call.
 * A call of a direct conversation is answered when its second participant
-  joins (``discuss.channel.member._rtc_join_call``). While the turn of an
-  ``active`` pair is an exact answer, or a precision whose guess is made,
-  the options that hold the call buttons of "Talk about yourself" are
-  open: the answered call ends that turn, the options leave the card, and
-  ``call_answered`` is reported for both (LU-F-044). The first participant
-  and any other call report nothing.
+  joins (``discuss.channel.member._rtc_join_call``); its two RTC sessions
+  are then marked ``linkup_call_answered``, so joining the same call again
+  answers nothing. Any answered call of an ``active`` pair reports
+  ``call_answered`` for both, whoever started it (Q-42). While the turn of
+  the pair is an exact answer, or a precision whose guess is made, the
+  member whose turn it is holds the call buttons of "Talk about yourself";
+  a call that this member started also ends that turn and takes the
+  options off the card (LU-F-044). The caller is read from the server
+  only. The first participant, and a call of a pair without an active
+  link, report nothing.
 * A daily cron expires the initial reflections left unanswered for
   ``linkup.reflet_expiry_days`` days (30 by default).
 * Every sent reflection, initial or child, has a carrier message: a
@@ -585,6 +590,10 @@ Settings menu
 * Phone, Privacy and My data have no screen in this module: they are
   disabled and say which feature brings them (the profile of the member,
   the export and the deletion of the data).
+* A module that brings a screen adds its entry after these eight, by
+  patching ``LinkupProfileMenu.entries`` with an entry whose ``action``
+  is what choosing it opens; the keyboard and the roles are those of the
+  other entries.
 
 Status
 ======

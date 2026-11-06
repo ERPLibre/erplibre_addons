@@ -706,23 +706,30 @@ class TestLinkupReflet(LinkupRefletCase):
         self.assertEqual(close.kind, "close")
         self.assertFalse(reflet.link_id._linkup_turn_user())
 
+    def _call_members(self, reflet):
+        """The members of the conversation of ``reflet`` for Sam and
+        France, each acting as their own user."""
+        members = {
+            member.partner_id: member
+            for member in reflet.channel_id.sudo().channel_member_ids
+        }
+        return (
+            members[self.sam.partner_id].with_user(self.sam).sudo(),
+            members[self.france.partner_id].with_user(self.france).sudo(),
+        )
+
     def test_answered_call_from_the_options(self):
         """T-33, LU-F-044 CA1, CA3 and RM3: the first participant of a call
-        reports nothing; the second, while Sam holds the three options,
-        reports ``call_answered`` for both once and ends the turn. A call
-        outside the options reports nothing."""
+        reports nothing; the second, when Sam started the call while he
+        holds the three options, reports ``call_answered`` for both once
+        and ends the turn. Joining the same call again reports nothing."""
         both = frozenset((self.sam | self.france).ids)
         reflet = self._confirmed()
         link = reflet.link_id
         exact = self._child(
             reflet.with_user(self.france).action_answer_exact()
         )
-        members = {
-            member.partner_id: member
-            for member in reflet.channel_id.sudo().channel_member_ids
-        }
-        sam = members[self.sam.partner_id].with_user(self.sam).sudo()
-        france = members[self.france.partner_id].with_user(self.france).sudo()
+        sam, france = self._call_members(reflet)
         self.events.clear()
         sam._rtc_join_call()
         self.assertEqual(self.events, [])
@@ -735,6 +742,50 @@ class TestLinkupReflet(LinkupRefletCase):
         france._rtc_leave_call()
         france._rtc_join_call()
         self.assertEqual(self.events, [("call_answered", both)])
+
+    def test_answered_call_outside_the_options(self):
+        """Q-42: a call that the member holding the options did not start,
+        or a call while nobody holds them, reports ``call_answered`` for
+        both as well and leaves the turn as it is."""
+        both = frozenset((self.sam | self.france).ids)
+        reflet = self._confirmed()
+        link = reflet.link_id
+        exact = self._child(
+            reflet.with_user(self.france).action_answer_exact()
+        )
+        sam, france = self._call_members(reflet)
+        self.events.clear()
+        # France started the call: the options belong to Sam.
+        france._rtc_join_call()
+        sam._rtc_join_call()
+        self.assertEqual(self.events, [("call_answered", both)])
+        self.assertEqual(link.turn_reflet_id, exact)
+        sam._rtc_leave_call()
+        france._rtc_leave_call()
+        # A new call, while Sam holds no option: the turn is a continued
+        # reflection waiting for France's answer.
+        exact.with_user(self.sam).action_continue(
+            self.action_cat.id, "Ta demande d'action est que…"
+        )
+        self.events.clear()
+        sam._rtc_join_call()
+        france._rtc_join_call()
+        self.assertEqual(self.events, [("call_answered", both)])
+        self.assertEqual(link.turn_reflet_id.kind, "continue")
+
+    def test_call_of_a_pending_pair_reports_nothing(self):
+        """A call of a pair whose reflection waits for its answer is not
+        scored, even where no start rule refuses it."""
+        self.env["ir.config_parameter"].sudo().set_param(
+            "linkup.start_rule_mode", "off"
+        )
+        reflet = self._sent()
+        sam, france = self._call_members(reflet)
+        self.events.clear()
+        sam._rtc_join_call()
+        france._rtc_join_call()
+        self.assertEqual(len(reflet.channel_id.sudo().rtc_session_ids), 2)
+        self.assertEqual(self.events, [])
 
     def test_turn_chain(self):
         """Each kind of the table of child reflections, in one chain."""

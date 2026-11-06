@@ -22,7 +22,7 @@ class LinkupTestMixin:
         self.events = []
         events = self.events
 
-        def record(reflet, code, users, link=None):
+        def record(reflet, code, users, link=None, **details):
             events.append((code, frozenset(users.ids)))
 
         self.patch(type(self.env["linkup.reflet"]), "_linkup_event", record)

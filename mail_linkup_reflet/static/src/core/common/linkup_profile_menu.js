@@ -8,7 +8,7 @@ import {useService} from "@web/core/utils/hooks";
  * The entries of the menu of the avatar (LU-F-080), in their order. An
  * entry with `hint` has no screen yet: it shows, disabled, with the reason.
  *
- * @returns {{id: string, label: string, icon: string, hint?: string}[]}
+ * @returns {LinkupProfileEntry[]}
  */
 export function linkupProfileEntries() {
     const profile = _t("Comes with the profile of the member.");
@@ -30,6 +30,20 @@ export function linkupProfileEntries() {
 }
 
 /**
+ * An entry of the menu of the avatar. `action`, an action or its external
+ * id, is what choosing the entry opens: a module that brings a screen adds
+ * its entry to `LinkupProfileMenu.entries` with it, and the menu needs
+ * nothing more. The entries of this module open their screen by `id`.
+ *
+ * @typedef {Object} LinkupProfileEntry
+ * @property {string} id the value of `data-entry`
+ * @property {string} label
+ * @property {string} icon a Font Awesome class
+ * @property {string} [hint] why the entry is disabled
+ * @property {string|Object} [action] the action the entry opens
+ */
+
+/**
  * The avatar of the member, whose double click opens the menu of their
  * settings, also opened by the "My profile" button next to it (LU-F-080):
  * Help, Email, Phone, Photo, Sounds and notifications, Privacy, My data,
@@ -38,7 +52,8 @@ export function linkupProfileEntries() {
  * Help opens the LinkUp help; Sounds and notifications and Blocked members
  * open it on their section. Email and Photo open the preferences of the
  * user, where both are changed. Phone, Privacy and My data have no screen
- * yet: they are disabled, each with the reason, and lead nowhere.
+ * yet: they are disabled, each with the reason, and lead nowhere. Another
+ * module adds its own entries after them (`LinkupProfileEntry.action`).
  *
  * The menu is a `menu` walked with the arrow keys, `Home` and `End`;
  * opening it gives the focus to its first entry, `Escape` or a click
@@ -76,6 +91,7 @@ export class LinkupProfileMenu extends Component {
         );
     }
 
+    /** @returns {LinkupProfileEntry[]} */
     get entries() {
         return linkupProfileEntries();
     }
@@ -133,12 +149,15 @@ export class LinkupProfileMenu extends Component {
         next?.focus();
     }
 
-    /** @param {{id: string, hint?: string}} entry */
+    /** @param {LinkupProfileEntry} entry */
     async choose(entry) {
         if (entry.hint) {
             return;
         }
         this.state.open = false;
+        if (entry.action) {
+            return this.action.doAction(entry.action);
+        }
         switch (entry.id) {
             case "help":
                 return this.action.doAction("mail_linkup_reflet.action_linkup_help");

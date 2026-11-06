@@ -575,14 +575,19 @@ class LinkupReflet(models.Model):
         self.ensure_one()
         return self.author_id | self.recipient_id
 
-    def _linkup_event(self, code, users, link=None):
+    def _linkup_event(self, code, users, link=None, channel=None, key=None):
         """Report a scoring event of the reflection; does nothing here.
 
         ``code`` is a rule code (``reflect_sent``, ``reflect_confirmed``,
         ``answer_exact``…), ``users`` the members it concerns, ``link`` the
         pair. The method is called after the state is written, inside the
-        same transaction, on the reflection that carries the event. The
-        scoring module overrides it to apply its rules.
+        same transaction, on the reflection that carries the event, or on
+        an empty recordset for an event of the pair that no reflection
+        carries, such as a call answered outside the options of a turn. ``channel`` is the
+        conversation of the event when the reflection does not give it, and
+        ``key`` a stable identifier of an event that the reflection does not
+        identify alone, such as one answered call. The scoring module
+        overrides it to apply its rules.
         """
         return None
 
@@ -1723,23 +1728,36 @@ class LinkupReflet(models.Model):
         return child.id
 
     @api.model
-    def _linkup_call_answered(self, channel):
+    def _linkup_call_answered(self, channel, member):
         """Report a call of a direct conversation that the other party
-        answered, when it opens from the three options (LU-F-044 RM2, RM3).
+        answered (LU-F-044 RM2, RM3).
 
         ``discuss.channel.member._rtc_join_call`` calls this after each
-        join: the call is answered when the conversation holds two RTC
-        sessions, the second participant having just joined. It counts
-        between two restricted members of an ``active`` link whose turn is
-        an exact answer, or a precision whose guess is made or that hides
-        no theme: the reflection whose recipient holds the call buttons of
-        "Talking about oneself". The answered call ends that turn, so the
-        options leave the card, and ``call_answered`` is reported for both
-        parties on that reflection. A call outside the options reports
-        nothing (Q-42).
+        join of ``member``: the call is answered when the conversation holds
+        two RTC sessions, the other one being the caller's. Both sessions
+        are then marked ``linkup_call_answered``, so that a participant who
+        leaves and joins the same call again reports nothing more; the call
+        ends with its last session. It counts between two restricted
+        members of an ``active`` link, and reports ``call_answered`` for
+        both, whoever started it and from wherever. ``key`` names the call
+        by the session of its caller.
+
+        A call also ends the turn when it opens from the three options: the
+        call buttons of "Talking about oneself" belong to the member whose
+        turn it is, while the turn shows the options (an exact answer, or a
+        precision whose guess is made or that hides no theme). A call that
+        this member started takes the options off the card, and its event
+        is reported on that reflection. The caller is read from the state of
+        the server, never from the client.
         """
         channel = channel.sudo()
-        if len(channel.rtc_session_ids) != 2:
+        sessions = channel.rtc_session_ids
+        if len(sessions) != 2:
+            return False
+        caller_session = sessions.filtered(
+            lambda session: session.channel_member_id != member
+        )
+        if len(caller_session) != 1 or caller_session.linkup_call_answered:
             return False
         users = channel._linkup_chat_users()
         if not users or not all(
@@ -1750,23 +1768,33 @@ class LinkupReflet(models.Model):
         if link.state != "active":
             return False
         link._linkup_lock()
+        sessions.write({"linkup_call_answered": True})
+        caller = caller_session.channel_member_id.partner_id.user_ids & users
+        key = f"call:rtc:{caller_session.id}"
         reflet = link.turn_reflet_id
         if (
-            not reflet
-            or reflet.kind not in ("answer_exact", "precision")
-            or reflet.state != "sent"
-            or reflet.response_state != "none"
-            or (reflet.kind == "precision" and reflet.guess_state == "pending")
+            reflet
+            and reflet.kind in ("answer_exact", "precision")
+            and reflet.state == "sent"
+            and reflet.response_state == "none"
+            and not (
+                reflet.kind == "precision" and reflet.guess_state == "pending"
+            )
+            and reflet.recipient_id == caller
         ):
-            return False
-        link.write(
-            {
-                "turn_reflet_id": False,
-                "last_interaction_date": fields.Datetime.now(),
-            }
+            link.write(
+                {
+                    "turn_reflet_id": False,
+                    "last_interaction_date": fields.Datetime.now(),
+                }
+            )
+            reflet._linkup_notify()
+        else:
+            link._linkup_touch()
+            reflet = self.browse()
+        reflet._linkup_event(
+            "call_answered", users, link=link, channel=channel, key=key
         )
-        reflet._linkup_notify()
-        reflet._linkup_event("call_answered", users, link=link)
         return True
 
     # ------------------------------------------------------------------
