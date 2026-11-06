@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- The default point scale (§7.1). Its caps count sliding windows of
+         24 hours and 7 days; a LinkUp administrator edits every value. -->
+    <record id="rule_reflect_sent" model="linkup.points.rule">
+        <field name="code">reflect_sent</field>
+        <field name="name">Reflection sent, paid at its confirmation</field>
+        <field name="sequence">10</field>
+        <field name="points">100</field>
+        <field name="beneficiaries">author</field>
+        <field name="daily_cap">5</field>
+    </record>
+    <record id="rule_reflect_rejected" model="linkup.points.rule">
+        <field name="code">reflect_rejected</field>
+        <field name="name">Reflection rejected</field>
+        <field name="sequence">20</field>
+        <field name="points">-150</field>
+        <field name="beneficiaries">author</field>
+    </record>
+    <record id="rule_reflect_confirmed" model="linkup.points.rule">
+        <field name="code">reflect_confirmed</field>
+        <field name="name">Reflection confirmed</field>
+        <field name="sequence">30</field>
+        <field name="points">1000</field>
+        <field name="beneficiaries">both</field>
+        <field name="pair_lifetime_cap">1</field>
+        <field name="daily_cap">3</field>
+        <field name="weekly_cap">10</field>
+        <field name="resets_decay" eval="True" />
+    </record>
+    <record id="rule_answer_exact" model="linkup.points.rule">
+        <field name="code">answer_exact</field>
+        <field name="name">That's exactly it</field>
+        <field name="sequence">40</field>
+        <field name="points">250</field>
+        <field name="beneficiaries">both</field>
+        <field name="decay" eval="True" />
+    </record>
+    <record id="rule_precision_sent" model="linkup.points.rule">
+        <field name="code">precision_sent</field>
+        <field name="name">Precision sent</field>
+        <field name="sequence">50</field>
+        <field name="points">1000</field>
+        <field name="beneficiaries">both</field>
+        <field name="pair_lifetime_cap">1</field>
+        <field name="daily_cap">3</field>
+    </record>
+    <record id="rule_theme_guessed" model="linkup.points.rule">
+        <field name="code">theme_guessed</field>
+        <field name="name">Hidden theme guessed</field>
+        <field name="sequence">60</field>
+        <field name="points">100</field>
+        <field name="beneficiaries">both</field>
+        <field name="pair_weekly_cap">1</field>
+    </record>
+    <record id="rule_theme_missed" model="linkup.points.rule">
+        <field name="code">theme_missed</field>
+        <field name="name">Hidden theme missed</field>
+        <field name="sequence">70</field>
+        <field name="points">0</field>
+        <field name="beneficiaries">none</field>
+    </record>
+    <record id="rule_continue_sent" model="linkup.points.rule">
+        <field name="code">continue_sent</field>
+        <field name="name">Reflection continued</field>
+        <field name="sequence">80</field>
+        <field name="points">250</field>
+        <field name="beneficiaries">both</field>
+        <field name="pair_daily_cap">5</field>
+        <field name="decay" eval="True" />
+    </record>
+    <record id="rule_continue_confirmed" model="linkup.points.rule">
+        <field name="code">continue_confirmed</field>
+        <field name="name">Continued reflection confirmed</field>
+        <field name="sequence">90</field>
+        <field name="points">250</field>
+        <field name="beneficiaries">both</field>
+        <field name="pair_daily_cap">5</field>
+        <field name="decay" eval="True" />
+    </record>
+    <record id="rule_close" model="linkup.points.rule">
+        <field name="code">close</field>
+        <field name="name">Exchange closed</field>
+        <field name="sequence">100</field>
+        <field name="points">0</field>
+        <field name="beneficiaries">none</field>
+    </record>
+    <record id="rule_call_answered" model="linkup.points.rule">
+        <field name="code">call_answered</field>
+        <field name="name">Call answered</field>
+        <field name="sequence">110</field>
+        <field name="points">250</field>
+        <field name="beneficiaries">both</field>
+        <field name="pair_daily_cap">1</field>
+        <field name="resets_decay" eval="True" />
+    </record>
+    <record id="rule_virtual_round" model="linkup.points.rule">
+        <field name="code">virtual_round</field>
+        <field name="name">Round of free text</field>
+        <field name="sequence">130</field>
+        <field name="points">100</field>
+        <field name="beneficiaries">both</field>
+        <field name="decay" eval="True" />
+    </record>
+    <record id="rule_highlight" model="linkup.points.rule">
+        <field name="code">highlight</field>
+        <field name="name">You add to my happiness</field>
+        <field name="sequence">140</field>
+        <field name="points">0</field>
+        <field name="beneficiaries">none</field>
+    </record>
+</odoo>

@@ -1,0 +1,71 @@
+// The points of LinkUp on the screen: the energy of the member and the
+// "+N" that rise above it. Colours are variables of web and Bootstrap
+// only; points.dark.scss adjusts the tint of the energy in the dark theme.
+
+$o-linkup-energy-tint: mix($o-view-background-color, $warning, 82%);
+
+.o-linkup-Energy-bubble,
+.o-linkup-Energy-card {
+    background-color: $o-linkup-energy-tint;
+    border: $border-width solid mix($o-view-background-color, $warning, 55%) !important;
+}
+
+.o-linkup-Energy-bubble {
+    color: inherit;
+
+    &:hover,
+    &:focus-visible {
+        background-color: mix($o-view-background-color, $warning, 70%);
+    }
+}
+
+.o-linkup-PointsBurst {
+    // Above the dialogs and the chat windows, below the notifications.
+    z-index: $zindex-modal + 5;
+    top: 4.5rem;
+    right: 1.5rem;
+    pointer-events: none;
+
+    &.o-isAnchored {
+        // Centred above the energy it rises from.
+        transform: translate(-50%, -100%);
+    }
+
+    .o-linkup-PointsBurst-chip {
+        animation: o-linkup-points-rise 1.2s ease-out forwards;
+    }
+}
+
+// Rises while wiggling, then fades: 1.2 s at most (LU-F-091 RM1).
+@keyframes o-linkup-points-rise {
+    0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg);
+    }
+    15% {
+        opacity: 1;
+        transform: translateY(-0.5rem) rotate(-4deg);
+    }
+    30% {
+        transform: translateY(-1rem) rotate(4deg);
+    }
+    45% {
+        transform: translateY(-1.5rem) rotate(-3deg);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-2rem) rotate(2deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-3rem) rotate(0deg);
+    }
+}
+
+// Reduced motion: the burst stays still, for as long as the service keeps
+// it on the screen.
+@media (prefers-reduced-motion: reduce) {
+    .o-linkup-PointsBurst .o-linkup-PointsBurst-chip {
+        animation: none;
+    }
+}

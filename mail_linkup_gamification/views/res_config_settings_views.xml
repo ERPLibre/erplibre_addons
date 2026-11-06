@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mail_linkup_gamification</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="mail_linkup_reflet.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <block id="linkup" position="inside">
+                <setting
+                    id="linkup_points_setting"
+                    string="Points"
+                    help="Decreasing sequences, calls and age of the accounts that earn points."
+                >
+                    <div class="row mt-2">
+                        <label for="linkup_timezone" class="col-lg-6 o_light_label" />
+                        <field name="linkup_timezone" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_virtual_round_points" class="col-lg-6 o_light_label" />
+                        <field name="linkup_virtual_round_points" placeholder="100,50,25,12,6,3,1,0" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_call_min_duration" class="col-lg-6 o_light_label" />
+                        <field name="linkup_call_min_duration" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_points_min_account_hours" class="col-lg-6 o_light_label" />
+                        <field name="linkup_points_min_account_hours" />
+                    </div>
+                    <div class="mt-2">
+                        <button
+                            name="%(linkup_points_rule_action)d"
+                            type="action"
+                            string="Point rules"
+                            icon="oi-arrow-right"
+                            class="btn-link"
+                        />
+                    </div>
+                </setting>
+                <setting
+                    id="linkup_collusion_setting"
+                    string="Collusion alerts"
+                    help="Reports created for the moderators when confirmations look like a loop."
+                >
+                    <div class="row mt-2">
+                        <label for="linkup_collusion_days" class="col-lg-6 o_light_label" />
+                        <field name="linkup_collusion_days" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_collusion_pair_confirmations" class="col-lg-6 o_light_label" />
+                        <field name="linkup_collusion_pair_confirmations" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_collusion_new_account_confirmations" class="col-lg-6 o_light_label" />
+                        <field name="linkup_collusion_new_account_confirmations" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_collusion_new_account_hours" class="col-lg-6 o_light_label" />
+                        <field name="linkup_collusion_new_account_hours" />
+                    </div>
+                </setting>
+            </block>
+        </field>
+    </record>
+</odoo>

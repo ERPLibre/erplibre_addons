@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- The ranks of LinkUp (LU-F-102 RM1), which replace the native ones
+         below. A rank names the energy of a member, their karma. -->
+    <record id="rank_spark" model="gamification.karma.rank">
+        <field name="name">Spark</field>
+        <field name="description" type="html"><p>Your first points: the link begins.</p></field>
+        <field name="description_motivational" type="html"><p>Confirm a first reflection to light the spark.</p></field>
+        <field name="karma_min">1</field>
+    </record>
+    <record id="rank_flame" model="gamification.karma.rank">
+        <field name="name">Flame</field>
+        <field name="description" type="html"><p>Your exchanges keep the flame alive.</p></field>
+        <field name="description_motivational" type="html"><p>Keep reflecting what the others tell you.</p></field>
+        <field name="karma_min">2500</field>
+    </record>
+    <record id="rank_fire" model="gamification.karma.rank">
+        <field name="name">Fire</field>
+        <field name="description" type="html"><p>Your network warms up around you.</p></field>
+        <field name="description_motivational" type="html"><p>A call says more than a long text.</p></field>
+        <field name="karma_min">10000</field>
+    </record>
+    <record id="rank_blaze" model="gamification.karma.rank">
+        <field name="name">Blaze</field>
+        <field name="description" type="html"><p>Your links carry the community.</p></field>
+        <field name="description_motivational" type="html"><p>Meet your links in person.</p></field>
+        <field name="karma_min">25000</field>
+    </record>
+    <record id="rank_sun" model="gamification.karma.rank">
+        <field name="name">Sun</field>
+        <field name="description" type="html"><p>Your energy lights up the whole network.</p></field>
+        <field name="description_motivational" type="html"><p>Your energy lights up the whole network.</p></field>
+        <field name="karma_min">50000</field>
+    </record>
+    <function model="gamification.karma.rank" name="_linkup_replace_native_ranks" />
+
+    <!-- The badges of LinkUp, granted by the server only (LU-F-102 RM1). -->
+    <record id="badge_first_reflection" model="gamification.badge">
+        <field name="name">First reflection</field>
+        <field name="description">A first reflection of yours was confirmed.</field>
+        <field name="rule_auth">nobody</field>
+        <field name="level">bronze</field>
+    </record>
+    <record id="badge_first_link" model="gamification.badge">
+        <field name="name">First link</field>
+        <field name="description">You confirmed a first link with another member.</field>
+        <field name="rule_auth">nobody</field>
+        <field name="level">bronze</field>
+    </record>
+    <record id="badge_ten_links" model="gamification.badge">
+        <field name="name">Ten links</field>
+        <field name="description">Ten members are linked to you by a confirmed reflection.</field>
+        <field name="rule_auth">nobody</field>
+        <field name="level">gold</field>
+    </record>
+    <record id="badge_first_guess" model="gamification.badge">
+        <field name="name">First guess</field>
+        <field name="description">You guessed a hidden theme for the first time.</field>
+        <field name="rule_auth">nobody</field>
+        <field name="level">bronze</field>
+    </record>
+    <record id="badge_first_call" model="gamification.badge">
+        <field name="name">First call</field>
+        <field name="description">A first call with another member was answered.</field>
+        <field name="rule_auth">nobody</field>
+        <field name="level">silver</field>
+    </record>
+
+    <!-- The native challenges target every internal user (LU-NF-033). -->
+    <function model="gamification.challenge" name="_linkup_close_native_challenges" />
+</odoo>

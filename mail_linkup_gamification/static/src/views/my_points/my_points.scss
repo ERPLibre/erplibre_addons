@@ -1,0 +1,18 @@
+// The screen "My points": the summary keeps a readable width beside the
+// history on a large screen and takes the full width on a small one.
+
+.o-linkup-MyPoints {
+    .o-linkup-MyPoints-summary {
+        @include media-breakpoint-up(lg) {
+            flex: 0 0 20rem;
+        }
+    }
+
+    .o-linkup-MyPoints-progress {
+        height: 0.5rem;
+    }
+
+    .o-linkup-MyPoints-scale summary {
+        cursor: pointer;
+    }
+}

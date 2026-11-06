@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkup_points_rule_member,linkup.points.rule member,model_linkup_points_rule,mail_linkup_reflet.group_linkup_member,1,0,0,0
+access_linkup_points_rule_admin,linkup.points.rule admin,model_linkup_points_rule,mail_linkup_reflet.group_linkup_admin,1,1,1,0
+access_linkup_points_ledger_member,linkup.points.ledger member,model_linkup_points_ledger,mail_linkup_reflet.group_linkup_member,1,0,0,0
+access_linkup_points_call_admin,linkup.points.call admin,model_linkup_points_call,mail_linkup_reflet.group_linkup_admin,1,0,0,0

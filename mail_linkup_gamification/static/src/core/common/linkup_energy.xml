@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_gamification.LinkupEnergy">
+        <t t-if="!hidden">
+            <button
+                t-if="props.variant === 'bubble'"
+                type="button"
+                class="o-linkup-Energy o-linkup-Energy-bubble btn rounded-pill d-inline-flex align-items-center gap-2 px-3 py-1"
+                data-linkup-points-anchor=""
+                data-linkup-guide="points-energy"
+                t-att-aria-label="label"
+                t-att-title="label"
+                t-on-click="openMyPoints"
+            >
+                <i class="fa fa-bolt" aria-hidden="true" />
+                <span class="o-linkup-Energy-value fw-bold" t-esc="karma" />
+            </button>
+            <section
+                t-else=""
+                class="o-linkup-Energy o-linkup-Energy-card border rounded-3 p-3 d-flex flex-column gap-1"
+                data-linkup-points-anchor=""
+                aria-labelledby="o-linkup-Energy-cardTitle"
+            >
+                <h3 id="o-linkup-Energy-cardTitle" class="fs-6 fw-bold mb-0">My energy</h3>
+                <span class="o-linkup-Energy-value fs-4 fw-bold" t-esc="karma" />
+                <span class="o-linkup-Energy-rank small" t-esc="rankLabel" />
+                <button
+                    type="button"
+                    class="o-linkup-Energy-open btn btn-link btn-sm p-0 align-self-start"
+                    data-linkup-guide="points-energy"
+                    t-on-click="openMyPoints"
+                >
+                    My points
+                </button>
+            </section>
+        </t>
+    </t>
+</templates>

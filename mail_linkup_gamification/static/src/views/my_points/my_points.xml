@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_gamification.LinkupMyPoints">
+        <div class="o-linkup-MyPoints o_action d-flex flex-column h-100 overflow-auto">
+            <header class="o-linkup-MyPoints-header d-flex align-items-center gap-2 px-3 py-2 border-bottom">
+                <h1 class="h4 mb-0">My points</h1>
+                <LinkupGuideButton className="'ms-auto'" />
+            </header>
+            <p t-if="state.loadError and !state.loaded" class="o-linkup-MyPoints-error m-3" role="alert">
+                LinkUp could not be loaded, try again.
+            </p>
+            <p t-elif="!state.loaded" class="o-linkup-MyPoints-loading m-3" role="status">Loading…</p>
+            <div t-else="" class="o-linkup-MyPoints-body d-flex flex-column flex-lg-row gap-3 p-3">
+                <div class="o-linkup-MyPoints-summary d-flex flex-column gap-3">
+                    <section
+                        class="o-linkup-MyPoints-balance border rounded-3 p-3 d-flex flex-column gap-1"
+                        data-linkup-points-anchor=""
+                        data-linkup-guide="points-balance"
+                        aria-labelledby="o-linkup-MyPoints-balanceTitle"
+                    >
+                        <h2 id="o-linkup-MyPoints-balanceTitle" class="fs-6 fw-bold mb-0">My energy</h2>
+                        <span class="o-linkup-MyPoints-balanceValue fs-2 fw-bold" t-esc="balance" />
+                    </section>
+                    <section
+                        class="o-linkup-MyPoints-rank border rounded-3 p-3 d-flex flex-column gap-2"
+                        data-linkup-guide="points-rank"
+                        aria-labelledby="o-linkup-MyPoints-rankTitle"
+                    >
+                        <h2 id="o-linkup-MyPoints-rankTitle" class="fs-6 fw-bold mb-0">Rank</h2>
+                        <span class="o-linkup-MyPoints-rankName fw-bold" t-esc="rankName" />
+                        <div
+                            class="o-linkup-MyPoints-progress progress"
+                            role="progressbar"
+                            aria-labelledby="o-linkup-MyPoints-rankTitle"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            t-att-aria-valuenow="progress"
+                            t-att-aria-valuetext="nextRankLabel"
+                        >
+                            <div class="progress-bar" t-att-style="'width: ' + progress + '%'" />
+                        </div>
+                        <span class="o-linkup-MyPoints-nextRank small" t-esc="nextRankLabel" />
+                    </section>
+                    <section
+                        class="o-linkup-MyPoints-badges border rounded-3 p-3 d-flex flex-column gap-2"
+                        data-linkup-guide="points-badges"
+                        aria-labelledby="o-linkup-MyPoints-badgesTitle"
+                    >
+                        <h2 id="o-linkup-MyPoints-badgesTitle" class="fs-6 fw-bold mb-0">Badges</h2>
+                        <p t-if="!state.data.badges.length" class="o-linkup-MyPoints-noBadge small mb-0">
+                            No badge yet.
+                        </p>
+                        <ul t-else="" class="list-unstyled d-flex flex-column gap-2 mb-0">
+                            <li
+                                t-foreach="state.data.badges"
+                                t-as="badge"
+                                t-key="badge.id"
+                                class="o-linkup-MyPoints-badge d-flex align-items-start gap-2"
+                                t-att-data-level="badge.level"
+                            >
+                                <i class="fa fa-certificate mt-1" aria-hidden="true" />
+                                <span class="d-flex flex-column">
+                                    <span class="o-linkup-MyPoints-badgeName fw-bold" t-esc="badge.name" />
+                                    <span t-if="badge.description" class="small" t-esc="badge.description" />
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+                    <details class="o-linkup-MyPoints-scale border rounded-3 p-3">
+                        <summary class="fw-bold" data-linkup-guide="points-scale">Point scale</summary>
+                        <ul class="list-unstyled d-flex flex-column gap-1 mt-2 mb-0">
+                            <li
+                                t-foreach="scale"
+                                t-as="rule"
+                                t-key="rule.code"
+                                class="o-linkup-MyPoints-scaleRule d-flex justify-content-between gap-2 small"
+                                t-att-data-code="rule.code"
+                            >
+                                <span t-esc="rule.name" />
+                                <span
+                                    class="fw-bold text-nowrap"
+                                    t-att-class="rule.points &lt; 0 ? 'text-danger' : 'text-success'"
+                                    t-esc="rulePoints(rule)"
+                                />
+                            </li>
+                        </ul>
+                    </details>
+                </div>
+                <section
+                    class="o-linkup-MyPoints-history d-flex flex-column gap-2 flex-grow-1"
+                    aria-labelledby="o-linkup-MyPoints-historyTitle"
+                >
+                    <h2 id="o-linkup-MyPoints-historyTitle" class="h6 mb-0">History</h2>
+                    <div class="o-linkup-MyPoints-filters d-flex flex-wrap gap-2" data-linkup-guide="points-filters">
+                        <label class="d-flex flex-column gap-1 small flex-grow-1">
+                            <span>Event</span>
+                            <select class="o-linkup-MyPoints-filterRule form-select form-select-sm" t-on-change="onChangeRule">
+                                <option value="" t-att-selected="!state.ruleCode">All events</option>
+                                <option
+                                    t-foreach="state.data.rules"
+                                    t-as="rule"
+                                    t-key="rule.code"
+                                    t-att-value="rule.code"
+                                    t-att-selected="rule.code === state.ruleCode"
+                                    t-esc="rule.name"
+                                />
+                            </select>
+                        </label>
+                        <label class="d-flex flex-column gap-1 small flex-grow-1">
+                            <span>With</span>
+                            <select
+                                class="o-linkup-MyPoints-filterCounterpart form-select form-select-sm"
+                                t-on-change="onChangeCounterpart"
+                            >
+                                <option value="" t-att-selected="!state.counterpartId">Everybody</option>
+                                <option
+                                    t-foreach="state.data.counterparts"
+                                    t-as="counterpart"
+                                    t-key="counterpart.id"
+                                    t-att-value="counterpart.id"
+                                    t-att-selected="isCounterpart(counterpart)"
+                                    t-esc="counterpart.name"
+                                />
+                            </select>
+                        </label>
+                    </div>
+                    <p t-if="state.loadError" class="o-linkup-MyPoints-error small mb-0" role="alert">
+                        LinkUp could not be loaded, try again.
+                    </p>
+                    <p t-if="!state.lines.length and isFiltered" class="o-linkup-MyPoints-empty small mb-0">
+                        No line matches these filters.
+                    </p>
+                    <p t-elif="!state.lines.length" class="o-linkup-MyPoints-empty small mb-0">
+                        No points yet. Your first confirmed reflection brings some.
+                    </p>
+                    <div t-else="" class="table-responsive" data-linkup-guide="points-history">
+                        <table class="o-linkup-MyPoints-table table table-sm align-middle mb-0" aria-describedby="o-linkup-MyPoints-count">
+                            <caption class="visually-hidden">History of my points</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Event</th>
+                                    <th scope="col">With</th>
+                                    <th scope="col" class="text-end">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    t-foreach="state.lines"
+                                    t-as="line"
+                                    t-key="line.id"
+                                    class="o-linkup-MyPoints-line"
+                                    t-att-data-code="line.rule_code"
+                                    t-att-data-capped="line.capped ? 'true' : 'false'"
+                                >
+                                    <td class="text-nowrap small" t-esc="lineDate(line)" />
+                                    <td class="o-linkup-MyPoints-lineEvent" t-esc="line.rule_name" />
+                                    <td class="o-linkup-MyPoints-lineCounterpart">
+                                        <t t-if="line.counterpart" t-esc="line.counterpart.name" />
+                                        <t t-else="">—</t>
+                                    </td>
+                                    <td class="text-end">
+                                        <span
+                                            class="o-linkup-MyPoints-linePoints fw-bold text-nowrap"
+                                            t-att-class="{ 'text-success': line.points > 0, 'text-danger': line.points &lt; 0 }"
+                                            t-esc="linePoints(line)"
+                                        />
+                                        <span
+                                            t-if="line.capped"
+                                            class="o-linkup-MyPoints-lineReason d-block small"
+                                            t-esc="lineReason(line)"
+                                        />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span id="o-linkup-MyPoints-count" class="o-linkup-MyPoints-count small" t-esc="countLabel" />
+                        <button
+                            t-if="hasMore"
+                            type="button"
+                            class="o-linkup-MyPoints-more btn btn-secondary btn-sm"
+                            t-att-disabled="state.loading"
+                            t-on-click="() => this.load({ more: true })"
+                        >
+                            Show more
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </t>
+</templates>
