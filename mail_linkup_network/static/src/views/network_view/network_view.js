@@ -139,7 +139,11 @@ export class LinkupNetworkView extends Component {
             },
             () => [this.guide.active]
         );
-        useExternalListener(window, "keydown", (ev) => this.onWindowKeydown(ev));
+        // On the document, not the window: the hotkey service listens on the
+        // window and stops a key that a global hotkey takes, as the
+        // "escape" of the website service; the document hears it first,
+        // after the handlers of the elements.
+        useExternalListener(document, "keydown", (ev) => this.onDocumentKeydown(ev));
         useExternalListener(window, "pointerdown", (ev) => this.onWindowPointerdown(ev));
     }
 
@@ -939,7 +943,7 @@ export class LinkupNetworkView extends Component {
      *
      * @param {KeyboardEvent} ev
      */
-    onWindowKeydown(ev) {
+    onDocumentKeydown(ev) {
         if (ev.key !== "Escape" || ev.defaultPrevented || this.guide.active) {
             return;
         }
