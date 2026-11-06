@@ -1,5 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-""""You add to my happiness" (T-10, T-34; LU-F-050, LU-F-052): the sender
+""" "You add to my happiness" (T-10, T-34; LU-F-050, LU-F-052): the sender
 is the current user, a pair holds one active highlight per direction, the
 next exchange puts it out, and no point is involved.
 """

@@ -34,6 +34,12 @@ msgstr "Non lus : %(count)s"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid "%(name)s accepted your invitation: your reflection reached them."
+msgstr "%(name)s a accepté ton invitation : ton reflet lui est parvenu."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
 #: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
 msgid "%(name)s adds to your happiness"
@@ -170,6 +176,12 @@ msgstr ""
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "%(name)s would like to make you a reflection"
+msgstr "%(name)s souhaite te faire un reflet"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
 msgid "%(name)s would like to make you a reflection on LinkUp"
 msgstr "%(name)s souhaite te faire un reflet sur LinkUp"
 
@@ -295,8 +307,7 @@ msgstr ""
 msgid ""
 "A LinkUp member posts and changes a message through its conversation only."
 msgstr ""
-"Un membre LinkUp publie et modifie un message seulement par sa "
-"conversation."
+"Un membre LinkUp publie et modifie un message seulement par sa conversation."
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -366,6 +377,16 @@ msgstr "Un membre ne se met pas lui-même en lumière."
 #: code:addons/mail_linkup_reflet/models/linkup_report.py:0
 msgid "A moderator changes only the processing of a report."
 msgstr "Un modérateur ne modifie que le traitement d'un signalement."
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid ""
+"A moderator does not process a report that concerns them or one of their "
+"links."
+msgstr ""
+"Un modérateur ne traite pas un signalement qui le concerne ou qui concerne "
+"un de ses liens."
 
 #. module: mail_linkup_reflet
 #: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_action
@@ -712,6 +733,12 @@ msgstr "Membre du canal"
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Check the code this person gave you."
+msgstr "Vérifie le code que cette personne t'a donné."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "Check the reflection before sending it."
 msgstr "Vérifie le reflet avant de l'envoyer."
 
@@ -842,6 +869,12 @@ msgid "Confirm that this exchange took place in person."
 msgstr "Confirme que cet échange a eu lieu en personne."
 
 #. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Confirm the reflection of %(name)s: that's a link!"
+msgstr "Confirmer le reflet de %(name)s : c'est un lien !"
+
+#. module: mail_linkup_reflet
 #. odoo-python
 #: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
 msgid "Confirm this reflection before answering it."
@@ -871,6 +904,11 @@ msgstr "Lien confirmé depuis le %(date)s."
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
 msgid "Confirmed link."
 msgstr "Lien confirmé."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__linkup_moderator_conflict
+msgid "Conflict of interest"
+msgstr "Conflit d'intérêts"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -1148,6 +1186,12 @@ msgstr "Énergie B"
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "Enter a valid email address."
 msgstr "Saisis une adresse courriel valide."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Enter a valid phone number."
+msgstr "Saisis un numéro de téléphone valide."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__response_state__exact
@@ -1603,8 +1647,15 @@ msgstr "Icône"
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
 #: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
 msgid "Ignore"
 msgstr "Ignorer"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Ignore the invitation of %(name)s"
+msgstr "Ignorer l'invitation de %(name)s"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -1702,6 +1753,16 @@ msgid "Invite a person who is not on LinkUp yet, from a real exchange."
 msgstr ""
 "Inviter une personne qui n'est pas encore sur LinkUp, à partir d'un échange "
 "réel."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__invitee_id
+msgid "Invited member"
+msgstr "Membre invité·e"
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__invitee_dismissed
+msgid "Invitee Dismissed"
+msgstr "Écartée par la personne invitée"
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__inviter_id
@@ -1839,6 +1900,11 @@ msgstr "LinkUp n'est pas disponible dans cette conversation."
 #: model:ir.model,name:mail_linkup_reflet.model_linkup_link
 msgid "LinkUp link between two members"
 msgstr "Lien LinkUp entre deux membres"
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_server_record
+msgid "LinkUp record written by the server"
+msgstr "Enregistrement LinkUp écrit par le serveur"
 
 #. module: mail_linkup_reflet
 #: model:ir.model,name:mail_linkup_reflet.model_linkup_reflet
@@ -2131,6 +2197,15 @@ msgstr ""
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid ""
+"No link nor conversation exists before your answer; ignoring tells nobody."
+msgstr ""
+"Aucun lien ni aucune conversation n'existe avant ta réponse ; ignorer ne "
+"prévient personne."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
 msgid "No link: no reflection was confirmed."
 msgstr "Aucun lien : aucun reflet n'a été confirmé."
@@ -2201,6 +2276,17 @@ msgstr "Notifier une mise en lumière"
 #: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_reflet_received
 msgid "Notify a received reflection"
 msgstr "Notifier un reflet reçu"
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_invitation_accepted
+msgid "Notify an invitation used"
+msgstr "Notifier une invitation utilisée"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Notify when a person I invited accepts"
+msgstr "Me notifier quand une personne invitée accepte"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -2659,6 +2745,12 @@ msgstr "Reflet retiré."
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Reflections received by invitation"
+msgstr "Reflets reçus par invitation"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
 msgid "Reflections sent, waiting"
 msgstr "Reflets envoyés, en attente"
 
@@ -2971,6 +3063,15 @@ msgstr "Quelqu'un"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid ""
+"Someone you met would like to make you a reflection: see the Reflet view."
+msgstr ""
+"Une personne que tu as rencontrée souhaite te faire un reflet : vois la Vue "
+"Reflet."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
 msgid "Sound of a confirmed reflection"
 msgstr "Son d'un reflet confirmé"
@@ -3172,9 +3273,16 @@ msgstr "Ce n'est pas ce que j'ai dit"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "That's a link with %(name)s!"
+msgstr "C'est un lien avec %(name)s !"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
 #: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
 #: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
 msgid "That's a link!"
 msgstr "C'est un lien !"
 
@@ -3340,6 +3448,15 @@ msgid "The other categories"
 msgstr "Les autres catégories"
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_notify_invitation_accepted
+msgid ""
+"The person invited by NewLink signed up, or confirmed the reflection, with "
+"the invited address."
+msgstr ""
+"La personne invitée par NewLink s'est inscrite, ou a confirmé le reflet, "
+"avec l'adresse invitée."
+
+#. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "The reflection could not be processed."
@@ -3489,6 +3606,12 @@ msgstr "Cette invitation a déjà servi."
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "This invitation has expired."
 msgstr "Cette invitation a expiré."
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This invitation is not available."
+msgstr "Cette invitation n'est pas disponible."
 
 #. module: mail_linkup_reflet
 #. odoo-python

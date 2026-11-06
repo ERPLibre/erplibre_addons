@@ -37,6 +37,7 @@
                     <t t-call="mail_linkup_reflet.LinkupNewlink" />
                 </section>
                 <section t-else="" class="o-linkup-RefletView-main d-flex flex-column gap-3 flex-grow-1">
+                    <t t-call="mail_linkup_reflet.LinkupReceivedInvitations" />
                     <LinkupHelpBar
                         barCategories="store.linkupBarCategories"
                         allCategories="store.linkupCategories"
@@ -293,6 +294,69 @@
         </div>
     </t>
 
+    <!-- The invitations that reach the member inside LinkUp instead of an
+         email (LU-F-020 RM6): who sends it, the card, then "That's a link!"
+         or "Ignore". -->
+    <t t-name="mail_linkup_reflet.LinkupReceivedInvitations">
+        <section
+            t-if="state.receivedInvitations.length"
+            class="o-linkup-RefletView-received d-flex flex-column gap-2"
+            aria-labelledby="o-linkup-RefletView-receivedTitle"
+        >
+            <h2 id="o-linkup-RefletView-receivedTitle" class="h6 mb-0">Reflections received by invitation</h2>
+            <ul class="list-unstyled d-flex flex-column gap-2 mb-0" aria-live="polite">
+                <li
+                    t-foreach="state.receivedInvitations"
+                    t-as="invitation"
+                    t-key="invitation.id"
+                    class="o-linkup-RefletView-receivedInvitation border rounded-3 p-3 d-flex flex-column gap-1"
+                    t-att-data-invitation-id="invitation.id"
+                >
+                    <t t-set="receivedCat" t-value="receivedCategory(invitation)" />
+                    <p class="fw-bold mb-0" t-esc="receivedTitle(invitation)" />
+                    <div t-if="invitation.reflet" class="d-flex flex-wrap align-items-center gap-2">
+                        <LinkupCategoryIcon t-if="receivedCat" code="receivedCat.code" />
+                        <span t-esc="receivedCat?.reflet_title or receivedCat?.name" />
+                    </div>
+                    <p t-if="invitation.reflet" class="small mb-0">
+                        <span class="fw-bold">You told me:</span>
+                        <t t-esc="invitation.reflet.you_said" />
+                    </p>
+                    <p t-if="invitation.reflet" class="small mb-0">
+                        <span class="fw-bold">I understood that:</span>
+                        <t t-esc="invitation.reflet.understood" />
+                    </p>
+                    <p class="small mb-0">No link nor conversation exists before your answer; ignoring tells nobody.</p>
+                    <div class="d-flex flex-wrap justify-content-end gap-2">
+                        <button
+                            type="button"
+                            class="o-linkup-RefletView-receivedIgnore btn btn-secondary btn-sm"
+                            t-att-aria-label="receivedIgnoreLabel(invitation)"
+                            t-att-disabled="state.receivedBusy"
+                            t-on-click="() => this.ignoreReceived(invitation)"
+                        >
+                            Ignore
+                        </button>
+                        <button
+                            type="button"
+                            class="o-linkup-RefletView-receivedAccept btn btn-primary btn-sm"
+                            t-att-aria-label="receivedConfirmLabel(invitation)"
+                            t-att-disabled="state.receivedBusy"
+                            t-on-click="() => this.acceptReceived(invitation)"
+                        >
+                            That's a link!
+                        </button>
+                    </div>
+                </li>
+            </ul>
+            <LinkupErrorAlert
+                t-if="state.receivedError"
+                error="state.receivedError"
+                className="'o-linkup-RefletView-receivedError'"
+            />
+        </section>
+    </t>
+
     <!-- NewLink in the Reflet view (reflet_view.js): the address, the card,
          the preview of the email, then the invitation sent. -->
     <t t-name="mail_linkup_reflet.LinkupNewlink">
@@ -338,11 +402,7 @@
                         t-model="state.newlink.name"
                     />
                 </label>
-                <LinkupErrorAlert
-                    t-if="state.error"
-                    error="state.error"
-                    className="'o-linkup-Newlink-error'"
-                />
+                <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-Newlink-error'" />
                 <div class="d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-secondary btn-sm" t-on-click="closeNewlink">Cancel</button>
                     <button type="submit" class="o-linkup-Newlink-next btn btn-primary btn-sm">
@@ -390,11 +450,7 @@
                     <t t-esc="newlinkNoText" />
                 </p>
                 <p class="o-linkup-Newlink-quota small mb-0" t-esc="newlinkQuotaLabel" />
-                <LinkupErrorAlert
-                    t-if="state.error"
-                    error="state.error"
-                    className="'o-linkup-Newlink-error'"
-                />
+                <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-Newlink-error'" />
                 <div class="d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-secondary btn-sm" t-on-click="newlinkBackToCard">Back</button>
                     <button
@@ -437,11 +493,7 @@
                 <p class="o-linkup-Newlink-expiry small mb-0" t-esc="invitationExpiry(invitation)" />
                 <p class="small mb-0" t-esc="newlinkNoConversation" />
                 <div t-if="state.notice" class="o-linkup-RefletView-notice small" role="status" t-esc="state.notice" />
-                <LinkupErrorAlert
-                    t-if="state.error"
-                    error="state.error"
-                    className="'o-linkup-Newlink-error'"
-                />
+                <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-Newlink-error'" />
                 <div class="d-flex flex-wrap justify-content-end gap-2">
                     <button
                         type="button"

@@ -18,6 +18,7 @@ function linkupSettingLabels() {
         ["linkup_notify_reflet_received", _t("Notify a received reflection")],
         ["linkup_notify_confirmed", _t("Notify a confirmed reflection")],
         ["linkup_notify_highlight", _t("Notify when someone adds to my happiness")],
+        ["linkup_notify_invitation_accepted", _t("Notify when a person I invited accepts")],
         ["linkup_notify_discreet", _t("Discreet notifications: “New LinkUp event”, without any name")],
     ];
 }

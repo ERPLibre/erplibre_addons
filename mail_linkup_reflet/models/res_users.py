@@ -7,6 +7,7 @@ from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools import email_normalize
 
+from ..client_context import server_context
 from ..exceptions import LinkupError
 
 MEMBER_GROUP = "mail_linkup_reflet.group_linkup_member"
@@ -182,6 +183,7 @@ class ResUsers(models.Model):
         return value != "False"
 
     @api.model
+    @server_context
     def linkup_tour_consume(self):
         """Record that the current user finished or skipped the first-use
         tour, so that it no longer starts by itself.
@@ -226,6 +228,21 @@ class ResUsers(models.Model):
     # Signup through an invitation (LU-F-020)
     # ------------------------------------------------------------------
 
+    def _linkup_accepts_invitation(self, inviter, via):
+        """Whether an invitation of ``inviter`` reaches this member inside
+        LinkUp; ``via`` is how the inviter named them (``email``, or a code
+        a module of the community adds). Every invitation reaches a member
+        here; the preference of the member restricts it in that module."""
+        self.ensure_one()
+        return True
+
+    @api.model
+    def _linkup_signup_login(self, email):
+        """The login of an account created through an invitation: the
+        normalized address here, a technical identifier in the module of
+        the public community (LU-F-113 RM2)."""
+        return email
+
     @api.model
     def _linkup_signup_invited(self, values, invitation):
         """Create the account of a person signing up through the link of
@@ -255,7 +272,12 @@ class ResUsers(models.Model):
         )
         if not template:
             raise SignupError(_("Signup: invalid template user"))
-        vals = dict(values, login=login, email=login, active=True)
+        vals = dict(
+            values,
+            login=self._linkup_signup_login(login),
+            email=login,
+            active=True,
+        )
         try:
             with self.env.cr.savepoint():
                 user = (

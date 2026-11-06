@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 from odoo import api, fields, models
+from odoo.addons.mail_linkup_reflet.client_context import server_context
 
 from .linkup_points_rule import CALL_CODE
 
@@ -85,6 +86,7 @@ class LinkupReflet(models.Model):
         return True
 
     @api.model
+    @server_context
     def linkup_channel_info(self, channel_id):
         """Add ``link_energy`` to what the web client shows of a direct
         conversation: the energy of the link of the pair as the member

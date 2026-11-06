@@ -5,6 +5,7 @@ from . import (
     test_points_caps,
     test_points_client,
     test_points_concurrency,
+    test_points_context,
     test_points_decay,
     test_points_demo,
     test_points_gamification,

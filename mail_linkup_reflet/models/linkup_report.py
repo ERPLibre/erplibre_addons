@@ -5,6 +5,7 @@ from datetime import timedelta
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
+from ..client_context import server_context
 from ..exceptions import LinkupError
 from .res_users import ADMIN_GROUP
 
@@ -58,12 +59,14 @@ class LinkupReport(models.Model):
     recipients (LU-F-023 RM5). It never sanctions anyone by itself.
 
     Members read the reports they made; moderators read and process the
-    others, a report about themselves excepted, and write only the fields
-    of their processing (``MODERATION_FIELDS``); LinkUp administrators
-    manage them all.
+    others, except those in a conflict of interest with them
+    (``linkup_moderator_conflict``, LU-F-116 RM5), and write only the
+    fields of their processing (``MODERATION_FIELDS``); LinkUp
+    administrators manage them all, under the same exception.
     """
 
     _name = "linkup.report"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp report"
     _order = "urgent desc, create_date desc, id desc"
 
@@ -117,6 +120,62 @@ class LinkupReport(models.Model):
     moderator_note = fields.Text(
         groups="mail_linkup_reflet.group_linkup_moderator"
     )
+    # Evaluated for the current user at each search, so that the record
+    # rule of the moderators follows the links as they change.
+    linkup_moderator_conflict = fields.Boolean(
+        string="Conflict of interest",
+        compute="_compute_linkup_moderator_conflict",
+        search="_search_linkup_moderator_conflict",
+    )
+
+    @api.model
+    def _linkup_conflict_user_ids(self, user):
+        """The users whose reports ``user`` does not process: themself, and
+        every member they share a link with, in any state."""
+        links = (
+            self.env["linkup.link"]
+            .sudo()
+            .search(
+                ["|", ("user_a_id", "=", user.id), ("user_b_id", "=", user.id)]
+            )
+        )
+        return {user.id} | set(links.user_a_id.ids) | set(links.user_b_id.ids)
+
+    @api.model
+    def _linkup_conflict_domain(self, user):
+        """The reports in a conflict of interest with ``user``: those they
+        made, those about them, and those whose reporter or reported member
+        shares a link with them."""
+        user_ids = list(self._linkup_conflict_user_ids(user))
+        return [
+            "|",
+            ("reporter_id", "in", user_ids),
+            ("reported_user_id", "in", user_ids),
+        ]
+
+    @api.depends_context("uid")
+    def _compute_linkup_moderator_conflict(self):
+        conflicted = set(
+            self.sudo()
+            .search(
+                [("id", "in", self.ids)]
+                + self._linkup_conflict_domain(self.env.user)
+            )
+            .ids
+        )
+        for report in self:
+            report.linkup_moderator_conflict = report.id in conflicted
+
+    def _search_linkup_moderator_conflict(self, operator, value):
+        if operator not in ("=", "!="):
+            raise NotImplementedError(
+                f"Operator {operator} is not supported on a conflict."
+            )
+        query = self.sudo()._search(
+            self._linkup_conflict_domain(self.env.user)
+        )
+        inside = (operator == "=") == bool(value)
+        return [("id", "in" if inside else "not in", query)]
 
     @api.model
     def _linkup_param(self, key, default):
@@ -125,16 +184,36 @@ class LinkupReport(models.Model):
     def write(self, vals):
         """Keep what was reported, and by whom, out of a moderator's reach:
         the access rights let a moderator write a report, and the
-        ``readonly`` of a field binds the forms only."""
-        if (
-            not self.env.su
-            and set(vals) - MODERATION_FIELDS
-            and not self.env.user._linkup_has_group_id(ADMIN_GROUP)
-        ):
-            raise AccessError(
-                _("A moderator changes only the processing of a report.")
-            )
+        ``readonly`` of a field binds the forms only. Nobody but the server
+        processes a report in a conflict of interest with them, their own
+        reports included, which the rule of the members lets them read: a
+        LinkUp administrator neither, though they read every report."""
+        if not self.env.su:
+            if set(vals) - MODERATION_FIELDS and not (
+                self.env.user._linkup_has_group_id(ADMIN_GROUP)
+            ):
+                raise AccessError(
+                    _("A moderator changes only the processing of a report.")
+                )
+            self._linkup_check_no_conflict()
         return super().write(vals)
+
+    def unlink(self):
+        """A LinkUp administrator deletes a report, but not one in a
+        conflict of interest with them; the retention of the closed reports
+        deletes them under ``sudo``."""
+        if not self.env.su:
+            self._linkup_check_no_conflict()
+        return super().unlink()
+
+    def _linkup_check_no_conflict(self):
+        if self.filtered("linkup_moderator_conflict"):
+            raise AccessError(
+                _(
+                    "A moderator does not process a report that concerns"
+                    " them or one of their links."
+                )
+            )
 
     @api.model
     def _linkup_reported_content(self, reflet_id, message_id, user_id):
@@ -206,6 +285,7 @@ class LinkupReport(models.Model):
         return reflet.sudo(), message.sudo(), reported.sudo()
 
     @api.model
+    @server_context
     def action_create_report(
         self,
         reflet_id=None,

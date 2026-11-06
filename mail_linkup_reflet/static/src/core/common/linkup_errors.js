@@ -87,6 +87,10 @@ export function linkupFieldMessage(field) {
             return _t("Guess the hidden theme first.");
         case "email":
             return _t("Enter a valid email address.");
+        case "phone":
+            return _t("Enter a valid phone number.");
+        case "code":
+            return _t("Check the code this person gave you.");
         case "draft":
             return _t("Send or delete your current draft first.");
     }

@@ -5,6 +5,7 @@ from collections import defaultdict
 
 from markupsafe import Markup
 from odoo import _, api, fields, models
+from odoo.addons.mail_linkup_reflet.client_context import server_context
 from odoo.addons.mail_linkup_reflet.models.res_users import (
     ADMIN_GROUP,
     MEMBER_GROUP,
@@ -62,6 +63,7 @@ class LinkupPointsLedger(models.Model):
     """
 
     _name = "linkup.points.ledger"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp points ledger"
     _order = "date desc, id desc"
     _rec_name = "rule_id"
@@ -408,6 +410,7 @@ class LinkupPointsLedger(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def linkup_my_points(
         self,
         limit=50,

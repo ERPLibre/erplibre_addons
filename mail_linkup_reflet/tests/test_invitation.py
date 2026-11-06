@@ -104,8 +104,8 @@ class TestLinkupInvitation(LinkupInvitationMixin, LinkupRefletCase):
     def test_same_answer_whoever_holds_the_address(self):
         """CA4, CA6, RM6: an unknown address, the address of a member, of a
         member who blocks Sam, and one that refuses the invitations give
-        Sam the same answer; the email leaves for the first two only, and
-        no link nor conversation exists before an answer."""
+        Sam the same answer; the email leaves for the unknown address only,
+        and no link nor conversation exists before an answer."""
         self.env["linkup.block"].with_user(self.france).action_block(
             self.sam.id
         )
@@ -125,7 +125,7 @@ class TestLinkupInvitation(LinkupInvitationMixin, LinkupRefletCase):
             }
         self.assertEqual(len({repr(value) for value in answers.values()}), 1)
         self.assertEqual(len(self._mails(UNKNOWN)), 1)
-        self.assertEqual(len(self._mails(self.luce.email)), 1)
+        self.assertFalse(self._mails(self.luce.email))
         self.assertFalse(self._mails(self.france.email))
         self.assertFalse(self._mails(OTHER))
         self.assertFalse(self._link(self.sam, self.luce))
@@ -138,6 +138,100 @@ class TestLinkupInvitation(LinkupInvitationMixin, LinkupRefletCase):
             self.Reflet.with_user(self.luce).search(
                 [("author_id", "=", self.sam.id)]
             )
+        )
+
+    def _open_invitations_to(self, user):
+        """Let ``user`` receive the invitations naming their address: a
+        module of the community restricts them to a code by default."""
+        if "linkup_first_reflet_scope" in self.env["res.users"]._fields:
+            user.sudo().linkup_first_reflet_scope = "email_or_code"
+
+    def test_member_receives_inside_linkup(self):
+        """RM6: the address of a member gets no email; the invitation
+        reaches the member inside LinkUp with the reflection, and its
+        confirmation links the pair and tells Sam. Nothing exists between
+        them before."""
+        self._open_invitations_to(self.luce)
+        self._bus_reset()
+        reflet, result = self._invite(self.luce.email)
+        invitation = self._invitation(result)
+        self.assertFalse(self._mails(self.luce.email))
+        self.assertEqual(invitation.invitee_id, self.luce)
+        self.assertIn(
+            self.luce.partner_id,
+            [
+                target
+                for target, kind, _payload in self._bus_sent()
+                if kind == "linkup.invitation/received"
+            ],
+        )
+        self.assertFalse(self._link(self.sam, self.luce))
+        received = self.Invitation.with_user(
+            self.luce
+        ).linkup_received_invitations()
+        self.assertEqual([info["id"] for info in received], invitation.ids)
+        self.assertEqual(received[0]["inviter"]["name"], "Sam")
+        self.assertEqual(received[0]["reflet"]["understood"], UNDERSTOOD)
+        self.assertFalse(
+            self.Invitation.with_user(
+                self.jacques
+            ).linkup_received_invitations()
+        )
+        with self.assertLinkupCode("linkup.unavailable"):
+            invitation.with_user(self.jacques).action_accept_received()
+        self._bus_reset()
+        answer = invitation.with_user(self.luce).action_accept_received()
+        self.assertTrue(answer["delivered"])
+        self.assertEqual(invitation.state, "accepted")
+        self.assertEqual(reflet.state, "confirmed")
+        self.assertEqual(reflet.recipient_id, self.luce)
+        link = self._link(self.sam, self.luce)
+        self.assertEqual(link.state, "active")
+        self.assertEqual(answer["channel_id"], link.channel_id.id)
+        accepted = [
+            payload
+            for target, kind, payload in self._bus_sent()
+            if kind == "linkup.invitation/accepted"
+            and target == self.sam.partner_id
+        ]
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(accepted[0]["name"], "Luce")
+        self.assertFalse(
+            self.Invitation.with_user(self.luce).linkup_received_invitations()
+        )
+
+    def test_member_ignores_an_invitation(self):
+        """RM6: the invited member sets the invitation aside; it leaves
+        their list, waits for its expiry, and Sam reads no change."""
+        self._open_invitations_to(self.luce)
+        reflet, result = self._invite(self.luce.email)
+        invitation = self._invitation(result)
+        before = invitation.with_user(self.sam).read(["write_date"])
+        invitation.with_user(self.luce).action_ignore_received()
+        self.assertFalse(
+            self.Invitation.with_user(self.luce).linkup_received_invitations()
+        )
+        self.assertEqual(invitation.state, "sent")
+        self.assertEqual(reflet.state, "pending_invite")
+        self.assertEqual(
+            invitation.with_user(self.sam).read(["write_date"]), before
+        )
+        with self.assertLinkupCode("linkup.unavailable"):
+            invitation.with_user(self.luce).action_accept_received()
+
+    def test_blocking_member_receives_nothing(self):
+        """RM6: a member who blocks Sam receives neither an email nor the
+        invitation inside LinkUp."""
+        self._open_invitations_to(self.france)
+        self.env["linkup.block"].with_user(self.france).action_block(
+            self.sam.id
+        )
+        _reflet, result = self._invite(self.france.email)
+        self.assertFalse(self._invitation(result).invitee_id)
+        self.assertFalse(
+            self.Invitation.with_user(
+                self.france
+            ).linkup_received_invitations()
         )
 
     def test_validation(self):
@@ -401,6 +495,8 @@ class TestLinkupInvitationRoute(
         return match and match.group(1)
 
     def _signup(self, token, email):
+        """Sign up through the link. The consents and declarations of the
+        public community go along: the page ignores them without it."""
         return self._page(
             token,
             data={
@@ -408,11 +504,17 @@ class TestLinkupInvitationRoute(
                 "name": "Camille",
                 "password": "linkup-Camille-2026",
                 "confirm_password": "linkup-Camille-2026",
+                "linkup_terms": "on",
+                "linkup_privacy": "on",
+                "linkup_sensitive_data": "on",
+                "linkup_adult": "on",
+                "linkup_age_bracket": "25_34",
+                "linkup_resides_canada": "on",
             },
         )
 
     def _user(self, email):
-        return self.env["res.users"].sudo().search([("login", "=", email)])
+        return self.env["res.users"].sudo().search([("email", "=", email)])
 
     def test_signup_attaches_the_reflection(self):
         """CA2, CA7: the page names the inviter, never the texts; the
@@ -498,17 +600,24 @@ class TestLinkupInvitationRoute(
     def test_logged_in_member(self):
         """A logged-in member with the invited address lands on the Reflet
         view with the reflection; another one reads that the invitation is
-        not theirs, and it stays usable."""
-        reflet, result = self._invite(self.luce.email)
-        token = self._token(self.luce.email)
+        not theirs, and it stays usable. The address became the one of a
+        member after the email left."""
+        reflet, result = self._invite()
+        token = self._token()
+        camille = mail_new_test_user(
+            self.env,
+            login="linkup_rf_camille",
+            email=UNKNOWN,
+            groups="mail_linkup_reflet.group_linkup_member",
+        )
         self.authenticate(self.jacques.login, self.jacques.login)
         self.assertEqual(self._code(self._page(token)), "linkup.unavailable")
         self.assertEqual(self._invitation(result).state, "sent")
-        self.authenticate(self.luce.login, self.luce.login)
+        self.authenticate(camille.login, camille.login)
         response = self._page(token)
         self.assertIn(response.status_code, (302, 303))
         self.env.invalidate_all()
-        self.assertEqual(reflet.recipient_id, self.luce)
+        self.assertEqual(reflet.recipient_id, camille)
         self.assertEqual(reflet.state, "sent")
 
     def test_optout(self):
@@ -533,16 +642,17 @@ class TestLinkupInvitationRoute(
         "odoo.sql_db", "odoo.addons.mail_linkup_reflet.controllers.invitation"
     )
     def test_signup_with_taken_address(self):
-        """An address already used as a login keeps the invitation usable
-        and says so, as the native signup does."""
+        """An address taken after the email left keeps the invitation
+        usable and says so, as the native signup does."""
+        _reflet, result = self._invite(OTHER)
+        token = self._token(OTHER)
         mail_new_test_user(
             self.env,
             login=OTHER,
             email=OTHER,
             groups="mail_linkup_reflet.group_linkup_member",
         )
-        _reflet, result = self._invite(OTHER)
-        response = self._signup(self._token(OTHER), OTHER)
+        response = self._signup(token, OTHER)
         self.assertEqual(response.status_code, 200)
         self.assertIn("alert-danger", response.text)
         self.assertEqual(self._invitation(result).state, "sent")

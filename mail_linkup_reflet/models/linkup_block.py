@@ -2,6 +2,7 @@
 
 from odoo import _, api, fields, models
 
+from ..client_context import server_context
 from ..exceptions import LinkupError
 from .res_users import MEMBER_GROUP
 
@@ -27,6 +28,7 @@ class LinkupBlock(models.Model):
     """
 
     _name = "linkup.block"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp block between two members"
     _order = "create_date desc, id desc"
 
@@ -169,6 +171,7 @@ class LinkupBlock(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def action_block(self, user_id=None, partner_id=None):
         """Block a member, given by user or by partner id.
 
@@ -195,6 +198,7 @@ class LinkupBlock(models.Model):
         return True
 
     @api.model
+    @server_context
     def action_unblock(self, user_id=None, partner_id=None):
         """Lift the block of the current user on a member.
 
@@ -219,6 +223,7 @@ class LinkupBlock(models.Model):
         return True
 
     @api.model
+    @server_context
     def linkup_blocked_members(self):
         """The members the current user blocks, for their settings: one
         entry per block with ``user_id``, ``partner_id`` and ``name``, the

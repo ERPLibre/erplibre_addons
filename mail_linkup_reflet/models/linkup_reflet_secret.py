@@ -19,6 +19,7 @@ class LinkupRefletSecret(models.Model):
     """
 
     _name = "linkup.reflet.secret"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp hidden themes of a precision"
 
     reflet_id = fields.Many2one(

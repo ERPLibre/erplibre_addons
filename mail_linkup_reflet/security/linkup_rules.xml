@@ -131,8 +131,9 @@
     </record>
 
     <!-- Blocks: a member reads the blocks they hold, never one held on
-         them; moderators and administrators read them all. Nobody writes
-         them outside the methods of linkup.block. -->
+         them; moderators and administrators read the others too, but
+         never one held on themselves (LU-F-115 RM2). Nobody writes them
+         outside the methods of linkup.block. -->
     <record id="rule_linkup_block_member" model="ir.rule">
         <field name="name">LinkUp member: own blocks</field>
         <field name="model_id" ref="model_linkup_block" />
@@ -141,10 +142,10 @@
     </record>
 
     <record id="rule_linkup_block_moderator" model="ir.rule">
-        <field name="name">LinkUp moderator: all blocks</field>
+        <field name="name">LinkUp moderator: blocks not held on themselves</field>
         <field name="model_id" ref="model_linkup_block" />
         <field name="groups" eval="[Command.link(ref('group_linkup_moderator'))]" />
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('blocked_id', '!=', user.id)]</field>
     </record>
 
     <!-- Invitations: a member reads the invitations they sent; a LinkUp
@@ -164,8 +165,12 @@
     </record>
 
     <!-- Reports: a member reads the reports they made; a moderator reads
-         the others too, except those about themself; an administrator
-         reads them all. -->
+         the others too, except those in a conflict of interest with them:
+         made by them, about them, or whose reporter or reported member
+         shares a link with them (LU-F-116 RM5). An administrator reads
+         them all but those in a conflict of interest with them, so that a
+         reported administrator learns nothing of who reported them
+         (LU-F-114 RM3). -->
     <record id="rule_linkup_report_member" model="ir.rule">
         <field name="name">LinkUp member: own reports</field>
         <field name="model_id" ref="model_linkup_report" />
@@ -174,16 +179,16 @@
     </record>
 
     <record id="rule_linkup_report_moderator" model="ir.rule">
-        <field name="name">LinkUp moderator: reports about others</field>
+        <field name="name">LinkUp moderator: reports without a conflict of interest</field>
         <field name="model_id" ref="model_linkup_report" />
         <field name="groups" eval="[Command.link(ref('group_linkup_moderator'))]" />
-        <field name="domain_force">[('reported_user_id', '!=', user.id)]</field>
+        <field name="domain_force">[('linkup_moderator_conflict', '=', False)]</field>
     </record>
 
     <record id="rule_linkup_report_admin" model="ir.rule">
-        <field name="name">LinkUp administrator: all reports</field>
+        <field name="name">LinkUp administrator: reports without a conflict of interest</field>
         <field name="model_id" ref="model_linkup_report" />
         <field name="groups" eval="[Command.link(ref('group_linkup_admin'))]" />
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('linkup_moderator_conflict', '=', False)]</field>
     </record>
 </odoo>

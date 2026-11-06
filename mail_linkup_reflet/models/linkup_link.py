@@ -24,6 +24,7 @@ class LinkupLink(models.Model):
     """
 
     _name = "linkup.link"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp link between two members"
     _order = "last_interaction_date desc, id desc"
 

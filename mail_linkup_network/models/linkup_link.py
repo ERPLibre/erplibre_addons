@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from odoo import _, api, fields, models
 from odoo.addons.mail.tools.discuss import Store
+from odoo.addons.mail_linkup_reflet.client_context import server_context
 from odoo.addons.mail_linkup_reflet.exceptions import LinkupError
 from odoo.addons.mail_linkup_reflet.models.linkup_reflet import (
     RECEIVED_STATES,
@@ -169,6 +170,7 @@ class LinkupLink(models.Model):
         return level
 
     @api.model
+    @server_context
     def get_network_graph(self, level=DEFAULT_LEVEL, limit=MAX_NODES):
         """The graph of the Network view, centred on the current member.
 
@@ -269,6 +271,7 @@ class LinkupLink(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def get_ranking(self, kind="partners", period="all"):
         """A ranking of the contacts of the current member, never of the
         whole community (LU-NF-032).
@@ -355,6 +358,7 @@ class LinkupLink(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def get_link_card(self, user_id, reflets_only=False, limit=20):
         """The card of the link between the current member and a contact.
 

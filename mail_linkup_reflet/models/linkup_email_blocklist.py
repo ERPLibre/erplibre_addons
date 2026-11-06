@@ -19,7 +19,8 @@ class LinkupEmailBlocklist(models.Model):
     of the database: the list answers "is this address in it?" and never
     gives an address back. ``invite_optout`` records the refusal of every
     invitation from the link of an invitation email (LU-F-020 RM7);
-    ``banned`` is for the moderation of a later lot. An entry lasts
+    ``banned`` keeps a member banned by the moderation from signing up
+    again (LU-F-116 RM6). An entry lasts
     ``RETENTION_MONTHS`` months, then the purge of the invitations deletes
     it.
 
@@ -27,6 +28,7 @@ class LinkupEmailBlocklist(models.Model):
     """
 
     _name = "linkup.email.blocklist"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp blocklist of email addresses"
     _order = "id desc"
 
@@ -58,17 +60,18 @@ class LinkupEmailBlocklist(models.Model):
         return hmac(self.env(su=True), EMAIL_HASH_SCOPE, normalized)
 
     @api.model
-    def _linkup_is_listed(self, email):
-        """Tell whether an address is listed, for any reason not expired."""
+    def _linkup_is_listed(self, email, reason=None):
+        """Tell whether an address is listed and not expired, for
+        ``reason`` or, without one, for any reason."""
         email_hash = self._linkup_hash(email)
+        domain = [
+            ("email_hash", "=", email_hash),
+            ("expiry_date", ">", fields.Datetime.now()),
+        ]
+        if reason:
+            domain.append(("reason", "=", reason))
         return bool(email_hash) and bool(
-            self.sudo().search_count(
-                [
-                    ("email_hash", "=", email_hash),
-                    ("expiry_date", ">", fields.Datetime.now()),
-                ],
-                limit=1,
-            )
+            self.sudo().search_count(domain, limit=1)
         )
 
     @api.model

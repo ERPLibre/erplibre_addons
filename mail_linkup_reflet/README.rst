@@ -295,6 +295,16 @@ Start rule
   the ``linkup`` keys of the context it receives; outside ``sudo``, a member
   creates the message of a conversation only from within ``message_post``
   (``authorization.channel_post``) and rewrites none.
+* The context of a call is the client's own, whichever way it comes
+  (``call_kw``, ``/jsonrpc``, the ``context`` of a JSON route). Every public
+  method of LinkUp runs with its language, time zone and companies only
+  (``client_context.server_context``): ``active_test`` turned off lets no
+  archived account, conversation or rule in, and no key of a module
+  changes what the method does. The records the server writes
+  (``linkup.server.record``: reflections, links, highlights, blocks,
+  reports, invitations, the ledger, the consents, the audit log) take the
+  defaults of their fields only, never a ``default_<field>`` of the
+  context, whichever path creates them.
 * ``_channel_basic_info`` gives the client ``linkup_start_rule`` and
   ``linkup_start_rule_satisfied``, sent again to the conversation when its
   link becomes active. The composer of Discuss and of the chat windows then
@@ -324,8 +334,8 @@ Blocking, suspension and reports
   user or partner id, force the blocker to the current user; a member
   blocks a member they read, share a link with, or already block, and any
   other id gets the same ``linkup.unavailable``. Members read their own
-  blocks, moderators and administrators all of them; nobody writes one
-  directly. ``linkup_blocked_members`` lists those of the member.
+  blocks, moderators and administrators those of the others too, never one
+  held on themselves; nobody writes one directly. ``linkup_blocked_members`` lists those of the member.
 * A block in either direction makes the link ``blocked``, which closes the
   scope of the pair and removes each one from the contacts of the other.
   Lifting the last block gives it back ``active``, ``pending`` or
@@ -376,9 +386,13 @@ Blocking, suspension and reports
   is returned again; beyond ``linkup.max_reports_per_day`` (20) a day, the
   code is ``linkup.rate_limited``. A member reports a member they read or
   share a link with, so that both parties of a block still report each
-  other. Members read the reports they made, moderators the others except
-  those about themselves, and write only their processing (state,
-  moderator, action, note); administrators manage them all.
+  other. Members read the reports they made; moderators the others, except
+  those in a conflict of interest with them
+  (``linkup_moderator_conflict``: made by them, about them, or whose
+  reporter or reported member shares a link with them), and write only
+  their processing (state, moderator, action, note); administrators
+  manage them all, those in a conflict of interest with them excepted,
+  which they neither read, process nor delete.
 * A rejection checks the author (LU-F-023 RM5): beyond
   ``linkup.rejection_alert_count`` (5) recipients within
   ``linkup.rejection_alert_days`` (30), counting only accounts of at least
@@ -400,7 +414,8 @@ Not covered yet:
   sent to a closed link, and a phantom delivery for a member who blocks
   them.
 * The moderation console, the notification of the moderators for an urgent
-  report and the report of a message from its menu belong to later lots.
+  report and the report of a message from its menu belong to
+  ``mail_linkup_community``.
 
 NewLink invitations
 ===================
@@ -427,9 +442,24 @@ NewLink invitations
 * The inviter always gets the same answer, the masked address
   (``c***@example.com``) and the card: for an unknown address, for the
   address of a member, for an address of the refusal list and for the
-  address of a member a block separates from them. The email goes out in
-  the first two cases only. No link nor conversation exists before the
-  invitation is used.
+  address of a member a block separates from them. The email goes out to
+  the unknown address only; it is rendered and dropped otherwise. No link
+  nor conversation exists before the invitation is used.
+* The address of a member gets no email (RM6): the invitation reaches the
+  member inside LinkUp (``invitee_id``, kept to the LinkUp administrators),
+  over the bus as ``linkup.invitation/received`` and in "Reflections
+  received by invitation" of the Reflet view, with the card.
+  ``action_accept_received`` delivers the reflection and confirms it at
+  once, which makes the link ``active``; ``action_ignore_received`` sets
+  it aside, without telling the inviter, until it expires. A member who
+  blocks the inviter, or is suspended, receives nothing, and
+  ``res.users._linkup_accepts_invitation`` lets another module restrict
+  who reaches a member.
+* When the invited address uses the invitation, by the signup, the link or
+  the Reflet view, the inviter receives ``linkup.invitation/accepted``
+  with the name of the new contact, announced by their client unless
+  ``linkup_notify_invitation_accepted`` is off. A link used with another
+  address tells them nothing.
 * The page of the link names the inviter, never the texts, and holds the
   signup form of ``auth_signup``, whatever ``auth_signup.invitation_scope``
   says. The account copies ``user_linkup_member_template``, inactive: an
@@ -474,11 +504,8 @@ Not covered yet:
 
 * The invitation by phone and its share link, the verification of the
   email of a public signup, the consents and the anti-robot limits of a
-  signup belong to later lots; the signup through an invitation needs no
-  other check than the token.
-* An existing member receives the same email as anybody, and the
-  reflection once they open the link; the inviter is not notified when an
-  invitation is used (``linkup_notify_invitation_accepted``).
+  signup belong to ``mail_linkup_community``; without it, the signup
+  through an invitation needs no other check than the token.
 
 You add to my happiness
 =======================

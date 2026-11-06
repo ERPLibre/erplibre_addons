@@ -1,4 +1,4 @@
-import {onWillStart, useEffect, useRef, useState} from "@odoo/owl";
+import {onWillStart, onWillUnmount, useEffect, useRef, useState} from "@odoo/owl";
 
 import {deserializeDateTime, formatDate} from "@web/core/l10n/dates";
 import {_t} from "@web/core/l10n/translation";
@@ -50,6 +50,12 @@ import {LinkupRefletFormBase} from "@mail_linkup_reflet/core/common/reflet_form"
  * contacts, each one opening that last step. The action context
  * `linkup_newlink` opens the view on the first step.
  *
+ * An invitation sent to the address of the member, or that names them,
+ * reaches them here instead of by email (LU-F-020 RM6): "Reflections
+ * received by invitation" shows who sends it and the card, with "That's a
+ * link!", which confirms it and opens the conversation, and "Ignore". The
+ * view reads them again when one arrives over the bus.
+ *
  * The reflections the member sent and that still wait for their
  * recipient stay in the view (LU-F-010 RM2), each card offering to
  * withdraw it while it is unread (LU-F-019). The avatar of the member opens
@@ -93,6 +99,14 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         this.focusTarget = null;
         onWillStart(() => {
             this.load();
+        });
+        const onInvitation = () => this.load();
+        const bus = this.env.services.bus_service;
+        bus?.subscribe("linkup.invitation/received", onInvitation);
+        bus?.subscribe("linkup.invitation/accepted", onInvitation);
+        onWillUnmount(() => {
+            bus?.unsubscribe("linkup.invitation/received", onInvitation);
+            bus?.unsubscribe("linkup.invitation/accepted", onInvitation);
         });
         useEffect(
             () => this.applyFocus(),
@@ -171,6 +185,10 @@ export class LinkupRefletView extends LinkupRefletFormBase {
             newlink: null,
             newlinkInfo: {invitations: [], quota: null, expiry_days: 0},
             newlinkBusy: false,
+            /** The invitations that reach the member inside LinkUp. */
+            receivedInvitations: [],
+            receivedBusy: false,
+            receivedError: null,
             sentIds: [],
             happinessOpen: false,
             happinessIndex: 0,
@@ -217,6 +235,7 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         if (info.newlink) {
             this.state.newlinkInfo = info.newlink;
         }
+        this.state.receivedInvitations = info.received_invitations || [];
         if (!this.recipient) {
             this.state.recipientUserId = null;
         }
@@ -458,6 +477,73 @@ export class LinkupRefletView extends LinkupRefletFormBase {
     /** A withdrawal reads the view again: the card leaves the list. */
     onSentAction() {
         this.load();
+    }
+
+    // ------------------------------------------------------------------
+    // Invitations received inside LinkUp (LU-F-020 RM6)
+    // ------------------------------------------------------------------
+
+    /** @param {Object} invitation as `linkup_received_invitations` gives it */
+    receivedCategory(invitation) {
+        const code = invitation.reflet?.category_code;
+        return code ? this.store.linkupCategories.find((category) => category.code === code) : null;
+    }
+
+    /** @param {Object} invitation */
+    receivedTitle(invitation) {
+        return _t("%(name)s would like to make you a reflection", {name: invitation.inviter.name});
+    }
+
+    /** @param {Object} invitation */
+    receivedConfirmLabel(invitation) {
+        return _t("Confirm the reflection of %(name)s: that's a link!", {name: invitation.inviter.name});
+    }
+
+    /** @param {Object} invitation */
+    receivedIgnoreLabel(invitation) {
+        return _t("Ignore the invitation of %(name)s", {name: invitation.inviter.name});
+    }
+
+    /**
+     * Run an action of an invitation received inside LinkUp, then read the
+     * view again.
+     *
+     * @param {Object} invitation
+     * @param {"action_accept_received"|"action_ignore_received"} method
+     */
+    async receivedAction(invitation, method) {
+        if (this.guide.active || this.state.receivedBusy) {
+            return null;
+        }
+        this.state.receivedBusy = true;
+        this.state.receivedError = null;
+        try {
+            return await this.orm.silent.call("linkup.invitation", method, [[invitation.id]]);
+        } catch (error) {
+            const info = linkupErrorInfo(error);
+            if (!info) {
+                throw error;
+            }
+            this.state.receivedError = info;
+            return null;
+        } finally {
+            this.state.receivedBusy = false;
+            this.load();
+        }
+    }
+
+    /** @param {Object} invitation */
+    async acceptReceived(invitation) {
+        const result = await this.receivedAction(invitation, "action_accept_received");
+        if (result?.delivered) {
+            linkupPlaySound(this.env.services, "linkup-success");
+            this.state.notice = _t("That's a link with %(name)s!", {name: invitation.inviter.name});
+        }
+    }
+
+    /** @param {Object} invitation */
+    async ignoreReceived(invitation) {
+        await this.receivedAction(invitation, "action_ignore_received");
     }
 
     // ------------------------------------------------------------------

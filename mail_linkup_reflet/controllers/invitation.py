@@ -32,7 +32,9 @@ class LinkupInvitationController(AuthSignupHome):
     the address, after a confirmation.
 
     The path variable is not named ``token``: ``auth_signup`` reads that
-    request parameter as the signup token of a partner.
+    request parameter as the signup token of a partner. The routes are
+    ``website`` ones, as ``/web/signup`` is: with the ``website`` module
+    installed, the login layout they render reads the current website.
     """
 
     def _linkup_set_lang(self, invitation, lang):
@@ -92,6 +94,7 @@ class LinkupInvitationController(AuthSignupHome):
         auth="public",
         methods=["GET", "POST"],
         sitemap=False,
+        website=True,
     )
     def linkup_invite(self, invite_token, lang=None, **kw):
         invitation = (
@@ -135,12 +138,10 @@ class LinkupInvitationController(AuthSignupHome):
             except UserError as error:
                 values["error"] = error.args[0]
             except (SignupError, AssertionError) as error:
-                if (
-                    request.env["res.users"]
-                    .sudo()
-                    .search_count(
-                        [("login", "=", qcontext.get("login"))], limit=1
-                    )
+                Users = request.env["res.users"].sudo()
+                if Users.search_count(
+                    Users._get_login_domain(qcontext.get("login") or ""),
+                    limit=1,
                 ):
                     values["error"] = request.env._(
                         "Another user is already registered using this email"
@@ -161,6 +162,7 @@ class LinkupInvitationController(AuthSignupHome):
         auth="public",
         methods=["GET", "POST"],
         sitemap=False,
+        website=True,
     )
     def linkup_invite_optout(self, invite_token, lang=None, **kw):
         invitation = (

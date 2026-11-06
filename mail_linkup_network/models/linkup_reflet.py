@@ -5,6 +5,7 @@ from contextlib import contextmanager
 
 from markupsafe import Markup
 from odoo import _, fields, models
+from odoo.addons.mail_linkup_reflet.client_context import server_context
 from odoo.addons.mail_linkup_reflet.exceptions import LinkupError
 
 # Category of a request for action (LU-F-046).
@@ -73,6 +74,7 @@ class LinkupReflet(models.Model):
             return env._("Agreed.")
         return env._("Not for now.")
 
+    @server_context
     def action_answer_action_request(self, reply):
         """Answer a request for action with a quick reply (LU-F-046).
 

@@ -123,7 +123,13 @@ patch(OutOfFocusService.prototype, {
  * - the confirmation of a reflection the member wrote, read in the cards
  *   the bus sends (`mail.record/insert`), once per reflection and session;
  * - a highlight received (`linkup.highlight/received`), whose card the
- *   service inserts in the Store.
+ *   service inserts in the Store;
+ * - an invitation that reaches the member inside LinkUp
+ *   (`linkup.invitation/received`, LU-F-020 RM6), announced as a received
+ *   reflection;
+ * - an invitation of the member used by the invited person
+ *   (`linkup.invitation/accepted`), with its setting
+ *   `linkup_notify_invitation_accepted`.
  *
  * Each notification follows its setting and the mute of Discuss, and
  * names nobody with discreet notifications.
@@ -180,6 +186,30 @@ export const linkupSignalsService = {
                         })
                     );
                 }
+            }
+        });
+        services.bus_service.subscribe("linkup.invitation/received", () => {
+            linkupPlaySound(env.services, "linkup-received");
+            if (store.settings?.linkup_notify_reflet_received && !linkupIsMuted(store.settings)) {
+                outOfFocus.sendNotification(
+                    linkupNotification(store.settings, {
+                        message: _t("Someone you met would like to make you a reflection: see the Reflet view."),
+                    })
+                );
+            }
+        });
+
+        services.bus_service.subscribe("linkup.invitation/accepted", (payload) => {
+            linkupPlaySound(env.services, "linkup-ting");
+            if (store.settings?.linkup_notify_invitation_accepted && !linkupIsMuted(store.settings)) {
+                outOfFocus.sendNotification(
+                    linkupNotification(store.settings, {
+                        message: _t("%(name)s accepted your invitation: your reflection reached them.", {
+                            name: payload?.name || _t("Someone"),
+                        }),
+                        type: "success",
+                    })
+                );
             }
         });
         return {};

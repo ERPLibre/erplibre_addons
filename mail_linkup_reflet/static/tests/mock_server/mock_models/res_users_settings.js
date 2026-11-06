@@ -9,5 +9,6 @@ export class ResUsersSettings extends mailModels.ResUsersSettings {
   linkup_notify_reflet_received = fields.Boolean({ default: true });
   linkup_notify_confirmed = fields.Boolean({ default: true });
   linkup_notify_highlight = fields.Boolean({ default: true });
+  linkup_notify_invitation_accepted = fields.Boolean({ default: true });
   linkup_notify_discreet = fields.Boolean({ default: false });
 }

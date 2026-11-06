@@ -8,6 +8,7 @@ from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import AccessError
 from odoo.tools import email_normalize
 
+from ..client_context import server_context
 from ..exceptions import LinkupError
 from .res_users import MEMBER_GROUP
 
@@ -51,8 +52,12 @@ class LinkupInvitation(models.Model):
 
     The inviter sees the same answer whatever the address: unknown, of a
     member, refusing the invitations, or of a member a block separates from
-    them. Only the email differs, sent in the first two cases and not in the
-    last two, and nothing the inviter reads tells which.
+    them. Only an unknown address receives the email. The address of a
+    member receives none: the invitation reaches that member inside LinkUp,
+    as a notification and an entry of the Reflet view, where they confirm
+    the reflection or ignore it (LU-F-020 RM6); no link nor conversation
+    exists before that confirmation. Nothing the inviter reads tells which
+    case applies, until the invitation is used.
 
     The inviter cancels an invitation not used yet, which gives the
     reflection back as their draft, or sends its link again with a new
@@ -69,6 +74,7 @@ class LinkupInvitation(models.Model):
     """
 
     _name = "linkup.invitation"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp invitation"
     _order = "id desc"
 
@@ -123,6 +129,21 @@ class LinkupInvitation(models.Model):
         groups="mail_linkup_reflet.group_linkup_admin",
     )
     accepted_date = fields.Datetime(string="Used on", readonly=True)
+    # The member the invitation reaches inside LinkUp, instead of an email
+    # (LU-F-020 RM6). Kept from the inviter: it tells that the address
+    # belongs to a member.
+    invitee_id = fields.Many2one(
+        "res.users",
+        string="Invited member",
+        index="btree_not_null",
+        ondelete="set null",
+        readonly=True,
+        groups="mail_linkup_reflet.group_linkup_admin",
+    )
+    # The invited member set the invitation aside; it waits for its expiry.
+    invitee_dismissed = fields.Boolean(
+        readonly=True, copy=False, groups="base.group_system"
+    )
     # Sendings of the day ``send_day`` (creation and new sendings), for the
     # daily limit of the inviter.
     send_day = fields.Date(readonly=True, groups="base.group_system")
@@ -293,9 +314,9 @@ class LinkupInvitation(models.Model):
         """
         self.ensure_one()
         invitation = self.sudo()
-        if self.env["linkup.email.blocklist"]._linkup_is_listed(
-            invitation.email
-        ):
+        if not invitation.email or self.env[
+            "linkup.email.blocklist"
+        ]._linkup_is_listed(invitation.email):
             return False
         users = (
             self.env["res.users"]
@@ -306,6 +327,60 @@ class LinkupInvitation(models.Model):
             invitation.inviter_id
         )
         return not (users & separated)
+
+    def _linkup_member_holder(self):
+        """The restricted member who holds the invited address, other than
+        the inviter, or an empty recordset."""
+        self.ensure_one()
+        invitation = self.sudo()
+        if not invitation.email:
+            return self.env["res.users"]
+        users = (
+            self.env["res.users"]
+            .sudo()
+            .search(
+                [
+                    ("partner_id.email_normalized", "=", invitation.email),
+                    ("share", "=", False),
+                    ("id", "!=", invitation.inviter_id.id),
+                ]
+            )
+        )
+        return users.filtered(
+            lambda user: user._linkup_is_restricted_member()
+        )[:1]
+
+    def _linkup_offer_to(self, member, via):
+        """Make the invitation reach ``member`` inside LinkUp.
+
+        ``via`` is how the inviter named them: ``email``, or a code that a
+        module of the community adds. Nothing reaches a member who refuses
+        the invitations, whom a block separates from the inviter, who is
+        suspended, or whose own preference keeps them from this inviter
+        (``res.users._linkup_accepts_invitation``). The inviter is never
+        told. Return whether the invitation reaches the member.
+        """
+        self.ensure_one()
+        invitation = self.sudo()
+        member = member.sudo()
+        separated = self.env["linkup.block"]._linkup_blocked_users(
+            invitation.inviter_id
+        )
+        if (
+            not member
+            or member in separated
+            or (invitation.email and not invitation._linkup_deliverable())
+            or member._linkup_is_suspended()
+            or not member._linkup_accepts_invitation(
+                invitation.inviter_id, via
+            )
+        ):
+            return False
+        invitation.write({"invitee_id": member.id})
+        member.partner_id._bus_send(
+            "linkup.invitation/received", {"id": invitation.id}
+        )
+        return True
 
     def _linkup_urls(self, token):
         """The links of the email: the invitation, the refusal of every
@@ -416,11 +491,26 @@ class LinkupInvitation(models.Model):
             }
         )
         invitation._linkup_count_sending()
-        invitation._linkup_send_mail(
-            token, deliver=invitation._linkup_deliverable()
-        )
+        invitation._linkup_dispatch(token)
         return invitation
 
+    def _linkup_dispatch(self, token):
+        """Send the invitation with the link of ``token``: by email to an
+        unknown address, inside LinkUp to the member who holds it.
+
+        The email is rendered in both cases, and dropped when it does not
+        leave, so that the time of the answer does not tell the inviter
+        whether the address belongs to a member.
+        """
+        self.ensure_one()
+        member = self._linkup_member_holder()
+        if member:
+            self._linkup_send_mail(token, deliver=False)
+            self._linkup_offer_to(member, "email")
+            return
+        self._linkup_send_mail(token, deliver=self._linkup_deliverable())
+
+    @server_context
     def action_cancel(self):
         """Cancel an invitation not used yet (LU-F-026 RM2).
 
@@ -457,6 +547,7 @@ class LinkupInvitation(models.Model):
         invitation.write({"state": "cancelled", "reflet_id": False})
         return reflet.id or False
 
+    @server_context
     def action_resend(self):
         """Send the link of an invitation not used yet again, with a new
         token: the former link stops working. It counts as a sending of
@@ -469,9 +560,7 @@ class LinkupInvitation(models.Model):
         token, hashed = self._linkup_new_token()
         invitation.write({"token_hash": hashed})
         invitation._linkup_count_sending()
-        invitation._linkup_send_mail(
-            token, deliver=invitation._linkup_deliverable()
-        )
+        invitation._linkup_dispatch(token)
         return invitation._linkup_info()
 
     # ------------------------------------------------------------------
@@ -504,6 +593,7 @@ class LinkupInvitation(models.Model):
         }
 
     @api.model
+    @server_context
     def linkup_invitations_info(self):
         """The invitations of the current member still waiting, the most
         recent first, and the sendings of the day against the limit."""
@@ -528,6 +618,117 @@ class LinkupInvitation(models.Model):
         }
 
     # ------------------------------------------------------------------
+    # Invitation received by a member (LU-F-020 RM6)
+    # ------------------------------------------------------------------
+
+    def _linkup_received_info(self):
+        """What the invited member sees of an invitation: who sends it,
+        and the reflection it carries."""
+        self.ensure_one()
+        invitation = self.sudo()
+        reflet = invitation.reflet_id
+        partner = invitation.inviter_id.partner_id
+        return {
+            "id": invitation.id,
+            "inviter": {"partner_id": partner.id, "name": partner.name},
+            "date": invitation.create_date,
+            "expiry_date": invitation.expiry_date,
+            "reflet": reflet
+            and {
+                "id": reflet.id,
+                "category_code": reflet.category_id.code or False,
+                "you_said": reflet.you_said or "",
+                "understood": reflet.understood or "",
+            },
+        }
+
+    @api.model
+    @server_context
+    def linkup_received_invitations(self):
+        """The invitations that reach the current member inside LinkUp,
+        still usable and not set aside, the most recent first."""
+        self.env["linkup.reflet"]._linkup_check_member()
+        invitations = self.sudo().search(
+            [
+                ("invitee_id", "=", self.env.uid),
+                ("invitee_dismissed", "=", False),
+                ("state", "=", "sent"),
+                ("expiry_date", ">", fields.Datetime.now()),
+                ("reflet_id.state", "=", "pending_invite"),
+            ]
+        )
+        return [
+            invitation._linkup_received_info() for invitation in invitations
+        ]
+
+    def _linkup_begin_received(self):
+        """Start an action of the invited member: the invitation must reach
+        the current user and still be usable. Any other invitation gets the
+        same refusal, whether it exists or not. Return it under ``sudo``,
+        locked."""
+        self.ensure_one()
+        invitation = self.sudo()
+        if (
+            not invitation.exists()
+            or invitation.invitee_id != self.env.user
+            or invitation.invitee_dismissed
+        ):
+            raise LinkupError(
+                "linkup.unavailable", _("This invitation is not available.")
+            )
+        invitation._linkup_lock()
+        invitation._linkup_check_usable()
+        return invitation
+
+    @server_context
+    def action_accept_received(self):
+        """Confirm the reflection of an invitation received inside LinkUp:
+        it reaches the member as from ``action_send``, then is confirmed at
+        once, which makes the link ``active`` and opens the conversation.
+        Return ``{"delivered": …, "channel_id": …}``."""
+        invitation = self._linkup_begin_received()
+        me = self.env.user
+        me._linkup_check_not_suspended()
+        reflet = invitation.reflet_id
+        delivered = invitation._linkup_consume(me)
+        channel = self.env["discuss.channel"]
+        if delivered:
+            reflet.with_user(me).action_confirm()
+            channel = reflet.sudo().link_id.channel_id
+        return {"delivered": delivered, "channel_id": channel.id or False}
+
+    @server_context
+    def action_ignore_received(self):
+        """Set an invitation received inside LinkUp aside: it no longer
+        shows to the member and expires as usual; the inviter is not told.
+
+        The flag is written in SQL: an ORM write moves ``write_date``,
+        which the inviter reads."""
+        invitation = self._linkup_begin_received()
+        self.env.cr.execute(
+            "UPDATE linkup_invitation SET invitee_dismissed = TRUE"
+            " WHERE id = %s",
+            [invitation.id],
+        )
+        invitation.invalidate_recordset(["invitee_dismissed"])
+        return True
+
+    def _linkup_notify_accepted(self, user):
+        """Tell the inviter that ``user``, who holds the invited address,
+        used the invitation; their client announces it when the setting
+        ``linkup_notify_invitation_accepted`` allows it."""
+        self.ensure_one()
+        invitation = self.sudo()
+        invitation.inviter_id.partner_id._bus_send(
+            "linkup.invitation/accepted",
+            {
+                "id": invitation.id,
+                "reflet_id": invitation.reflet_id.id,
+                "name": user.sudo().partner_id.name,
+            },
+        )
+
+    # ------------------------------------------------------------------
     # Use of the link (invited person)
     # ------------------------------------------------------------------
 
@@ -541,8 +742,9 @@ class LinkupInvitation(models.Model):
         link or opened it while logged in; the caller holds its lock.
 
         The token serves once. The reflection reaches ``user`` when their
-        address is the invited one; otherwise, as for a forwarded link, it
-        reaches nobody and expires. Return whether it was delivered.
+        address is the invited one, and the inviter is told; otherwise, as
+        for a forwarded link, it reaches nobody and expires, and the inviter
+        is told nothing. Return whether it was delivered.
         """
         self.ensure_one()
         invitation = self.sudo()
@@ -558,7 +760,10 @@ class LinkupInvitation(models.Model):
         if not reflet:
             return False
         if invitation._linkup_matches(user):
-            return reflet._linkup_deliver_invited(user)
+            delivered = reflet._linkup_deliver_invited(user)
+            if delivered:
+                invitation._linkup_notify_accepted(user)
+            return delivered
         reflet._linkup_lock()
         if reflet.state == "pending_invite":
             reflet.write({"state": "expired"})

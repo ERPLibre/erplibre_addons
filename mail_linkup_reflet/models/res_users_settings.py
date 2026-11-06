@@ -34,6 +34,12 @@ class ResUsersSettings(models.Model):
     linkup_notify_highlight = fields.Boolean(
         string="Notify a highlight", default=True
     )
+    linkup_notify_invitation_accepted = fields.Boolean(
+        string="Notify an invitation used",
+        default=True,
+        help="The person invited by NewLink signed up, or confirmed the"
+        " reflection, with the invited address.",
+    )
     # Off by default on the web; the mobile application turns it on for
     # its own notifications (LU-F-092 RM4).
     linkup_notify_discreet = fields.Boolean(

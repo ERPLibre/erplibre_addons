@@ -8,6 +8,7 @@ from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError, ValidationError
 
 from ..authorization import linkup_post
+from ..client_context import server_context
 from ..exceptions import LinkupError
 from .res_users import MEMBER_GROUP
 
@@ -65,6 +66,7 @@ class LinkupReflet(models.Model):
     """
 
     _name = "linkup.reflet"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp reflection"
     _order = "id desc"
 
@@ -824,6 +826,7 @@ class LinkupReflet(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def linkup_channel_info(self, channel_id):
         """What the web client shows of a direct conversation of the member.
 
@@ -923,6 +926,7 @@ class LinkupReflet(models.Model):
         return recipient
 
     @api.model
+    @server_context
     def linkup_history(
         self, channel_id, category_id=False, state=False, limit=HISTORY_LIMIT
     ):
@@ -995,6 +999,7 @@ class LinkupReflet(models.Model):
         }
 
     @api.model
+    @server_context
     def linkup_reflet_view_info(self):
         """What the Reflet view shows to the current member.
 
@@ -1020,7 +1025,9 @@ class LinkupReflet(models.Model):
         conversation of the pair when the member belongs to it, or ``False``.
         ``draft`` is the single draft of the member, or ``False``;
         ``newlink`` the invitations of the member still waiting, with the
-        sendings of the day (``linkup.invitation.linkup_invitations_info``).
+        sendings of the day (``linkup.invitation.linkup_invitations_info``);
+        ``received_invitations`` the invitations that reach the member inside
+        LinkUp (``linkup.invitation.linkup_received_invitations``).
         ``sent_ids`` are the initial reflections of the member still waiting
         for their recipient (LU-F-010 RM2), whose cards and recipient names
         are in ``store``; a phantom one is among them, as delivered.
@@ -1142,6 +1149,9 @@ class LinkupReflet(models.Model):
             "contacts": contacts,
             "draft": self._linkup_draft_info(),
             "newlink": self.env["linkup.invitation"].linkup_invitations_info(),
+            "received_invitations": self.env[
+                "linkup.invitation"
+            ].linkup_received_invitations(),
             "sent_ids": sent.ids,
             "store": store.get_result(),
         }
@@ -1151,6 +1161,7 @@ class LinkupReflet(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def action_save_draft(self, vals):
         """Create or update the single draft of the current member.
 
@@ -1212,6 +1223,7 @@ class LinkupReflet(models.Model):
             )
         return draft.id
 
+    @server_context
     def action_discard_draft(self):
         """Delete the draft of the current member."""
         reflet = self._linkup_begin(
@@ -1249,6 +1261,7 @@ class LinkupReflet(models.Model):
                 field="real_world_declared",
             )
 
+    @server_context
     def action_send(self, recipient_id=None, invite=None):
         """Send the draft to a member of the author's scope, or by NewLink.
 
@@ -1373,6 +1386,7 @@ class LinkupReflet(models.Model):
         reflet._linkup_event("reflect_sent", author, link=link)
         return True
 
+    @server_context
     def action_withdraw(self):
         """Withdraw a sent reflection that its recipient has not read; a
         ``pending`` link that no other reflection waits on is closed."""
@@ -1395,6 +1409,7 @@ class LinkupReflet(models.Model):
     # Reception (recipient of an initial reflection)
     # ------------------------------------------------------------------
 
+    @server_context
     def action_mark_read(self):
         """Record the first reading of the reflection by its recipient."""
         reflet = self._linkup_begin(
@@ -1413,6 +1428,7 @@ class LinkupReflet(models.Model):
             vals["read_date"] = now
         self.write(vals)
 
+    @server_context
     def action_confirm(self):
         """Confirm the exchange: the pair becomes linked and the recipient
         takes the turn."""
@@ -1428,6 +1444,7 @@ class LinkupReflet(models.Model):
         )
         return True
 
+    @server_context
     def action_reject(self):
         """Declare that the exchange never took place; a ``pending`` link
         that no other reflection waits on is closed."""
@@ -1442,6 +1459,7 @@ class LinkupReflet(models.Model):
         self.env["linkup.report"]._linkup_check_rejections(reflet.author_id)
         return True
 
+    @server_context
     def action_ignore(self):
         """Set the reflection aside for the recipient only.
 
@@ -1463,6 +1481,7 @@ class LinkupReflet(models.Model):
             reflet._linkup_notify(conversation=False)
         return True
 
+    @server_context
     def action_mark_inaccurate(self, body=None):
         """The exchange took place but the reformulation is wrong; ``body``
         is an optional correction for the author. No link results."""
@@ -1487,6 +1506,7 @@ class LinkupReflet(models.Model):
     # Answers (recipient of a confirmed initial or of a continued one)
     # ------------------------------------------------------------------
 
+    @server_context
     def action_answer_exact(self, body=None):
         """Answer "that's exactly it", with an optional text.
 
@@ -1523,6 +1543,7 @@ class LinkupReflet(models.Model):
         child._linkup_event(code, child._linkup_parties(), link=link)
         return child.id
 
+    @server_context
     def action_answer_precision(self, body, hidden_category_ids=None):
         """Answer "I would like to clarify…", hiding up to N themes.
 
@@ -1575,6 +1596,7 @@ class LinkupReflet(models.Model):
         )
         return child.id
 
+    @server_context
     def action_guess(self, category_id):
         """Guess the hidden theme of a precision, once.
 
@@ -1616,6 +1638,7 @@ class LinkupReflet(models.Model):
     # Follow-up options (member whose turn it is)
     # ------------------------------------------------------------------
 
+    @server_context
     def action_continue(self, category_id, body, you_said=None):
         """Reformulate again: "So if I understand correctly…".
 
@@ -1665,6 +1688,7 @@ class LinkupReflet(models.Model):
         )
         return child.id
 
+    @server_context
     def action_self_disclosure(self, category_id, body):
         """Talk about oneself: the recipient is invited to reformulate.
 
@@ -1698,6 +1722,7 @@ class LinkupReflet(models.Model):
         reflet._linkup_after_child(child)
         return child.id
 
+    @server_context
     def action_close(self, body=None):
         """End the turn politely; nobody has a turn until the next
         confirmed reflection. ``body`` is optional: without it, the clients

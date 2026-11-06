@@ -160,7 +160,13 @@ class LinkupPointsRule(models.Model):
         codes = EVENT_RULES.get(code, (code,))
         if not codes:
             return self.env["linkup.points.ledger"]
-        rules = self.sudo().search([("code", "in", list(codes))])
+        # A rule archived by an administrator pays nothing, whatever the
+        # context of the action that raises the event says.
+        rules = (
+            self.sudo()
+            .with_context(active_test=True)
+            .search([("code", "in", list(codes))])
+        )
         targets = [
             (rule, user)
             for rule in rules.sorted(lambda rule: codes.index(rule.code))

@@ -4,6 +4,7 @@ from odoo import _, api, fields, models
 from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError
 
+from ..client_context import server_context
 from ..exceptions import LinkupError
 
 EXTINGUISHED_REASONS = [
@@ -38,6 +39,7 @@ class LinkupHighlight(models.Model):
     """
 
     _name = "linkup.highlight"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp highlight: you add to my happiness"
     _order = "create_date desc, id desc"
 
@@ -155,6 +157,7 @@ class LinkupHighlight(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @server_context
     def action_send(self, recipient_id, channel_id=None):
         """Put a member of the sender's scope in the light.
 
@@ -264,11 +267,13 @@ class LinkupHighlight(models.Model):
             )
         return highlight
 
+    @server_context
     def action_withdraw(self):
         """The sender withdraws the highlight; an inactive one is left."""
         self._linkup_own("sender_id")._linkup_put_out("withdrawn")
         return True
 
+    @server_context
     def action_dismiss(self):
         """The highlighted member hides the highlight; the recipient of a
         phantom one is a stranger to it."""

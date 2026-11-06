@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from . import (
+    test_client_context,
     test_error_catalogue,
     test_first_use_tour,
     test_highlight,

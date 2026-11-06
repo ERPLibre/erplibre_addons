@@ -1,5 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
+# The mixin first: the models below inherit from it.
+from . import linkup_server_record  # isort: skip
 from . import (
     discuss_channel,
     discuss_channel_member,

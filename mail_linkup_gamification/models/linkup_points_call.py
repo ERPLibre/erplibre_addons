@@ -16,6 +16,7 @@ class LinkupPointsCall(models.Model):
     """
 
     _name = "linkup.points.call"
+    _inherit = ["linkup.server.record"]
     _description = "LinkUp answered call waiting for its end"
 
     code = fields.Char(required=True)
