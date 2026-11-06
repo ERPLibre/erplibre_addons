@@ -4,6 +4,7 @@ LU-NF-008)."""
 
 from odoo import Command
 from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.addons.mail_linkup_reflet import uninstall_hook
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
@@ -53,6 +54,29 @@ class TestLinkupAccess(TransactionCase):
             group_no_one, self.env.ref("base.group_system").implied_ids
         )
         self.assertIn(group_no_one, self.env.ref("base.user_admin").groups_id)
+
+    def test_uninstall_gives_the_technical_features_back(self):
+        """The uninstall hook restores the implication of the technical
+        features by the internal users. It runs once the groups of LinkUp
+        are gone: their users are taken out of them first here."""
+        group_no_one = self.env.ref("base.group_no_one")
+        linkup_groups = (
+            self.group_admin | self.group_moderator | self.group_member
+        )
+        # Archived users too, such as the template of the signup.
+        self.env["res.users"].with_context(active_test=False).search(
+            [("groups_id", "in", linkup_groups.ids)]
+        ).write(
+            {
+                "groups_id": [
+                    Command.unlink(group.id) for group in linkup_groups
+                ]
+            }
+        )
+        uninstall_hook(self.env)
+        self.assertIn(
+            group_no_one, self.env.ref("base.group_user").implied_ids
+        )
 
     def test_member_groups(self):
         """A member holds the member group and no technical features."""

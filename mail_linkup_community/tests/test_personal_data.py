@@ -397,3 +397,18 @@ class TestLinkupExportRoute(HttpCase):
         data = response.json()
         self.assertEqual(data["profile"]["pseudonym"], "Camille")
         self.assertNotIn("linkup_pd_andre", response.text)
+
+    def test_delete_route_requests_then_cancels(self):
+        """The route asks for the deletion of the session account, then
+        cancels it with ``cancel``; the user is the only target."""
+        self.authenticate("linkup_pd_camille", "linkup_pd_camille")
+        asked = self.make_jsonrpc_request("/linkup/v1/me/delete", {})
+        self.assertTrue(asked["deletion_requested"])
+        self.camille.invalidate_recordset()
+        self.assertTrue(self.camille.linkup_deletion_requested_date)
+        cancelled = self.make_jsonrpc_request(
+            "/linkup/v1/me/delete", {"cancel": True}
+        )
+        self.assertFalse(cancelled["deletion_requested"])
+        self.camille.invalidate_recordset()
+        self.assertFalse(self.camille.linkup_deletion_requested_date)
