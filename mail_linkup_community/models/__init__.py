@@ -3,6 +3,7 @@
 from . import (
     discuss_channel,
     ir_binary,
+    ir_http,
     linkup_audit_log,
     linkup_consent,
     linkup_hidden_content,

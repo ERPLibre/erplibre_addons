@@ -859,6 +859,7 @@ msgstr ""
 #. module: mail_linkup_community
 #. odoo-python
 #: code:addons/mail_linkup_community/controllers/signup.py:0
+#: code:addons/mail_linkup_community/models/ir_http.py:0
 #: code:addons/mail_linkup_community/models/res_users.py:0
 msgid "Could not create a new account."
 msgstr ""

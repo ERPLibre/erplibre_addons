@@ -51,6 +51,11 @@ A logged-in user gets no welcome session: ``/im_livechat/init`` answers
 nothing. A visitor opens at most ``linkup.livechat_sessions_per_ip_hour``
 welcome sessions an hour from one address (20).
 
+"Sign up" leaves the widget for the page ``/web/signup``, outside its
+shadow root: the form there asks for the proof of work of
+``website_altcha`` once the website holds its key (see Configuration of
+``mail_linkup_community``), and the widget loads none of its scripts.
+
 Reflection guide
 ================
 

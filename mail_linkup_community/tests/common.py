@@ -2,6 +2,7 @@
 
 import re
 
+from altcha.v2 import Challenge, Payload, solve_challenge
 from odoo.addons.mail_linkup_reflet.tests.common import LinkupRefletCase
 
 # A signup form filled as a person who accepts the required consents,
@@ -16,6 +17,35 @@ SIGNUP_FORM = {
 }
 VERIFY_RE = re.compile(r"/linkup/verify/([A-Za-z0-9_-]{20,})")
 INVITE_RE = re.compile(r"/linkup/invite/([A-Za-z0-9_-]{20,})")
+
+
+class LinkupAltchaMixin:
+    """Helpers of the proof of work of the signup entries, for an
+    ``HttpCase``.
+
+    ``_linkup_altcha_enable`` gives the current website an ALTCHA key, with
+    the smallest cost, so that a test solves a challenge at once.
+    ``_linkup_altcha_solution`` fetches a challenge from ``/altcha``, as the
+    widget of the page does, and returns its solution, the value of the
+    ``altcha`` field of a form; it serves once.
+    """
+
+    def _linkup_altcha_enable(self):
+        website = self.env["website"].get_current_website()
+        website.write(
+            {
+                "altcha_key": "linkup-test-key",
+                "altcha_private_key": "linkup-test-private-key",
+                "altcha_cost": 2,
+            }
+        )
+        return website
+
+    def _linkup_altcha_solution(self):
+        response = self.url_open("/altcha")
+        response.raise_for_status()
+        challenge = Challenge.from_dict(response.json())
+        return Payload(challenge, solve_challenge(challenge)).to_base64()
 
 
 class LinkupCommunityCase(LinkupRefletCase):

@@ -481,6 +481,10 @@ NewLink invitations
   reflection expires and reaches nobody.
 * The pages of the link send no referrer and are not cached: their URL
   holds the token.
+* The signup through the link first calls
+  ``ir.http._verify_request_recaptcha_token("signup")``, as ``/web/signup``
+  does: a request passes unless a captcha module checks it, as
+  ``mail_linkup_community`` does with ``website_altcha``.
 * A logged-in member who holds the invited address uses the link for
   their account; another member reads that the invitation is not theirs,
   and it stays usable. A used, cancelled, expired or unknown link gets a

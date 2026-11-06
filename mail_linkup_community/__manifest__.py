@@ -13,6 +13,9 @@
     "depends": [
         "mail_linkup_reflet",
         "mail_linkup_gamification",
+        # The proof of work of the signup entries, inactive until the
+        # website holds an ALTCHA key (see Configuration in README.rst).
+        "website_altcha",
     ],
     "data": [
         "security/ir.model.access.csv",

@@ -11,7 +11,10 @@ from datetime import timedelta
 import psycopg2
 from odoo import fields
 from odoo.addons.mail.tools.discuss import Store
-from odoo.addons.mail_linkup_community.tests.common import SIGNUP_FORM
+from odoo.addons.mail_linkup_community.tests.common import (
+    SIGNUP_FORM,
+    LinkupAltchaMixin,
+)
 from odoo.exceptions import AccessError
 from odoo.tests import HttpCase, tagged
 from odoo.tools import mute_logger
@@ -376,7 +379,7 @@ class TestLinkupLivechatReflet(LinkupLivechatRefletMixin, LinkupLivechatCase):
 
 @tagged("post_install", "-at_install")
 class TestLinkupLivechatRefletRoutes(
-    LinkupLivechatRefletMixin, LinkupLivechatCase, HttpCase
+    LinkupAltchaMixin, LinkupLivechatRefletMixin, LinkupLivechatCase, HttpCase
 ):
     """The routes of a visitor (RM4): the visitor comes from the cookie of
     ``mail.guest`` and acts only in a conversation they belong to."""
@@ -614,3 +617,57 @@ class TestLinkupLivechatRefletRoutes(
         self.assertFalse(draft.author_guest_id)
         info = self.Reflet.with_user(user)._linkup_draft_info()
         self.assertEqual(info["id"], draft.id)
+
+    def _widget_signup(self, email, **extra):
+        """Post the form of ``/web/signup`` from the browser of the visitor,
+        whose cookie the opener keeps, with the fields of ``extra`` too."""
+        page = self.url_open("/web/signup")
+        csrf = re.search(r'name="csrf_token" value="([^"]+)"', page.text)
+        return self.url_open(
+            "/web/signup",
+            data=dict(
+                SIGNUP_FORM,
+                login=email,
+                name="Camille",
+                password="linkup-Livechat-2026",
+                confirm_password="linkup-Livechat-2026",
+                csrf_token=csrf.group(1),
+                **extra,
+            ),
+            allow_redirects=False,
+        )
+
+    @mute_logger(
+        "odoo.addons.website_altcha.models.ir_http",
+        "odoo.addons.mail_linkup_community.models.ir_http",
+    )
+    def test_signup_from_the_widget_altcha(self):
+        """The "Sign up" answer of the widget leaves it for the page
+        ``/web/signup``, whose form asks for the proof of work once the
+        website holds an ALTCHA key: without its solution, the neutral
+        error and no account; with it, the account remembers the
+        visitor."""
+        self.env["ir.config_parameter"].sudo().set_param(
+            "auth_signup.invitation_scope", "b2c"
+        )
+        self.assertEqual(
+            self.env.ref(
+                "im_livechat_linkup_reflect.welcome_answer_signup"
+            ).redirect_link,
+            "/web/signup",
+        )
+        self._linkup_altcha_enable()
+        _channel, guest = self._open_session()
+        email = "linkup_lc_altcha@example.com"
+        Users = self.env["res.users"].sudo().with_context(active_test=False)
+        refused = self._widget_signup(email)
+        self.assertEqual(refused.status_code, 200)
+        self.assertIn("Could not create a new account.", refused.text)
+        self.assertFalse(Users.search([("email", "=", email)]))
+        accepted = self._widget_signup(
+            email, altcha=self._linkup_altcha_solution()
+        )
+        self.assertNotIn("alert-danger", accepted.text)
+        user = Users.search([("email", "=", email)])
+        self.assertEqual(len(user), 1)
+        self.assertEqual(user.linkup_livechat_guest_id, guest)

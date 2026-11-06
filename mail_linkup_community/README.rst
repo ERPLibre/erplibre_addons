@@ -63,6 +63,10 @@ Public signup
 * The signup through an invitation link takes the same form; the address
   of the invitation is verified by the signup itself (LU-F-020 RM4), any
   other address receives its link.
+* Once the website holds an ALTCHA key, the form asks for the proof of
+  work of ``website_altcha`` before anything else, and a signup without
+  its solution gets the neutral "Could not create a new account." (see
+  Configuration).
 
 Consents
 ========
@@ -324,16 +328,48 @@ Operation
 * Content and administration (LU-NF-053): a LinkUp administrator reads no
   reflection of two other members through the ORM; the moderators read a
   content only through a report, each reading written to the audit log.
-* With the ``website`` module installed, the signup reads the setting of
-  the current website (Website › Settings › Customer Account) in place of
+* The ``website`` module, which ``website_altcha`` brings, makes the
+  signup read the setting of the current website (Website › Settings ›
+  Customer Account) in place of
   ``auth_signup.invitation_scope``: it stays "Free sign up" for LinkUp to
-  be open. ``im_livechat_linkup_reflect``, which brings the website, sets
-  it on the default website at its installation.
+  be open. ``im_livechat_linkup_reflect`` sets it on the default website
+  at its installation.
 * Incidents of confidentiality (LU-NF-016): the register and the
   procedure of notice are kept outside the application, by the person in
   charge of the protection of personal information (LU-NF-010). The
   application gives them the audit log of the moderation and the export
   of an account.
+
+Configuration
+=============
+
+Proof of work of the signup (ALTCHA):
+
+* Every public entry that creates an account asks for the proof of work
+  of ``website_altcha`` (OCA/website), computed in the browser and checked
+  on the server, with no third party: ``/web/signup`` of ``auth_signup``
+  and of the public signup of this module, the page of an invitation link
+  ``/linkup/invite/<token>``, and the "Sign up" answer of the live chat
+  widget, which leaves the widget for ``/web/signup``.
+* The proof is off until the website holds an ALTCHA key: Website ›
+  Configuration › Settings › Privacy, "Enable Altcha", which generates
+  the HMAC secret (``altcha_key``) and the key secret
+  (``altcha_private_key``); the algorithm, the cost and the lifetime of a
+  challenge (5 minutes) are set there too, for each website. Without a
+  key, a signup passes as it does without the module.
+* With the key, the widget of the signup form (``.oe_signup_form``)
+  solves a challenge of ``/altcha`` once the person ticks it, then posts
+  its solution in the ``altcha`` field. A signup without a solution, with
+  an invalid or expired one, or with one already used is refused with
+  "Could not create a new account.", the error of the other refusals of a
+  signup (``ir.http._verify_request_recaptcha_token``, action
+  ``signup``, in ``models/ir_http.py``): the check comes before any
+  lookup of the address, so the answer is the same whatever the address.
+  A solution serves once, from the IP address that fetched its challenge.
+* ``website_altcha`` brings the ``website`` module, which
+  ``mail_linkup_reflet`` does not need, and its directory,
+  ``OCA_website``, belongs to the ``addons_path``. Its Python library,
+  ``altcha``, is a requirement of the Odoo environment.
 
 Choices
 =======
@@ -359,9 +395,11 @@ specification, to confirm:
   terms of use state it.
 * Q-38: no applicative encryption of the content; the disk and the
   backups are encrypted by the operation (see Operation).
-* Captcha: none. The only native captcha of ``/web/signup`` sends the
-  address IP to a third party; the limits, the disposable domains and the
-  trap field stand instead.
+* Captcha: the proof of work of ``website_altcha``, self-hosted, which
+  sends nothing to a third party, unlike the native captcha of
+  ``/web/signup``; it is on once the website holds its key (see
+  Configuration). The limits, the disposable domains and the trap field
+  stay.
 * The accounts created by an administrator are verified and their consents
   are gathered outside the application, unless "Consents of every member"
   is on.

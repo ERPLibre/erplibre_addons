@@ -10,16 +10,26 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from odoo import Command
+from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.mail_linkup_community.models import res_users
+from odoo.addons.mail_linkup_reflet.tests.common import MEMBER
+from odoo.addons.mail_linkup_reflet.tests.test_invitation import (
+    OTHER,
+    UNKNOWN,
+    TestLinkupInvitationRoute,
+)
 from odoo.tests import HttpCase, tagged
 from odoo.tools import mute_logger
 
-from .common import SIGNUP_FORM, VERIFY_RE
+from .common import SIGNUP_FORM, VERIFY_RE, LinkupAltchaMixin
 
 PASSWORD = "linkup-Signup-2026"
 # The marker of the page that answers a signup while addresses are
 # verified.
 SENT_PAGE = "o-linkup-SignupSentPage"
+# The neutral error of a refused signup, as the page shows it.
+NEUTRAL_ERROR = "Could not create a new account."
+ALERT_RE = re.compile(r'class="alert alert-danger"[^>]*>([^<]*)<')
 
 
 @tagged("post_install", "-at_install")
@@ -29,6 +39,9 @@ class TestLinkupSignup(HttpCase):
         self.env["ir.config_parameter"].sudo().set_param(
             "auth_signup.invitation_scope", "b2c"
         )
+        # The website, which website_altcha brings, holds the setting
+        # the signup reads in place of the parameter.
+        self.env["website"].get_current_website().auth_signup_uninvited = "b2c"
         self.template = self.env.ref(
             "mail_linkup_reflet.user_linkup_member_template"
         )
@@ -330,3 +343,156 @@ class TestLinkupSignup(HttpCase):
         response = self._post("camille.template@example.com")
         self.assertIn("alert-danger", response.text)
         self.assertFalse(self._user("camille.template@example.com"))
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupSignupAltcha(LinkupAltchaMixin, TestLinkupSignup):
+    """The proof of work of ``/web/signup`` (F-04): ``website_altcha``
+    checks it once the website holds an ALTCHA key, before any lookup of
+    the address; the widget of the form solves it in the browser."""
+
+    def _alert(self, response):
+        match = ALERT_RE.search(response.text)
+        return match and match.group(1).strip()
+
+    @mute_logger(
+        "odoo.addons.website_altcha.models.ir_http",
+        "odoo.addons.mail_linkup_community.models.ir_http",
+    )
+    def test_altcha_refuses_a_signup_without_proof(self):
+        """While addresses are verified, a signup without a solution, or
+        with an invalid one, gets the neutral error of a signup, the same
+        for a free address and a taken one; neither gets an account nor
+        an email."""
+        self._linkup_altcha_enable()
+        taken = "camille.taken@example.com"
+        mail_new_test_user(self.env, login=taken, email=taken, groups=MEMBER)
+        free = "camille.free@example.com"
+        answers = []
+        for email, altcha in (
+            (free, None),
+            (taken, None),
+            (free, "bm90IGEgc29sdXRpb24="),
+        ):
+            response = self._post(email, altcha=altcha)
+            answers.append((response.status_code, self._alert(response)))
+        self.assertEqual(answers, [(200, NEUTRAL_ERROR)] * 3)
+        self.assertFalse(self._user(free))
+        self.assertFalse(
+            self.env["mail.mail"]
+            .sudo()
+            .search([("email_to", "in", (free, taken))])
+        )
+
+    def test_altcha_signup_with_proof(self):
+        """While addresses are verified, a signup with the solution of a
+        challenge gets its account and the "check your mailbox" page."""
+        self._linkup_altcha_enable()
+        email = "camille.proof@example.com"
+        response = self._post(email, altcha=self._linkup_altcha_solution())
+        self.assertIn(SENT_PAGE, response.text)
+        self.assertEqual(len(self._user(email)), 1)
+
+    @mute_logger(
+        "odoo.addons.website_altcha.models.ir_http",
+        "odoo.addons.mail_linkup_community.models.ir_http",
+    )
+    def test_altcha_native_signup(self):
+        """With ``linkup.email_verification`` off, the native signup of
+        ``auth_signup`` asks for the same proof: refused with the neutral
+        error without it, the account created with it."""
+        self.env["ir.config_parameter"].sudo().set_param(
+            "linkup.email_verification", "False"
+        )
+        self._linkup_altcha_enable()
+        email = "camille.native@example.com"
+        response = self._post(email)
+        self.assertEqual(self._alert(response), NEUTRAL_ERROR)
+        self.assertFalse(self._user(email))
+        response = self._post(email, altcha=self._linkup_altcha_solution())
+        self.assertNotIn("alert-danger", response.text)
+        user = self._user(email)
+        self.assertEqual(len(user), 1)
+        self.assertTrue(user.linkup_email_verified)
+
+    def test_altcha_without_key(self):
+        """Without an ALTCHA key, a signup needs no solution, as without
+        ``website_altcha``."""
+        website = self.env["website"].get_current_website()
+        self.assertFalse(website.altcha_key)
+        email = "camille.nokey@example.com"
+        self.assertIn(SENT_PAGE, self._post(email).text)
+        self.assertEqual(len(self._user(email)), 1)
+
+    def test_altcha_signup_tour(self):
+        """The widget of the form solves the challenge in the browser, and
+        the signup gets the "check your mailbox" page."""
+        self._linkup_altcha_enable()
+        self.start_tour("/web/signup", "linkup_signup_altcha_tour")
+        self.assertEqual(len(self._user("camille.tour@example.com")), 1)
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupInvitationAltcha(LinkupAltchaMixin, TestLinkupInvitationRoute):
+    """The proof of work of the page of an invitation link: the page asks
+    for it as ``/web/signup`` does, before any lookup of the address."""
+
+    def _alert(self, response):
+        match = ALERT_RE.search(response.text)
+        return match and match.group(1).strip()
+
+    @mute_logger(
+        "odoo.addons.website_altcha.models.ir_http",
+        "odoo.addons.mail_linkup_community.models.ir_http",
+    )
+    def test_altcha_refuses_a_signup_without_proof(self):
+        """With an ALTCHA key, a signup through the link without a
+        solution, with an invalid one or with one already used creates no
+        account and keeps the invitation usable. The refusal is the neutral
+        error of a signup, the same for a free address and a taken one."""
+        self._linkup_altcha_enable()
+        _reflet, result = self._invite()
+        token = self._token()
+        mail_new_test_user(self.env, login=OTHER, email=OTHER, groups=MEMBER)
+        answers = []
+        for email in (UNKNOWN, OTHER):
+            response = self._signup(token, email)
+            self.assertEqual(response.status_code, 200)
+            answers.append(self._alert(response))
+        self.assertEqual(answers, [NEUTRAL_ERROR, NEUTRAL_ERROR])
+        response = self._signup(token, UNKNOWN, altcha="bm90IGEgc29sdXRpb24=")
+        self.assertEqual(self._alert(response), NEUTRAL_ERROR)
+        # A solution serves once, even for a signup refused after it.
+        solution = self._linkup_altcha_solution()
+        response = self._signup(token, OTHER, altcha=solution)
+        self.assertNotEqual(self._alert(response), NEUTRAL_ERROR)
+        response = self._signup(token, UNKNOWN, altcha=solution)
+        self.assertEqual(self._alert(response), NEUTRAL_ERROR)
+        self.assertFalse(self._user(UNKNOWN))
+        self.assertEqual(self._invitation(result).state, "sent")
+
+    def test_altcha_signup_with_proof(self):
+        """With an ALTCHA key, a signup through the link with the solution
+        of a challenge creates the account and delivers the
+        reflection."""
+        self._linkup_altcha_enable()
+        reflet, _result = self._invite()
+        token = self._token()
+        response = self._signup(
+            token, UNKNOWN, altcha=self._linkup_altcha_solution()
+        )
+        self.assertIn(response.status_code, (302, 303))
+        user = self._user(UNKNOWN)
+        self.assertEqual(len(user), 1)
+        self.env.invalidate_all()
+        self.assertEqual(reflet.recipient_id, user)
+
+    def test_altcha_without_key(self):
+        """Without an ALTCHA key, the link signs up without a solution, as
+        it does without ``website_altcha``."""
+        website = self.env["website"].get_current_website()
+        self.assertFalse(website.altcha_key)
+        _reflet, _result = self._invite()
+        response = self._signup(self._token(), UNKNOWN)
+        self.assertIn(response.status_code, (302, 303))
+        self.assertEqual(len(self._user(UNKNOWN)), 1)

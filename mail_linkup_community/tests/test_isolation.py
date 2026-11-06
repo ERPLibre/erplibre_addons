@@ -41,6 +41,9 @@ class TestLinkupPublicMemberIsolation(LinkupCommunityCase, HttpCase):
         cls.env["ir.config_parameter"].sudo().set_param(
             "auth_signup.invitation_scope", "b2c"
         )
+        # The website, which website_altcha brings, holds the setting
+        # the signup reads in place of the parameter.
+        cls.env["website"].get_current_website().auth_signup_uninvited = "b2c"
         (cls.sam | cls.france).partner_id.write({"image_1920": PIXEL})
 
     def _sign_up(self, email, name):

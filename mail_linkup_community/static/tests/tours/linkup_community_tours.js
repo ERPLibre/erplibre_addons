@@ -166,3 +166,66 @@ registry.category("web_tour.tours").add("linkup_moderation_tour", {
     },
   ],
 });
+
+// A person signs up on /web/signup once the website holds an ALTCHA key:
+// the widget of the form solves the proof of work, then the page answers
+// "check your mailbox".
+registry.category("web_tour.tours").add("linkup_signup_altcha_tour", {
+  steps: () => [
+    {
+      trigger: ".oe_signup_form input[name='login']",
+      run: "edit camille.tour@example.com",
+    },
+    {
+      trigger: ".oe_signup_form input[name='name']",
+      run: "edit Camille",
+    },
+    {
+      trigger: ".oe_signup_form input[name='password']",
+      run: "edit linkup-Signup-2026",
+    },
+    {
+      trigger: ".oe_signup_form input[name='confirm_password']",
+      run: "edit linkup-Signup-2026",
+    },
+    {
+      trigger: "#linkup_terms",
+      run: "click",
+    },
+    {
+      trigger: "#linkup_privacy",
+      run: "click",
+    },
+    {
+      trigger: "#linkup_sensitive_data",
+      run: "click",
+    },
+    {
+      trigger: "#linkup_adult",
+      run: "click",
+    },
+    {
+      trigger: "#linkup_age_bracket",
+      run: "select 25_34",
+    },
+    {
+      trigger: "#linkup_resides_canada",
+      run: "click",
+    },
+    {
+      trigger: ".oe_signup_form altcha-widget input[type='checkbox']",
+      run: "click",
+    },
+    {
+      trigger: ".oe_signup_form altcha-widget [data-state='verified']",
+    },
+    {
+      trigger: ".oe_signup_form button[type='submit']",
+      run: "click",
+      expectUnloadPage: true,
+    },
+    {
+      trigger: ".o-linkup-SignupSentPage",
+    },
+  ],
+});

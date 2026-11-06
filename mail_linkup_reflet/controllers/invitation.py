@@ -17,6 +17,8 @@ _logger = logging.getLogger(__name__)
 SIGNUP_FIELDS = ("login", "name", "password", "confirm_password")
 # Where a member lands once the invitation is used: the Reflet view.
 HOME_URL = "/odoo/linkup"
+# The action of the anti-robot check of a signup, the one of /web/signup.
+SIGNUP_ACTION = "signup"
 
 
 class LinkupInvitationController(AuthSignupHome):
@@ -28,7 +30,10 @@ class LinkupInvitationController(AuthSignupHome):
     invited one. A logged-in member opening the link uses it for their own
     account, when it holds the invited address. A used, cancelled, expired
     or unknown link gets a page that says so, with the native signup and
-    login. ``/linkup/invite/<token>/optout`` refuses every invitation to
+    login. A signup through the link first passes the anti-robot check of
+    ``/web/signup`` (``ir.http._verify_request_recaptcha_token``), which
+    lets every request through unless a captcha module checks it.
+    ``/linkup/invite/<token>/optout`` refuses every invitation to
     the address, after a confirmation.
 
     The path variable is not named ``token``: ``auth_signup`` reads that
@@ -121,6 +126,11 @@ class LinkupInvitationController(AuthSignupHome):
         values.update(qcontext)
         if request.httprequest.method == "POST":
             try:
+                # The anti-robot check comes first: its refusal reads no
+                # address, so it is the same whatever the form holds.
+                request.env["ir.http"]._verify_request_recaptcha_token(
+                    SIGNUP_ACTION
+                )
                 signup = self._prepare_signup_values(qcontext)
                 login, password = (
                     request.env["res.users"]

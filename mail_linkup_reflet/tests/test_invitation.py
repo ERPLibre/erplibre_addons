@@ -494,12 +494,14 @@ class TestLinkupInvitationRoute(
         match = re.search(r'data-code="([^"]+)"', response.text)
         return match and match.group(1)
 
-    def _signup(self, token, email):
-        """Sign up through the link. The consents and declarations of the
-        public community go along: the page ignores them without it."""
+    def _signup(self, token, email, **extra):
+        """Sign up through the link, with the fields of ``extra`` too. The
+        consents and declarations of the public community go along: the
+        page ignores them without it."""
         return self._page(
             token,
             data={
+                **extra,
                 "login": email,
                 "name": "Camille",
                 "password": "linkup-Camille-2026",
