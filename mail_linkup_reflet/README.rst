@@ -155,6 +155,10 @@ Reflections
   ignoring sends the ignore flag to the recipient alone.
 * Demonstration data: eleven members, the links of Sam and France, and one
   reflection of Sam to France in each state, with its carrier messages.
+* ``tools/linkup_recette.py`` creates a local acceptance database with the
+  modules and their demonstration: new random passwords for its accounts,
+  printed once, a LinkUp administrator, and the email queue cron archived
+  so that no email leaves the machine.
 
 Web client
 ==========
