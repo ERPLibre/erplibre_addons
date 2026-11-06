@@ -43,9 +43,19 @@ export class LinkupRefletComposer extends LinkupRefletFormBase {
         return Boolean(this.state.info);
     }
 
+    /**
+     * What LinkUp shows of the conversation `thread`.
+     *
+     * @param {import("models").Thread} thread
+     * @returns {Promise<Object>}
+     */
+    fetchChannelInfo(thread) {
+        return this.store.fetchLinkupChannelInfo(thread.id);
+    }
+
     async fetchInfo() {
         const thread = this.props.thread;
-        const info = await this.store.fetchLinkupChannelInfo(thread.id);
+        const info = await this.fetchChannelInfo(thread);
         return this.props.thread.eq(thread) ? info : null;
     }
 
@@ -63,10 +73,7 @@ export class LinkupRefletComposer extends LinkupRefletFormBase {
         this.state.info = null;
         this.state.loadError = false;
         try {
-            const [info] = await Promise.all([
-                this.store.fetchLinkupChannelInfo(thread.id),
-                this.store.fetchLinkupCategories(),
-            ]);
+            const [info] = await Promise.all([this.fetchChannelInfo(thread), this.store.fetchLinkupCategories()]);
             if (this.props.thread.notEq(thread)) {
                 return;
             }

@@ -48,7 +48,10 @@ export const LINKUP_DRAFT_SAVE_DELAY = 800;
  * - `recipientName`, `recipientPersona` (for the preview),
  *   `needsRealWorld` and `formId`, unique in the page;
  * - `sendLabel` and `cancelLabel`, the texts of the two buttons of the
- *   form when they differ from "Send the reflection" and "Cancel".
+ *   form when they differ from "Send the reflection" and "Cancel";
+ * - `saveDraftCall(vals)`, `sendCall(draftId, target)` and
+ *   `discardCall(draftId)`, the calls to the server, when they differ from
+ *   `action_save_draft`, `action_send` and `action_discard_draft`.
  */
 export class LinkupRefletFormBase extends Component {
     static components = {LinkupCategoryIcon, LinkupErrorAlert, LinkupRefletCard};
@@ -263,11 +266,37 @@ export class LinkupRefletFormBase extends Component {
                 real_world_declared: this.state.real_world_declared,
                 real_world_date: this.state.real_world_declared ? this.state.real_world_date || false : false,
             };
-            this.draftId = await this.orm.silent.call("linkup.reflet", "action_save_draft", [vals]);
+            this.draftId = await this.saveDraftCall(vals);
             return this.draftId;
         });
         this.saving = next.catch(() => {});
         return next;
+    }
+
+    /**
+     * @param {Object} vals the fields of the draft
+     * @returns {Promise<number>} the id of the draft
+     */
+    saveDraftCall(vals) {
+        return this.orm.silent.call("linkup.reflet", "action_save_draft", [vals]);
+    }
+
+    /**
+     * @param {number} draftId
+     * @param {{recipientId?: number, invite?: Object}} target
+     * @returns {Promise<any>} the answer of the server
+     */
+    sendCall(draftId, target) {
+        return target.invite
+            ? this.orm.silent.call("linkup.reflet", "action_send", [[draftId]], {
+                  invite: target.invite,
+              })
+            : this.orm.silent.call("linkup.reflet", "action_send", [[draftId], target.recipientId]);
+    }
+
+    /** @param {number} draftId */
+    discardCall(draftId) {
+        return this.orm.silent.call("linkup.reflet", "action_discard_draft", [[draftId]]);
     }
 
     /** The first missing piece of the reflection, checked before the server does. */
@@ -316,11 +345,7 @@ export class LinkupRefletFormBase extends Component {
         const target = this.sendTarget;
         try {
             const draftId = await this.saveDraft();
-            const result = target.invite
-                ? await this.orm.silent.call("linkup.reflet", "action_send", [[draftId]], {
-                      invite: target.invite,
-                  })
-                : await this.orm.silent.call("linkup.reflet", "action_send", [[draftId], target.recipientId]);
+            const result = await this.sendCall(draftId, target);
             this.draftId = null;
             this.reset();
             linkupPlaySound(this.env.services, "linkup-sent");
@@ -344,7 +369,7 @@ export class LinkupRefletFormBase extends Component {
         this.reset();
         if (draftId) {
             try {
-                await this.orm.silent.call("linkup.reflet", "action_discard_draft", [[draftId]]);
+                await this.discardCall(draftId);
             } catch (error) {
                 this.showError(error);
             }

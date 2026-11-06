@@ -99,12 +99,13 @@ export class LinkupReportDialog extends Component {
         this.state.error = null;
         const target = this.props.messageId ? {message_id: this.props.messageId} : {partner_id: this.props.partnerId};
         try {
-            await this.orm.silent.call("linkup.report", "action_create_report", [], {
+            const reportId = await this.orm.silent.call("linkup.report", "action_create_report", [], {
                 ...target,
                 reason: this.state.reason,
                 description: this.state.description.trim() || null,
             });
             this.state.sent = {
+                reportId,
                 reason: this.state.reason,
                 urgent: LINKUP_URGENT_REASONS.has(this.state.reason),
                 urgentHours: this.store.linkup_urgent_hours,
