@@ -14,7 +14,7 @@ RETENTION_DAYS = 2
 
 class LinkupRateEvent(models.Model):
     """The attempts that the limits of LinkUp count (LU-NF-006): a kind and
-    a keyed hash of what is counted, an address IP or a user, never the
+    a keyed hash of what is counted, an IP address or a user, never the
     value itself. A limit counts the events of its kind and key within its
     window; a daily cron deletes those older than two days.
 

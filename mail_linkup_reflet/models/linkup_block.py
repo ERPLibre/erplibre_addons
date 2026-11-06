@@ -56,7 +56,7 @@ class LinkupBlock(models.Model):
         (
             "not_self",
             "CHECK(blocker_id != blocked_id)",
-            "A member does not block themself.",
+            "You cannot block yourself.",
         ),
     ]
 

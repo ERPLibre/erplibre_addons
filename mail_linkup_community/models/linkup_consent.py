@@ -46,7 +46,7 @@ NOTIFICATION_SETTINGS = (
 # Parameter holding the current version of the text of a purpose; a purpose
 # without one is at version "1".
 VERSION_PARAM = "linkup.consent_version.%s"
-# Scope of the keyed hash of an address IP.
+# Scope of the keyed hash of an IP address.
 IP_HASH_SCOPE = "linkup.consent.ip"
 
 

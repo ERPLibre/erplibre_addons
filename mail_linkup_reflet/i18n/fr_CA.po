@@ -364,13 +364,13 @@ msgstr "Un membre ne bloque un autre membre qu'une fois."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_block_not_self
-msgid "A member does not block themself."
-msgstr "Un membre ne se bloque pas lui-même."
+msgid "You cannot block yourself."
+msgstr "Tu ne peux pas te bloquer toi-même."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_highlight_sender_not_recipient
-msgid "A member does not put themself in the light."
-msgstr "Un membre ne se met pas lui-même en lumière."
+msgid "You cannot put yourself in the light."
+msgstr "Tu ne peux pas te mettre toi-même en lumière."
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -2946,8 +2946,8 @@ msgstr "Envoi impossible."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_max_invitations_per_day
-msgid "Sendings of an invitation link, new ones and sent again."
-msgstr "Envois d'un lien d'invitation, nouveaux et renvoyés."
+msgid "Every invitation link sent counts, a new one or one sent again."
+msgstr "Chaque lien d'invitation envoyé compte, nouveau ou renvoyé."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_invitation__state__sent
@@ -3727,8 +3727,8 @@ msgstr "Trop de signalements pour l'instant, réessaie plus tard."
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
-msgid "Too many sendings for now, try again later."
-msgstr "Trop d'envois pour l'instant, réessaie plus tard."
+msgid "Too many attempts for now, try again later."
+msgstr "Trop de tentatives pour l'instant, réessaie plus tard."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript

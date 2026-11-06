@@ -38,7 +38,7 @@ const MESSAGES = {
   "linkup.unavailable": "Sending is not possible.",
   "linkup.already_answered": "This reflection has already been answered.",
   "linkup.expired": "This reflection is no longer available.",
-  "linkup.rate_limited": "Too many sendings for now, try again later.",
+  "linkup.rate_limited": "Too many attempts for now, try again later.",
   "linkup.start_rule": "Start with a reflection of a real exchange.",
   "linkup.not_verified": "Confirm your email address first.",
   "linkup.consent_required": "Accept the conditions of LinkUp first.",

@@ -39,7 +39,7 @@ class ResConfigSettings(models.TransientModel):
         " click on the link of its verification email.",
     )
     linkup_signup_rate_per_ip_hour = fields.Integer(
-        string="Signups per address IP and per hour",
+        string="Signups per IP address and per hour",
         config_parameter=SIGNUP_RATE_PARAM,
         default=DEFAULT_SIGNUP_RATE,
     )

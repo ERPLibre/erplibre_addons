@@ -1,0 +1,4208 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mail_linkup_reflet
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-06 12:08+0000\n"
+"PO-Revision-Date: 2026-11-06 12:08+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/category_picker.js:0
+msgid "%(category)s, main theme"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "%(count)s reflections"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "%(count)s unread"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid "%(name)s accepted your invitation: your reflection reached them."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "%(name)s adds to your happiness"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid "%(name)s adds to your happiness."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "%(name)s answered: that's exactly it!"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "%(name)s clarified their thought."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "%(name)s closed the exchange."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "%(name)s continued the reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "%(name)s hid a theme in this answer. Which one?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "%(name)s is blocked. The conversation is hidden."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid ""
+"%(name)s is not told: what they send seems to leave, but nothing reaches "
+"you."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "%(name)s is unblocked."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "%(name)s said that the exchange took place, but not as reformulated."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "%(name)s said that this exchange did not take place."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "%(name)s sees your avatar on theirs until your next exchange."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "%(name)s sent you a reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "%(name)s talked about themselves."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid ""
+"%(name)s told you about something that matters to them. Rephrase it to show "
+"what you understood."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid ""
+"%(name)s will no longer reach you in any conversation: reflection, message, "
+"mention, reaction, call, adding to a group, highlight."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "%(name)s will not know who reported this reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid ""
+"%(name)s will see your avatar on theirs until your next exchange, with the "
+"notification “%(me)s adds to your happiness”."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "%(name)s would like to make you a reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "%(name)s would like to make you a reflection on LinkUp"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/public_web/linkup_sidebar.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "+ NewLink"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "1 reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:mail.template,body_html:mail_linkup_reflet.mail_template_linkup_invitation
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"    <p>Hello,</p>\n"
+"    <p>\n"
+"        A person you met, <strong t-out=\"object.inviter_id.partner_id.name or ''\">Sam</strong>, would like to make you a reflection on LinkUp.\n"
+"    </p>\n"
+"    <p>\n"
+"        A reflection puts into words what this person understood of your exchange in person. Its text is not in this email: you will read it in LinkUp once signed up through this link.\n"
+"    </p>\n"
+"    <p style=\"margin: 16px 0px;\">\n"
+"        <a t-att-href=\"ctx.get('linkup_invite_url')\" style=\"background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;\">See the reflection and sign up</a>\n"
+"    </p>\n"
+"    <p style=\"font-size: 12px;\">\n"
+"        Personal link, valid <t t-out=\"ctx.get('linkup_expiry_days') or ''\">14</t> days, for a single signup.\n"
+"    </p>\n"
+"    <p style=\"font-size: 12px;\">\n"
+"        <t t-if=\"ctx.get('linkup_privacy_url')\">\n"
+"            <a t-att-href=\"ctx.get('linkup_privacy_url')\">Privacy policy</a> ·\n"
+"        </t>\n"
+"        <a t-att-href=\"ctx.get('linkup_optout_url')\">Never receive a LinkUp invitation again</a> ·\n"
+"        <a t-att-href=\"ctx.get('linkup_other_lang_url')\">Version française</a>\n"
+"    </p>\n"
+"</div>\n"
+"        "
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid ""
+"A LinkUp member adds to a group only the people they have confirmed a "
+"reflection with."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid ""
+"A LinkUp member can only add to a conversation the people they already share"
+" one with."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "A LinkUp member cannot have the technical features (%(user)s)."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/mail_notification.py:0
+msgid "A LinkUp member notifies nobody outside a conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid "A LinkUp member only opens a direct conversation they belong to."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+msgid ""
+"A LinkUp member opens a direct conversation only with a person of a "
+"confirmed reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/mail_message.py:0
+msgid ""
+"A LinkUp member posts and changes a message through its conversation only."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid "A call opens once a reflection is confirmed in this conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid "A comment holds at most %(count)s characters."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "A contact"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid ""
+"A conversation starts with the reflection of a real exchange: choose what "
+"you were told about, then rephrase it without judgement. Each category below"
+" explains what to say and what not to say."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_vulnerability
+msgid ""
+"A disclosure that starts on the surface, then grows progressively and "
+"slowly; sincere, it strengthens the bond; too fast, it drives people away. "
+"It marks a sensitive point, expressed or understood. What was not said is "
+"not reformulated."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_link_pair_ordered
+msgid "A link joins two distinct members, in increasing id order."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_block_pair_unique
+msgid "A member blocks another member once."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid "A moderator changes only the processing of a report."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid ""
+"A moderator does not process a report that concerns them or one of their "
+"links."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_action
+msgid ""
+"A negotiable request, made for our own benefit and needs; a way of "
+"influencing that does not lock the other person in; without judgement."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_link_pair_unique
+msgid "A pair of members has a single link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "A person of your conversations or of your confirmed links."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/controllers/invitation.py:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"A person you met, %(name)s, would like to make you a reflection on LinkUp."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_reflet_secret_reflet_unique
+msgid "A precision has a single set of hidden themes."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet_secret.py:0
+msgid "A precision hides at most %(count)s themes."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "A reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_reflet_author_not_recipient
+msgid "A reflection is never addressed to its author."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "A reflection is waiting for an answer."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_inhibition
+msgid ""
+"A request to stop or not to do something, made like an action request: "
+"negotiable and without judgement."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_first_use_tour
+msgid "A short tour starts the first time a member opens Discuss."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid ""
+"A short tour starts the first time a member opens Discuss; a member who "
+"finished or skipped it no longer sees it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid ""
+"A sound always comes with a visible change; the reward sounds are off by "
+"default."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "A suspension ends in the future."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "A theme is hidden in this answer."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "A word to add (optional)"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "A word to add if you wish."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Accept the conditions of LinkUp first."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.module.category,description:mail_linkup_reflet.module_category_linkup
+msgid "Access levels of the LinkUp community."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__action_taken
+msgid "Action Taken"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_action
+msgid "Action request"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__state__actioned
+msgid "Actioned"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__active
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__active
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_link__state__active
+msgid "Active"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Add your nuance, hide a theme."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_privacy_policy_url
+msgid ""
+"Address of the privacy policy, linked from the invitation emails and pages."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:res.groups,name:mail_linkup_reflet.group_linkup_admin
+msgid "Administrator"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "All"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "All the categories"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Allow the microphone or the camera to call."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+msgid "Already have an account? Log in"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_email_blocklist_hash_reason_unique
+msgid "An address is listed once for a reason."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_invitation_token_hash_unique
+msgid "An invitation token is unique."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "And now?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/controllers/invitation.py:0
+msgid "Another user is already registered using this email address."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__answered_date
+msgid "Answered Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel_rtc_session__linkup_call_answered
+msgid "Answered call"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__author_id
+msgid "Author"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__auto_generated
+msgid "Auto Generated"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Back"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_email_blocklist__reason__banned
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__action_taken__banned
+msgid "Banned"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Behaviour:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "Block %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "Block %(name)s?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__blocked_id
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_link__state__blocked
+msgid "Blocked"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "Blocked members"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__blocker_id
+msgid "Blocker"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Call %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__extinguished_reason__call
+msgid "Call started"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Cancel"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Cancel the invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_invitation__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__reflet_title
+msgid "Card title"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__message_id
+msgid "Carrier message"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "Category"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Category of the starter"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_discuss_channel_member
+msgid "Channel Member"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Check the code this person gave you."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Check the reflection before sending it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__child_ids
+msgid "Child"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.js:0
+msgid "Choose a category"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Choose a category."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "Choose a reason."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+msgid "Choose a reason…"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Choose a theme."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "Choose at most %(count)s themes among the categories."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Choose fewer hidden themes."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Choose the person who told you this."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"Choose what you were told about, then the person on the right. You can also "
+"drag a category onto a person."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Close"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_link__state__closed
+msgid "Closed"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__kind__close
+msgid "Closing"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__code
+msgid "Code"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "Comes with the export and the deletion of your data."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "Comes with the profile of the member."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__description
+msgid "Comment"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+msgid "Comment (optional)"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Confirm that this exchange took place in person."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Confirm the reflection of %(name)s: that's a link!"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "Confirm this reflection before answering it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Confirm your email address first."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__confirmed
+msgid "Confirmed"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "Confirmed link since %(date)s."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "Confirmed link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__linkup_moderator_conflict
+msgid "Conflict of interest"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Connection lost, try again."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Contact"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Contacts"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__context
+msgid "Context"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_go_speak
+msgid "Context: / Trigger: / Realisation: / Where I am heading: / My request:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Continue the reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__kind__continue
+msgid "Continued reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__channel_id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__channel_id
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__context__thread
+msgid "Conversation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Correction for %(name)s (optional)"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Correction:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/controllers/invitation.py:0
+msgid "Could not create a new account."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__create_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__turn_reflet_id
+msgid "Current turn"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Daily limit reached"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__real_world_date
+msgid "Date of the exchange"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_config_settings__linkup_invitation_expiry_days
+msgid "Days an invitation lasts"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid ""
+"Declare that the exchange of this reflection never took place? %(name)s will"
+" see it. For a reflection you do not want, choose “Ignore”; for a wrong "
+"reformulation, “That is not what I said”."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__definition
+msgid "Definition"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_reflet__round_index
+msgid "Depth of the reflection in its chain of turns."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Did %(name)s understand you well?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Did this exchange really take place?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__channel_id
+msgid "Direct conversation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_highlight__channel_id
+msgid "Direct conversation the highlight was sent from, if any."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_discreet
+msgid "Discreet notifications"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Discreet notifications: “New LinkUp event”, without any name"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_discuss_channel
+msgid "Discussion Channel"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__state__dismissed
+msgid "Dismissed"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__display_name
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_optout_page
+msgid "Done: LinkUp will no longer send any invitation to this address."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "Double-click: my settings"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"Drag onto a person, or choose one, to thank them for an exchange that did "
+"you good."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__context__drag
+msgid "Dragged onto a person"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_effective_start_rule
+msgid "Effective start rule"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__email
+msgid "Email"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__email_hash
+msgid "Email Hash"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_emotions
+msgid "Emotions"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "End it here"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__energy_a
+msgid "Energy A"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__energy_b
+msgid "Energy B"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Enter a valid email address."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Enter a valid phone number."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_max_invitations_per_day
+msgid "Every invitation link sent counts, a new one or one sent again."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__response_state__exact
+msgid "Exact"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__kind__answer_exact
+msgid "Exact answer"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__real_world_declared
+msgid "Exchange declared in person"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_invitation__state__expired
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__expired
+msgid "Expired"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Expired without an answer."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"Expires on %(date)s. The content of the reflection is erased the day after."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__expiry_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__expiry_date
+msgid "Expiry Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_goals
+msgid ""
+"Expressing our goals clearly gives the exchange its meaning and lets us "
+"choose whom to team up with: the key to a lasting bond."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__extinguished_date
+msgid "Extinguished Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__extinguished_reason
+msgid "Extinguished Reason"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_go_listen
+msgid ""
+"Facing a long silence, a frozen attitude or a call for help: signalling that"
+" we are ready to receive what the other person is about to say, even if it "
+"stirs strong emotions."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Fill in “I understood that”."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Fill in “You told me”."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.xml:0
+msgid "Finish"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__first_link_date
+msgid "First Link Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__starter_self
+msgid "First-person starter"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_config_settings__linkup_first_use_tour
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "First-use tour"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_emotions
+msgid ""
+"Five basic categories (joy, fear, disgust, anger, sadness), natural, which "
+"belong to us and express a fundamental need. Anger is not violence, unless "
+"it is directed against a person."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_focus
+msgid "Focused attention"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_team
+msgid "For our team, you suggest:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_team
+msgid "For our team:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__guess_state__found
+msgid "Found"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/composer_patch.js:0
+msgid "Free text is open; a confirmed reflection creates the link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "Free text locked"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "Free text open"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_needs
+msgid ""
+"Fundamental elements to be heard (hunger, thirst, rest, silence, connection "
+"with others). Expressing them belongs to us, clearly and without judgement; "
+"the other person is not responsible for needs left unexpressed."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_start_rule__inherit
+msgid "Global rule"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel__linkup_start_rule
+msgid ""
+"Global rule: a direct conversation follows the start rule of the LinkUp "
+"settings, a group or a channel has none."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_go_listen
+msgid "Go listen"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_go_speak
+msgid "Go speak"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_goals
+msgid "Goals"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__guess_state
+msgid "Guess State"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Guess the hidden theme"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Guess the hidden theme first."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__guessed_category_id
+msgid "Guessed Category"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Guide"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Guide · %(position)s of %(count)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Guide: explain each element"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_composer.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "HELP — What did %(name)s tell you about?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "HELP — What were you told about?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__harassment
+msgid "Harassment"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__hate
+msgid "Hate speech"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Hello,"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+#: model:ir.ui.menu,name:mail_linkup_reflet.menu_linkup_help
+msgid "Help"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid ""
+"Here a conversation starts with the reflection of a real exchange: choose "
+"what you were told about, then rephrase it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__action_taken__hidden
+msgid "Hidden"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__extinguished_reason__manual
+msgid "Hidden by the highlighted member"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid ""
+"Hidden theme, optional: %(name)s will have to guess it while reading your "
+"answer."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Hidden theme, to guess"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Hidden theme: %(themes)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__revealed_category_ids
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__category_ids
+msgid "Hidden themes"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_reflet__revealed_category_ids
+msgid ""
+"Hidden themes of a precision, given to its author, and to everybody once the"
+" guess is made."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "Hide"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/thread_actions.js:0
+msgid "Hide LinkUp"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "History"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid ""
+"How a conversation between two members starts: with a confirmed reflection "
+"of a real exchange."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "How can LinkUp reach this person?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_go_listen
+msgid "I am ready to listen to you:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+msgid "I confirm that I had this exchange in person"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_emotions
+msgid "I feel:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_needs
+msgid "I need:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_observation
+msgid "I notice that:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__understood
+msgid "I understood that"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "I understood that:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "I would like to clarify…"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "I would like to tell you about something that matters to me."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_inhibition
+msgid "I would like you to stop:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_action
+msgid "I would like you to:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__id
+msgid "ID"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__icon
+msgid "Icon"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Ignore"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Ignore the invitation of %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__impersonation
+msgid "Impersonation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__state__in_review
+msgid "In review"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid ""
+"In strict mode, free text opens once the other member confirms a reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__in_reflet_bar
+msgid "In the reduced bar"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__inaccurate
+msgid "Inaccurate"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_effective_start_rule__incitative
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_start_rule__incitative
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__res_config_settings__linkup_start_rule_mode__incitative
+msgid "Incentive"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_inhibition
+msgid "Inhibition"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid ""
+"Invitation cancelled. The link no longer works. Your reflection is back in "
+"your drafts."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Invitation sent to"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Invitation sent to %(email)s."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Invitation sent · reflection waiting"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "Invitations by email of people who are not members yet."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_config_settings__linkup_max_invitations_per_day
+msgid "Invitations per member and per day"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Invitations today: %(used)s of %(max)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Invite a person who is not on LinkUp yet, from a real exchange."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__invitee_id
+msgid "Invited member"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__invitee_dismissed
+msgid "Invitee Dismissed"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__inviter_id
+msgid "Inviter"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__kind
+msgid "Kind"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__lang
+msgid "Language"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__last_interaction_date
+msgid "Last Interaction Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_block__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__write_date
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.xml:0
+msgid "Leave the guide"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__link_id
+msgid "Link"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Link sent again."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/thread_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/public_web/linkup_sidebar.xml:0
+#: model:ir.module.category,name:mail_linkup_reflet.module_category_linkup
+#: model:ir.ui.menu,name:mail_linkup_reflet.menu_linkup_root
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_optout_page
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "LinkUp"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_block
+msgid "LinkUp block between two members"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_email_blocklist
+msgid "LinkUp blocklist of email addresses"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_category
+msgid "LinkUp category of communication"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_composer.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "LinkUp could not be loaded, try again."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/public_web/linkup_sidebar.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+#: model:ir.actions.client,name:mail_linkup_reflet.action_linkup_help
+msgid "LinkUp help"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_reflet_secret
+msgid "LinkUp hidden themes of a precision"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_highlight
+msgid "LinkUp highlight: you add to my happiness"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_invitation
+msgid "LinkUp invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "LinkUp is not available in this conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_link
+msgid "LinkUp link between two members"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_server_record
+msgid "LinkUp record written by the server"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_reflet
+msgid "LinkUp reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_report
+msgid "LinkUp report"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_reward_sounds_enabled
+msgid "LinkUp reward sounds"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "LinkUp sends them a personal signup link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_sound_enabled
+msgid "LinkUp sounds"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_start_rule
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_config_settings__linkup_start_rule_mode
+msgid "LinkUp start rule"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users__linkup_suspended_until
+msgid "LinkUp suspension until"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users__linkup_tour_done
+msgid "LinkUp tour seen"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_optout_page
+msgid ""
+"LinkUp will no longer send any invitation to the address that received this link, whoever\n"
+"                        writes it. Nobody is told."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:mail.template,name:mail_linkup_reflet.mail_template_linkup_invitation
+msgid "LinkUp: NewLink invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.actions.server,name:mail_linkup_reflet.ir_cron_linkup_invitation_purge_ir_actions_server
+msgid "LinkUp: expire and purge invitations"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.actions.server,name:mail_linkup_reflet.ir_cron_linkup_reflet_expire_ir_actions_server
+msgid "LinkUp: expire unanswered reflections"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users__linkup_link_a_ids
+msgid "Linkup Link A"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users__linkup_link_b_ids
+msgid "Linkup Link B"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_mail_mail__linkup_reflet_ids
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_mail_message__linkup_reflet_ids
+msgid "Linkup Reflet"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Loading…"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_error_alert.xml:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+msgid "Log in"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_discuss_channel_rtc_session
+msgid "Mail RTC session"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__primary_category_id
+msgid "Main theme"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/composer_patch.xml:0
+msgid "Make a reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:res.groups,name:mail_linkup_reflet.group_linkup_member
+msgid "Member"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_mail_message
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__message_id
+msgid "Message"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_mail_notification
+msgid "Message Notifications"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__extinguished_reason__message
+msgid "Message of the highlighted member"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__minor
+msgid "Minor in danger"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__guess_state__missed
+msgid "Missed"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__moderator_id
+#: model:res.groups,name:mail_linkup_reflet.group_linkup_moderator
+msgid "Moderator"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__moderator_note
+msgid "Moderator Note"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "My data"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_goals
+msgid "My goal is:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.xml:0
+msgid "My profile"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.xml:0
+msgid "My settings"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.xml:0
+msgid "NVC"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__name
+msgid "Name"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__name
+msgid "Name to remember them"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Name to remember them, seen by you only"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_needs
+msgid "Needs"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_optout_page
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+msgid "Never receive a LinkUp invitation again"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__state__new
+msgid "New"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid "New LinkUp event"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "NewLink"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__invitation_id
+msgid "NewLink invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "NewLink invitations"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.xml:0
+msgid "Next"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.xml:0
+msgid "Next element"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Next: the preview"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Next: the reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "No card yet: choose a category."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"No conversation exists yet with %(name)s. When the person signs up through "
+"this link, the reflection reaches them unread; the chat opens once they "
+"confirm it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid ""
+"No link nor conversation exists before your answer; ignoring tells nobody."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "No link: no reflection was confirmed."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_composer.xml:0
+msgid "No reflection can be sent in this conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "No reflection exchanged yet."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "No reflection matches these filters."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "No reflection yet."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid ""
+"Nobody here yet. The people you share a conversation or a confirmed "
+"reflection with appear here."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__is_cnv
+msgid "Non-violent communication"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__guess_state__none
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__response_state__none
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__action_taken__none
+msgid "None"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_confirmed
+msgid "Notify a confirmed reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_highlight
+msgid "Notify a highlight"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_reflet_received
+msgid "Notify a received reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_users_settings__linkup_notify_invitation_accepted
+msgid "Notify an invitation used"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Notify when a person I invited accepts"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Notify when someone adds to my happiness"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_observation
+msgid "Observation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_effective_start_rule__off
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_start_rule__off
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__res_config_settings__linkup_start_rule_mode__off
+msgid "Off"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "One try only."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "Only a LinkUp administrator can reset the tour."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "Only a LinkUp administrator can suspend a member."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+msgid "Only a LinkUp administrator changes the type of a conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+msgid "Only a LinkUp administrator creates a channel."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "Only a LinkUp member can do this."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "Only an internal user can do this."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Only for a false reflection. Key ←"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Only for a false reflection: the exchange never happened."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Open the conversation with %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__sequence
+msgid "Order in the full band of categories."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__reflet_bar_sequence
+msgid "Order in the reduced bar of the Reflet view."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__other
+msgid "Other"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, choosing a person makes them the recipient of the card; "
+"dropping a category on a person does both."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, drag this field onto a person, or press it to choose one "
+"in the list: the arrow keys move, Enter chooses, Escape closes."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Outside the guide, this button asks for a confirmation first. Key ←."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button asks for a confirmation, then puts the person"
+" in the light. A new press while it shines has no effect."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Outside the guide, this button chooses this category for your answer."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button chooses this theme as your guess; “Propose "
+"this theme” sends it, once."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button confirms the reflection: the link becomes "
+"active and free text opens. Key →."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button folds the card; the reflection expires "
+"without an answer."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button opens a form for an optional correction; no "
+"link is created."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button opens the card “%(title)s”: You told me / I "
+"understood that."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button opens the invitation in three steps: the "
+"email address, the reflection, the preview. Dropping a category on it does "
+"the same."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button opens the list: the arrow keys move, Enter "
+"chooses and sends, Escape closes."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button sends the guess: one try only. The answer "
+"shows the themes to both of you."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button unfolds the full band, then folds it back."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__is_cnv
+msgid "Part of the non-violent communication group."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_link__state__pending
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__guess_state__pending
+msgid "Pending"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Pending invitations"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__distress
+msgid "Person in distress or at risk for themselves"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Personal link, valid %(count)s days, for a single signup."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__phantom
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__phantom
+msgid "Phantom"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "Phone"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "Photo"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_link__energy_a
+msgid "Points received by the first member in the events of the pair."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_link__energy_b
+msgid "Points received by the second member in the events of the pair."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Possible as long as %(name)s has not read it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__kind__precision
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__response_state__precision
+msgid "Precision"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Press a numbered element to read what it does. Escape or “?” leaves the "
+"guide."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid ""
+"Press “?” to read what each element does. The help of the categories stays "
+"in the LinkUp menu."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Preview"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Preview: %(name)s will see this card."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.xml:0
+msgid "Previous element"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__parent_id
+msgid "Previous reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+msgid "Privacy"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_res_config_settings__linkup_privacy_policy_url
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_links
+msgid "Privacy policy"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid ""
+"Privacy policy · Never receive a LinkUp invitation again · Version française"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Propose this theme"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "Put %(name)s in the light?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "Put in the light"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Put someone in the light"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__read_date
+msgid "Read Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_email_blocklist__reason
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__reason
+msgid "Reason"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__recipient_id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__recipient_id
+msgid "Recipient"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__recipient_ignored
+msgid "Recipient Ignored"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/composer_patch.js:0
+msgid ""
+"Reflect an exchange you had in person. Free text opens once a reflection is "
+"confirmed."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__reflet_id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_mail_mail__linkup_reflet_id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_mail_message__linkup_reflet_id
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__kind__initial
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_reflection
+msgid "Reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__extinguished_reason__reflet
+msgid "Reflection sent"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.js:0
+msgid "Reflection sent to %(name)s."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Reflection withdrawn"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "Reflection withdrawn."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Reflections received by invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Reflections sent, waiting"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__reflet_ids
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet_secret__reflet_id
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__reflet_id
+msgid "Reflet"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__reflet_bar_sequence
+msgid "Reflet Bar Sequence"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/public_web/linkup_sidebar.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+#: model:ir.actions.client,name:mail_linkup_reflet.action_linkup_home
+#: model:ir.ui.menu,name:mail_linkup_reflet.menu_linkup_reflet_view
+msgid "Reflet view"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__starter_reflect
+msgid "Reformulation starter"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_email_blocklist__reason__invite_optout
+msgid "Refuses the invitations"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__rejected
+msgid "Rejected"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__repeated_rejections
+msgid "Repeated rejections"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+msgid ""
+"Rephrase without judgement or evaluation: what you were told, then what you "
+"understood."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "Replay the tour"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid "Report one reflection, one message or one member."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+msgid "Report this reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__reported_user_id
+msgid "Reported member"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__reporter_id
+msgid "Reporter"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "Reset for all members"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__response_state
+msgid "Response State"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Resume the draft"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__round_index
+msgid "Round Index"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "Safety"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "See the reflection and sign up"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_invitation__name
+msgid "Seen by the inviter only; never sent to anybody."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__send_day
+msgid "Send Day"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__send_day_count
+msgid "Send Day Count"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "Send or delete your current draft before cancelling this invitation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Send or delete your current draft first."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Send the invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Send the link again"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+msgid "Send the reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+msgid "Send the report"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Send to %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Send to…"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_highlight__sender_id
+msgid "Sender"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Sending is not possible."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_invitation__state__sent
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__sent
+msgid "Sent"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__sent_date
+msgid "Sent Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_reflet__phantom
+msgid ""
+"Sent to a member who blocks its author: it has no carrier message, its "
+"recipient never reads it and it expires as usual."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:mail.template,description:mail_linkup_reflet.mail_template_linkup_invitation
+msgid "Sent to a person invited to read a reflection on LinkUp."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Set aside"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__sexual
+msgid "Sexual content"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.xml:0
+msgid "Show"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/help_bar.js:0
+msgid "Show all the categories"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/help_bar.js:0
+msgid "Show the main categories only"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_reflection
+msgid ""
+"Showing the other person that we listened and understood: saying it is not "
+"enough, it has to be shown. It announces a reformulation to come or the wish"
+" to be better understood."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__in_reflet_bar
+msgid "Shown in the reduced bar of the Reflet view."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+msgid "Sign up"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+msgid "Sign up and read the reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "Signup: invalid template user"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.xml:0
+msgid "Skip the tour"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "So if I understand correctly…"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Someone"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid ""
+"Someone you met would like to make you a reflection: see the Reflet view."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Sound of a confirmed reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_reward_sounds_enabled
+msgid "Sound of a confirmed reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_profile_menu.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "Sounds and notifications"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Sounds of a reflection sent and received"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_sound_enabled
+msgid "Sounds of a reflection sent and received."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__spam
+msgid "Spam"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "Start rule"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "Start with a reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/composer_patch.js:0
+msgid "Start with a reflection of a real exchange"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Start with a reflection of a real exchange."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+msgid ""
+"Start with a reflection of a real exchange: free text opens once a "
+"reflection is confirmed in this conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Starter:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__state
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__state
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__state
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__state
+msgid "State"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Step %(index)s of 3 · %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "Step %(step)s of %(count)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_effective_start_rule__strict
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__discuss_channel__linkup_start_rule__strict
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__res_config_settings__linkup_start_rule_mode__strict
+msgid "Strict"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_start_rule_mode
+msgid ""
+"Strict: in a direct conversation, free text, attachments and calls open once"
+" a reflection is confirmed. Incentive: free text is open, and a banner "
+"suggests a reflection. Off: no rule. A conversation may set its own mode."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Subject:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__action_taken__suspended
+msgid "Suspended"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Talk about yourself"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__kind__self_disclosure
+msgid "Talking about oneself"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_team
+msgid "Team"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__code
+msgid "Technical key used by the clients and the scoring rules."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__body_text
+msgid "Text"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__starter_self
+msgid "Text that opens a precision or a disclosure on this theme."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__starter_reflect
+msgid "Text that opens a reformulation on this theme."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "Thank %(name)s for an exchange that did you good."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Thank someone without words: their avatar shines until your next exchange."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Thank you for our discussion."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+msgid "Thank you, your report is passed on to the moderation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "That is not what I said"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "That's a link with %(name)s!"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "That's a link!"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid ""
+"The Reflet view gathers your reflections, person by person; the help "
+"explains each category."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel_rtc_session__linkup_call_answered
+msgid ""
+"The call this session belongs to was answered: a participant who joins it "
+"again does not answer it a second time."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_category_code_unique
+msgid "The category code must be unique."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "The email LinkUp sends"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "The exchange took place and the reformulation is right."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "The exchange took place and the reformulation is right. Key →"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "The exchange took place, but that is not what I said"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "The exchange took place, but the reformulation is not right."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "The exchange took place; no link, a correction if you wish."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "The field %(field)s holds at most %(count)s characters."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "The field %(field)s is required."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "The field %(field)s of a sent reflection is required."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "The five steps shown the first time you opened Discuss."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "The free text of the conversation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "The guide, at any time"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "The invitation by phone is not available yet."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "The list of your contacts, without a mouse."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet_secret.py:0
+msgid "The main theme must be one of the hidden themes."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_focus
+msgid ""
+"The main tool to perceive, learn and imagine courses of action; without "
+"focused attention, one should not speak; giving the other person feedback on"
+" our attention."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users__linkup_tour_done
+msgid ""
+"The member finished or skipped the first-use tour of LinkUp; it no longer "
+"starts by itself, on any device."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+#: code:addons/mail_linkup_reflet/models/mail_message.py:0
+msgid "The message of a reflection cannot be changed."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+msgid "The name and the description of a direct conversation are not changed."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_notify_discreet
+msgid "The notifications of LinkUp read “New LinkUp event”, without any name."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "The other categories"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_notify_invitation_accepted
+msgid ""
+"The person invited by NewLink signed up, or confirmed the reflection, with "
+"the invited address."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "The reflection could not be processed."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "The reflection disappears for you; nobody is told."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid ""
+"The state of your link, your recent reflections and “You add to my "
+"happiness”."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_page
+msgid ""
+"The text of the reflection is not on this page: you will read it in LinkUp once signed up\n"
+"                        with the address this invitation was sent to."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"The text of your reflection is not in the email: %(name)s reads it in LinkUp"
+" after signing up through this link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_config_settings.py:0
+msgid "The tour will start again for %(count)s members."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "The twelve categories"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "The twelve categories of communication, in the order of the full band."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Theme found: %(themes)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Theme missed: %(themes)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Theme, optional"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_highlight.py:0
+msgid "This action belongs to another party of the highlight."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "This action belongs to another party of the reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This action belongs to the person who sent the invitation."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "This action does not apply to this kind of reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid "This content cannot be reported."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "This conversation is unavailable."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/composer_patch.js:0
+msgid "This conversation starts with a reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "This exchange did not take place"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_highlight.py:0
+msgid "This highlight cannot be sent."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "This invitation has already been used."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "This invitation has expired."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This invitation is not available."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This invitation link is not valid."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This invitation was cancelled by the person who sent it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "This invitation was cancelled."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This invitation was sent to another address."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "This is your own address."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_block.py:0
+msgid "This member cannot be blocked."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "This precision hides no theme."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "This reflection cannot be sent."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "This reflection has already been answered."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "This reflection is no longer available."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "This text holds at most %(count)s characters."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__reason__threat
+msgid "Threat"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_linkup_category__reflet_title
+msgid "Title prefilled on a reflection card of this category."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "To:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "To: %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__token_hash
+msgid "Token Hash"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Too many attempts for now, try again later."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
+msgid "Too many invitations today, try again tomorrow."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid "Too many reports for now, try again later."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "Tour"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_error_alert.xml:0
+msgid "Try again"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "Unblock %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "Unknown category."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
+msgid "Unknown state."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_users__linkup_suspended_until
+msgid ""
+"Until this date, the member neither sends nor answers anything, and receives"
+" no reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_report__urgent
+msgid "Urgent"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_invitation__state__accepted
+msgid "Used"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__accepted_user_id
+msgid "Used by"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_invitation__accepted_date
+msgid "Used on"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_res_users
+msgid "User"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__user_a_id
+msgid "User A"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__user_b_id
+msgid "User B"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_res_users_settings
+msgid "User Settings"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.linkup_invite_links
+msgid "Version française"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Video call with %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__virtual_round_count
+msgid "Virtual Round Count"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_link__virtual_round_date
+msgid "Virtual Round Date"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__category_id
+msgid "Visible category"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,name:mail_linkup_reflet.linkup_category_vulnerability
+msgid "Vulnerability"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Waiting"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Waiting for the confirmation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Waiting for the confirmation of %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__pending_invite
+msgid "Waiting for the invitation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Waiting for the signup"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_report__action_taken__warning
+msgid "Warning"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_team
+msgid ""
+"We are fragile and the team lets us survive; talking about how the team is "
+"built, how it works and how it performs."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_reflection
+msgid "What I would like you to understand:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "What did %(name)s tell you about during your exchange in person?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_focus
+msgid "What holds my attention:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_focus
+msgid "What holds your attention:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_self:mail_linkup_reflet.linkup_category_vulnerability
+msgid "What is sensitive for me:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_vulnerability
+msgid "What is sensitive for you:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "What matters to you."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__example_dont
+msgid "What not to say"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "What not to say:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_category__example_do
+msgid "What to say"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.js:0
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
+msgid "What to say:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_observation
+msgid ""
+"What we see or perceive, described without judgement or evaluation; the rest"
+" comes from our own representations and pollutes the connection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_reflection
+msgid "What you would like me to understand:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:linkup.category,definition:mail_linkup_reflet.linkup_category_go_speak
+msgid ""
+"When the other person wants to listen, it is our turn. Vector expression in "
+"five steps: context, trigger, realisation, goal, clear action request."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Who adds to your happiness: %(names)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Who told you this?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.xml:0
+msgid "Why are you reporting this reflection?"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
+msgid "With %(name)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Withdraw"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+msgid "Withdraw my highlight"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Withdraw this reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Withdraw this reflection? %(name)s will no longer see its content."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__state__withdrawn
+msgid "Withdrawn"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_highlight__extinguished_reason__withdrawn
+msgid "Withdrawn by the sender"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/composer_patch.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "Write a reflection"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/help_bar.js:0
+msgid "Write a reflection: %(category)s"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Write your text."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "Yes, that's exactly it!"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "You add to my happiness"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_go_listen
+msgid "You are ready to listen to me:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.xml:0
+msgid "You block nobody."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "You can unblock %(name)s from the LinkUp help."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "You can write freely; a confirmed reflection creates the link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_block_not_self
+msgid "You cannot block yourself."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_highlight_sender_not_recipient
+msgid "You cannot put yourself in the light."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/linkup_report.py:0
+msgid "You cannot report yourself."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "You disappear from each other's list."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_emotions
+msgid "You feel:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_needs
+msgid "You need:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_observation
+msgid "You noticed that:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "You put %(name)s in the light"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "You said that the exchange took place, but not as reformulated."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "You said that this exchange did not take place."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "You set this reflection aside; %(name)s is not told."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_linkup_reflet__you_said
+msgid "You told me"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_action
+msgid "You told me about a request"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_team
+msgid "You told me about the team"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_focus
+msgid "You told me about what holds your attention"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_inhibition
+msgid "You told me about what you no longer want"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_observation
+msgid "You told me about what you observed"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_go_speak
+msgid "You told me about what you wanted to tell me"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_emotions
+msgid "You told me about your emotions"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_goals
+msgid "You told me about your goal"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_needs
+msgid "You told me about your needs"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_vulnerability
+msgid "You told me about your vulnerability"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_go_listen
+msgid "You told me you need to be listened to"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,reflet_title:mail_linkup_reflet.linkup_category_reflection
+msgid "You told me you want to be better understood"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "You told me:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_go_speak
+msgid "You wanted to tell me:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "You withdrew this reflection."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "Your LinkUp panel"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
+msgid "Your LinkUp views"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/res_users.py:0
+msgid "Your account is suspended: you cannot send anything for now."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_action
+msgid "Your action request is that:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Your clarification"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Your closing message"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_safety.js:0
+msgid "Your conversation is hidden, not deleted."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_goals
+msgid "Your goal is:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Your guess of the hidden theme."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Your message"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_signals.js:0
+msgid "Your reflection was confirmed: that's a link!"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+msgid "Your reformulation"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_inhibition
+msgid "Your request is that I stop:"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Your session expired: log in again."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "and %(count)s more"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model_terms:ir.ui.view,arch_db:mail_linkup_reflet.res_config_settings_view_form
+msgid "https://"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_card.js:0
+msgid "the other person"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "this person"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:mail.template,subject:mail_linkup_reflet.mail_template_linkup_invitation
+msgid ""
+"{{ object.inviter_id.partner_id.name }} would like to make you a reflection "
+"on LinkUp"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_do:mail_linkup_reflet.linkup_category_emotions
+msgid "“I feel anger when I see that the rule is not respected.”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_do:mail_linkup_reflet.linkup_category_needs
+msgid "“I need to eat, I feel weak.”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_do:mail_linkup_reflet.linkup_category_observation
+msgid "“I notice that Jean is not here.”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_do:mail_linkup_reflet.linkup_category_action
+msgid "“I would like you to put on the winter tyres.”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_dont:mail_linkup_reflet.linkup_category_observation
+msgid "“Jean is late again, like every day! We can never count on him!”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_do:mail_linkup_reflet.linkup_category_goals
+msgid "“My goal really is to find someone to move this situation forward…”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_dont:mail_linkup_reflet.linkup_category_action
+msgid "“Once again it is up to me to remind you to put on the winter tyres!”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
+msgid "“So if I understand correctly…”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_dont:mail_linkup_reflet.linkup_category_needs
+msgid "“You never want me to eat, or what?”"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:linkup.category,example_dont:mail_linkup_reflet.linkup_category_emotions
+msgid "“You really are stupid not to respect the rules, where is your head?”"
+msgstr ""

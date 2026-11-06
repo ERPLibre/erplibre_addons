@@ -47,7 +47,7 @@ export function linkupCodeMessage(code) {
         case "linkup.unavailable":
             return _t("Sending is not possible.");
         case "linkup.rate_limited":
-            return _t("Too many sendings for now, try again later.");
+            return _t("Too many attempts for now, try again later.");
         case "linkup.start_rule":
             return _t("Start with a reflection of a real exchange.");
         case "linkup.not_verified":

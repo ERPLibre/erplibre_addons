@@ -1,0 +1,3318 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mail_linkup_community
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-06 12:08+0000\n"
+"PO-Revision-Date: 2026-11-06 12:08+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.js:0
+msgid "%(date)s · %(reason)s · %(source)s: %(member)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid ""
+"%(name)s is told of the decision (%(decision)s) and of the possible appeal."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.js:0
+msgid "%(name)s is unblocked."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid "%(name)s will not know who reported this."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.js:0
+msgid "%(name)s would like to make you a reflection on LinkUp: %(url)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "%(open)s to process · %(urgent)s urgent · %(overdue)s late"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid ""
+"%(reports)s earlier reports, %(open)s open; %(warnings)s warnings, "
+"%(hidden)s contents hidden, %(suspensions)s suspensions."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "(late)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_age_bracket__18_24
+msgid "18 to 24"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_age_bracket__25_34
+msgid "25 to 34"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_age_bracket__35_44
+msgid "35 to 44"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_age_bracket__45_54
+msgid "45 to 54"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_age_bracket__55_64
+msgid "55 to 64"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_age_bracket__65_plus
+msgid "65 and over"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "9-1-1: emergency services, when a life is in danger."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid ""
+"9-8-8: suicide crisis helpline, by phone or text message, at any time "
+"(Canada)."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,body_html:mail_linkup_community.mail_template_linkup_urgent_report
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"                <p>Hello,</p>\n"
+"                <p>\n"
+"                    An urgent report waits in the moderation queue. The members are told it is handled within\n"
+"                    <t t-out=\"ctx.get('linkup_urgent_hours') or ''\">24</t>\n"
+"                    hours.\n"
+"                </p>\n"
+"                <p style=\"margin: 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('linkup_console_url')\" style=\"background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;\">Open the moderation</a>\n"
+"                </p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,body_html:mail_linkup_community.mail_template_linkup_banned
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"                <p>Hello,</p>\n"
+"                <p>After a report, the moderation of LinkUp closed your account for a breach of the terms of use. This address can no longer open an account.</p>\n"
+"                <p>\n"
+"                    To contest this decision, answer this email or write to\n"
+"                    <t t-out=\"object.company_id.email or ''\">the address of the community</t>\n"
+"                    within\n"
+"                    <t t-out=\"ctx.get('linkup_appeal_days') or ''\">14</t>\n"
+"                    days.\n"
+"                </p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,body_html:mail_linkup_community.mail_template_linkup_verify_email
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"                <p>Hello,</p>\n"
+"                <p>Confirm that this address is yours: until then, LinkUp sends none of your reflections and invitations.</p>\n"
+"                <p style=\"margin: 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('linkup_verify_url')\" style=\"background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;\">Confirm my address</a>\n"
+"                </p>\n"
+"                <p style=\"font-size: 12px;\">\n"
+"                    This link lasts\n"
+"                    <t t-out=\"ctx.get('linkup_verify_hours') or ''\">24</t>\n"
+"                    hours and serves once. If you did not sign up on LinkUp, ignore this email.\n"
+"                </p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,body_html:mail_linkup_community.mail_template_linkup_signup_existing
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"                <p>Hello,</p>\n"
+"                <p>Somebody, maybe you, tried to sign up on LinkUp with this address. An account already uses it: log in with this address, or choose a new password if you forgot it.</p>\n"
+"                <p style=\"margin: 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('linkup_login_url')\" style=\"background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;\">Log in</a>\n"
+"                </p>\n"
+"                <p>\n"
+"                    <a t-att-href=\"ctx.get('linkup_reset_url')\">Choose a new password</a>\n"
+"                </p>\n"
+"                <p style=\"font-size: 12px;\">If it was not you, ignore this email: your account has not changed.</p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "<option value=\"\">Choose…</option>"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid ""
+"<small class=\"form-text\">Only the range is kept, never your date of "
+"birth.</small>"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid ""
+"<small id=\"o-linkup-Signup-canadaHelp\" class=\"form-text d-block\">\n"
+"                    LinkUp is open to people living in Canada for now.\n"
+"                </small>"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid ""
+"<small id=\"o-linkup-Signup-phoneHelp\" class=\"form-text\">\n"
+"                The reflection reaches you when it is the number the person who invited you typed.\n"
+"            </small>"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid ""
+"<small id=\"o-linkup-Signup-sensitiveHelp\" class=\"form-text d-block\">\n"
+"                    A reflection may tell emotions, needs, health or private life. I can withdraw this consent at any\n"
+"                    time from my profile; I then send no reflection.\n"
+"                </small>"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"A JSON file of everything LinkUp keeps about you: profile, consents, "
+"reflections, messages, points, links, reports."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_retention_closed_report_months
+msgid ""
+"A closed report is deleted after this delay, with its audit log and the "
+"originals of the content it hid."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_banner.xml:0
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_service.js:0
+msgid "A decision of the moderation concerns you."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid ""
+"A file of everything LinkUp keeps about you, in a format other applications "
+"read (JSON)."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid ""
+"A link was sent a moment ago: check your mailbox, or try again in a few "
+"minutes."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "A member is reported: there is no content, only their history."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/discuss_channel.py:0
+msgid "A message hidden by the moderation cannot be changed."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_email_verification
+msgid ""
+"A new account sends, invites and earns nothing before the click on the link "
+"of its verification email."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "A new link that confirms your email address, valid 24 hours."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.js:0
+msgid "A new link was sent to %(email)s."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "A new link was sent to your address."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.constraint,message:mail_linkup_community.constraint_res_users_linkup_personal_code_unique
+msgid "A personal code is unique."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+msgid ""
+"A reflection may tell emotions, needs, health or private life. Without this "
+"consent, you send no reflection."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"A reflection you rejected lends you words you did not say: its texts can be "
+"erased for good."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_reflet.py:0
+msgid ""
+"A report about this reflection is being processed; its content can be erased"
+" once it is closed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "A suspension lasts from 1 to %(count)s days."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "ABCDE-FGHJK"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.xml:0
+msgid "Accept"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Accept the conditions of LinkUp first."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid ""
+"Accept the terms of use, the privacy policy and the processing of sensitive "
+"information to sign up."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__decision__banned
+msgid "Account closed"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Actioned"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_verified_date
+msgid "Address first verified on"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__ip_hash
+msgid "Address hash"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Address not confirmed yet: click the link LinkUp sent you."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_terms_url
+msgid "Address of the terms of use, linked from the signup and the profile."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Addresses of this domain are not accepted; use another."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_age_attested
+msgid "Adult attested"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "After your appeal, the decision is reversed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "After your appeal, the decision is upheld."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "Age and residence"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_age_bracket
+msgid "Age range"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Age range declared"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_retention_unverified_days
+msgid ""
+"An account of the public signup never verified is erased after this delay."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_users__linkup_verified_date
+msgid ""
+"An account of the public signup never verified is erased once the retention "
+"period of the unverified accounts is over."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_users__linkup_email_verified
+msgid ""
+"An account of the public signup sends, invites and earns nothing before the "
+"click on the link of its verification email. An account created by an "
+"administrator, or through an invitation sent to its address, is verified."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "An administrator account is closed by another administrator."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"An urgent reason tells the moderators at once and puts the report first; a "
+"member never sets the urgency."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_service.js:0
+msgid "An urgent report waits in the moderation queue."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Another moderator just processed this report."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Another user is already registered using this email address."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__appeal_date
+msgid "Appeal Date"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__appeal_state
+msgid "Appeal State"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__appeal_text
+msgid "Appeal Text"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__appeal
+msgid "Appeal of the member"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__appeal_state__requested
+msgid "Appeal under review"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_report__state__appealed
+msgid "Appealed"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__ai
+msgid "Artificial intelligence assistance"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Assigns the report to you: you then decide."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__attachment_ids
+msgid "Attachment"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Audit log"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Audit log (read only)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Automatic signal"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Ban"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Ban %(name)s?"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__ban
+msgid "Banned"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.xml:0
+msgid "Before your first reflection"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Blocked members"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__body
+msgid "Body"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__body_text
+msgid "Body Text"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"By email, LinkUp sends the link; by phone, you send a share link yourself; "
+"by code, the member who gave it receives the reflection inside LinkUp."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_jurisdiction__ca
+msgid "Canada"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.xml:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Cancel"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Cancel the deletion"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Change the photo"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__update
+msgid "Changed the processing"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_invitation.py:0
+msgid "Check the code this person gave you."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_sent_page
+msgid "Check your mailbox"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/controllers/signup.py:0
+#: code:addons/mail_linkup_community/models/linkup_consent.py:0
+msgid "Choose a consent."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "Choose a decision."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Choose a photo in a common format, of at most 5 MB."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Choose a pseudonym of at most %(count)s characters."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid "Choose a reason."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Choose one of the languages offered."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_invitation.py:0
+msgid "Choose one way to reach this person."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Choose who may send you a first reflection."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.xml:0
+msgid ""
+"Click the link LinkUp sent you: until then, you send no reflection and "
+"invite nobody."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.xml:0
+msgid "Close"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Closed"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Code copied."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.xml:0
+msgid "Comment (optional)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Comment of the reporter"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.xml:0
+msgid "Confirm your email address"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Confirm your email address first."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,subject:mail_linkup_community.mail_template_linkup_verify_email
+msgid "Confirm your email address for LinkUp"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Confirmed address."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Consent given."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Consent withdrawn."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.actions.act_window,name:mail_linkup_community.action_linkup_consent
+#: model:ir.ui.menu,name:mail_linkup_community.menu_linkup_consent
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid "Consents"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_consent_all_members
+msgid "Consents of every member"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_consent_required
+msgid "Consents required"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_erase_pending
+msgid "Content held by a report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__decision__hidden
+msgid "Content hidden"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/moderation_message_patch.xml:0
+msgid "Content hidden by the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_users__linkup_erase_pending
+msgid ""
+"Content of this erased account that an open report points to; the retention "
+"cron erases it once the report is closed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/reflet_erase_patch.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_reflet__linkup_content_removed
+msgid "Content removed"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Contest this decision"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Copy"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "Copy the link"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/controllers/signup.py:0
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Could not create a new account."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Counters"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Counters of the queue"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__create_date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__create_date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__create_date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__date
+msgid "Date"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_deletion_grace_days
+msgid "Days before a deletion"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_retention_draft_days
+msgid "Days of a draft"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_suspension_days
+msgid "Days of a suspension"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_retention_unverified_days
+msgid "Days of an unverified account"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Days of suspension"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_appeal_days
+msgid "Days to contest a decision"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_report__decided_by_id
+msgid "Decided by"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__decision
+msgid "Decision"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_report__decision_date
+msgid "Decision Date"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__reverse
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__appeal_state__reversed
+msgid "Decision reversed"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__uphold
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__appeal_state__upheld
+msgid "Decision upheld"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Decisions"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Decisions of the moderation about me"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_jurisdiction
+msgid "Declared residence"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_deletion_grace_days
+msgid ""
+"Delay of grace between the request of a member and the erasure of their "
+"account; the member cancels it meanwhile."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Delete my account"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Delete my account?"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_personal_data.py:0
+msgid "Deleted member"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Deletion cancelled: your account stays as it is."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_deletion_requested_date
+msgid "Deletion requested on"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Deletion requested."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_discuss_channel
+msgid "Discussion Channel"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Dismiss"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Dismiss, hide the content, warn, suspend for some days, or ban: the account "
+"is closed and a hash of its address kept 24 months."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__dismiss
+msgid "Dismissed"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__display_name
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__display_name
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__display_name
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__display_name
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_disposable_email_domains
+msgid ""
+"Domains of disposable addresses, separated by commas; their subdomains are "
+"refused too."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Download my data"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Due"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_report__due_date
+msgid "Due Date"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.xml:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "Each consent is separate; none is checked in advance."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Each consent, with the date and the version of the text you agreed to."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Each decision and each reading of the content adds a row."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Each decision needs its reason, written to the audit log; the member is told"
+" of it and of the possible appeal."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_invitation__email
+msgid "Email"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Email and phone"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_email_verified
+msgid "Email verified"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "Email · LinkUp sends a signup link"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Enter a valid email address."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_invitation.py:0
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Enter a valid phone number."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/reflet_erase_patch.js:0
+msgid "Erase"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/reflet_erase_patch.xml:0
+msgid "Erase its content"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/reflet_erase_patch.js:0
+msgid "Erase this reflection?"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_deleted_date
+msgid "Erased on"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_consent_all_members
+msgid ""
+"Every member, also those created by an administrator, accepts the terms of "
+"use, the privacy policy and the processing of sensitive information before "
+"sending anything."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_moderation_notice.py:0
+msgid "Explain why in at most %(count)s characters."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_ir_binary
+msgid "File streaming helper model for controllers"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid ""
+"Give it to a person you met: with it, they send you a first reflection."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "Give the reason of the decision, in at most %(count)s characters."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Give the reason of the decision: it goes to the audit log."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Given on %(date)s, version %(version)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__granted
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_consent_view_search
+msgid "Granted"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_help_resources
+msgid "Help resources"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__hide
+msgid "Hid the content"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Hidden"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_reflet__linkup_moderation_hidden
+#: model:ir.model.fields,field_description:mail_linkup_community.field_mail_mail__linkup_hidden
+#: model:ir.model.fields,field_description:mail_linkup_community.field_mail_message__linkup_hidden
+msgid "Hidden by the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Hide the content"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "History of the member:"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_moderation_hours
+msgid "Hours of the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_report_urgent_hours
+msgid "Hours to handle an urgent report"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_report_due_hours
+msgid "Hours to handle another report"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid ""
+"How long LinkUp keeps what members write, before a daily task erases it. The"
+" values proposed by the specification wait for the privacy impact "
+"assessment."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "How to reach this person"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "I accept the privacy policy."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "I accept the terms of use."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid ""
+"I agree that LinkUp processes the sensitive information my reflections may "
+"hold."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "I am 18 or older."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "I live in Canada."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "I understood that:"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__id
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__id
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__id
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__id
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__id
+msgid "ID"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Identity"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid ""
+"In %(days)s days, your account is erased: your pseudonym becomes “Deleted "
+"member”, your address, phone and photo leave, and the texts of your "
+"reflections and messages are erased. Your points stay, without your name, in"
+" the energy of the links of the others. Until then, you can cancel."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "In review"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.js:0
+msgid "Invitation sent."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_retention_closed_reflet_months
+msgid "Its texts are erased after this delay; its dates stay."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/reflet_erase_patch.js:0
+msgid ""
+"Its texts are erased for good, for both of you; the card stays, marked "
+"“Content removed”."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__key_hash
+msgid "Key Hash"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__kind
+msgid "Kind"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Language"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__write_date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__write_date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__write_date
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_rate_event__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "Leave this field empty"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.js:0
+msgid "Link copied."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_service.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_invite_phone_page
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_verify_page
+msgid "LinkUp"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "LinkUp (automatic signal)"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_consent
+msgid "LinkUp consent"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_hidden_content
+msgid "LinkUp content hidden by the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "LinkUp could not be loaded, try again."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_highlight
+msgid "LinkUp highlight: you add to my happiness"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_invitation
+msgid "LinkUp invitation"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_help_now.xml:0
+msgid ""
+"LinkUp is not an emergency service. If a person is in danger, contact a help"
+" resource right away:"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"LinkUp is not an emergency service: the help resources of the territory, set"
+" by the administrator, come first."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "LinkUp is open to people aged 18 and over."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "LinkUp is open to people living in Canada for now."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+msgid "LinkUp may suggest themes and wordings with artificial intelligence."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_service.js:0
+msgid "LinkUp moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_audit_log
+msgid "LinkUp moderation audit log"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_moderation_notice
+msgid "LinkUp moderation decision notified to a member"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "LinkUp notifies me of my reflections and invitations."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_personal_data
+msgid "LinkUp personal data"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_rate_event
+msgid "LinkUp rate limit event"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_reflet
+msgid "LinkUp reflection"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_linkup_report
+msgid "LinkUp report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid ""
+"LinkUp sends nothing: once the invitation is ready, copy the link and send "
+"it yourself."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,name:mail_linkup_community.mail_template_linkup_banned
+msgid "LinkUp: account closed by the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,subject:mail_linkup_community.mail_template_linkup_urgent_report
+msgid "LinkUp: an urgent report waits in the moderation queue"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,name:mail_linkup_community.mail_template_linkup_verify_email
+msgid "LinkUp: email verification"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.actions.server,name:mail_linkup_community.ir_cron_linkup_rate_purge_ir_actions_server
+msgid "LinkUp: purge the rate limit events"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.actions.server,name:mail_linkup_community.ir_cron_linkup_retention_ir_actions_server
+msgid "LinkUp: retention of the personal data"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,name:mail_linkup_community.mail_template_linkup_signup_existing
+msgid "LinkUp: signup with an address already used"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,name:mail_linkup_community.mail_template_linkup_urgent_report
+msgid "LinkUp: urgent report for the moderators"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_verify_expiry
+msgid "Linkup Verify Expiry"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_verify_token_hash
+msgid "Linkup Verify Token Hash"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Loading…"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_sent_page
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_verify_page
+msgid "Log in"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__user_id
+msgid "Member"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid ""
+"Members are told that an urgent report is handled within %(hours)s hours."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model,name:mail_linkup_community.model_mail_message
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__message_id
+msgid "Message"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/moderation_message_patch.xml:0
+msgid "Message hidden by the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_moderation_context_messages
+msgid "Messages a moderator reads before and after a reported one."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_moderation_context_messages
+msgid "Messages of context"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_verification_resend_minutes
+msgid "Minutes between two verification emails"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.actions.client,name:mail_linkup_community.action_linkup_moderation
+#: model:ir.ui.menu,name:mail_linkup_community.menu_linkup_moderation
+msgid "Moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid "Moderation and help"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.actions.act_window,name:mail_linkup_community.action_linkup_audit_log
+#: model:ir.ui.menu,name:mail_linkup_community.menu_linkup_audit_log
+msgid "Moderation audit log"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Moderator"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_retention_closed_report_months
+msgid "Months of a closed report"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_retention_closed_reflet_months
+msgid "Months of a rejected or expired reflection"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_retention_inactive_pair_months
+msgid "Months without activity of a pair"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "My age range"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "My consents"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "My data"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "My energy is visible to my links."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__energy_visibility
+msgid "My energy visible to my links"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_texts.js:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "My links are visible to my links."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__link_visibility
+msgid "My links visible to my links"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "My personal code"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "My photo"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model:ir.actions.client,name:mail_linkup_community.action_linkup_profile
+#: model:ir.ui.menu,name:mail_linkup_community.menu_linkup_profile
+msgid "My profile"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "My reports"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/help/help_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/help/help_patch.xml:0
+msgid "Need help now"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Never given"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "New"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "New code"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "New code: the former one no longer works."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"New, In review, then Actioned or Dismissed; Appealed when the member "
+"contests the decision."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Nine reasons. A threat, a minor in danger or a person in distress are "
+"urgent."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__appeal_state__none
+msgid "No appeal"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "No code could be created, try again."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "No earlier report."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "No entry for this report."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "No report waits in your queue."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_first_reflet_scope__nobody
+msgid "Nobody"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Nobody else sees it. A new address is confirmed again by a link."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Nobody, people who have your code, or people who also know your email "
+"address."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "None"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "None."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Not assigned"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Not declared"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Not urgent"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_sent_page
+msgid ""
+"Nothing arrived? Look in the spam folder, then sign up again in a few "
+"minutes."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Nothing to press: the list follows the moderation."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__notifications
+msgid "Notifications"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.js:0
+msgid "On %(date)s, reason: %(reason)s."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_help_resources
+msgid ""
+"One resource per line, shown under “Need help now” and with a report of a "
+"person in distress. Empty, LinkUp shows the crisis line 9-8-8 and the "
+"emergency number 9-1-1 of Canada."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "Only a LinkUp moderator can do this."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Only the members you share a confirmed link with see it; the others see your"
+" pseudonym."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/mail_message.py:0
+msgid "Only the moderation hides a message or shows it again."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Only the reported content and its immediate context, never the rest of the "
+"conversation."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_verify_page
+msgid "Open LinkUp"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_banner.xml:0
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_service.js:0
+msgid "Open the moderation"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Open the report: %(reason)s, %(member)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "Optional"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid ""
+"Other members see your pseudonym; your photo, only those you share a confirmed link with.\n"
+"                        Your address and your phone, nobody."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, a switch grants or withdraws the consent at once."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, the choice changes the field below."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, the choice is recorded at once."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, the choice reloads the list."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, the reason opens the report, without its content."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button asks for a confirmation, then sets the date "
+"of the deletion."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, this button asks for a confirmation."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button copies the link; send it by text message."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button downloads the file; nobody else can download "
+"it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, this button opens the choice of an image."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button records the consents checked above, with "
+"their date and version."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button sends the link; a second one waits a few "
+"minutes."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button sends the report and shows the "
+"acknowledgement."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, this button takes the report; the audit log tells it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, “Contest this decision” opens a short text; another "
+"moderator reviews it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Outside the guide, “New code” replaces it; the former one stops working."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, “Save” records it and sends the link."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, “Save” records it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Outside the guide, “Unblock” lifts the block at once."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "People who have my code"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "People who know my email address or have my code"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_invitation.py:0
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_personal_code
+msgid "Personal code"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "Personal code · the code a member gave you"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid "Personal data"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_invitation__phone
+msgid "Phone"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Phone (optional)"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_invitation__phone_attempts
+msgid "Phone Attempts"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "Phone · a share link you send yourself"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Photo"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Photo changed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Photo removed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Privacy"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__privacy
+msgid "Privacy policy"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Processed"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "Processing of the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_fields
+msgid "Pseudonym"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_rate_event__kind__signup
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid "Public signup"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__purpose
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_consent_view_search
+msgid "Purpose"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Queue of the reports"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_banner.xml:0
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_service.js:0
+msgid "Read it"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "Read the privacy policy"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_invite_phone_page
+msgid "Read the reflection"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__content_read
+msgid "Read the reported content"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Read the reported content and its context"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "Read the terms of use"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_audit_log_view_search
+msgid "Readings of content"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__reason
+msgid "Reason"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reason of the decision (written to the audit log)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Reason of the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid "Reason: %(reason)s. %(name)s does not know who reported it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Received"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__res_id
+msgid "Record"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__res_model
+msgid "Record model"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Reflection"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__reflet_id
+msgid "Reflet"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_disposable_email_domains
+msgid "Refused email domains"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Remove the photo"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Repeated rejections (automatic signal)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/moderation_message_patch.js:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__report_id
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__report_id
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__report_id
+msgid "Report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/safety_patch.js:0
+msgid "Report %(name)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Report dismissed: %(name)s is not sanctioned."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid "Report this message"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reported"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reported by"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "Reported content (logged access)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reported content and immediate context"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reported member"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reports"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reports shown"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reports, urgent first, then by date"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Residence declared"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Reverse the decision"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Safety"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Save"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Saved."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Saved. Click the link sent to your new address to confirm it."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__seen
+msgid "Seen"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Select the code and copy it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.js:0
+msgid "Select the link and copy it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid ""
+"Send it yourself by text message. It is shown once: \"Send the link again\" "
+"makes a new one."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Send the appeal"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.xml:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "Send the link again"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.xml:0
+msgid "Send the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__sensitive_data
+msgid "Sensitive information"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,description:mail_linkup_community.mail_template_linkup_banned
+msgid "Sent to a member banned by the moderation."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,description:mail_linkup_community.mail_template_linkup_verify_email
+msgid "Sent to a new member to verify their email address."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,description:mail_linkup_community.mail_template_linkup_signup_existing
+msgid "Sent to an account when a signup uses its address."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,description:mail_linkup_community.mail_template_linkup_urgent_report
+msgid ""
+"Sent to the moderators when a member reports a threat, a minor in danger or "
+"a person in distress."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "Share link"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.js:0
+msgid "Share link ready: send it yourself."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Show the content (logged access)"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Showing the content adds a row to the audit log, visible to the other "
+"moderators."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_report_urgent_hours
+msgid ""
+"Shown to the members who report a threat, a minor in danger or a person in "
+"distress."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_signup_rate_per_ip_hour
+msgid "Signups per IP address and per hour"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Source"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_report__state
+msgid "State"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "State of the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "States of the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Suspend"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__suspend
+msgid "Suspended"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__suspended_until
+msgid "Suspended Until"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__decision__suspended
+msgid "Suspension"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/controllers/signup.py:0
+msgid "Suspicious activity detected by Google reCaptcha."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Take the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "Take the report before deciding."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Take the report to decide; the audit log tells who took it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_terms_url
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_consent__purpose__terms
+msgid "Terms of use"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.xml:0
+msgid "Thank you, your report is passed on to the moderation."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_community_notice.js:0
+msgid "Thank you: your consents are recorded."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid ""
+"The account is closed and its address can no longer open an account for 24 "
+"months. The person is told by email, with the recourse."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_users__linkup_deletion_requested_date
+msgid ""
+"The account is erased once the delay of grace is over; until then, the "
+"member cancels the request from their profile."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_users__linkup_consent_required
+msgid ""
+"The account sends nothing without its consents to the terms of use, the "
+"privacy policy and the processing of sensitive information. Set by the "
+"signup; the setting 'Consents of every member' extends it to all."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_audit_log.py:0
+msgid "The audit log of the moderation is not changed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_audit_log.py:0
+msgid "The audit log of the moderation is not deleted."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid "The code shown in the profile of this member."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"The consents your account needs before a first reflection, each one apart."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid ""
+"The content stays hidden until you show it. Each reading is written to the audit\n"
+"                                log, visible to the other moderators."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid ""
+"The delays of the moderation shown to the members, what a moderator reads, "
+"and the resources of the help in distress."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.js:0
+msgid ""
+"The member who gave you this code receives the reflection inside LinkUp, if "
+"their settings allow it. Nobody is told otherwise."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "The member you reported does not know who reported them."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "The members who can no longer reach you; they are not told."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "The moderation cannot sanction this account."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "The moderation could not be loaded, try again."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_help_now.js:0
+msgid ""
+"The moderation reads the reports: %(hours)s. Outside these hours, use the "
+"resources above."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"The moderation receives it; the reported member never learns who reported."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "The moderation sent you a warning."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "The name the other members see. It need not be unique."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_fields
+msgid "The name the other members see. Your legal name is not asked."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"The name the other members see; it need not be unique, and your legal name "
+"is never asked."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_users__linkup_age_attested
+msgid "The person declared being 18 or older at signup."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_invite_phone_page
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_consents
+msgid "The phone number this link was sent to"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_retention_inactive_pair_months
+msgid ""
+"The reflections and the messages of a pair are erased after this delay "
+"without any exchange."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "The rejected reflections of the member, without their texts."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"The reports to process, the urgent ones and the late ones, and the delay "
+"shown to the members."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "The reports waiting for a decision, or the latest closed ones."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"The reports you made and where each one stands; the member you reported "
+"never learns it was you."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "The share link of this invitation, shown once."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid ""
+"The texts members accept, and who must accept them before sending anything."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_help_now.xml:0
+msgid "These resources stay available at all times from the LinkUp help."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "These resources stay in the LinkUp help at all times; nothing is sent."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "They follow the queue: an urgent report adds to them at once."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "This address cannot open an account."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "This address is not available."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_consent.py:0
+msgid "This consent cannot be changed here."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_moderation_notice.py:0
+msgid "This decision can no longer be contested."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_moderation_notice.py:0
+msgid "This decision cannot be contested."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_invitation.py:0
+msgid "This is your own code."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_verify_page
+msgid ""
+"This link no longer works: it lasts 24 hours and serves once. Ask for a new "
+"one from LinkUp."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/controllers/signup.py:0
+msgid "This number is not the one of the invitation."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "This report has no appeal to close."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "This report holds no content to hide."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+msgid "This report is already closed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_report.py:0
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "This report is not in your queue."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "To process"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "To process or closed"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/linkup_rate_event.py:0
+msgid "Too many attempts for now, try again later."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/controllers/signup.py:0
+#: code:addons/mail_linkup_community/models/res_users.py:0
+msgid "Too many signups from this connection, try again later."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__take
+msgid "Took the report"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.js:0
+msgid "Unblock %(name)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__understood
+msgid "Understood"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.js:0
+msgid "Until %(date)s."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Uphold the decision"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.xml:0
+#: code:addons/mail_linkup_community/static/src/core/common/safety_patch.xml:0
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "Urgent"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid ""
+"Urgent report: the moderators are told at once. It is handled within "
+"%(hours)s hours."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Urgent reports first, then by date. A report you made, about you, or about a"
+" member you share a link with is never in it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_banner.xml:0
+msgid "Urgent reports wait in your moderation queue."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/safety_patch.js:0
+msgid ""
+"Urgent: the moderators are told at once. It is handled within %(hours)s "
+"hours."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_res_users
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_moderation_notice__user_id
+msgid "User"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_rate_event__kind__verification
+msgid "Verification email"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_email_verification
+msgid "Verify the email address"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__version
+msgid "Version"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.js:0
+msgid "Warn"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_audit_log__action__warn
+msgid "Warned"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__linkup_moderation_notice__decision__warning
+msgid "Warning"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_sent_page
+msgid ""
+"We sent an email to the address you entered. If it can open an account, the email holds a link that\n"
+"                    confirms it; the link lasts"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__action
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_audit_log_view_search
+msgid "What"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"What the moderation decided after a report about you, and why; never who "
+"reported nor what they wrote."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "When"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,help:mail_linkup_community.field_res_config_settings__linkup_moderation_hours
+msgid ""
+"When moderators read the reports, as members read it; outside these hours, "
+"the help resources stand in."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__actor_id
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_audit_log_view_search
+msgid "Who"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_res_users__linkup_first_reflet_scope
+msgid "Who may send me a first reflection"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid ""
+"Who opens an account, and the limits against robots. New members are "
+"restricted to Discuss and LinkUp."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Who, when, what, why: every decision and every reading of content. Nobody "
+"changes it."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_audit_log__reason
+msgid "Why"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid "Why are you reporting %(name)s?"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_report_dialog.js:0
+msgid "Why are you reporting this message?"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "Why do you contest it? Another moderator reads it."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_first_reflet_scope__code
+msgid "With my code"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields.selection,name:mail_linkup_community.selection__res_users__linkup_first_reflet_scope__email_or_code
+msgid "With my email address or my code"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_consent_view_search
+msgid "Withdrawn"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Withdrawn on %(date)s"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_hidden_content__you_said
+msgid "You Said"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.xml:0
+msgid "You block nobody."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/newlink_patch.xml:0
+msgid ""
+"You copy the link and send it by text message; the reflection is attached once this person types\n"
+"                    this number."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid "You told me:"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,subject:mail_linkup_community.mail_template_linkup_signup_existing
+msgid "Your LinkUp account already exists"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:mail.template,subject:mail_linkup_community.mail_template_linkup_banned
+msgid "Your LinkUp account is closed"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_fields
+msgid "Your Name"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Your account is closed."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid ""
+"Your account is erased after a delay you can cancel: your pseudonym becomes "
+"“Deleted member”, your texts and messages are erased, your points stay "
+"without your name."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Your account is suspended: you cannot send anything for now."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.js:0
+msgid "Your account will be deleted on %(date)s. Until then, you can cancel."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile_safety.js:0
+msgid "Your appeal is sent: another moderator reviews the decision."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Your appeal is under review."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/linkup_moderation_texts.js:0
+msgid "Your content was hidden by the moderation."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_verify_page
+msgid ""
+"Your email address is confirmed: you can now send reflections and invite "
+"people."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/moderation/moderation_console.xml:0
+msgid ""
+"Your queue never holds a report you made, a report about you, or a report about a member you\n"
+"                        share a link with."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_signup_sent_page
+msgid ""
+"hours and serves once. If an account already uses this address, the email "
+"tells how to log in."
+msgstr ""
+
+#. module: mail_linkup_community
+#: model_terms:ir.ui.view,arch_db:mail_linkup_community.res_config_settings_view_form
+msgid "https://"
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/views/profile/linkup_profile.xml:0
+msgid "· Leaving it means deleting your account."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-javascript
+#: code:addons/mail_linkup_community/static/src/core/common/community_guide_patch.js:0
+msgid "“Take the report” moves it to In review and assigns it to you."
+msgstr ""

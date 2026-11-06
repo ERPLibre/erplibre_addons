@@ -32,7 +32,7 @@ class ResConfigSettings(models.TransientModel):
         string="Invitations per member and per day",
         config_parameter="linkup.max_invitations_per_day",
         default=10,
-        help="Sendings of an invitation link, new ones and sent again.",
+        help="Every invitation link sent counts, a new one or one sent again.",
     )
     linkup_privacy_policy_url = fields.Char(
         string="Privacy policy",

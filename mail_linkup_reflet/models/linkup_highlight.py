@@ -83,7 +83,7 @@ class LinkupHighlight(models.Model):
         (
             "sender_not_recipient",
             "CHECK(sender_id != recipient_id)",
-            "A member does not put themself in the light.",
+            "You cannot put yourself in the light.",
         ),
     ]
 

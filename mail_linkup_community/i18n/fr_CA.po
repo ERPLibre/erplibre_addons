@@ -2750,7 +2750,7 @@ msgstr ""
 
 #. module: mail_linkup_community
 #: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_signup_rate_per_ip_hour
-msgid "Signups per address IP and per hour"
+msgid "Signups per IP address and per hour"
 msgstr "Inscriptions par adresse IP et par heure"
 
 #. module: mail_linkup_community

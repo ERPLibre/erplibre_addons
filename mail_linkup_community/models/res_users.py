@@ -637,7 +637,7 @@ class ResUsers(models.Model):
 
     @api.model
     def _linkup_request_address(self):
-        """The address IP of the current request, as the limits count it:
+        """The IP address of the current request, as the limits count it:
         an IPv6 address counts as its /64 network, which one subscriber
         holds whole.
 
