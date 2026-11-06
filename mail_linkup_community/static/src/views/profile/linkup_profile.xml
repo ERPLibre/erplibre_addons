@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupProfileFeedback">
+        <p
+            t-if="noticeIn(section)"
+            class="o-linkup-Profile-notice small mb-0"
+            role="status"
+            t-esc="noticeIn(section)"
+        />
+        <LinkupErrorAlert t-if="errorIn(section)" error="errorIn(section)" className="'o-linkup-Profile-error'" />
+    </t>
+
+    <t t-name="mail_linkup_community.LinkupProfile">
+        <div class="o-linkup-Profile o_action h-100 overflow-auto p-3 d-flex flex-column gap-4" t-ref="root">
+            <header class="d-flex align-items-center gap-2">
+                <div class="flex-grow-1">
+                    <h1 class="h4 mb-1">My profile</h1>
+                    <p class="mb-0 small">
+                        Other members see your pseudonym; your photo, only those you share a confirmed link with.
+                        Your address and your phone, nobody.
+                    </p>
+                </div>
+                <LinkupGuideButton />
+            </header>
+            <p t-if="state.loadError" class="o-linkup-Profile-loadError" role="alert">
+                LinkUp could not be loaded, try again.
+            </p>
+            <p t-elif="!state.loaded" role="status">Loading…</p>
+            <t t-else="">
+                <section
+                    class="o-linkup-Profile-identity d-flex flex-column gap-2"
+                    aria-labelledby="o-linkup-Profile-identityTitle"
+                >
+                    <h2 id="o-linkup-Profile-identityTitle" class="h5 mb-0" tabindex="-1">Identity</h2>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <img class="o-linkup-Profile-photo rounded-circle border" t-att-src="photoUrl" alt="My photo" />
+                        <div class="d-flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                class="o-linkup-Profile-choosePhoto btn btn-secondary btn-sm"
+                                data-linkup-guide="profile-photo"
+                                t-att-disabled="state.busy"
+                                t-on-click="choosePhoto"
+                            >
+                                Change the photo
+                            </button>
+                            <button
+                                type="button"
+                                class="o-linkup-Profile-removePhoto btn btn-link btn-sm"
+                                t-att-disabled="state.busy"
+                                t-on-click="removePhoto"
+                            >
+                                Remove the photo
+                            </button>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                class="d-none"
+                                aria-hidden="true"
+                                tabindex="-1"
+                                t-ref="photoInput"
+                                t-on-change="onPhotoChange"
+                            />
+                        </div>
+                    </div>
+                    <form class="d-flex flex-column gap-2" t-on-submit.prevent="saveIdentity">
+                        <label class="d-flex flex-column gap-1">
+                            <span>Pseudonym</span>
+                            <input
+                                type="text"
+                                name="name"
+                                class="o-linkup-Profile-name form-control"
+                                maxlength="64"
+                                required="required"
+                                data-linkup-guide="profile-name"
+                                aria-describedby="o-linkup-Profile-nameHelp"
+                                t-model="state.form.name"
+                            />
+                            <small id="o-linkup-Profile-nameHelp">
+                                The name the other members see. It need not be unique.
+                            </small>
+                        </label>
+                        <label t-if="profile.langs.length > 1" class="d-flex flex-column gap-1">
+                            <span>Language</span>
+                            <select name="lang" class="o-linkup-Profile-lang form-select" t-model="state.form.lang">
+                                <option
+                                    t-foreach="profile.langs"
+                                    t-as="lang"
+                                    t-key="lang[0]"
+                                    t-att-value="lang[0]"
+                                    t-esc="lang[1]"
+                                />
+                            </select>
+                        </label>
+                        <div>
+                            <button
+                                type="submit"
+                                class="o-linkup-Profile-saveIdentity btn btn-primary btn-sm"
+                                t-att-disabled="state.busy"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                    <t t-call="mail_linkup_community.LinkupProfileFeedback">
+                        <t t-set="section" t-value="'identity'" />
+                    </t>
+                </section>
+
+                <section
+                    class="o-linkup-Profile-contact d-flex flex-column gap-2"
+                    aria-labelledby="o-linkup-Profile-contactTitle"
+                >
+                    <h2 id="o-linkup-Profile-contactTitle" class="h5 mb-0" tabindex="-1">Email and phone</h2>
+                    <form class="d-flex flex-column gap-2" t-on-submit.prevent="saveContact">
+                        <label class="d-flex flex-column gap-1">
+                            <span>Email</span>
+                            <input
+                                type="email"
+                                name="email"
+                                class="o-linkup-Profile-email form-control"
+                                autocomplete="email"
+                                required="required"
+                                data-linkup-guide="profile-email"
+                                t-model="state.form.email"
+                            />
+                        </label>
+                        <p
+                            class="o-linkup-Profile-verified small mb-0"
+                            t-att-data-verified="profile.email_verified ? '1' : '0'"
+                        >
+                            <t t-if="profile.email_verified">
+                                <i class="fa fa-check me-1" aria-hidden="true" />
+                                Confirmed address.
+                            </t>
+                            <t t-else="">
+                                <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
+                                Address not confirmed yet: click the link LinkUp sent you.
+                                <button
+                                    type="button"
+                                    class="o-linkup-Profile-resend btn btn-link btn-sm p-0 align-baseline"
+                                    t-att-disabled="state.busy"
+                                    t-on-click="resendVerification"
+                                >
+                                    Send the link again
+                                </button>
+                            </t>
+                        </p>
+                        <label class="d-flex flex-column gap-1">
+                            <span>Phone (optional)</span>
+                            <input
+                                type="tel"
+                                name="phone"
+                                class="o-linkup-Profile-phone form-control"
+                                autocomplete="tel"
+                                t-model="state.form.phone"
+                            />
+                        </label>
+                        <div>
+                            <button
+                                type="submit"
+                                class="o-linkup-Profile-saveContact btn btn-primary btn-sm"
+                                t-att-disabled="state.busy"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                    <t t-call="mail_linkup_community.LinkupProfileFeedback">
+                        <t t-set="section" t-value="'contact'" />
+                    </t>
+                </section>
+
+                <section
+                    class="o-linkup-Profile-privacy d-flex flex-column gap-3"
+                    aria-labelledby="o-linkup-Profile-privacyTitle"
+                >
+                    <h2 id="o-linkup-Profile-privacyTitle" class="h5 mb-0" tabindex="-1">Privacy</h2>
+                    <fieldset class="o-linkup-Profile-scope d-flex flex-column gap-1" data-linkup-guide="profile-scope">
+                        <legend class="h6 mb-1">Who may send me a first reflection</legend>
+                        <div t-foreach="scopes" t-as="scope" t-key="scope.value" class="form-check mb-0">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                name="linkup_first_reflet_scope"
+                                t-att-id="'o-linkup-Profile-scope-' + scope.value"
+                                t-att-value="scope.value"
+                                t-att-checked="profile.first_reflet_scope === scope.value"
+                                t-att-disabled="state.busy"
+                                t-on-change="() => this.setScope(scope.value)"
+                            />
+                            <label
+                                class="form-check-label"
+                                t-att-for="'o-linkup-Profile-scope-' + scope.value"
+                                t-esc="scope.label"
+                            />
+                        </div>
+                    </fieldset>
+                    <div class="o-linkup-Profile-codeBox d-flex flex-column gap-1">
+                        <h3 class="h6 mb-0">My personal code</h3>
+                        <p class="small mb-0">
+                            Give it to a person you met: with it, they send you a first reflection.
+                        </p>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <code
+                                class="o-linkup-Profile-code fs-5"
+                                data-linkup-guide="profile-code"
+                                t-esc="profile.code"
+                            />
+                            <button
+                                type="button"
+                                class="o-linkup-Profile-copyCode btn btn-secondary btn-sm"
+                                t-on-click="copyCode"
+                            >
+                                Copy
+                            </button>
+                            <button
+                                type="button"
+                                class="o-linkup-Profile-newCode btn btn-link btn-sm"
+                                t-att-disabled="state.busy"
+                                t-on-click="newCode"
+                            >
+                                New code
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        class="o-linkup-Profile-consents d-flex flex-column gap-2"
+                        data-linkup-guide="profile-consents"
+                    >
+                        <h3 class="h6 mb-0">My consents</h3>
+                        <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                            <li
+                                t-foreach="profile.consents"
+                                t-as="consent"
+                                t-key="consent.purpose"
+                                class="o-linkup-Profile-consent"
+                                t-att-data-purpose="consent.purpose"
+                            >
+                                <div class="form-check form-switch mb-0">
+                                    <input
+                                        type="checkbox"
+                                        role="switch"
+                                        class="form-check-input"
+                                        t-att-id="'o-linkup-Profile-consent-' + consent.purpose"
+                                        t-att-checked="consent.granted"
+                                        t-att-disabled="state.busy or (consent.granted and !consent.revocable)"
+                                        t-att-aria-describedby="'o-linkup-Profile-consentDetail-' + consent.purpose"
+                                        t-on-change="(ev) => this.toggleConsent(consent, ev.target.checked)"
+                                    />
+                                    <label
+                                        class="form-check-label"
+                                        t-att-for="'o-linkup-Profile-consent-' + consent.purpose"
+                                        t-esc="consentLabel(consent)"
+                                    />
+                                </div>
+                                <small
+                                    class="o-linkup-Profile-consentDetail d-block"
+                                    t-att-id="'o-linkup-Profile-consentDetail-' + consent.purpose"
+                                >
+                                    <t t-esc="consentDetail(consent)" />
+                                    <t t-if="consent.purpose === 'sensitive_data'">
+                                        ·
+                                        <t t-esc="sensitiveHelp" />
+                                    </t>
+                                    <t t-if="consent.granted and !consent.revocable">
+                                        · Leaving it means deleting your account.
+                                    </t>
+                                </small>
+                            </li>
+                        </ul>
+                        <p class="small mb-0">
+                            <a
+                                t-if="profile.terms_url"
+                                t-att-href="profile.terms_url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Terms of use
+                            </a>
+                            <t t-if="profile.terms_url and profile.privacy_url">·</t>
+                            <a
+                                t-if="profile.privacy_url"
+                                t-att-href="profile.privacy_url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Privacy policy
+                            </a>
+                        </p>
+                    </div>
+                    <dl class="o-linkup-Profile-declaration small mb-0">
+                        <dt>Age range declared</dt>
+                        <dd class="o-linkup-Profile-age" t-esc="ageLabel" />
+                        <dt>Residence declared</dt>
+                        <dd class="o-linkup-Profile-residence mb-0" t-esc="residenceLabel" />
+                    </dl>
+                    <t t-call="mail_linkup_community.LinkupProfileFeedback">
+                        <t t-set="section" t-value="'privacy'" />
+                    </t>
+                </section>
+                <LinkupProfileSafety profile="profile" />
+
+                <section
+                    class="o-linkup-Profile-data d-flex flex-column gap-2"
+                    aria-labelledby="o-linkup-Profile-dataTitle"
+                >
+                    <h2 id="o-linkup-Profile-dataTitle" class="h5 mb-0" tabindex="-1">My data</h2>
+                    <p class="small mb-0">
+                        A file of everything LinkUp keeps about you, in a format other applications read (JSON).
+                    </p>
+                    <div>
+                        <a
+                            class="o-linkup-Profile-export btn btn-secondary btn-sm"
+                            data-linkup-guide="profile-export"
+                            t-att-href="exportUrl"
+                            download=""
+                        >
+                            <i class="fa fa-download me-1" aria-hidden="true" />
+                            Download my data
+                        </a>
+                    </div>
+                    <div
+                        t-if="profile.deletion_date"
+                        class="o-linkup-Profile-deletion alert alert-warning d-flex flex-column gap-2 mb-0"
+                        role="status"
+                    >
+                        <span class="o-linkup-Profile-deletionText" t-esc="deletionText" />
+                        <div>
+                            <button
+                                type="button"
+                                class="o-linkup-Profile-cancelDeletion btn btn-primary btn-sm"
+                                t-att-disabled="state.busy"
+                                t-on-click="cancelDeletion"
+                            >
+                                Cancel the deletion
+                            </button>
+                        </div>
+                    </div>
+                    <div t-else="">
+                        <button
+                            type="button"
+                            class="o-linkup-Profile-delete btn btn-outline-danger btn-sm"
+                            data-linkup-guide="profile-delete"
+                            t-att-disabled="state.busy"
+                            t-on-click="requestDeletion"
+                        >
+                            Delete my account
+                        </button>
+                    </div>
+                    <t t-call="mail_linkup_community.LinkupProfileFeedback">
+                        <t t-set="section" t-value="'data'" />
+                    </t>
+                </section>
+            </t>
+        </div>
+    </t>
+</templates>

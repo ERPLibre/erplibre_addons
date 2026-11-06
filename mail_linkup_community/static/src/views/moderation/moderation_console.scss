@@ -1,0 +1,14 @@
+// The console of the moderation: a readable column, the reported item
+// set apart from its context by a tint of the danger token.
+
+.o-linkup-Moderation {
+    max-width: 72rem;
+
+    .o-linkup-Moderation-days {
+        width: 5rem;
+    }
+
+    .o-linkup-Moderation-reported {
+        background-color: rgba($danger, 0.06);
+    }
+}

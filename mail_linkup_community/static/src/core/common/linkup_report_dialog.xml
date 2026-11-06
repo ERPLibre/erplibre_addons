@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupReportDialog">
+        <Dialog title="title" size="'md'" contentClass="'o-linkup-ReportDialog'">
+            <form
+                t-if="!state.sent"
+                class="o-linkup-ReportDialog-form d-flex flex-column gap-2"
+                t-on-submit.prevent="send"
+            >
+                <fieldset class="d-flex flex-column gap-1" data-linkup-guide="report-reason" t-ref="reasons">
+                    <legend class="h6 mb-1" t-esc="question" />
+                    <div
+                        t-foreach="reasons"
+                        t-as="reason"
+                        t-key="reason.code"
+                        class="o-linkup-ReportDialog-reason form-check mb-0"
+                    >
+                        <input
+                            type="radio"
+                            class="form-check-input"
+                            name="linkup_report_reason"
+                            t-att-id="'o-linkup-ReportDialog-reason-' + reason.code"
+                            t-att-value="reason.code"
+                            t-att-checked="state.reason === reason.code"
+                            t-on-change="() => this.choose(reason.code)"
+                        />
+                        <label class="form-check-label" t-att-for="'o-linkup-ReportDialog-reason-' + reason.code">
+                            <t t-esc="reason.label" />
+                            <span t-if="reason.urgent" class="badge text-bg-danger ms-2">Urgent</span>
+                        </label>
+                    </div>
+                </fieldset>
+                <LinkupHelpNow t-if="isDistress" />
+                <label class="small" for="o-linkup-ReportDialog-description">Comment (optional)</label>
+                <textarea
+                    id="o-linkup-ReportDialog-description"
+                    class="o-linkup-ReportDialog-description form-control form-control-sm"
+                    rows="3"
+                    maxlength="2000"
+                    t-model="state.description"
+                />
+                <p class="small text-muted mb-0" t-esc="anonymityText" />
+                <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-ReportDialog-error'" />
+            </form>
+            <div t-else="" class="o-linkup-ReportDialog-ack d-flex flex-column gap-2" role="status">
+                <p class="mb-0">
+                    <i class="fa fa-check me-1" aria-hidden="true" />
+                    Thank you, your report is passed on to the moderation.
+                </p>
+                <p class="small mb-0" t-esc="ackText" />
+                <p t-if="state.sent.urgent" class="o-linkup-ReportDialog-urgent small mb-0" t-esc="urgentText" />
+                <LinkupHelpNow t-if="isDistress" />
+            </div>
+            <t t-set-slot="footer">
+                <t t-if="!state.sent">
+                    <button
+                        type="button"
+                        class="o-linkup-ReportDialog-send btn btn-primary"
+                        data-linkup-guide="report-send"
+                        t-att-disabled="state.busy"
+                        t-on-click="send"
+                    >
+                        Send the report
+                    </button>
+                    <button type="button" class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+                </t>
+                <button
+                    t-else=""
+                    type="button"
+                    class="o-linkup-ReportDialog-close btn btn-primary"
+                    t-on-click="props.close"
+                >
+                    Close
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

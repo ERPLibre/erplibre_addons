@@ -1,0 +1,6 @@
+// The tint of the reported item in the dark theme, after the rules of
+// moderation_console.scss: stronger, so that it shows on a dark background.
+
+.o-linkup-Moderation .o-linkup-Moderation-reported {
+    background-color: rgba($danger, 0.16);
+}

@@ -1,0 +1,24 @@
+// The profile of the member: a readable column, a photo the size of the
+// avatar of the Reflet view twice over.
+
+.o-linkup-Profile {
+    max-width: 48rem;
+
+    .o-linkup-Profile-photo {
+        width: 4rem;
+        height: 4rem;
+        object-fit: cover;
+    }
+
+    .o-linkup-Profile-code {
+        color: $body-color;
+        background-color: $gray-200;
+        letter-spacing: 0.1em;
+        padding: 0.125rem 0.5rem;
+        border-radius: $border-radius;
+    }
+}
+
+.o-linkup-Newlink-shareUrl {
+    min-width: 12rem;
+}

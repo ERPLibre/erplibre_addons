@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mail_linkup_community</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="mail_linkup_reflet.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <block id="linkup" position="inside">
+                <setting
+                    id="linkup_signup_setting"
+                    string="Public signup"
+                    help="Who opens an account, and the limits against robots. New members are restricted to Discuss and LinkUp."
+                >
+                    <field name="auth_signup_uninvited" widget="radio" />
+                    <div class="mt-2">
+                        <field name="linkup_email_verification" />
+                        <label for="linkup_email_verification" class="o_light_label" />
+                    </div>
+                    <div class="row mt-2">
+                        <label for="linkup_signup_rate_per_ip_hour" class="col-lg-6 o_light_label" />
+                        <field name="linkup_signup_rate_per_ip_hour" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_verification_resend_minutes" class="col-lg-6 o_light_label" />
+                        <field name="linkup_verification_resend_minutes" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_disposable_email_domains" class="col-lg-6 o_light_label" />
+                        <field name="linkup_disposable_email_domains" />
+                    </div>
+                </setting>
+                <setting
+                    id="linkup_consent_setting"
+                    string="Consents"
+                    help="The texts members accept, and who must accept them before sending anything."
+                >
+                    <div class="row">
+                        <label for="linkup_terms_url" class="col-lg-6 o_light_label" />
+                        <field name="linkup_terms_url" placeholder="https://" />
+                    </div>
+                    <div class="mt-2">
+                        <field name="linkup_consent_all_members" />
+                        <label for="linkup_consent_all_members" class="o_light_label" />
+                    </div>
+                </setting>
+                <setting
+                    id="linkup_moderation_setting"
+                    string="Moderation and help"
+                    help="The delays of the moderation shown to the members, what a moderator reads, and the resources of the help in distress."
+                >
+                    <div class="row">
+                        <label for="linkup_report_urgent_hours" class="col-lg-6 o_light_label" />
+                        <field name="linkup_report_urgent_hours" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_report_due_hours" class="col-lg-6 o_light_label" />
+                        <field name="linkup_report_due_hours" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_moderation_context_messages" class="col-lg-6 o_light_label" />
+                        <field name="linkup_moderation_context_messages" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_suspension_days" class="col-lg-6 o_light_label" />
+                        <field name="linkup_suspension_days" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_appeal_days" class="col-lg-6 o_light_label" />
+                        <field name="linkup_appeal_days" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_moderation_hours" class="col-lg-6 o_light_label" />
+                        <field name="linkup_moderation_hours" />
+                    </div>
+                    <div class="mt-2">
+                        <label for="linkup_help_resources" class="o_light_label" />
+                        <field name="linkup_help_resources" />
+                    </div>
+                </setting>
+                <setting
+                    id="linkup_personal_data_setting"
+                    string="Personal data"
+                    help="How long LinkUp keeps what members write, before a daily task erases it. The values proposed by the specification wait for the privacy impact assessment."
+                >
+                    <div class="row">
+                        <label for="linkup_deletion_grace_days" class="col-lg-6 o_light_label" />
+                        <field name="linkup_deletion_grace_days" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_retention_unverified_days" class="col-lg-6 o_light_label" />
+                        <field name="linkup_retention_unverified_days" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_retention_draft_days" class="col-lg-6 o_light_label" />
+                        <field name="linkup_retention_draft_days" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_retention_closed_reflet_months" class="col-lg-6 o_light_label" />
+                        <field name="linkup_retention_closed_reflet_months" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_retention_inactive_pair_months" class="col-lg-6 o_light_label" />
+                        <field name="linkup_retention_inactive_pair_months" />
+                    </div>
+                    <div class="row">
+                        <label for="linkup_retention_closed_report_months" class="col-lg-6 o_light_label" />
+                        <field name="linkup_retention_closed_report_months" />
+                    </div>
+                </setting>
+            </block>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- Set at the installation only; the settings change them afterwards.
+         The public signup is open (LU-F-110 RM1) and copies the member
+         template of the reflections (RM2). The refused domains are those
+         of common disposable address services. -->
+    <data noupdate="1">
+        <function model="ir.config_parameter" name="set_param">
+            <value>auth_signup.invitation_scope</value>
+            <value>b2c</value>
+        </function>
+        <function model="ir.config_parameter" name="set_param">
+            <value>base.template_portal_user_id</value>
+            <value eval="str(ref('mail_linkup_reflet.user_linkup_member_template'))" />
+        </function>
+        <function model="ir.config_parameter" name="set_param">
+            <value>linkup.disposable_email_domains</value>
+            <value>mailinator.com, yopmail.com, guerrillamail.com, guerrillamail.net, sharklasers.com, 10minutemail.com, temp-mail.org, tempmail.com, trashmail.com, throwawaymail.com, getnada.com, dispostable.com, maildrop.cc, fakeinbox.com, mailnesia.com, mintemail.com, emailondeck.com, moakt.com, tempr.email, discard.email</value>
+        </function>
+    </data>
+
+    <!-- Daily purge of the events counted by the limits. -->
+    <record id="ir_cron_linkup_rate_purge" model="ir.cron">
+        <field name="name">LinkUp: purge the rate limit events</field>
+        <field name="model_id" ref="model_linkup_rate_event" />
+        <field name="state">code</field>
+        <field name="code">model._cron_linkup_purge()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True" />
+    </record>
+
+    <!-- Daily retention of the personal data (LU-NF-015, LU-F-117 RM2):
+         deletions past their delay of grace, unverified accounts, drafts,
+         closed reflections, inactive pairs, closed reports. Each run
+         catches up what the previous ones left, after a restoration too. -->
+    <record id="ir_cron_linkup_retention" model="ir.cron">
+        <field name="name">LinkUp: retention of the personal data</field>
+        <field name="model_id" ref="model_linkup_personal_data" />
+        <field name="state">code</field>
+        <field name="code">model._cron_linkup_retention()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True" />
+    </record>
+
+    <!-- The email that verifies the address of a new account (LU-F-110
+         RM3). res.users._linkup_send_verification gives the link in the
+         context: the token exists nowhere else in clear. -->
+    <record id="mail_template_linkup_verify_email" model="mail.template">
+        <field name="name">LinkUp: email verification</field>
+        <field name="model_id" ref="base.model_res_users" />
+        <field name="subject">Confirm your email address for LinkUp</field>
+        <field name="email_from">{{ object.company_id.email_formatted }}</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="lang">{{ object.lang }}</field>
+        <field name="auto_delete" eval="True" />
+        <field name="description">Sent to a new member to verify their email address.</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 14px;">
+                <p>Hello,</p>
+                <p>Confirm that this address is yours: until then, LinkUp sends none of your reflections and invitations.</p>
+                <p style="margin: 16px 0px;">
+                    <a t-att-href="ctx.get('linkup_verify_url')" style="background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;">Confirm my address</a>
+                </p>
+                <p style="font-size: 12px;">
+                    This link lasts
+                    <t t-out="ctx.get('linkup_verify_hours') or ''">24</t>
+                    hours and serves once. If you did not sign up on LinkUp, ignore this email.
+                </p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Sent to an account whose address a public signup tried
+         (res.users._linkup_send_signup_existing): the signup page answers
+         as for a free address, and this email tells the owner how to log
+         in. -->
+    <record id="mail_template_linkup_signup_existing" model="mail.template">
+        <field name="name">LinkUp: signup with an address already used</field>
+        <field name="model_id" ref="base.model_res_users" />
+        <field name="subject">Your LinkUp account already exists</field>
+        <field name="email_from">{{ object.company_id.email_formatted }}</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="lang">{{ object.lang }}</field>
+        <field name="auto_delete" eval="True" />
+        <field name="description">Sent to an account when a signup uses its address.</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 14px;">
+                <p>Hello,</p>
+                <p>Somebody, maybe you, tried to sign up on LinkUp with this address. An account already uses it: log in with this address, or choose a new password if you forgot it.</p>
+                <p style="margin: 16px 0px;">
+                    <a t-att-href="ctx.get('linkup_login_url')" style="background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;">Log in</a>
+                </p>
+                <p>
+                    <a t-att-href="ctx.get('linkup_reset_url')">Choose a new password</a>
+                </p>
+                <p style="font-size: 12px;">If it was not you, ignore this email: your account has not changed.</p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Sent to each moderator who may process an urgent report (LU-F-114
+         RM4): it names neither the content, the reason, nor who reported. -->
+    <record id="mail_template_linkup_urgent_report" model="mail.template">
+        <field name="name">LinkUp: urgent report for the moderators</field>
+        <field name="model_id" ref="base.model_res_users" />
+        <field name="subject">LinkUp: an urgent report waits in the moderation queue</field>
+        <field name="email_from">{{ object.company_id.email_formatted }}</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="lang">{{ object.lang }}</field>
+        <field name="auto_delete" eval="True" />
+        <field name="description">Sent to the moderators when a member reports a threat, a minor in danger or a person in distress.</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 14px;">
+                <p>Hello,</p>
+                <p>
+                    An urgent report waits in the moderation queue. The members are told it is handled within
+                    <t t-out="ctx.get('linkup_urgent_hours') or ''">24</t>
+                    hours.
+                </p>
+                <p style="margin: 16px 0px;">
+                    <a t-att-href="ctx.get('linkup_console_url')" style="background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;">Open the moderation</a>
+                </p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Sent to a member the moderation bans (LU-F-116 RM3): the decision
+         and the recourse, never who reported nor what. -->
+    <record id="mail_template_linkup_banned" model="mail.template">
+        <field name="name">LinkUp: account closed by the moderation</field>
+        <field name="model_id" ref="base.model_res_users" />
+        <field name="subject">Your LinkUp account is closed</field>
+        <field name="email_from">{{ object.company_id.email_formatted }}</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="lang">{{ object.lang }}</field>
+        <field name="auto_delete" eval="True" />
+        <field name="description">Sent to a member banned by the moderation.</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 14px;">
+                <p>Hello,</p>
+                <p>After a report, the moderation of LinkUp closed your account for a breach of the terms of use. This address can no longer open an account.</p>
+                <p>
+                    To contest this decision, answer this email or write to
+                    <t t-out="object.company_id.email or ''">the address of the community</t>
+                    within
+                    <t t-out="ctx.get('linkup_appeal_days') or ''">14</t>
+                    days.
+                </p>
+            </div>
+        </field>
+    </record>
+</odoo>

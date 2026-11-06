@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupHelp" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-linkup-Help')]/header" position="after">
+            <section
+                class="o-linkup-Help-helpNow d-flex flex-column gap-2"
+                aria-labelledby="o-linkup-Help-helpNowTitle"
+            >
+                <h2 id="o-linkup-Help-helpNowTitle" class="h5 mb-0" tabindex="-1">Need help now</h2>
+                <LinkupHelpNow fromHelp="true" />
+            </section>
+        </xpath>
+    </t>
+</templates>

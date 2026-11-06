@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupSafetyActions" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-linkup-Safety-report')]" position="after">
+            <button
+                t-if="!props.refletId"
+                type="button"
+                class="o-linkup-Safety-reportMember btn btn-link btn-sm p-0 text-muted"
+                t-att-disabled="state.busy"
+                t-on-click="openMemberReport"
+            >
+                <i class="fa fa-flag me-1" aria-hidden="true" />
+                <t t-esc="reportMemberLabel" />
+            </button>
+        </xpath>
+        <xpath expr="//select[hasclass('o-linkup-Safety-reason')]" position="after">
+            <p t-if="isUrgentReason" class="o-linkup-Safety-urgent small mb-0">
+                <span class="badge text-bg-danger me-1">Urgent</span>
+                <t t-esc="urgentText" />
+            </p>
+            <LinkupHelpNow t-if="state.reason === 'distress'" />
+        </xpath>
+        <xpath expr="//p[hasclass('o-linkup-Safety-ack')]" position="after">
+            <LinkupHelpNow t-if="state.reported and state.sentReason === 'distress'" />
+        </xpath>
+    </t>
+</templates>

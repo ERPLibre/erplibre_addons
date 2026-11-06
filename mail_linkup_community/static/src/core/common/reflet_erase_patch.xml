@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupRefletCard" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-linkup-RefletCard-header')]" position="after">
+            <p
+                t-if="reflet.content_removed and !reflet.moderation_hidden"
+                class="o-linkup-RefletCard-contentRemoved fst-italic text-muted small mb-0 px-3 py-2"
+            >
+                <i class="fa fa-eraser me-1" aria-hidden="true" />
+                Content removed
+            </p>
+        </xpath>
+        <xpath expr="//div[hasclass('o-linkup-RefletCard-safety')]" position="before">
+            <div t-if="canEraseContent" class="o-linkup-RefletCard-erase px-3 pb-2">
+                <button
+                    type="button"
+                    class="o-linkup-RefletCard-eraseButton btn btn-link btn-sm p-0"
+                    data-linkup-guide="reflet-erase"
+                    t-on-click="eraseContent"
+                >
+                    <i class="fa fa-eraser me-1" aria-hidden="true" />
+                    Erase its content
+                </button>
+            </div>
+        </xpath>
+    </t>
+</templates>

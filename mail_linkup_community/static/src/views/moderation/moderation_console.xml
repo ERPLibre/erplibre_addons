@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupModerationConsole">
+        <div class="o-linkup-Moderation o_action h-100 overflow-auto p-3 d-flex flex-column gap-3">
+            <header class="d-flex align-items-center gap-2">
+                <div class="flex-grow-1">
+                    <h1 class="h4 mb-1">Moderation</h1>
+                    <p class="small mb-0">
+                        Your queue never holds a report you made, a report about you, or a report about a member you
+                        share a link with.
+                    </p>
+                </div>
+                <LinkupGuideButton />
+            </header>
+            <p t-if="state.loadError" class="o-linkup-Moderation-loadError" role="alert">
+                The moderation could not be loaded, try again.
+            </p>
+            <p t-elif="!state.loaded" role="status">Loading…</p>
+            <t t-elif="!state.detail">
+                <section
+                    class="o-linkup-Moderation-summary d-flex flex-wrap align-items-center gap-3 border rounded-3 px-3 py-2"
+                    data-linkup-guide="moderation-summary"
+                    aria-labelledby="o-linkup-Moderation-summaryTitle"
+                >
+                    <h2 id="o-linkup-Moderation-summaryTitle" class="visually-hidden">Counters</h2>
+                    <span class="o-linkup-Moderation-counters fw-bold" role="status" t-esc="summaryText" />
+                    <span class="small text-muted" t-esc="urgentDelayText" />
+                </section>
+                <div
+                    class="btn-group align-self-start"
+                    role="group"
+                    aria-label="Reports shown"
+                    data-linkup-guide="moderation-scope"
+                >
+                    <button
+                        type="button"
+                        class="o-linkup-Moderation-scopeOpen btn btn-sm"
+                        t-att-class="state.scope === 'open' ? 'btn-primary' : 'btn-secondary'"
+                        t-att-aria-pressed="state.scope === 'open' ? 'true' : 'false'"
+                        t-on-click="() => this.setScope('open')"
+                    >
+                        To process
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-Moderation-scopeClosed btn btn-sm"
+                        t-att-class="state.scope === 'closed' ? 'btn-primary' : 'btn-secondary'"
+                        t-att-aria-pressed="state.scope === 'closed' ? 'true' : 'false'"
+                        t-on-click="() => this.setScope('closed')"
+                    >
+                        Closed
+                    </button>
+                </div>
+                <p t-if="!state.rows.length" class="o-linkup-Moderation-empty mb-0" role="status">
+                    No report waits in your queue.
+                </p>
+                <div t-else="" class="table-responsive" data-linkup-guide="moderation-queue">
+                    <table class="o-linkup-Moderation-queue table table-sm table-hover align-middle mb-0">
+                        <caption class="visually-hidden">Reports, urgent first, then by date</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Urgent</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Reason</th>
+                                <th scope="col">Reported member</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">State</th>
+                                <th scope="col">Due</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                t-foreach="state.rows"
+                                t-as="row"
+                                t-key="row.id"
+                                class="o-linkup-Moderation-row"
+                                t-att-data-report-id="row.id"
+                                t-att-data-urgent="row.urgent ? 'true' : 'false'"
+                            >
+                                <td>
+                                    <span t-if="row.urgent" class="badge text-bg-danger">Urgent</span>
+                                    <span t-else="" class="text-muted" aria-label="Not urgent">—</span>
+                                </td>
+                                <td class="text-nowrap" t-esc="formatDate(row.date)" />
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="o-linkup-Moderation-open btn btn-link p-0 text-start"
+                                        t-att-aria-label="openLabel(row)"
+                                        t-on-click="() => this.open(row.id)"
+                                        t-esc="reasonLabel(row.reason)"
+                                    />
+                                </td>
+                                <td t-esc="row.member" />
+                                <td t-esc="sourceLabel(row.source)" />
+                                <td t-esc="stateLabel(row.state)" />
+                                <td class="text-nowrap" t-att-class="{'text-danger fw-bold': row.overdue}">
+                                    <t t-esc="formatDate(row.due_date)" />
+                                    <span t-if="row.overdue" class="ms-1">(late)</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-Moderation-error'" />
+            </t>
+            <t t-else="">
+                <t t-set="detail" t-value="state.detail" />
+                <div>
+                    <button type="button" class="o-linkup-Moderation-back btn btn-link p-0" t-on-click="back">
+                        <i class="fa fa-arrow-left me-1" aria-hidden="true" />
+                        Reports
+                    </button>
+                </div>
+                <section
+                    class="o-linkup-Moderation-detail d-flex flex-column gap-3"
+                    t-att-data-report-id="detail.id"
+                    aria-labelledby="o-linkup-Moderation-detailTitle"
+                >
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h2 id="o-linkup-Moderation-detailTitle" class="h5 mb-0" t-esc="reasonLabel(detail.reason)" />
+                        <span t-if="detail.urgent" class="badge text-bg-danger">Urgent</span>
+                    </div>
+                    <ol
+                        class="o-linkup-Moderation-steps list-inline mb-0"
+                        aria-label="State of the report"
+                        data-linkup-guide="moderation-steps"
+                    >
+                        <li
+                            t-foreach="steps"
+                            t-as="step"
+                            t-key="step.code"
+                            class="list-inline-item badge rounded-pill"
+                            t-att-class="step.current ? 'text-bg-primary' : 'bg-body-secondary text-body border'"
+                            t-att-aria-current="step.current ? 'step' : undefined"
+                            t-esc="step.label"
+                        />
+                    </ol>
+                    <div
+                        class="o-linkup-Moderation-actions d-flex flex-column gap-2 border rounded-3 p-2"
+                        data-linkup-guide="moderation-decisions"
+                    >
+                        <div class="d-flex flex-wrap gap-2">
+                            <button
+                                t-if="canTake"
+                                type="button"
+                                class="o-linkup-Moderation-take btn btn-primary btn-sm"
+                                data-linkup-guide="moderation-take"
+                                t-att-disabled="state.busy"
+                                t-on-click="take"
+                            >
+                                Take the report
+                            </button>
+                            <t t-if="canDecide">
+                                <button
+                                    t-foreach="decisions"
+                                    t-as="decision"
+                                    t-key="decision.code"
+                                    type="button"
+                                    class="btn btn-sm"
+                                    t-att-class="(decision.danger ? 'btn-outline-danger' : 'btn-secondary') + ' o-linkup-Moderation-decide-' + decision.code"
+                                    t-att-disabled="state.busy"
+                                    t-on-click="() => this.decide(decision.code)"
+                                    t-esc="decision.label"
+                                />
+                                <label class="d-inline-flex align-items-center gap-1 small mb-0">
+                                    <span>Days of suspension</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="365"
+                                        class="o-linkup-Moderation-days form-control form-control-sm"
+                                        t-model="state.days"
+                                    />
+                                </label>
+                            </t>
+                            <t t-if="isAppealed">
+                                <button
+                                    type="button"
+                                    class="o-linkup-Moderation-uphold btn btn-secondary btn-sm"
+                                    t-att-disabled="state.busy"
+                                    t-on-click="() => this.resolveAppeal(true)"
+                                >
+                                    Uphold the decision
+                                </button>
+                                <button
+                                    type="button"
+                                    class="o-linkup-Moderation-reverse btn btn-outline-danger btn-sm"
+                                    t-att-disabled="state.busy"
+                                    t-on-click="() => this.resolveAppeal(false)"
+                                >
+                                    Reverse the decision
+                                </button>
+                            </t>
+                        </div>
+                        <t t-if="canDecide or isAppealed">
+                            <label for="o-linkup-Moderation-reason" class="small mb-0">
+                                Reason of the decision (written to the audit log)
+                            </label>
+                            <textarea
+                                id="o-linkup-Moderation-reason"
+                                class="o-linkup-Moderation-reason form-control form-control-sm"
+                                rows="2"
+                                maxlength="2000"
+                                t-ref="reason"
+                                t-model="state.reason"
+                            />
+                        </t>
+                        <p t-if="!canTake and !canDecide and !isAppealed" class="small mb-0" t-esc="decisionNote" />
+                        <p t-elif="canTake" class="small text-muted mb-0">
+                            Take the report to decide; the audit log tells who took it.
+                        </p>
+                        <LinkupErrorAlert
+                            t-if="state.error"
+                            error="state.error"
+                            className="'o-linkup-Moderation-error'"
+                        />
+                    </div>
+                    <dl class="o-linkup-Moderation-facts row small mb-0">
+                        <dt class="col-sm-3">Reported member</dt>
+                        <dd class="o-linkup-Moderation-member col-sm-9" t-esc="detail.member or '—'" />
+                        <dt class="col-sm-3">Reported by</dt>
+                        <dd class="o-linkup-Moderation-reporter col-sm-9">
+                            <t t-if="detail.reporter" t-esc="detail.reporter" />
+                            <t t-else="">LinkUp (automatic signal)</t>
+                        </dd>
+                        <dt class="col-sm-3">Source</dt>
+                        <dd class="col-sm-9" t-esc="sourceLabel(detail.source)" />
+                        <dt class="col-sm-3">Received</dt>
+                        <dd class="col-sm-9" t-esc="formatDate(detail.date)" />
+                        <dt class="col-sm-3">Moderator</dt>
+                        <dd class="o-linkup-Moderation-moderator col-sm-9">
+                            <t t-if="detail.moderator" t-esc="detail.moderator" />
+                            <t t-else="">Not assigned</t>
+                        </dd>
+                        <dt class="col-sm-3">Due</dt>
+                        <dd
+                            class="col-sm-9"
+                            t-att-class="{'text-danger fw-bold': detail.overdue}"
+                            t-esc="formatDate(detail.due_date)"
+                        />
+                        <dt class="col-sm-3">Decision</dt>
+                        <dd class="o-linkup-Moderation-decision col-sm-9" t-esc="actionLabel(detail.action_taken)" />
+                        <dt class="col-sm-3">Comment of the reporter</dt>
+                        <dd class="o-linkup-Moderation-comment col-sm-9" t-esc="detail.description or '—'" />
+                        <t t-if="detail.appeal_text">
+                            <dt class="col-sm-3">Appeal of the member</dt>
+                            <dd class="o-linkup-Moderation-appeal col-sm-9" t-esc="detail.appeal_text" />
+                        </t>
+                    </dl>
+                    <section
+                        class="o-linkup-Moderation-content d-flex flex-column gap-2 border rounded-3 p-2"
+                        data-linkup-guide="moderation-content"
+                        aria-labelledby="o-linkup-Moderation-contentTitle"
+                    >
+                        <h3 id="o-linkup-Moderation-contentTitle" class="h6 mb-0">
+                            Reported content and immediate context
+                        </h3>
+                        <t t-if="!state.content">
+                            <p class="small mb-0">
+                                The content stays hidden until you show it. Each reading is written to the audit
+                                log, visible to the other moderators.
+                            </p>
+                            <button
+                                type="button"
+                                class="o-linkup-Moderation-showContent btn btn-secondary btn-sm align-self-start"
+                                t-att-disabled="state.busy"
+                                t-on-click="showContent"
+                            >
+                                Show the content (logged access)
+                            </button>
+                        </t>
+                        <t t-else="">
+                            <p t-if="contentNote" class="small mb-0" t-esc="contentNote" />
+                            <ol class="o-linkup-Moderation-items list-unstyled d-flex flex-column gap-2 mb-0">
+                                <li
+                                    t-foreach="state.content.items"
+                                    t-as="item"
+                                    t-key="item.kind + item.id"
+                                    class="o-linkup-Moderation-item border rounded-2 p-2"
+                                    t-att-class="{'o-linkup-Moderation-reported border-danger': item.reported}"
+                                    t-att-data-kind="item.kind"
+                                >
+                                    <div class="small text-muted">
+                                        <span t-if="item.reported" class="badge text-bg-danger me-1">Reported</span>
+                                        <span t-if="item.hidden" class="badge text-bg-secondary me-1">Hidden</span>
+                                        <t t-esc="item.author" />
+                                        <t t-if="item.recipient">
+                                            →
+                                            <t t-esc="item.recipient" />
+                                        </t>
+                                        <t t-if="item.date">
+                                            ·
+                                            <t t-esc="formatDate(item.date)" />
+                                        </t>
+                                    </div>
+                                    <t t-if="item.kind === 'reflet'">
+                                        <div class="fw-bold" t-esc="item.category" />
+                                        <div t-if="item.you_said">
+                                            <span class="fw-bold me-1">You told me:</span>
+                                            <span class="o-linkup-Moderation-youSaid" t-esc="item.you_said" />
+                                        </div>
+                                        <div t-if="item.understood">
+                                            <span class="fw-bold me-1">I understood that:</span>
+                                            <span class="o-linkup-Moderation-understood" t-esc="item.understood" />
+                                        </div>
+                                        <div t-if="item.body_text" t-esc="item.body_text" />
+                                    </t>
+                                    <t t-elif="item.kind === 'rejection'">
+                                        <div t-esc="item.category" />
+                                    </t>
+                                    <t t-else="">
+                                        <div
+                                            t-if="item.reflet_category"
+                                            class="fst-italic"
+                                            t-esc="item.reflet_category"
+                                        />
+                                        <div class="o-linkup-Moderation-text text-break" t-esc="item.text" />
+                                    </t>
+                                </li>
+                            </ol>
+                        </t>
+                    </section>
+                    <p class="o-linkup-Moderation-history small mb-0">
+                        <span class="fw-bold">History of the member:</span>
+                        <t t-esc="historyText" />
+                    </p>
+                    <section
+                        class="o-linkup-Moderation-audit d-flex flex-column gap-2"
+                        data-linkup-guide="moderation-audit"
+                        aria-labelledby="o-linkup-Moderation-auditTitle"
+                    >
+                        <h3 id="o-linkup-Moderation-auditTitle" class="h6 mb-0">Audit log (read only)</h3>
+                        <p t-if="!detail.audit.length" class="small mb-0">No entry for this report.</p>
+                        <div t-else="" class="table-responsive">
+                            <table class="o-linkup-Moderation-auditTable table table-sm small mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">When</th>
+                                        <th scope="col">Who</th>
+                                        <th scope="col">What</th>
+                                        <th scope="col">Why</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        t-foreach="detail.audit"
+                                        t-as="row"
+                                        t-key="row.id"
+                                        class="o-linkup-Moderation-auditRow"
+                                        t-att-data-action="row.action"
+                                    >
+                                        <td class="text-nowrap" t-esc="formatDate(row.date)" />
+                                        <td t-esc="row.actor" />
+                                        <td t-esc="auditLabel(row.action)" />
+                                        <td class="text-break" t-esc="row.reason" />
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </section>
+            </t>
+        </div>
+    </t>
+</templates>
