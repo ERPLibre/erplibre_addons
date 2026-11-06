@@ -41,6 +41,9 @@ Ledger and karma
   side through the server.
 * The uninstallation takes the points of the ledger out of the karma of
   their members, and keeps the karma earned elsewhere.
+* Two indexes serve the readings by member (LU-NF-029): ``(user_id,
+  date)`` for "My points", the caps and the rankings by period, and
+  ``(user_id, partner_user_id)`` for the counterparts of "My points".
 
 Caps and decay
 ==============

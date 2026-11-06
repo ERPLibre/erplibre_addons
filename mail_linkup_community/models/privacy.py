@@ -73,14 +73,20 @@ def blank(field):
     return [] if field.type in ("one2many", "many2many") else False
 
 
-def mask_rows(records, rows, fnames, contact_fields, own_id, linked_ids):
+def mask_rows(records, rows, fnames, contact_fields, own_id, linked):
     """Blank, in ``rows`` read from ``records``, the contact fields of every
     row but ``own_id``, and the photo of every row neither ``own_id`` nor in
-    ``linked_ids``."""
+    the ids that ``linked()`` returns.
+
+    ``linked`` is called only when a photo is read: the readings of the
+    Discuss Store, which ask for no photo, then run no query of the links
+    of the reader, whose number grows with their contacts.
+    """
     contact = contact_fields.intersection(fnames)
     images = IMAGE_FIELDS.intersection(fnames)
     if not contact and not images:
         return rows
+    linked_ids = linked() if images else set()
     for vals in rows:
         row_id = vals.get("id")
         if row_id == own_id:

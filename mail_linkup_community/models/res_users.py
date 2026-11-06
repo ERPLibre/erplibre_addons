@@ -1143,7 +1143,7 @@ class ResUsers(models.Model):
                 fnames,
                 privacy.USER_CONTACT_FIELDS,
                 self.env.uid,
-                privacy.linked_user_ids(self.env),
+                lambda: privacy.linked_user_ids(self.env),
             )
         return result
 

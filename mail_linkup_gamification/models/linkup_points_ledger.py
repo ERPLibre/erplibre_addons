@@ -12,6 +12,7 @@ from odoo.addons.mail_linkup_reflet.models.res_users import (
 )
 from odoo.exceptions import AccessError
 from odoo.tools import SQL
+from odoo.tools.sql import create_index
 
 from .linkup_points_rule import CAP_REASONS, INELIGIBLE_REASONS
 
@@ -145,6 +146,24 @@ class LinkupPointsLedger(models.Model):
             "A rule pays a member once per event.",
         ),
     ]
+
+    def init(self):
+        """The indexes of the readings by member (LU-NF-029): their lines by
+        date, which "My points", the caps and the rankings by period read,
+        and by counterpart, which the filter of "My points" groups."""
+        super().init()
+        create_index(
+            self.env.cr,
+            "linkup_points_ledger_user_date_idx",
+            self._table,
+            ["user_id", "date"],
+        )
+        create_index(
+            self.env.cr,
+            "linkup_points_ledger_user_partner_idx",
+            self._table,
+            ["user_id", "partner_user_id"],
+        )
 
     def write(self, vals):
         raise AccessError(_("The points ledger cannot be modified."))

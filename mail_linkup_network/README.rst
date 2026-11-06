@@ -20,6 +20,11 @@ Contacts
 * A suspended contact keeps their node, row and card: the view does not
   tell a sanction. A phantom reflection or highlight leaves no trace in
   the card or the graph of either member, even once the block is lifted.
+* The graph, the rankings and the card run a number of queries that does
+  not grow with the contacts of the member
+  (``tests/test_network_performance.py``); the unique pair of
+  ``linkup.link`` indexes ``(user_a_id, user_b_id)``. The response times
+  are measured on the load-test database of ``mail_linkup_reflet``.
 
 Graph
 =====

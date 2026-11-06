@@ -19,18 +19,22 @@ class ResPartner(models.Model):
         of those not linked, in what a restricted member reads."""
         result = super()._read_format(fnames, load)
         if privacy.contact_closed(self.env):
-            linked = (
-                self.env["res.users"]
-                .sudo()
-                .browse(privacy.linked_user_ids(self.env))
-            )
+
+            def linked():
+                users = (
+                    self.env["res.users"]
+                    .sudo()
+                    .browse(privacy.linked_user_ids(self.env))
+                )
+                return set(users.partner_id.ids)
+
             privacy.mask_rows(
                 self,
                 result,
                 fnames,
                 privacy.CONTACT_FIELDS,
                 self.env.user.partner_id.id,
-                set(linked.partner_id.ids),
+                linked,
             )
         return result
 

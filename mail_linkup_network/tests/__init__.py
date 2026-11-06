@@ -6,6 +6,7 @@ from . import (
     test_network_card,
     test_network_demo,
     test_network_graph,
+    test_network_performance,
     test_network_privacy,
     test_network_ranking,
     test_network_routes,

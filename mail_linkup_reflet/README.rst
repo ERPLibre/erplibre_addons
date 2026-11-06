@@ -626,6 +626,51 @@ Settings menu
   is what choosing it opens; the keyboard and the roles are those of the
   other entries.
 
+Load test
+=========
+
+``tools/linkup_bench.py`` creates the load-test database of LU-NF-028 and
+LU-NF-029, and ``tools/linkup_bench_measure.py`` measures it. From the
+root of the ERPLibre checkout, with the Python of the Odoo environment::
+
+    PYTHONPATH=odoo18.0/odoo .venv.odoo18.0_python3.12.10/bin/python \
+        odoo18.0/addons/ERPLibre_erplibre_addons/mail_linkup_reflet/tools/linkup_bench.py \
+        -d linkup_bench [--replace] -- -c config.conf
+
+    PYTHONPATH=odoo18.0/odoo .venv.odoo18.0_python3.12.10/bin/python \
+        odoo18.0/addons/ERPLibre_erplibre_addons/mail_linkup_reflet/tools/linkup_bench_measure.py \
+        -d linkup_bench [--runs 50] [--url http://localhost:18969] \
+        -- -c config.conf
+
+* The database holds the six LinkUp modules and a community drawn from a
+  fixed seed (``--seed``): 1 000 members (``--members``) named after the
+  deck under ``example.com``, a reference member ``linkup_bench_0000``
+  with 200 active links (``--links``), the links of the others, group
+  conversations, the direct conversations of the reference member with
+  their carrier messages, a year of reflections, the points ledger they
+  pay and the karma, ranks and energies that follow from it, and
+  highlights. No account has a password; the email queue cron is
+  archived.
+* The measure calls, as the reference member, the Reflet view, the graph
+  at each density, the rankings, a link card, "My points", and the
+  sending of a reflection to the reference member, ``--runs`` times each
+  (at least 30) after a first call, and prints p50, p95 and the maximum in
+  milliseconds. Its exit status is 1 when a target is missed: 500 ms at
+  p95 and at most 50 nodes for the graph (LU-NF-029), 2 s at p95 for the
+  sending (LU-NF-028). Each reflection sent is withdrawn afterwards.
+* By default the measure runs in the process, with an empty ORM cache at
+  each call, and gives the queries of each call; the sending covers
+  ``action_send`` and the commit that writes its bus notifications. With
+  ``--url``, it goes through a server of the database started beforehand,
+  as the web client does, and measures the sending until the websocket
+  of the recipient receives the card; the accounts it logs in with get a
+  random password, kept in memory and never shown. ``web.base.url``
+  holds the port of ``--http-port``, which the origin of the websocket
+  must match.
+* ``mail_linkup_network/tests/test_network_performance.py`` keeps the
+  number of queries of each screen from growing with the contacts of the
+  member, and under a ceiling.
+
 Status
 ======
 

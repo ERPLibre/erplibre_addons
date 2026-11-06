@@ -50,10 +50,17 @@ class ResUsers(models.Model):
         than ``has_group``: that one reports ``base.group_no_one`` only in
         debug mode, and its cache is stale inside a constraint that runs
         during the write of the groups.
+
+        The id of the group comes from the cache of the external ids, and
+        not from ``env.ref``, which checks with a query that the record
+        exists: a filter of the members of a conversation would run one
+        such query per member.
         """
         self.ensure_one()
-        group = self.env.ref(xmlid, raise_if_not_found=False)
-        return bool(group) and group in self.groups_id
+        group_id = self.env["ir.model.data"]._xmlid_to_res_id(
+            xmlid, raise_if_not_found=False
+        )
+        return bool(group_id) and group_id in self.groups_id.ids
 
     def _linkup_is_restricted_member(self):
         """A LinkUp member who is not a system administrator."""
