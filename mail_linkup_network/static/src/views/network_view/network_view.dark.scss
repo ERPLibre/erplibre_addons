@@ -12,12 +12,18 @@
         }
     }
 
+    // The lines carry the graph: lighter than $primary, which keeps 3:1
+    // only just on a dark background; the selected line lighter still.
     .o-linkup-NetworkView-edge {
-        stroke: mix($gray-100, $primary, 40%);
+        stroke: lighten($primary, 10%);
+
+        &.o-isSelected {
+            stroke: lighten($primary, 25%);
+        }
     }
 
     .o-linkup-NetworkView-legendLine {
-        background-color: mix($gray-100, $primary, 40%);
+        background-color: lighten($primary, 10%);
     }
 
     .o-linkup-NetworkView-greyEdge {

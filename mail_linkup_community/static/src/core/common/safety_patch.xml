@@ -5,7 +5,7 @@
             <button
                 t-if="!props.refletId"
                 type="button"
-                class="o-linkup-Safety-reportMember btn btn-link btn-sm p-0 text-muted"
+                class="o-linkup-Safety-reportMember btn btn-link btn-sm p-0"
                 t-att-disabled="state.busy"
                 t-on-click="openMemberReport"
             >

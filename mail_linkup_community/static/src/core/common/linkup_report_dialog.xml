@@ -39,7 +39,7 @@
                     maxlength="2000"
                     t-model="state.description"
                 />
-                <p class="small text-muted mb-0" t-esc="anonymityText" />
+                <p class="small mb-0" t-esc="anonymityText" />
                 <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-ReportDialog-error'" />
             </form>
             <div t-else="" class="o-linkup-ReportDialog-ack d-flex flex-column gap-2" role="status">

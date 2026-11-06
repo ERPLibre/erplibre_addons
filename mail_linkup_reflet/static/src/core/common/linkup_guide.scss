@@ -1,6 +1,11 @@
 // Guide mode, first-use tour and highlights: variables of web and Bootstrap
 // only, so the dark bundle compiles them with the dark values of the theme.
 
+// The text on a filled $primary: the colour of the primary button of
+// web, which each theme sets. color-contrast() picks black on the
+// primary of the dark theme, under the 4.5:1 of AA.
+$o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") !default;
+
 .o-linkup-GuideButton {
     width: 2rem;
     height: 2rem;
@@ -11,7 +16,7 @@
 
     &[aria-pressed="true"] {
         background-color: $primary;
-        color: color-contrast($primary);
+        color: $o-linkup-on-primary;
     }
 }
 
@@ -37,7 +42,7 @@ body.o-linkup-guideActive {
             padding: 0 0.25rem;
             border-radius: 0.625rem;
             background-color: $primary;
-            color: color-contrast($primary);
+            color: $o-linkup-on-primary;
             font-size: $font-size-sm * 0.85;
             font-weight: $font-weight-bold;
             line-height: 1.25rem;

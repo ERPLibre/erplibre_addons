@@ -1,5 +1,12 @@
 // The screen "My points": the summary keeps a readable width beside the
 // history on a large screen and takes the full width on a small one.
+// A gain and a loss differ by their sign besides their colour (LU-NF-021);
+// the text tokens of web for success and danger fall under the 4.5:1 of
+// AA on the grey background of the view, hence one step darker here and
+// one step lighter in my_points.dark.scss.
+
+$o-linkup-points-gain: darken(map-get($o-theme-text-colors, "success"), 3%) !default;
+$o-linkup-points-loss: darken(map-get($o-theme-text-colors, "danger"), 5%) !default;
 
 .o-linkup-MyPoints {
     .o-linkup-MyPoints-summary {
@@ -10,6 +17,14 @@
 
     .o-linkup-MyPoints-progress {
         height: 0.5rem;
+    }
+
+    .o-linkup-MyPoints-gain {
+        color: $o-linkup-points-gain;
+    }
+
+    .o-linkup-MyPoints-loss {
+        color: $o-linkup-points-loss;
     }
 
     .o-linkup-MyPoints-scale summary {

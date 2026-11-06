@@ -1,6 +1,11 @@
 // The tint of the reported item in the dark theme, after the rules of
-// moderation_console.scss: stronger, so that it shows on a dark background.
+// moderation_console.scss: stronger, so that it shows on a dark background;
+// the late date one step lighter than the danger token.
 
 .o-linkup-Moderation .o-linkup-Moderation-reported {
     background-color: rgba($danger, 0.16);
+}
+
+.o-linkup-Moderation .o-linkup-Moderation-overdue {
+    color: lighten(map-get($o-theme-text-colors, "danger"), 10%);
 }

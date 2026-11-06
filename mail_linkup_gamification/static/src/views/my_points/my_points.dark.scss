@@ -1,0 +1,12 @@
+// The colours of a gain and a loss in the dark theme, after the rules of
+// my_points.scss: one step lighter, for 4.5:1 on a dark background.
+
+.o-linkup-MyPoints {
+    .o-linkup-MyPoints-gain {
+        color: lighten(map-get($o-theme-text-colors, "success"), 10%);
+    }
+
+    .o-linkup-MyPoints-loss {
+        color: lighten(map-get($o-theme-text-colors, "danger"), 10%);
+    }
+}

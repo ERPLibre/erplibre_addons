@@ -1,5 +1,7 @@
 // The console of the moderation: a readable column, the reported item
-// set apart from its context by a tint of the danger token.
+// set apart from its context by a tint of the danger token. A late report
+// says "(late)" besides its colour, one step darker than the danger token
+// for the 4.5:1 of AA (lighter in moderation_console.dark.scss).
 
 .o-linkup-Moderation {
     max-width: 72rem;
@@ -10,5 +12,9 @@
 
     .o-linkup-Moderation-reported {
         background-color: rgba($danger, 0.06);
+    }
+
+    .o-linkup-Moderation-overdue {
+        color: darken(map-get($o-theme-text-colors, "danger"), 5%);
     }
 }

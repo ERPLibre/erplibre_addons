@@ -1,6 +1,11 @@
 // Reflet view: variables of web and Bootstrap only, so the dark bundle
 // compiles it with the dark values of the theme.
 
+// The text on a filled $primary: the colour of the primary button of
+// web, which each theme sets. color-contrast() picks black on the
+// primary of the dark theme, under the 4.5:1 of AA.
+$o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") !default;
+
 .o-linkup-RefletView {
     background-color: $o-view-background-color;
 
@@ -39,7 +44,7 @@
 
             &.o-isActive {
                 background-color: $primary;
-                color: color-contrast($primary);
+                color: $o-linkup-on-primary;
             }
         }
     }
@@ -127,7 +132,7 @@
     // The button of the email, drawn as text: the preview links nowhere.
     .o-linkup-Newlink-mailButton {
         background-color: $primary;
-        color: color-contrast($primary);
+        color: $o-linkup-on-primary;
     }
 
     @media (prefers-reduced-motion: reduce) {

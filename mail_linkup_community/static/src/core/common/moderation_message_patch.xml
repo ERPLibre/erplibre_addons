@@ -4,7 +4,7 @@
         <xpath expr="//*[hasclass('o-mail-Message-textContent')]" position="before">
             <p
                 t-if="message.linkup_hidden and !message.linkup_reflet_id"
-                class="o-linkup-MessageHidden fst-italic text-muted small mb-0 px-2 py-1"
+                class="o-linkup-MessageHidden fst-italic small mb-0 px-2 py-1"
             >
                 <i class="fa fa-eye-slash me-1" aria-hidden="true" />
                 Message hidden by the moderation
@@ -16,7 +16,7 @@
         <xpath expr="//div[hasclass('o-linkup-RefletCard-header')]" position="after">
             <p
                 t-if="reflet.moderation_hidden"
-                class="o-linkup-RefletCard-moderationHidden fst-italic text-muted small mb-0 px-3 py-2"
+                class="o-linkup-RefletCard-moderationHidden fst-italic small mb-0 px-3 py-2"
             >
                 <i class="fa fa-eye-slash me-1" aria-hidden="true" />
                 Content hidden by the moderation

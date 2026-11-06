@@ -9,12 +9,12 @@
                 class="o-linkup-Panel-content d-flex flex-column gap-3 px-1"
                 t-att-data-reflet-states="refletSignature"
             >
-                <p t-if="state.loadError" class="small text-muted mb-0">LinkUp could not be loaded, try again.</p>
-                <p t-elif="!state.info" class="small text-muted mb-0">
+                <p t-if="state.loadError" class="small mb-0">LinkUp could not be loaded, try again.</p>
+                <p t-elif="!state.info" class="small mb-0">
                     <i class="fa fa-circle-o-notch fa-spin me-1" aria-hidden="true" />
                     Loading…
                 </p>
-                <p t-elif="!state.info.available" class="small text-muted mb-0">
+                <p t-elif="!state.info.available" class="small mb-0">
                     LinkUp is not available in this conversation.
                 </p>
                 <t t-else="">
@@ -153,13 +153,13 @@
                                 </select>
                             </label>
                         </div>
-                        <p t-if="state.historyError" class="small text-muted mb-0">
+                        <p t-if="state.historyError" class="small mb-0">
                             LinkUp could not be loaded, try again.
                         </p>
-                        <p t-elif="!reflets.length and isHistoryFiltered" class="o-linkup-Panel-historyEmpty small text-muted mb-0">
+                        <p t-elif="!reflets.length and isHistoryFiltered" class="o-linkup-Panel-historyEmpty small mb-0">
                             No reflection matches these filters.
                         </p>
-                        <p t-elif="!reflets.length" class="small text-muted mb-0">No reflection yet.</p>
+                        <p t-elif="!reflets.length" class="small mb-0">No reflection yet.</p>
                         <ul t-else="" class="o-linkup-Panel-history list-unstyled d-flex flex-column gap-2 mb-0" aria-live="polite">
                             <li t-foreach="reflets" t-as="reflet" t-key="reflet.id">
                                 <LinkupRefletCard reflet="reflet" />

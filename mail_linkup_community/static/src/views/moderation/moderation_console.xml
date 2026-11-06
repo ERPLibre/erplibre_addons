@@ -24,7 +24,7 @@
                 >
                     <h2 id="o-linkup-Moderation-summaryTitle" class="visually-hidden">Counters</h2>
                     <span class="o-linkup-Moderation-counters fw-bold" role="status" t-esc="summaryText" />
-                    <span class="small text-muted" t-esc="urgentDelayText" />
+                    <span class="small" t-esc="urgentDelayText" />
                 </section>
                 <div
                     class="btn-group align-self-start"
@@ -79,7 +79,10 @@
                             >
                                 <td>
                                     <span t-if="row.urgent" class="badge text-bg-danger">Urgent</span>
-                                    <span t-else="" class="text-muted" aria-label="Not urgent">—</span>
+                                    <t t-else="">
+                                        <span aria-hidden="true">—</span>
+                                        <span class="visually-hidden">Not urgent</span>
+                                    </t>
                                 </td>
                                 <td class="text-nowrap" t-esc="formatDate(row.date)" />
                                 <td>
@@ -94,7 +97,10 @@
                                 <td t-esc="row.member" />
                                 <td t-esc="sourceLabel(row.source)" />
                                 <td t-esc="stateLabel(row.state)" />
-                                <td class="text-nowrap" t-att-class="{'text-danger fw-bold': row.overdue}">
+                                <td
+                                    class="text-nowrap"
+                                    t-att-class="{'o-linkup-Moderation-overdue fw-bold': row.overdue}"
+                                >
                                     <t t-esc="formatDate(row.due_date)" />
                                     <span t-if="row.overdue" class="ms-1">(late)</span>
                                 </td>
@@ -207,7 +213,7 @@
                             />
                         </t>
                         <p t-if="!canTake and !canDecide and !isAppealed" class="small mb-0" t-esc="decisionNote" />
-                        <p t-elif="canTake" class="small text-muted mb-0">
+                        <p t-elif="canTake" class="small mb-0">
                             Take the report to decide; the audit log tells who took it.
                         </p>
                         <LinkupErrorAlert
@@ -234,11 +240,10 @@
                             <t t-else="">Not assigned</t>
                         </dd>
                         <dt class="col-sm-3">Due</dt>
-                        <dd
-                            class="col-sm-9"
-                            t-att-class="{'text-danger fw-bold': detail.overdue}"
-                            t-esc="formatDate(detail.due_date)"
-                        />
+                        <dd class="col-sm-9" t-att-class="{'o-linkup-Moderation-overdue fw-bold': detail.overdue}">
+                            <t t-esc="formatDate(detail.due_date)" />
+                            <span t-if="detail.overdue" class="ms-1">(late)</span>
+                        </dd>
                         <dt class="col-sm-3">Decision</dt>
                         <dd class="o-linkup-Moderation-decision col-sm-9" t-esc="actionLabel(detail.action_taken)" />
                         <dt class="col-sm-3">Comment of the reporter</dt>
@@ -281,7 +286,7 @@
                                     t-att-class="{'o-linkup-Moderation-reported border-danger': item.reported}"
                                     t-att-data-kind="item.kind"
                                 >
-                                    <div class="small text-muted">
+                                    <div class="small">
                                         <span t-if="item.reported" class="badge text-bg-danger me-1">Reported</span>
                                         <span t-if="item.hidden" class="badge text-bg-secondary me-1">Hidden</span>
                                         <t t-esc="item.author" />

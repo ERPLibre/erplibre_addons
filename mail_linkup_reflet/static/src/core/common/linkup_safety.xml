@@ -10,7 +10,7 @@
                 <button
                     t-if="props.refletId and !state.reported"
                     type="button"
-                    class="o-linkup-Safety-report btn btn-link btn-sm p-0 text-muted"
+                    class="o-linkup-Safety-report btn btn-link btn-sm p-0"
                     t-att-disabled="state.busy"
                     t-on-click="openReport"
                 >
@@ -28,7 +28,7 @@
                 <button
                     t-else=""
                     type="button"
-                    class="o-linkup-Safety-block btn btn-link btn-sm p-0 text-muted"
+                    class="o-linkup-Safety-block btn btn-link btn-sm p-0"
                     t-att-disabled="state.busy"
                     t-on-click="askBlock"
                 >
@@ -61,7 +61,7 @@
                     maxlength="2000"
                     t-model="state.description"
                 />
-                <span class="small text-muted" t-esc="anonymityText" />
+                <span class="small" t-esc="anonymityText" />
                 <div class="d-flex gap-2 justify-content-end">
                     <button type="button" class="o-linkup-Safety-cancel btn btn-secondary btn-sm" t-on-click="closeReport">
                         Cancel

@@ -79,7 +79,7 @@
                                 <span t-esc="rule.name" />
                                 <span
                                     class="fw-bold text-nowrap"
-                                    t-att-class="rule.points &lt; 0 ? 'text-danger' : 'text-success'"
+                                    t-att-class="rule.points &lt; 0 ? 'o-linkup-MyPoints-loss' : 'o-linkup-MyPoints-gain'"
                                     t-esc="rulePoints(rule)"
                                 />
                             </li>
@@ -162,7 +162,7 @@
                                     <td class="text-end">
                                         <span
                                             class="o-linkup-MyPoints-linePoints fw-bold text-nowrap"
-                                            t-att-class="{ 'text-success': line.points > 0, 'text-danger': line.points &lt; 0 }"
+                                            t-att-class="{ 'o-linkup-MyPoints-gain': line.points > 0, 'o-linkup-MyPoints-loss': line.points &lt; 0 }"
                                             t-esc="linePoints(line)"
                                         />
                                         <span

@@ -1,6 +1,7 @@
 // Tints of the LinkUp views in the dark theme, after the light rules of
 // linkup.scss: mixed with $gray-100 as mail does for its bubbles, so the
-// cards stay distinct from the background of the thread.
+// cards stay distinct from the background of the thread. The focus ring is
+// lighter, for 3:1 on a dark background.
 
 $o-linkup-tint-dark: mix($gray-100, $info, 87.5%);
 
@@ -43,4 +44,14 @@ $o-linkup-tint-dark: mix($gray-100, $info, 87.5%);
 .o-linkup-StartRule {
     background-color: $o-linkup-tint-dark;
     border-color: lighten($o-linkup-tint-dark, 5%) !important;
+}
+
+[class*="o-linkup-"]:where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(.form-control, .form-select, .form-check-input):focus {
+    outline-color: lighten($primary, 15%);
+}
+
+.o-mail-DiscussSidebar-item[class*="o-linkup-"]:focus-visible {
+    outline-color: lighten($primary, 15%) !important;
 }

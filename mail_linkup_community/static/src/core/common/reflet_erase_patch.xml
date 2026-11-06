@@ -4,7 +4,7 @@
         <xpath expr="//div[hasclass('o-linkup-RefletCard-header')]" position="after">
             <p
                 t-if="reflet.content_removed and !reflet.moderation_hidden"
-                class="o-linkup-RefletCard-contentRemoved fst-italic text-muted small mb-0 px-3 py-2"
+                class="o-linkup-RefletCard-contentRemoved fst-italic small mb-0 px-3 py-2"
             >
                 <i class="fa fa-eraser me-1" aria-hidden="true" />
                 Content removed

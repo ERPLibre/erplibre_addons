@@ -262,6 +262,12 @@ Sources in ``static/src/core/common``, loaded in ``web.assets_backend``.
 * Pictograms are inline SVG drawn with ``currentColor``; colours come from
   the variables of web and Bootstrap, with ``linkup.dark.scss`` in the dark
   bundle. Texts go through ``_t`` and ``i18n/fr_CA.po``.
+* ``linkup.scss`` gives every element under an ``o-linkup-`` class a focus
+  ring, fields outlined at 3:1, and targets of 44 px on a small screen;
+  ``static/src/public/linkup_public.scss`` does the same for the public
+  pages, in the frontend bundle. Odoo Community has no dark variables: the
+  dark bundle darkens the screens only with a module that brings them,
+  such as ``web_dark_mode`` of OCA.
 * Hoot tests in ``static/tests`` run in the browser through
   ``tests/test_ui.py`` (``TestLinkupRefletHoot``), or by hand at
   ``/web/tests?preset=desktop`` filtered on ``@mail_linkup_reflet``.

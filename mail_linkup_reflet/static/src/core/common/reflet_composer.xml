@@ -2,10 +2,10 @@
 <templates xml:space="preserve">
     <t t-name="mail_linkup_reflet.LinkupRefletComposer">
         <div class="o-linkup-RefletComposer d-flex flex-column gap-2 px-3 pt-2 pb-1">
-            <p t-if="state.loadError" class="o-linkup-RefletComposer-unavailable small text-muted mb-0">
+            <p t-if="state.loadError" class="o-linkup-RefletComposer-unavailable small mb-0">
                 LinkUp could not be loaded, try again.
             </p>
-            <p t-elif="state.info and !available" class="o-linkup-RefletComposer-unavailable small text-muted mb-0">
+            <p t-elif="state.info and !available" class="o-linkup-RefletComposer-unavailable small mb-0">
                 No reflection can be sent in this conversation.
             </p>
             <t t-elif="available">

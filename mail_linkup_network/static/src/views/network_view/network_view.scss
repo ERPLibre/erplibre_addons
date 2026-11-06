@@ -2,6 +2,11 @@
 // compiles it with the dark values of the theme (network_view.dark.scss
 // adds the tints that differ).
 
+// The text on a filled $primary: the colour of the primary button of
+// web, which each theme sets. color-contrast() picks black on the
+// primary of the dark theme, under the 4.5:1 of AA.
+$o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") !default;
+
 $o-linkup-network-energy-tint: mix($o-view-background-color, $warning, 82%) !default;
 // The lines carry the graph: 3:1 at least against the background (WCAG
 // 1.4.11). The grey lines are dashed besides, not told by colour only.
@@ -169,7 +174,7 @@ $o-linkup-network-edge: mix($o-view-background-color, $primary, 20%) !default;
 
         &.active {
             background-color: $primary;
-            color: color-contrast($primary);
+            color: $o-linkup-on-primary;
         }
     }
 
@@ -258,7 +263,7 @@ $o-linkup-network-edge: mix($o-view-background-color, $primary, 20%) !default;
 
             &.o-isActive {
                 background-color: $primary;
-                color: color-contrast($primary);
+                color: $o-linkup-on-primary;
             }
         }
     }

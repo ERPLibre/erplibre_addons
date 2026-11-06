@@ -5,6 +5,11 @@
 // opacity: the text colour of web at 75 % falls under the 4.5:1 contrast
 // of AA on a light background, and on a filled button.
 
+// The text on a filled $primary: the colour of the primary button of
+// web, which each theme sets. color-contrast() picks black on the
+// primary of the dark theme, under the 4.5:1 of AA.
+$o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") !default;
+
 $o-linkup-tint: mix($o-view-background-color, $info, 87.5%);
 $o-linkup-tint-border: darken($o-linkup-tint, 10%);
 
@@ -70,7 +75,7 @@ $o-linkup-tint-border: darken($o-linkup-tint, 10%);
     .o-linkup-HelpBar-category.o-isSelected {
         border-color: $primary;
         background-color: $primary;
-        color: color-contrast($primary);
+        color: $o-linkup-on-primary;
     }
 }
 
@@ -138,7 +143,7 @@ $o-linkup-tint-border: darken($o-linkup-tint, 10%);
         &.o-isSelected {
             border-color: $primary;
             background-color: $primary;
-            color: color-contrast($primary);
+            color: $o-linkup-on-primary;
         }
 
         &.o-isUnavailable {
@@ -158,4 +163,61 @@ $o-linkup-tint-border: darken($o-linkup-tint, 10%);
 .o-linkup-StartRule {
     background-color: $o-linkup-tint;
     border-color: $o-linkup-tint-border !important;
+}
+
+// Keyboard focus of every LinkUp control, whose root or ancestor carries an
+// o-linkup- class: a ring of the focus token, 3:1 at least against the
+// background (WCAG 2.4.7, 1.4.11). The specificity equals the one of
+// .btn:focus-visible, which removes the outline, and comes after it; a
+// rule of a view that draws its own ring stays stronger.
+$o-linkup-focus: $primary !default;
+
+[class*="o-linkup-"]:where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(.form-control, .form-select, .form-check-input):focus {
+    outline: $border-width * 2 solid $o-linkup-focus;
+    outline-offset: $border-width;
+}
+
+// The sidebar of Discuss hides the outline of its items with !important.
+.o-mail-DiscussSidebar-item[class*="o-linkup-"]:focus-visible {
+    outline: $border-width * 2 solid $o-linkup-focus !important;
+}
+
+// The fields of LinkUp: an outline of 3:1 at least against the background,
+// since their border is what shows where to type or tick (WCAG 1.4.11).
+$o-linkup-field-border: $gray-600 !default;
+
+[class*="o-linkup-"] :where(.form-control, .form-select, .form-check-input):not(:focus) {
+    border-color: $o-linkup-field-border;
+}
+
+// Touch targets of 44 px at least on a small screen (LU-NF-024, WCAG 2.5.5).
+// A box or a switch is reached through its label too: the row of the label
+// is the target, centred on the box.
+@include media-breakpoint-down(md) {
+    [class*="o-linkup-"]:where(button, summary, .btn, .form-control, .form-select),
+    [class*="o-linkup-"] :where(button, summary, .btn, .form-control, .form-select) {
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+    }
+
+    [class*="o-linkup-"] .form-check {
+        display: flex;
+        align-items: center;
+        gap: map-get($spacers, 2);
+        min-height: 2.75rem;
+
+        .form-check-input {
+            flex-shrink: 0;
+            margin-top: 0;
+        }
+
+        .form-check-label {
+            flex-grow: 1;
+            min-height: 2.75rem;
+            display: flex;
+            align-items: center;
+        }
+    }
 }
