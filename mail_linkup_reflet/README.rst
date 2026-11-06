@@ -78,7 +78,11 @@ Not covered yet:
   exchange (``linkup_talk_about_oneself_tour``,
   ``linkup_end_it_here_tour``), and "You add to my happiness" from a
   conversation and from the Reflet view (``linkup_happiness_send_tour``,
-  ``linkup_happiness_receive_tour``).
+  ``linkup_happiness_receive_tour``), and the same screens in English and
+  in French (``linkup_english_tour``, ``linkup_french_tour``). Each class
+  of tours of the LinkUp modules runs once more in the dark theme, with the
+  cookie ``color_scheme=dark`` (``DarkThemeTourMixin`` of
+  ``tests/common.py``).
 
 Reflections
 ===========

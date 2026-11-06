@@ -19,5 +19,6 @@ from . import (
     test_safety_bypass,
     test_start_rule,
     test_start_rule_bypass,
+    test_theme_bundles,
     test_ui,
 )

@@ -6,6 +6,7 @@ of the module (§12.1)."""
 
 from odoo import Command
 from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.addons.mail_linkup_reflet.tests.common import DarkThemeTourMixin
 from odoo.addons.web.tests import test_js
 from odoo.tests import HttpCase, tagged
 
@@ -150,3 +151,11 @@ class TestLinkupCommunityUi(HttpCase):
             success_signal="[HOOT] Test suite succeeded",
             error_checker=test_js.unit_test_error_checker,
         )
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupCommunityUiDark(DarkThemeTourMixin, TestLinkupCommunityUi):
+    """The tours of TestLinkupCommunityUi in the dark theme (LU-NF-054,
+    T-56); the Hoot suite does not depend on the theme and runs once."""
+
+    test_hoot_suite = None

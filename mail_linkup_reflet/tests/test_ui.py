@@ -6,7 +6,8 @@ and its guess (LU-F-031 to LU-F-042), of the Reflet view (T-24, LU-F-010 to
 LU-F-016), of NewLink (T-29, LU-F-020), of the first-use tour (T-25,
 LU-F-083), of a sending with the keyboard only (T-18, LU-NF-020), of the
 three options (P4, LU-F-040 to LU-F-044), of "You add to my happiness" (P5,
-LU-F-050, LU-F-051), and the Hoot unit tests of the module (§12.1).
+LU-F-050, LU-F-051), of the languages (LU-NF-025), each one once more in the
+dark theme (LU-NF-054), and the Hoot unit tests of the module (§12.1).
 """
 
 from odoo import Command
@@ -14,7 +15,7 @@ from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.web.tests import test_js
 from odoo.tests import HttpCase, tagged
 
-from .common import MEMBER
+from .common import MEMBER, DarkThemeTourMixin
 
 # Suite of the Hoot tests of the module, as the Hoot runner names it.
 HOOT_SUITE = "@mail_linkup_reflet"
@@ -327,6 +328,32 @@ class TestLinkupRefletUi(HttpCase):
         )
         self.assertEqual(sent.recipient_id, self.france)
         self.assertEqual(sent.context, "drag")
+
+    def test_language_tours(self):
+        """Sam reads the Reflet view and a reflection France wrote in
+        French in English, then in French once his language changes: the
+        texts follow the language of the reader (LU-NF-025)."""
+        Reflet = self.env["linkup.reflet"].with_user(self.france)
+        draft_id = Reflet.action_save_draft(
+            {
+                "category_id": self.env["linkup.category"]
+                .search([("code", "=", "emotions")])
+                .id,
+                "you_said": "Que la réunion d'hier t'a fatiguée.",
+                "understood": "tu as besoin d'une pause.",
+                "real_world_declared": True,
+            }
+        )
+        Reflet.browse(draft_id).action_send(self.sam.id)
+        self.sam.lang = "en_US"
+        self.start_tour("/odoo", "linkup_english_tour", login=self.sam.login)
+        self.sam.lang = "fr_CA"
+        self.start_tour("/odoo", "linkup_french_tour", login=self.sam.login)
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupRefletUiDark(DarkThemeTourMixin, TestLinkupRefletUi):
+    """The tours of TestLinkupRefletUi in the dark theme (LU-NF-054, T-56)."""
 
 
 @tagged("post_install", "-at_install")

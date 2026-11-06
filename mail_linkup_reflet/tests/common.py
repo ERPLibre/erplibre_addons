@@ -10,6 +10,25 @@ from odoo.tests.common import TransactionCase
 
 MEMBER = "mail_linkup_reflet.group_linkup_member"
 
+# The cookie that makes the web client load web.assets_web_dark in place of
+# web.assets_web (web/views/webclient_templates.xml).
+DARK_COOKIES = {"color_scheme": "dark"}
+
+
+class DarkThemeTourMixin:
+    """Replays the tours of an ``HttpCase`` in the dark theme (LU-NF-054):
+    each ``start_tour`` sends the cookie ``color_scheme=dark``, unless the
+    test gives its own cookies. A class that inherits from this mixin then
+    from a class of tours runs every tour of that class once more: the
+    loader of Odoo collects inherited test methods only for a class that
+    sets ``allow_inherited_tests_method``."""
+
+    allow_inherited_tests_method = True
+
+    def start_tour(self, url_path, tour_name, step_delay=None, **kwargs):
+        kwargs.setdefault("cookies", DARK_COOKIES)
+        return super().start_tour(url_path, tour_name, step_delay, **kwargs)
+
 
 class LinkupTestMixin:
     """Helpers shared by the LinkUp test classes.

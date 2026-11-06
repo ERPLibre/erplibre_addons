@@ -5,7 +5,10 @@ module (§12.1)."""
 
 from odoo import fields
 from odoo.addons.mail.tests.common import mail_new_test_user
-from odoo.addons.mail_linkup_reflet.tests.common import MEMBER
+from odoo.addons.mail_linkup_reflet.tests.common import (
+    MEMBER,
+    DarkThemeTourMixin,
+)
 from odoo.addons.web.tests import test_js
 from odoo.tests import HttpCase, tagged
 
@@ -87,6 +90,11 @@ class TestLinkupNetworkUi(HttpCase):
         self.start_tour(
             "/odoo/discuss", "linkup_network_tour", login=self.sam.login
         )
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupNetworkUiDark(DarkThemeTourMixin, TestLinkupNetworkUi):
+    """The tours of TestLinkupNetworkUi in the dark theme (LU-NF-054, T-56)."""
 
 
 @tagged("post_install", "-at_install")

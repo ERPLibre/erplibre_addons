@@ -5,7 +5,10 @@ of the module (§12.1)."""
 
 from odoo import Command
 from odoo.addons.mail.tests.common import mail_new_test_user
-from odoo.addons.mail_linkup_reflet.tests.common import MEMBER
+from odoo.addons.mail_linkup_reflet.tests.common import (
+    MEMBER,
+    DarkThemeTourMixin,
+)
 from odoo.addons.web.tests import test_js
 from odoo.tests import HttpCase, tagged
 
@@ -113,6 +116,11 @@ class TestLinkupPointsUi(HttpCase):
         )
         self.assertEqual(self.sam.sudo().karma, 1100)
         self.assertEqual(self.france.sudo().karma, 1000)
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupPointsUiDark(DarkThemeTourMixin, TestLinkupPointsUi):
+    """The tours of TestLinkupPointsUi in the dark theme (LU-NF-054, T-56)."""
 
 
 @tagged("post_install", "-at_install")
