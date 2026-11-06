@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <!-- A reflection of a live chat has no link: its recipient neither
+         ignores it nor answers "That is not what I said". -->
+    <t t-inherit="mail_linkup_reflet.LinkupRefletActions" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-linkup-RefletActions-inaccurate')]/.." position="attributes">
+            <attribute name="t-if">!reflet.livechat</attribute>
+        </xpath>
+    </t>
+
+    <!-- The report of a card of a live chat targets the visitor of the
+         conversation. -->
+    <t t-inherit="mail_linkup_reflet.LinkupRefletCard" t-inherit-mode="extension">
+        <xpath expr="//LinkupSafetyActions" position="attributes">
+            <attribute name="livechatChannelId">reflet.livechat ? props.thread?.id : undefined</attribute>
+        </xpath>
+    </t>
+
+    <!-- A visitor cannot be blocked: no account holds the block. -->
+    <t t-inherit="mail_linkup_reflet.LinkupSafetyActions" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-linkup-Safety-block')]" position="attributes">
+            <attribute name="t-else" />
+            <attribute name="t-elif">!props.livechatChannelId</attribute>
+        </xpath>
+    </t>
+</templates>

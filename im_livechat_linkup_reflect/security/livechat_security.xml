@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- A conversation of the distress channel, its members and its
+         messages are read by its two parties only (LU-F-126 RM5): global
+         rules, so that neither the rule of the live chat managers, which
+         opens every live chat conversation to them, nor any search reaches
+         it. The server opens and closes it under sudo. -->
+    <record id="rule_discuss_channel_distress" model="ir.rule">
+        <field name="name">LinkUp: a distress conversation, to its members</field>
+        <field name="model_id" ref="mail.model_discuss_channel" />
+        <field name="domain_force">[
+            '|',
+            ('livechat_channel_id', 'not any', [('linkup_kind', '=', 'distress')]),
+            ('is_member', '=', True),
+        ]</field>
+    </record>
+    <record id="rule_discuss_channel_member_distress" model="ir.rule">
+        <field name="name">LinkUp: the members of a distress conversation, to its members</field>
+        <field name="model_id" ref="mail.model_discuss_channel_member" />
+        <field name="domain_force">[
+            '|',
+            ('channel_id.livechat_channel_id', 'not any', [('linkup_kind', '=', 'distress')]),
+            ('channel_id.is_member', '=', True),
+        ]</field>
+    </record>
+</odoo>

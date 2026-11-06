@@ -1,0 +1,863 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* im_livechat_linkup_reflect
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "%(name)s sent you a reflection."
+msgstr "%(name)s t'a envoyé un reflet."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid "9-1-1: emergency services, when a life is in danger."
+msgstr "9-1-1 : services d'urgence, quand une vie est en danger."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid ""
+"9-8-8: suicide crisis helpline, by phone or text message, at any time "
+"(Canada)."
+msgstr ""
+"9-8-8 : ligne d'aide en cas de crise suicidaire, par téléphone ou texto, en "
+"tout temps (Canada)."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid "A comment holds at most %(count)s characters."
+msgstr "Un commentaire compte au plus %(count)s caractères."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_member
+msgid ""
+"A member joins you. Here too, the conversation starts with a reflection."
+msgstr ""
+"Un membre te rejoint. Ici aussi, la conversation commence par un reflet."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/report_dialog_patch.js:0
+msgid "A person of the moderation joins you in a conversation."
+msgstr "Une personne de la modération te rejoint dans une conversation."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.js:0
+msgid "A person of the moderation joins you in this conversation."
+msgstr "Une personne de la modération te rejoint dans cette conversation."
+
+#. module: im_livechat_linkup_reflect
+#: model:im_livechat.channel,default_message:im_livechat_linkup_reflect.livechat_channel_distress
+msgid "A person of the moderation reads this conversation."
+msgstr "Une personne de la modération lit cette conversation."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.constraint,message:im_livechat_linkup_reflect.constraint_linkup_reflet_author_one_party
+msgid "A reflection has one author, a member or a visitor."
+msgstr "Un reflet a un seul auteur : un membre ou un visiteur."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.constraint,message:im_livechat_linkup_reflect.constraint_linkup_reflet_recipient_one_party
+msgid "A reflection has one recipient, a member or a visitor."
+msgstr "Un reflet a un seul destinataire : un membre ou un visiteur."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_discover
+msgid ""
+"A reflection holds two parts: “You told me…”, what the person said, and “I "
+"understood that…”, what you understood of it. A category names the exchange:"
+" an observation, an emotion, a need…"
+msgstr ""
+"Un reflet a deux parties : « Tu m'as dit… », ce que la personne a dit, et « "
+"J'ai compris que… », ce que tu en as compris. Une catégorie nomme l'échange "
+": une observation, une émotion, un besoin…"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.constraint,message:im_livechat_linkup_reflect.constraint_linkup_guest_event_event_unique
+msgid "An event of a visitor is held once."
+msgstr "Un événement d'un visiteur n'est mis en attente qu'une fois."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_answers.js:0
+msgid "Answers"
+msgstr "Réponses"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_reflet__author_id
+msgid "Author"
+msgstr "Auteur"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_reflet__author_guest_id
+msgid "Author visitor"
+msgstr "Visiteur auteur"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
+msgid "Call or write to one of them at once when a life is in danger."
+msgstr ""
+"Appelle ou écris à l'une d'elles tout de suite quand une vie est en danger."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_answers.js:0
+msgid "Categories"
+msgstr "Catégories"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "Category: %(name)s"
+msgstr "Catégorie : %(name)s"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_chatbot_script
+msgid "Chatbot Script"
+msgstr "Script du chatbot"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_chatbot_script_answer
+msgid "Chatbot Script Answer"
+msgstr "Script de réponse du Chatbot"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_chatbot_script_step
+msgid "Chatbot Script Step"
+msgstr "Étape de script du chatbot"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "Choose a category."
+msgstr "Choisis une catégorie."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+#: code:addons/im_livechat_linkup_reflect/static/src/common/livechat_reflet.js:0
+msgid "Choose a reason."
+msgstr "Choisis un motif."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.xml:0
+msgid "Close the help"
+msgstr "Fermer l'aide"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__code
+msgid "Code"
+msgstr "Code"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid "Conversation of distress opened by the server"
+msgstr "Conversation de détresse ouverte par le serveur"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__date
+msgid "Date"
+msgstr "Date"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/common/livechat_reflet.js:0
+msgid ""
+"Declare that the exchange of this reflection never took place? %(name)s will"
+" see it."
+msgstr ""
+"Déclarer que l'échange de ce reflet n'a jamais eu lieu ? %(name)s le verra."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_discover
+msgid "Discover LinkUp"
+msgstr "Découvrir LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_discuss_channel
+msgid "Discussion Channel"
+msgstr "Canal de discussion"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__im_livechat_channel__linkup_kind__distress
+msgid "Distress"
+msgstr "Détresse"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_report__distress_channel_id
+msgid "Distress conversation"
+msgstr "Conversation de détresse"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__event_key
+msgid "Event key"
+msgstr "Clé d'événement"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__im_livechat_channel__linkup_start_rule__inherit
+msgid "Global rule"
+msgstr "Règle globale"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_hello
+msgid ""
+"Hello! On LinkUp, a conversation starts with an exchange lived in person: "
+"you reformulate what a person told you, a reflection. Once they confirm it, "
+"the chat opens between you."
+msgstr ""
+"Bonjour ! Sur LinkUp, une conversation commence par un échange vécu en "
+"personne : tu reformules ce qu'une personne t'a dit, c'est un reflet. Une "
+"fois qu'elle le confirme, la discussion s'ouvre entre vous."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
+msgid "Help resources"
+msgstr "Ressources d'aide"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.guide_step_review
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_guide_review
+msgid "Here is your reflection."
+msgstr "Voici ton reflet."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.guide_step_intro
+msgid ""
+"I guide you through a reflection, one question at a time. Nothing is sent: "
+"the reflection waits as a draft in the Reflet view."
+msgstr ""
+"Je te guide dans un reflet, une question à la fois. Rien n'est envoyé : le "
+"reflet t'attend en brouillon dans la Vue Reflet."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_invitation
+msgid "I received an invitation"
+msgstr "J'ai reçu une invitation"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "I understood that: %(text)s"
+msgstr "J'ai compris que : %(text)s"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.guide_step_understood
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_guide_understood
+msgid "I understood that: write what you understood of it."
+msgstr "J'ai compris que : écris ce que tu en as compris."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_patch.js:0
+msgid "I understood that…"
+msgstr "J'ai compris que…"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__id
+msgid "ID"
+msgstr "ID"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__im_livechat_channel__linkup_start_rule__incitative
+msgid "Incentive"
+msgstr "Incitatif"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_rate_event__kind
+msgid "Kind"
+msgstr "Type"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_chatbot_script_answer__linkup_category_id
+msgid "LinkUp category"
+msgstr "Catégorie LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_category
+msgid "LinkUp category of communication"
+msgstr "Catégorie de communication LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.xml:0
+msgid "LinkUp is not an emergency service."
+msgstr "LinkUp n'est pas un service d'urgence."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_help
+msgid ""
+"LinkUp is not an emergency service: in an immediate danger, call 9-1-1. A "
+"person of the moderation joins you."
+msgstr ""
+"LinkUp n'est pas un service d'urgence : en cas de danger immédiat, compose "
+"le 9-1-1. Une personne de la modération te rejoint."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid ""
+"LinkUp is not an emergency service: in an immediate danger, call 9-1-1. A "
+"person of the moderation reads this conversation."
+msgstr ""
+"LinkUp n'est pas un service d'urgence : en cas de danger immédiat, compose "
+"le 9-1-1. Une personne de la modération lit cette conversation."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
+msgid ""
+"LinkUp is not an emergency service: the help resources of the territory, set"
+" by the administrator, come first."
+msgstr ""
+"LinkUp n'est pas un service d'urgence : les ressources d'aide du territoire, "
+"réglées par l'administrateur, passent en premier."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_audit_log
+msgid "LinkUp moderation audit log"
+msgstr "Journal d'audit de la modération LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_rate_event
+msgid "LinkUp rate limit event"
+msgstr "Événement de limite de débit LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_reflet
+msgid "LinkUp reflection"
+msgstr "Reflet LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_report
+msgid "LinkUp report"
+msgstr "Signalement LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_im_livechat_channel__linkup_kind
+msgid "LinkUp role"
+msgstr "Rôle LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_guest_event
+msgid "LinkUp scoring event of a visitor, pending"
+msgstr "Événement de points LinkUp d'un visiteur, en attente"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_im_livechat_channel__linkup_start_rule
+msgid "LinkUp start rule"
+msgstr "Règle de démarrage LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script,title:im_livechat_linkup_reflect.chatbot_script_welcome
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__im_livechat_channel__linkup_kind__welcome
+msgid "LinkUp welcome"
+msgstr "Accueil LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__chatbot_script_step__step_type__linkup_understood
+msgid "LinkUp: I understood that"
+msgstr "LinkUp : J'ai compris que"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__chatbot_script_step__step_type__linkup_you_said
+msgid "LinkUp: You told me"
+msgstr "LinkUp : Tu m'as dit"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__chatbot_script_step__step_type__linkup_category
+msgid "LinkUp: category of the reflection"
+msgstr "LinkUp : catégorie du reflet"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.actions.server,name:im_livechat_linkup_reflect.ir_cron_linkup_livechat_expire_ir_actions_server
+msgid "LinkUp: expiry of the live chat"
+msgstr "LinkUp : expiration du clavardage"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__chatbot_script_step__step_type__linkup_forward_moderator
+msgid "LinkUp: forward to a moderator"
+msgstr "LinkUp : transfert à la modération"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__chatbot_script_step__step_type__linkup_reflet_review
+msgid "LinkUp: review of the reflection"
+msgstr "LinkUp : relecture du reflet"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_report__livechat_conversation_id
+msgid "Live chat conversation"
+msgstr "Conversation de clavardage"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__linkup_rate_event__kind__livechat_session
+msgid "Live chat session"
+msgstr "Session de clavardage"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_im_livechat_channel
+msgid "Livechat Channel"
+msgstr "Canal de Live Chat"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.js:0
+msgid "Looking for a person of the moderation…"
+msgstr "Recherche d'une personne de la modération…"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__counterpart_user_id
+msgid "Member of the pair"
+msgstr "Membre de la paire"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_ir_module_module
+msgid "Module"
+msgstr "Module"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.xml:0
+#: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_help
+msgid "Need help now"
+msgstr "Besoin d'aide maintenant"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_member_none
+msgid ""
+"No member is available right now. Come back a little later, or make your "
+"first reflection in the meantime."
+msgstr ""
+"Aucun membre n'est disponible pour l'instant. Reviens un peu plus tard, ou "
+"fais ton premier reflet en attendant."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid ""
+"No person of the moderation is available right now. LinkUp is not an "
+"emergency service: reach one of these resources."
+msgstr ""
+"Aucune personne de la modération n'est disponible pour l'instant. LinkUp "
+"n'est pas un service d'urgence : joins l'une de ces ressources."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/report_dialog_patch.js:0
+msgid ""
+"No person of the moderation is available right now. Your report waits in the"
+" queue, processed within %(hours)s hours."
+msgstr ""
+"Aucune personne de la modération n'est disponible pour l'instant. Ton "
+"signalement attend dans la file, traité dans un délai de %(hours)s heures."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.js:0
+msgid ""
+"No person of the moderation is available right now. Your request waits in "
+"the queue, processed within %(hours)s hours."
+msgstr ""
+"Aucune personne de la modération n'est disponible pour l'instant. Ta demande "
+"attend dans la file, traitée dans un délai de %(hours)s heures."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "Not to say: %(text)s"
+msgstr "À ne pas dire : %(text)s"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid ""
+"Nothing is sent: choose “Talk to a member” to send it in this window, or "
+"sign up to keep it."
+msgstr ""
+"Rien n'est envoyé : choisis « Parler à un membre » pour l'envoyer dans cette"
+" fenêtre, ou inscris-toi pour le garder."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid ""
+"Nothing is sent: your draft waits in the Reflet view, where you choose who "
+"receives it."
+msgstr ""
+"Rien n'est envoyé : ton brouillon t'attend dans la Vue Reflet, où tu choisis"
+" qui le reçoit."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__im_livechat_channel__linkup_start_rule__off
+msgid "Off"
+msgstr "Désactivé"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/livechat_service_patch.js:0
+msgid "Open LinkUp in Discuss"
+msgstr "Ouvrir LinkUp dans Discussion"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/livechat_service_patch.js:0
+msgid "Open the chat"
+msgstr "Ouvrir la discussion"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/report_dialog_patch.xml:0
+msgid "Open the conversation"
+msgstr "Ouvrir la conversation"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_invitation
+msgid ""
+"Open the link of the email you received: it leads you to the signup, then to"
+" the reflection that waits for you. Nobody here asks you for that link, a "
+"code or your address."
+msgstr ""
+"Ouvre le lien du courriel que tu as reçu : il te mène à l'inscription, puis "
+"au reflet qui t'attend. Personne ici ne te demande ce lien, un code ou ton "
+"adresse."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__linkup_audit_log__action__distress_open
+msgid "Opened a conversation of distress"
+msgstr "A ouvert une conversation de détresse"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
+msgid "Outside the guide, this button answers the guide with this category."
+msgstr "Hors du guide, ce bouton répond au guide avec cette catégorie."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
+msgid ""
+"Outside the guide, this button shows the resources, reports the request as "
+"urgent and brings a person of the moderation into this conversation; without"
+" one available, the request waits in the queue."
+msgstr ""
+"Hors du guide, ce bouton affiche les ressources, signale la demande comme "
+"urgente et fait entrer une personne de la modération dans cette conversation "
+"; si aucune n'est disponible, la demande attend dans la file."
+
+#. module: im_livechat_linkup_reflect
+#: model:im_livechat.channel,button_text:im_livechat_linkup_reflect.livechat_channel_welcome
+msgid "Questions? Talk with LinkUp"
+msgstr "Des questions ? Parle avec LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_reflet__recipient_guest_id
+msgid "Recipient visitor"
+msgstr "Visiteur destinataire"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__reflet_id
+msgid "Reflection"
+msgstr "Reflet"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script,title:im_livechat_linkup_reflect.chatbot_script_guide
+msgid "Reflection guide"
+msgstr "Guide du reflet"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "Reflection withdrawn."
+msgstr "Reflet retiré."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_report__reported_guest_id
+msgid "Reported visitor"
+msgstr "Visiteur signalé"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_report__reporter_guest_id
+msgid "Reporting visitor"
+msgstr "Visiteur signaleur"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_patch.js:0
+msgid "Select an option above"
+msgstr "Choisis une option ci-dessus"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_signup
+msgid "Sign up"
+msgstr "M'inscrire"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,help:im_livechat_linkup_reflect.field_im_livechat_channel__linkup_start_rule
+msgid ""
+"Start rule of the conversations of this channel; a conversation of the "
+"distress channel has none."
+msgstr ""
+"Règle de démarrage des conversations de ce canal ; une conversation du canal"
+" de détresse n'en a pas."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_chatbot_script_step__step_type
+msgid "Step Type"
+msgstr "Type d'étape"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__im_livechat_channel__linkup_start_rule__strict
+msgid "Strict"
+msgstr "Strict"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_member
+msgid "Talk to a member"
+msgstr "Parler à un membre"
+
+#. module: im_livechat_linkup_reflect
+#: model:im_livechat.channel,button_text:im_livechat_linkup_reflect.livechat_channel_distress
+msgid "Talk with the moderation"
+msgstr "Parler avec la modération"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.js:0
+msgid "The conversation could not be opened, try again."
+msgstr "La conversation n'a pas pu s'ouvrir, réessaie."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,help:im_livechat_linkup_reflect.field_linkup_report__distress_channel_id
+msgid "The conversation with a moderator that the report opened."
+msgstr ""
+"La conversation avec une personne de la modération que le signalement a "
+"ouverte."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,help:im_livechat_linkup_reflect.field_linkup_report__livechat_conversation_id
+msgid "The live chat conversation the report comes from."
+msgstr "La conversation de clavardage d'où vient le signalement."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_discover_next
+msgid ""
+"The person confirms that the exchange took place: “That's a link!”. You both"
+" earn points, and the free text opens between you. To join, sign up; to try,"
+" make your first reflection here."
+msgstr ""
+"La personne confirme que l'échange a eu lieu : « C'est un lien ! ». Vous "
+"gagnez des points tous les deux, et le texte libre s'ouvre entre vous. Pour "
+"te joindre à LinkUp, inscris-toi ; pour essayer, fais ton premier reflet "
+"ici."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,help:im_livechat_linkup_reflect.field_res_users__linkup_livechat_guest_id
+msgid ""
+"The visitor of the live chat who signed up from the same browser; given to "
+"the account once its address is verified."
+msgstr ""
+"Le visiteur du clavardage qui s'est inscrit depuis le même navigateur ; "
+"rattaché au compte une fois son adresse vérifiée."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,help:im_livechat_linkup_reflect.field_im_livechat_channel__linkup_kind
+msgid ""
+"The welcome of the visitors, or the conversations of distress with the "
+"moderation."
+msgstr ""
+"L'accueil des visiteurs, ou les conversations de détresse avec la "
+"modération."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "This action belongs to another party of the reflection."
+msgstr "Cette action appartient à l'autre partie du reflet."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "This action does not apply to this kind of reflection."
+msgstr "Cette action ne s'applique pas à ce type de reflet."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "This conversation is not yours."
+msgstr "Cette conversation n'est pas la tienne."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "This conversation is unavailable."
+msgstr "Cette conversation est indisponible."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/common/livechat_reflet.js:0
+msgid "This exchange did not take place"
+msgstr "Cet échange n'a pas eu lieu"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid "This report is unavailable."
+msgstr "Ce signalement est indisponible."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "To say: %(text)s"
+msgstr "À dire : %(text)s"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_report.py:0
+msgid "Too many reports for now, try again later."
+msgstr "Trop de signalements pour l'instant, réessaie plus tard."
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_guide
+msgid "Try a guided reflection"
+msgstr "Essayer un reflet guidé"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "Unknown answer."
+msgstr "Réponse inconnue."
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/im_livechat_channel.py:0
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_guest_event__guest_id
+msgid "Visitor"
+msgstr "Visiteur"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_res_users__linkup_livechat_guest_id
+msgid "Visitor of the signup"
+msgstr "Visiteur de l'inscription"
+
+#. module: im_livechat_linkup_reflect
+#: model:im_livechat.channel,default_message:im_livechat_linkup_reflect.livechat_channel_welcome
+msgid "Welcome to LinkUp!"
+msgstr "Bienvenue sur LinkUp !"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_linkup_audit_log__action
+msgid "What"
+msgstr "Quoi"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_choice
+msgid "What would you like to do?"
+msgstr "Que veux-tu faire ?"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.guide_step_category
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_guide_category
+msgid "Which category names the exchange?"
+msgstr "Quelle catégorie nomme l'échange ?"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
+msgid "Write a reflection first."
+msgstr "Écris d'abord un reflet."
+
+#. module: im_livechat_linkup_reflect
+#: model:im_livechat.channel,input_placeholder:im_livechat_linkup_reflect.livechat_channel_welcome
+msgid "Write your answer…"
+msgstr "Écris ta réponse…"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "You may start with: %(text)s"
+msgstr "Tu peux commencer par : %(text)s"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "You told me: %(text)s"
+msgstr "Tu m'as dit : %(text)s"
+
+#. module: im_livechat_linkup_reflect
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.guide_step_you_said
+#: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_guide_you_said
+msgid "You told me: write what the person told you, in their words."
+msgstr "Tu m'as dit : écris ce que la personne t'a dit, dans ses mots."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_patch.js:0
+msgid "You told me…"
+msgstr "Tu m'as dit…"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid ""
+"Your request waits in the queue of the moderation, which processes it within"
+" %(hours)s hours."
+msgstr ""
+"Ta demande attend dans la file de la modération, qui la traite dans un délai"
+" de %(hours)s heures."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/common/livechat_composer.js:0
+msgid "the other person"
+msgstr "l'autre personne"

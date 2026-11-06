@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="im_livechat_linkup_reflect.LinkupLivechatHelp">
+        <div class="o-linkup-LivechatHelp d-flex flex-column gap-2 border-top px-2 py-2">
+            <div t-if="!help.open" class="d-flex flex-wrap align-items-center gap-2">
+                <span class="small flex-grow-1">LinkUp is not an emergency service.</span>
+                <button
+                    type="button"
+                    class="o-linkup-LivechatHelp-button btn btn-outline-danger btn-sm"
+                    data-linkup-guide="livechat-help-now"
+                    t-att-disabled="help.busy"
+                    t-on-click="press"
+                    t-ref="button"
+                >
+                    <i class="fa fa-life-ring me-1" aria-hidden="true" />
+                    Need help now
+                </button>
+                <LinkupGuideButton />
+            </div>
+            <section
+                t-else=""
+                class="o-linkup-LivechatHelp-panel d-flex flex-column gap-2"
+                aria-labelledby="o-linkup-LivechatHelp-title"
+                tabindex="-1"
+                t-ref="panel"
+            >
+                <div class="d-flex align-items-center gap-2">
+                    <h2 id="o-linkup-LivechatHelp-title" class="o-linkup-LivechatHelp-title h6 fw-bold mb-0 me-auto">
+                        Need help now
+                    </h2>
+                    <button
+                        type="button"
+                        class="o-linkup-LivechatHelp-close btn btn-link btn-sm"
+                        title="Close the help"
+                        aria-label="Close the help"
+                        t-on-click="close"
+                    >
+                        <i class="fa fa-times" aria-hidden="true" />
+                    </button>
+                </div>
+                <LinkupHelpNow fromHelp="true" />
+                <p
+                    class="o-linkup-LivechatHelp-status small mb-0"
+                    t-att-class="{ 'fw-bold': help.found }"
+                    role="status"
+                    aria-live="polite"
+                    t-esc="help.status"
+                />
+                <LinkupErrorAlert
+                    t-if="help.error"
+                    error="help.error"
+                    className="'o-linkup-LivechatHelp-error'"
+                    onRetry.bind="press"
+                />
+            </section>
+        </div>
+    </t>
+</templates>

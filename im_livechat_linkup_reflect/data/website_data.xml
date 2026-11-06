@@ -4,9 +4,11 @@
     <!-- The website of the widget keeps the public signup of LinkUp open
          (LU-F-110 RM1): once website is installed, the signup reads the
          setting of the current website, "On invitation" by default, in
-         place of auth_signup.invitation_scope. Set at the installation
-         only; Website › Settings changes it afterwards. -->
+         place of auth_signup.invitation_scope. It shows the welcome
+         channel on its pages (Q-45). Set at the installation only;
+         Website › Settings changes them afterwards. -->
     <record id="website.default_website" model="website">
         <field name="auth_signup_uninvited">b2c</field>
+        <field name="channel_id" ref="livechat_channel_welcome" />
     </record>
 </odoo>

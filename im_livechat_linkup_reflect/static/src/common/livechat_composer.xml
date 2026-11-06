@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Composer" t-inherit-mode="extension">
+        <xpath expr="//LinkupRefletComposer" position="after">
+            <LinkupLivechatRefletComposer t-if="hasLinkupLivechatReflet and linkupState.open" thread="thread" />
+        </xpath>
+        <xpath expr="//button[hasclass('o-linkup-StartRule-reflet')]" position="attributes">
+            <attribute name="t-if">hasLinkupReflet or hasLinkupLivechatReflet</attribute>
+        </xpath>
+    </t>
+    <t t-inherit="mail.Composer.emojiPicker" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-linkup-Composer-refletButton')]" position="attributes">
+            <attribute name="t-if">hasLinkupReflet or hasLinkupLivechatReflet</attribute>
+        </xpath>
+    </t>
+</templates>

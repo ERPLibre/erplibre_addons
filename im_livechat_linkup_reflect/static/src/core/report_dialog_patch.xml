@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_community.LinkupReportDialog" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-linkup-ReportDialog-ack')]" position="inside">
+            <div
+                t-if="linkupDistress.info"
+                class="o-linkup-ReportDialog-distress d-flex flex-wrap align-items-center gap-2"
+            >
+                <p class="fw-bold mb-0" t-esc="linkupDistressText" />
+                <button
+                    t-if="linkupDistress.info.channel_id"
+                    type="button"
+                    class="o-linkup-ReportDialog-openDistress btn btn-outline-primary btn-sm"
+                    t-on-click="linkupOpenConversation"
+                >
+                    Open the conversation
+                </button>
+            </div>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <!-- The click stays on the item of the list, as in im_livechat; the
+         button inside it is what the keyboard reaches and presses. -->
+    <t t-inherit="mail.Message" t-inherit-mode="extension">
+        <xpath expr="//ul[li[@t-foreach='props.message.chatbotStep?.answers']]" position="replace">
+            <ul
+                t-if="props.message.chatbotStep?.answers and !props.message.chatbotStep.selectedAnswer"
+                class="o-linkup-ChatbotAnswers list-unstyled p-0 m-0 mt-2"
+                t-att-class="{ 'o-linkup-ChatbotAnswers-isGrid': linkupHasCategoryAnswers }"
+                t-att-aria-label="linkupAnswersLabel"
+            >
+                <li
+                    t-foreach="props.message.chatbotStep.answers"
+                    t-as="answer"
+                    t-key="answer.id"
+                    t-on-click="() => this.answerChatbot(answer)"
+                >
+                    <button
+                        type="button"
+                        class="o-linkup-ChatbotAnswer btn btn-outline-primary w-100 d-flex align-items-center gap-2 text-start"
+                        t-att-data-linkup-guide="answer.linkup_category_code ? 'category' : undefined"
+                        t-att-data-code="answer.linkup_category_code or undefined"
+                        t-att-data-linkup-guide-context="answer.linkup_category_code ? 'chatbot' : undefined"
+                    >
+                        <LinkupCategoryIcon t-if="answer.linkup_category_code" code="answer.linkup_category_code" />
+                        <span class="text-break" t-esc="answer.name" />
+                    </button>
+                </li>
+            </ul>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- Welcome of the visitors (LU-F-124): its operators are the members
+         who volunteer, added by a LinkUp administrator; its rule shows the
+         welcome chatbot on every page of the website. -->
+    <record id="livechat_channel_welcome" model="im_livechat.channel">
+        <field name="name">LinkUp welcome</field>
+        <field name="linkup_kind">welcome</field>
+        <field name="user_ids" eval="[Command.clear()]" />
+        <field name="button_text">Questions? Talk with LinkUp</field>
+        <field name="default_message">Welcome to LinkUp!</field>
+        <field name="input_placeholder">Write your answer…</field>
+    </record>
+    <record id="livechat_rule_welcome" model="im_livechat.channel.rule">
+        <field name="channel_id" ref="livechat_channel_welcome" />
+        <field name="sequence">10</field>
+        <field name="action">display_button</field>
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+    </record>
+
+    <!-- Distress (LU-F-126): no rule, so no page shows it; its operators
+         are the LinkUp moderators, and the server alone opens its
+         conversations. -->
+    <record id="livechat_channel_distress" model="im_livechat.channel">
+        <field name="name">LinkUp distress</field>
+        <field name="linkup_kind">distress</field>
+        <field name="user_ids" eval="[Command.clear()]" />
+        <field name="button_text">Talk with the moderation</field>
+        <field name="default_message">A person of the moderation reads this conversation.</field>
+        <field name="linkup_start_rule">off</field>
+    </record>
+</odoo>

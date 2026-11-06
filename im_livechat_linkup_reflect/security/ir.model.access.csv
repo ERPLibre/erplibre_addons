@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkup_guest_event_none,linkup.guest.event server only,model_linkup_guest_event,mail_linkup_reflet.group_linkup_admin,0,0,0,0
