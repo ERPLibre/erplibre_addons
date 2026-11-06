@@ -55,3 +55,17 @@ $o-linkup-tint-dark: mix($gray-100, $info, 87.5%);
 .o-mail-DiscussSidebar-item[class*="o-linkup-"]:focus-visible {
     outline-color: lighten($primary, 15%) !important;
 }
+
+// The "?" of the guide button, $primary on the dark background of a view
+// under 4.5:1, takes the tint of the focus ring; pressed, it is the text
+// on a filled $primary of linkup_guide.scss.
+.o-linkup-GuideButton:not([aria-pressed="true"]) {
+    color: lighten($primary, 15%);
+}
+
+// The text of an outlined danger button, one step lighter than the text
+// token of web, for 4.5:1 on a dark background.
+[class*="o-linkup-"]:where(.btn-outline-danger),
+[class*="o-linkup-"] :where(.btn-outline-danger) {
+    --btn-color: #{lighten(map-get($o-theme-text-colors, "danger"), 10%)};
+}

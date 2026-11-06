@@ -192,6 +192,18 @@ $o-linkup-field-border: $gray-600 !default;
     border-color: $o-linkup-field-border;
 }
 
+// The text of an outlined danger button of LinkUp: the text token of web
+// for danger, one step darker, as for the losses of "My points".
+// Bootstrap draws it in $danger, under the 4.5:1 of AA on the grey
+// background of a view; linkup.dark.scss lightens it. A hovered button
+// keeps the white text on $danger of Bootstrap.
+$o-linkup-danger-text: darken(map-get($o-theme-text-colors, "danger"), 5%) !default;
+
+[class*="o-linkup-"]:where(.btn-outline-danger),
+[class*="o-linkup-"] :where(.btn-outline-danger) {
+    --btn-color: #{$o-linkup-danger-text};
+}
+
 // Touch targets of 44 px at least on a small screen (LU-NF-024, WCAG 2.5.5).
 // A box or a switch is reached through its label too: the row of the label
 // is the target, centred on the box.
