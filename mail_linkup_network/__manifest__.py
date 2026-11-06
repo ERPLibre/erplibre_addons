@@ -13,7 +13,30 @@
         "mail_linkup_gamification",
         "mail_linkup_reflet",
     ],
-    "data": [],
+    "data": [
+        "views/linkup_network_views.xml",
+        "views/res_config_settings_views.xml",
+    ],
+    "demo": [
+        "demo/linkup_network_demo.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "mail_linkup_network/static/src/**/*",
+            # The dark tints are compiled in the dark bundle only.
+            ("remove", "mail_linkup_network/static/src/**/*.dark.scss"),
+        ],
+        "web.assets_web_dark": [
+            "mail_linkup_network/static/src/**/*.dark.scss",
+        ],
+        "web.assets_unit_tests": [
+            "mail_linkup_network/static/tests/**/*",
+            ("remove", "mail_linkup_network/static/tests/tours/**/*"),
+        ],
+        "web.assets_tests": [
+            "mail_linkup_network/static/tests/tours/**/*",
+        ],
+    },
     "installable": True,
     "application": False,
     "auto_install": False,

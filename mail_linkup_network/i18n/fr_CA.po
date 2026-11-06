@@ -1,0 +1,1250 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mail_linkup_network
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "%(level)s: %(hint)s. %(count)s people shown."
+msgstr "%(level)s : %(hint)s. %(count)s personnes affichées."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "%(name)s adds to your happiness."
+msgstr "%(name)s ajoute à ton bonheur."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "%(name)s sees your avatar on theirs until your next exchange."
+msgstr "%(name)s voit ton avatar sur le sien jusqu'à votre prochain échange."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid ""
+"%(name)s, energy of the link %(points)s points. Open the card of the link."
+msgstr "%(name)s, énergie du lien %(points)s points. Ouvrir la fiche du lien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "%(name)s. Open the card of the link."
+msgstr "%(name)s. Ouvrir la fiche du lien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "%(points)s points"
+msgstr "%(points)s points"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "%(position)s. %(name)s, %(points)s points. Open the card of the link."
+msgstr "%(position)s. %(name)s, %(points)s points. Ouvrir la fiche du lien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "+ NewLink"
+msgstr "+ NewLink"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "30 days"
+msgstr "30 jours"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"A circle is a person you share a confirmed link with; the stronger the link,"
+" the larger the circle."
+msgstr ""
+"Un rond est une personne avec qui tu as un lien confirmé ; plus le lien est "
+"fort, plus le rond est gros."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "A person"
+msgstr "Une personne"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/action_request_patch.xml:0
+msgid "A request for action: answer as you wish, or not at all."
+msgstr "Une demande d'action : réponds comme tu veux, ou pas du tout."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "A row of the ranking"
+msgstr "Une ligne du classement"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "A video call with this person."
+msgstr "Une visio avec cette personne."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "A voice call with this person."
+msgstr "Un appel vocal avec cette personne."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Accept the request: “Agreed.” is posted in your conversation."
+msgstr ""
+"Accepter la demande : « D'accord. » est publié dans votre conversation."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/action_request_patch.xml:0
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_network.selection__linkup_reflet__linkup_action_reply__agree
+msgid "Agreed"
+msgstr "D'accord"
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_reflet.py:0
+msgid "Agreed."
+msgstr "D'accord."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "All"
+msgstr "Tout"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Answer the request in your own words."
+msgstr "Répondre à la demande avec tes propres mots."
+
+#. module: mail_linkup_network
+#: model:ir.model.fields,field_description:mail_linkup_network.field_linkup_reflet__linkup_action_reply
+msgid "Answer to the request for action"
+msgstr "Réponse à la demande d'action"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/action_request_patch.js:0
+msgid "Answer to the request: Agreed."
+msgstr "Réponse à la demande : D'accord."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/action_request_patch.js:0
+msgid "Answer to the request: Not for now."
+msgstr "Réponse à la demande : Pas pour l'instant."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Back"
+msgstr "Retour"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Back (Escape)"
+msgstr "Retour (Échap)"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Back to the graph"
+msgstr "Revenir au graphe"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Call"
+msgstr "Appel"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Call %(name)s"
+msgstr "Appeler %(name)s"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Choose a person to thank them for an exchange that did you good."
+msgstr ""
+"Choisis une personne pour la remercier d'un échange qui t'a fait du bien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Close the card"
+msgstr "Fermer la fiche"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Close the card (Escape)"
+msgstr "Fermer la fiche (Échap)"
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_reflet.py:0
+msgid "Confirm this reflection before answering it."
+msgstr "Confirme ce reflet avant d'y répondre."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Decline for now, without having to explain: “Not for now.” is posted in your"
+" conversation."
+msgstr ""
+"Décliner pour l'instant, sans avoir à t'expliquer : « Pas pour l'instant. » "
+"est publié dans votre conversation."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Density %(level)s: %(hint)s. Press for %(next)s."
+msgstr "Densité %(level)s : %(hint)s. Appuie pour %(next)s."
+
+#. module: mail_linkup_network
+#: model_terms:ir.ui.view,arch_db:mail_linkup_network.res_config_settings_view_form
+msgid "Density X3 of the graph: the strongest partners of the member."
+msgstr "Densité X3 du graphe : les partenaires les plus forts du membre."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Density of the graph"
+msgstr "Densité du graphe"
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_discuss_channel
+msgid "Discussion Channel"
+msgstr "Canal de discussion"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid ""
+"Draws a grey line in X1 between you and another contact who shows their "
+"links too."
+msgstr ""
+"Trace un trait gris en X1 entre toi et un autre contact qui montre aussi ses"
+" liens."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Energy of the link"
+msgstr "Énergie du lien"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Energy of the link: %(points)s points"
+msgstr "Énergie du lien : %(points)s points"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "First link: %(date)s"
+msgstr "Premier lien : %(date)s"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"For “The most active”: count every point, or those of the last 30 days only."
+msgstr ""
+"Pour « Les plus actifs » : compter tous les points, ou seulement ceux des 30"
+" derniers jours."
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_gamification_badge
+msgid "Gamification Badge"
+msgstr "Badge de ludification"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Golden halo"
+msgstr "Halo doré"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Golden halo: “You add to my happiness” received"
+msgstr "Halo doré : « Tu ajoutes à mon bonheur » reçu"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Graph"
+msgstr "Graphe"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Graph of my links"
+msgstr "Graphe de mes liens"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Grey line: two of your contacts linked, who both agree to show it"
+msgstr ""
+"Trait gris : deux de tes contacts liés, qui acceptent tous deux de le "
+"montrer"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Grey lines"
+msgstr "Traits gris"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "In the light"
+msgstr "En lumière"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Invite a person who is not on LinkUp yet, from a real exchange."
+msgstr ""
+"Inviter une personne qui n'est pas encore sur LinkUp, à partir d'un échange "
+"réel."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "It does not move."
+msgstr "Il ne bouge pas."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "It grows with each confirmed exchange of the pair."
+msgstr "Elle grandit à chaque échange confirmé de la paire."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Its position, the person and their points."
+msgstr "Son rang, la personne et ses points."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Its width shows the points you received in this link."
+msgstr "Son épaisseur montre les points que tu as reçus dans ce lien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Keep only the reflections of the pair in the thread."
+msgstr "Ne garder que les reflets de la paire dans le fil."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Leave the Network view for the previous screen."
+msgstr "Quitter la Vue Réseau pour l'écran précédent."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/action_request_patch.xml:0
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Let's propose something else"
+msgstr "Proposons autre chose"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Link with %(name)s"
+msgstr "Lien avec %(name)s"
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_linkup_link
+msgid "LinkUp link between two members"
+msgstr "Lien LinkUp entre deux membres"
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_linkup_reflet
+msgid "LinkUp reflection"
+msgstr "Reflet LinkUp"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid ""
+"Lists you in “The most active” of your links, rounded and without penalties."
+msgstr ""
+"T'inscrit dans « Les plus actifs » de tes liens, arrondie et sans pénalités."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Loading…"
+msgstr "Chargement…"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "My %(count)s strongest partners"
+msgstr "Mes %(count)s partenaires les plus forts"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "My direct links only"
+msgstr "Mes liens directs seulement"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "My energy"
+msgstr "Mon énergie"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+#: model:ir.model.fields,field_description:mail_linkup_network.field_res_users__linkup_energy_visible
+msgid "My energy is visible to my links"
+msgstr "Mon énergie est visible de mes liens"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "My energy: %(points)s points. Back to the graph."
+msgstr "Mon énergie : %(points)s points. Revenir au graphe."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+#: model:ir.model.fields,field_description:mail_linkup_network.field_res_users__linkup_links_visible
+msgid "My links are visible to my links"
+msgstr "Mes liens sont visibles de mes liens"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "My partners"
+msgstr "Mes partenaires"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/core/common/reflet_view_patch.xml:0
+#: code:addons/mail_linkup_network/static/src/core/public_web/linkup_sidebar_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+#: model:ir.actions.client,name:mail_linkup_network.action_linkup_network
+#: model:ir.ui.menu,name:mail_linkup_network.menu_linkup_network_view
+#: model_terms:ir.ui.view,arch_db:mail_linkup_network.res_config_settings_view_form
+msgid "Network view"
+msgstr "Vue Réseau"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/public_web/linkup_sidebar_patch.js:0
+msgid "Network view (%(energy)s)"
+msgstr "Vue Réseau (%(energy)s)"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "New reflection"
+msgstr "Nouveau reflet"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Nobody yet."
+msgstr "Personne pour l'instant."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "None of your contacts shows their energy yet."
+msgstr "Aucun de tes contacts ne montre encore son énergie."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/action_request_patch.xml:0
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_network.selection__linkup_reflet__linkup_action_reply__not_now
+msgid "Not for now"
+msgstr "Pas pour l'instant"
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_reflet.py:0
+msgid "Not for now."
+msgstr "Pas pour l'instant."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Nothing to show here yet."
+msgstr "Rien à montrer ici pour l'instant."
+
+#. module: mail_linkup_network
+#: model:ir.model.fields,help:mail_linkup_network.field_res_config_settings__linkup_network_top_count
+msgid ""
+"Number of partners the density X3 of the Network view keeps, the strongest "
+"links first."
+msgstr ""
+"Nombre de partenaires que garde la densité X3 de la Vue Réseau, les liens "
+"les plus forts d'abord."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Only the %(count)s strongest links are drawn."
+msgstr "Seuls les %(count)s liens les plus forts sont tracés."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Open the conversation"
+msgstr "Ouvrir la conversation"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Outside the guide, choosing a period reads the ranking again."
+msgstr "Hors du guide, choisir une période relit le classement."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Outside the guide, each box allows or withdraws it at once."
+msgstr "Hors du guide, chaque case l'autorise ou le retire aussitôt."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, each press goes to the next density: X1 → X2 → X3 → X1."
+msgstr ""
+"Hors du guide, chaque appui passe à la densité suivante : X1 → X2 → X3 → X1."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, each press shows “The most active”, then “My partners”, "
+"then the graph again; the energy bubble also brings the graph back."
+msgstr ""
+"Hors du guide, chaque appui montre « Les plus actifs », puis « Mes "
+"partenaires », puis de nouveau le graphe ; la bulle d'énergie ramène aussi "
+"le graphe."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, pressing it opens the card of the link. The arrow keys "
+"move from one person to the next."
+msgstr ""
+"Hors du guide, le toucher ouvre la fiche du lien. Les flèches passent d'une "
+"personne à l'autre."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, pressing it opens the card of the link: call, video call,"
+" conversation."
+msgstr ""
+"Hors du guide, la toucher ouvre la fiche du lien : appel, visio, "
+"conversation."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Outside the guide, pressing the line opens the card of the link."
+msgstr "Hors du guide, toucher le trait ouvre la fiche du lien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this bubble closes a card or a ranking and brings you "
+"back to the graph."
+msgstr ""
+"Hors du guide, cette bulle referme une fiche ou un classement et te ramène "
+"au graphe."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Outside the guide, this button draws the graph at this density."
+msgstr "Hors du guide, ce bouton trace le graphe à cette densité."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button filters the thread, and a second press shows "
+"everything again."
+msgstr ""
+"Hors du guide, ce bouton filtre le fil, et un second appui montre tout de "
+"nouveau."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button goes back; Escape does the same out of a "
+"field."
+msgstr ""
+"Hors du guide, ce bouton revient en arrière ; Échap fait de même hors d'un "
+"champ."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Outside the guide, this button opens it."
+msgstr "Hors du guide, ce bouton l'ouvre."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button opens the Reflet view with this person as the"
+" recipient."
+msgstr ""
+"Hors du guide, ce bouton ouvre la Vue Reflet avec cette personne comme "
+"destinataire."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Outside the guide, this button opens the form of your answer."
+msgstr "Hors du guide, ce bouton ouvre le formulaire de ta réponse."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button opens the invitation in the Reflet view."
+msgstr "Hors du guide, ce bouton ouvre l'invitation dans la Vue Reflet."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button opens the list of your contacts: the arrow "
+"keys move, Enter chooses, Escape closes."
+msgstr ""
+"Hors du guide, ce bouton ouvre la liste de tes contacts : les flèches "
+"déplacent, Entrée choisit, Échap ferme."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button opens your conversation and starts the call."
+msgstr "Hors du guide, ce bouton ouvre votre conversation et lance l'appel."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button opens your conversation and starts the video "
+"call."
+msgstr "Hors du guide, ce bouton ouvre votre conversation et lance la visio."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button posts the answer once. It earns and costs no "
+"point."
+msgstr ""
+"Hors du guide, ce bouton publie la réponse une seule fois. Elle ne rapporte "
+"et ne coûte aucun point."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button posts the answer once. Nobody loses any "
+"point."
+msgstr ""
+"Hors du guide, ce bouton publie la réponse une seule fois. Personne ne perd "
+"de point."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button puts the person in the light. A new press "
+"while it shines has no effect."
+msgstr ""
+"Hors du guide, ce bouton met la personne en lumière. Un nouvel appui pendant"
+" qu'elle brille est sans effet."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this button unfolds the list; each name opens the card of"
+" the link."
+msgstr ""
+"Hors du guide, ce bouton déplie la liste ; chaque nom ouvre la fiche du "
+"lien."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Outside the guide, this tab shows the ranking; a row opens the card of the "
+"link."
+msgstr ""
+"Hors du guide, cet onglet affiche le classement ; une ligne ouvre la fiche "
+"du lien."
+
+#. module: mail_linkup_network
+#: model:ir.model.fields,field_description:mail_linkup_network.field_res_config_settings__linkup_network_top_count
+msgid "Partners of the strongest density"
+msgstr "Partenaires de la densité la plus forte"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Period"
+msgstr "Période"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Put in the light"
+msgstr "Mettre en lumière"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Put someone in the light"
+msgstr "Mettre quelqu'un en lumière"
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_gamification_karma_rank
+msgid "Rank based on karma"
+msgstr "Rang selon le karma"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Rankings"
+msgstr "Classements"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Rankings: back to the graph"
+msgstr "Classements : revenir au graphe"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Rankings: show %(ranking)s"
+msgstr "Classements : afficher %(ranking)s"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Reflections only"
+msgstr "Reflets seulement"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Reflet view"
+msgstr "Vue Reflet"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Start a reflection of an exchange you had with this person."
+msgstr "Commencer un reflet d'un échange que tu as eu avec cette personne."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Thank someone without words: their avatar shines until your next exchange."
+msgstr ""
+"Remercier quelqu'un sans mots : son avatar brille jusqu'à votre prochain "
+"échange."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Thank this person without words: their avatar shines until your next "
+"exchange."
+msgstr ""
+"Remercier cette personne sans mots : son avatar brille jusqu'à votre "
+"prochain échange."
+
+#. module: mail_linkup_network
+#: model:ir.model.fields,help:mail_linkup_network.field_res_users__linkup_links_visible
+msgid ""
+"The Network view of a linked member draws a grey line between you and "
+"another of their contacts who shows their links too."
+msgstr ""
+"La Vue Réseau d'un membre lié trace un trait gris entre toi et un autre de "
+"ses contacts qui montre aussi ses liens."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid ""
+"The energy of your contacts who show it, rounded to the hundred, without "
+"penalties. Never the whole community."
+msgstr ""
+"L'énergie de tes contacts qui la montrent, arrondie à la centaine, sans "
+"pénalités. Jamais toute la communauté."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "The graph as a list"
+msgstr "Le graphe en liste"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "The graph as a list (%(count)s)"
+msgstr "Le graphe en liste (%(count)s)"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The graph is always centred on you: each line goes from you to a person you "
+"share a confirmed link with."
+msgstr ""
+"Le graphe est toujours centré sur toi : chaque trait part de toi vers une "
+"personne avec qui tu as un lien confirmé."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The graph of your links, their energy and the rankings of your contacts."
+msgstr ""
+"Le graphe de tes liens, leur énergie et les classements de tes contacts."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The halo shows around their circle, in the graph and in the rankings, until "
+"your next exchange."
+msgstr ""
+"Le halo s'affiche autour de son rond, dans le graphe et dans les "
+"classements, jusqu'à votre prochain échange."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "The line of a link"
+msgstr "Le trait d'un lien"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The links between your contacts. A choice of privacy: a line shows only when"
+" both people agree to show their links."
+msgstr ""
+"Les liens entre tes contacts. Choix de confidentialité : un trait n'apparaît"
+" que si les deux personnes acceptent de montrer leurs liens."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "The most active"
+msgstr "Les plus actifs"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "The oldest first."
+msgstr "Les plus anciens d'abord."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "The other person sees the points they received, which may differ."
+msgstr ""
+"L'autre personne voit les points qu'elle a reçus, qui peuvent différer."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "The people you have an active link with."
+msgstr "Les personnes avec qui tu as un lien actif."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The points you received in the events of this pair: the same value as in “My"
+" partners”."
+msgstr ""
+"Les points que tu as reçus dans les événements de cette paire : la même "
+"valeur que dans « Mes partenaires »."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The points you received in the link with the person: the energy of the link,"
+" as you see it."
+msgstr ""
+"Les points que tu as reçus dans le lien avec la personne : l'énergie du "
+"lien, telle que tu la vois."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "The points you received with each person: the energy of your link."
+msgstr ""
+"Les points que tu as reçus avec chaque personne : l'énergie de votre lien."
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/gamification_karma_rank.py:0
+#: code:addons/mail_linkup_network/models/res_users.py:0
+msgid "The points, rank and badges of a member are theirs alone."
+msgstr ""
+"Les points, le rang et les badges d'un membre n'appartiennent qu'à lui."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The same people as the graph, in text, with the energy of each link and the "
+"contacts they share."
+msgstr ""
+"Les mêmes personnes que le graphe, en texte, avec l'énergie de chaque lien "
+"et les contacts qu'elles partagent."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"The total of the points your links earned you: confirmed reflections, exact "
+"reformulations, calls. It is neither a number of friends nor a number of "
+"messages."
+msgstr ""
+"Le total des points que tes liens t'ont rapportés : reflets confirmés, "
+"reformulations exactes, appels. Ce n'est ni un nombre d'amis ni un nombre de"
+" messages."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "The view where you make a reflection of an exchange in person."
+msgstr "La vue où tu fais le reflet d'un échange en personne."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "This link is not available."
+msgstr "Ce lien n'est pas disponible."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "This person sent you “You add to my happiness”."
+msgstr "Cette personne t'a envoyé « Tu ajoutes à mon bonheur »."
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_reflet.py:0
+msgid "This reflection asks for no action."
+msgstr "Ce reflet ne demande aucune action."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid ""
+"Two levels: my links, and the links between my contacts who agree to show "
+"them"
+msgstr ""
+"Deux niveaux : mes liens, et les liens entre mes contacts qui acceptent de "
+"les montrer"
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_reflet.py:0
+msgid "Unknown answer."
+msgstr "Réponse inconnue."
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_link.py:0
+msgid "Unknown density of the network."
+msgstr "Densité du réseau inconnue."
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_link.py:0
+msgid "Unknown period."
+msgstr "Période inconnue."
+
+#. module: mail_linkup_network
+#. odoo-python
+#: code:addons/mail_linkup_network/models/linkup_link.py:0
+msgid "Unknown ranking."
+msgstr "Classement inconnu."
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Video"
+msgstr "Visio"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Video call"
+msgstr "Visio"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "Video call with %(name)s"
+msgstr "Visio avec %(name)s"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Visible in X1 only; they disappear in X2 and X3."
+msgstr "Visibles en X1 seulement ; ils disparaissent en X2 et X3."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "What my links see"
+msgstr "Ce que voient mes liens"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"What you both read in your conversation: yours on the right, theirs on the "
+"left."
+msgstr ""
+"Ce que vous lisez tous deux dans votre conversation : les tiens à droite, "
+"les siens à gauche."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Width of the line"
+msgstr "Épaisseur du trait"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Width of the line: the points received in the link"
+msgstr "Épaisseur du trait : les points reçus dans le lien"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "X1 · two levels"
+msgstr "X1 · deux niveaux"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"X1: your links and the grey lines between your contacts; X2: your direct "
+"links; X3: your %(count)s strongest partners."
+msgstr ""
+"X1 : tes liens et les traits gris entre tes contacts ; X2 : tes liens "
+"directs ; X3 : tes %(count)s partenaires les plus forts."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "X2 · direct links"
+msgstr "X2 · liens directs"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "X3 · the strongest"
+msgstr "X3 · les plus forts"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "You"
+msgstr "Toi"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "You add to my happiness"
+msgstr "Tu ajoutes à mon bonheur"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "You have no active link yet. A confirmed reflection creates one."
+msgstr "Tu n'as encore aucun lien actif. Un reflet confirmé en crée un."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid ""
+"You, %(name)s, in the centre, and %(count)s people around you. %(level)s: "
+"%(hint)s."
+msgstr ""
+"Toi, %(name)s, au centre, et %(count)s personnes autour de toi. %(level)s : "
+"%(hint)s."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "You, in the centre"
+msgstr "Toi, au centre"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Your %(count)s strongest partners only."
+msgstr "Seulement tes %(count)s partenaires les plus forts."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Your contacts ranked by the energy of the link with you."
+msgstr "Tes contacts classés selon l'énergie du lien avec toi."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Your contacts who show their energy, ranked by it, rounded to the hundred "
+"and without penalties. Never the whole community."
+msgstr ""
+"Tes contacts qui montrent leur énergie, classés selon elle, arrondie à la "
+"centaine et sans pénalités. Jamais toute la communauté."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Your direct conversation with this person, in Discuss."
+msgstr "Ta conversation directe avec cette personne, dans Discussion."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Your direct links only: the grey lines disappear."
+msgstr "Seulement tes liens directs : les traits gris disparaissent."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid ""
+"Your direct links, and the grey lines between your contacts who both agree "
+"to show their links."
+msgstr ""
+"Tes liens directs, et les traits gris entre tes contacts qui acceptent tous "
+"deux de montrer leurs liens."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.xml:0
+msgid "Your exchanges"
+msgstr "Vos échanges"
+
+#. module: mail_linkup_network
+#: model:ir.model.fields,help:mail_linkup_network.field_res_users__linkup_energy_visible
+msgid ""
+"Your linked members see your energy, rounded and without penalties, in their"
+" ranking of the most active."
+msgstr ""
+"Tes liens voient ton énergie, arrondie et sans pénalités, dans leur "
+"classement des plus actifs."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "Your links see neither your links nor your energy unless you allow it."
+msgstr ""
+"Tes liens ne voient ni tes liens ni ton énergie, sauf si tu le permets."
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
+msgid "also linked with %(names)s"
+msgstr "aussi lié à %(names)s"
+
+#. module: mail_linkup_network
+#. odoo-javascript
+#: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
+msgid "“The most active” and “My partners”, among your contacts only."
+msgstr ""
+"« Les plus actifs » et « Mes partenaires », parmi tes contacts seulement."

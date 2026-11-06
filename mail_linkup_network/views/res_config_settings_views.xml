@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field
+      name="name"
+    >res.config.settings.view.form.inherit.mail_linkup_network</field>
+        <field name="model">res.config.settings</field>
+        <field
+      name="inherit_id"
+      ref="mail_linkup_reflet.res_config_settings_view_form"
+    />
+        <field name="arch" type="xml">
+            <block id="linkup" position="inside">
+                <setting
+          id="linkup_network_setting"
+          string="Network view"
+          help="Density X3 of the graph: the strongest partners of the member."
+        >
+                    <div class="row mt-2">
+                        <label
+              for="linkup_network_top_count"
+              class="col-lg-6 o_light_label"
+            />
+                        <field name="linkup_network_top_count" />
+                    </div>
+                </setting>
+            </block>
+        </field>
+    </record>
+</odoo>

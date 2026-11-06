@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- The Network view of a member (static/src/views/network_view). -->
+    <record id="action_linkup_network" model="ir.actions.client">
+        <field name="name">Network view</field>
+        <field name="tag">linkup.network_view</field>
+        <field name="path">linkup-network</field>
+    </record>
+
+    <menuitem
+        id="menu_linkup_network_view"
+        name="Network view"
+        parent="mail_linkup_reflet.menu_linkup_root"
+        action="action_linkup_network"
+        groups="mail_linkup_reflet.group_linkup_member"
+        sequence="15"
+    />
+</odoo>

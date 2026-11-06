@@ -1,0 +1,273 @@
+// Network view: variables of web and Bootstrap only, so the dark bundle
+// compiles it with the dark values of the theme (network_view.dark.scss
+// adds the tints that differ).
+
+$o-linkup-network-energy-tint: mix($o-view-background-color, $warning, 82%) !default;
+// The lines carry the graph: 3:1 at least against the background (WCAG
+// 1.4.11). The grey lines are dashed besides, not told by colour only.
+$o-linkup-network-grey: $gray-600 !default;
+$o-linkup-network-edge: mix($o-view-background-color, $primary, 20%) !default;
+
+.o-linkup-NetworkView {
+    background-color: $o-view-background-color;
+
+    .o-linkup-NetworkView-energy {
+        background-color: $o-linkup-network-energy-tint;
+        border: $border-width solid mix($o-view-background-color, $warning, 55%);
+        color: inherit;
+
+        &:hover,
+        &:focus-visible {
+            background-color: mix($o-view-background-color, $warning, 70%);
+        }
+    }
+
+    .o-linkup-NetworkView-cycle,
+    .o-linkup-NetworkView-listButton {
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        font-weight: $font-weight-bold;
+    }
+
+    .o-linkup-NetworkView-level {
+        min-width: 3rem;
+    }
+
+    .o-linkup-NetworkView-main {
+        min-width: 0;
+    }
+
+    .o-linkup-NetworkView-canvas {
+        max-width: 40rem;
+        border: $border-width solid $border-color;
+        border-radius: $border-radius-lg;
+    }
+
+    .o-linkup-NetworkView-svg {
+        pointer-events: none;
+    }
+
+    .o-linkup-NetworkView-edge {
+        stroke: $o-linkup-network-edge;
+        stroke-linecap: round;
+
+        &.o-isSelected {
+            stroke: $primary;
+        }
+    }
+
+    .o-linkup-NetworkView-greyEdge {
+        stroke: $o-linkup-network-grey;
+        stroke-width: 3;
+        stroke-dasharray: 8 6;
+    }
+
+    // The buttons laid over the SVG are centred on their point.
+    .o-linkup-NetworkView-me,
+    .o-linkup-NetworkView-node,
+    .o-linkup-NetworkView-lineHit {
+        transform: translate(-50%, -50%);
+    }
+
+    .o-linkup-NetworkView-lineHit {
+        width: 2rem;
+        height: 2rem;
+        background-color: transparent;
+
+        &:hover,
+        &:focus-visible {
+            outline: $border-width * 2 dashed $primary;
+        }
+    }
+
+    .o-linkup-NetworkView-me {
+        width: 6rem;
+        pointer-events: none;
+
+        .o-linkup-NetworkView-meAvatar {
+            width: 4rem;
+            height: 4rem;
+            object-fit: cover;
+            box-shadow: 0 0 0 0.3rem mix($o-view-background-color, $primary, 80%);
+        }
+    }
+
+    .o-linkup-NetworkView-node {
+        --o-linkup-node-scale: 1;
+        width: 6rem;
+        color: inherit;
+
+        .o-linkup-NetworkView-avatar {
+            width: calc(2.25rem * var(--o-linkup-node-scale));
+            height: calc(2.25rem * var(--o-linkup-node-scale));
+            object-fit: cover;
+        }
+
+        &:focus-visible {
+            outline: none;
+
+            .o-linkup-NetworkView-avatar {
+                outline: $border-width * 3 solid $primary;
+                outline-offset: $border-width * 2;
+            }
+        }
+
+        &.o-isSelected .o-linkup-NetworkView-avatar {
+            outline: $border-width * 3 solid $primary;
+            outline-offset: $border-width * 2;
+        }
+    }
+
+    .o-linkup-NetworkView-name {
+        max-width: 100%;
+        padding: 0 0.25rem;
+        border-radius: $border-radius-sm;
+        background-color: rgba($o-view-background-color, 0.9);
+    }
+
+    .o-linkup-NetworkView-legend li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .o-linkup-NetworkView-legendLine,
+    .o-linkup-NetworkView-legendGrey {
+        display: inline-block;
+        width: 1.5rem;
+        border-radius: 0.25rem;
+    }
+
+    .o-linkup-NetworkView-legendLine {
+        height: 0.35rem;
+        background-color: $o-linkup-network-edge;
+    }
+
+    .o-linkup-NetworkView-legendGrey {
+        border-top: 0.2rem dashed $o-linkup-network-grey;
+    }
+
+    .o-linkup-NetworkView-legendHalo {
+        display: inline-block;
+        width: 0.9rem;
+        height: 0.9rem;
+        border: $border-width solid $border-color;
+    }
+
+    .o-linkup-NetworkView-list summary {
+        cursor: pointer;
+    }
+
+    .o-linkup-NetworkView-side {
+        flex: 0 0 22rem;
+        min-width: 0;
+    }
+
+    .o-linkup-NetworkView-tabs .nav-link {
+        color: inherit;
+
+        &.active {
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+    }
+
+    .o-linkup-NetworkView-row {
+        color: inherit;
+        border: $border-width solid transparent;
+
+        &.o-isSelected {
+            border-color: $primary;
+        }
+    }
+
+    .o-linkup-NetworkView-position {
+        width: 1.5rem;
+    }
+
+    .o-linkup-NetworkView-rowAvatar {
+        width: 1.75rem;
+        height: 1.75rem;
+        object-fit: cover;
+    }
+
+    .o-linkup-NetworkView-card {
+        background-color: $o-view-background-color;
+        border-color: $primary !important;
+
+        &:focus-visible {
+            outline: $border-width * 2 solid $primary;
+        }
+
+        .o-linkup-NetworkView-cardAvatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            object-fit: cover;
+            border: $border-width * 2 solid $o-view-background-color;
+
+            + .o-linkup-NetworkView-cardAvatar {
+                margin-left: -0.75rem;
+            }
+        }
+
+        .o-linkup-NetworkView-thread {
+            max-height: 20rem;
+            overflow-y: auto;
+        }
+
+        // The thread of the pair alternates, as a conversation does: the
+        // entries of the member on the right.
+        .o-linkup-NetworkView-entry {
+            max-width: 85%;
+            background-color: $gray-100;
+            border: $border-width solid $border-color;
+
+            &.o-isMine {
+                background-color: mix($o-view-background-color, $primary, 88%);
+            }
+        }
+
+        // On a small screen, the card rises from the bottom, over the graph.
+        @include media-breakpoint-down(md) {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: $zindex-offcanvas;
+            max-height: 75vh;
+            overflow-y: auto;
+            border-bottom-right-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            box-shadow: $box-shadow-lg;
+        }
+    }
+
+    .o-linkup-NetworkView-happinessList {
+        max-width: 20rem;
+        max-height: 16rem;
+        overflow-y: auto;
+
+        &:focus-visible {
+            outline: $border-width * 2 solid $primary;
+            outline-offset: $border-width;
+        }
+
+        .o-linkup-NetworkView-option {
+            cursor: pointer;
+
+            &.o-isActive {
+                background-color: $primary;
+                color: color-contrast($primary);
+            }
+        }
+    }
+
+    // Touch targets of at least 44 px on a small screen (LU-NF-024).
+    @include media-breakpoint-down(md) {
+        .o-linkup-NetworkView-footer .btn,
+        .o-linkup-NetworkView-card .btn {
+            min-height: 2.75rem;
+        }
+    }
+}

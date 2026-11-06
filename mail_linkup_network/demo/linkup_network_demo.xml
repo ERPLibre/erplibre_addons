@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- Links between the contacts of Sam, for the grey lines of the
+         density X1. France, Joanna, Jean, Nicolas and Mathieu show their
+         links: the pairs France-Joanna, Jean-Nicolas and Joanna-Mathieu
+         draw a grey line. Jacques does not: the pair France-Jacques draws
+         none. These links hold no ledger line, so the points of the
+         demonstration of the scoring module stay as they are. -->
+    <record id="demo_link_france_joanna" model="linkup.link">
+        <field name="user_a_id" ref="mail_linkup_reflet.demo_user_france" />
+        <field name="user_b_id" ref="mail_linkup_reflet.demo_user_joanna" />
+        <field name="state">active</field>
+        <field
+      name="first_link_date"
+      eval="(DateTime.now() - timedelta(days=15)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+        <field
+      name="last_interaction_date"
+      eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+    </record>
+    <record id="demo_link_jean_nicolas" model="linkup.link">
+        <field name="user_a_id" ref="mail_linkup_reflet.demo_user_jean" />
+        <field name="user_b_id" ref="mail_linkup_reflet.demo_user_nicolas" />
+        <field name="state">active</field>
+        <field
+      name="first_link_date"
+      eval="(DateTime.now() - timedelta(days=15)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+        <field
+      name="last_interaction_date"
+      eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+    </record>
+    <record id="demo_link_mathieu_joanna" model="linkup.link">
+        <field name="user_a_id" ref="mail_linkup_reflet.demo_user_mathieu" />
+        <field name="user_b_id" ref="mail_linkup_reflet.demo_user_joanna" />
+        <field name="state">active</field>
+        <field
+      name="first_link_date"
+      eval="(DateTime.now() - timedelta(days=15)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+        <field
+      name="last_interaction_date"
+      eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+    </record>
+    <record id="demo_link_france_jacques" model="linkup.link">
+        <field name="user_a_id" ref="mail_linkup_reflet.demo_user_france" />
+        <field name="user_b_id" ref="mail_linkup_reflet.demo_user_jacques" />
+        <field name="state">active</field>
+        <field
+      name="first_link_date"
+      eval="(DateTime.now() - timedelta(days=15)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+        <field
+      name="last_interaction_date"
+      eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"
+    />
+    </record>
+
+    <!-- Preferences of the network: the six contacts of Sam show their
+         energy to their links, for the ranking of the most active. Sam,
+         Luce, Thomas, Jonathan and Henri keep the defaults: nothing
+         shown. -->
+    <record id="mail_linkup_reflet.demo_user_france" model="res.users">
+        <field name="linkup_links_visible" eval="True" />
+        <field name="linkup_energy_visible" eval="True" />
+    </record>
+    <record id="mail_linkup_reflet.demo_user_joanna" model="res.users">
+        <field name="linkup_links_visible" eval="True" />
+        <field name="linkup_energy_visible" eval="True" />
+    </record>
+    <record id="mail_linkup_reflet.demo_user_jean" model="res.users">
+        <field name="linkup_links_visible" eval="True" />
+        <field name="linkup_energy_visible" eval="True" />
+    </record>
+    <record id="mail_linkup_reflet.demo_user_nicolas" model="res.users">
+        <field name="linkup_links_visible" eval="True" />
+        <field name="linkup_energy_visible" eval="True" />
+    </record>
+    <record id="mail_linkup_reflet.demo_user_mathieu" model="res.users">
+        <field name="linkup_links_visible" eval="True" />
+        <field name="linkup_energy_visible" eval="True" />
+    </record>
+    <record id="mail_linkup_reflet.demo_user_jacques" model="res.users">
+        <field name="linkup_energy_visible" eval="True" />
+    </record>
+</odoo>
