@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- The website of the widget keeps the public signup of LinkUp open
+         (LU-F-110 RM1): once website is installed, the signup reads the
+         setting of the current website, "On invitation" by default, in
+         place of auth_signup.invitation_scope. Set at the installation
+         only; Website › Settings changes it afterwards. -->
+    <record id="website.default_website" model="website">
+        <field name="auth_signup_uninvited">b2c</field>
+    </record>
+</odoo>

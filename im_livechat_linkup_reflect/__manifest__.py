@@ -16,7 +16,9 @@
         "mail_linkup_community",
         "website_livechat",
     ],
-    "data": [],
+    "data": [
+        "data/website_data.xml",
+    ],
     "installable": True,
     "application": False,
     "auto_install": False,

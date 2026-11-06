@@ -17,7 +17,10 @@ Skeleton: the module installs and declares its dependencies:
 ``im_livechat``,
 ``mail_linkup_community``,
 ``website_livechat``.
-Its features are not implemented yet.
+Its features are not implemented yet, but one: the default website opens
+the public signup of LinkUp at the installation (``auth_signup_uninvited =
+b2c``), since the signup reads the setting of the website once
+``website`` is installed, and that setting is "On invitation" by default.
 
 License
 =======
