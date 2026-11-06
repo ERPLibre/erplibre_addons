@@ -123,7 +123,9 @@ class TestLinkupPointsScale(LinkupPointsCase):
             user_id=self.sam.id
         )
         self._sent()
-        self.assertFalse(self.Ledger.sudo().search([]))
+        self.assertFalse(
+            self.Ledger.sudo().search([("user_id", "in", self.members.ids)])
+        )
 
     def test_withdrawal_keeps_the_balance(self):
         """LU-F-019 CA1: withdrawing an unread reflection leaves the balance
@@ -156,7 +158,9 @@ class TestLinkupPointsScale(LinkupPointsCase):
         ignored.sudo().sent_date = fields.Datetime.now() - timedelta(days=31)
         self.Reflet._cron_expire_reflets()
         self.assertEqual(ignored.state, "expired")
-        self.assertFalse(self.Ledger.sudo().search([]))
+        self.assertFalse(
+            self.Ledger.sudo().search([("user_id", "in", self.members.ids)])
+        )
 
     # Answers (LU-F-030 to LU-F-033)
 

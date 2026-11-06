@@ -24,6 +24,9 @@
         "views/res_config_settings_views.xml",
         "views/linkup_my_points_views.xml",
     ],
+    "demo": [
+        "demo/linkup_points_demo.xml",
+    ],
     "assets": {
         "web.assets_backend": [
             "mail_linkup_gamification/static/src/**/*",

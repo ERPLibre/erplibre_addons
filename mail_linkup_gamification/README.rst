@@ -123,6 +123,18 @@ Web client
   points in the guide; the points are still counted, and "My points"
   stays reachable.
 
+Demonstration
+=============
+
+* The demonstration pays the reflections of the demonstration of the core
+  through their scoring events, and one answered call to four pairs: the
+  accounts of the demonstration are dated back before their links, so
+  they earn points, and their karma equals the sum of their lines. Sam
+  holds 2700 points, the rank Flame, and France 2250, the rank Spark; the
+  pair Sam-Jacques holds no line. The values of the deck, such as the
+  energy of a link at 32450, are not reproduced: the caps of the scale
+  bound what the events of one day pay.
+
 License
 =======
 
