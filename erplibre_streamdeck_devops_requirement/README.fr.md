@@ -65,7 +65,9 @@ décision, non-objectif et anti-objectif de sa conception, de code
 `SD-INV-R<nn>`. Ses preuves sont des tests Odoo d'`erplibre_streamdeck`, des
 tests Node de l'extension et des tests unitaires d'ERPLibre. Une décision que
 le code ne tient pas encore reste à faire, étape *Développement*, et *Ce qui
-manque* décrit l'écart.
+manque* décrit l'écart. Un requis dont la garantie repose sur un autre le
+liste sous *Dépend de*, et reste à faire, en le nommant dans *Ce qui
+manque*, tant que celui-ci n'est pas fait.
 
 Le test `tests/test_requirement_inventory.py` vérifie que chaque preuve
 nomme un test qui existe : un test Odoo est importé et doit tourner sous

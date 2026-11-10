@@ -68,7 +68,9 @@ decks: one per decision, non-goal and anti-goal of its design, coded
 `SD-INV-R<nn>`. Its proofs are Odoo tests of `erplibre_streamdeck`, Node
 tests of the extension and unit tests of ERPLibre. A decision the code does
 not hold yet stays to do, stage *Develop*, and *What is missing* describes
-the gap.
+the gap. A requirement whose guarantee rests on another one lists it under
+*Depends on*, and stays to do, naming it in *What is missing*, as long as
+that one is not done.
 
 The test `tests/test_requirement_inventory.py` checks that each proof names
 a test that exists: an Odoo test is imported and must run under
@@ -168,7 +170,9 @@ décision, non-objectif et anti-objectif de sa conception, de code
 `SD-INV-R<nn>`. Ses preuves sont des tests Odoo d'`erplibre_streamdeck`, des
 tests Node de l'extension et des tests unitaires d'ERPLibre. Une décision que
 le code ne tient pas encore reste à faire, étape *Développement*, et *Ce qui
-manque* décrit l'écart.
+manque* décrit l'écart. Un requis dont la garantie repose sur un autre le
+liste sous *Dépend de*, et reste à faire, en le nommant dans *Ce qui
+manque*, tant que celui-ci n'est pas fait.
 
 Le test `tests/test_requirement_inventory.py` vérifie que chaque preuve
 nomme un test qui existe : un test Odoo est importé et doit tourner sous
