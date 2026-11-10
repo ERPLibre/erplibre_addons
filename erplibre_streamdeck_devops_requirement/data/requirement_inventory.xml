@@ -1197,6 +1197,18 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_inventory.TestRequirementInventory.test_a_requirement_is_not_done_before_what_it_rests_on</field>
     </record>
+    <record id="test_sd_inv_r13_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r13" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_inventory.TestRequirementInventory.test_a_loop_names_one_node_test_per_literal_value</field>
+    </record>
+    <record id="test_sd_inv_r13_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r13" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_inventory.TestRequirementInventory.test_a_template_its_loop_does_not_fill_names_no_test</field>
+    </record>
     <record id="test_sd_inv_r14_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r14" />
         <field name="sequence" eval="10" />
