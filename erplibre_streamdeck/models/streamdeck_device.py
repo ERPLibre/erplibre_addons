@@ -36,10 +36,10 @@ def usb_model_name(product_id):
 class StreamdeckDevice(models.Model):
     """A deck, identified across the company by `key`.
 
-    `key` is the serial number when the workstation reads one; a deck
-    without a readable serial gets a key built from its workstation, its
-    product id and its USB path, so it is never merged with a deck of
-    another workstation. `workstation_id` is the workstation that reported
+    `key` is `sn:<serial>` when the workstation reads a serial; a deck
+    without a readable serial gets `nosn:<workstation>:<product>:<path>`,
+    so it is never merged with a deck of another workstation. A serial
+    has no `:` (the service refuses one), so the two forms never meet. `workstation_id` is the workstation that reported
     it last: a deck moved to another workstation follows it, and its
     events keep the workstation where each happened.
     """

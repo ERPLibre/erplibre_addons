@@ -99,9 +99,12 @@ carries `protocol`; an error reply adds `error`.
   time.
 - `lost_events`: the running total of events the workstation dropped
   unsent; Odoo keeps the largest total received.
-- A deck is known by its serial number; a deck without a readable serial
-  number is known by its workstation, product id and USB path, and is
-  never merged with a deck of another workstation.
+- A deck is known by its serial number, key `sn:<serial>`; a deck without
+  a readable serial number is known by its workstation, product id and
+  USB path, key `nosn:<workstation>:<product>:<path>`, and is never
+  merged with a deck of another workstation. A serial outside
+  `[A-Za-z0-9._-]{1,64}` is a 400 `bad_request`: having no `:`, it can
+  never name a deck without serial.
 
 | Status | `error` | Meaning |
 |---|---|---|
@@ -220,9 +223,12 @@ une réponse d'erreur y ajoute `error`.
   par l'heure de réception.
 - `lost_events` : le total cumulé des événements que le poste a abandonnés
   sans les envoyer ; Odoo garde le plus grand total reçu.
-- Un deck se reconnaît à son numéro de série ; un deck sans numéro de série
-  lisible se reconnaît à son poste, son identifiant produit et son chemin
-  USB, et n'est jamais fusionné avec le deck d'un autre poste.
+- Un deck se reconnaît à son numéro de série, clé `sn:<numéro>` ; un deck
+  sans numéro de série lisible se reconnaît à son poste, son identifiant
+  produit et son chemin USB, clé `nosn:<poste>:<produit>:<chemin>`, et
+  n'est jamais fusionné avec le deck d'un autre poste. Un numéro hors de
+  `[A-Za-z0-9._-]{1,64}` est un 400 `bad_request` : sans `:`, il ne peut
+  jamais nommer un deck sans numéro.
 
 | Statut | `error` | Sens |
 |---|---|---|

@@ -67,6 +67,8 @@ ERRORS = (
 _PROTOCOL_RE = re.compile(r"([0-9]+)\.([0-9]+)")
 _FINGERPRINT_RE = re.compile(r"[0-9a-f]{64}")
 _PRODUCT_RE = re.compile(r"[0-9a-f]{4}")
+# A serial has no `:`, so `sn:<serial>` never equals a `nosn:` key.
+_SERIAL_RE = re.compile(r"[A-Za-z0-9._-]{1,64}")
 
 
 class RequestError(Exception):
@@ -155,9 +157,12 @@ def _parse_at(value):
 
 def _deck_identity(obj):
     """`(serial, usb_product_id, usb_path)` of a deck or of an event, the
-    product id as four lowercase hex digits or None; at least a serial or
-    a USB path is required to name the deck."""
+    serial within `_SERIAL_RE`, the product id as four lowercase hex
+    digits, each or None; at least a serial or a USB path is required to
+    name the deck."""
     serial = _text(obj, "serial")
+    if serial is not None and not _SERIAL_RE.fullmatch(serial):
+        raise _bad()
     product = _text(obj, "usb_product_id")
     path = _text(obj, "usb_path")
     if serial is None and path is None:
@@ -478,8 +483,11 @@ class StreamdeckService(models.AbstractModel):
         return _reply(accepted=accepted, heartbeat_s=HEARTBEAT_S)
 
     def _deck_key(self, workstation, deck):
+        """`sn:<serial>`, shared by every workstation that reports the
+        serial, or `nosn:<workstation>:<product>:<path>` for a deck
+        without one, which no other workstation can name."""
         if deck["serial"]:
-            return deck["serial"]
+            return "sn:%s" % deck["serial"]
         return "nosn:%d:%s:%s" % (
             workstation.id,
             deck["usb_product_id"] or "",

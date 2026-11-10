@@ -94,9 +94,12 @@ carries `protocol`; an error reply adds `error`.
   time.
 - `lost_events`: the running total of events the workstation dropped
   unsent; Odoo keeps the largest total received.
-- A deck is known by its serial number; a deck without a readable serial
-  number is known by its workstation, product id and USB path, and is
-  never merged with a deck of another workstation.
+- A deck is known by its serial number, key `sn:<serial>`; a deck without
+  a readable serial number is known by its workstation, product id and
+  USB path, key `nosn:<workstation>:<product>:<path>`, and is never
+  merged with a deck of another workstation. A serial outside
+  `[A-Za-z0-9._-]{1,64}` is a 400 `bad_request`: having no `:`, it can
+  never name a deck without serial.
 
 | Status | `error` | Meaning |
 |---|---|---|
