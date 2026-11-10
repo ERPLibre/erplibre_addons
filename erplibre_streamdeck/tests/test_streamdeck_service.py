@@ -768,7 +768,15 @@ class TestStreamdeckService(TransactionCase):
         token = enrolled["token"]
         workstation = self.Workstation.browse(enrolled["workstation_id"])
         self.assertEqual(workstation.lost_events_total, 0)
-        for lost, expected in ((3, 3), (3, 3), (2, 3), (5, 5), (0, 5)):
+        largest = 2**31 - 1  # le plus grand entier de la colonne
+        for lost, expected in (
+            (3, 3),
+            (3, 3),
+            (2, 3),
+            (5, 5),
+            (0, 5),
+            (largest, largest),
+        ):
             with self.subTest(lost=lost):
                 self.assertEqual(self._report(token, lost=lost)[0], 200)
                 self.assertEqual(workstation.lost_events_total, expected)
@@ -811,6 +819,20 @@ class TestStreamdeckService(TransactionCase):
             "key missing": dict(good_enroll, method="api_key"),
             "password missing": dict(
                 good_enroll, method="password", login="zz_sd_svc_b"
+            ),
+            # PostgreSQL ne stocke ni le caractère NUL ni une moitié de
+            # paire de substitution : le texte est refusé avant la base.
+            "hostname with NUL": dict(good_enroll, hostname="a\x00b"),
+            "hostname not UTF-8": dict(good_enroll, hostname="a\ud800b"),
+            "code with NUL": dict(good_enroll, code="ABCD\x00EFG"),
+            "key with NUL": dict(
+                good_enroll, method="api_key", key="\x00" * 40
+            ),
+            "login with NUL": dict(
+                good_enroll,
+                method="password",
+                login="zz_sd\x00svc_b",
+                password="x",
             ),
         }
         for name, payload in enroll_cases.items():
@@ -859,6 +881,7 @@ class TestStreamdeckService(TransactionCase):
             "lost not an int": dict(good, lost_events="3"),
             "lost a bool": dict(good, lost_events=True),
             "lost negative": dict(good, lost_events=-1),
+            "lost beyond the column": dict(good, lost_events=2**31),
             "lost missing": {
                 k: v for k, v in good.items() if k != "lost_events"
             },
@@ -882,6 +905,18 @@ class TestStreamdeckService(TransactionCase):
             ),
             "text too long": dict(
                 good, state=dict(state, deck_program="x" * 1000)
+            ),
+            "text with NUL": dict(
+                good, state=dict(state, gnome_shell="4\x008")
+            ),
+            "text not UTF-8": dict(
+                good, state=dict(state, deck_program="\udcff")
+            ),
+            "deck serial with NUL": dict(
+                good, state=dict(state, decks=[self._deck("SN\x00")])
+            ),
+            "event uuid with NUL": dict(
+                good, events=[dict(event, uuid="u\x00u")]
             ),
             "deck product not hex": dict(
                 good, state=dict(state, decks=[self._deck("SN", "84zz")])
