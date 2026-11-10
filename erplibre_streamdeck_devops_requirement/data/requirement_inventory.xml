@@ -336,13 +336,12 @@
         <field name="sequence" eval="230" />
         <field name="moscow">must</field>
         <field name="requirement_type">functional</field>
-        <field name="devsecops_stage">code</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">_deck_key of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py builds nosn:&lt;workstation&gt;:&lt;product&gt;:&lt;port&gt;; the extension reads sysfs serial before lsusb. A serial forged in that form is SD-INV-R44.</field>
-        <field name="missing">Holds only once SD-INV-R44 is done: until a serial is kept apart from the nosn: form, the key of a deck without serial is not reserved to its workstation.</field>
-        <field name="notes">Origin: violated.</field>
+        <field name="done" eval="True" />
+        <field name="achievement">_deck_key of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py builds nosn:&lt;workstation&gt;:&lt;product&gt;:&lt;port&gt;, a key no serial can take (SD-INV-R44); the extension reads sysfs serial before lsusb.</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_inv_r24" model="devops.requirement">
         <field name="code">SD-INV-R24</field>
@@ -577,14 +576,13 @@
         <field name="sequence" eval="400" />
         <field name="moscow">must</field>
         <field name="requirement_type">security</field>
-        <field name="devsecops_stage">code</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">The user rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml; the deck views show the workstation and employee names snapshot on each event, never a link to the other workstation; a pairing code is read by its creator only.</field>
-        <field name="missing">Holds only once SD-INV-R44 is done: until a serial is kept apart from the nosn: form, a workstation can make another workstation's deck without serial one it had, and read it with its events.</field>
-        <field name="notes">Origin: violated.</field>
+        <field name="achievement">The user rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml; the deck views show the workstation and employee names snapshot on each event, never a link to the other workstation; a pairing code is read by its creator only; no serial can name another workstation's deck without serial (SD-INV-R44).</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_inv_r41" model="devops.requirement">
         <field name="code">SD-INV-R41</field>
@@ -638,18 +636,17 @@
         <field name="sequence" eval="440" />
         <field name="moscow">must</field>
         <field name="requirement_type">security</field>
-        <field name="devsecops_stage">code</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
         <field
             name="dependent_ids"
             eval="[(6, 0, [ref('req_sd_inv_r23'), ref('req_sd_inv_r40')])]"
         />
-        <field name="achievement">_deck_key of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py keys a deck without serial as nosn:&lt;workstation&gt;:&lt;product&gt;:&lt;port&gt;.</field>
-        <field name="missing">The key of a deck with a serial is the bare serial, and a serial is any text up to 256 characters: a workstation that declares a serial of the form nosn:&lt;workstation&gt;:&lt;product&gt;:&lt;port&gt; takes over another workstation's deck without serial, with its history. Neither the sn: prefix nor the serial pattern is in the service, and no test pins them.</field>
-        <field name="notes">Origin: violated.</field>
+        <field name="achievement">_deck_identity of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers 400 bad_request to a serial outside [A-Za-z0-9._-]{1,64}, and _deck_key keys a serial sn:&lt;serial&gt; and a deck without serial nosn:&lt;workstation&gt;:&lt;product&gt;:&lt;port&gt;; lib/inventory.js of the extension sends a serial outside the pattern as null, so a deck with such a serial is still reported.</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="test_sd_inv_r01_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r01" />
@@ -2013,6 +2010,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_routes.TestStreamdeckPairingWizard.test_nobody_reads_the_code_of_another_employee</field>
     </record>
+    <record id="test_sd_inv_r40_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r40" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_serial_cannot_take_a_deck_without_serial</field>
+    </record>
     <record id="test_sd_inv_r41_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r41" />
         <field name="sequence" eval="10" />
@@ -2102,5 +2105,29 @@
         <field name="sequence" eval="10" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_deck_moves_to_the_reporting_workstation</field>
+    </record>
+    <record id="test_sd_inv_r44_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r44" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_serial_cannot_take_a_deck_without_serial</field>
+    </record>
+    <record id="test_sd_inv_r44_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r44" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_deck_key_keeps_serials_apart_from_decks_without_one</field>
+    </record>
+    <record id="test_sd_inv_r44_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r44" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_bad_requests_are_400</field>
+    </record>
+    <record id="test_sd_inv_r44_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r44" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::a serial outside Odoo's pattern goes as none, in the state and the events</field>
     </record>
 </odoo>
