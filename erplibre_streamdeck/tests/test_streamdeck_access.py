@@ -120,14 +120,36 @@ class TestStreamdeckAccess(TransactionCase):
             self.ws_b.with_user(self.user_a).read(["name"])
 
     def test_the_current_holder_reads_the_deck_history(self):
+        # Le deck tenu par le poste de B n'a d'événement qu'au poste de A :
+        # B le lit par son poste actuel, pas par l'historique.
         deck = self._device("SN-HELD", self.ws_b)
         events = self._event("plugged", self.ws_a, deck) | self._event(
             "unplugged", self.ws_a, deck
+        )
+        self.assertEqual(
+            self.Device.with_user(self.user_b).search([("id", "=", deck.id)]),
+            deck,
         )
         seen = self.Event.with_user(self.user_b).search(
             [("device_id", "=", deck.id)]
         )
         self.assertEqual(seen, events)
+
+    def test_an_employee_reads_the_service_history_of_their_workstation(
+        self,
+    ):
+        # Un changement d'état du service ne porte aucun deck : seule la
+        # branche des postes de l'employé, dans la règle des événements,
+        # le montre.
+        service = self._event("service_changed", self.ws_a)
+        seen = self.Event.with_user(self.user_a).search(
+            [("workstation_id", "=", self.ws_a.id)]
+        )
+        self.assertEqual(seen, service)
+        self.assertEqual(
+            service.with_user(self.user_a).read(["kind"])[0]["kind"],
+            "service_changed",
+        )
 
     def test_an_employee_never_reads_a_deck_their_workstations_never_had(
         self,
@@ -246,6 +268,21 @@ class TestStreamdeckAccess(TransactionCase):
         with self.assertRaises(AccessError):
             self.ws_b.with_user(self.user_a).write({"name": "taken"})
 
+    def test_the_manager_only_renames_and_archives_a_workstation(self):
+        ws = self.ws_b.with_user(self.manager)
+        ws.write({"name": "renamed-by-m"})
+        self.assertEqual(self.ws_b.name, "renamed-by-m")
+        for vals in (
+            {"fingerprint": "0" * 64},
+            {"os_name": "invented"},
+            {"token_active": False},
+            {"user_id": self.user_a.id},
+        ):
+            with self.subTest(vals=vals):
+                with self.assertRaises(AccessError):
+                    ws.write(vals)
+        self.assertEqual(self.ws_b.user_id, self.user_b)
+
     def test_an_employee_revokes_their_own_token_only(self):
         self.ws_a.with_user(self.user_a).action_revoke_token()
         self.assertFalse(self.ws_a.token_hash)
@@ -288,6 +325,18 @@ class TestStreamdeckAccess(TransactionCase):
         self.assertEqual(
             self.Event.with_user(as_m).search([("id", "=", event.id)]), event
         )
+
+    def test_reactivating_employees_leaves_their_workstations_alone(self):
+        # Une réactivation en lot touche aussi des employés restés actifs :
+        # leurs postes gardent leur jeton. Le poste d'un employé de retour
+        # reste archivé jusqu'à sa réinscription.
+        self.user_a.action_archive()
+        (self.user_a | self.user_b).write({"active": True})
+        self.assertTrue(self.user_a.active)
+        self.assertTrue(self.ws_b.active)
+        self.assertTrue(self.ws_b.token_hash)
+        self.assertFalse(self.ws_a.active)
+        self.assertFalse(self.ws_a.token_hash)
 
     def test_the_token_hash_is_not_readable_by_an_employee(self):
         for user in (self.user_a, self.manager):
