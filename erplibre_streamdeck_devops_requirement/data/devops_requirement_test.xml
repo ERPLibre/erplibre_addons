@@ -2925,7 +2925,7 @@
         <field name="requirement_id" ref="req_sd_deploy_r111" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesIndicateursNonMontes::test_the_command_reads_the_lines_extension_js_writes</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesIndicateursNonMontes::test_the_command_reads_the_lines_the_contract_states</field>
     </record>
     <record id="test_sd_deploy_r112_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r112" />
@@ -3249,7 +3249,7 @@
         <field name="requirement_id" ref="req_sd_ext_r03" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCommandesVisentLExtension::test_the_object_and_interface_are_those_extension_js_exports</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCommandesVisentLExtension::test_the_object_and_interface_are_those_the_contract_states</field>
     </record>
     <record id="test_sd_ext_r04_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r04" />
@@ -7269,7 +7269,7 @@
         <field name="requirement_id" ref="req_sd_rename_r05" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCommandesVisentLExtension::test_the_object_and_interface_are_those_extension_js_exports</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCommandesVisentLExtension::test_the_object_and_interface_are_those_the_contract_states</field>
     </record>
     <record id="test_sd_rename_r07_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r07" />
@@ -7293,7 +7293,7 @@
         <field name="requirement_id" ref="req_sd_rename_r08" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesIndicateursNonMontes::test_the_command_reads_the_lines_extension_js_writes</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesIndicateursNonMontes::test_the_command_reads_the_lines_the_contract_states</field>
     </record>
     <record id="test_sd_rename_r09_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r09" />
@@ -7341,7 +7341,7 @@
         <field name="requirement_id" ref="req_sd_rename_r13" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_identity.py::TestDataDirectories::test_the_device_indicator_reads_the_controller_pid_file</field>
+        <field name="reference">erplibre:test/test_erplibre_home_identity.py::TestDataDirectories::test_the_contract_names_the_controller_pid_file</field>
     </record>
     <record id="test_sd_rename_r14_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r14" />
