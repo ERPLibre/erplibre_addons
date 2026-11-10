@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Liste éditable : cocher Accepted / Done directement -->
+    <record id="view_devops_requirement_list" model="ir.ui.view">
+        <field name="name">devops.requirement.list</field>
+        <field name="model">devops.requirement</field>
+        <field name="arch" type="xml">
+            <list string="Requirements" editable="bottom" default_order="category_id,sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="moscow"
+                       decoration-danger="moscow == 'must'"
+                       decoration-warning="moscow == 'should'"
+                       decoration-muted="moscow == 'wont'"/>
+                <field name="priority" optional="show"/>
+                <field name="phase_id" optional="show"/>
+                <field name="size" optional="hide"/>
+                <field name="responsible_id" optional="hide"/>
+                <field name="accepted" widget="boolean_toggle"/>
+                <field name="approved" widget="boolean_toggle"/>
+                <field name="done" widget="boolean_toggle"/>
+                <field name="achievement" optional="show"/>
+                <field name="missing" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Formulaire détaillé -->
+    <record id="view_devops_requirement_form" model="ir.ui.view">
+        <field name="name">devops.requirement.form</field>
+        <field name="model">devops.requirement</field>
+        <field name="arch" type="xml">
+            <form string="Requirement">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Requirement title"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category_id"/>
+                            <field name="moscow"/>
+                            <field name="priority"/>
+                        </group>
+                        <group>
+                            <field name="phase_id"/>
+                            <field name="size"/>
+                            <field name="responsible_id"/>
+                            <field name="accepted"/>
+                            <field name="approved"/>
+                            <field name="done"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <group string="Achievement (how)">
+                        <field name="achievement" nolabel="1"
+                               placeholder="How this requirement is covered: module, menu, view, or the current state and what comes next."/>
+                    </group>
+                    <group string="What is missing">
+                        <field name="missing" nolabel="1"
+                               placeholder="What is still missing for a complete production delivery."/>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Recherche + regroupements -->
+    <record id="view_devops_requirement_search" model="ir.ui.view">
+        <field name="name">devops.requirement.search</field>
+        <field name="model">devops.requirement</field>
+        <field name="arch" type="xml">
+            <search string="Requirements">
+                <field name="name" string="Requirement"
+                       filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="category_id"/>
+                <field name="responsible_id"/>
+                <separator/>
+                <filter name="f_accepted" string="Accepted" domain="[('accepted', '=', True)]"/>
+                <filter name="f_not_accepted" string="Not accepted" domain="[('accepted', '=', False)]"/>
+                <separator/>
+                <filter name="f_approved" string="Approved" domain="[('approved', '=', True)]"/>
+                <filter name="f_not_approved" string="Not approved" domain="[('approved', '=', False)]"/>
+                <separator/>
+                <filter name="f_done" string="Done" domain="[('done', '=', True)]"/>
+                <filter name="f_not_done" string="To do" domain="[('done', '=', False)]"/>
+                <separator/>
+                <filter name="f_must" string="Essential (Must)" domain="[('moscow', '=', 'must')]"/>
+                <group expand="0" name="group_by" string="Group by">
+                    <filter name="g_cat" string="Domain" context="{'group_by': 'category_id'}"/>
+                    <filter name="g_moscow" string="MoSCoW level" context="{'group_by': 'moscow'}"/>
+                    <filter name="g_phase" string="Phase" context="{'group_by': 'phase_id'}"/>
+                    <filter name="g_prio" string="Priority" context="{'group_by': 'priority'}"/>
+                    <filter name="g_resp" string="Responsible" context="{'group_by': 'responsible_id'}"/>
+                    <filter name="g_done" string="Done" context="{'group_by': 'done'}"/>
+                    <filter name="g_approved" string="Approved" context="{'group_by': 'approved'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vues graphiques (avancement) -->
+    <record id="view_devops_requirement_graph" model="ir.ui.view">
+        <field name="name">devops.requirement.graph</field>
+        <field name="model">devops.requirement</field>
+        <field name="arch" type="xml">
+            <graph string="Requirements by domain" type="bar" sample="1">
+                <field name="category_id"/>
+                <field name="moscow"/>
+            </graph>
+        </field>
+    </record>
+    <record id="view_devops_requirement_pivot" model="ir.ui.view">
+        <field name="name">devops.requirement.pivot</field>
+        <field name="model">devops.requirement</field>
+        <field name="arch" type="xml">
+            <pivot string="Requirements" sample="1">
+                <field name="category_id" type="row"/>
+                <field name="moscow" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_devops_requirement" model="ir.actions.act_window">
+        <field name="name">Requirements</field>
+        <field name="res_model">devops.requirement</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+        <field name="context">{'search_default_g_cat': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a requirement</p>
+            <p>Describe what the project commits to, by domain and by phase.</p>
+        </field>
+    </record>
+
+</odoo>
