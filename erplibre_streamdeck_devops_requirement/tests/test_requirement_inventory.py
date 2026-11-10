@@ -8,13 +8,16 @@ import subprocess
 import unittest
 from pathlib import Path
 
+import polib
 
 from odoo.tests.common import TransactionCase, tagged
 from odoo.tools.misc import file_path
+from odoo.tools.translate import TranslationModuleReader
 
 from .test_streamdeck_requirement_data import (
     AUDIT_ALIAS,
     FIRST_PERSON,
+    FRENCH_LEXICON,
     NON_GOAL,
     ORIGIN,
     TEXT_FIELDS,
@@ -95,6 +98,14 @@ SHARED_REFERENCE = (
     ".TestStreamdeckAccess"
     ".test_a_deck_lent_keeps_its_whole_history_for_the_lender"
 )
+
+FRENCH = {
+    "cat_sd_inv": "Inventaire",
+    "SD-INV-R02": (
+        "L'extension appelle Odoo en HTTPS, et en HTTP simple seulement "
+        "vers la machine elle-même : 127.0.0.0/8, ::1 ou localhost"
+    ),
+}
 
 
 def erplibre_root():
@@ -345,3 +356,36 @@ class TestRequirementInventory(TransactionCase):
             len(data), 1 + len(self.requirements) + len(self.lines)
         )
         self.assertTrue(all(data.mapped("noupdate")))
+
+    def test_the_inventory_reads_in_fr_CA(self):
+        # Les termes que l'export d'Odoo tire des données de l'inventaire
+        # sont au catalogue, et chacun a son français.
+        exported = {
+            term[4]
+            for term in TranslationModuleReader(self.env.cr, modules=[MODULE])
+            if re.search(r"\.(req_sd_inv_r\d+|cat_sd_inv)$", term[3] or "")
+        }
+        self.assertGreater(len(exported), COUNT)
+        template = polib.pofile(file_path("%s/i18n/%s.pot" % (MODULE, MODULE)))
+        self.assertFalse(sorted(exported - {e.msgid for e in template}))
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+            if entry.msgid in exported
+        }
+        self.assertEqual(set(french), exported)
+        self.assertFalse([msgid for msgid, s in french.items() if not s])
+        for msgstr in french.values():
+            self.assertNotRegex(msgstr, FRENCH_LEXICON)
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(
+            [MODULE], ["fr_CA"], overwrite=True
+        )
+        self.assertEqual(
+            self.category.with_context(lang="fr_CA").name,
+            FRENCH["cat_sd_inv"],
+        )
+        self.assertEqual(
+            self._requirement("SD-INV-R02").with_context(lang="fr_CA").name,
+            FRENCH["SD-INV-R02"],
+        )

@@ -1179,6 +1179,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_inventory.TestRequirementInventory.test_a_done_requirement_has_a_proof_and_nothing_missing</field>
     </record>
+    <record id="test_sd_inv_r13_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r13" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_inventory.TestRequirementInventory.test_the_inventory_reads_in_fr_CA</field>
+    </record>
     <record id="test_sd_inv_r14_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r14" />
         <field name="sequence" eval="10" />
