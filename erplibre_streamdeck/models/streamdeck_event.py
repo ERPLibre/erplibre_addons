@@ -44,7 +44,7 @@ class StreamdeckEvent(models.Model):
         index=True,
         ondelete="restrict",
     )
-    workstation_name = fields.Char()
+    workstation_name = fields.Char(string="Workstation name")
     employee_name = fields.Char(string="Employee")
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
 

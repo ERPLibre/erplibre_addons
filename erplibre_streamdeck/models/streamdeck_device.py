@@ -62,8 +62,8 @@ class StreamdeckDevice(models.Model):
         ondelete="set null",
     )
     connected = fields.Boolean()
-    connected_since = fields.Datetime()
-    last_seen = fields.Datetime()
+    connected_since = fields.Datetime(string="Connected since")
+    last_seen = fields.Datetime(string="Last seen")
     event_ids = fields.One2many(
         "streamdeck.event", "device_id", string="Events"
     )

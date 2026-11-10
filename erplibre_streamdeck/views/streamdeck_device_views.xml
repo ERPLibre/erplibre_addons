@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Un deck prêté reste lisible de son prêteur, qui ne lit pas le
+         poste qui le tient : le poste actuel s'affiche sans lien, et
+         l'historique nomme poste et employé par leur copie sur
+         l'événement. -->
+    <record id="view_streamdeck_device_list" model="ir.ui.view">
+        <field name="name">streamdeck.device.list</field>
+        <field name="model">streamdeck.device</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false"
+                  decoration-muted="not connected">
+                <field name="model_name"/>
+                <field name="serial"/>
+                <field name="workstation_id" options="{'no_open': True}"/>
+                <field name="connected"/>
+                <field name="connected_since" optional="show"/>
+                <field name="last_seen" optional="show"/>
+                <field name="usb_product_id" optional="hide"/>
+                <field name="firmware" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_device_form" model="ir.ui.view">
+        <field name="name">streamdeck.device.form</field>
+        <field name="model">streamdeck.device</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="model_name" readonly="True"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="serial" readonly="True"/>
+                            <field name="usb_product_id" readonly="True"/>
+                            <field name="firmware" readonly="True"/>
+                        </group>
+                        <group>
+                            <field name="workstation_id" readonly="True"
+                                   options="{'no_open': True}"/>
+                            <field name="connected" readonly="True"/>
+                            <field name="connected_since" readonly="True"/>
+                            <field name="last_seen" readonly="True"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Events" name="events">
+                            <field name="event_ids" readonly="True">
+                                <list>
+                                    <field name="at"/>
+                                    <field name="kind"/>
+                                    <field name="workstation_name"/>
+                                    <field name="employee_name"/>
+                                    <field name="received_at" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_device_search" model="ir.ui.view">
+        <field name="name">streamdeck.device.search</field>
+        <field name="model">streamdeck.device</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="serial"/>
+                <field name="model_name"/>
+                <field name="workstation_id"/>
+                <filter name="connected" string="Connected"
+                        domain="[('connected', '=', True)]"/>
+                <filter name="disconnected" string="Disconnected"
+                        domain="[('connected', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_model" string="Model"
+                            context="{'group_by': 'model_name'}"/>
+                    <filter name="group_workstation" string="Current workstation"
+                            context="{'group_by': 'workstation_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- « Mes decks » : ceux que tient un de mes postes et ceux qu'un de
+         mes postes a eus, le domaine de la règle de l'employé, appliqué
+         aussi au gestionnaire. -->
+    <record id="action_streamdeck_my_decks" model="ir.actions.act_window">
+        <field name="name">My decks</field>
+        <field name="res_model">streamdeck.device</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[
+            '|',
+            ('workstation_id.user_id', '=', uid),
+            ('event_ids.workstation_id.user_id', '=', uid),
+        ]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                No deck reported yet
+            </p>
+            <p>
+                A deck appears here once one of your enrolled workstations
+                reports it.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_fleet_decks" model="ir.actions.act_window">
+        <field name="name">Decks</field>
+        <field name="res_model">streamdeck.device</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
