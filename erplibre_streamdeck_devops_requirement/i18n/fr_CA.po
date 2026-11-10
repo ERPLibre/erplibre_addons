@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 11:42+0000\n"
-"PO-Revision-Date: 2026-11-10 11:42+0000\n"
+"POT-Creation-Date: 2026-11-10 11:43+0000\n"
+"PO-Revision-Date: 2026-11-10 11:43+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -37,9 +37,9 @@ msgid ""
 "--check exits 0 only when program != none, venv python exists, a USB device "
 "of vendor 0fd9 is present; else non-zero with a reason"
 msgstr ""
-"--check sort en 0 seulement si le programme n'est pas none, que le python du"
-" venv existe et qu'un périphérique USB du fabricant 0fd9 est présent ; sinon"
-" il sort en non-zéro avec une raison"
+"--check se termine avec le code 0 seulement si le programme n'est pas none, "
+"que le python du venv existe et qu'un périphérique USB du fabricant 0fd9 est"
+" présent ; sinon il se termine avec un code non nul et donne une raison"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r50
@@ -59,9 +59,9 @@ msgid ""
 "--stream-deck lists both"
 msgstr ""
 "--dry-run affiche la famille, la version de GNOME, les commandes de paquets "
-"(un extra par ligne), la migration, les fichiers; avec --uninstall, les "
-"fichiers et les clés, aucune commande de paquet; ne change rien, sans sudo; "
-"la base ne liste ni règle ni venv, --stream-deck liste les deux"
+"(un extra par ligne), la migration, les fichiers ; avec --uninstall, les "
+"fichiers et les clés, aucune commande de paquet ; ne change rien, sans sudo "
+"; la base ne liste ni règle ni venv, --stream-deck liste les deux"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r23
@@ -79,7 +79,7 @@ msgid ""
 "package; without gettext it fails at the translations naming the package"
 msgstr ""
 "--extension-only lance l'étape de l'extension seule : sans sudo, sans "
-"vérification du système, sans paquet; sans gettext, elle échoue aux "
+"vérification du système, sans paquet ; sans gettext, elle échoue aux "
 "traductions en nommant le paquet"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -88,7 +88,7 @@ msgid ""
 "--extension-only with --stream-deck or --uninstall is a usage error, exit 1"
 msgstr ""
 "--extension-only avec --stream-deck ou --uninstall est une erreur d'usage, "
-"sortie 1"
+"code de sortie 1"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r75
@@ -98,7 +98,8 @@ msgstr "--list-plugins n'ouvre pas le deck et ne prend pas le verrou"
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r74
 msgid "--list-plugins prints one line per plugin and exits 0"
-msgstr "--list-plugins affiche une ligne par plugin et sort avec 0"
+msgstr ""
+"--list-plugins affiche une ligne par plugin et se termine avec le code 0"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r121
@@ -148,7 +149,7 @@ msgid ""
 "exits 0"
 msgstr ""
 "--uninstall --stream-deck est idempotent : une seconde exécution n'appelle "
-"rien et sort en 0"
+"rien et se termine avec le code 0"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r69
@@ -157,7 +158,7 @@ msgid ""
 "the extension stays installed and enabled"
 msgstr ""
 "--uninstall --stream-deck retire seulement la règle (puis recharge) et le "
-"venv; l'extension reste installée et activée"
+"venv ; l'extension reste installée et activée"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r22
@@ -180,7 +181,7 @@ msgid ""
 "rule (then reload), .venv.streamdeck; never system packages"
 msgstr ""
 "--uninstall retire l'UUID d'enabled-extensions, le lien symbolique, la règle"
-" udev (puis recharge), .venv.streamdeck; jamais les paquets système"
+" udev (puis recharge), .venv.streamdeck ; jamais les paquets système"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r71
@@ -189,7 +190,8 @@ msgid ""
 "rest, prints its summary, then exits 1 naming the UUID"
 msgstr ""
 "Un --uninstall qui ne peut pas lire ou écrire enabled-extensions retire "
-"quand même le reste, affiche son bilan, puis sort en 1 en nommant l'UUID"
+"quand même le reste, affiche son bilan, puis se termine avec le code 1 en "
+"nommant l'UUID"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r67
@@ -198,7 +200,7 @@ msgid ""
 "lz4; one command per extra; a missing extra warns, never fatal"
 msgstr ""
 "--with-extras (les deux niveaux) : mpv, yt-dlp, nmap, keepassxc, xdotool, "
-"lz4 du système; une commande par extra; un extra manquant avertit, jamais "
+"lz4 du système ; une commande par extra ; un extra manquant avertit, jamais "
 "fatal"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -213,9 +215,10 @@ msgid ""
 "unknown argument prints the usage on stderr and exits 2; neither takes the "
 "lock nor imports app"
 msgstr ""
-"-h/--help affiche l'usage, les réglages et les codes de sortie et sort avec "
-"0 ; un argument inconnu affiche l'usage sur stderr et sort avec 2 ; ni l'un "
-"ni l'autre ne prend le verrou ni n'importe app"
+"-h/--help affiche l'usage, les réglages et les codes de sortie et se termine"
+" avec le code 0 ; un argument inconnu affiche l'usage sur stderr et se "
+"termine avec le code 2 ; ni l'un ni l'autre ne prend le verrou ni n'importe "
+"app"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r28
@@ -242,8 +245,8 @@ msgid ""
 "/etc/os-release maps to debian/rhel/suse/arch (ID, then ID_LIKE); unknown or"
 " unreadable exits 2"
 msgstr ""
-"/etc/os-release se ramène à debian/rhel/suse/arch (ID, puis ID_LIKE); "
-"inconnu ou illisible, sortie 2"
+"/etc/os-release se ramène à debian/rhel/suse/arch (ID, puis ID_LIKE) ; "
+"inconnu ou illisible, code de sortie 2"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r75
@@ -301,8 +304,8 @@ msgid ""
 "A SIGTERM during a build resets the deck and exits 143; SigtermExit passes "
 "through the guard and the loader"
 msgstr ""
-"Un SIGTERM pendant une construction réinitialise le deck et sort avec 143 ; "
-"SigtermExit traverse la garde et le chargeur"
+"Un SIGTERM pendant une construction réinitialise le deck et se termine avec "
+"le code 143 ; SigtermExit traverse la garde et le chargeur"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r133
@@ -407,7 +410,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r09
 msgid "A deck held elsewhere runs no game, exit 2"
-msgstr "Un deck tenu ailleurs ne lance aucun jeu, sortie 2"
+msgstr "Un deck tenu ailleurs ne lance aucun jeu, code de sortie 2"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r38
@@ -506,7 +509,7 @@ msgid ""
 "FAILED(<check>); both skip the rest"
 msgstr ""
 "Une commande d'étape en échec donne FAILED(<command>), le premier contrôle "
-"en échec FAILED(<check>); les deux sautent le reste"
+"en échec FAILED(<check>) ; les deux sautent le reste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r32
@@ -682,15 +685,15 @@ msgid ""
 "Edit instance"
 msgstr ""
 "Le sous-menu d'une instance locale offre les actions KeePassXC configurées "
-"par Edit instance"
+"par « Modifier l'instance »"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r51
 msgid ""
 "A major outside shell-version exits 2 ('GNOME <v> not in shell-version')"
 msgstr ""
-"Une version majeure hors de shell-version sort en 2 ('GNOME <v> not in "
-"shell-version')"
+"Une version majeure hors de shell-version se termine avec le code 2 ('GNOME "
+"<v> not in shell-version')"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r128
@@ -934,7 +937,7 @@ msgid ""
 " and exits 0"
 msgstr ""
 "Un second --uninstall complet ne change rien (aucune réécriture d'enabled-"
-"extensions) et sort en 0"
+"extensions) et se termine avec le code 0"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r16
@@ -1300,7 +1303,7 @@ msgstr ""
 msgid ""
 "Arch/Tumbleweed may be UNSUPPORTED; any other UNSUPPORTED fails the run"
 msgstr ""
-"Arch/Tumbleweed peuvent être UNSUPPORTED; tout autre UNSUPPORTED fait "
+"Arch/Tumbleweed peuvent être UNSUPPORTED ; tout autre UNSUPPORTED fait "
 "échouer l'exécution"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -1386,8 +1389,8 @@ msgid ""
 "Base install: exit 2 -> UNSUPPORTED(<reason>), exit 1 -> FAILED(install), "
 "the rest skipped"
 msgstr ""
-"Installation de base : sortie 2 -> UNSUPPORTED(<reason>), sortie 1 -> "
-"FAILED(install), le reste sauté"
+"Installation de base : code de sortie 2 -> UNSUPPORTED(<reason>), code de "
+"sortie 1 -> FAILED(install), le reste sauté"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r25
@@ -1447,9 +1450,9 @@ msgid ""
 "5 s without opening the deck; the required keys are present; readers ignore "
 "unknown keys"
 msgstr ""
-"CONTRACT.md, ligne de commande : --meta affiche un seul objet JSON et sort "
-"en 0 en moins de 5 s sans ouvrir le deck ; les clés requises sont présentes "
-"; les lecteurs ignorent les clés inconnues"
+"CONTRACT.md, ligne de commande : --meta affiche un seul objet JSON et se "
+"termine avec le code 0 en moins de 5 s sans ouvrir le deck ; les clés "
+"requises sont présentes ; les lecteurs ignorent les clés inconnues"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r04
@@ -1457,8 +1460,9 @@ msgid ""
 "CONTRACT.md, Command line: -h and --help exit 0, an unknown argument exits "
 "2, both before the PIL and Stream Deck imports"
 msgstr ""
-"CONTRACT.md, ligne de commande : -h et --help sortent en 0, un argument "
-"inconnu sort en 2, les deux avant les imports de PIL et de Stream Deck"
+"CONTRACT.md, ligne de commande : -h et --help se terminent avec le code 0, "
+"un argument inconnu se termine avec le code 2, les deux avant les imports de"
+" PIL et de Stream Deck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r02
@@ -1524,8 +1528,8 @@ msgid ""
 "CONTRACT.md, Playing: a game played without an option exits 0 when the "
 "player quits"
 msgstr ""
-"CONTRACT.md, partie : un jeu lancé sans option sort en 0 quand le joueur "
-"quitte"
+"CONTRACT.md, partie : un jeu lancé sans option se termine avec le code 0 "
+"quand le joueur quitte"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r06
@@ -1569,8 +1573,8 @@ msgid ""
 "CONTRACT.md, what the games rely on: the hand-over exits 4 when GAMES is not"
 " on, before stopping anything"
 msgstr ""
-"CONTRACT.md, ce dont les jeux dépendent : la passation sort en 4 quand GAMES"
-" n'est pas à on, avant d'arrêter quoi que ce soit"
+"CONTRACT.md, ce dont les jeux dépendent : la passation se termine avec le "
+"code 4 quand GAMES n'est pas à on, avant d'arrêter quoi que ce soit"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r21
@@ -1679,7 +1683,7 @@ msgid ""
 "<bundle> ~/git/erplibre, checkout <HEAD sha>; never GitHub"
 msgstr ""
 "Étape du code : installer git avec le gestionnaire de la famille, scp du "
-"bundle, git clone <bundle> ~/git/erplibre, checkout <HEAD sha>; jamais "
+"bundle, git clone <bundle> ~/git/erplibre, checkout <HEAD sha> ; jamais "
 "GitHub"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -1772,7 +1776,9 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r67
 msgid "Copy hostname and Copy IP copy the host's name and address"
-msgstr "Copy hostname et Copy IP copient le nom et l'adresse de l'hôte"
+msgstr ""
+"« Copier le nom d'hôte » et « Copier l'IP » copient le nom et l'adresse de "
+"l'hôte"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r58
@@ -1780,15 +1786,15 @@ msgid ""
 "Copy username and Copy password read the entry through keepassxc-cli and put"
 " it in St.Clipboard"
 msgstr ""
-"Copy username et Copy password lisent l'entrée par keepassxc-cli et la "
-"placent dans St.Clipboard"
+"« Copier le nom d'utilisateur » et « Copier le mot de passe » lisent "
+"l'entrée par keepassxc-cli et la placent dans St.Clipboard"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r35
 msgid "Custom… opens a modal text dialog and runs the typed command"
 msgstr ""
-"Custom… ouvre une boîte de dialogue modale de saisie et lance la commande "
-"tapée"
+"« Personnalisé… » ouvre une boîte de dialogue modale de saisie et lance la "
+"commande tapée"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r04
@@ -1980,7 +1986,9 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r88
 msgid "Device Status and Show details open as modals"
-msgstr "Device Status et Show details s'ouvrent en fenêtres modales"
+msgstr ""
+"« Statut » de l'indicateur « Périphérique » et « Afficher les détails » "
+"s'ouvrent en fenêtres modales"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r56
@@ -2148,7 +2156,7 @@ msgid ""
 "commands; a failure adds each raw reply"
 msgstr ""
 "Chaque commande et chaque contrôle écrit '── contrôle <name> : "
-"réussi/ÉCHEC', puis ses commandes; un échec ajoute chaque réponse brute"
+"réussi/ÉCHEC', puis ses commandes ; un échec ajoute chaque réponse brute"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r19
@@ -2238,7 +2246,7 @@ msgid ""
 "empty error; enabled-extensions alone is not enough"
 msgstr ""
 "Activée signifie ACTIVE dans une session ouverte : GetExtensionInfo à l'état"
-" 1 et error vide; enabled-extensions seul ne suffit pas"
+" 1 et error vide ; enabled-extensions seul ne suffit pas"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r127
@@ -2252,9 +2260,9 @@ msgid ""
 "$(STREAMDECK_PY) -m unittest; vosk via $(STREAMDECK_PY) -m pip install vosk,"
 " never pip install --user"
 msgstr ""
-"Chaque point d'entrée du deck dans le Makefile lance $(STREAMDECK_PY); les "
-"cibles unittest, $(STREAMDECK_PY) -m unittest; vosk par $(STREAMDECK_PY) -m "
-"pip install vosk, jamais pip install --user"
+"Chaque point d'entrée du deck dans le Makefile lance $(STREAMDECK_PY) ; les "
+"cibles unittest, $(STREAMDECK_PY) -m unittest ; vosk par $(STREAMDECK_PY) -m"
+" pip install vosk, jamais pip install --user"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r02
@@ -2370,8 +2378,9 @@ msgid ""
 "ExecStart passes no argument, so under the unit exit 2 still means a busy "
 "lock and RestartPreventExitStatus=2 3 keeps its meaning"
 msgstr ""
-"ExecStart ne passe aucun argument : sous l'unité, la sortie 2 signifie "
-"toujours un verrou occupé et RestartPreventExitStatus=2 3 garde son sens"
+"ExecStart ne passe aucun argument : sous l'unité, le code de sortie 2 "
+"signifie toujours un verrou occupé et RestartPreventExitStatus=2 3 garde son"
+" sens"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r53
@@ -2389,13 +2398,14 @@ msgid ""
 "Exit 2 (lock taken) and 3 (no visual deck) are not restarted; they are "
 "deck_lock.BUSY_EXIT / NO_DECK_EXIT"
 msgstr ""
-"Les sorties 2 (verrou pris) et 3 (aucun deck visuel) ne sont pas relancées ;"
-" ce sont deck_lock.BUSY_EXIT / NO_DECK_EXIT"
+"Les codes de sortie 2 (verrou pris) et 3 (aucun deck visuel) n'entraînent "
+"aucune relance ; ce sont deck_lock.BUSY_EXIT / NO_DECK_EXIT"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r80
 msgid "Exit 2 shows the UNSUPPORTED: reason, not a stack of errors"
-msgstr "La sortie 2 affiche la raison UNSUPPORTED:, pas une pile d'erreurs"
+msgstr ""
+"Le code de sortie 2 affiche la raison UNSUPPORTED:, pas une pile d'erreurs"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r45
@@ -2403,8 +2413,8 @@ msgid ""
 "Exit codes 0/2/1: 2 with one stderr line 'UNSUPPORTED: ...'; the EXIT trap "
 "maps foreign codes (100, 127, 2) to 1"
 msgstr ""
-"Codes de sortie 0/2/1 : 2 avec une seule ligne stderr 'UNSUPPORTED: ...'; le"
-" piège EXIT ramène les codes étrangers (100, 127, 2) à 1"
+"Codes de sortie 0/2/1 : 2 avec une seule ligne stderr 'UNSUPPORTED: ...' ; "
+"le piège EXIT ramène les codes étrangers (100, 127, 2) à 1"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r08
@@ -2418,7 +2428,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r110
 msgid "Export and Reset cover every schema key"
-msgstr "Export et Reset couvrent chaque clé du schéma"
+msgstr "« Exporter » et « Réinitialiser » couvrent chaque clé du schéma"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r64
@@ -2467,7 +2477,7 @@ msgid ""
 "symlink; once per install whatever the entry point"
 msgstr ""
 "L'étape de l'extension lance tools/migrate_legacy.py d'abord, à chaque "
-"exécution, avant le lien symbolique; une fois par installation, quel que "
+"exécution, avant le lien symbolique ; une fois par installation, quel que "
 "soit le point d'entrée"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -2522,7 +2532,7 @@ msgid ""
 " names unique"
 msgstr ""
 "Cinq étapes dans l'ordre sur la même VM, chacune avec sa commande et ses "
-"contrôles; noms de contrôle uniques"
+"contrôles ; noms de contrôle uniques"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r55b
@@ -2535,8 +2545,8 @@ msgid ""
 "Follow-up sub-projects: TypeScript service, Bluetooth plugin, port of the "
 "Tiler modes without TILE, LAYOUT and DEV RELOAD"
 msgstr ""
-"Sous-projets de suivi : service TypeScript, plugiciel Bluetooth, portage des"
-" modes du Tiler sans TILE, LAYOUT ni DEV RELOAD"
+"Sous-projets de suivi : service TypeScript, plugin Bluetooth, portage des "
+"modes du Tiler sans TILE, LAYOUT ni DEV RELOAD"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r83
@@ -2614,7 +2624,7 @@ msgid ""
 "NOFOLLOW_SYMLINKS); Gio injected, never statically imported"
 msgstr ""
 "readLink GJS bâti sur Gio.File.query_info('standard::symlink-target', "
-"NOFOLLOW_SYMLINKS); Gio injecté, jamais importé statiquement"
+"NOFOLLOW_SYMLINKS) ; Gio injecté, jamais importé statiquement"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_ext
@@ -2707,8 +2717,8 @@ msgid ""
 "Hand-over step 4: exits with the game's code (a game's exit 2 passed through"
 " as is)"
 msgstr ""
-"Passation, étape 4 : sort avec le code du jeu (une sortie 2 du jeu est "
-"transmise telle quelle)"
+"Passation, étape 4 : se termine avec le code du jeu (un code de sortie 2 du "
+"jeu est transmis tel quel)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r53
@@ -2768,8 +2778,8 @@ msgid ""
 "Idempotent: a second run changes nothing and exits 0; every step checks "
 "before it writes"
 msgstr ""
-"Idempotent : une seconde exécution ne change rien et sort en 0; chaque étape"
-" vérifie avant d'écrire"
+"Idempotent : une seconde exécution ne change rien et se termine avec le code"
+" 0 ; chaque étape vérifie avant d'écrire"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r82
@@ -2822,7 +2832,7 @@ msgid ""
 "Indicator action without the venv notifies and spawns nothing; the check "
 "runs at the click, not in enable()"
 msgstr ""
-"Une action d'indicateur sans le venv notifie et ne lance rien; la "
+"Une action d'indicateur sans le venv notifie et ne lance rien ; la "
 "vérification se fait au clic, pas dans enable()"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -2917,7 +2927,9 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r63
 msgid "Keys are read back; a write that did not take exits 1"
-msgstr "Les clés sont relues; une écriture qui n'a pas pris sort en 1"
+msgstr ""
+"Les clés sont relues ; une écriture qui n'a pas pris se termine avec le code"
+" 1"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r85
@@ -3209,7 +3221,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r47
 msgid "NixOS exits 2"
-msgstr "NixOS sort en 2"
+msgstr "NixOS se termine avec le code 2"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r79
@@ -3245,7 +3257,7 @@ msgstr "Aucun game_tiler.py n'est gardé pour compatibilité"
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r49
 msgid "No gnome-shell exits 2 ('no GNOME Shell')"
-msgstr "Sans gnome-shell, sortie 2 ('no GNOME Shell')"
+msgstr "Sans gnome-shell, code de sortie 2 ('no GNOME Shell')"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r23
@@ -3272,7 +3284,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r116
 msgid "No reboot at stage 2; stage 5 reinstalls then reboots"
-msgstr "Aucun redémarrage à l'étape 2; l'étape 5 réinstalle puis redémarre"
+msgstr "Aucun redémarrage à l'étape 2 ; l'étape 5 réinstalle puis redémarre"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r80
@@ -3286,8 +3298,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r73
 msgid "Non-goal: Bluetooth control, which belongs to a separate plugin"
-msgstr ""
-"Non-objectif : le contrôle Bluetooth, qui relève d'un plugiciel distinct"
+msgstr "Non-objectif : le contrôle Bluetooth, qui relève d'un plugin distinct"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r05
@@ -3295,8 +3306,8 @@ msgid ""
 "Non-goal: GNOME 52+ unsupported; metadata.json declares 45-51; adding a "
 "version is a separate change"
 msgstr ""
-"Hors objectif : GNOME 52 et plus non pris en charge; metadata.json déclare "
-"45 à 51; ajouter une version est un changement à part"
+"Hors objectif : GNOME 52 et plus non pris en charge ; metadata.json déclare "
+"45 à 51 ; ajouter une version est un changement à part"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_deploy_r05
@@ -3305,7 +3316,7 @@ msgid ""
 "\n"
 "erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and erplibre:script/stream_deck/INSTALL.base.md names GNOME Shell 45 to 51. erplibre:long_test/README.base.md treats UNSUPPORTED on a rolling distribution as the signal to update metadata.json."
 msgstr ""
-"Hors objectif : GNOME 52 et plus non pris en charge; metadata.json déclare 45 à 51; ajouter une version est un changement à part.\n"
+"Hors objectif : GNOME 52 et plus non pris en charge ; metadata.json déclare 45 à 51 ; ajouter une version est un changement à part.\n"
 "\n"
 "erplibre-home-gnome-extension:metadata.json déclare shell-version 45 à 51, et erplibre:script/stream_deck/INSTALL.base.md nomme GNOME Shell 45 à 51. erplibre:long_test/README.base.md fait d'UNSUPPORTED sur une distribution en continu le signal de mettre à jour metadata.json."
 
@@ -3317,7 +3328,7 @@ msgstr "Non-objectif : une fréquence d'images garantie par modèle"
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r74
 msgid "Non-goal: animations as a plugin feature"
-msgstr "Non-objectif : les animations comme fonction du plugiciel"
+msgstr "Non-objectif : les animations comme fonction du plugin"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r72
@@ -3333,7 +3344,7 @@ msgid ""
 "Non-goal: no USB passthrough; the long test proves the software runs, not "
 "that a key press reaches a game"
 msgstr ""
-"Hors objectif : aucune redirection USB vers la VM; le test long prouve que "
+"Hors objectif : aucune redirection USB vers la VM ; le test long prouve que "
 "le logiciel tourne, pas qu'une touche pressée atteint un jeu"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -3343,9 +3354,9 @@ msgid ""
 "\n"
 "erplibre:long_test/README.base.md says only that a VM has no deck; no README states the non-goal itself."
 msgstr ""
-"Hors objectif : aucune redirection USB vers la VM; le test long prouve que le logiciel tourne, pas qu'une touche pressée atteint un jeu.\n"
+"Hors objectif : aucune redirection USB vers la VM ; le test long prouve que le logiciel tourne, pas qu'une touche pressée atteint un jeu.\n"
 "\n"
-"erplibre:long_test/README.base.md dit seulement qu'une VM n'a pas de deck; aucun README n'énonce le hors-objectif lui-même."
+"erplibre:long_test/README.base.md dit seulement qu'une VM n'a pas de deck ; aucun README n'énonce le hors-objectif lui-même."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r120
@@ -3421,8 +3432,8 @@ msgid ""
 "Non-goal: the Device indicator only reads the decks and launches the deck "
 "program"
 msgstr ""
-"Non-objectif : l'indicateur Device ne fait que lire les decks et lancer le "
-"programme du deck"
+"Non-objectif : l'indicateur « Périphérique » ne fait que lire les decks et "
+"lancer le programme du deck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r75
@@ -3465,20 +3476,23 @@ msgid ""
 "line for Result=exec-condition or the unmet condition with its three causes,"
 " or the state/status of a failed or auto-restart(-queued) program"
 msgstr ""
-"L'avis dit pourquoi : détenteur du verrou (sortie 2), aucun deck visuel "
-"(sortie 3), la ligne de --check pour Result=exec-condition ou la condition "
-"non remplie avec ses trois causes, ou l'état/le statut d'un programme en "
-"échec ou en auto-restart(-queued)"
+"L'avis dit pourquoi : détenteur du verrou (code de sortie 2), aucun deck "
+"visuel (code de sortie 3), la ligne de --check pour Result=exec-condition ou"
+" la condition non remplie avec ses trois causes, ou l'état/le statut d'un "
+"programme en échec ou en auto-restart(-queued)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r14b
 msgid "On SIGTERM the controller resets the deck (and exits 143)"
-msgstr "Sur SIGTERM, le contrôleur réinitialise le deck (et sort en 143)"
+msgstr ""
+"Sur SIGTERM, le contrôleur réinitialise le deck (et se termine avec le code "
+"143)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r14
 msgid "On SIGTERM the tiler resets the deck and exits 143"
-msgstr "Sur SIGTERM, le tiler réinitialise le deck et sort en 143"
+msgstr ""
+"Sur SIGTERM, le tiler réinitialise le deck et se termine avec le code 143"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r71
@@ -3525,8 +3539,8 @@ msgid ""
 "same game exits 2 naming the first; sequential ones both run"
 msgstr ""
 "Un seul programme du deck par jeu : flock sur deck.inner ; un second "
-"programme du deck dans le même jeu sort en 2 en nommant le premier ; des "
-"programmes successifs tournent tous les deux"
+"programme du deck dans le même jeu se termine avec le code 2 en nommant le "
+"premier ; des programmes successifs tournent tous les deux"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r36
@@ -3557,7 +3571,7 @@ msgid ""
 "One package table per family, non-interactive manager; base rows by default,"
 " Stream Deck rows added (deduplicated) with --stream-deck"
 msgstr ""
-"Une table de paquets par famille, gestionnaire non interactif; lignes de "
+"Une table de paquets par famille, gestionnaire non interactif ; lignes de "
 "base par défaut, lignes Stream Deck ajoutées (sans doublon) avec --stream-"
 "deck"
 
@@ -3622,12 +3636,12 @@ msgstr "Open Files ouvre sftp://<alias> ou sftp://<user>@<ip>"
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r51
 msgid "Open URL goes to http://localhost:<port>, falling back to 8069"
-msgstr "Open URL mène à http://localhost:<port>, avec 8069 en repli"
+msgstr "« Ouvrir l'URL » mène à http://localhost:<port>, avec 8069 en repli"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r59
 msgid "Open in KeePassXC runs keepassxc DB --keyfile K"
-msgstr "Open in KeePassXC lance keepassxc DB --keyfile K"
+msgstr "« Ouvrir dans KeePassXC » lance keepassxc DB --keyfile K"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r80
@@ -3722,7 +3736,7 @@ msgid ""
 " --dry-run; unknown option exits 1"
 msgstr ""
 "Options --stream-deck --no-enable --extension-only --with-extras --uninstall"
-" --dry-run; une option inconnue sort en 1"
+" --dry-run ; une option inconnue se termine avec le code 1"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r08
@@ -3757,8 +3771,8 @@ msgid ""
 "Out of scope: concurrent updates of todo_terminals.json can be lost; the "
 "last write wins"
 msgstr ""
-"Hors portée : des mises à jour concurrentes de todo_terminals.json peuvent "
-"se perdre ; la dernière écriture l'emporte"
+"Hors périmètre : des mises à jour concurrentes de todo_terminals.json "
+"peuvent se perdre ; la dernière écriture l'emporte"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r81
@@ -3775,8 +3789,8 @@ msgid ""
 "Out of scope: no hardware test of the '…' mark on a real key nor of the deck"
 " staying usable during a zenity dialog"
 msgstr ""
-"Hors portée : aucun test sur le matériel de la marque « … » sur une vraie "
-"touche ni du deck qui reste utilisable pendant un dialogue zenity"
+"Hors périmètre : aucun test sur le matériel de la marque « … » sur une vraie"
+" touche ni du deck qui reste utilisable pendant un dialogue zenity"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r55
@@ -3784,7 +3798,7 @@ msgid ""
 "Out of scope: the Stream Deck games game_*.py and their streamdeck_<game> "
 "targets keep their names"
 msgstr ""
-"Hors portée : les jeux Stream Deck game_*.py et leurs cibles "
+"Hors périmètre : les jeux Stream Deck game_*.py et leurs cibles "
 "streamdeck_<game> gardent leurs noms"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -3793,8 +3807,8 @@ msgid ""
 "Out of scope: the extension's session readers and writers do no liveness "
 "check"
 msgstr ""
-"Hors portée : les lecteurs et les écrivains de sessions de l'extension ne "
-"vérifient pas que le processus est vivant"
+"Hors périmètre : les lecteurs et les écrivains de sessions de l'extension ne"
+" vérifient pas que le processus est vivant"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r82
@@ -4004,8 +4018,8 @@ msgid ""
 "Profile plus base tool runs it twice (no-op); plus Stream Deck tool adds the"
 " level"
 msgstr ""
-"Le profil plus l'outil de base le lance deux fois (sans effet); plus l'outil"
-" Stream Deck ajoute le niveau"
+"Le profil plus l'outil de base le lance deux fois (sans effet) ; plus "
+"l'outil Stream Deck ajoute le niveau"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r32
@@ -4045,7 +4059,7 @@ msgid ""
 "QEMU label, hint and every help line and the profile label translated; help "
 "non-empty"
 msgstr ""
-"Libellé QEMU, indice, chaque ligne d'aide et libellé du profil traduits; "
+"Libellé QEMU, indice, chaque ligne d'aide et libellé du profil traduits ; "
 "aide non vide"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4055,9 +4069,9 @@ msgid ""
 " phase after, desktops gnome, needs_desktop, arches amd64, four families, "
 "disk 1/2 GB"
 msgstr ""
-"Outils QEMU erplibre_home et erplibre_home_streamdeck juste après gnome_ext;"
-" phase after, desktops gnome, needs_desktop, arches amd64, quatre familles, "
-"disque 1/2 Go"
+"Outils QEMU erplibre_home et erplibre_home_streamdeck juste après gnome_ext "
+"; phase after, desktops gnome, needs_desktop, arches amd64, quatre familles,"
+" disque 1/2 Go"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r06
@@ -4138,14 +4152,14 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r41
 msgid "Refuses to run as root (exit 1)"
-msgstr "Refuse de s'exécuter en root (sortie 1)"
+msgstr "Refuse de s'exécuter en root (code de sortie 1)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r96
 msgid ""
 "Refuses to start when a tracked file is modified; the dry run only warns"
 msgstr ""
-"Refuse de démarrer quand un fichier suivi est modifié; l'essai à blanc ne "
+"Refuse de démarrer quand un fichier suivi est modifié ; l'essai à blanc ne "
 "fait qu'avertir"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4155,7 +4169,7 @@ msgid ""
 "packages in cloud-init"
 msgstr ""
 "Solutions écartées : un installateur Python dans TODO doublé d'une copie "
-"shell pour les VM; les paquets dans cloud-init"
+"shell pour les VM ; les paquets dans cloud-init"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r38
@@ -4225,7 +4239,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r95
 msgid "Reset to defaults asks for confirmation first"
-msgstr "Reset to defaults demande d'abord une confirmation"
+msgstr "« Restaurer les valeurs par défaut » demande d'abord une confirmation"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r104
@@ -4242,8 +4256,8 @@ msgid ""
 "Resume runs gnome-terminal --working-directory=PATH -- bash -lc 'claude "
 "--resume; exec bash'"
 msgstr ""
-"Resume lance gnome-terminal --working-directory=PATH -- bash -lc 'claude "
-"--resume; exec bash'"
+"« Reprendre » lance gnome-terminal --working-directory=PATH -- bash -lc "
+"'claude --resume; exec bash'"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r49
@@ -4287,7 +4301,7 @@ msgid ""
 "Runs as the user, from the checkout root; sudo only for system packages and "
 "the udev rule"
 msgstr ""
-"S'exécute sous le compte de l'utilisateur, depuis la racine du checkout; "
+"S'exécute sous le compte de l'utilisateur, depuis la racine du checkout ; "
 "sudo seulement pour les paquets système et la règle udev"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4316,7 +4330,7 @@ msgid ""
 "STREAMDECK_PY := .venv.streamdeck/bin/python; a target without the venv "
 "stops with 'Stream Deck venv missing: make erplibre_home_streamdeck_install'"
 msgstr ""
-"STREAMDECK_PY := .venv.streamdeck/bin/python; une cible sans le venv "
+"STREAMDECK_PY := .venv.streamdeck/bin/python ; une cible sans le venv "
 "s'arrête sur 'Stream Deck venv missing: make "
 "erplibre_home_streamdeck_install'"
 
@@ -4429,8 +4443,8 @@ msgstr ""
 msgid ""
 "Show details opens a modal with the scanned hostname, latency and ports"
 msgstr ""
-"Show details ouvre une fenêtre modale avec le nom d'hôte analysé, la latence"
-" et les ports"
+"« Afficher les détails » ouvre une fenêtre modale avec le nom d'hôte "
+"analysé, la latence et les ports"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r21
@@ -4470,16 +4484,16 @@ msgid ""
 "Stage 3 partial-uninstall-gone/-kept (link, UUID, ACTIVE); stage 4 "
 "uninstall-gone; stage 5 reinstall-active, -indicators, -no-udev"
 msgstr ""
-"Étape 3 partial-uninstall-gone/-kept (lien, UUID, ACTIVE); étape 4 "
-"uninstall-gone; étape 5 reinstall-active, -indicators, -no-udev"
+"Étape 3 partial-uninstall-gone/-kept (lien, UUID, ACTIVE) ; étape 4 "
+"uninstall-gone ; étape 5 reinstall-active, -indicators, -no-udev"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r52
 msgid ""
 "Start server opens a terminal running make run, for a local instance only"
 msgstr ""
-"Start server ouvre un terminal qui lance make run, pour une instance locale "
-"seulement"
+"« Démarrer le serveur » ouvre un terminal qui lance make run, pour une "
+"instance locale seulement"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r12
@@ -4523,7 +4537,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_mobplug
 msgid "Stream Deck mobile plugin"
-msgstr "Plugiciel mobile du Stream Deck"
+msgstr "Plugin mobile du Stream Deck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r73
@@ -4532,7 +4546,7 @@ msgid ""
 "separate Capacitor plugin."
 msgstr ""
 "StreamDeckPlugin pilote seulement les decks USB ; le contrôle Bluetooth "
-"revient à un plugiciel Capacitor distinct."
+"revient à un plugin Capacitor distinct."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r75
@@ -4571,8 +4585,9 @@ msgid ""
 "Summary table on stdout; exit 0 when every in-scope system is ACTIVE (or "
 "UNSUPPORTED where rolling), else 1"
 msgstr ""
-"Tableau récapitulatif sur stdout; sortie 0 quand chaque système du périmètre"
-" est ACTIVE (ou UNSUPPORTED pour une distribution en continu), sinon 1"
+"Tableau récapitulatif sur stdout ; code de sortie 0 quand chaque système du "
+"périmètre est ACTIVE (ou UNSUPPORTED pour une distribution en continu), "
+"sinon 1"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r105
@@ -4588,8 +4603,8 @@ msgid ""
 "agree"
 msgstr ""
 "TODO > Test > Long tests : entrées pour planifier, lancer et défaire, "
-"aiguillées sans --depth; chaque choix listé a sa branche et les deux copies "
-"de la liste concordent"
+"aiguillées sans --depth ; chaque choix listé a sa branche et les deux copies"
+" de la liste concordent"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r82
@@ -4754,9 +4769,9 @@ msgid ""
 "The Add path dialog offers label, path, a file chooser and recent "
 "suggestions; the menu ends with a separator, Add path and Open prefs"
 msgstr ""
-"La boîte de dialogue Add path offre libellé, chemin, sélecteur de fichier et"
-" suggestions récentes ; le menu se termine par un séparateur, Add path et "
-"Open prefs"
+"La boîte de dialogue « Ajouter un chemin » offre libellé, chemin, sélecteur "
+"de fichier et suggestions récentes ; le menu se termine par un séparateur, «"
+" Ajouter un chemin » et « Ouvrir les préférences »"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r60
@@ -4776,7 +4791,7 @@ msgid ""
 "The Buttons preferences page has SwitchRows, and dragging rewrites button-"
 "order"
 msgstr ""
-"La page de préférences Buttons a des SwitchRow, et un glisser-déposer "
+"La page de préférences « Boutons » a des SwitchRow, et un glisser-déposer "
 "réécrit button-order"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4823,16 +4838,16 @@ msgid ""
 "erplibre-home-gnome-extension:README.base.md describes the indicator in its "
 "Indicators table."
 msgstr ""
-"L'indicateur Device liste les Stream Deck branchés et démarre ou redémarre "
-"le programme du deck ; configurer un deck depuis l'extension est hors du "
-"périmètre. erplibre-home-gnome-extension:README.base.md décrit l'indicateur "
-"dans sa table Indicators."
+"L'indicateur « Périphérique » liste les Stream Deck branchés et démarre ou "
+"redémarre le programme du deck ; configurer un deck depuis l'extension est "
+"hors du périmètre. erplibre-home-gnome-extension:README.base.md décrit "
+"l'indicateur dans sa table Indicators."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r92
 msgid "The Device preferences page lists the decks and has a refresh button"
 msgstr ""
-"La page de préférences Device liste les decks et a un bouton de "
+"La page de préférences « Périphérique » liste les decks et a un bouton de "
 "rafraîchissement"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -5034,8 +5049,8 @@ msgid ""
 "The Theming preferences page offers a ComboRow and a Browse button for an "
 "SVG"
 msgstr ""
-"La page de préférences Theming offre un ComboRow et un bouton Browse pour un"
-" SVG"
+"La page de préférences « Apparence » offre un ComboRow et un bouton Browse "
+"pour un SVG"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r19
@@ -5050,8 +5065,9 @@ msgid ""
 "The VM's etages entry is written as soon as it exists; VM creation or ssh "
 "failure gives FAILED(vm)/FAILED(ssh), then the next system"
 msgstr ""
-"L'entrée etages de la VM est écrite dès qu'elle existe; un échec de création"
-" de VM ou de ssh donne FAILED(vm)/FAILED(ssh), puis le système suivant"
+"L'entrée etages de la VM est écrite dès qu'elle existe ; un échec de "
+"création de VM ou de ssh donne FAILED(vm)/FAILED(ssh), puis le système "
+"suivant"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r54
@@ -5134,7 +5150,9 @@ msgstr "Le repo init du générateur de code garde le groupe streamdeck"
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r32
 msgid "The controller's Open prefs item opens the preferences window"
-msgstr "L'élément Open prefs du controller ouvre la fenêtre des préférences"
+msgstr ""
+"L'élément « Ouvrir les préférences » du contrôleur ouvre la fenêtre des "
+"préférences"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r85
@@ -5208,7 +5226,7 @@ msgid ""
 "guarantees none."
 msgstr ""
 "La conception estime la fréquence d'images que chaque modèle peut atteindre "
-"; le plugiciel n'en garantit aucune."
+"; le plugin n'en garantit aucune."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_service_r77
@@ -5568,8 +5586,8 @@ msgstr "La passation vérifie GAMES après la vérification de l'usage"
 msgid ""
 "The hand-over exits 5 before stopping anything when the games are absent"
 msgstr ""
-"La passation sort en 5 avant d'arrêter quoi que ce soit quand les jeux sont "
-"absents"
+"La passation se termine avec le code 5 avant d'arrêter quoi que ce soit "
+"quand les jeux sont absents"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r45
@@ -5829,8 +5847,8 @@ msgstr ""
 msgid ""
 "The make streamdeck_<id> guard prints the message and exits 1 on GAMES=off"
 msgstr ""
-"La garde de make streamdeck_<id> affiche le message et sort en 1 sur "
-"GAMES=off"
+"La garde de make streamdeck_<id> affiche le message et se termine avec le "
+"code 1 sur GAMES=off"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r19
@@ -5910,7 +5928,8 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r130
 msgid "The migration runs under the system python3 and always exits 0"
 msgstr ""
-"La migration s'exécute sous le python3 du système et sort toujours en 0"
+"La migration s'exécute sous le python3 du système et se termine toujours "
+"avec le code 0"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r44
@@ -5939,7 +5958,7 @@ msgid ""
 msgstr ""
 "Le message de venv manquant est un msgid de po/erplibre-home.pot, traduit "
 "dans fr.po et en.po, qui ne contiennent pas 'Python venv not found at "
-".venv.erplibre'; les deux indicateurs du deck l'affichent par _()"
+".venv.erplibre' ; les deux indicateurs du deck l'affichent par _()"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r68
@@ -6018,8 +6037,8 @@ msgid ""
 "their own repository, streamdeck_game, which "
 "erplibre:manifest/git_manifest_streamdeck_game.xml pulls."
 msgstr ""
-"Le plugiciel ne porte ni les jeux ni les modes du Tiler. Les jeux vivent "
-"dans leur propre dépôt, streamdeck_game, que tire "
+"Le plugin ne porte ni les jeux ni les modes du Tiler. Les jeux vivent dans "
+"leur propre dépôt, streamdeck_game, que tire "
 "erplibre:manifest/git_manifest_streamdeck_game.xml."
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -6035,7 +6054,7 @@ msgid ""
 "and the coalescing of the writer queue absorbs the frames it cannot send in "
 "time. erplibre_home_mobile:doc/NATIVE_PLUGINS.base.md states the coalescing."
 msgstr ""
-"Le plugiciel n'a pas d'API d'animation : un composant Owl boucle sur "
+"Le plugin n'a pas d'API d'animation : un composant Owl boucle sur "
 "setKeyImage, et la fusion de la file d'écriture absorbe les images qu'elle "
 "ne peut pas envoyer à temps. erplibre_home_mobile:doc/NATIVE_PLUGINS.base.md"
 " énonce la fusion."
@@ -6055,7 +6074,7 @@ msgid ""
 "The plugin leaves out what only a desktop session offers: tiling over D-Bus,"
 " audio control through wpctl and the gnome-shell reload."
 msgstr ""
-"Le plugiciel laisse de côté ce que seule une session de bureau offre : le "
+"Le plugin laisse de côté ce que seule une session de bureau offre : le "
 "tuilage par D-Bus, le contrôle audio par wpctl et le rechargement de gnome-"
 "shell."
 
@@ -6080,7 +6099,8 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r90
 msgid "The preferences bind the Pencil, ERPLibre, Network and Device settings"
 msgstr ""
-"Les préférences lient les réglages Pencil, ERPLibre, Network et Device"
+"Les préférences lient les réglages « Crayon », ERPLibre, « Réseau » et « "
+"Périphérique »"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r91
@@ -6416,8 +6436,8 @@ msgid ""
 "The venv is created by --stream-deck only; a base install has no venv; the "
 "system python3 runs the migration"
 msgstr ""
-"Le venv n'est créé que par --stream-deck; une installation de base n'a pas "
-"de venv; le python3 du système exécute la migration"
+"Le venv n'est créé que par --stream-deck ; une installation de base n'a pas "
+"de venv ; le python3 du système exécute la migration"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r20
@@ -6443,9 +6463,9 @@ msgid ""
 "stderr, exit 2; neither takes the lock nor opens the deck"
 msgstr ""
 "Le tiler et le contrôleur lisent argv avec argparse avant d'importer la "
-"bibliothèque Stream Deck ; -h/--help sort en 0 avec les codes de sortie ; "
-"argument inconnu : usage sur stderr, sortie 2 ; ni l'un ni l'autre ne prend "
-"le verrou ni n'ouvre le deck"
+"bibliothèque Stream Deck ; -h/--help affiche les codes de sortie et se "
+"termine avec le code 0 ; argument inconnu : usage sur stderr, code de sortie"
+" 2 ; ni l'un ni l'autre ne prend le verrou ni n'ouvre le deck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r27
@@ -6456,7 +6476,7 @@ msgid ""
 msgstr ""
 "Le tiler et le contrôleur prennent le verrou par flock LOCK_EX|LOCK_NB au "
 "démarrage, avant d'ouvrir le deck ; un second détenteur affiche le programme"
-" et le PID du détenteur et sort en 2"
+" et le PID du détenteur et se termine avec le code 2"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r15
@@ -6464,7 +6484,7 @@ msgid ""
 "Tiler survives an unplug: shuts plugins down, keeps process and lock, polls,"
 " rebuilds the kernel when the deck returns; controller unchanged"
 msgstr ""
-"Le tiler survit à un débranchement : il arrête les plugiciels, garde son "
+"Le tiler survit à un débranchement : il arrête les plugins, garde son "
 "processus et le verrou, sonde, puis reconstruit le noyau au retour du deck ;"
 " le contrôleur est inchangé"
 
@@ -6497,8 +6517,8 @@ msgid ""
 "Two levels: the base (extension, schemas, translations, enabled; no device "
 "access, no venv) installs alone; --stream-deck always installs the base too"
 msgstr ""
-"Deux niveaux : la base (extension, schémas, traductions, activée; ni accès "
-"au périphérique ni venv) s'installe seule; --stream-deck installe toujours "
+"Deux niveaux : la base (extension, schémas, traductions, activée ; ni accès "
+"au périphérique ni venv) s'installe seule ; --stream-deck installe toujours "
 "la base aussi"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -6605,7 +6625,7 @@ msgid ""
 " back-off, exit 3 only at start"
 msgstr ""
 "Débranchement et rebranchement du deck : arrêts, nouveau noyau, ouverture "
-"retentée, espacement des essais, sortie 3 seulement au démarrage"
+"retentée, espacement des essais, code de sortie 3 seulement au démarrage"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_plugin_r110
@@ -6619,8 +6639,8 @@ msgstr ""
 " l'arrivée du deck. Un deck rebranché reçoit un nouveau noyau. Une ouverture"
 " ratée est fermée, retentée et inscrite au journal une fois. Un deck qui "
 "disparaît de nouveau aussitôt espace ses essais. Un échec de "
-"réinitialisation tient en une ligne du journal. La sortie 3 n'a lieu qu'au "
-"démarrage."
+"réinitialisation tient en une ligne du journal. Le code de sortie 3 ne "
+"survient qu'au démarrage."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r97
@@ -6658,7 +6678,7 @@ msgid ""
 "rewritten"
 msgstr ""
 "Une VM à la fois, chacune détruite avant la suivante sauf avec --garder, "
-"dans le processus par detruire_etage1 + retirer_alias, jamais detruire(); "
+"dans le processus par detruire_etage1 + retirer_alias, jamais detruire() ; "
 "etages réécrit"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -6744,7 +6764,7 @@ msgid ""
 "naming game"
 msgstr ""
 "Pendant qu'un jeu tourne, un programme du deck lancé hors de lui (le "
-"service) sort en 2 en nommant game"
+"service) se termine avec le code 2 en nommant game"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r19
@@ -6764,8 +6784,8 @@ msgid ""
 "With GAMES off or unknown, the hand-over writes one stderr line and exits 4,"
 " stopping nothing and running nothing"
 msgstr ""
-"Avec GAMES à off ou inconnu, la passation écrit une ligne sur stderr et sort"
-" en 4, sans rien arrêter ni rien lancer"
+"Avec GAMES à off ou inconnu, la passation écrit une ligne sur stderr et se "
+"termine avec le code 4, sans rien arrêter ni rien lancer"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r37
@@ -6798,7 +6818,7 @@ msgid ""
 "exits 1 and does not listen"
 msgstr ""
 "Avec les jeux refusés, le main() de la galerie écrit la raison sur stderr, "
-"sort en 1 et n'écoute pas"
+"se termine avec le code 1 et n'écoute pas"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r21
@@ -6817,13 +6837,13 @@ msgid ""
 "Without a visual Stream Deck, app.py prints 'No visual Stream Deck found.' "
 "and exits with NO_DECK_EXIT (3)"
 msgstr ""
-"Sans Stream Deck visuel, app.py affiche 'No visual Stream Deck found.' et "
-"sort avec NO_DECK_EXIT (3)"
+"Sans Stream Deck visuel, app.py affiche 'No visual Stream Deck found.' et se"
+" termine avec le code NO_DECK_EXIT (3)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r123
 msgid "Without an argument, exit 2 still means a busy lock"
-msgstr "Sans argument, la sortie 2 signifie toujours un verrou occupé"
+msgstr "Sans argument, le code de sortie 2 signifie toujours un verrou occupé"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r87
@@ -7008,8 +7028,8 @@ msgid ""
 "base-idempotent / stream-deck-idempotent: second run exits 0 AND leaves the "
 "mtimes unchanged"
 msgstr ""
-"base-idempotent / stream-deck-idempotent : la seconde exécution sort en 0 ET"
-" laisse les mtimes inchangés"
+"base-idempotent / stream-deck-idempotent : la seconde exécution se termine "
+"avec le code 0 ET laisse les mtimes inchangés"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r112
@@ -7266,7 +7286,7 @@ msgid ""
 "descente.detruire undoes every niveau-1 entry; a deep_* single entry still "
 "works"
 msgstr ""
-"descente.detruire défait chaque entrée niveau-1; une entrée deep_* unique "
+"descente.detruire défait chaque entrée niveau-1 ; une entrée deep_* unique "
 "fonctionne toujours"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -7333,8 +7353,8 @@ msgid ""
 "unread and failing; 'mount <id> failed' lines give the ids"
 msgstr ""
 "extension-indicators : le journal doit contenir '[ERPLibreHome] enabled', "
-"sinon il est non lu et en échec; les lignes 'mount <id> failed' donnent les "
-"identifiants"
+"sinon il est non lu et en échec ; les lignes 'mount <id> failed' donnent les"
+" identifiants"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r17
@@ -7390,7 +7410,7 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r59
 msgid "glib-compile-schemas --strict on schemas/; a failure fails the install"
 msgstr ""
-"glib-compile-schemas --strict sur schemas/; un échec fait échouer "
+"glib-compile-schemas --strict sur schemas/ ; un échec fait échouer "
 "l'installation"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -7448,7 +7468,7 @@ msgid ""
 "install_erplibre_home.py in descente.SCRIPTS and SCRIPTS_DEFAISABLES; a test"
 " keeps the two lists equal"
 msgstr ""
-"install_erplibre_home.py dans descente.SCRIPTS et SCRIPTS_DEFAISABLES; un "
+"install_erplibre_home.py dans descente.SCRIPTS et SCRIPTS_DEFAISABLES ; un "
 "test garde les deux listes égales"
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -7491,7 +7511,7 @@ msgid ""
 "plugin's dialog"
 msgstr ""
 "load() parcourt les appareils Elgato branchés et rattache chacun, avec la "
-"boîte de dialogue du plugiciel"
+"boîte de dialogue du plugin"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r47
@@ -7519,7 +7539,7 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r48
 msgid "macOS exits 2"
-msgstr "macOS sort en 2"
+msgstr "macOS se termine avec le code 2"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r66
@@ -7562,7 +7582,7 @@ msgid ""
 msgstr ""
 "make erplibre_home_install_extension crée le lien symbolique "
 "~/.local/share/gnome-shell/extensions/erplibre-home@technolibre.ca -> "
-"checkout; le lien reste"
+"checkout ; le lien reste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r21
@@ -7626,8 +7646,8 @@ msgid ""
 "family's gettext package"
 msgstr ""
 "msgfmt --check pour chaque po/<lang>.po vers "
-"locale/<lang>/LC_MESSAGES/erplibre-home.mo aux deux niveaux; un échec ou un "
-"msgfmt absent fait échouer, en nommant le paquet gettext de la famille"
+"locale/<lang>/LC_MESSAGES/erplibre-home.mo aux deux niveaux ; un échec ou un"
+" msgfmt absent fait échouer, en nommant le paquet gettext de la famille"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r72
@@ -7660,7 +7680,7 @@ msgid ""
 "python3; the installer does not call them"
 msgstr ""
 "po/compile_locales.py et erplibre_home_compile_locale gardent le python3 du "
-"système; l'installateur ne les appelle pas"
+"système ; l'installateur ne les appelle pas"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r37
@@ -8032,8 +8052,8 @@ msgid ""
 "extension in ERROR is FAILED(<stage check>) with its raw GetExtensionInfo "
 "reply in the log"
 msgstr ""
-"verdict parmi ACTIVE/FAILED/UNSUPPORTED; ACTIVE = les cinq étapes réussies; "
-"une extension en ERROR est FAILED(<stage check>) avec sa réponse brute de "
+"verdict parmi ACTIVE/FAILED/UNSUPPORTED ; ACTIVE = les cinq étapes réussies "
+"; une extension en ERROR est FAILED(<stage check>) avec sa réponse brute de "
 "GetExtensionInfo dans le journal"
 
 #. module: erplibre_streamdeck_devops_requirement
