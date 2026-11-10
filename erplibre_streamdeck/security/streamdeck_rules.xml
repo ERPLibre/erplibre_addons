@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Les règles d'un même modèle s'additionnent d'un groupe à l'autre :
+         le gestionnaire, qui implique l'utilisateur, reçoit la règle
+         ouverte en plus de la règle bornée. Les droits du fichier
+         ir.model.access.csv bornent les opérations ; ces règles bornent
+         les enregistrements. -->
+
+    <!-- L'employé lit et renomme ses propres postes, et seulement eux. -->
+    <record id="rule_streamdeck_workstation_user" model="ir.rule">
+        <field name="name">Stream Deck workstation: own workstations</field>
+        <field name="model_id" ref="model_streamdeck_workstation"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <!-- L'employé lit le deck que tient un de ses postes, et celui qu'un de
+         ses postes a eu, ce que l'historique prouve. -->
+    <record id="rule_streamdeck_device_user" model="ir.rule">
+        <field name="name">Stream Deck device: decks of own workstations</field>
+        <field name="model_id" ref="model_streamdeck_device"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('event_ids.workstation_id.user_id', '=', user.id),
+        ]</field>
+    </record>
+
+    <!-- L'employé lit les événements de ses postes, et tous ceux d'un deck
+         qu'il peut lire, y compris ceux survenus au poste d'un autre : le
+         nom de ce poste et de son employé sont copiés sur l'événement, la
+         fiche du poste reste fermée. Les deux dernières branches répètent
+         le domaine de la règle des decks. -->
+    <record id="rule_streamdeck_event_user" model="ir.rule">
+        <field name="name">Stream Deck event: own workstations and readable decks</field>
+        <field name="model_id" ref="model_streamdeck_event"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|', '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('device_id.workstation_id.user_id', '=', user.id),
+            ('device_id.event_ids.workstation_id.user_id', '=', user.id),
+        ]</field>
+    </record>
+
+    <!-- Le gestionnaire lit tout le parc et écrit les postes : les droits
+         du fichier CSV ne lui donnent ni création ni suppression. -->
+    <record id="rule_streamdeck_workstation_manager" model="ir.rule">
+        <field name="name">Stream Deck workstation: whole fleet</field>
+        <field name="model_id" ref="model_streamdeck_workstation"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_device_manager" model="ir.rule">
+        <field name="name">Stream Deck device: whole fleet</field>
+        <field name="model_id" ref="model_streamdeck_device"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_event_manager" model="ir.rule">
+        <field name="name">Stream Deck event: whole fleet</field>
+        <field name="model_id" ref="model_streamdeck_event"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+</odoo>
