@@ -23,6 +23,7 @@ import logging
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from odoo import api, fields, models
 from odoo.exceptions import AccessDenied
@@ -52,6 +53,8 @@ MAX_EVENTS = 10000
 MAX_COUNT = 2**31 - 1
 
 ENROLL_METHODS = ("pairing_code", "api_key", "password")
+# The kinds a workstation reports. `moved` is written by Odoo only, so a
+# report that carries it is refused as any unknown kind.
 EVENT_KINDS = ("plugged", "unplugged", "service_changed")
 SERVICE_STATE_KEYS = tuple(key for key, _label in SERVICE_STATES)
 
@@ -516,12 +519,22 @@ class StreamdeckService(models.AbstractModel):
         """The decks of the state become the connected decks of
         `workstation`, moved from another workstation if need be; its
         other decks are disconnected. A null firmware keeps the stored
-        one: the deck service may hold the device and hide it."""
+        one: the deck service may hold the device and hide it.
+
+        A deck taken from another workstation gets a `moved` event dated
+        `now`, which keeps both workstations; a deck created by this
+        report, or already held by `workstation`, gets none."""
         seen = self.env["streamdeck.device"]
+        moves = []
         for deck in decks:
             device = self._device(workstation, deck)
+            previous = device.workstation_id
+            if previous and previous != workstation:
+                moves.append(
+                    self._moved_values(device, previous, workstation, now)
+                )
             values = {"last_seen": now, "connected": True}
-            if not device.connected or device.workstation_id != workstation:
+            if not device.connected or previous != workstation:
                 values["connected_since"] = now
             values["workstation_id"] = workstation.id
             if deck["usb_product_id"]:
@@ -533,6 +546,25 @@ class StreamdeckService(models.AbstractModel):
         (workstation.device_ids - seen).filtered("connected").write(
             {"connected": False, "connected_since": False}
         )
+        self.env["streamdeck.event"].create(moves)
+
+    def _moved_values(self, device, previous, workstation, now):
+        """The values of the `moved` event of `device`, taken by
+        `workstation` from `previous`, with the names of both copied as
+        those of a reported event are. The uuid is drawn here: no
+        workstation sends this event."""
+        return {
+            "uuid": str(uuid4()),
+            "kind": "moved",
+            "at": now,
+            "received_at": now,
+            "device_id": device.id,
+            "workstation_id": workstation.id,
+            "workstation_name": workstation.name,
+            "employee_name": workstation.user_id.name,
+            "previous_workstation_id": previous.id,
+            "previous_workstation_name": previous.name,
+        }
 
     def _store_events(self, workstation, events, now):
         """Create the events whose uuid is new and return every uuid of

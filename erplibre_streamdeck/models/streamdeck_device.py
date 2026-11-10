@@ -41,8 +41,8 @@ class StreamdeckDevice(models.Model):
     so it is never merged with a deck of another workstation. A serial
     has no `:` (the service refuses one), so the two forms never meet.
     `workstation_id` is the workstation that reported it last: a deck
-    moved to another workstation follows it, and its events keep the
-    workstation where each happened.
+    moved to another workstation follows it, with a `moved` event that
+    names both, and its events keep the workstation where each happened.
     """
 
     _name = "streamdeck.device"

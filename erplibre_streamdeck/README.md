@@ -56,6 +56,15 @@ workstation included: each event carries a copy of the name of its
 workstation and of its employee, so the lender never needs, nor gets, the
 other workstation's record.
 
+When a workstation reports a deck that another workstation holds, the deck
+moves to it without confirmation, and Odoo adds an event *Changed
+workstation* (`moved`) dated at the reception. It names the new workstation
+and its employee, and the workstation the deck left, each by a copy of its
+name. This event alone proves that the former workstation had the deck: its
+employee keeps reading the deck and its history, even when that
+workstation never sent an event of it. The same workstation reporting the
+deck again moves nothing.
+
 Archiving a user archives their workstations and revokes their tokens; the
 workstations, their decks and their events stay readable by the manager.
 Pairing codes are readable by nobody.
@@ -88,10 +97,11 @@ carries `protocol`; an error reply adds `error`.
   (serial number, USB product id, USB path, firmware). The decks of the
   workstation missing from the list become disconnected.
 - `events`: `plugged`, `unplugged` or `service_changed`, each with its own
-  uuid and the time it was observed. A uuid already stored is acknowledged
-  again without change, so a report sent again creates nothing. A time
-  more than 5 minutes ahead of the reception is replaced by the reception
-  time.
+  uuid and the time it was observed. `moved` is written by Odoo only: a
+  report that carries it is a 400 `bad_request`. A uuid already stored is
+  acknowledged again without change, so a report sent again creates
+  nothing. A time more than 5 minutes ahead of the reception is replaced
+  by the reception time.
 - `lost_events`: the running total of events the workstation dropped
   unsent; Odoo keeps the largest total received.
 - A deck is known by its serial number, key `sn:<serial>`; a deck without

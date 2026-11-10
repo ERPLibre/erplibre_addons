@@ -1,12 +1,15 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 import hashlib
+import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from odoo import Command, fields
+from odoo.exceptions import AccessError
 from odoo.tests.common import TransactionCase, new_test_user, tagged
+from odoo.tools.safe_eval import safe_eval
 
 FINGERPRINT_A = "a" * 64
 FINGERPRINT_B = "b" * 64
@@ -747,6 +750,154 @@ class TestStreamdeckService(TransactionCase):
             device.workstation_id.id, enrolled_b["workstation_id"]
         )
         self.assertTrue(device.connected)
+
+    def test_a_deck_taken_by_another_workstation_leaves_a_moved_event(self):
+        enrolled_a = self._enroll(self.user_a, FINGERPRINT_A, "host-a")
+        enrolled_b = self._enroll(self.user_b, FINGERPRINT_B, "host-b")
+        ws_a = self.Workstation.browse(enrolled_a["workstation_id"])
+        ws_b = self.Workstation.browse(enrolled_b["workstation_id"])
+        deck = self._deck("SN-TAKEN")
+        # Un deck nouveau naît sur le poste qui le déclare : rien ne bouge.
+        self._report(enrolled_a["token"], decks=[deck])
+        device = self.Device.search([("key", "=", "sn:SN-TAKEN")])
+        self.assertFalse(device.event_ids)
+        plugged = self._event("plugged", deck)
+        status, body = self._report(
+            enrolled_b["token"], decks=[deck], events=[plugged]
+        )
+        self.assertEqual(status, 200, body)
+        # Le déplacement n'est pas un événement du poste : la réponse
+        # n'accuse que ce que le poste a envoyé.
+        self.assertEqual(body["accepted"], [plugged["uuid"]])
+        moved = device.event_ids.filtered(lambda e: e.kind == "moved")
+        self.assertEqual(len(moved), 1)
+        self.assertRecordValues(
+            moved,
+            [
+                {
+                    "device_id": device.id,
+                    "workstation_id": ws_b.id,
+                    "previous_workstation_id": ws_a.id,
+                    "workstation_name": "host-b",
+                    "employee_name": "Employee B",
+                    "previous_workstation_name": "host-a",
+                    "service_state": False,
+                }
+            ],
+        )
+        self.assertEqual(uuid.UUID(moved.uuid).version, 4)
+        self.assertTrue(moved.received_at)
+        self.assertEqual(moved.at, moved.received_at)
+        self.assertEqual(moved.at, device.connected_since)
+        # Les copies gardent le nom qu'avait le poste au déplacement.
+        ws_a.write({"name": "renamed later"})
+        self.assertEqual(moved.previous_workstation_name, "host-a")
+        # Le même poste qui redéclare le deck, débranché puis rebranché,
+        # ne le déplace pas.
+        self._report(enrolled_b["token"], decks=[])
+        self._report(enrolled_b["token"], decks=[deck])
+        self.assertEqual(
+            device.event_ids.filtered(lambda e: e.kind == "moved"), moved
+        )
+        # Rendu au prêteur : un second déplacement, en sens inverse.
+        self._report(enrolled_a["token"], decks=[deck])
+        back = device.event_ids.filtered(lambda e: e.kind == "moved") - moved
+        self.assertEqual(len(back), 1)
+        self.assertEqual(back.workstation_id, ws_a)
+        self.assertEqual(back.previous_workstation_id, ws_b)
+        self.assertEqual(back.workstation_name, "renamed later")
+        self.assertEqual(back.previous_workstation_name, "host-b")
+        self.assertNotEqual(back.uuid, moved.uuid)
+
+    def test_a_moved_deck_is_read_by_the_lender_and_the_holder_only(self):
+        # Le deck n'a qu'un état chez A, aucun événement, comme un deck
+        # déjà branché au premier démarrage de l'extension : l'événement
+        # de déplacement est la seule trace de son passage chez A.
+        user_c = new_test_user(
+            self.env,
+            login="zz_sd_svc_c",
+            name="Employee C",
+            groups="base.group_user",
+        )
+        enrolled_a = self._enroll(self.user_a, FINGERPRINT_A, "host-a")
+        enrolled_b = self._enroll(self.user_b, FINGERPRINT_B, "host-b")
+        self._enroll(user_c, "c" * 64, "host-c")
+        deck = self._deck("SN-LENT-MOVE")
+        self._report(enrolled_a["token"], decks=[deck])
+        self._report(enrolled_b["token"], decks=[deck])
+        device = self.Device.search([("key", "=", "sn:SN-LENT-MOVE")])
+        moved = self.Event.search(
+            [("device_id", "=", device.id), ("kind", "=", "moved")]
+        )
+        self.assertEqual(len(moved), 1)
+        for user in (self.user_a, self.user_b):
+            with self.subTest(user=user.name):
+                self.assertEqual(
+                    self.Device.with_user(user).search(
+                        [("id", "=", device.id)]
+                    ),
+                    device,
+                )
+                self.assertEqual(
+                    self.Event.with_user(user).search(
+                        [("device_id", "=", device.id)]
+                    ),
+                    moved,
+                )
+                values = moved.with_user(user).read(
+                    [
+                        "kind",
+                        "workstation_name",
+                        "employee_name",
+                        "previous_workstation_name",
+                    ]
+                )[0]
+                self.assertEqual(values["kind"], "moved")
+                self.assertEqual(values["workstation_name"], "host-b")
+                self.assertEqual(values["employee_name"], "Employee B")
+                self.assertEqual(values["previous_workstation_name"], "host-a")
+        # « Mes decks » de A le montre encore.
+        my_decks = self.env.ref(
+            "erplibre_streamdeck.action_streamdeck_my_decks"
+        )
+        domain = safe_eval(my_decks.domain, {"uid": self.user_a.id})
+        self.assertIn(
+            device, self.Device.with_user(self.user_a).search(domain)
+        )
+        self.assertFalse(
+            self.Device.with_user(user_c).search([("id", "=", device.id)])
+        )
+        self.assertFalse(
+            self.Event.with_user(user_c).search([("id", "=", moved.id)])
+        )
+        with self.assertRaises(AccessError):
+            moved.with_user(user_c).read(["kind"])
+        # B remonte le deck une seconde fois : aucun second déplacement.
+        self._report(enrolled_b["token"], decks=[deck])
+        self.assertEqual(
+            self.Event.search(
+                [("device_id", "=", device.id), ("kind", "=", "moved")]
+            ),
+            moved,
+        )
+
+    def test_a_client_cannot_report_a_moved_event(self):
+        # Seul Odoo écrit un déplacement : un poste qui en déclare un est
+        # refusé comme pour toute sorte inconnue, et rien n'est écrit.
+        enrolled = self._enroll(self.user_a)
+        deck = self._deck("SN-FORGED-MOVE")
+        before = self._counts()
+        self._assert_error(
+            self._report(
+                enrolled["token"],
+                decks=[deck],
+                events=[self._event("moved", deck)],
+            ),
+            400,
+            "bad_request",
+        )
+        self.assertEqual(self._counts(), before)
+        self.assertFalse(self.Event.search([("kind", "=", "moved")]))
 
     def test_a_deck_without_serial_stays_with_its_workstation(self):
         enrolled_a = self._enroll(self.user_a, FINGERPRINT_A, "host-a")

@@ -5,7 +5,8 @@
 
     <!-- Le poste et l'employé d'un événement s'affichent par leur copie
          sur l'événement : un employé lit l'historique d'un deck prêté sans
-         lire le poste où il se trouve. -->
+         lire le poste où il se trouve. Le poste qu'un déplacement a quitté
+         s'affiche de même, par sa copie. -->
     <record id="view_streamdeck_event_list" model="ir.ui.view">
         <field name="name">streamdeck.event.list</field>
         <field name="model">streamdeck.event</field>
@@ -16,6 +17,7 @@
                 <field name="device_id"/>
                 <field name="workstation_name"/>
                 <field name="employee_name"/>
+                <field name="previous_workstation_name" optional="show"/>
                 <field name="service_state" optional="show"/>
                 <field name="received_at" optional="hide"/>
                 <field name="uuid" optional="hide"/>
@@ -41,6 +43,9 @@
                             <field name="device_id" readonly="True"/>
                             <field name="workstation_name" readonly="True"/>
                             <field name="employee_name" readonly="True"/>
+                            <field name="previous_workstation_name"
+                                   readonly="True"
+                                   invisible="kind != 'moved'"/>
                             <field name="uuid" readonly="True"/>
                         </group>
                     </group>
@@ -57,12 +62,15 @@
                 <field name="device_id"/>
                 <field name="workstation_name"/>
                 <field name="employee_name"/>
+                <field name="previous_workstation_name"/>
                 <filter name="plugged" string="Plugged"
                         domain="[('kind', '=', 'plugged')]"/>
                 <filter name="unplugged" string="Unplugged"
                         domain="[('kind', '=', 'unplugged')]"/>
                 <filter name="service_changed" string="Service changed"
                         domain="[('kind', '=', 'service_changed')]"/>
+                <filter name="moved" string="Changed workstation"
+                        domain="[('kind', '=', 'moved')]"/>
                 <separator/>
                 <filter name="filter_at" string="Time" date="at"/>
                 <group expand="0" string="Group By">
