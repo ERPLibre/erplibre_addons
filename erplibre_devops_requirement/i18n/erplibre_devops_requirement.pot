@@ -1,0 +1,791 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_devops_requirement
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-10 06:44+0000\n"
+"PO-Revision-Date: 2026-11-10 06:44+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: erplibre_devops_requirement
+#. odoo-python
+#: code:addons/erplibre_devops_requirement/models/devops_requirement.py:0
+msgid "A requirement cannot depend on itself, even indirectly."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_test_requirement_kind_reference_uniq
+msgid "A requirement cannot list the same test twice."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Acceptance"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__acceptance_criteria
+msgid "Acceptance criteria"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__accepted
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Accepted"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__achievement
+msgid "Achievement"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Achievement (how)"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.actions.act_window,help:erplibre_devops_requirement.action_devops_requirement
+msgid "Add a requirement"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__approved
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Approved"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__build
+msgid "Build"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__code
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__code
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_classifier__code
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__code
+msgid "Code"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__requirement_type__compliance
+msgid "Compliance"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__data_classification__confidential
+msgid "Confidential"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement_config
+msgid "Configuration"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__could
+msgid "Could have"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__data_classification
+msgid "Data classification"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__stride__denial_of_service
+msgid "Denial of service"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Dependencies"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__depends_on_ids
+msgid "Depends on"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__deploy
+msgid "Deploy"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.actions.act_window,help:erplibre_devops_requirement.action_devops_requirement
+msgid "Describe what the project commits to, by domain and by phase."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__description
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Description"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.module.category,name:erplibre_devops_requirement.module_category_devops_requirement
+msgid "DevOps Requirements"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__devsecops_stage
+msgid "DevSecOps stage"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__code
+msgid "Develop"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__category_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Domain"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.actions.act_window,name:erplibre_devops_requirement.action_devops_requirement_category
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement_category
+msgid "Domains"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__done
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Done"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__last_duration
+msgid "Duration (s)"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__stride__elevation_of_privilege
+msgid "Elevation of privilege"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__last_result__error
+msgid "Error"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Essential (Must)"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__size
+msgid "Estimated effort"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__test_state__failed
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__last_result__failed
+msgid "Failed"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Failing tests"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__requirement_type__functional
+msgid "Functional"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Given a context, When an action happens, Then an expected outcome."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Group by"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__tour
+msgid "Guided tour"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_test__reference
+msgid ""
+"Guided tour: the tour name. Python test: the dotted path of the test method."
+" Selenium script: the script path, relative to the repository. Manual check:"
+" free text."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__high
+msgid "High"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__residual_risk__high
+msgid "High risk"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid ""
+"How this requirement is covered: module, menu, view, or the current state "
+"and what comes next."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__id
+msgid "ID"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__stride__information_disclosure
+msgid "Information disclosure"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__data_classification__internal
+msgid "Internal"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__kind
+msgid "Kind"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__size__l
+msgid "Large"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__last_log
+msgid "Last log"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__last_result
+msgid "Last result"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__last_run
+msgid "Last run"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__low
+msgid "Low"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__residual_risk__low
+msgid "Low risk"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__manual
+msgid "Manual check"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__size__m
+msgid "Medium"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__mitigation
+msgid "Mitigation"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__moscow
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "MoSCoW level"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__residual_risk__moderate
+msgid "Moderate risk"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__monitor
+msgid "Monitor"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement__data_classification
+msgid "Most sensitive class of data the requirement handles."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__must
+msgid "Must have"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_classifier__name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__name
+msgid "Name"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__test_state__none
+msgid "No test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__requirement_type__non_functional
+msgid "Non-functional"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__medium
+msgid "Normal"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Not accepted"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Not approved"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__test_state__not_run
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__last_result__not_run
+msgid "Not run"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__notes
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Notes"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement__acceptance_criteria
+msgid ""
+"Observable conditions that make the requirement accepted. Prefer one "
+"scenario per criterion, in the form: Given a context, When an action "
+"happens, Then an expected outcome."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#. odoo-python
+#: code:addons/erplibre_devops_requirement/models/devops_requirement_test.py:0
+msgid "Only a requirement test runner can record a test result."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__operate
+msgid "Operate"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__requirement_type__operational
+msgid "Operational"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__test_state__passed
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__last_result__passed
+msgid "Passed"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__phase_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Phase"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.actions.act_window,name:erplibre_devops_requirement.action_devops_requirement_phase
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement_phase
+msgid "Phases"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__plan
+msgid "Plan"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__priority
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Priority"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__data_classification__public
+msgid "Public"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__python
+msgid "Python test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__reference
+msgid "Reference"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement__tour_name
+msgid "Reference of the first guided tour test, in sequence order."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__release
+msgid "Release"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__stride__repudiation
+msgid "Repudiation"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__dependent_ids
+msgid "Required by"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__name
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__requirement_id
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__requirement_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Requirement"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_classifier
+msgid "Requirement classification axis"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_category
+msgid "Requirement domain"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_phase
+msgid "Requirement phase"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_test
+msgid "Requirement test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:res.groups,name:erplibre_devops_requirement.group_devops_requirement_runner
+msgid "Requirement test runner"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement_threat
+msgid "Requirement threat (STRIDE)"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Requirement title"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__requirement_type
+msgid "Requirement type"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.actions.act_window,name:erplibre_devops_requirement.action_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__requirement_ids
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__requirement_ids
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_devops_requirement
+#: model:ir.ui.menu,name:erplibre_devops_requirement.menu_erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_list
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_pivot
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Requirements"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_graph
+msgid "Requirements by domain"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement__depends_on_ids
+msgid "Requirements that must be delivered before this one."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement__dependent_ids
+msgid "Requirements that wait for this one."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__residual_risk
+msgid "Residual risk"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__responsible_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Responsible"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__data_classification__restricted
+msgid "Restricted"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__stride
+msgid "STRIDE category"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__requirement_type__security
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Security"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__security_relevant
+msgid "Security relevant"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__selenium
+msgid "Selenium script"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_category__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_classifier__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_phase__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__should
+msgid "Should have"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__last_result__skipped
+msgid "Skipped"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__size__s
+msgid "Small"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model,name:erplibre_devops_requirement.model_devops_requirement
+msgid "Software requirement (MoSCoW)"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__stride__spoofing
+msgid "Spoofing"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_category__code
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_classifier__code
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement_phase__code
+msgid ""
+"Stable identifier used by data files and by the domains of counted figures. "
+"Renaming it silently breaks every count that matches on it."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Stage"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_threat__stride__tampering
+msgid "Tampering"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__test
+msgid "Test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__test_count
+msgid "Test count"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__test_state
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Test state"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__test_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "Tests"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_category_code_uniq
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_classifier_code_uniq
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_phase_code_uniq
+msgid "The code must be unique."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.constraint,message:erplibre_devops_requirement.constraint_devops_requirement_code_uniq
+msgid "The requirement code must be unique."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,help:erplibre_devops_requirement.field_devops_requirement__security_relevant
+msgid "The requirement protects data, access or traceability."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#. odoo-python
+#: code:addons/erplibre_devops_requirement/models/devops_requirement.py:0
+msgid ""
+"The test summary of a requirement follows its test results and cannot be "
+"written: %(fields)s."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_threat__description
+msgid "Threat"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__threat_ids
+msgid "Threats"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement_test__name
+msgid "Title"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "To do"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__tour_name
+msgid "Tour name"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Type"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#. odoo-python
+#: code:addons/erplibre_devops_requirement/models/devops_requirement_test.py:0
+msgid "Unknown test result %(result)r, expected: %(expected)s."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields,field_description:erplibre_devops_requirement.field_devops_requirement__missing
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "What is missing"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_form
+msgid "What is still missing for a complete production delivery."
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_requirement.view_devops_requirement_search
+msgid "Without test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__moscow__wont
+msgid "Won't have"
+msgstr ""

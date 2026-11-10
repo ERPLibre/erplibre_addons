@@ -3,12 +3,16 @@
 <!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
 
-    <!-- Liste éditable : cocher Accepted / Done directement -->
+    <!-- Liste éditable : cocher Accepted / Done directement. Le
+         regroupement par domaine est celui de la vue, et non de l'action :
+         un `search_default_` de l'action s'imposerait aussi au kanban, dont
+         `default_group_by` ne vaut que sans regroupement de recherche. -->
     <record id="view_devops_requirement_list" model="ir.ui.view">
         <field name="name">devops.requirement.list</field>
         <field name="model">devops.requirement</field>
         <field name="arch" type="xml">
-            <list string="Requirements" editable="bottom" default_order="category_id,sequence">
+            <list string="Requirements" editable="bottom" default_order="category_id,sequence"
+                  default_group_by="category_id">
                 <field name="sequence" widget="handle"/>
                 <field name="code"/>
                 <field name="name"/>
@@ -19,6 +23,14 @@
                        decoration-muted="moscow == 'wont'"/>
                 <field name="priority" optional="show"/>
                 <field name="phase_id" optional="show"/>
+                <field name="devsecops_stage" optional="show"/>
+                <field name="requirement_type" optional="hide"/>
+                <field name="security_relevant" optional="hide"/>
+                <field name="test_state" widget="badge" optional="show"
+                       decoration-success="test_state == 'passed'"
+                       decoration-warning="test_state == 'not_run'"
+                       decoration-danger="test_state == 'failed'"
+                       decoration-muted="test_state == 'none'"/>
                 <field name="size" optional="hide"/>
                 <field name="responsible_id" optional="hide"/>
                 <field name="accepted" widget="boolean_toggle"/>
@@ -30,12 +42,17 @@
         </field>
     </record>
 
-    <!-- Formulaire détaillé -->
+    <!-- Formulaire détaillé. L'étape DevSecOps se change d'un clic dans
+         la barre d'état ; l'état des tests est calculé, en lecture. -->
     <record id="view_devops_requirement_form" model="ir.ui.view">
         <field name="name">devops.requirement.form</field>
         <field name="model">devops.requirement</field>
         <field name="arch" type="xml">
             <form string="Requirement">
+                <header>
+                    <field name="devsecops_stage" widget="statusbar"
+                           options="{'clickable': '1'}"/>
+                </header>
                 <sheet>
                     <div class="oe_title">
                         <label for="name"/>
@@ -45,6 +62,7 @@
                         <group>
                             <field name="code"/>
                             <field name="category_id"/>
+                            <field name="requirement_type"/>
                             <field name="moscow"/>
                             <field name="priority"/>
                         </group>
@@ -55,24 +73,112 @@
                             <field name="accepted"/>
                             <field name="approved"/>
                             <field name="done"/>
+                            <field name="test_state" widget="badge"
+                                   decoration-success="test_state == 'passed'"
+                                   decoration-warning="test_state == 'not_run'"
+                                   decoration-danger="test_state == 'failed'"
+                                   decoration-muted="test_state == 'none'"/>
                         </group>
                     </group>
-                    <group string="Description">
-                        <field name="description" nolabel="1"/>
-                    </group>
-                    <group string="Achievement (how)">
-                        <field name="achievement" nolabel="1"
-                               placeholder="How this requirement is covered: module, menu, view, or the current state and what comes next."/>
-                    </group>
-                    <group string="What is missing">
-                        <field name="missing" nolabel="1"
-                               placeholder="What is still missing for a complete production delivery."/>
-                    </group>
-                    <group string="Notes">
-                        <field name="notes" nolabel="1"/>
-                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <group string="Description">
+                                <field name="description" nolabel="1" colspan="2"/>
+                            </group>
+                            <group string="Achievement (how)">
+                                <field name="achievement" nolabel="1" colspan="2"
+                                       placeholder="How this requirement is covered: module, menu, view, or the current state and what comes next."/>
+                            </group>
+                            <group string="What is missing">
+                                <field name="missing" nolabel="1" colspan="2"
+                                       placeholder="What is still missing for a complete production delivery."/>
+                            </group>
+                            <group string="Notes">
+                                <field name="notes" nolabel="1" colspan="2"/>
+                            </group>
+                        </page>
+                        <page string="Acceptance" name="acceptance">
+                            <field name="acceptance_criteria"
+                                   placeholder="Given a context, When an action happens, Then an expected outcome."/>
+                        </page>
+                        <page string="Security" name="security">
+                            <group>
+                                <group>
+                                    <field name="security_relevant"/>
+                                    <field name="data_classification"/>
+                                </group>
+                            </group>
+                            <field name="threat_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stride"/>
+                                    <field name="description"/>
+                                    <field name="mitigation"/>
+                                    <field name="residual_risk"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Tests" name="tests">
+                            <!-- Les champs last_* sont en lecture dans
+                                 ce formulaire : le résultat vient d'un
+                                 lancement, par record_result, et non d'une
+                                 saisie à la main. -->
+                            <field name="test_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="kind"/>
+                                    <field name="reference"/>
+                                    <field name="last_result" readonly="1" widget="badge"
+                                           decoration-success="last_result == 'passed'"
+                                           decoration-warning="last_result == 'not_run'"
+                                           decoration-danger="last_result in ('failed', 'error')"
+                                           decoration-muted="last_result == 'skipped'"/>
+                                    <field name="last_run" readonly="1"/>
+                                    <field name="last_duration" readonly="1" optional="hide"/>
+                                    <field name="last_log" readonly="1" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Dependencies" name="dependencies">
+                            <group>
+                                <field name="depends_on_ids" widget="many2many_tags"/>
+                                <field name="dependent_ids" widget="many2many_tags" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- Kanban groupé par étape DevSecOps : glisser une carte change son
+         étape. group_expand affiche aussi les étapes vides. -->
+    <record id="view_devops_requirement_kanban" model="ir.ui.view">
+        <field name="name">devops.requirement.kanban</field>
+        <field name="model">devops.requirement</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="devsecops_stage" sample="1">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex gap-2">
+                            <field name="code" class="fw-bold"/>
+                            <field name="name"/>
+                        </div>
+                        <footer class="pt-1">
+                            <field name="moscow" widget="badge"
+                                   decoration-danger="moscow == 'must'"
+                                   decoration-warning="moscow == 'should'"
+                                   decoration-muted="moscow == 'wont'"/>
+                            <field name="test_state" widget="badge"
+                                   decoration-success="test_state == 'passed'"
+                                   decoration-warning="test_state == 'not_run'"
+                                   decoration-danger="test_state == 'failed'"
+                                   decoration-muted="test_state == 'none'"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
@@ -97,6 +203,10 @@
                 <filter name="f_not_done" string="To do" domain="[('done', '=', False)]"/>
                 <separator/>
                 <filter name="f_must" string="Essential (Must)" domain="[('moscow', '=', 'must')]"/>
+                <separator/>
+                <filter name="f_security" string="Security" domain="[('security_relevant', '=', True)]"/>
+                <filter name="f_failing" string="Failing tests" domain="[('test_state', '=', 'failed')]"/>
+                <filter name="f_no_test" string="Without test" domain="[('test_state', '=', 'none')]"/>
                 <group expand="0" name="group_by" string="Group by">
                     <filter name="g_cat" string="Domain" context="{'group_by': 'category_id'}"/>
                     <filter name="g_moscow" string="MoSCoW level" context="{'group_by': 'moscow'}"/>
@@ -105,6 +215,9 @@
                     <filter name="g_resp" string="Responsible" context="{'group_by': 'responsible_id'}"/>
                     <filter name="g_done" string="Done" context="{'group_by': 'done'}"/>
                     <filter name="g_approved" string="Approved" context="{'group_by': 'approved'}"/>
+                    <filter name="g_stage" string="Stage" context="{'group_by': 'devsecops_stage'}"/>
+                    <filter name="g_test_state" string="Test state" context="{'group_by': 'test_state'}"/>
+                    <filter name="g_type" string="Type" context="{'group_by': 'requirement_type'}"/>
                 </group>
             </search>
         </field>
@@ -135,8 +248,7 @@
     <record id="action_devops_requirement" model="ir.actions.act_window">
         <field name="name">Requirements</field>
         <field name="res_model">devops.requirement</field>
-        <field name="view_mode">list,form,graph,pivot</field>
-        <field name="context">{'search_default_g_cat': 1}</field>
+        <field name="view_mode">list,kanban,form,graph,pivot</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Add a requirement</p>
             <p>Describe what the project commits to, by domain and by phase.</p>
