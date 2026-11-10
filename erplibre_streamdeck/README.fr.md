@@ -105,6 +105,11 @@ une réponse d'erreur y ajoute `error`.
   n'est jamais fusionné avec le deck d'un autre poste. Un numéro hors de
   `[A-Za-z0-9._-]{1,64}` est un 400 `bad_request` : sans `:`, il ne peut
   jamais nommer un deck sans numéro.
+- Chaque texte d'un corps compte au plus 256 caractères et aucun
+  caractère NUL, un identifiant produit USB a 4 chiffres hexadécimaux, et
+  un deck, dans `state` comme dans un événement, porte un numéro de série
+  ou un chemin USB ; tout autre cas est un 400 `bad_request` et rien
+  n'est écrit.
 
 | Statut | `error` | Sens |
 |---|---|---|
