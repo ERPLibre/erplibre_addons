@@ -541,6 +541,10 @@ class TestRequirementInventory(TransactionCase):
         }
         self.assertEqual(set(french), exported)
         self.assertFalse([msgid for msgid, s in french.items() if not s])
+        # Un nom ou une description est une phrase : aucun ne s'écrit pareil
+        # dans les deux langues, et un msgstr recopié du msgid laisserait
+        # le requis en anglais pour un utilisateur fr_CA.
+        self.assertFalse([msgid for msgid, s in french.items() if s == msgid])
         for msgstr in french.values():
             self.assertNotRegex(msgstr, FRENCH_LEXICON)
         self.env["res.lang"]._activate_lang("fr_CA")
