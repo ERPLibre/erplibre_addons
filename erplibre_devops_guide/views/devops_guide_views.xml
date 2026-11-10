@@ -88,6 +88,12 @@
                                             <field name="action_label"/>
                                             <field name="count_model"/>
                                             <field name="count_domain"/>
+                                            <field name="requirement_id" optional="show"/>
+                                            <field name="tour_name" optional="show"/>
+                                            <field name="tour_label" optional="hide"/>
+                                            <field name="effective_tour_name" optional="hide"/>
+                                            <field name="groups_id" widget="many2many_tags"
+                                                   optional="show"/>
                                         </list>
                                     </field>
                                 </form>

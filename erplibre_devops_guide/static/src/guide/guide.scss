@@ -12,6 +12,7 @@
     --dg-line: #e5e7eb;
     --dg-warn: #f6a623;
     --dg-ok: #2e7d32;
+    --dg-fail: #c62828;
     --dg-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
     --dg-bg: #f7f7f8;
     --dg-surface: #ffffff;
@@ -180,7 +181,7 @@
         margin-bottom: 0.6rem;
     }
     // La pastille reprend --dg-warn, déjà la couleur de l'alerte : elle
-    // signale sans ajouter une onzième variable au contrat du thème.
+    // signale sans ajouter de variable au contrat du thème.
     .o_devops_guide_card_badge {
         margin-left: 0.5rem;
         padding: 0.1rem 0.45rem;
@@ -205,13 +206,91 @@
     .o_devops_guide_problem { color: var(--dg-muted); i { color: var(--dg-warn); } }
     .o_devops_guide_solution { color: var(--dg-ink); i { color: var(--dg-ok); } }
     .o_devops_guide_card_btn {
-        margin-top: auto;
-        align-self: flex-start;
         padding-left: 0;
         color: var(--dg-accent);
         font-weight: 600;
         text-decoration: none;
         &:hover { color: var(--dg-accent); }
+    }
+
+    // ---- Requis d'une carte : pastilles et boutons ----
+    // Les boutons se rangent au pied de la carte, quelle que soit la
+    // hauteur du texte au-dessus : les cartes d'une rangée s'alignent.
+    .o_devops_guide_card_actions {
+        margin-top: auto;
+        padding-top: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem 0.75rem;
+    }
+    .o_devops_guide_card_tour {
+        background: var(--dg-accent);
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        &:hover { background: color-mix(in srgb, var(--dg-accent) 80%, #000); color: #fff; }
+    }
+    .o_devops_guide_card_link {
+        padding-left: 0;
+        padding-right: 0;
+        color: var(--dg-muted);
+        text-decoration: none;
+        &:hover { color: var(--dg-accent); }
+    }
+    .o_devops_guide_pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-bottom: 0.6rem;
+    }
+    .o_devops_guide_pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid var(--dg-line);
+        background: var(--dg-bg);
+        color: var(--dg-muted);
+        font-size: 0.72rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .o_devops_guide_pill_req {
+        background: var(--dg-accent-soft);
+        border-color: transparent;
+        color: var(--dg-accent);
+    }
+    // Le séparateur est posé par la feuille et non par le gabarit : un
+    // texte de ponctuation seule y deviendrait un terme à traduire.
+    .o_devops_guide_pill_code + .o_devops_guide_pill_level::before {
+        content: "·";
+        margin: 0 0.3em;
+    }
+    // Couleur par état : passé en --dg-ok, à lancer en --dg-warn, en échec
+    // en --dg-fail ; sans test, la pastille reste neutre.
+    .o_devops_guide_pill_test_passed { color: #fff; background: var(--dg-ok); border-color: var(--dg-ok); }
+    .o_devops_guide_pill_test_not_run { color: #fff; background: var(--dg-warn); border-color: var(--dg-warn); }
+    .o_devops_guide_pill_test_failed { color: #fff; background: var(--dg-fail); border-color: var(--dg-fail); }
+    // Étape DevSecOps, en contour pour ne pas rivaliser avec l'état des
+    // tests : en pointillé tant que le requis n'est pas livré (plan à
+    // test), plein en --dg-accent une fois publié ou déployé, plein en
+    // --dg-ok en exploitation ou sous surveillance.
+    .o_devops_guide_pill_stage {
+        background: var(--dg-surface);
+        border-style: dashed;
+    }
+    .o_devops_guide_pill_stage_release,
+    .o_devops_guide_pill_stage_deploy {
+        border-style: solid;
+        border-color: var(--dg-accent);
+        color: var(--dg-accent);
+    }
+    .o_devops_guide_pill_stage_operate,
+    .o_devops_guide_pill_stage_monitor {
+        border-style: solid;
+        border-color: var(--dg-ok);
+        color: var(--dg-ok);
     }
 
     // ---- Roadmap ----
@@ -226,6 +305,8 @@
         border-radius: 14px;
         padding: 1.25rem;
         position: relative;
+        display: flex;
+        flex-direction: column;
     }
     .o_devops_guide_step_num {
         width: 34px;

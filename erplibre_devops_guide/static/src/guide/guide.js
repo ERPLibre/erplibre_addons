@@ -5,6 +5,7 @@
 import { Component, markup, onWillStart, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { session } from "@web/session";
 
 // La page vient en entier d'un seul appel : son contenu est en base, et le
 // composant ne sait rien d'un projet en particulier.
@@ -15,9 +16,9 @@ export class DevopsGuide extends Component {
     setup() {
         this.action = useService("action");
         this.orm = useService("orm");
-        // Le service de visite guidée est absent quand `web_tour` n'est pas
-        // installé : le bouton de visite ne s'affiche alors pas, plutôt que
-        // de faire échouer le montage du composant.
+        // Le service de visite guidée peut manquer (`web_tour` absent du
+        // paquet chargé) : le bouton de visite ne s'affiche alors pas,
+        // plutôt que de faire échouer le montage du composant.
         this.tour = this.env.services.tour_service || null;
         this.state = useState({ page: null, loaded: false });
 
@@ -40,8 +41,15 @@ export class DevopsGuide extends Component {
         });
     }
 
-    get canStartTour() {
-        return Boolean(this.tour && this.state.page && this.state.page.tour_name);
+    // Un nom de visite absent du registre JS ne lance rien : `startTour`
+    // du service rend sans erreur ni effet. C'est le cas d'une visite
+    // déclarée seulement dans `web.assets_tests`, chargé en mode test
+    // seulement. Le bouton ne s'affiche donc que si la visite est connue,
+    // plutôt que de rester muet au clic.
+    canStartTour(name) {
+        return Boolean(
+            this.tour && name && registry.category("web_tour.tours").contains(name)
+        );
     }
 
     openAction(xmlId) {
@@ -91,9 +99,57 @@ export class DevopsGuide extends Component {
         }
     }
 
-    startTour() {
-        if (this.canStartTour) {
-            this.tour.startTour(this.state.page.tour_name, { mode: "manual" });
+    // Le mode manuel du service active l'Onboarding de l'utilisateur EN
+    // BASE (`switch_tour_enabled(true)`) quand il était inactif. Laissé
+    // ainsi, chaque chargement suivant lancerait les visites natives
+    // d'Odoo non consommées, et la fin de cette visite enchaînerait sur la
+    // prochaine (`consume` rend la suivante tant que l'Onboarding est
+    // actif). L'état d'origine se lit dans `session.tour_enabled`, valeur
+    // du chargement de la page que le service ne modifie pas, et il est
+    // rétabli en base sitôt la visite démarrée.
+    //
+    // La visite en cours n'en souffre pas tant que la page ne se recharge
+    // pas : son état vit dans le localStorage (`tourState`) et le pointeur
+    // dans le service, qui garde sa propre copie de l'Onboarding pour la
+    // page. Un rechargement, lui, l'efface : au démarrage, le service ne
+    // reprend une visite manuelle que si l'Onboarding est actif en base.
+    // D'où `redirect: false`, et la règle qu'une visite lancée du guide
+    // navigue par les menus, sans `url`, `goToUrl` ni `expectUnloadPage`.
+    async startTour(name) {
+        if (!this.canStartTour(name)) {
+            return;
+        }
+        const restoreOnboarding = !session.tour_enabled && !session.is_public;
+        await this.tour.startTour(name, { mode: "manual", redirect: false });
+        if (restoreOnboarding) {
+            await this.orm.call("res.users", "switch_tour_enabled", [false]);
+        }
+    }
+
+    // Le formulaire du requis, dans le fil d'Ariane : le retour ramène à
+    // la page du guide.
+    openRequirement(requirement) {
+        if (requirement && requirement.id) {
+            this.action.doAction({
+                type: "ir.actions.act_window",
+                res_model: "devops.requirement",
+                res_id: requirement.id,
+                views: [[false, "form"]],
+                target: "current",
+            });
+        }
+    }
+
+    // L'action vient du serveur (`action_open_guide`), qui sait seul
+    // quelle page détaillée le requis désigne.
+    async openGuide(requirement) {
+        if (requirement && requirement.has_guide) {
+            const action = await this.orm.call(
+                "devops.requirement",
+                "action_open_guide",
+                [[requirement.id]]
+            );
+            await this.action.doAction(action);
         }
     }
 }

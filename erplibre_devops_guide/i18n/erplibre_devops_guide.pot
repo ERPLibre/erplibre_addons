@@ -1,0 +1,484 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_devops_guide
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-10 06:44+0000\n"
+"PO-Revision-Date: 2026-11-10 06:44+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_guide_section.py:0
+msgid ""
+"A lead section renders its intro only. Move its cards to a card grid or a "
+"roadmap section, or change this section's shape."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__action_xmlid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__action_xmlid
+msgid "Action"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__active
+msgid "Active"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_search
+msgid "Archived"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__badge
+msgid "Badge"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__action_label
+msgid "Button label"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Buttons"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields.selection,name:erplibre_devops_guide.selection__devops_guide_section__kind__cards
+msgid "Card grid"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__card_ids
+msgid "Cards"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__count_domain
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_counter_mixin__count_domain
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__count_domain
+msgid "Counted domain"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__count_model
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_counter_mixin__count_model
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__count_model
+msgid "Counted model"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__create_uid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__create_date
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_requirement__guide_id
+msgid "Detailed guide page of this requirement."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+msgid "DevSecOps stage"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__display_name
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__effective_tour_name
+msgid "Effective tour"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__eyebrow
+msgid "Eyebrow"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__icon
+msgid "Font Awesome class without the fa prefix, e.g. fa-database."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__footer
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Footer"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__footer_small
+msgid "Footer note"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__groups_id
+msgid "Groups"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__guide_id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__guide_id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__guide_id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_requirement__guide_id
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_requirement_form_guide
+msgid "Guide"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_guide_card
+msgid "Guide card"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_requirement__guide_card_ids
+msgid "Guide cards"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_guide_section
+msgid "Guide section"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_guide_stat
+msgid "Guide statistic"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.actions.act_window,name:erplibre_devops_guide.action_devops_guide
+#: model:ir.ui.menu,name:erplibre_devops_guide.menu_devops_guide
+msgid "Guides"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Hero"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__id
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__id
+msgid "ID"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__icon
+msgid "Icon"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__name
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Internal name"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__intro
+msgid "Intro"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__label
+msgid "Label"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__write_uid
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__write_date
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields.selection,name:erplibre_devops_guide.selection__devops_guide_section__kind__lead
+msgid "Lead text"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__groups_id
+msgid ""
+"Left empty, every reader of the guide sees the card. Otherwise only members "
+"of at least one of these groups see it."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__num
+msgid "Literal value"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+msgid "No guide to show. Pick one in Requirements / Configuration / Guides."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__num
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__num
+msgid "Number"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__count_domain
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_counter_mixin__count_domain
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_stat__count_domain
+msgid "Odoo domain as a literal list, e.g. [('done', '=', True)]."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__url
+msgid "Opened in a new tab, and takes precedence over the action."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_guide
+msgid "Presentation guide"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Preview"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__primary_action
+msgid "Primary action"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__primary_label
+msgid "Primary button"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__problem
+msgid "Problem"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__requirement_id
+msgid "Requirement"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_guide_counter_mixin
+msgid "Resolve a declared record count"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__resolved_label
+msgid "Resolved label"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields.selection,name:erplibre_devops_guide.selection__devops_guide_section__kind__roadmap
+msgid "Roadmap"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__section_id
+msgid "Section"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__section_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Sections"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__sequence
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__kind
+msgid "Shape"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_guide_card.py:0
+msgid "Show me"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_stat__num
+msgid ""
+"Shown as written when no counted model is set. Ignored as soon as one is, "
+"the figure being counted instead."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model,name:erplibre_devops_guide.model_devops_requirement
+msgid "Software requirement (MoSCoW)"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__solution
+msgid "Solution"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_guide.py:0
+msgid "Start the tour"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__stat_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_devops_guide.view_devops_guide_form
+msgid "Statistics"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__subtitle
+msgid "Subtitle"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide__tour_name
+msgid ""
+"Technical name of a registered tour. Left empty, or unknown to the tour "
+"registry of the web client, the tour button is not shown."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__tour_name
+msgid ""
+"Technical name of a registered tour. Left empty, the card launches the tour "
+"of its requirement, if any."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__count_model
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_counter_mixin__count_model
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_stat__count_model
+msgid "Technical name of the model to count, e.g. devops.requirement."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-javascript
+#: code:addons/erplibre_devops_guide/static/src/guide/guide.xml:0
+msgid "Test state"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__requirement_id
+msgid "The card shows this requirement's code, level, stage and test state."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__action_label
+msgid ""
+"The marker {count} is replaced by the counted figure when a counted model is"
+" set, so the label stays true as data changes. Without a counted model the "
+"marker is left as written."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#. odoo-python
+#: code:addons/erplibre_devops_guide/models/devops_requirement.py:0
+msgid "This requirement has no guide page."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__title
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__title
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_section__title
+msgid "Title"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__total_domain
+msgid "Total domain"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__tour_label
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__tour_label
+msgid "Tour button"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide__tour_name
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__tour_name
+msgid "Tour name"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_card__url
+msgid "URL"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,field_description:erplibre_devops_guide.field_devops_guide_stat__value
+msgid "Value"
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_stat__total_domain
+msgid "When set, the value reads as a ratio: counted / total."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_card__action_xmlid
+msgid "XML id of an action, e.g. crm.crm_lead_action_pipeline."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide_stat__action_xmlid
+msgid "XML id of an action; without it the figure is not clickable."
+msgstr ""
+
+#. module: erplibre_devops_guide
+#: model:ir.model.fields,help:erplibre_devops_guide.field_devops_guide__primary_action
+msgid "XML id of the action the second hero button opens."
+msgstr ""
