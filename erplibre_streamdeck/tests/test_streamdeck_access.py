@@ -237,6 +237,8 @@ class TestStreamdeckAccess(TransactionCase):
                 with self.subTest(user=user.login, model=model, op="unlink"):
                     with self.assertRaises(AccessError):
                         record.with_user(user).unlink()
+            # Le gestionnaire non plus ne lit les codes : un code inutilisé
+            # lu inscrirait un poste au nom de l'employé du code.
             with self.subTest(user=user.login, model="pairing", op="read"):
                 with self.assertRaises(AccessError):
                     self.env["streamdeck.pairing.code"].with_user(user).search(
