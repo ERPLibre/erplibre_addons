@@ -32,6 +32,13 @@ besoin sont listés dans `requirements.txt`.
 | `erplibre_devops_requirement` | Suit les requis logiciels d'un projet d'implantation : niveau MoSCoW, domaine fonctionnel, phase, étape DevSecOps, menaces STRIDE, critères d'acceptation, dépendances et tests qui prouvent chaque requis. Ne livre aucun requis : un module de projet les fournit en données. |
 | `erplibre_devops_guide` | Rend la page de présentation d'un projet d'implantation à partir d'enregistrements : bandeau avec chiffres, sections de cartes, feuille de route et décomptes sur n'importe quel modèle, avec boutons vers une URL, une action ou une visite guidée. Ne livre que le moteur : un module de projet décrit ses pages en données. |
 
+### Stream Deck
+
+| Module | Description |
+|---|---|
+| `erplibre_streamdeck` | Base de l'inventaire des Stream Deck des employés. Ne contient encore aucun modèle ni aucun menu : seulement la catégorie Stream Deck et ses groupes Utilisateur et Gestionnaire ; tout utilisateur interne est utilisateur Stream Deck. |
+| `erplibre_streamdeck_devops_requirement` | Les requis du Stream Deck d'ERPLibre (programmes du deck, extension GNOME ERPLibre Home, installation, jeux, plugin mobile) en données d'`erplibre_devops_requirement`, chacun avec les tests de dépôt qui le prouvent ; un lanceur de tests pousse son verdict par la référence du test. |
+
 ### Synchronisation de données externes
 
 | Module | Description |

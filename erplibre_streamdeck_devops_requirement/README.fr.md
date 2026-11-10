@@ -23,8 +23,15 @@ dont le code commence par `sd_`.
 | test long à écrire | à faire ; *Ce qui manque* dit ce que le test long doit vérifier |
 | non-objectif, hors périmètre | MoSCoW *Ne fera pas*, fait, la raison dans la description |
 | décision de conception | MoSCoW *Devrait*, *Non fonctionnel*, fait, la raison dans *Réalisation* |
+| question ouverte, risque ouvert, suite | MoSCoW *Devrait*, à faire ; *Ce qui manque* dit ce qui reste |
+| invariant de sécurité | MoSCoW *Doit*, type *Sécurité*, *Touche la sécurité* |
 | preuve dans un autre dépôt | à faire ; *Ce qui manque* nomme le dépôt |
 | enfreinte | à faire, étape *Développement* ; *Ce qui manque* décrit l'écart |
+
+*Réalisation* et *Ce qui manque* nomment fichiers et tests sous la même
+forme `<dépôt>:<chemin>` que les preuves ci-dessous : chaque renvoi se
+résout dans son propre dépôt. Un requis qui protège un secret, un accès ou
+un fichier hors du checkout est marqué *Touche la sécurité*.
 
 Chaque requis porte un code stable `SD-<DOMAINE>-R<ligne>`, par exemple
 `SD-DEFECTS-R02`. Les données se chargent **une fois** : elles sont

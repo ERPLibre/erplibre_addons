@@ -2,13 +2,15 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 import re
 
+import polib
+
 from odoo.tests.common import TransactionCase, tagged
 from odoo.tools.convert import convert_file
+from odoo.tools.misc import file_path
 
 MODULE = "erplibre_streamdeck_devops_requirement"
 
-# Requis par domaine, tels que le générateur les a comptés dans l'audit
-# des specs Stream Deck : une ligne « obsolete » ne donne aucun requis.
+# Requis par domaine : une ligne d'audit « obsolete » ne donne aucun requis.
 COUNTS = {
     "sd_bundle": 66,
     "sd_defects": 107,
@@ -33,6 +35,15 @@ SHARED_REFERENCE = (
     "erplibre:test/test_deck_lock.py::LaCommandeSousVerrou"
     "::test_a_busy_deck_runs_nothing_and_exits_two"
 )
+
+# Les alias de l'audit (M: dépôt mobile, J/ jeux, EXT/ extension) et le
+# nom daté d'un clone local ne se résolvent pas hors de l'audit. L'alias M
+# est suivi d'un chemin, ce qui laisse passer un format d'heure « H:M:S ».
+AUDIT_ALIAS = re.compile(r"\bM[:/](?=[\w-]+[./])|\bJ/|\bEXT/|plain-clone-\d")
+# Le « I » anglais isolé est la première personne de l'auditeur ; « I/O »
+# et un « I » collé à un identifiant n'en sont pas.
+FIRST_PERSON = re.compile(r"(?<![\w/])I(?![\w/'’-])")
+TEXT_FIELDS = ("name", "description", "achievement", "missing", "notes")
 
 
 @tagged("post_install", "-at_install")
@@ -114,8 +125,8 @@ class TestStreamdeckRequirementData(TransactionCase):
             lines.filtered(lambda line: line.kind == "node_test"),
             "the extension's node tests are proofs too",
         )
-        # Les tests Python de la migration ont suivi l'extension dans son
-        # dépôt : leur preuve la nomme, jamais ERPLibre.
+        # Les tests Python de la migration vivent dans le dépôt de
+        # l'extension : leur preuve le nomme, jamais ERPLibre.
         self.assertFalse(
             lines.filtered(
                 lambda line: "test_erplibre_home_migrate_legacy"
@@ -135,17 +146,18 @@ class TestStreamdeckRequirementData(TransactionCase):
         # par l'échappement XML et reviennent tels que l'audit les écrit.
         texts = {
             "SD-GREPO-R14": (
-                "Contract 5: GET /launch/<id> 2xx when started, else "
-                '{"error": line}, 403 games off, 404 unknown id'
+                "CONTRACT.md, Gallery: GET /launch/<id> answers 2xx when the "
+                'game starts, otherwise {"error": line} with 403 when the '
+                "games are off and 404 for an unknown id"
             ),
             "SD-DEPLOY-R55": (
                 "udev rule /etc/udev/rules.d/70-streamdeck.rules, the two "
                 "uaccess lines for 0fd9, compared before replacing, then "
                 "udevadm control --reload-rules && udevadm trigger"
             ),
-            "SD-EXT-R31": (
-                "Games GET http://localhost:8042/api/games, click → "
-                "/launch/<id>"
+            "SD-EXT-R40": (
+                "Terminal fallback gnome-terminal → xterm → kgx; with none "
+                "of them, a notification"
             ),
         }
         for code, text in texts.items():
@@ -211,3 +223,48 @@ class TestStreamdeckRequirementData(TransactionCase):
         )
         self.assertEqual(updated, len(lines))
         self.assertEqual(set(lines.mapped("last_result")), {"passed"})
+
+    def test_open_risks_and_security_invariants_are_classified(self):
+        # Une question ouverte, un risque sans parade ou une suite à mener
+        # reste à faire : un filtre « pas fait » les montre.
+        for code in (
+            "SD-MOBPLUG-R80",
+            "SD-MOBPLUG-R90",
+            "SD-RENAME-R44",
+            "SD-SERVICE-R81",
+            "SD-SERVICE-R82",
+            "SD-DEPLOY-R126",
+        ):
+            requirement = self._requirement(code)
+            self.assertFalse(requirement.done, code)
+            self.assertTrue(requirement.missing, code)
+        # Un secret jamais écrit sur le disque est un invariant de sécurité.
+        for code in ("SD-EXT-R28", "SD-EXT-R122"):
+            requirement = self._requirement(code)
+            self.assertEqual(requirement.moscow, "must", code)
+            self.assertEqual(requirement.requirement_type, "security", code)
+            self.assertTrue(requirement.security_relevant, code)
+
+    def test_no_text_carries_audit_shorthand(self):
+        # Chaque texte se lit seul dans Odoo : ni alias de l'audit, ni
+        # clone local daté, ni première personne.
+        records = [(c, ("name",)) for c in self.categories]
+        records += [(r, TEXT_FIELDS) for r in self.requirements]
+        for record, fields in records:
+            for field in fields:
+                value = record[field] or ""
+                self.assertNotRegex(value, AUDIT_ALIAS, record.display_name)
+                self.assertNotRegex(value, FIRST_PERSON, record.display_name)
+        for entry in self._french_entries():
+            self.assertNotRegex(entry.msgstr, AUDIT_ALIAS, entry.msgid)
+
+    def _french_entries(self):
+        po = polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        return [
+            entry
+            for entry in po
+            if any(
+                path.startswith("model:devops.requirement")
+                for path, _line in entry.occurrences
+            )
+        ]
