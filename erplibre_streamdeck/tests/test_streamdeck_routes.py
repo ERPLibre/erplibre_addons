@@ -1,8 +1,11 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+import hashlib
 import json
 import logging
 from datetime import timedelta
+
+from lxml import etree
 
 from odoo import fields
 from odoo.exceptions import AccessError
@@ -13,6 +16,7 @@ from odoo.tests.common import (
     new_test_user,
     tagged,
 )
+from odoo.tools.safe_eval import safe_eval
 
 FINGERPRINT_A = "c" * 64
 FINGERPRINT_B = "d" * 64
@@ -384,6 +388,128 @@ class TestStreamdeckPairingWizard(TransactionCase):
         self.assertEqual(action["res_model"], "streamdeck.pairing.wizard")
         self.assertEqual(action["target"], "new")
         return Wizard.browse(action["res_id"])
+
+    def _visible(self, xmlid, user):
+        """Ce qu'une action de fenêtre montre à `user` : son domaine, évalué
+        avec l'`uid` de l'utilisateur comme le fait le client web, puis la
+        recherche sous ses droits et ses règles."""
+        action = self.env.ref(xmlid)
+        domain = safe_eval(action.domain or "[]", {"uid": user.id})
+        return self.env[action.res_model].with_user(user).search(domain)
+
+    def test_add_a_workstation_runs_for_an_employee(self):
+        # Le chemin du client web : le bouton d'en-tête de la liste des
+        # postes lance l'action serveur, qui exécute `action_open` sous
+        # l'utilisateur qui clique. Un groupe trop étroit sur l'action
+        # serveur refuserait le clic par une AccessError.
+        server_action = self.env.ref(
+            "erplibre_streamdeck.action_streamdeck_pairing_wizard"
+        )
+        for user in (self.user_a, self.manager):
+            with self.subTest(user=user.login):
+                arch = (
+                    self.env["streamdeck.workstation"]
+                    .with_user(user)
+                    .get_views([(False, "list")])["views"]["list"]["arch"]
+                )
+                buttons = etree.fromstring(arch).xpath(
+                    "//header/button[@type='action'][@name='%d']"
+                    % server_action.id
+                )
+                self.assertEqual(len(buttons), 1)
+
+                action = server_action.with_user(user).run()
+                self.assertEqual(action["type"], "ir.actions.act_window")
+                self.assertEqual(
+                    action["res_model"], "streamdeck.pairing.wizard"
+                )
+                self.assertEqual(action["target"], "new")
+                wizard = (
+                    self.env["streamdeck.pairing.wizard"]
+                    .with_user(user)
+                    .browse(action["res_id"])
+                )
+                self.assertEqual(len(wizard.code), 8)
+                code = (
+                    self.env["streamdeck.pairing.code"]
+                    .sudo()
+                    .search([("code", "=", wizard.code)])
+                )
+                self.assertEqual(code.user_id, user)
+
+    def test_my_menus_hold_only_my_own_records_even_for_the_manager(self):
+        # Les règles ouvrent tout le parc au gestionnaire : seul le domaine
+        # des actions « Mes postes » et « Mes decks » le borne à ses postes.
+        Workstation = self.env["streamdeck.workstation"]
+        Device = self.env["streamdeck.device"]
+        ws_a, ws_m = (
+            Workstation.create(
+                {
+                    "user_id": user.id,
+                    "name": "host-%s" % seed,
+                    "fingerprint": hashlib.sha256(seed.encode()).hexdigest(),
+                }
+            )
+            for user, seed in ((self.user_a, "a"), (self.manager, "m"))
+        )
+        deck_a, deck_m, deck_moved = (
+            Device.create(
+                {
+                    "key": serial,
+                    "serial": serial,
+                    "usb_product_id": "0084",
+                    "workstation_id": workstation.id,
+                    "connected": True,
+                }
+            )
+            for serial, workstation in (
+                ("SN-A", ws_a),
+                ("SN-M", ws_m),
+                ("SN-MOVED", ws_a),
+            )
+        )
+        # Le deck déplacé a été branché sur le poste du gestionnaire avant
+        # de passer sur celui de l'employé A.
+        self.env["streamdeck.event"].create(
+            {
+                "uuid": "00000000-0000-4000-8000-000000000001",
+                "kind": "plugged",
+                "at": "2026-01-01 10:00:00",
+                "received_at": "2026-01-01 10:00:01",
+                "device_id": deck_moved.id,
+                "workstation_id": ws_m.id,
+                "workstation_name": ws_m.name,
+                "employee_name": self.manager.name,
+            }
+        )
+        my_workstations = (
+            "erplibre_streamdeck.action_streamdeck_my_workstations"
+        )
+        my_decks = "erplibre_streamdeck.action_streamdeck_my_decks"
+        self.assertEqual(self._visible(my_workstations, self.manager), ws_m)
+        self.assertEqual(
+            self._visible(my_decks, self.manager), deck_m | deck_moved
+        )
+        self.assertEqual(self._visible(my_workstations, self.user_a), ws_a)
+        self.assertEqual(
+            self._visible(my_decks, self.user_a), deck_a | deck_moved
+        )
+        # Le parc, lui, montre au gestionnaire les postes et les decks de
+        # chacun.
+        self.assertLessEqual(
+            ws_a | ws_m,
+            self._visible(
+                "erplibre_streamdeck.action_streamdeck_fleet_workstations",
+                self.manager,
+            ),
+        )
+        self.assertLessEqual(
+            deck_a | deck_m | deck_moved,
+            self._visible(
+                "erplibre_streamdeck.action_streamdeck_fleet_decks",
+                self.manager,
+            ),
+        )
 
     def test_the_wizard_shows_a_fresh_code_for_the_current_user(self):
         wizard = self._open(self.user_a)
