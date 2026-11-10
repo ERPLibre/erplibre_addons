@@ -53,6 +53,16 @@ ORIGIN = re.compile(
 )
 NON_GOAL = re.compile(r"^(Non-goals?|Out of scope)\b")
 
+# Le français des requis suit celui de l'interface d'ERPLibre : « plugin »,
+# « hors périmètre », « se termine avec le code N ».
+FRENCH_LEXICON = re.compile(
+    r"plugiciel|hors portée|\bsort(?:ent)? en \d", re.IGNORECASE
+)
+# Un « ; » prend une espace avant lui ; une commande citée après
+# « bash -lc » garde le « ; » du shell.
+GLUED_SEMICOLON = re.compile(r"(?<=\S);(?=\s)")
+QUOTED_SHELL = re.compile(r"bash -lc '[^']*'")
+
 # Un requis et un domaine lus en fr_CA : le nom du requis porte chevrons,
 # accolades et guillemets, qui traversent aussi le fichier .po.
 FRENCH = {
@@ -299,6 +309,15 @@ class TestStreamdeckRequirementData(TransactionCase):
     def test_notes_open_on_an_origin(self):
         for requirement in self.requirements:
             self.assertRegex(requirement.notes or "", ORIGIN, requirement.code)
+
+    def test_french_follows_one_vocabulary(self):
+        for entry in self._french_entries():
+            self.assertNotRegex(entry.msgstr, FRENCH_LEXICON, entry.msgid)
+            self.assertNotRegex(
+                QUOTED_SHELL.sub("", entry.msgstr),
+                GLUED_SEMICOLON,
+                entry.msgid,
+            )
 
     def test_no_text_carries_audit_shorthand(self):
         # Chaque texte se lit seul dans Odoo : ni alias de l'audit, ni
