@@ -25,13 +25,31 @@ dont le code commence par `sd_`.
 | décision de conception | MoSCoW *Devrait*, *Non fonctionnel*, fait, la raison dans *Réalisation* |
 | question ouverte, risque ouvert, suite | MoSCoW *Devrait*, à faire ; *Ce qui manque* dit ce qui reste |
 | invariant de sécurité | MoSCoW *Doit*, type *Sécurité*, *Touche la sécurité* |
-| preuve dans un autre dépôt | à faire ; *Ce qui manque* nomme le dépôt |
+| preuve dans un autre dépôt | fait, une ligne de preuve par test de ce dépôt ; sinon à faire, *Ce qui manque* nomme le dépôt |
 | enfreinte | à faire, étape *Développement* ; *Ce qui manque* décrit l'écart |
 
 *Réalisation* et *Ce qui manque* nomment fichiers et tests sous la même
 forme `<dépôt>:<chemin>` que les preuves ci-dessous : chaque renvoi se
-résout dans son propre dépôt. Un requis qui protège un secret, un accès ou
-un fichier hors du checkout est marqué *Touche la sécurité*.
+résout dans son propre dépôt. Un requis fait laisse *Ce qui manque* vide.
+Un requis qui protège un secret, un accès ou le mode d'un fichier est de
+type *Sécurité* et marqué *Touche la sécurité*.
+
+*Notes* s'ouvre sur l'origine du requis, ce que l'audit a trouvé pour sa
+ligne. Le libellé reste en anglais, comme tout le champ :
+
+| Origine | Sens |
+|---|---|
+| covered by a test | un test d'un dépôt le prouvait déjà |
+| unit test missing | aucun test unitaire ne le prouvait |
+| long test needed | seul le test long, dans des machines virtuelles avec une session GNOME, peut le vérifier |
+| documented only | la conception l'énonce : une décision, une règle ou un non-objectif |
+| proof in another repository | son test relève du dépôt des jeux ou du dépôt mobile |
+| violated | le code ne le tenait pas |
+
+Ce qui suit l'origine dit ce qui tient le requis : *a unit test pins it*
+(un test unitaire le fixe), *an existing test covers it* (un test existant
+le couvre), *its unit test shows the violation* (son test unitaire montre
+l'écart).
 
 Chaque requis porte un code stable `SD-<DOMAINE>-R<ligne>`, par exemple
 `SD-DEFECTS-R02`. Les données se chargent **une fois** : elles sont
@@ -79,6 +97,6 @@ l'exemple ci-dessus met deux requis à jour en un appel.
 Les noms et descriptions des requis et les noms des domaines sont écrits en
 anglais et livrés en français canadien : `i18n/fr_CA.po` porte le français
 de chacun d'eux, et charger la langue française (`fr_CA`) affiche donc les
-requis en français. *Réalisation*, *Ce qui manque* et *Notes* ne se
-traduisent pas : ils nomment fichiers, tests et commandes, qui se lisent de
-même dans les deux langues.
+requis en français. *Réalisation*, *Ce qui manque* et *Notes* restent en
+anglais dans les deux langues : `erplibre_devops_requirement` ne déclare pas
+ces champs traduisibles, le module n'en livre donc aucun français.

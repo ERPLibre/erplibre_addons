@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 09:47+0000\n"
-"PO-Revision-Date: 2026-11-10 09:47+0000\n"
+"POT-Creation-Date: 2026-11-10 11:42+0000\n"
+"PO-Revision-Date: 2026-11-10 11:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -4720,6 +4720,18 @@ msgid ""
 msgstr ""
 "Les tests qui exigent le vrai clone sont sautés avec leur raison quand il "
 "est absent ; la suite passe avec et sans games/"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_defects_r89
+msgid ""
+"The '…' mark on a real key and the deck during a zenity dialog need a USB "
+"deck and a GNOME session: erplibre:long_test/install_erplibre_home.py "
+"installs the deck level in its virtual machines and presses no key."
+msgstr ""
+"La marque « … » sur une vraie touche et le deck pendant un dialogue zenity "
+"demandent un deck USB et une session GNOME : "
+"erplibre:long_test/install_erplibre_home.py installe le niveau deck dans ses"
+" machines virtuelles et n'appuie sur aucune touche."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r14

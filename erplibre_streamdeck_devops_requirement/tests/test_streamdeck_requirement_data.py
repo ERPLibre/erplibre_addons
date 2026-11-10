@@ -45,6 +45,14 @@ AUDIT_ALIAS = re.compile(r"\bM[:/](?=[\w-]+[./])|\bJ/|\bEXT/|plain-clone-\d")
 FIRST_PERSON = re.compile(r"(?<![\w/])I(?![\w/'’-])")
 TEXT_FIELDS = ("name", "description", "achievement", "missing", "notes")
 
+# Les Notes s'ouvrent sur l'origine du requis, l'un des libellés que
+# définit le README du module, jamais sur le code brut de l'audit.
+ORIGIN = re.compile(
+    r"^Origin: (covered by a test|unit test missing|long test needed"
+    r"|documented only|proof in another repository|violated)[.;]"
+)
+NON_GOAL = re.compile(r"^(Non-goals?|Out of scope)\b")
+
 # Un requis et un domaine lus en fr_CA : le nom du requis porte chevrons,
 # accolades et guillemets, qui traversent aussi le fichier .po.
 FRENCH = {
@@ -249,12 +257,48 @@ class TestStreamdeckRequirementData(TransactionCase):
             requirement = self._requirement(code)
             self.assertFalse(requirement.done, code)
             self.assertTrue(requirement.missing, code)
-        # Un secret jamais écrit sur le disque est un invariant de sécurité.
-        for code in ("SD-EXT-R28", "SD-EXT-R122"):
+        # Un secret, un mot de passe ou le mode d'un fichier : invariant de
+        # sécurité.
+        for code in (
+            "SD-EXT-R28",
+            "SD-EXT-R122",
+            "SD-EXT-R55",
+            "SD-EXT-R58",
+            "SD-GREPO-R45",
+        ):
             requirement = self._requirement(code)
             self.assertEqual(requirement.moscow, "must", code)
             self.assertEqual(requirement.requirement_type, "security", code)
             self.assertTrue(requirement.security_relevant, code)
+
+    def test_a_done_requirement_lists_no_missing_work(self):
+        # Un requis fait n'a plus rien à faire : « Ce qui manque » vide.
+        done = self.requirements.filtered("done")
+        self.assertFalse(done.filtered("missing").mapped("code"))
+
+    def test_security_type_and_flag_agree(self):
+        # Le type Sécurité et « Touche la sécurité » désignent les mêmes
+        # requis : un filtre sur l'un trouve tous ceux de l'autre.
+        self.assertFalse(
+            self.requirements.filtered(
+                lambda r: (r.requirement_type == "security")
+                != r.security_relevant
+            ).mapped("code")
+        )
+
+    def test_non_goals_are_wont_and_done(self):
+        non_goals = self.requirements.filtered(
+            lambda r: NON_GOAL.match(r.name)
+        )
+        self.assertIn("SD-DEFECTS-R89", non_goals.mapped("code"))
+        for requirement in non_goals:
+            self.assertEqual(requirement.moscow, "wont", requirement.code)
+            self.assertTrue(requirement.done, requirement.code)
+            self.assertFalse(requirement.missing, requirement.code)
+
+    def test_notes_open_on_an_origin(self):
+        for requirement in self.requirements:
+            self.assertRegex(requirement.notes or "", ORIGIN, requirement.code)
 
     def test_no_text_carries_audit_shorthand(self):
         # Chaque texte se lit seul dans Odoo : ni alias de l'audit, ni

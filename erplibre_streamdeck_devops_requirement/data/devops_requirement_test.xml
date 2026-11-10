@@ -719,6 +719,66 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_erplibre_streamdeck_sessions.py::ClaudePageTest::test_removed_file_goes_home</field>
     </record>
+    <record id="test_sd_defects_r56_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_claude_recycled_pid_dropped</field>
+    </record>
+    <record id="test_sd_defects_r56_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_claude_original_pid_kept</field>
+    </record>
+    <record id="test_sd_defects_r56_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_claude_uses_oldest_stamp</field>
+    </record>
+    <record id="test_sd_defects_r56_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_claude_zero_stamps_do_not_count</field>
+    </record>
+    <record id="test_sd_defects_r56_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_claude_without_stamps_checks_proc</field>
+    </record>
+    <record id="test_sd_defects_r56_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_claude_pid_zero_kept</field>
+    </record>
+    <record id="test_sd_defects_r56_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_mpv_recycled_pid_dropped</field>
+    </record>
+    <record id="test_sd_defects_r56_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="90" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_mpv_original_pid_kept</field>
+    </record>
+    <record id="test_sd_defects_r56_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="100" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_mpv_without_started_at_checks_proc</field>
+    </record>
+    <record id="test_sd_defects_r56_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_defects_r56" />
+        <field name="sequence" eval="110" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_files.py::LoaderTest::test_mpv_pid_zero_kept</field>
+    </record>
     <record id="test_sd_defects_r57_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_defects_r57" />
         <field name="sequence" eval="10" />
@@ -1427,6 +1487,12 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_tiler_target_is_an_alias</field>
     </record>
+    <record id="test_sd_deploy_r19_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_deploy_r19" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryLaunch::test_the_game_runs_under_the_server_interpreter</field>
+    </record>
     <record id="test_sd_deploy_r20_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r20" />
         <field name="sequence" eval="10" />
@@ -1558,6 +1624,12 @@
         <field name="sequence" eval="10" />
         <field name="kind">long_test</field>
         <field name="reference">erplibre:long_test/install_erplibre_home.py::extension-indicators</field>
+    </record>
+    <record id="test_sd_deploy_r28_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_deploy_r28" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCinqEtapes::test_a_failed_mount_stops_the_base_stage</field>
     </record>
     <record id="test_sd_deploy_r29_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r29" />
@@ -3179,6 +3251,12 @@
         <field name="kind">long_test</field>
         <field name="reference">erplibre:long_test/install_erplibre_home.py::session</field>
     </record>
+    <record id="test_sd_deploy_r127_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_deploy_r127" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::absolute symlink: root of the link target</field>
+    </record>
     <record id="test_sd_deploy_r128_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r128" />
         <field name="sequence" eval="10" />
@@ -3244,6 +3322,12 @@
         <field name="sequence" eval="20" />
         <field name="kind">long_test</field>
         <field name="reference">erplibre:long_test/install_erplibre_home.py::reinstall-indicators</field>
+    </record>
+    <record id="test_sd_ext_r01_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r01" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesIndicateursNonMontes::test_failed_mounts_are_listed_by_id</field>
     </record>
     <record id="test_sd_ext_r03_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r03" />
@@ -3377,6 +3461,18 @@
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/settings.test.js::migrateLegacyJson seeds paths from erplibre_path</field>
     </record>
+    <record id="test_sd_ext_r19_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r19" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/settings.test.js::migrateLegacyJson is no-op when paths already populated</field>
+    </record>
+    <record id="test_sd_ext_r19_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r19" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/settings.test.js::migrateLegacyJson handles missing erplibre_path</field>
+    </record>
     <record id="test_sd_ext_r21_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r21" />
         <field name="sequence" eval="10" />
@@ -3394,6 +3490,18 @@
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/migrations.test.js::runSchemaMigrations: bumps schema-version to current</field>
+    </record>
+    <record id="test_sd_ext_r23_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r23" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/migrations.test.js::runSchemaMigrations: fault keeps version pinned for retry</field>
+    </record>
+    <record id="test_sd_ext_r23_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r23" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/migrations.test.js::runSchemaMigrations: idempotent on already-current data</field>
     </record>
     <record id="test_sd_ext_r25_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r25" />
@@ -3418,6 +3526,18 @@
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/keepass.test.js::MasterPasswordCache keeps an entry 5 minutes by default</field>
+    </record>
+    <record id="test_sd_ext_r28_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r28" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/erplibre.test.js::a fresh cached master password unlocks without a prompt</field>
+    </record>
+    <record id="test_sd_ext_r28_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r28" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/keepass.test.js::callKeepassCli runs show -a with the password on stdin</field>
     </record>
     <record id="test_sd_ext_r29_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r29" />
@@ -3514,6 +3634,12 @@
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/erplibre.test.js::selenium auto-login runs web_login.py in .venv.erplibre</field>
+    </record>
+    <record id="test_sd_ext_r54_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r54" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/erplibre.test.js::selenium without .venv.erplibre falls back to xdotool</field>
     </record>
     <record id="test_sd_ext_r55_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r55" />
@@ -3617,11 +3743,23 @@
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/network.test.js::deriveCidrFromIpRoute returns /24 of default-gateway iface</field>
     </record>
+    <record id="test_sd_ext_r71_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r71" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/network.test.js::deriveCidrFromIpRoute returns null when no default route</field>
+    </record>
     <record id="test_sd_ext_r80_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r80" />
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/usb.test.js::parseLsusbVerbose finds two Elgato devices</field>
+    </record>
+    <record id="test_sd_ext_r80_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r80" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/usb.test.js::parseLsusbVerbose handles empty input</field>
     </record>
     <record id="test_sd_ext_r85_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r85" />
@@ -3749,6 +3887,24 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_install_erplibre_home.py::TestCiblesDeLExtension::test_test_gnome_extension_valide_le_schema_puis_lance_node</field>
     </record>
+    <record id="test_sd_ext_r122_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r122" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/network.test.js::SSH terminal on a configured host runs ssh &lt;alias&gt;</field>
+    </record>
+    <record id="test_sd_ext_r122_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r122" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/network.test.js::SSH terminal on a scanned host runs ssh &lt;user&gt;@&lt;ip&gt;</field>
+    </record>
+    <record id="test_sd_ext_r122_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ext_r122" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/network.test.js::without network-ssh-user the scanned host gets $USER</field>
+    </record>
     <record id="test_sd_ext_r123_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ext_r123" />
         <field name="sequence" eval="10" />
@@ -3779,6 +3935,42 @@
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::the tiling, tracker and hot-reload methods stay exported</field>
     </record>
+    <record id="test_sd_grepo_r01_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r01" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestLayout::test_every_game_is_named_executable_and_has_its_shebang</field>
+    </record>
+    <record id="test_sd_grepo_r02_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r02" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestLayout::test_every_game_opens_on_a_one_line_description</field>
+    </record>
+    <record id="test_sd_grepo_r04_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r04" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestCommandLine::test_help_prints_the_usage_and_exits_0</field>
+    </record>
+    <record id="test_sd_grepo_r04_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r04" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestCommandLine::test_an_unknown_option_exits_2_with_the_usage</field>
+    </record>
+    <record id="test_sd_grepo_r05_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r05" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestMeta::test_every_game_answers_meta_with_the_required_keys</field>
+    </record>
+    <record id="test_sd_grepo_r06_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r06" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestCommandLine::test_without_an_option_every_game_goes_on_to_the_hardware</field>
+    </record>
     <record id="test_sd_grepo_r07_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r07" />
         <field name="sequence" eval="10" />
@@ -3803,6 +3995,36 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
     </record>
+    <record id="test_sd_grepo_r11_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r11" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_saves.py::TestSaveDirectory::test_the_path_follows_xdg_data_home_and_creates_nothing</field>
+    </record>
+    <record id="test_sd_grepo_r11_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r11" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_saves.py::TestSaveDirectory::test_save_dir_creates_it_and_moves_the_former_saves</field>
+    </record>
+    <record id="test_sd_grepo_r11_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r11" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_saves.py::TestSaveDirectory::test_a_save_already_there_is_never_replaced</field>
+    </record>
+    <record id="test_sd_grepo_r11_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r11" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_saves.py::TestSaveDirectory::test_across_filesystems_the_copy_does_not_replace_either</field>
+    </record>
+    <record id="test_sd_grepo_r11_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r11" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_saves.py::TestSaveDirectory::test_a_recorded_path_is_found_again_after_the_move</field>
+    </record>
     <record id="test_sd_grepo_r12_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r12" />
         <field name="sequence" eval="10" />
@@ -3814,6 +4036,18 @@
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LePortDeLaGalerie::test_the_extension_talks_on_the_port_the_gallery_serves</field>
+    </record>
+    <record id="test_sd_grepo_r13_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r13" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestGallery::test_api_games_lists_every_game_with_its_id</field>
+    </record>
+    <record id="test_sd_grepo_r13_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r13" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_saves.py::TestGallerySaves::test_the_scan_reads_the_save_path_and_creates_nothing</field>
     </record>
     <record id="test_sd_grepo_r14_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r14" />
@@ -3845,11 +4079,77 @@
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::launchRefusal: a body without error falls back on the status</field>
     </record>
+    <record id="test_sd_grepo_r15_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r15" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::the controller lists the :8042 games and launches one</field>
+    </record>
+    <record id="test_sd_grepo_r15_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r15" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::the ERPLibre submenu lists exactly the gallery entries of section erplibre</field>
+    </record>
+    <record id="test_sd_grepo_r16_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r16" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_gallery_access.py::TestGalleryAccess::test_the_page_sends_the_header_on_every_action</field>
+    </record>
+    <record id="test_sd_grepo_r17_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r17" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_inside_erplibre</field>
+    </record>
+    <record id="test_sd_grepo_r17_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r17" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryLaunch::test_the_game_runs_under_the_server_interpreter</field>
+    </record>
+    <record id="test_sd_grepo_r17_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r17" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryLaunch::test_the_loop_really_starts_that_interpreter</field>
+    </record>
+    <record id="test_sd_grepo_r17_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r17" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryLaunch::test_two_rounds_run_inside_one_handover</field>
+    </record>
     <record id="test_sd_grepo_r18_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r18" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LesVraisScans::test_the_gallery_lists_the_games_and_not_the_tiler</field>
+    </record>
+    <record id="test_sd_grepo_r18_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r18" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_it_follows_the_main_branch_of_the_games</field>
+    </record>
+    <record id="test_sd_grepo_r18_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r18" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_it_belongs_to_the_streamdeck_group</field>
+    </record>
+    <record id="test_sd_grepo_r18_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r18" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_its_remote_is_named_technolibre_like_the_mobile</field>
+    </record>
+    <record id="test_sd_grepo_r18_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r18" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_only_the_streamdeck_list_names_it</field>
     </record>
     <record id="test_sd_grepo_r19_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r19" />
@@ -3898,6 +4198,12 @@
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeContrat::test_games_contract_holds_one_version</field>
+    </record>
+    <record id="test_sd_grepo_r24_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r24" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestContractVersion::test_games_cli_carries_the_version_of_contract_md</field>
     </record>
     <record id="test_sd_grepo_r25_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r25" />
@@ -4367,11 +4673,53 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LEnTeteDActionDeLaGalerie::test_the_extension_sends_the_header_the_gallery_requires</field>
     </record>
+    <record id="test_sd_grepo_r65_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r65" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::the controller lists the :8042 games and launches one</field>
+    </record>
+    <record id="test_sd_grepo_r66_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r66" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_gallery_access.py::TestGalleryAccess::test_main_listens_on_this_machine_only</field>
+    </record>
+    <record id="test_sd_grepo_r66_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r66" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_gallery_access.py::TestGalleryAccess::test_another_host_is_refused</field>
+    </record>
+    <record id="test_sd_grepo_r66_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r66" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_gallery_access.py::TestGalleryAccess::test_a_request_from_another_site_is_refused_before_acting</field>
+    </record>
+    <record id="test_sd_grepo_r66_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r66" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_gallery_access.py::TestGalleryAccess::test_an_action_needs_the_gallery_header</field>
+    </record>
+    <record id="test_sd_grepo_r66_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r66" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_gallery_access.py::TestGalleryAccess::test_a_link_opened_from_outside_the_browser_does_not_act</field>
+    </record>
     <record id="test_sd_grepo_r67_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r67" />
         <field name="sequence" eval="10" />
         <field name="kind">long_test</field>
         <field name="reference">erplibre:long_test/install_erplibre_home.py::games</field>
+    </record>
+    <record id="test_sd_grepo_r67_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r67" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCinqEtapes::test_the_stream_deck_stage_checks_rule_venv_service_extension</field>
     </record>
     <record id="test_sd_grepo_r69_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r69" />
@@ -4413,37 +4761,13 @@
         <field name="requirement_id" ref="req_sd_grepo_r72" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeScript::test_it_is_valid_shell</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_clean_clone_is_moved_aside_and_its_saves_copied_back</field>
     </record>
     <record id="test_sd_grepo_r72_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r72" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeScript::test_it_is_executable</field>
-    </record>
-    <record id="test_sd_grepo_r72_3" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r72" />
-        <field name="sequence" eval="30" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeScript::test_help_exits_zero_even_as_root</field>
-    </record>
-    <record id="test_sd_grepo_r72_4" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r72" />
-        <field name="sequence" eval="40" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeScript::test_an_unknown_option_exits_one</field>
-    </record>
-    <record id="test_sd_grepo_r72_5" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r72" />
-        <field name="sequence" eval="50" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeScript::test_uninstall_takes_no_install_option</field>
-    </record>
-    <record id="test_sd_grepo_r72_6" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r72" />
-        <field name="sequence" eval="60" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeScript::test_extension_only_refuses_the_other_levels</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_work_the_checks_miss_survives_in_the_moved_clone</field>
     </record>
     <record id="test_sd_grepo_r73_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r73" />
@@ -4487,6 +4811,42 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LesScriptsDeMiseAJour::test_the_code_generator_init_keeps_the_streamdeck_group</field>
     </record>
+    <record id="test_sd_grepo_r78_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r78" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestInstallHint::test_the_install_hint_names_the_requirements_next_to_it</field>
+    </record>
+    <record id="test_sd_grepo_r78_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r78" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGameInstallHint::test_a_game_without_pil_names_the_repository_requirements</field>
+    </record>
+    <record id="test_sd_grepo_r78_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r78" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_without_erplibre</field>
+    </record>
+    <record id="test_sd_grepo_r78_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r78" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_the_loop_really_runs_without_erplibre</field>
+    </record>
+    <record id="test_sd_grepo_r84_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r84" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand runs the gallery under the venv python, no make</field>
+    </record>
+    <record id="test_sd_grepo_r84_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r84" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand quotes a path with a space or a quote</field>
+    </record>
     <record id="test_sd_grepo_r88_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r88" />
         <field name="sequence" eval="10" />
@@ -4510,6 +4870,72 @@
         <field name="sequence" eval="40" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand runs the gallery under the venv python, no make</field>
+    </record>
+    <record id="test_sd_grepo_r88_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r88" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_it_follows_the_main_branch_of_the_games</field>
+    </record>
+    <record id="test_sd_grepo_r88_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r88" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_it_belongs_to_the_streamdeck_group</field>
+    </record>
+    <record id="test_sd_grepo_r88_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r88" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_its_remote_is_named_technolibre_like_the_mobile</field>
+    </record>
+    <record id="test_sd_grepo_r88_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r88" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LeManifeste::test_only_the_streamdeck_list_names_it</field>
+    </record>
+    <record id="test_sd_grepo_r89_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r89" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestLayout::test_no_game_imports_a_sibling_but_games_cli</field>
+    </record>
+    <record id="test_sd_grepo_r89_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r89" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestLayout::test_games_cli_is_not_a_game_and_imports_the_stdlib_only</field>
+    </record>
+    <record id="test_sd_grepo_r91_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r91" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::launchRefusal: a gallery without the header gives its line</field>
+    </record>
+    <record id="test_sd_grepo_r91_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r91" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::launchRefusal: a 2xx answer is no refusal</field>
+    </record>
+    <record id="test_sd_grepo_r91_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r91" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::launchRefusal: 403 gives the gallery error line</field>
+    </record>
+    <record id="test_sd_grepo_r91_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r91" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::launchRefusal: 404 gives the gallery error line</field>
+    </record>
+    <record id="test_sd_grepo_r91_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_grepo_r91" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/gallery-launch.test.js::launchRefusal: a body without error falls back on the status</field>
     </record>
     <record id="test_sd_grepo_r92_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r92" />
@@ -4636,6 +5062,30 @@
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTilerCommandLine::test_the_deck_program_is_not_a_game</field>
+    </record>
+    <record id="test_sd_gsplit_r12_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r12" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestGallery::test_api_games_lists_every_game_with_its_id</field>
+    </record>
+    <record id="test_sd_gsplit_r12_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r12" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_without_erplibre</field>
+    </record>
+    <record id="test_sd_gsplit_r13_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r13" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_inside_erplibre</field>
+    </record>
+    <record id="test_sd_gsplit_r13_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r13" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LesVraisScans::test_the_gallery_lists_the_games_and_not_the_tiler</field>
     </record>
     <record id="test_sd_gsplit_r15_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r15" />
@@ -4943,6 +5393,30 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_venv_is_checked_before_the_games_setting</field>
     </record>
+    <record id="test_sd_gsplit_r39_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r39" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryGames::test_main_refuses_to_start</field>
+    </record>
+    <record id="test_sd_gsplit_r39_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r39" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_inside_erplibre</field>
+    </record>
+    <record id="test_sd_gsplit_r40_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r40" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryGames::test_launch_rereads_the_setting</field>
+    </record>
+    <record id="test_sd_gsplit_r40_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r40" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryGames::test_refusal_follows_the_file</field>
+    </record>
     <record id="test_sd_gsplit_r41_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r41" />
         <field name="sequence" eval="10" />
@@ -5020,6 +5494,12 @@
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_todo_streamdeck_menu.py::LeReglageDesJeux::test_the_submenu_offers_the_entry</field>
+    </record>
+    <record id="test_sd_gsplit_r47_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r47" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_todo_menu.py::TestStreamDeckMenuNumbering::test_every_entry_reaches_the_method_it_names</field>
     </record>
     <record id="test_sd_gsplit_r48_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r48" />
@@ -5212,6 +5692,30 @@
         <field name="sequence" eval="10" />
         <field name="kind">long_test</field>
         <field name="reference">erplibre:long_test/install_erplibre_home.py::games</field>
+    </record>
+    <record id="test_sd_gsplit_r58_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r58" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesEtapes::test_the_five_stages_in_order</field>
+    </record>
+    <record id="test_sd_gsplit_r59_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r59" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestLayout::test_every_game_is_named_executable_and_has_its_shebang</field>
+    </record>
+    <record id="test_sd_gsplit_r59_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r59" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestLayout::test_no_game_imports_a_sibling_but_games_cli</field>
+    </record>
+    <record id="test_sd_gsplit_r59_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_gsplit_r59" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestMeta::test_every_game_answers_meta_with_the_required_keys</field>
     </record>
     <record id="test_sd_gsplit_r60_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r60" />
@@ -7307,6 +7811,12 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_install_erplibre_home.py::TestExtensionSeule::test_lien_schemas_et_locales</field>
     </record>
+    <record id="test_sd_rename_r09_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r09" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre-home-gnome-extension:test/python/test_identity.py::TestMetadataAndSchema::test_gettext_domains_are_the_mo_basename</field>
+    </record>
     <record id="test_sd_rename_r10_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r10" />
         <field name="sequence" eval="10" />
@@ -7324,6 +7834,12 @@
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_erplibre_streamdeck_base.py::PathsTest::test_user_plugin_dir_follows_xdg_config_home</field>
+    </record>
+    <record id="test_sd_rename_r11_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r11" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/settings.test.js::the legacy file is migrated once, then kept as .bak</field>
     </record>
     <record id="test_sd_rename_r12_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r12" />
@@ -7420,6 +7936,24 @@
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre-home-gnome-extension:test/python/test_identity.py::TestStyleClasses::test_dialog_and_button_classes_are_erplibre_home</field>
+    </record>
+    <record id="test_sd_rename_r24_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r24" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre-home-gnome-extension:test/python/test_identity.py::TestDbusClients::test_the_claude_hook_calls_the_exported_object</field>
+    </record>
+    <record id="test_sd_rename_r24_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r24" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre-home-gnome-extension:test/python/test_identity.py::TestMetadataAndSchema::test_schema_id_path_file_and_metadata_agree</field>
+    </record>
+    <record id="test_sd_rename_r24_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r24" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestMakefile::test_les_deux_niveaux_s_installent_et_se_retirent</field>
     </record>
     <record id="test_sd_rename_r26_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r26" />
@@ -7784,6 +8318,18 @@
     <record id="test_sd_rename_r47_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r47" />
         <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_spec_entry_points_use_the_venv</field>
+    </record>
+    <record id="test_sd_rename_r48_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r48" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestMakefile::test_les_deux_niveaux_s_installent_et_se_retirent</field>
+    </record>
+    <record id="test_sd_rename_r48_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r48" />
+        <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_spec_entry_points_use_the_venv</field>
     </record>
@@ -8831,6 +9377,36 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_command_really_runs_the_game</field>
     </record>
+    <record id="test_sd_service_r48_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r48" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_inside_erplibre</field>
+    </record>
+    <record id="test_sd_service_r48_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r48" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_without_erplibre</field>
+    </record>
+    <record id="test_sd_service_r48_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r48" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_standalone.py::TestGalleryAlone::test_the_loop_really_runs_without_erplibre</field>
+    </record>
+    <record id="test_sd_service_r48_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r48" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryLaunch::test_the_game_runs_under_the_server_interpreter</field>
+    </record>
+    <record id="test_sd_service_r48_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r48" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestGalleryLaunch::test_two_rounds_run_inside_one_handover</field>
+    </record>
     <record id="test_sd_service_r49_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r49" />
         <field name="sequence" eval="10" />
@@ -8866,6 +9442,30 @@
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestControllerCommandLine::test_without_an_option_it_goes_on_to_the_hardware</field>
+    </record>
+    <record id="test_sd_service_r50_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r50" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestCommandLine::test_help_prints_the_usage_and_exits_0</field>
+    </record>
+    <record id="test_sd_service_r50_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r50" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestCommandLine::test_an_unknown_option_exits_2_with_the_usage</field>
+    </record>
+    <record id="test_sd_service_r50_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r50" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestGallery::test_help_prints_the_usage_and_exits_0</field>
+    </record>
+    <record id="test_sd_service_r50_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r50" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">streamdeck_game:tests/test_contract.py::TestGallery::test_an_unknown_option_exits_2_with_the_usage</field>
     </record>
     <record id="test_sd_service_r51_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r51" />
@@ -9358,6 +9958,24 @@
         <field name="sequence" eval="50" />
         <field name="kind">long_test</field>
         <field name="reference">erplibre:long_test/install_erplibre_home.py::uninstall-service-gone</field>
+    </record>
+    <record id="test_sd_service_r68_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r68" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesEtapes::test_the_checks_of_each_stage</field>
+    </record>
+    <record id="test_sd_service_r68_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r68" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesEtapes::test_the_plan_describes_each_stage</field>
+    </record>
+    <record id="test_sd_service_r68_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r68" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesEtapes::test_the_service_checks_name_the_unit_and_the_checkout</field>
     </record>
     <record id="test_sd_service_r70_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r70" />

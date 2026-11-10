@@ -24,13 +24,30 @@ Requirements application, under ten domains whose code starts with `sd_`.
 | design decision | MoSCoW *Should*, *Non-functional*, done, the reason in *Achievement* |
 | open question, open risk, follow-up | MoSCoW *Should*, to do; *What is missing* says what is left |
 | security invariant | MoSCoW *Must*, type *Security*, *Security relevant* |
-| proof in another repository | to do; *What is missing* names the repository |
+| proof in another repository | done with a proof line per test of that repository; else to do, *What is missing* names the repository |
 | violated | to do, stage *Develop*; *What is missing* describes the gap |
 
 *Achievement* and *What is missing* name files and tests in the same
 `<repository>:<path>` form as the proofs below, so each pointer resolves in
-its own repository. A requirement that protects a secret, an access or a
-file outside the checkout is marked *Security relevant*.
+its own repository. A done requirement leaves *What is missing* empty. A
+requirement that protects a secret, an access or a file mode is of type
+*Security* and marked *Security relevant*.
+
+*Notes* opens on the origin of the requirement: what the audit found for
+its row.
+
+| Origin | Meaning |
+|---|---|
+| covered by a test | a test of a repository already proved it |
+| unit test missing | no unit test proved it |
+| long test needed | only the long test, in virtual machines with a GNOME session, can check it |
+| documented only | the design states it: a decision, a rule or a non-goal |
+| proof in another repository | its test belongs to the games or the mobile repository |
+| violated | the code did not hold it |
+
+What follows the origin says what holds the requirement: *a unit test
+pins it*, *an existing test covers it*, *its unit test shows the
+violation*.
 
 Each requirement carries a stable code `SD-<DOMAIN>-R<row>`, for example
 `SD-DEFECTS-R02`. The data is loaded **once**: it is `noupdate`, so a
@@ -77,5 +94,6 @@ the example above updates two requirements in one call.
 The requirement names, descriptions and domain names are written in English
 and ship in Canadian French: `i18n/fr_CA.po` holds the French of every one
 of them, so loading the French language (`fr_CA`) shows the requirements in
-French. *Achievement*, *What is missing* and *Notes* are not translated:
-they name files, tests and commands, which read the same in both languages.
+French. *Achievement*, *What is missing* and *Notes* stay in English in
+both languages: `erplibre_devops_requirement` does not declare these fields
+translatable, so the module ships no French for them.

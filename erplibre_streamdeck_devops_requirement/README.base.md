@@ -29,13 +29,30 @@ Requirements application, under ten domains whose code starts with `sd_`.
 | design decision | MoSCoW *Should*, *Non-functional*, done, the reason in *Achievement* |
 | open question, open risk, follow-up | MoSCoW *Should*, to do; *What is missing* says what is left |
 | security invariant | MoSCoW *Must*, type *Security*, *Security relevant* |
-| proof in another repository | to do; *What is missing* names the repository |
+| proof in another repository | done with a proof line per test of that repository; else to do, *What is missing* names the repository |
 | violated | to do, stage *Develop*; *What is missing* describes the gap |
 
 *Achievement* and *What is missing* name files and tests in the same
 `<repository>:<path>` form as the proofs below, so each pointer resolves in
-its own repository. A requirement that protects a secret, an access or a
-file outside the checkout is marked *Security relevant*.
+its own repository. A done requirement leaves *What is missing* empty. A
+requirement that protects a secret, an access or a file mode is of type
+*Security* and marked *Security relevant*.
+
+*Notes* opens on the origin of the requirement: what the audit found for
+its row.
+
+| Origin | Meaning |
+|---|---|
+| covered by a test | a test of a repository already proved it |
+| unit test missing | no unit test proved it |
+| long test needed | only the long test, in virtual machines with a GNOME session, can check it |
+| documented only | the design states it: a decision, a rule or a non-goal |
+| proof in another repository | its test belongs to the games or the mobile repository |
+| violated | the code did not hold it |
+
+What follows the origin says what holds the requirement: *a unit test
+pins it*, *an existing test covers it*, *its unit test shows the
+violation*.
 
 Each requirement carries a stable code `SD-<DOMAIN>-R<row>`, for example
 `SD-DEFECTS-R02`. The data is loaded **once**: it is `noupdate`, so a
@@ -87,13 +104,31 @@ dont le code commence par `sd_`.
 | décision de conception | MoSCoW *Devrait*, *Non fonctionnel*, fait, la raison dans *Réalisation* |
 | question ouverte, risque ouvert, suite | MoSCoW *Devrait*, à faire ; *Ce qui manque* dit ce qui reste |
 | invariant de sécurité | MoSCoW *Doit*, type *Sécurité*, *Touche la sécurité* |
-| preuve dans un autre dépôt | à faire ; *Ce qui manque* nomme le dépôt |
+| preuve dans un autre dépôt | fait, une ligne de preuve par test de ce dépôt ; sinon à faire, *Ce qui manque* nomme le dépôt |
 | enfreinte | à faire, étape *Développement* ; *Ce qui manque* décrit l'écart |
 
 *Réalisation* et *Ce qui manque* nomment fichiers et tests sous la même
 forme `<dépôt>:<chemin>` que les preuves ci-dessous : chaque renvoi se
-résout dans son propre dépôt. Un requis qui protège un secret, un accès ou
-un fichier hors du checkout est marqué *Touche la sécurité*.
+résout dans son propre dépôt. Un requis fait laisse *Ce qui manque* vide.
+Un requis qui protège un secret, un accès ou le mode d'un fichier est de
+type *Sécurité* et marqué *Touche la sécurité*.
+
+*Notes* s'ouvre sur l'origine du requis, ce que l'audit a trouvé pour sa
+ligne. Le libellé reste en anglais, comme tout le champ :
+
+| Origine | Sens |
+|---|---|
+| covered by a test | un test d'un dépôt le prouvait déjà |
+| unit test missing | aucun test unitaire ne le prouvait |
+| long test needed | seul le test long, dans des machines virtuelles avec une session GNOME, peut le vérifier |
+| documented only | la conception l'énonce : une décision, une règle ou un non-objectif |
+| proof in another repository | son test relève du dépôt des jeux ou du dépôt mobile |
+| violated | le code ne le tenait pas |
+
+Ce qui suit l'origine dit ce qui tient le requis : *a unit test pins it*
+(un test unitaire le fixe), *an existing test covers it* (un test existant
+le couvre), *its unit test shows the violation* (son test unitaire montre
+l'écart).
 
 Chaque requis porte un code stable `SD-<DOMAINE>-R<ligne>`, par exemple
 `SD-DEFECTS-R02`. Les données se chargent **une fois** : elles sont
@@ -143,8 +178,9 @@ the example above updates two requirements in one call.
 The requirement names, descriptions and domain names are written in English
 and ship in Canadian French: `i18n/fr_CA.po` holds the French of every one
 of them, so loading the French language (`fr_CA`) shows the requirements in
-French. *Achievement*, *What is missing* and *Notes* are not translated:
-they name files, tests and commands, which read the same in both languages.
+French. *Achievement*, *What is missing* and *Notes* stay in English in
+both languages: `erplibre_devops_requirement` does not declare these fields
+translatable, so the module ships no French for them.
 
 <!-- [fr] -->
 
@@ -156,6 +192,6 @@ l'exemple ci-dessus met deux requis à jour en un appel.
 Les noms et descriptions des requis et les noms des domaines sont écrits en
 anglais et livrés en français canadien : `i18n/fr_CA.po` porte le français
 de chacun d'eux, et charger la langue française (`fr_CA`) affiche donc les
-requis en français. *Réalisation*, *Ce qui manque* et *Notes* ne se
-traduisent pas : ils nomment fichiers, tests et commandes, qui se lisent de
-même dans les deux langues.
+requis en français. *Réalisation*, *Ce qui manque* et *Notes* restent en
+anglais dans les deux langues : `erplibre_devops_requirement` ne déclare pas
+ces champs traduisibles, le module n'en livre donc aucun français.
