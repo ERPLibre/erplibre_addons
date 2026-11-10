@@ -113,3 +113,8 @@ une réponse d'erreur y ajoute `error`.
 
 Ni un corps, ni un en-tête, ni une réponse n'est journalisé, et chaque
 réponse est marquée `Cache-Control: no-store`.
+
+## Traductions
+
+Le français canadien (`fr_CA`) couvre chaque terme du module : menus, vues,
+champs et messages.

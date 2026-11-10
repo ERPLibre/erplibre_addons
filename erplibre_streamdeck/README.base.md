@@ -114,6 +114,11 @@ carries `protocol`; an error reply adds `error`.
 Neither a body, a header nor a reply is logged, and every reply is marked
 `Cache-Control: no-store`.
 
+## Translations
+
+Canadian French (`fr_CA`) covers every term of the module: menus, views,
+fields and messages.
+
 <!-- [fr] -->
 
 # ERPLibre — Stream Deck
@@ -229,3 +234,8 @@ une réponse d'erreur y ajoute `error`.
 
 Ni un corps, ni un en-tête, ni une réponse n'est journalisé, et chaque
 réponse est marquée `Cache-Control: no-store`.
+
+## Traductions
+
+Le français canadien (`fr_CA`) couvre chaque terme du module : menus, vues,
+champs et messages.
