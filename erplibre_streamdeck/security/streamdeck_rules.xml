@@ -18,32 +18,35 @@
     </record>
 
     <!-- L'employé lit le deck que tient un de ses postes, et celui qu'un de
-         ses postes a eu, ce que l'historique prouve. -->
+         ses postes a eu, ce que l'historique prouve : un événement à ce
+         poste, ou le déplacement qui l'a pris à ce poste. -->
     <record id="rule_streamdeck_device_user" model="ir.rule">
         <field name="name">Stream Deck device: decks of own workstations</field>
         <field name="model_id" ref="model_streamdeck_device"/>
         <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
         <field name="domain_force">[
-            '|',
+            '|', '|',
             ('workstation_id.user_id', '=', user.id),
             ('event_ids.workstation_id.user_id', '=', user.id),
+            ('event_ids.previous_workstation_id.user_id', '=', user.id),
         ]</field>
     </record>
 
     <!-- L'employé lit les événements de ses postes, et tous ceux d'un deck
          qu'il peut lire, y compris ceux survenus au poste d'un autre : le
          nom de ce poste et de son employé sont copiés sur l'événement, la
-         fiche du poste reste fermée. Les deux dernières branches répètent
+         fiche du poste reste fermée. Les trois dernières branches répètent
          le domaine de la règle des decks. -->
     <record id="rule_streamdeck_event_user" model="ir.rule">
         <field name="name">Stream Deck event: own workstations and readable decks</field>
         <field name="model_id" ref="model_streamdeck_event"/>
         <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
         <field name="domain_force">[
-            '|', '|',
+            '|', '|', '|',
             ('workstation_id.user_id', '=', user.id),
             ('device_id.workstation_id.user_id', '=', user.id),
             ('device_id.event_ids.workstation_id.user_id', '=', user.id),
+            ('device_id.event_ids.previous_workstation_id.user_id', '=', user.id),
         ]</field>
     </record>
 

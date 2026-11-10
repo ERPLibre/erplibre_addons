@@ -13,6 +13,12 @@ class StreamdeckEvent(models.Model):
     creation: they keep what the event was when it happened, and they let
     an employee who reads the deck's history read where it went without
     any access to that workstation.
+
+    A `moved` event is Odoo's own, never a workstation's: the report that
+    declares a deck held by another workstation creates it, with a uuid
+    drawn by Odoo and the reception time as `at`. `workstation_id` is the
+    new holder and `previous_workstation_id` the one it left, its name
+    copied in `previous_workstation_name` as the other names are.
     """
 
     _name = "streamdeck.event"
@@ -26,6 +32,7 @@ class StreamdeckEvent(models.Model):
             ("plugged", "Plugged"),
             ("unplugged", "Unplugged"),
             ("service_changed", "Service changed"),
+            ("moved", "Changed workstation"),
         ],
         required=True,
     )
@@ -45,6 +52,14 @@ class StreamdeckEvent(models.Model):
         ondelete="restrict",
     )
     workstation_name = fields.Char(string="Workstation name")
+    previous_workstation_id = fields.Many2one(
+        "streamdeck.workstation",
+        string="Previous workstation",
+        readonly=True,
+        index=True,
+        ondelete="restrict",
+    )
+    previous_workstation_name = fields.Char(string="Previous workstation name")
     employee_name = fields.Char(string="Employee")
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
 
