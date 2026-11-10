@@ -92,6 +92,15 @@ SECURITY = (
     "SD-INV-R44",
 )
 
+# Les requis dont la garantie repose sur un autre, qui reste à faire tant
+# que celui-ci l'est : un deck sans numéro de série ne garde sa clé, et un
+# employé ne lit que les decks que son poste a eus, que si aucun numéro de
+# série ne peut prendre la forme d'une clé nosn: (SD-INV-R44).
+DEPENDS_ON = {
+    "SD-INV-R23": ["SD-INV-R44"],
+    "SD-INV-R40": ["SD-INV-R44"],
+}
+
 # Un test cité par deux requis : un seul verdict les atteint tous deux.
 SHARED_REFERENCE = (
     "odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access"
@@ -296,6 +305,21 @@ class TestRequirementInventory(TransactionCase):
                 else:
                     self.assertTrue(requirement.missing)
                     self.assertNotEqual(requirement.devsecops_stage, "plan")
+
+    def test_a_requirement_is_not_done_before_what_it_rests_on(self):
+        for code, depends_on in DEPENDS_ON.items():
+            self.assertEqual(
+                sorted(self._requirement(code).depends_on_ids.mapped("code")),
+                depends_on,
+                code,
+            )
+        for requirement in self.requirements:
+            undone = requirement.depends_on_ids.filtered(lambda r: not r.done)
+            with self.subTest(code=requirement.code):
+                if undone:
+                    self.assertFalse(requirement.done)
+                for code in undone.mapped("code"):
+                    self.assertIn(code, requirement.missing or "")
 
     def test_security_requirements_are_must_and_flagged(self):
         security = self.requirements.filtered(
