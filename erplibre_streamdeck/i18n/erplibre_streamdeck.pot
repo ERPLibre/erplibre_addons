@@ -76,6 +76,12 @@ msgid "Archived"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__moved
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Changed workstation"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_workstations
 msgid ""
 "Click Add a workstation to get a pairing code, then enroll\n"
@@ -419,6 +425,16 @@ msgstr ""
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__plugged
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Plugged"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__previous_workstation_id
+msgid "Previous workstation"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__previous_workstation_name
+msgid "Previous workstation name"
 msgstr ""
 
 #. module: erplibre_streamdeck
