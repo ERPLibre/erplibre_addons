@@ -59,14 +59,27 @@ INVENTORY_TEST_FILES = (
 )
 
 # Un test node:test se déclare par test('nom', …), le nom pouvant être
-# coupé en littéraux joints par « + » ; un nom gabarit `… ${x} …` est
-# produit par une boucle et se compare comme un motif.
+# coupé en littéraux joints par « + ». Un nom gabarit `… ${x} …` est le
+# corps d'une boucle `for (const [x, …] of [[…], …])` : il nomme un test
+# par valeur littérale de la boucle, et aucun quand la boucle ne se lit
+# pas, de sorte qu'une preuve ne cite jamais un nom que la boucle ne
+# produit pas.
 JS_STRING = r"(?:'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"|`(?:\\.|[^`\\])*`)"
 NODE_TEST_CALL = re.compile(
     r"(?<![\w.])test\(\s*(%s(?:\s*\+\s*%s)*)" % (JS_STRING, JS_STRING)
 )
 JS_STRING_PART = re.compile(JS_STRING)
-TEMPLATE_HOLE = re.compile(r"\$\{[^}]*\}")
+TEMPLATE_HOLE = re.compile(r"\$\{([^}]*)\}")
+JS_FOR_OF = re.compile(
+    r"(?<![\w.])for\s*\(\s*(?:const|let|var)\s+(\[[\w\s,]*\]|\w+)\s+of\s+"
+)
+# Entre la fin de l'en-tête de la boucle et l'appel test( de son corps.
+JS_LOOP_BODY = re.compile(r"\s*\)\s*\{?\s*")
+JS_SPACE = re.compile(r"\s*")
+JS_NUMBER = re.compile(r"-?\d+(?:\.\d+)?(?![\w.])")
+# Une valeur de boucle qui n'est ni chaîne, ni nombre, ni tableau : un
+# objet, un identifiant, une expression. Un trou qui la lit ne nomme rien.
+OPAQUE = object()
 
 ANTI_GOAL = re.compile(r"^Anti-goal\b")
 
@@ -141,22 +154,117 @@ def committed(repository, path):
     return result.stdout if result.returncode == 0 else None
 
 
+def js_string(literal):
+    """(guillemet, corps sans échappements) d'un littéral chaîne JS."""
+    return literal[0], re.sub(r"\\(.)", r"\1", literal[1:-1])
+
+
+def js_value(source, start):
+    """(valeur, fin) de la valeur JS qui commence à `source[start:]` :
+    chaîne, nombre ou tableau de ces valeurs ; toute autre valeur, gabarit
+    à trous compris, est OPAQUE et court jusqu'à la virgule ou au crochet
+    fermant de son niveau. Lève IndexError sur une source tronquée."""
+    i = JS_SPACE.match(source, start).end()
+    if source[i] == "[":
+        items = []
+        i = JS_SPACE.match(source, i + 1).end()
+        while source[i] != "]":
+            value, i = js_value(source, i)
+            items.append(value)
+            i = JS_SPACE.match(source, i).end()
+            if source[i] == ",":
+                i = JS_SPACE.match(source, i + 1).end()
+        return items, i + 1
+    string = JS_STRING_PART.match(source, i)
+    if string:
+        quote, body = js_string(string.group(0))
+        if quote == "`" and TEMPLATE_HOLE.search(body):
+            return OPAQUE, string.end()
+        return body, string.end()
+    number = JS_NUMBER.match(source, i)
+    if number:
+        value = float(number.group(0))
+        return (int(value) if value.is_integer() else value), number.end()
+    depth = 0
+    while True:
+        string = JS_STRING_PART.match(source, i)
+        if string:
+            i = string.end()
+            continue
+        char = source[i]
+        if char in "([{":
+            depth += 1
+        elif char in ")]}":
+            if not depth:
+                return OPAQUE, i
+            depth -= 1
+        elif char == "," and not depth:
+            return OPAQUE, i
+        i += 1
+
+
+def node_loop_bindings(source):
+    """{position d'un appel test( : [{variable: valeur}, …]} pour chaque
+    test qui est le corps d'une boucle for…of sur un tableau littéral,
+    une liaison par élément du tableau."""
+    loops = {}
+    for loop in JS_FOR_OF.finditer(source):
+        try:
+            values, end = js_value(source, loop.end())
+        except IndexError:
+            continue
+        body = JS_LOOP_BODY.match(source, end)
+        if not body or not isinstance(values, list):
+            continue
+        target = loop.group(1)
+        if target.startswith("["):
+            variables = re.findall(r"\w+", target)
+            if not all(isinstance(value, list) for value in values):
+                continue
+            loops[body.end()] = [
+                dict(zip(variables, value)) for value in values
+            ]
+        else:
+            loops[body.end()] = [{target: value} for value in values]
+    return loops
+
+
+def node_test_name(literals, binding):
+    """Le nom que forment les littéraux joints d'un appel test() sous
+    `binding`, ou None quand un trou ne lit pas une chaîne ou un nombre
+    de la liaison."""
+    name = ""
+    for literal in literals:
+        quote, body = js_string(literal)
+        if quote != "`":
+            name += body
+            continue
+        parts = TEMPLATE_HOLE.split(body)
+        for index, part in enumerate(parts):
+            if index % 2 == 0:
+                name += part
+                continue
+            value = binding.get(part.strip(), OPAQUE)
+            if isinstance(value, bool) or not isinstance(
+                value, (str, int, float)
+            ):
+                return None
+            name += str(value)
+    return name
+
+
 def node_test_names(source):
-    """Les noms des test() d'un fichier node:test, en motifs : un nom
-    littéral se compare tel quel, un gabarit avec ses trous en `.+`."""
-    patterns = []
-    for name in NODE_TEST_CALL.findall(source):
-        pattern = ""
-        for literal in JS_STRING_PART.findall(name):
-            quote, body = literal[0], literal[1:-1]
-            body = re.sub(r"\\(.)", r"\1", body)
-            if quote == "`":
-                parts = TEMPLATE_HOLE.split(body)
-                pattern += ".+".join(re.escape(part) for part in parts)
-            else:
-                pattern += re.escape(body)
-        patterns.append(re.compile("^%s$" % pattern, re.DOTALL))
-    return patterns
+    """Les noms exacts des test() d'un fichier node:test : un nom
+    littéral tel quel, un gabarit une fois par élément de sa boucle."""
+    loops = node_loop_bindings(source)
+    names = set()
+    for call in NODE_TEST_CALL.finditer(source):
+        literals = JS_STRING_PART.findall(call.group(1))
+        for binding in loops.get(call.start(), [{}]):
+            name = node_test_name(literals, binding)
+            if name is not None:
+                names.add(name)
+    return names
 
 
 def python_test_methods(source):
@@ -270,9 +378,43 @@ class TestRequirementInventory(TransactionCase):
                     source = committed(extension, path)
                     self.assertIsNotNone(source, "%s not committed" % path)
                     names[path] = node_test_names(source)
-                self.assertTrue(
-                    any(pattern.match(name) for pattern in names[path])
-                )
+                self.assertIn(name, names[path])
+
+    def test_a_loop_names_one_node_test_per_literal_value(self):
+        source = (
+            "for (const [status, error] of [[401, 'token_invalid'],\n"
+            '    [403, "user_inactive"],])\n'
+            "    test(`a ${status} ${error} is revoked`, async () => {\n"
+            "    });\n"
+            "for (const what of ['URL', `database`]) {\n"
+            "    test(`the ${ what } changes`, () => {});\n"
+            "}\n"
+            "test('a name cut ' + \"in two\", () => {});\n"
+        )
+        self.assertEqual(
+            node_test_names(source),
+            {
+                "a 401 token_invalid is revoked",
+                "a 403 user_inactive is revoked",
+                "the URL changes",
+                "the database changes",
+                "a name cut in two",
+            },
+        )
+
+    def test_a_template_its_loop_does_not_fill_names_no_test(self):
+        # Sans boucle lisible, aucun nom : la preuve qui cite le gabarit
+        # tombe, au lieu de passer sur n'importe quelle valeur.
+        source = (
+            "test(`a ${status} alone`, () => {});\n"
+            "for (const [what, change] of [[OTHER, 'x'], [{url: 'u'}, 'y']])"
+            "\n    test(`a ${what} change`, () => {});\n"
+            "for (const [what, change] of [['URL', OTHER.url]])\n"
+            "    test(`a ${what.length} change`, () => {});\n"
+            "for (const value of values)\n"
+            "    test(`a ${value} value`, () => {});\n"
+        )
+        self.assertEqual(node_test_names(source), set())
 
     def test_erplibre_proofs_name_its_committed_tests(self):
         root = erplibre_root()

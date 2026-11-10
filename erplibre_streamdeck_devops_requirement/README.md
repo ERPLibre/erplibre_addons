@@ -71,8 +71,11 @@ The test `tests/test_requirement_inventory.py` checks that each proof names
 a test that exists: an Odoo test is imported and must run under
 `--test-tags /<module>`; inside an ERPLibre checkout, a test of the
 extension or of ERPLibre must be in the committed tree of its repository
-(that check is skipped outside a checkout). Each test of the four inventory
-test files of `erplibre_streamdeck` proves at least one requirement.
+(that check is skipped outside a checkout). A Node test declared in a
+`for … of` loop over a literal array is named once per value of the loop;
+a name the loop does not produce is not a test. Each test of the four
+inventory test files of `erplibre_streamdeck` proves at least one
+requirement.
 
 ## Proofs and verdicts
 
