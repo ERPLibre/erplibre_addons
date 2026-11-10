@@ -39,9 +39,10 @@ class StreamdeckDevice(models.Model):
     `key` is `sn:<serial>` when the workstation reads a serial; a deck
     without a readable serial gets `nosn:<workstation>:<product>:<path>`,
     so it is never merged with a deck of another workstation. A serial
-    has no `:` (the service refuses one), so the two forms never meet. `workstation_id` is the workstation that reported
-    it last: a deck moved to another workstation follows it, and its
-    events keep the workstation where each happened.
+    has no `:` (the service refuses one), so the two forms never meet.
+    `workstation_id` is the workstation that reported it last: a deck
+    moved to another workstation follows it, and its events keep the
+    workstation where each happened.
     """
 
     _name = "streamdeck.device"
