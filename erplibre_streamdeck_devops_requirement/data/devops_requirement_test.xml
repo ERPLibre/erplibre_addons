@@ -8303,6 +8303,12 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre-home-gnome-extension:test/python/test_identity.py::TestLegacyNames::test_only_the_migration_and_the_history_name_the_old_identity</field>
     </record>
+    <record id="test_sd_rename_r43_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_rename_r43" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_identity.py::TestLegacyNames::test_only_the_history_names_the_old_identity</field>
+    </record>
     <record id="test_sd_rename_r45_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r45" />
         <field name="sequence" eval="10" />

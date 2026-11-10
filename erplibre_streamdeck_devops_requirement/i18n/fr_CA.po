@@ -6799,7 +6799,8 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r81
 msgid "With no deck, a non-clickable '(no Stream Deck found)' line shows"
-msgstr "Sans deck, une ligne non cliquable '(no Stream Deck found)' s'affiche"
+msgstr ""
+"Sans deck, une ligne non cliquable « (aucun Stream Deck détecté) » s'affiche"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r31
