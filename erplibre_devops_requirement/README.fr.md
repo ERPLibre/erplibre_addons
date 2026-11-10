@@ -69,6 +69,9 @@ désigne sa `reference` :
 | `python` | le chemin pointé de la méthode de test |
 | `selenium` | le chemin du script, relatif au dépôt |
 | `manual` | un texte libre |
+| `repo_unittest` | un test unitaire d'un dépôt : `<dépôt>:<chemin>::<Classe>::<méthode>` |
+| `node_test` | un test `node --test` d'un dépôt : `<dépôt>:<chemin>::<nom du test>` |
+| `long_test` | un test long d'un dépôt, même forme |
 
 `test_state`, stocké sur le requis, résume ses lignes par le pire résultat :
 aucun test → `none` ; un échec ou une erreur → `failed` ; sinon un test jamais
@@ -95,6 +98,37 @@ models.execute_kw(
 tronqué à 20 000 caractères, la fin conservée — c'est elle qui porte
 l'assertion en échec. Seuls les champs `last_*` sont écrits.
 
+### Verdict par référence
+
+Un lanceur de tests de dépôt — les tests unitaires d'ERPLibre, la suite
+`node --test` d'une extension, les tests longs — connaît son test et aucun des
+requis qu'il prouve : le lien ne vit que dans la base. Il écrit par
+`record_result_by_reference`, avec la seule `kind` et la seule `reference` :
+
+
+```python
+models.execute_kw(
+    db, uid, password,
+    "devops.requirement.test", "record_result_by_reference",
+    ["repo_unittest", "erplibre:test/test_inventory.py::TestStock::test_count",
+     "passed"],
+    {"log": output, "duration": 0.8},
+)
+```
+
+
+Le verdict va sur **toutes** les lignes qui portent cette `kind` et cette
+`reference`, quel que soit leur requis : un test qui prouve plusieurs requis
+les met tous à jour d'un seul appel. La méthode rend le nombre de lignes mises
+à jour ; `0`, avec un avertissement au journal, quand la `kind` ou la
+`reference` est vide ou qu'aucune ligne ne les déclare. Elle ne crée rien, et
+partage avec `record_result` ses droits, la validation du résultat et la
+troncature du journal.
+
+Une référence de dépôt se lit `<dépôt>:<chemin>::<identifiant du test>` : le
+dépôt par son nom, le chemin du fichier de test relatif à lui, puis
+`Classe::méthode` pour un test unitaire ou le nom du test pour un test Node.
+
 ## Droits
 
 | Modèle | Utilisateur interne | Lanceur de tests | Configuration |
@@ -103,7 +137,7 @@ l'assertion en échec. Seuls les champs `last_*` sont écrits.
 | `devops.requirement.category` | lire | lire | tout |
 | `devops.requirement.phase` | lire | lire | tout |
 | `devops.requirement.threat` | lire | — | tout |
-| `devops.requirement.test` | lire | lire, résultat par `record_result` | tout |
+| `devops.requirement.test` | lire | lire, résultat par `record_result` et `record_result_by_reference` | tout |
 
 Le vocabulaire est en lecture seule pour l'utilisateur : son `code` porte des
 décomptes, et une faute de frappe y coûte plus qu'un champ mal rempli sur un

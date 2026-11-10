@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "ERPLibre DevOps Requirement",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Project",
     "summary": (
         "Track the software requirements of an implementation project in "
