@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 11:43+0000\n"
-"PO-Revision-Date: 2026-11-10 11:43+0000\n"
+"POT-Creation-Date: 2026-11-10 14:30+0000\n"
+"PO-Revision-Date: 2026-11-10 14:30+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -317,6 +317,29 @@ msgstr ""
 "FAILED(install-stream-deck) après que la base a réussi l'étape 1"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r27
+msgid ""
+"A Stream Deck user reads and renames their workstations and revokes their "
+"tokens, reads the decks their workstations have had and the events of their "
+"workstations and of those decks"
+msgstr ""
+"Un utilisateur Stream Deck lit et renomme ses postes et en révoque les "
+"jetons, lit les decks que ses postes ont eus et les événements de ses postes"
+" et de ces decks"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r22
+msgid ""
+"A background part of the extension detects the decks, by GUdev events or "
+"else an asynchronous poll every 10 seconds, whether the deck indicator is "
+"shown or not; the indicator reads that same part"
+msgstr ""
+"Une partie de fond de l'extension détecte les decks, par les événements "
+"GUdev ou sinon par un sondage asynchrone toutes les 10 secondes, que "
+"l'indicateur du deck soit affiché ou non ; l'indicateur lit cette même "
+"partie"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r48
 msgid ""
 "A branch or local work stays; the summary says so, and reports a failed "
@@ -408,6 +431,16 @@ msgstr ""
 "rendu"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r43
+msgid ""
+"A deck declared by another workstation moves to it without confirmation, "
+"with a changed-workstation event that keeps the former and the new "
+"workstation"
+msgstr ""
+"Un deck déclaré par un autre poste passe à ce poste sans confirmation, avec "
+"un événement « changé de poste » qui garde l'ancien et le nouveau poste"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r09
 msgid "A deck held elsewhere runs no game, exit 2"
 msgstr "Un deck tenu ailleurs ne lance aucun jeu, code de sortie 2"
@@ -422,6 +455,19 @@ msgstr ""
 "Un programme du deck dans un jeu tient le verrou par le descripteur hérité ;"
 " un programme aux descripteurs fermés tourne sous l'ancêtre du jeu et "
 "reprend le verrou quand le jeu le libère"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r23
+msgid ""
+"A deck without a readable serial (sysfs serial first, lsusb next) is "
+"inventoried without a serial, owned by its workstation through the key "
+"workstation, USB product id and USB port, never merged with another "
+"workstation's deck"
+msgstr ""
+"Un deck sans numéro de série lisible (serial de sysfs d'abord, lsusb "
+"ensuite) est inventorié sans numéro, propre à son poste par la clé poste, "
+"identifiant produit USB et port USB, jamais fusionné avec le deck d'un autre"
+" poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r17
@@ -480,6 +526,15 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r108
 msgid "A failed rebase is aborted and notifies Manual merge required"
 msgstr "Un rebase en échec est annulé et notifie Manual merge required"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r32
+msgid ""
+"A failed report is silent apart from the status the extension shows: no "
+"notification, no log line"
+msgstr ""
+"Une remontée en échec reste silencieuse hormis l'état que l'extension "
+"affiche : ni notification, ni ligne de journal"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r82
@@ -679,6 +734,17 @@ msgid "A leftover __pycache__/game_*.pyc file is harmless"
 msgstr "Un fichier __pycache__/game_*.pyc resté en place est sans effet"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r09
+msgid ""
+"A lent deck follows its current workstation; an employee whose workstation "
+"had it keeps reading the deck and all its events, those of the holder "
+"included, never the holder's workstation nor its other decks"
+msgstr ""
+"Un deck prêté suit son poste actuel ; un employé dont un poste l'a eu garde "
+"la lecture du deck et de tous ses événements, ceux du détenteur compris, "
+"jamais le poste du détenteur ni ses autres decks"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r130
 msgid ""
 "A local instance's sub-menu offers the KeePassXC actions configured through "
@@ -765,6 +831,17 @@ msgstr "Un tick de page qui lève renvoie le deck à l'accueil"
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r73
 msgid "A page whose keys() raises refuses its plugin"
 msgstr "Une page dont keys() lève fait refuser son plugin"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r18
+msgid ""
+"A pairing code has 8 characters without ambiguity (no 0/O, 1/I), works for "
+"10 minutes, once, for the employee who asked for it, and only that employee "
+"reads it"
+msgstr ""
+"Un code d'appairage a 8 caractères sans ambiguïté (ni 0/O, ni 1/I), vaut 10 "
+"minutes, une seule fois, pour l'employé qui l'a demandé, et seul cet employé"
+" le lit"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r15
@@ -915,6 +992,17 @@ msgstr ""
 "déplacé par l'installateur"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r26
+msgid ""
+"A revoked token, or the token of an archived employee or of an account that "
+"is not a Stream Deck user, is refused with a code the extension shows as "
+"enrollment revoked"
+msgstr ""
+"Un jeton révoqué, ou le jeton d'un employé archivé ou d'un compte qui n'est "
+"pas utilisateur Stream Deck, est refusé avec un code que l'extension affiche"
+" comme inscription révoquée"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r18
 msgid ""
 "A running GNOME Shell session keeps the old gallery path until the next "
@@ -1045,6 +1133,37 @@ msgstr ""
 "remplace, avec une ligne au journal ; couper l'identifiant coupe les deux"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r05
+msgid ""
+"A workstation enrolls by pairing code, by the employee's API key, or by "
+"login and password"
+msgstr ""
+"Un poste s'inscrit par code d'appairage, par la clé d'API de l'employé, ou "
+"par identifiant et mot de passe"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r16
+msgid ""
+"A workstation is identified by an HMAC-SHA256 of /etc/machine-id keyed by "
+"the Linux user and the destination's URL and database: two Odoo cannot match"
+" it, the raw id never leaves it"
+msgstr ""
+"Un poste est identifié par un HMAC-SHA256 de /etc/machine-id avec pour clé "
+"l'utilisateur Linux et l'URL et la base de la destination : deux Odoo ne "
+"peuvent pas le recouper, l'identifiant brut ne le quitte jamais"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r01
+msgid ""
+"A workstation reports to several Odoo databases, each a local instance of "
+"the extension or a remote one given by URL and database, with its own "
+"enrollment and token"
+msgstr ""
+"Un poste remonte vers plusieurs bases Odoo, chacune une instance locale de "
+"l'extension ou une instance distante donnée par son URL et sa base, avec sa "
+"propre inscription et son propre jeton"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r43
 msgid ""
 "A write to a read-only repository is impossible at compile time, and "
@@ -1169,6 +1288,15 @@ msgstr ""
 "message clair et n'est relancé qu'après une nouvelle tentative"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r10
+msgid ""
+"An ERPLibre runner runs the tests of an Odoo module on a throwaway database "
+"and sends each test's verdict to the registry as a Python test"
+msgstr ""
+"Un lanceur d'ERPLibre lance les tests d'un module Odoo sur une base jetable "
+"et envoie le verdict de chaque test au registre comme test Python"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_deploy_r04
 msgid ""
 "An automatic login on the user's machine would open the session without a "
@@ -1176,6 +1304,15 @@ msgid ""
 msgstr ""
 "Une connexion automatique sur le poste de l'utilisateur ouvrirait la session"
 " sans mot de passe."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r04
+msgid ""
+"An employee gets a pairing code in Odoo from Stream Deck › My workstations ›"
+" Add a workstation"
+msgstr ""
+"Un employé obtient un code d'appairage dans Odoo par Stream Deck › Mes "
+"postes › Ajouter un poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r70
@@ -1271,6 +1408,42 @@ msgstr ""
 "USB_DEVICE_ATTACHED et la méta-donnée @xml/streamdeck_devices"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r39
+msgid ""
+"Anti-goal: a secret in clear on the workstation, in its settings or in a log"
+msgstr ""
+"Anti-objectif : un secret en clair sur le poste, dans ses réglages ou dans "
+"un journal"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r40
+msgid ""
+"Anti-goal: an employee who sees another employee's workstation; the only "
+"exception is the record of a deck their workstation had, and its events, "
+"read only"
+msgstr ""
+"Anti-objectif : un employé qui voit le poste d'un autre ; la seule exception"
+" est la fiche d'un deck que son poste a eu, et ses événements, en lecture"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r41
+msgid ""
+"Anti-goal: an extension that slows GNOME Shell down when Odoo is slow or "
+"absent"
+msgstr ""
+"Anti-objectif : une extension qui ralentit GNOME Shell quand Odoo est lent "
+"ou absent"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r42
+msgid ""
+"Anti-goal: identifying data in the code, the demo data, the comments or the "
+"commits"
+msgstr ""
+"Anti-objectif : une donnée identifiante dans le code, les données de démo, "
+"les commentaires ou les commits"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r42
 msgid ""
 "Any other existing directory is left alone (one holding the games, the old "
@@ -1305,6 +1478,15 @@ msgid ""
 msgstr ""
 "Arch/Tumbleweed peuvent être UNSUPPORTED ; tout autre UNSUPPORTED fait "
 "échouer l'exécution"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r08
+msgid ""
+"Archiving an employee revokes the tokens and archives the workstations; "
+"workstations, decks and history stay visible to the manager"
+msgstr ""
+"Archiver un employé révoque ses jetons et archive ses postes ; postes, decks"
+" et historique restent visibles du gestionnaire"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r104
@@ -1906,6 +2088,17 @@ msgid "Deck defects"
 msgstr "Défauts du deck"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r44
+msgid ""
+"Deck keys sn:<serial> and nosn:<workstation>:<product>:<port> cannot "
+"collide, and a serial outside [A-Za-z0-9._-]{1,64} is refused 400 "
+"bad_request"
+msgstr ""
+"Les clés de deck sn:<numéro> et nosn:<poste>:<produit>:<port> ne peuvent pas"
+" se confondre, et un numéro de série hors de [A-Za-z0-9._-]{1,64} est refusé"
+" en 400 bad_request"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r26
 msgid "Deck lock at $XDG_RUNTIME_DIR/erplibre-home/deck.lock"
 msgstr "Verrou du deck dans $XDG_RUNTIME_DIR/erplibre-home/deck.lock"
@@ -2150,6 +2343,17 @@ msgid "Each bulk OUT page has a 500 ms timeout"
 msgstr "Chaque page bulk OUT a un délai d'expiration de 500 ms"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r21
+msgid ""
+"Each call carries its protocol version MAJOR.MINOR (1.0): Odoo refuses an "
+"unknown MAJOR with a code the extension shows, and accepts a newer MINOR, "
+"ignoring the keys it does not know"
+msgstr ""
+"Chaque appel porte sa version de protocole MAJEUR.MINEUR (1.0) : Odoo refuse"
+" une MAJEURE inconnue avec un code que l'extension affiche, et accepte une "
+"MINEURE plus récente en ignorant les clés qu'il ne connaît pas"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r93
 msgid ""
 "Each command and check writes '── contrôle <name> : réussi/ÉCHEC', then its "
@@ -2247,6 +2451,18 @@ msgid ""
 msgstr ""
 "Activée signifie ACTIVE dans une session ouverte : GetExtensionInfo à l'état"
 " 1 et error vide ; enabled-extensions seul ne suffit pas"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r15
+msgid ""
+"Events are born on the workstation, dated and with a unique id, and Odoo "
+"keeps each id once; the full state sent with them sets the current "
+"inventory, and Odoo never infers an event from a state change"
+msgstr ""
+"Les événements naissent sur le poste, datés et avec un identifiant unique, "
+"et Odoo garde chaque identifiant une fois ; l'état complet envoyé avec eux "
+"fait l'inventaire courant, et Odoo ne déduit jamais un événement d'un écart "
+"d'état"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r127
@@ -2863,6 +3079,11 @@ msgstr ""
 "game (et --restart-after-game) listées dans l'aide"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_inv
+msgid "Inventory"
+msgstr "Inventaire"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r11
 msgid ""
 "JPEG keys rotated 180° on XL, XL v2, Original v2, MK.2 and Neo; Plus keys "
@@ -3032,6 +3253,17 @@ msgid ""
 msgstr ""
 "Les clés de la matrice sont distro:version, celles qu'acceptent "
 "deploy_qemu.py et --only"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r30
+msgid ""
+"Menus: Stream Deck › My workstations (with Add a workstation) and My decks "
+"for every Stream Deck user, Stream Deck › Fleet (workstations, decks, "
+"events) for the manager"
+msgstr ""
+"Menus : Stream Deck › Mes postes (avec Ajouter un poste) et Mes decks pour "
+"tout utilisateur Stream Deck, Stream Deck › Parc (postes, decks, événements)"
+" pour le gestionnaire"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r30
@@ -3296,6 +3528,54 @@ msgstr ""
 "arrive des deux côtés en même temps"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r29
+msgid ""
+"Nobody writes the inventory by hand: only the routes write it, in sudo, "
+"bound to the workstation of the token"
+msgstr ""
+"Personne n'écrit l'inventaire à la main : seules les routes l'écrivent, en "
+"sudo, bornées au poste du jeton"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_inv_r36
+msgid ""
+"Non-goal of the inventory: Odoo never opens a connection to the workstation;"
+" driving the workstation comes with a later lot."
+msgstr ""
+"Non-objectif de l'inventaire : Odoo n'ouvre jamais de connexion vers le "
+"poste ; le pilotage du poste vient avec un lot ultérieur."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_inv_r35
+msgid ""
+"Non-goal of the inventory: activities, the detection of a workstation that "
+"stops reporting and the Settings › Stream Deck page come with the next lot."
+msgstr ""
+"Non-objectif de l'inventaire : les activités, la détection d'un poste qui "
+"cesse de remonter et la page Paramètres › Stream Deck viennent avec le lot "
+"suivant."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_inv_r38
+msgid ""
+"Non-goal of the inventory: the GNOME extension ERPLibre Home is the only "
+"client of the routes; the wire contract does not forbid another one."
+msgstr ""
+"Non-objectif de l'inventaire : l'extension GNOME ERPLibre Home est le seul "
+"client des routes ; le contrat de la remontée n'en interdit pas un autre."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_inv_r37
+msgid ""
+"Non-goal of the inventory: the firmware stays empty rather than disputing "
+"the device with the deck service; a report without firmware keeps the one "
+"Odoo already has."
+msgstr ""
+"Non-objectif de l'inventaire : le firmware reste vide plutôt que de disputer"
+" le périphérique au service deck ; une remontée sans firmware garde celui "
+"qu'Odoo a déjà."
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r73
 msgid "Non-goal: Bluetooth control, which belongs to a separate plugin"
 msgstr "Non-objectif : le contrôle Bluetooth, qui relève d'un plugin distinct"
@@ -3321,14 +3601,31 @@ msgstr ""
 "erplibre-home-gnome-extension:metadata.json déclare shell-version 45 à 51, et erplibre:script/stream_deck/INSTALL.base.md nomme GNOME Shell 45 à 51. erplibre:long_test/README.base.md fait d'UNSUPPORTED sur une distribution en continu le signal de mettre à jour metadata.json."
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r38
+msgid "Non-goal: a client other than the GNOME extension"
+msgstr "Non-objectif : un client autre que l'extension GNOME"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r78
 msgid "Non-goal: a guaranteed frame rate per model"
 msgstr "Non-objectif : une fréquence d'images garantie par modèle"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r35
+msgid ""
+"Non-goal: activities, the silent workstation and Settings › Stream Deck"
+msgstr ""
+"Non-objectif : les activités, le poste muet et Paramètres › Stream Deck"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r74
 msgid "Non-goal: animations as a plugin feature"
 msgstr "Non-objectif : les animations comme fonction du plugin"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r36
+msgid "Non-goal: any configuration pushed from Odoo to the workstation"
+msgstr "Non-objectif : toute configuration poussée d'Odoo vers le poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r72
@@ -3427,6 +3724,13 @@ msgid "Non-goal: porting the games and Tiler modes"
 msgstr "Non-objectif : porter les jeux et les modes du Tiler"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r37
+msgid "Non-goal: reading the firmware while the deck service holds the device"
+msgstr ""
+"Non-objectif : lire le firmware pendant que le service deck tient le "
+"périphérique"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r119
 msgid ""
 "Non-goal: the Device indicator only reads the decks and launches the deck "
@@ -3480,6 +3784,51 @@ msgstr ""
 "visuel (code de sortie 3), la ligne de --check pour Result=exec-condition ou"
 " la condition non remplie avec ses trois causes, ou l'état/le statut d'un "
 "programme en échec ou en auto-restart(-queued)"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r06
+msgid ""
+"Odoo sees of a workstation its host name (the default name, renamable), "
+"GNOME Shell, extension and contract versions, ERPLibre branch and commit, "
+"deck program, deck service state, and system name and version"
+msgstr ""
+"Odoo voit d'un poste son nom d'hôte (nom par défaut, renommable), les "
+"versions de GNOME Shell, de l'extension et du contrat, la branche et le "
+"commit ERPLibre, le programme du deck, l'état du service deck, et le nom et "
+"la version du système"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r07
+msgid ""
+"Odoo sees of each deck its model, serial number, whether it is connected and"
+" since when, when it was last seen, and its firmware when readable"
+msgstr ""
+"Odoo voit de chaque deck son modèle, son numéro de série, s'il est branché "
+"et depuis quand, quand il a été vu pour la dernière fois, et son firmware "
+"quand il est lisible"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r25
+msgid ""
+"Odoo serves the JSON routes enroll, report and unenroll under "
+"/streamdeck/v1/, POST only; report and unenroll authenticate by the "
+"workstation token, and a malformed body is 400 bad_request with nothing "
+"written"
+msgstr ""
+"Odoo sert les routes JSON enroll, report et unenroll sous /streamdeck/v1/, "
+"en POST seulement ; report et unenroll s'authentifient par le jeton du "
+"poste, et un corps malformé reçoit 400 bad_request sans rien écrire"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r11
+msgid ""
+"Offline, the extension keeps the dated events in a bounded local queue and "
+"sends them when Odoo answers again; the history carries the real time of "
+"each event"
+msgstr ""
+"Hors ligne, l'extension garde les événements datés dans une file locale "
+"bornée et les envoie quand Odoo répond de nouveau ; l'historique porte "
+"l'heure réelle de chaque événement"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r14b
@@ -4874,6 +5223,15 @@ msgstr ""
 "section est erplibre"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r24
+msgid ""
+"The ERPLibre-extension contract moves to 1.2, a MINOR version; CONTRACT.md "
+"of the extension and the README of erplibre_streamdeck describe the report"
+msgstr ""
+"Le contrat ERPLibre-extension passe à 1.2, version MINEURE ; le CONTRACT.md "
+"de l'extension et le README d'erplibre_streamdeck décrivent la remontée"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r31
 msgid ""
 "The Games menu reads GET http://localhost:8042/api/games, and a click calls "
@@ -4918,6 +5276,17 @@ msgid ""
 msgstr ""
 "L'écran d'information du Neo est monté pivoté de 180° comme ses touches : "
 "l'appelant envoie l'image pivotée"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r34
+msgid ""
+"The Odoo test runner keeps the guarantees of requirement_report.py: nothing "
+"without the ERPLIBRE_REQUIREMENT_* variables, key never sent to Odoo nor "
+"shown, HTTPS or loopback, exit code of the tests"
+msgstr ""
+"Le lanceur des tests Odoo garde les garanties de requirement_report.py : "
+"rien sans les variables ERPLIBRE_REQUIREMENT_*, clé jamais transmise à Odoo "
+"ni affichée, HTTPS ou bouclage, code de sortie des tests"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r81b
@@ -4966,6 +5335,15 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r51
 msgid "The Stream Deck entry in Execute opens the submenu"
 msgstr "L'entrée Stream Deck d'Exécution ouvre le sous-menu"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r28
+msgid ""
+"The Stream Deck manager reads every workstation, deck and event, revokes "
+"tokens and archives workstations"
+msgstr ""
+"Le gestionnaire Stream Deck lit tous les postes, decks et événements, "
+"révoque les jetons et archive les postes"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r94
@@ -5325,6 +5703,15 @@ msgid "The export has the shape {schema_version, settings}"
 msgstr "L'export a la forme {schema_version, settings}"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r02
+msgid ""
+"The extension calls Odoo over HTTPS, and over plain HTTP only to this "
+"machine: 127.0.0.0/8, ::1 or localhost"
+msgstr ""
+"L'extension appelle Odoo en HTTPS, et en HTTP simple seulement vers la "
+"machine elle-même : 127.0.0.0/8, ::1 ou localhost"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r59
 msgid ""
 "The extension greys its gallery entry when gallery_server.py is missing"
@@ -5352,6 +5739,17 @@ msgstr ""
 " refuse un lancement par un 403 et l'extension affiche la ligne d'erreur de "
 "la galerie dans une notification. erplibre:doc/streamdeck_game.base.md le "
 "suppose sans l'énoncer comme une décision."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r12
+msgid ""
+"The extension shows an Odoo inventory page in its preferences (destinations,"
+" enrollment, detailed status) and a status line in the deck menu of the "
+"panel"
+msgstr ""
+"L'extension affiche une page Inventaire Odoo dans ses préférences "
+"(destinations, inscription, état détaillé) et une ligne d'état dans le menu "
+"du deck du panneau"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r15
@@ -5637,6 +6035,15 @@ msgstr ""
 "L'en-tête affiche Subnet · dernière analyse et l'état de l'analyse en cours"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r14
+msgid ""
+"The history enters the inventory now: Odoo records a deck plugged, a deck "
+"unplugged and a change of the deck service state"
+msgstr ""
+"L'historique entre dès l'inventaire : Odoo enregistre un deck branché, un "
+"deck débranché et un changement d'état du service deck"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r35
 msgid ""
 "The home screen re-renders on its own; home_period 0.0 means every pass, and"
@@ -5759,6 +6166,15 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r56
 msgid "The instance dialog marks xdotool as experimental"
 msgstr "La boîte de dialogue d'instance marque xdotool comme expérimental"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r31
+msgid ""
+"The inventory is translated into Canadian French in Odoo and in French in "
+"the extension, and the module's README is bilingual"
+msgstr ""
+"L'inventaire est traduit en français canadien dans Odoo et en français dans "
+"l'extension, et le README du module est bilingue"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r42b
@@ -6003,6 +6419,17 @@ msgstr ""
 " SERVICES.md et BUNDLE_PIPELINE.md"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r20
+msgid ""
+"The offline queue holds at most 1000 events or 30 days per destination, the "
+"oldest dropped first; every report carries the running total of lost events,"
+" and Odoo keeps the largest"
+msgstr ""
+"La file hors ligne garde au plus 1000 événements ou 30 jours par "
+"destination, les plus anciens tombant en premier ; chaque remontée porte le "
+"total cumulé des événements perdus, et Odoo garde le plus grand"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r07
 msgid ""
 "The other D-Bus clients (translator.py, hooks/erplibre-home-hook.py, "
@@ -6125,6 +6552,17 @@ msgstr ""
 "_erplibre_home_install_local)"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r33
+msgid ""
+"The pure logic of the inventory (payload, queue, URL policy, fingerprint, "
+"change detection) lives in lib/inventory.js under node --test; the rest has "
+"its manual checklist"
+msgstr ""
+"La logique pure de l'inventaire (charge utile, file, politique d'URL, "
+"empreinte, détection de changement) vit dans lib/inventory.js sous node "
+"--test ; le reste a sa liste de vérification manuelle"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r65b
 msgid "The read times are exactly 1.5, 3, 5 and 8 s after the start"
 msgstr "Les lectures ont lieu exactement 1,5, 3, 5 et 8 s après le démarrage"
@@ -6196,6 +6634,15 @@ msgid "The repository's home button orders 10 to 90 reproduce the home row"
 msgstr ""
 "Les ordres 10 à 90 des boutons d'accueil du dépôt reproduisent la rangée "
 "d'accueil"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r13
+msgid ""
+"The requirements of the inventory live in the registry, domain Inventory, "
+"each done one with the tests that prove it"
+msgstr ""
+"Les requis de l'inventaire vivent dans le registre, domaine Inventaire, "
+"chacun de ceux qui sont faits avec les tests qui le prouvent"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r73
@@ -6438,6 +6885,38 @@ msgid ""
 msgstr ""
 "Le venv n'est créé que par --stream-deck ; une installation de base n'a pas "
 "de venv ; le python3 du système exécute la migration"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r19
+msgid ""
+"The workstation reports every 15 minutes and at each change, each call "
+"bounded by 10 seconds, never two reports at once to one destination"
+msgstr ""
+"Le poste remonte toutes les 15 minutes et à chaque changement, chaque appel "
+"borné à 10 secondes, jamais deux remontées en même temps vers une même "
+"destination"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r17
+msgid ""
+"The workstation token is 32 random bytes returned once at enrollment; Odoo "
+"keeps only its SHA-256, which no employee reads, and the employee or the "
+"manager revokes it from the workstation"
+msgstr ""
+"Le jeton du poste est fait de 32 octets aléatoires rendus une fois à "
+"l'inscription ; Odoo n'en garde que le SHA-256, qu'aucun employé ne lit, et "
+"l'employé ou le gestionnaire le révoque depuis le poste"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r03
+msgid ""
+"The workstation token lives in the GNOME keyring, bound to the URL and "
+"database it serves; the API key or the password serves the enrollment only "
+"and is never kept"
+msgstr ""
+"Le jeton du poste vit dans le trousseau GNOME, lié à l'URL et à la base "
+"qu'il sert ; la clé d'API ou le mot de passe ne sert qu'à l'inscription et "
+"n'est jamais gardé"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r20
