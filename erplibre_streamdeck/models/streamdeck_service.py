@@ -7,6 +7,11 @@ Every public method takes the decoded JSON body and returns
 adds `error`, one of the codes of `ERRORS`. A body is validated whole
 before anything is written, so a 4xx leaves the database as it was.
 
+Only a Stream Deck user, which every internal user is, enrolls or
+reports: valid credentials of any other account, a portal one included,
+and the token of an employee who is no longer such a user, are answered
+403 `user_inactive`, as for an archived employee.
+
 Secrets: the workstation token is returned once by `enroll` and only its
 SHA-256 is stored; an API key or a password is checked and dropped. No
 log line carries any of them.
@@ -30,6 +35,8 @@ PROTOCOL = "1.0"
 HEARTBEAT_S = 900
 PAIRING_TTL_MIN = 10
 FUTURE_TOLERANCE_MIN = 5
+
+USER_GROUP = "erplibre_streamdeck.group_streamdeck_user"
 
 PAIRING_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 PAIRING_LENGTH = 8
@@ -318,6 +325,8 @@ class StreamdeckService(models.AbstractModel):
             user, code = self._user_of_password(login, secret), None
         if not user.active:
             raise RequestError(403, "user_inactive")
+        if not user.has_group(USER_GROUP):
+            raise RequestError(403, "user_inactive")
         if code:
             code.write({"used": True})
 
@@ -423,7 +432,7 @@ class StreamdeckService(models.AbstractModel):
     def _workstation_of(self, token):
         """The workstation holding `token`; 401 `token_invalid` for an
         unknown or revoked token, 403 `user_inactive` when its employee
-        is archived."""
+        is archived or no longer a Stream Deck user."""
         if not isinstance(token, str) or not token:
             raise RequestError(401, "token_invalid")
         workstation = (
@@ -434,6 +443,8 @@ class StreamdeckService(models.AbstractModel):
         if not workstation or not workstation.active:
             raise RequestError(401, "token_invalid")
         if not workstation.user_id.active:
+            raise RequestError(403, "user_inactive")
+        if not workstation.user_id.has_group(USER_GROUP):
             raise RequestError(403, "user_inactive")
         return workstation
 

@@ -3,7 +3,7 @@
 import hashlib
 from datetime import datetime, timedelta, timezone
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.tests.common import TransactionCase, new_test_user, tagged
 
 FINGERPRINT_A = "a" * 64
@@ -39,6 +39,13 @@ class TestStreamdeckService(TransactionCase):
             login="zz_sd_svc_b",
             name="Employee B",
             groups="base.group_user",
+        )
+        cls.portal = new_test_user(
+            cls.env,
+            login="zz_sd_svc_p",
+            password="zz-sd-svc-p-pw-1",
+            name="Portal P",
+            groups="base.group_portal",
         )
         cls._uuid = 0
 
@@ -321,6 +328,67 @@ class TestStreamdeckService(TransactionCase):
         self.assertFalse(
             self.Workstation.search([("user_id", "=", self.user_a.id)])
         )
+
+    def test_a_portal_user_cannot_enroll(self):
+        # Un compte portail (un client) n'est pas un utilisateur Stream
+        # Deck : ses identifiants valides ne lui ouvrent pas l'inventaire,
+        # quelle que soit la méthode.
+        code = self.Service.new_pairing_code(self.portal)
+        key = (
+            self.env["res.users.apikeys"]
+            .with_user(self.portal)
+            .sudo()
+            ._generate(None, "inventory", None)
+        )
+        payloads = {
+            "pairing_code": {"code": code.code},
+            "api_key": {"key": key},
+            "password": {
+                "login": "zz_sd_svc_p",
+                "password": "zz-sd-svc-p-pw-1",
+            },
+        }
+        before = self._counts()
+        for method, secret in payloads.items():
+            with self.subTest(method=method):
+                payload = dict(
+                    secret,
+                    protocol="1.0",
+                    method=method,
+                    fingerprint=FINGERPRINT_A,
+                    hostname="host-p",
+                )
+                self._assert_error(
+                    self.Service.enroll(payload), 403, "user_inactive"
+                )
+        self.assertFalse(code.used)
+        self.assertEqual(self._counts(), before)
+
+    def test_an_employee_turned_portal_user_is_refused(self):
+        enrolled = self._enroll(self.user_a)
+        token = enrolled["token"]
+        workstation = self.Workstation.browse(enrolled["workstation_id"])
+        self.user_a.write(
+            {
+                "groups_id": [
+                    Command.set([self.env.ref("base.group_portal").id])
+                ]
+            }
+        )
+        before = self._counts()
+        self._assert_error(
+            self._report(token, decks=[self._deck("SN-PORTAL")]),
+            403,
+            "user_inactive",
+        )
+        self._assert_error(
+            self.Service.unenroll(token, {"protocol": "1.0"}),
+            403,
+            "user_inactive",
+        )
+        self.assertEqual(self._counts(), before)
+        self.assertFalse(workstation.last_report)
+        self.assertTrue(workstation.token_hash)
 
     def test_reenrolling_the_same_fingerprint_keeps_the_workstation(self):
         first = self._enroll(self.user_a)
