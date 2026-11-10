@@ -141,7 +141,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">The record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml open a device to the employees whose workstation holds it or has an event of it, and its events with it; the report moves a deck to the workstation that declares it.</field>
+        <field name="achievement">The record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml open a device to the employees whose workstation holds it, has an event of it, or is the one a changed-workstation event took it from, and its events with it; the report moves a deck to the workstation that declares it.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_inv_r10" model="devops.requirement">
@@ -621,13 +621,12 @@
         <field name="sequence" eval="430" />
         <field name="moscow">should</field>
         <field name="requirement_type">functional</field>
-        <field name="devsecops_stage">code</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">_apply_decks of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py moves the deck to the reporting workstation without confirmation.</field>
-        <field name="missing">No event records the move: streamdeck.event has no changed-workstation kind holding the former and the new workstation, and the move leaves no trace in the history.</field>
-        <field name="notes">Origin: violated.</field>
+        <field name="done" eval="True" />
+        <field name="achievement">_apply_decks of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py moves the deck to the reporting workstation without confirmation and creates a streamdeck.event of kind moved, dated at the reception, holding the new workstation in workstation_id and the former in previous_workstation_id, each name copied on the event; a deck created by the report, or already on the reporting workstation, moves nothing, and a report that carries the kind moved is refused 400 bad_request.</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_inv_r44" model="devops.requirement">
         <field name="code">SD-INV-R44</field>
@@ -1007,6 +1006,12 @@
         <field name="sequence" eval="40" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_deck_moves_to_the_reporting_workstation</field>
+    </record>
+    <record id="test_sd_inv_r09_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_moved_deck_is_read_by_the_lender_and_the_holder_only</field>
     </record>
     <record id="test_sd_inv_r10_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r10" />
@@ -2201,6 +2206,24 @@
         <field name="sequence" eval="10" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_deck_moves_to_the_reporting_workstation</field>
+    </record>
+    <record id="test_sd_inv_r43_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r43" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_deck_taken_by_another_workstation_leaves_a_moved_event</field>
+    </record>
+    <record id="test_sd_inv_r43_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r43" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_moved_deck_is_read_by_the_lender_and_the_holder_only</field>
+    </record>
+    <record id="test_sd_inv_r43_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r43" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_client_cannot_report_a_moved_event</field>
     </record>
     <record id="test_sd_inv_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r44" />
