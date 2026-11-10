@@ -311,7 +311,7 @@ class TestStreamdeckService(TransactionCase):
         token = self._enroll(self.user_a)["token"]
         deck = self._deck("SN-UPPER", "006C")
         self.assertEqual(self._report(token, decks=[deck])[0], 200)
-        device = self.Device.search([("key", "=", "SN-UPPER")])
+        device = self.Device.search([("key", "=", "sn:SN-UPPER")])
         self.assertEqual(device.usb_product_id, "006c")
         self.assertEqual(device.model_name, "Stream Deck XL")
 
@@ -577,7 +577,7 @@ class TestStreamdeckService(TransactionCase):
         self.assertTrue(all(decks.mapped("connected_since")))
         self.assertTrue(all(decks.mapped("last_seen")))
         deck_one = decks.filtered(lambda d: d.serial == "SN-ONE")
-        self.assertEqual(deck_one.key, "SN-ONE")
+        self.assertEqual(deck_one.key, "sn:SN-ONE")
         self.assertEqual(deck_one.firmware, "1.0.5")
         self.assertEqual(deck_one.model_name, "Stream Deck +")
         self.assertRecordValues(
@@ -701,7 +701,7 @@ class TestStreamdeckService(TransactionCase):
         self.assertEqual(
             self._report(enrolled["token"], events=events)[0], 200
         )
-        device = self.Device.search([("key", "=", "SN-GONE")])
+        device = self.Device.search([("key", "=", "sn:SN-GONE")])
         self.assertEqual(len(device), 1)
         self.assertFalse(device.connected)
         self.assertEqual(device.workstation_id.id, enrolled["workstation_id"])
@@ -714,7 +714,7 @@ class TestStreamdeckService(TransactionCase):
         at_a = self._event("plugged", deck)
         self._report(enrolled_a["token"], decks=[deck], events=[at_a])
         since_a = datetime(2026, 1, 1, 8, 0, 0)
-        self.Device.search([("key", "=", "SN-MOVE")]).write(
+        self.Device.search([("key", "=", "sn:SN-MOVE")]).write(
             {"connected_since": since_a}
         )
         at_b = self._event("plugged", dict(deck, usb_path="3-1"))
@@ -773,6 +773,62 @@ class TestStreamdeckService(TransactionCase):
             self.assertEqual(
                 device.event_ids.workstation_id, device.workstation_id
             )
+
+    def test_a_serial_cannot_take_a_deck_without_serial(self):
+        enrolled_a = self._enroll(self.user_a, FINGERPRINT_A, "host-a")
+        enrolled_b = self._enroll(self.user_b, FINGERPRINT_B, "host-b")
+        deck = self._deck(None, "0063", "1-4")
+        self._report(
+            enrolled_a["token"],
+            decks=[deck],
+            events=[self._event("plugged", deck)],
+        )
+        device = self.Device.search([("usb_product_id", "=", "0063")])
+        self.assertEqual(
+            device.key, "nosn:%d:0063:1-4" % device.workstation_id.id
+        )
+        forged = self._deck(device.key, "0063", "2-1")
+        before = self._counts()
+        self._assert_error(
+            self._report(
+                enrolled_b["token"],
+                decks=[forged],
+                events=[self._event("plugged", forged)],
+            ),
+            400,
+            "bad_request",
+        )
+        self.assertEqual(self._counts(), before)
+        self.assertEqual(
+            device.workstation_id.id, enrolled_a["workstation_id"]
+        )
+        self.assertEqual(len(device.event_ids), 1)
+        self.assertFalse(
+            self.Device.with_user(self.user_b).search([("id", "=", device.id)])
+        )
+
+    def test_a_deck_key_keeps_serials_apart_from_decks_without_one(self):
+        enrolled = self._enroll(self.user_a)
+        decks = [self._deck("SN-KEY.1_a"), self._deck(None, "0063", "1-4")]
+        self.assertEqual(self._report(enrolled["token"], decks=decks)[0], 200)
+        devices = self.Device.search(
+            [("workstation_id", "=", enrolled["workstation_id"])]
+        )
+        self.assertEqual(
+            sorted(devices.mapped("key")),
+            sorted(
+                [
+                    "nosn:%d:0063:1-4" % enrolled["workstation_id"],
+                    "sn:SN-KEY.1_a",
+                ]
+            ),
+        )
+        widest = "S" * 64
+        self.assertEqual(
+            self._report(enrolled["token"], decks=[self._deck(widest)])[0],
+            200,
+        )
+        self.assertTrue(self.Device.search([("key", "=", "sn:" + widest)]))
 
     def test_an_event_from_the_future_takes_the_reception_time(self):
         token = self._enroll(self.user_a)["token"]
@@ -1016,6 +1072,21 @@ class TestStreamdeckService(TransactionCase):
             ),
             "deck serial with NUL": dict(
                 good, state=dict(state, decks=[self._deck("SN\x00")])
+            ),
+            "deck serial with a space": dict(
+                good, state=dict(state, decks=[self._deck("SN BAD")])
+            ),
+            "deck serial in the no-serial form": dict(
+                good, state=dict(state, decks=[self._deck("nosn:1:0084:1-2")])
+            ),
+            "deck serial beyond 64": dict(
+                good, state=dict(state, decks=[self._deck("S" * 65)])
+            ),
+            "deck serial not ASCII": dict(
+                good, state=dict(state, decks=[self._deck("SN-\u00c9")])
+            ),
+            "event serial with a colon": dict(
+                good, events=[dict(event, serial="sn:SN-BAD")]
             ),
             "event uuid with NUL": dict(
                 good, events=[dict(event, uuid="u\x00u")]

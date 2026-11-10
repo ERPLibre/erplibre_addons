@@ -99,9 +99,12 @@ une réponse d'erreur y ajoute `error`.
   par l'heure de réception.
 - `lost_events` : le total cumulé des événements que le poste a abandonnés
   sans les envoyer ; Odoo garde le plus grand total reçu.
-- Un deck se reconnaît à son numéro de série ; un deck sans numéro de série
-  lisible se reconnaît à son poste, son identifiant produit et son chemin
-  USB, et n'est jamais fusionné avec le deck d'un autre poste.
+- Un deck se reconnaît à son numéro de série, clé `sn:<numéro>` ; un deck
+  sans numéro de série lisible se reconnaît à son poste, son identifiant
+  produit et son chemin USB, clé `nosn:<poste>:<produit>:<chemin>`, et
+  n'est jamais fusionné avec le deck d'un autre poste. Un numéro hors de
+  `[A-Za-z0-9._-]{1,64}` est un 400 `bad_request` : sans `:`, il ne peut
+  jamais nommer un deck sans numéro.
 
 | Statut | `error` | Sens |
 |---|---|---|
