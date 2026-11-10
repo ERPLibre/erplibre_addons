@@ -22,8 +22,15 @@ Requirements application, under ten domains whose code starts with `sd_`.
 | long test to write | to do; *What is missing* says what the long test must check |
 | non-goal, out of scope | MoSCoW *Won't*, done, the reason in the description |
 | design decision | MoSCoW *Should*, *Non-functional*, done, the reason in *Achievement* |
+| open question, open risk, follow-up | MoSCoW *Should*, to do; *What is missing* says what is left |
+| security invariant | MoSCoW *Must*, type *Security*, *Security relevant* |
 | proof in another repository | to do; *What is missing* names the repository |
 | violated | to do, stage *Develop*; *What is missing* describes the gap |
+
+*Achievement* and *What is missing* name files and tests in the same
+`<repository>:<path>` form as the proofs below, so each pointer resolves in
+its own repository. A requirement that protects a secret, an access or a
+file outside the checkout is marked *Security relevant*.
 
 Each requirement carries a stable code `SD-<DOMAIN>-R<row>`, for example
 `SD-DEFECTS-R02`. The data is loaded **once**: it is `noupdate`, so a

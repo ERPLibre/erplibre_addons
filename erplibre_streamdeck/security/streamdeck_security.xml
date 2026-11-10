@@ -9,16 +9,17 @@
     </record>
 
     <!-- Le groupe de l'employé qui possède des postes et des decks. Il
-         n'accorde aucun droit par lui-même : les modèles et les règles
-         d'enregistrement qui s'y rattachent limitent chacun à ses propres
-         postes. -->
+         n'accorde aucun droit par lui-même, et ce module ne déclare aucun
+         modèle ni aucune règle d'enregistrement : la restriction de chacun
+         à ses propres postes vit avec les règles du modèle qui les porte. -->
     <record id="group_streamdeck_user" model="res.groups">
         <field name="name">User</field>
         <field name="category_id" ref="module_category_streamdeck"/>
     </record>
 
-    <!-- Le gestionnaire voit le parc entier ; il reste utilisateur pour
-         ses propres postes. -->
+    <!-- Le gestionnaire implique l'utilisateur. Comme lui, il n'accorde
+         aucun droit par lui-même : c'est le groupe que vise une règle qui
+         ouvre le parc entier. -->
     <record id="group_streamdeck_manager" model="res.groups">
         <field name="name">Manager</field>
         <field name="category_id" ref="module_category_streamdeck"/>
