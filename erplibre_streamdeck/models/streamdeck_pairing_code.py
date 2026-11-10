@@ -6,9 +6,11 @@ from odoo import fields, models
 class StreamdeckPairingCode(models.Model):
     """A single-use code that enrolls a workstation for `user_id`.
 
-    No group has any right on this model: the pairing wizard creates the
-    code in sudo for the current user, and the enrollment route consumes
-    it in sudo.
+    No group has any right on this model, the Stream Deck manager
+    included: whoever reads an unused code can enroll a workstation in the
+    name of the code's employee. The pairing wizard creates the code in
+    sudo for the current user, and the enrollment route consumes it in
+    sudo.
     """
 
     _name = "streamdeck.pairing.code"
