@@ -66,6 +66,7 @@ class StreamdeckWorkstation(models.Model):
     token_hash = fields.Char(
         groups="base.group_system",
         copy=False,
+        index="btree_not_null",
         help="SHA-256 of the workstation token; the token itself is kept"
         " only by the workstation.",
     )
@@ -77,6 +78,13 @@ class StreamdeckWorkstation(models.Model):
     )
     token_created = fields.Datetime(copy=False)
     token_last_used = fields.Datetime(copy=False)
+    lost_events_total = fields.Integer(
+        string="Lost events",
+        readonly=True,
+        help="Events the workstation dropped unsent because its offline"
+        " queue was full or too old: the largest running total it"
+        " reported, so a report sent again changes nothing.",
+    )
     device_ids = fields.One2many(
         "streamdeck.device",
         "workstation_id",
