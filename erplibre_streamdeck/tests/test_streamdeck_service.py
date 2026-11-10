@@ -2,12 +2,18 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 import hashlib
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from odoo import Command, fields
 from odoo.tests.common import TransactionCase, new_test_user, tagged
 
 FINGERPRINT_A = "a" * 64
 FINGERPRINT_B = "b" * 64
+
+# Le module où Odoo lit l'adresse de la requête pour la temporisation des
+# connexions.
+RES_USERS_MODULE = "odoo.addons.base.models.res_users"
 
 
 @tagged("post_install", "-at_install")
@@ -390,6 +396,93 @@ class TestStreamdeckService(TransactionCase):
         self.assertFalse(workstation.last_report)
         self.assertTrue(workstation.token_hash)
 
+    def test_a_password_alone_is_refused_when_rpc_needs_an_api_key(self):
+        # Un employé dont l'accès RPC exige une clé d'API (double facteur)
+        # ne s'inscrit pas avec son seul mot de passe ; sa clé d'API reste
+        # acceptée.
+        key = (
+            self.env["res.users.apikeys"]
+            .with_user(self.user_a)
+            .sudo()
+            ._generate(None, "inventory", None)
+        )
+        Users = type(self.env["res.users"])
+        with patch.object(Users, "_rpc_api_keys_only", return_value=True):
+            self._assert_error(
+                self.Service.enroll(
+                    {
+                        "protocol": "1.0",
+                        "method": "password",
+                        "login": "zz_sd_svc_a",
+                        "password": "zz-sd-svc-a-pw-1",
+                        "fingerprint": FINGERPRINT_A,
+                        "hostname": "host-a",
+                    }
+                ),
+                401,
+                "credentials_refused",
+            )
+            self.assertFalse(
+                self.Workstation.search([("user_id", "=", self.user_a.id)])
+            )
+            status, body = self.Service.enroll(
+                {
+                    "protocol": "1.0",
+                    "method": "api_key",
+                    "key": key,
+                    "fingerprint": FINGERPRINT_A,
+                    "hostname": "host-a",
+                }
+            )
+        self.assertEqual(status, 200, body)
+
+    def test_repeated_failures_from_one_address_are_put_on_cooldown(self):
+        # Après cinq échecs depuis une adresse, la sixième tentative est
+        # refusée sans examen, même avec un code valide ; une autre
+        # adresse n'est pas touchée.
+        ICP = self.env["ir.config_parameter"].sudo()
+        ICP.set_param("base.login_cooldown_after", 5)
+        ICP.set_param("base.login_cooldown_duration", 60)
+        flooding, other = "192.0.2.7", "192.0.2.8"
+
+        def forget_failures():
+            failures = getattr(self.registry, "_login_failures", {})
+            for address in (flooding, other):
+                failures.pop(address, None)
+
+        self.addCleanup(forget_failures)
+        fake = SimpleNamespace(
+            httprequest=SimpleNamespace(remote_addr=flooding)
+        )
+        code = self.Service.new_pairing_code(self.user_a)
+        # Le message de la temporisation se traduit dans la langue de
+        # l'environnement, que celui d'une route porte toujours.
+        Service = self.Service.with_context(lang="en_US")
+
+        def enroll(typed):
+            return Service.enroll(
+                {
+                    "protocol": "1.0",
+                    "method": "pairing_code",
+                    "code": typed,
+                    "fingerprint": FINGERPRINT_A,
+                    "hostname": "host-a",
+                }
+            )
+
+        with patch(RES_USERS_MODULE + ".request", fake), self.assertLogs(
+            RES_USERS_MODULE, "WARNING"
+        ):
+            for _attempt in range(5):
+                self._assert_error(
+                    enroll("ZZZZZZZZ"), 401, "credentials_refused"
+                )
+            self._assert_error(enroll(code.code), 401, "credentials_refused")
+            self.assertFalse(code.used)
+            fake.httprequest.remote_addr = other
+            status, body = enroll(code.code)
+        self.assertEqual(status, 200, body)
+
     def test_reenrolling_the_same_fingerprint_keeps_the_workstation(self):
         first = self._enroll(self.user_a)
         workstation = self.Workstation.browse(first["workstation_id"])
@@ -694,9 +787,18 @@ class TestStreamdeckService(TransactionCase):
             self._deck("SN-FUTURE"),
             at=(now + timedelta(minutes=4)).isoformat(),
         )
-        self.assertEqual(self._report(token, events=[late, close])[0], 200)
-        stored = self.Event.search([("uuid", "=", late["uuid"])])
-        self.assertEqual(stored.at, stored.received_at)
+        # Juste au-delà des 5 minutes de tolérance.
+        beyond = self._event(
+            "plugged",
+            self._deck("SN-FUTURE"),
+            at=(now + timedelta(minutes=6)).isoformat(),
+        )
+        self.assertEqual(
+            self._report(token, events=[late, close, beyond])[0], 200
+        )
+        for event in (late, beyond):
+            stored = self.Event.search([("uuid", "=", event["uuid"])])
+            self.assertEqual(stored.at, stored.received_at, event["at"])
         within = self.Event.search([("uuid", "=", close["uuid"])])
         self.assertGreater(within.at, within.received_at)
 
