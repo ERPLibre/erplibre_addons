@@ -792,6 +792,24 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_routes.TestStreamdeckRoutes.test_no_route_logs_the_token_or_password</field>
     </record>
+    <record id="test_sd_inv_r03_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r03" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-io.test.js::a locked keyring rejects instead of answering "no token"</field>
+    </record>
+    <record id="test_sd_inv_r03_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r03" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a keyring error at the tick is not taken for a missing token</field>
+    </record>
+    <record id="test_sd_inv_r03_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r03" />
+        <field name="sequence" eval="110" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a token missing for one look only keeps the queue</field>
+    </record>
     <record id="test_sd_inv_r04_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r04" />
         <field name="sequence" eval="10" />
@@ -1098,6 +1116,24 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_an_event_from_the_future_takes_the_reception_time</field>
     </record>
+    <record id="test_sd_inv_r11_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r11" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::every text of the state and the events fits what Odoo accepts</field>
+    </record>
+    <record id="test_sd_inv_r11_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r11" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::a product id Odoo would refuse goes as none</field>
+    </record>
+    <record id="test_sd_inv_r11_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r11" />
+        <field name="sequence" eval="110" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::a deck with neither a serial nor a USB path is left out</field>
+    </record>
     <record id="test_sd_inv_r12_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r12" />
         <field name="sequence" eval="10" />
@@ -1145,6 +1181,12 @@
         <field name="sequence" eval="80" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the deck menu shows the inventory status line</field>
+    </record>
+    <record id="test_sd_inv_r12_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r12" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a token cleared by the preferences is seen at the next tick</field>
     </record>
     <record id="test_sd_inv_r13_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r13" />
@@ -1236,6 +1278,36 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_an_employee_reads_the_service_history_of_their_workstation</field>
     </record>
+    <record id="test_sd_inv_r14_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r14" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a deck unplugged while the service was stopped is an event at start</field>
+    </record>
+    <record id="test_sd_inv_r14_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r14" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a deck plugged while the service was stopped is an event at start</field>
+    </record>
+    <record id="test_sd_inv_r14_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r14" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a deck service changed while the service was stopped is an event at start</field>
+    </record>
+    <record id="test_sd_inv_r14_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r14" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the same decks and service after a stop give no event</field>
+    </record>
+    <record id="test_sd_inv_r14_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r14" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a corrupt file of what was seen is a first start</field>
+    </record>
     <record id="test_sd_inv_r15_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r15" />
         <field name="sequence" eval="10" />
@@ -1301,6 +1373,12 @@
         <field name="sequence" eval="60" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_inventory_keys_are_unique</field>
+    </record>
+    <record id="test_sd_inv_r16_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r16" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_i18n.TestStreamdeckI18n.test_the_fingerprint_help_names_the_whole_key</field>
     </record>
     <record id="test_sd_inv_r17_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r17" />
@@ -1583,6 +1661,12 @@
         <field name="sequence" eval="40" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::diffDecks: a deck without serial on another port is unplug + plug</field>
+    </record>
+    <record id="test_sd_inv_r23_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r23" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::a deck with neither a serial nor a USB path is left out</field>
     </record>
     <record id="test_sd_inv_r24_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r24" />
@@ -1986,6 +2070,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_token_hash_is_not_readable_by_an_employee</field>
     </record>
+    <record id="test_sd_inv_r39_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r39" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::what the service last saw is kept in a private file of its own</field>
+    </record>
     <record id="test_sd_inv_r40_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r40" />
         <field name="sequence" eval="10" />
@@ -2015,6 +2105,12 @@
         <field name="sequence" eval="50" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_serial_cannot_take_a_deck_without_serial</field>
+    </record>
+    <record id="test_sd_inv_r40_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r40" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the events of an unenrolled destination never reach its next enrollment</field>
     </record>
     <record id="test_sd_inv_r41_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r41" />
