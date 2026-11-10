@@ -73,8 +73,11 @@ Le test `tests/test_requirement_inventory.py` vérifie que chaque preuve
 nomme un test qui existe : un test Odoo est importé et doit tourner sous
 `--test-tags /<module>` ; dans un checkout d'ERPLibre, un test de l'extension
 ou d'ERPLibre doit figurer dans l'arbre commité de son dépôt (ce contrôle est
-sauté hors d'un checkout). Chaque test des quatre fichiers de test de
-l'inventaire d'`erplibre_streamdeck` prouve au moins un requis.
+sauté hors d'un checkout). Un test Node déclaré dans une boucle
+`for … of` sur un tableau littéral se nomme une fois par valeur de la
+boucle ; un nom que la boucle ne produit pas n'est pas un test. Chaque test
+des quatre fichiers de test de l'inventaire d'`erplibre_streamdeck` prouve
+au moins un requis.
 
 ## Preuves et verdicts
 
