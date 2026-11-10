@@ -219,8 +219,15 @@ class TestStreamdeckRequirementData(TransactionCase):
         )
         self.assertTrue(data)
         self.assertTrue(all(data.mapped("noupdate")))
+        # Chacun des requis de ces dix domaines vient des données ; le
+        # domaine Inventaire a son propre test.
         self.assertEqual(
-            len(data.filtered(lambda d: d.model == "devops.requirement")),
+            len(
+                data.filtered(
+                    lambda d: d.model == "devops.requirement"
+                    and d.res_id in self.requirements.ids
+                )
+            ),
             len(self.requirements),
         )
         # Une mise à jour du module relit le fichier : un requis déjà

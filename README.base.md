@@ -43,7 +43,7 @@ packages the modules need are listed in `requirements.txt`.
 | Module | Description |
 |---|---|
 | `erplibre_streamdeck` | Inventory of the employees' Stream Decks: each workstation running the GNOME extension ERPLibre Home enrolls (pairing code, API key or password) and reports its decks, its deck service and their events through JSON routes authenticated by a workstation token. Every employee reads their own workstations and the decks they have held; the manager reads the whole fleet. |
-| `erplibre_streamdeck_devops_requirement` | The requirements of the ERPLibre Stream Deck (deck programs, GNOME extension ERPLibre Home, installation, games, mobile plugin) as `erplibre_devops_requirement` data, in English and Canadian French, each with the repository tests that prove it; a test runner pushes its verdict by test reference. |
+| `erplibre_streamdeck_devops_requirement` | The requirements of the ERPLibre Stream Deck (deck programs, GNOME extension ERPLibre Home, installation, games, mobile plugin, Odoo inventory) as `erplibre_devops_requirement` data, in English and Canadian French, each with the repository tests that prove it; a test runner pushes its verdict by test reference. |
 
 ### External data synchronisation
 
@@ -155,7 +155,7 @@ besoin sont listés dans `requirements.txt`.
 | Module | Description |
 |---|---|
 | `erplibre_streamdeck` | Inventaire des Stream Deck des employés : chaque poste qui fait tourner l'extension GNOME ERPLibre Home s'inscrit (code d'appairage, clé d'API ou mot de passe) et remonte ses decks, son service deck et leurs événements par des routes JSON authentifiées par un jeton de poste. Chaque employé lit ses postes et les decks qu'il a tenus ; le gestionnaire lit tout le parc. |
-| `erplibre_streamdeck_devops_requirement` | Les requis du Stream Deck d'ERPLibre (programmes du deck, extension GNOME ERPLibre Home, installation, jeux, plugin mobile) en données d'`erplibre_devops_requirement`, en anglais et en français canadien, chacun avec les tests de dépôt qui le prouvent ; un lanceur de tests pousse son verdict par la référence du test. |
+| `erplibre_streamdeck_devops_requirement` | Les requis du Stream Deck d'ERPLibre (programmes du deck, extension GNOME ERPLibre Home, installation, jeux, plugin mobile, inventaire Odoo) en données d'`erplibre_devops_requirement`, en anglais et en français canadien, chacun avec les tests de dépôt qui le prouvent ; un lanceur de tests pousse son verdict par la référence du test. |
 
 ### Synchronisation de données externes
 

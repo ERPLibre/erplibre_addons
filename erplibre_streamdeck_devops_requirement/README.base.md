@@ -11,11 +11,13 @@ The requirements of the ERPLibre Stream Deck — the deck programs, the GNOME
 extension ERPLibre Home, its installation, the games and the mobile plugin —
 as `devops.requirement` records, each with the repository tests that prove
 it. They come from the audit of the Stream Deck design specifications, row
-by row, and live here instead of in a document.
+by row, and from the design of the Odoo inventory, and live here instead of
+in a document.
 
 The module depends on `erplibre_streamdeck` and `erplibre_devops_requirement`,
 and adds no model, no view and no menu: the requirements show in the
-Requirements application, under ten domains whose code starts with `sd_`.
+Requirements application, under eleven domains whose code starts with
+`sd_`.
 
 ## What the data holds
 
@@ -58,6 +60,23 @@ Each requirement carries a stable code `SD-<DOMAIN>-R<row>`, for example
 `SD-DEFECTS-R02`. The data is loaded **once**: it is `noupdate`, so a
 requirement edited by hand keeps its edit when the module is updated.
 
+## The Inventory domain
+
+The domain *Inventory* (`sd_inv`, file `data/requirement_inventory.xml`)
+holds the requirements of the Odoo inventory of the workstations and their
+decks: one per decision, non-goal and anti-goal of its design, coded
+`SD-INV-R<nn>`. Its proofs are Odoo tests of `erplibre_streamdeck`, Node
+tests of the extension and unit tests of ERPLibre. A decision the code does
+not hold yet stays to do, stage *Develop*, and *What is missing* describes
+the gap.
+
+The test `tests/test_requirement_inventory.py` checks that each proof names
+a test that exists: an Odoo test is imported and must run under
+`--test-tags /<module>`; inside an ERPLibre checkout, a test of the
+extension or of ERPLibre must be in the committed tree of its repository
+(that check is skipped outside a checkout). Each test of the four inventory
+test files of `erplibre_streamdeck` proves at least one requirement.
+
 ## Proofs and verdicts
 
 A proof line is a `devops.requirement.test` whose reference names a test of
@@ -72,6 +91,11 @@ a repository:
 | Repository unit test | `erplibre`, `erplibre-home-gnome-extension`, `streamdeck_game` | `Class::method` | `erplibre:test/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two` |
 | Node test | `erplibre-home-gnome-extension` | the test name | `erplibre-home-gnome-extension:test/unit/deck-service.test.js::restart goes through the unit only when it exists` |
 | Long test | `erplibre` | the check name | `erplibre:long_test/install_erplibre_home.py::extension-indicators` |
+| Python test | an Odoo module | its dotted path | `odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_manager_reads_the_whole_fleet` |
+
+A Python test is an Odoo test, named by the dotted path of its method:
+`script/test/odoo_test_report.py --modules erplibre_streamdeck` of ERPLibre
+runs the module's tests on a throwaway database and pushes their verdicts.
 
 A test runner pushes its verdict with the reference alone, through
 `record_result_by_reference` of `erplibre_devops_requirement`, as a user of
@@ -85,11 +109,12 @@ Les requis du Stream Deck d'ERPLibre — les programmes du deck, l'extension
 GNOME ERPLibre Home, son installation, les jeux et le plugin mobile — en
 enregistrements `devops.requirement`, chacun avec les tests de dépôt qui le
 prouvent. Ils viennent de l'audit des spécifications de conception du Stream
-Deck, ligne par ligne, et vivent ici plutôt que dans un document.
+Deck, ligne par ligne, et de la conception de l'inventaire Odoo, et vivent ici
+plutôt que dans un document.
 
 Le module dépend de `erplibre_streamdeck` et de
 `erplibre_devops_requirement`, et n'ajoute aucun modèle, aucune vue ni aucun
-menu : les requis s'affichent dans l'application Requis, sous dix domaines
+menu : les requis s'affichent dans l'application Requis, sous onze domaines
 dont le code commence par `sd_`.
 
 ## Ce que portent les données
@@ -135,6 +160,23 @@ Chaque requis porte un code stable `SD-<DOMAINE>-R<ligne>`, par exemple
 `noupdate`, un requis retouché à la main garde donc sa retouche à la mise à
 jour du module.
 
+## Le domaine Inventaire
+
+Le domaine *Inventaire* (`sd_inv`, fichier `data/requirement_inventory.xml`)
+porte les requis de l'inventaire Odoo des postes et de leurs decks : un par
+décision, non-objectif et anti-objectif de sa conception, de code
+`SD-INV-R<nn>`. Ses preuves sont des tests Odoo d'`erplibre_streamdeck`, des
+tests Node de l'extension et des tests unitaires d'ERPLibre. Une décision que
+le code ne tient pas encore reste à faire, étape *Développement*, et *Ce qui
+manque* décrit l'écart.
+
+Le test `tests/test_requirement_inventory.py` vérifie que chaque preuve
+nomme un test qui existe : un test Odoo est importé et doit tourner sous
+`--test-tags /<module>` ; dans un checkout d'ERPLibre, un test de l'extension
+ou d'ERPLibre doit figurer dans l'arbre commité de son dépôt (ce contrôle est
+sauté hors d'un checkout). Chaque test des quatre fichiers de test de
+l'inventaire d'`erplibre_streamdeck` prouve au moins un requis.
+
 ## Preuves et verdicts
 
 Une ligne de preuve est un `devops.requirement.test` dont la référence nomme
@@ -149,6 +191,11 @@ un test d'un dépôt :
 | Test unitaire de dépôt | `erplibre`, `erplibre-home-gnome-extension`, `streamdeck_game` | `Classe::méthode` | `erplibre:test/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two` |
 | Test Node | `erplibre-home-gnome-extension` | le nom du test | `erplibre-home-gnome-extension:test/unit/deck-service.test.js::restart goes through the unit only when it exists` |
 | Test long | `erplibre` | le nom du contrôle | `erplibre:long_test/install_erplibre_home.py::extension-indicators` |
+| Test Python | un module Odoo | son chemin pointé | `odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_manager_reads_the_whole_fleet` |
+
+Un test Python est un test Odoo, nommé par le chemin pointé de sa méthode :
+`script/test/odoo_test_report.py --modules erplibre_streamdeck` d'ERPLibre
+lance les tests du module sur une base jetable et pousse leurs verdicts.
 
 Un lanceur de tests pousse son verdict avec la seule référence, par
 `record_result_by_reference` d'`erplibre_devops_requirement`, en tant
