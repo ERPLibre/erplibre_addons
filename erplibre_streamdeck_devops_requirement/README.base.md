@@ -141,8 +141,10 @@ the example above updates two requirements in one call.
 ## Translation
 
 The requirement names, descriptions and domain names are written in English
-and translate: `i18n/fr_CA.po` holds one term per text, and loading the
-French language translates the requirements.
+and ship in Canadian French: `i18n/fr_CA.po` holds the French of every one
+of them, so loading the French language (`fr_CA`) shows the requirements in
+French. *Achievement*, *What is missing* and *Notes* are not translated:
+they name files, tests and commands, which read the same in both languages.
 
 <!-- [fr] -->
 
@@ -152,5 +154,8 @@ l'exemple ci-dessus met deux requis à jour en un appel.
 ## Traduction
 
 Les noms et descriptions des requis et les noms des domaines sont écrits en
-anglais et se traduisent : `i18n/fr_CA.po` porte un terme par texte, et
-charger la langue française traduit les requis.
+anglais et livrés en français canadien : `i18n/fr_CA.po` porte le français
+de chacun d'eux, et charger la langue française (`fr_CA`) affiche donc les
+requis en français. *Réalisation*, *Ce qui manque* et *Notes* ne se
+traduisent pas : ils nomment fichiers, tests et commandes, qui se lisent de
+même dans les deux langues.
