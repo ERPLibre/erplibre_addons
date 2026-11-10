@@ -11,11 +11,17 @@
     "application": False,
     "depends": [
         "base",
+        "web",
     ],
     "data": [
         "security/streamdeck_security.xml",
         "security/ir.model.access.csv",
         "security/streamdeck_rules.xml",
+        "wizard/streamdeck_pairing_wizard_views.xml",
+        "views/streamdeck_workstation_views.xml",
+        "views/streamdeck_device_views.xml",
+        "views/streamdeck_event_views.xml",
+        "views/streamdeck_menus.xml",
     ],
     "installable": True,
 }

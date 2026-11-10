@@ -36,7 +36,7 @@ besoin sont listés dans `requirements.txt`.
 
 | Module | Description |
 |---|---|
-| `erplibre_streamdeck` | Base de l'inventaire des Stream Deck des employés. Ne contient encore aucun modèle ni aucun menu : seulement la catégorie Stream Deck et ses groupes Utilisateur et Gestionnaire ; tout utilisateur interne est utilisateur Stream Deck. |
+| `erplibre_streamdeck` | Inventaire des Stream Deck des employés : chaque poste qui fait tourner l'extension GNOME ERPLibre Home s'inscrit (code d'appairage, clé d'API ou mot de passe) et remonte ses decks, son service deck et leurs événements par des routes JSON authentifiées par un jeton de poste. Chaque employé lit ses postes et les decks qu'il a tenus ; le gestionnaire lit tout le parc. |
 | `erplibre_streamdeck_devops_requirement` | Les requis du Stream Deck d'ERPLibre (programmes du deck, extension GNOME ERPLibre Home, installation, jeux, plugin mobile) en données d'`erplibre_devops_requirement`, en anglais et en français canadien, chacun avec les tests de dépôt qui le prouvent ; un lanceur de tests pousse son verdict par la référence du test. |
 
 ### Synchronisation de données externes

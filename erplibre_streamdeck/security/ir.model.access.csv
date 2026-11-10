@@ -3,3 +3,4 @@ access_streamdeck_workstation_user,streamdeck.workstation user,model_streamdeck_
 access_streamdeck_device_user,streamdeck.device user,model_streamdeck_device,group_streamdeck_user,1,0,0,0
 access_streamdeck_event_user,streamdeck.event user,model_streamdeck_event,group_streamdeck_user,1,0,0,0
 access_streamdeck_pairing_code_none,streamdeck.pairing.code nobody,model_streamdeck_pairing_code,,0,0,0,0
+access_streamdeck_pairing_wizard_user,streamdeck.pairing.wizard user,model_streamdeck_pairing_wizard,group_streamdeck_user,1,1,1,0

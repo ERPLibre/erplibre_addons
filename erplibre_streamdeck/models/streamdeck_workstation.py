@@ -56,14 +56,15 @@ class StreamdeckWorkstation(models.Model):
     os_name = fields.Char(string="Operating system")
     os_version = fields.Char(string="Operating system version")
     gnome_shell = fields.Char(string="GNOME Shell version")
-    extension_version = fields.Char()
-    contract_version = fields.Char()
+    extension_version = fields.Char(string="Extension version")
+    contract_version = fields.Char(string="Contract version")
     erplibre_branch = fields.Char(string="ERPLibre branch")
     erplibre_commit = fields.Char(string="ERPLibre commit")
-    deck_program = fields.Char()
+    deck_program = fields.Char(string="Deck program")
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
-    last_report = fields.Datetime()
+    last_report = fields.Datetime(string="Last report")
     token_hash = fields.Char(
+        string="Token hash",
         groups="base.group_system",
         copy=False,
         index="btree_not_null",
@@ -76,8 +77,8 @@ class StreamdeckWorkstation(models.Model):
         string="Enrolled",
         help="The workstation holds a token that this database accepts.",
     )
-    token_created = fields.Datetime(copy=False)
-    token_last_used = fields.Datetime(copy=False)
+    token_created = fields.Datetime(string="Token created", copy=False)
+    token_last_used = fields.Datetime(string="Token last used", copy=False)
     lost_events_total = fields.Integer(
         string="Lost events",
         readonly=True,

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Seul le nom s'écrit à la main ; le reste vient des remontées du
+         poste. Le champ `active` ne figure qu'au gestionnaire : le client
+         web n'offre « Archiver » que s'il est dans la vue. -->
+    <record id="view_streamdeck_workstation_list" model="ir.ui.view">
+        <field name="name">streamdeck.workstation.list</field>
+        <field name="model">streamdeck.workstation</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not token_active">
+                <header>
+                    <button name="%(action_streamdeck_pairing_wizard)d"
+                            type="action"
+                            string="Add a workstation"
+                            class="btn-primary"
+                            display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="user_id" optional="show"/>
+                <field name="os_name" optional="hide"/>
+                <field name="os_version" optional="hide"/>
+                <field name="gnome_shell" optional="hide"/>
+                <field name="extension_version" optional="show"/>
+                <field name="deck_program" optional="hide"/>
+                <field name="service_state"
+                       widget="badge"
+                       decoration-success="service_state == 'active'"
+                       decoration-danger="service_state == 'failed'"
+                       decoration-warning="service_state == 'inactive'"
+                       optional="show"/>
+                <field name="last_report" optional="show"/>
+                <field name="token_active" optional="show"/>
+                <field name="lost_events_total" optional="hide"/>
+                <field name="active" column_invisible="True"
+                       groups="erplibre_streamdeck.group_streamdeck_manager"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_workstation_form" model="ir.ui.view">
+        <field name="name">streamdeck.workstation.form</field>
+        <field name="model">streamdeck.workstation</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false">
+                <header>
+                    <button name="action_revoke_token"
+                            type="object"
+                            string="Revoke the token"
+                            invisible="not token_active"
+                            confirm="The workstation will stop reporting until it is enrolled again. Revoke its token?"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"
+                            groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                    <field name="active" invisible="True"
+                           groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Workstation">
+                            <field name="user_id" readonly="True"
+                                   options="{'no_open': True}"/>
+                            <field name="os_name" readonly="True"/>
+                            <field name="os_version" readonly="True"/>
+                            <field name="gnome_shell" readonly="True"/>
+                            <field name="erplibre_branch" readonly="True"/>
+                            <field name="erplibre_commit" readonly="True"/>
+                        </group>
+                        <group string="Deck">
+                            <field name="extension_version" readonly="True"/>
+                            <field name="contract_version" readonly="True"/>
+                            <field name="deck_program" readonly="True"/>
+                            <field name="service_state" readonly="True"/>
+                        </group>
+                        <group string="Reports">
+                            <field name="token_active" readonly="True"/>
+                            <field name="token_created" readonly="True"/>
+                            <field name="token_last_used" readonly="True"/>
+                            <field name="last_report" readonly="True"/>
+                            <field name="lost_events_total" readonly="True"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Decks" name="decks">
+                            <field name="device_ids" readonly="True">
+                                <list>
+                                    <field name="model_name"/>
+                                    <field name="serial"/>
+                                    <field name="connected"/>
+                                    <field name="connected_since"/>
+                                    <field name="last_seen"/>
+                                    <field name="firmware" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Events" name="events">
+                            <field name="event_ids" readonly="True">
+                                <list>
+                                    <field name="at"/>
+                                    <field name="kind"/>
+                                    <field name="device_id"/>
+                                    <field name="service_state"/>
+                                    <field name="received_at" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_workstation_search" model="ir.ui.view">
+        <field name="name">streamdeck.workstation.search</field>
+        <field name="model">streamdeck.workstation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="device_ids" string="Deck serial number"
+                       filter_domain="[('device_ids.serial', 'ilike', self)]"/>
+                <filter name="enrolled" string="Enrolled"
+                        domain="[('token_active', '=', True)]"/>
+                <filter name="not_enrolled" string="Not enrolled"
+                        domain="[('token_active', '=', False)]"/>
+                <separator/>
+                <filter name="service_failed" string="Deck service failed"
+                        domain="[('service_state', '=', 'failed')]"/>
+                <separator/>
+                <filter name="archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_user" string="Employee"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter name="group_service_state" string="Deck service"
+                            context="{'group_by': 'service_state'}"/>
+                    <filter name="group_extension" string="Extension version"
+                            context="{'group_by': 'extension_version'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- « Mes postes » se borne à l'utilisateur courant, gestionnaire
+         compris ; « Parc › Postes » montre ce que les règles ouvrent. -->
+    <record id="action_streamdeck_my_workstations" model="ir.actions.act_window">
+        <field name="name">My workstations</field>
+        <field name="res_model">streamdeck.workstation</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No workstation reports to this database yet
+            </p>
+            <p>
+                Click Add a workstation to get a pairing code, then enroll
+                this database from the preferences of the ERPLibre Home
+                extension on the workstation.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_fleet_workstations" model="ir.actions.act_window">
+        <field name="name">Workstations</field>
+        <field name="res_model">streamdeck.workstation</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_user': 1}</field>
+    </record>
+
+</odoo>
