@@ -37,7 +37,7 @@ packages the modules need are listed in `requirements.txt`.
 | Module | Description |
 |---|---|
 | `erplibre_streamdeck` | Inventory of the employees' Stream Decks: each workstation running the GNOME extension ERPLibre Home enrolls (pairing code, API key or password) and reports its decks, its deck service and their events through JSON routes authenticated by a workstation token. Every employee reads their own workstations and the decks they have held; the manager reads the whole fleet. |
-| `erplibre_streamdeck_devops_requirement` | The requirements of the ERPLibre Stream Deck (deck programs, GNOME extension ERPLibre Home, installation, games, mobile plugin) as `erplibre_devops_requirement` data, in English and Canadian French, each with the repository tests that prove it; a test runner pushes its verdict by test reference. |
+| `erplibre_streamdeck_devops_requirement` | The requirements of the ERPLibre Stream Deck (deck programs, GNOME extension ERPLibre Home, installation, games, mobile plugin, Odoo inventory) as `erplibre_devops_requirement` data, in English and Canadian French, each with the repository tests that prove it; a test runner pushes its verdict by test reference. |
 
 ### External data synchronisation
 

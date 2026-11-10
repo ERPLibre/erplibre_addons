@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "ERPLibre Stream Deck DevOps Requirement",
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Project",
     "summary": (
         "Requirements of the ERPLibre Stream Deck, with the repository "
@@ -22,6 +22,7 @@
         "data/devops_requirement_category.xml",
         "data/devops_requirement.xml",
         "data/devops_requirement_test.xml",
+        "data/requirement_inventory.xml",
     ],
     "installable": True,
 }
