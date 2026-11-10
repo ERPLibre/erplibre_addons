@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record id="module_category_streamdeck" model="ir.module.category">
+        <field name="name">Stream Deck</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <!-- Le groupe de l'employé qui possède des postes et des decks. Il
+         n'accorde aucun droit par lui-même : les modèles et les règles
+         d'enregistrement qui s'y rattachent limitent chacun à ses propres
+         postes. -->
+    <record id="group_streamdeck_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_streamdeck"/>
+    </record>
+
+    <!-- Le gestionnaire voit le parc entier ; il reste utilisateur pour
+         ses propres postes. -->
+    <record id="group_streamdeck_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_streamdeck"/>
+        <field name="implied_ids" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="users" eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- Tout utilisateur interne est utilisateur Stream Deck : l'écriture
+         d'une implication ajoute aussi le groupe aux employés qui existent
+         déjà à l'installation. -->
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+    </record>
+
+</odoo>
