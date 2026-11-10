@@ -75,3 +75,13 @@ class TestStreamdeckI18n(TransactionCase):
             Workstation.fields_get(["user_id"])["user_id"]["string"],
             "Employé",
         )
+
+    def test_the_fingerprint_help_names_the_whole_key(self):
+        # The key is `<uid>|<url>|<db>` (README, protocol 1.0): the help
+        # shown on the field names its URL part, in English and French.
+        field = self.env["streamdeck.workstation"]._fields["fingerprint"]
+        self.assertIn("URL", field.help)
+        french = {
+            entry.msgid: entry.msgstr for entry in self._catalog("fr_CA.po")
+        }
+        self.assertIn("URL", french[field.help])

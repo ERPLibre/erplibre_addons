@@ -279,9 +279,9 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__fingerprint
 msgid ""
-"HMAC-SHA256 of the machine identifier, keyed by the Linux user and this "
-"database: the raw identifier never leaves the workstation, and two databases"
-" cannot match the same workstation."
+"HMAC-SHA256 of the machine identifier, keyed by the Linux user, the URL of "
+"this Odoo and this database: the raw identifier never leaves the "
+"workstation, and two Odoo destinations cannot match the same workstation."
 msgstr ""
 
 #. module: erplibre_streamdeck
