@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record id="module_category_devops_requirement" model="ir.module.category">
+        <field name="name">DevOps Requirements</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <!-- Le compte d'un lanceur de tests (script Selenium, suite
+         automatisée) : le groupe lit les requis, leur vocabulaire et leurs
+         lignes de test, et n'écrit un résultat que par `record_result`. Il
+         n'implique pas l'utilisateur interne, dont le droit d'écriture sur
+         les requis laisserait le compte du lanceur changer un code ou un
+         état. Un compte qui est AUSSI utilisateur interne garde les droits
+         de l'interne. -->
+    <record id="group_devops_requirement_runner" model="res.groups">
+        <field name="name">Requirement test runner</field>
+        <field name="category_id" ref="module_category_devops_requirement"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_devops_guide_user,devops.guide read,model_devops_guide,base.group_user,1,0,0,0
+access_devops_guide_system,devops.guide manage,model_devops_guide,base.group_system,1,1,1,1
+access_devops_guide_section_user,devops.guide.section read,model_devops_guide_section,base.group_user,1,0,0,0
+access_devops_guide_section_system,devops.guide.section manage,model_devops_guide_section,base.group_system,1,1,1,1
+access_devops_guide_card_user,devops.guide.card read,model_devops_guide_card,base.group_user,1,0,0,0
+access_devops_guide_card_system,devops.guide.card manage,model_devops_guide_card,base.group_system,1,1,1,1
+access_devops_guide_stat_user,devops.guide.stat read,model_devops_guide_stat,base.group_user,1,0,0,0
+access_devops_guide_stat_system,devops.guide.stat manage,model_devops_guide_stat,base.group_system,1,1,1,1

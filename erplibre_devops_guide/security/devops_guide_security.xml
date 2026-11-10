@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- `groups_id` d'une carte est un contrôle d'accès : la règle filtre la
+         carte partout où elle se lit — la page, l'onglet Guide du requis,
+         un appel RPC. `user.groups_id` porte aussi les groupes impliqués :
+         un membre d'un groupe qui implique celui de la carte la voit.
+         Les règles de groupes différents s'additionnent : l'administrateur
+         lit toutes les cartes, pour les éditer. -->
+    <record id="rule_devops_guide_card_user" model="ir.rule">
+        <field name="name">Guide card: restricted to its groups</field>
+        <field name="model_id" ref="model_devops_guide_card"/>
+        <field name="groups" eval="[Command.link(ref('base.group_user'))]"/>
+        <field name="domain_force">['|', ('groups_id', '=', False), ('groups_id', 'in', user.groups_id.ids)]</field>
+    </record>
+
+    <record id="rule_devops_guide_card_system" model="ir.rule">
+        <field name="name">Guide card: all cards for administrators</field>
+        <field name="model_id" ref="model_devops_guide_card"/>
+        <field name="groups" eval="[Command.link(ref('base.group_system'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+</odoo>
