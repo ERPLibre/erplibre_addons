@@ -77,5 +77,8 @@ l'exemple ci-dessus met deux requis à jour en un appel.
 ## Traduction
 
 Les noms et descriptions des requis et les noms des domaines sont écrits en
-anglais et se traduisent : `i18n/fr_CA.po` porte un terme par texte, et
-charger la langue française traduit les requis.
+anglais et livrés en français canadien : `i18n/fr_CA.po` porte le français
+de chacun d'eux, et charger la langue française (`fr_CA`) affiche donc les
+requis en français. *Réalisation*, *Ce qui manque* et *Notes* ne se
+traduisent pas : ils nomment fichiers, tests et commandes, qui se lisent de
+même dans les deux langues.

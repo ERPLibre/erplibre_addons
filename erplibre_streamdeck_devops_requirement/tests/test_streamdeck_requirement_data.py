@@ -45,6 +45,17 @@ AUDIT_ALIAS = re.compile(r"\bM[:/](?=[\w-]+[./])|\bJ/|\bEXT/|plain-clone-\d")
 FIRST_PERSON = re.compile(r"(?<![\w/])I(?![\w/'’-])")
 TEXT_FIELDS = ("name", "description", "achievement", "missing", "notes")
 
+# Un requis et un domaine lus en fr_CA : le nom du requis porte chevrons,
+# accolades et guillemets, qui traversent aussi le fichier .po.
+FRENCH = {
+    "SD-GREPO-R14": (
+        "CONTRACT.md, galerie : GET /launch/<id> répond 2xx quand le jeu "
+        'démarre, sinon {"error": ligne} avec 403 quand les jeux sont '
+        "désactivés et 404 pour un id inconnu"
+    ),
+    "sd_deploy": "Déploiement d'ERPLibre Home",
+}
+
 
 @tagged("post_install", "-at_install")
 class TestStreamdeckRequirementData(TransactionCase):
@@ -268,3 +279,24 @@ class TestStreamdeckRequirementData(TransactionCase):
                 for path, _line in entry.occurrences
             )
         ]
+
+    def test_requirements_read_in_fr_CA(self):
+        entries = self._french_entries()
+        self.assertTrue(entries)
+        self.assertFalse(
+            [entry.msgid for entry in entries if not entry.msgstr],
+            "every data term has its French",
+        )
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(
+            [MODULE], ["fr_CA"], overwrite=True
+        )
+        requirement = self._requirement("SD-GREPO-R14")
+        category = self.categories.filtered(lambda c: c.code == "sd_deploy")
+        for record, french in (
+            (requirement, FRENCH["SD-GREPO-R14"]),
+            (category, FRENCH["sd_deploy"]),
+        ):
+            name = record.with_context(lang="fr_CA").name
+            self.assertEqual(name, french)
+            self.assertNotEqual(name, record.with_context(lang="en_US").name)
