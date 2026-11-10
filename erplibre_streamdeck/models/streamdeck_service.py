@@ -48,6 +48,8 @@ MAX_TEXT = 256
 MAX_SECRET = 4096
 MAX_DECKS = 128
 MAX_EVENTS = 10000
+# The largest value of an Integer field, a PostgreSQL `integer` column.
+MAX_COUNT = 2**31 - 1
 
 ENROLL_METHODS = ("pairing_code", "api_key", "password")
 EVENT_KINDS = ("plugged", "unplugged", "service_changed")
@@ -83,7 +85,9 @@ def _bad():
 def _text(obj, key, required=False, bound=MAX_TEXT):
     """The string at `obj[key]`, or None when absent or null; an empty
     string counts as absent. Raises a 400 when the value is not a string,
-    is longer than `bound`, or is required and absent."""
+    is longer than `bound`, is required and absent, or cannot reach
+    PostgreSQL: a NUL character or a lone surrogate, which JSON carries
+    as `\\u0000` or `\\ud800`, would fail in the database driver."""
     value = obj.get(key)
     if value is None or value == "":
         if required:
@@ -91,6 +95,12 @@ def _text(obj, key, required=False, bound=MAX_TEXT):
         return None
     if not isinstance(value, str) or len(value) > bound:
         raise _bad()
+    if "\x00" in value:
+        raise _bad()
+    try:
+        value.encode()
+    except UnicodeEncodeError as error:
+        raise _bad() from error
     return value
 
 
@@ -225,7 +235,9 @@ def _parse_report(payload):
     state, decks = _parse_state(_dict(payload, "state"))
     events = [_parse_event(e) for e in _list(payload, "events", MAX_EVENTS)]
     lost = payload.get("lost_events")
-    if not isinstance(lost, int) or isinstance(lost, bool) or lost < 0:
+    if not isinstance(lost, int) or isinstance(lost, bool):
+        raise _bad()
+    if not 0 <= lost <= MAX_COUNT:
         raise _bad()
     return state, decks, events, lost
 
