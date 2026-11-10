@@ -22,6 +22,11 @@ class DevopsRequirementTest(models.Model):
     Selenium, visite guidée, suite Python) n'y écrit que son résultat, par
     `record_result`. Le triplet (requis, sorte, référence) identifie la
     ligne : c'est la clé qu'un lanceur connaît sans lire la base.
+
+    Un lanceur de dépôt ne connaît que (sorte, référence) : il écrit par
+    `record_result_by_reference`, et le lien vers les requis reste dans la
+    base. Les deux méthodes partagent le contrôle d'accès, la validation du
+    résultat et la troncature du journal.
     """
 
     _name = "devops.requirement.test"
@@ -43,6 +48,9 @@ class DevopsRequirementTest(models.Model):
             ("tour", "Guided tour"),
             ("selenium", "Selenium script"),
             ("manual", "Manual check"),
+            ("repo_unittest", "Repository unit test"),
+            ("node_test", "Node test"),
+            ("long_test", "Long test"),
         ],
         string="Kind",
         required=True,
@@ -53,7 +61,10 @@ class DevopsRequirementTest(models.Model):
         help=(
             "Guided tour: the tour name. Python test: the dotted path of the "
             "test method. Selenium script: the script path, relative to the "
-            "repository. Manual check: free text."
+            "repository. Manual check: free text. Repository unit test, "
+            "Node test, Long test: <repository>:<path>::<test id>, where the "
+            "test id is Class::method for a unit test and the test name for "
+            "a Node test."
         ),
     )
     last_result = fields.Selection(
@@ -109,14 +120,7 @@ class DevopsRequirementTest(models.Model):
         `log` est tronqué à LOG_MAX_LENGTH caractères, fin conservée ;
         `duration` est en secondes.
         """
-        if not (
-            self.env.is_superuser()
-            or self.env.user.has_group(RUNNER_GROUP)
-            or self.env.user.has_group("base.group_system")
-        ):
-            raise AccessError(
-                _("Only a requirement test runner can record a test result.")
-            )
+        self._check_result_recorder()
         # Un code vide se lirait `code IS NULL` et désignerait le premier
         # requis sans code : le verdict tomberait sur un requis que
         # personne n'a nommé. Même garde pour la sorte et la référence.
@@ -129,15 +133,7 @@ class DevopsRequirementTest(models.Model):
                 reference,
             )
             return False
-        results = dict(self._fields["last_result"].selection)
-        if result not in results:
-            raise ValidationError(
-                _(
-                    "Unknown test result %(result)r, expected: %(expected)s.",
-                    result=result,
-                    expected=", ".join(results),
-                )
-            )
+        self._check_result_value(result)
         requirement = (
             self.env["devops.requirement"]
             .sudo()
@@ -164,17 +160,95 @@ class DevopsRequirementTest(models.Model):
                 reference,
             )
             return False
+        line.write(self._result_values(result, log, duration))
+        return True
+
+    @api.model
+    def record_result_by_reference(
+        self, kind, reference, result, log=None, duration=None
+    ):
+        """Écrit un verdict sur toutes les lignes (`kind`, `reference`).
+
+        Point d'écriture d'un lanceur de dépôt, qui connaît son test mais
+        aucun code de requis : un même test peut prouver plusieurs requis,
+        et chaque ligne qui le déclare reçoit le verdict. Rend le nombre de
+        lignes mises à jour ; 0, avec un avertissement au journal, quand
+        `kind` ou `reference` est vide ou qu'aucune ligne ne les porte. Ne
+        crée rien.
+
+        Mêmes droits que `record_result` (AccessError), même validation de
+        `result` (ValidationError), même troncature de `log` ; `duration`
+        est en secondes. L'écriture passe en sudo, bornée aux champs
+        `last_*`.
+        """
+        self._check_result_recorder()
+        # Les deux colonnes sont requises : une sorte ou une référence vide
+        # ne désigne aucune ligne, et trahit une erreur du lanceur que
+        # l'avertissement signale comme une référence inconnue.
+        if not (kind and reference):
+            _logger.warning(
+                "Requirement test result ignored: empty kind or reference "
+                "(%r, %r)",
+                kind,
+                reference,
+            )
+            return 0
+        self._check_result_value(result)
+        lines = self.sudo().search(
+            [("kind", "=", kind), ("reference", "=", reference)]
+        )
+        if not lines:
+            _logger.warning(
+                "Requirement test result ignored: no %s test %r is declared",
+                kind,
+                reference,
+            )
+            return 0
+        lines.write(self._result_values(result, log, duration))
+        return len(lines)
+
+    @api.model
+    def _check_result_recorder(self):
+        # Seuls un lanceur, un administrateur et le superutilisateur écrivent
+        # un verdict ; les deux points d'écriture passent par ce contrôle.
+        if not (
+            self.env.is_superuser()
+            or self.env.user.has_group(RUNNER_GROUP)
+            or self.env.user.has_group("base.group_system")
+        ):
+            raise AccessError(
+                _("Only a requirement test runner can record a test result.")
+            )
+
+    @api.model
+    def _check_result_value(self, result):
+        # Lève ValidationError si `result` n'est pas une valeur de
+        # `last_result`, en listant les valeurs admises.
+        results = dict(self._fields["last_result"].selection)
+        if result not in results:
+            raise ValidationError(
+                _(
+                    "Unknown test result %(result)r, expected: %(expected)s.",
+                    result=result,
+                    expected=", ".join(results),
+                )
+            )
+
+    @api.model
+    def _result_values(self, result, log, duration):
+        """Rend les valeurs `last_*` d'un verdict, prêtes pour `write`.
+
+        `log` est tronqué à LOG_MAX_LENGTH caractères, fin conservée ;
+        `duration` est en secondes, 0 quand elle manque.
+        """
         if log and len(log) > LOG_MAX_LENGTH:
             keep = LOG_MAX_LENGTH - len(LOG_TRUNCATED_MARK)
             log = LOG_TRUNCATED_MARK + log[-keep:]
-        line.write(
-            {
-                "last_result": result,
-                "last_run": fields.Datetime.now(),
-                "last_duration": float(duration or 0.0),
-                # Un appel sans journal efface celui du lancement précédent :
-                # garder l'ancien le ferait passer pour celui-ci.
-                "last_log": log or False,
-            }
-        )
-        return True
+        return {
+            "last_result": result,
+            "last_run": fields.Datetime.now(),
+            "last_duration": float(duration or 0.0),
+            # Un appel sans journal efface celui du lancement précédent :
+            # garder l'ancien le ferait passer pour celui-ci.
+            "last_log": log or False,
+        }

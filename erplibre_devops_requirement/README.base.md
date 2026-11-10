@@ -75,6 +75,9 @@ A test line is declared in data, by the project. Its `kind` tells what its
 | `python` | the dotted path of the test method |
 | `selenium` | the path of the script, relative to the repository |
 | `manual` | free text |
+| `repo_unittest` | a unit test of a repository: `<repository>:<path>::<Class>::<method>` |
+| `node_test` | a `node --test` test of a repository: `<repository>:<path>::<test name>` |
+| `long_test` | a long test of a repository, same form |
 
 `test_state`, stored on the requirement, sums up its lines by the worst
 result: no test → `none`; a failure or an error → `failed`; otherwise a test
@@ -155,6 +158,9 @@ désigne sa `reference` :
 | `python` | le chemin pointé de la méthode de test |
 | `selenium` | le chemin du script, relatif au dépôt |
 | `manual` | un texte libre |
+| `repo_unittest` | un test unitaire d'un dépôt : `<dépôt>:<chemin>::<Classe>::<méthode>` |
+| `node_test` | un test `node --test` d'un dépôt : `<dépôt>:<chemin>::<nom du test>` |
+| `long_test` | un test long d'un dépôt, même forme |
 
 `test_state`, stocké sur le requis, résume ses lignes par le pire résultat :
 aucun test → `none` ; un échec ou une erreur → `failed` ; sinon un test jamais
@@ -183,6 +189,54 @@ models.execute_kw(
 characters, the end kept — it is the end that carries the failing assertion.
 Only the `last_*` fields are written.
 
+### Verdict by reference
+
+A repository test runner — ERPLibre's unit tests, the `node --test` suite of
+an extension, the long tests — knows its test and none of the requirements it
+proves: the link lives in the database only. It writes through
+`record_result_by_reference`, with the `kind` and the `reference` alone:
+
+<!-- [fr] -->
+
+`record_result` **ne crée rien** : un requis ou une ligne inconnus rendent
+`False` et laissent un avertissement au journal. Un résultat hors de
+`not_run`, `passed`, `failed`, `error`, `skipped` est refusé. Le journal est
+tronqué à 20 000 caractères, la fin conservée — c'est elle qui porte
+l'assertion en échec. Seuls les champs `last_*` sont écrits.
+
+### Verdict par référence
+
+Un lanceur de tests de dépôt — les tests unitaires d'ERPLibre, la suite
+`node --test` d'une extension, les tests longs — connaît son test et aucun des
+requis qu'il prouve : le lien ne vit que dans la base. Il écrit par
+`record_result_by_reference`, avec la seule `kind` et la seule `reference` :
+
+<!-- [common] -->
+
+```python
+models.execute_kw(
+    db, uid, password,
+    "devops.requirement.test", "record_result_by_reference",
+    ["repo_unittest", "erplibre:test/test_inventory.py::TestStock::test_count",
+     "passed"],
+    {"log": output, "duration": 0.8},
+)
+```
+
+<!-- [en] -->
+
+The verdict goes to **every** line that carries this `kind` and this
+`reference`, whatever their requirement: one test that proves several
+requirements updates them all in one call. The method returns the number of
+lines updated; `0`, with a warning in the log, when the `kind` or the
+`reference` is empty or when no line declares them. It creates nothing, and
+shares with `record_result` its rights, the validation of the result and the
+truncation of the log.
+
+A repository reference reads `<repository>:<path>::<test id>`: the
+repository by its name, the path of the test file relative to it, then
+`Class::method` for a unit test or the test name for a Node test.
+
 ## Rights
 
 | Model | Internal user | Test runner | Configuration |
@@ -191,7 +245,7 @@ Only the `last_*` fields are written.
 | `devops.requirement.category` | read | read | all |
 | `devops.requirement.phase` | read | read | all |
 | `devops.requirement.threat` | read | — | all |
-| `devops.requirement.test` | read | read, result through `record_result` | all |
+| `devops.requirement.test` | read | read, result through `record_result` and `record_result_by_reference` | all |
 
 The vocabulary is read-only for the user: its `code` carries counts, and a
 typo there costs more than a badly filled field on a requirement.
@@ -219,11 +273,17 @@ A project module declares the dependency, then its records:
 
 <!-- [fr] -->
 
-`record_result` **ne crée rien** : un requis ou une ligne inconnus rendent
-`False` et laissent un avertissement au journal. Un résultat hors de
-`not_run`, `passed`, `failed`, `error`, `skipped` est refusé. Le journal est
-tronqué à 20 000 caractères, la fin conservée — c'est elle qui porte
-l'assertion en échec. Seuls les champs `last_*` sont écrits.
+Le verdict va sur **toutes** les lignes qui portent cette `kind` et cette
+`reference`, quel que soit leur requis : un test qui prouve plusieurs requis
+les met tous à jour d'un seul appel. La méthode rend le nombre de lignes mises
+à jour ; `0`, avec un avertissement au journal, quand la `kind` ou la
+`reference` est vide ou qu'aucune ligne ne les déclare. Elle ne crée rien, et
+partage avec `record_result` ses droits, la validation du résultat et la
+troncature du journal.
+
+Une référence de dépôt se lit `<dépôt>:<chemin>::<identifiant du test>` : le
+dépôt par son nom, le chemin du fichier de test relatif à lui, puis
+`Classe::méthode` pour un test unitaire ou le nom du test pour un test Node.
 
 ## Droits
 
@@ -233,7 +293,7 @@ l'assertion en échec. Seuls les champs `last_*` sont écrits.
 | `devops.requirement.category` | lire | lire | tout |
 | `devops.requirement.phase` | lire | lire | tout |
 | `devops.requirement.threat` | lire | — | tout |
-| `devops.requirement.test` | lire | lire, résultat par `record_result` | tout |
+| `devops.requirement.test` | lire | lire, résultat par `record_result` et `record_result_by_reference` | tout |
 
 Le vocabulaire est en lecture seule pour l'utilisateur : son `code` porte des
 décomptes, et une faute de frappe y coûte plus qu'un champ mal rempli sur un
