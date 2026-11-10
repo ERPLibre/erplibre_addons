@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <menuitem id="menu_devops_guide"
+              name="Guides"
+              parent="erplibre_devops_requirement.menu_devops_requirement_config"
+              action="action_devops_guide"
+              sequence="10"/>
+
+</odoo>
