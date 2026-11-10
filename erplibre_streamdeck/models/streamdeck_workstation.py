@@ -47,9 +47,9 @@ class StreamdeckWorkstation(models.Model):
         required=True,
         help=(
             "HMAC-SHA256 of the machine identifier, keyed by the Linux"
-            " user and this database: the raw identifier never leaves the"
-            " workstation, and two databases cannot match the same"
-            " workstation."
+            " user, the URL of this Odoo and this database: the raw"
+            " identifier never leaves the workstation, and two Odoo"
+            " destinations cannot match the same workstation."
         ),
     )
     active = fields.Boolean(default=True)
