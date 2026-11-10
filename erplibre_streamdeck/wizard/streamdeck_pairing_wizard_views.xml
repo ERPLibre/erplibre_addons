@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record id="view_streamdeck_pairing_wizard_form" model="ir.ui.view">
+        <field name="name">streamdeck.pairing.wizard.form</field>
+        <field name="model">streamdeck.pairing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add a workstation">
+                <p>
+                    On the workstation, open the preferences of the ERPLibre
+                    Home extension, page Odoo inventory, and enroll this
+                    database with the method Pairing code. The code works
+                    once, until the time below.
+                </p>
+                <h1 class="text-center font-monospace">
+                    <field name="code"/>
+                </h1>
+                <group>
+                    <field name="expires_at"/>
+                </group>
+                <footer>
+                    <button string="Close" special="cancel" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Le bouton « Ajouter un poste » passe par cette action serveur :
+         chaque clic crée un assistant, donc tire un code neuf, au nom de
+         l'utilisateur qui clique. -->
+    <record id="action_streamdeck_pairing_wizard" model="ir.actions.server">
+        <field name="name">Add a workstation</field>
+        <field name="model_id" ref="model_streamdeck_pairing_wizard"/>
+        <field name="groups_id" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open()</field>
+    </record>
+
+</odoo>

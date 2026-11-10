@@ -25,7 +25,7 @@ class StreamdeckPairingCode(models.Model):
         index=True,
         ondelete="cascade",
     )
-    expires_at = fields.Datetime(required=True)
+    expires_at = fields.Datetime(string="Expires at", required=True)
     used = fields.Boolean()
 
     _sql_constraints = [

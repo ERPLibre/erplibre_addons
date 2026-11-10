@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <menuitem id="menu_streamdeck_root"
+              name="Stream Deck"
+              web_icon="erplibre_streamdeck,static/description/icon.png"
+              groups="group_streamdeck_user"
+              sequence="60"/>
+
+    <menuitem id="menu_streamdeck_my_workstations"
+              name="My workstations"
+              parent="menu_streamdeck_root"
+              action="action_streamdeck_my_workstations"
+              sequence="10"/>
+
+    <menuitem id="menu_streamdeck_my_decks"
+              name="My decks"
+              parent="menu_streamdeck_root"
+              action="action_streamdeck_my_decks"
+              sequence="20"/>
+
+    <menuitem id="menu_streamdeck_fleet"
+              name="Fleet"
+              parent="menu_streamdeck_root"
+              groups="group_streamdeck_manager"
+              sequence="30"/>
+
+    <menuitem id="menu_streamdeck_fleet_workstations"
+              name="Workstations"
+              parent="menu_streamdeck_fleet"
+              action="action_streamdeck_fleet_workstations"
+              sequence="10"/>
+
+    <menuitem id="menu_streamdeck_fleet_decks"
+              name="Decks"
+              parent="menu_streamdeck_fleet"
+              action="action_streamdeck_fleet_decks"
+              sequence="20"/>
+
+    <menuitem id="menu_streamdeck_fleet_events"
+              name="Events"
+              parent="menu_streamdeck_fleet"
+              action="action_streamdeck_fleet_events"
+              sequence="30"/>
+
+</odoo>

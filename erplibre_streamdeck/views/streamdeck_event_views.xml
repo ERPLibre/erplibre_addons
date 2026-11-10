@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Le poste et l'employé d'un événement s'affichent par leur copie
+         sur l'événement : un employé lit l'historique d'un deck prêté sans
+         lire le poste où il se trouve. -->
+    <record id="view_streamdeck_event_list" model="ir.ui.view">
+        <field name="name">streamdeck.event.list</field>
+        <field name="model">streamdeck.event</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false">
+                <field name="at"/>
+                <field name="kind"/>
+                <field name="device_id"/>
+                <field name="workstation_name"/>
+                <field name="employee_name"/>
+                <field name="service_state" optional="show"/>
+                <field name="received_at" optional="hide"/>
+                <field name="uuid" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_event_form" model="ir.ui.view">
+        <field name="name">streamdeck.event.form</field>
+        <field name="model">streamdeck.event</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kind" readonly="True"/>
+                            <field name="at" readonly="True"/>
+                            <field name="received_at" readonly="True"/>
+                            <field name="service_state" readonly="True"
+                                   invisible="kind != 'service_changed'"/>
+                        </group>
+                        <group>
+                            <field name="device_id" readonly="True"/>
+                            <field name="workstation_name" readonly="True"/>
+                            <field name="employee_name" readonly="True"/>
+                            <field name="uuid" readonly="True"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_event_search" model="ir.ui.view">
+        <field name="name">streamdeck.event.search</field>
+        <field name="model">streamdeck.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="device_id"/>
+                <field name="workstation_name"/>
+                <field name="employee_name"/>
+                <filter name="plugged" string="Plugged"
+                        domain="[('kind', '=', 'plugged')]"/>
+                <filter name="unplugged" string="Unplugged"
+                        domain="[('kind', '=', 'unplugged')]"/>
+                <filter name="service_changed" string="Service changed"
+                        domain="[('kind', '=', 'service_changed')]"/>
+                <separator/>
+                <filter name="filter_at" string="Time" date="at"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_kind" string="Kind"
+                            context="{'group_by': 'kind'}"/>
+                    <filter name="group_device" string="Deck"
+                            context="{'group_by': 'device_id'}"/>
+                    <filter name="group_employee" string="Employee"
+                            context="{'group_by': 'employee_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_fleet_events" model="ir.actions.act_window">
+        <field name="name">Events</field>
+        <field name="res_model">streamdeck.event</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
