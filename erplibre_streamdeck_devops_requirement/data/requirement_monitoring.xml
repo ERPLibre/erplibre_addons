@@ -136,7 +136,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">streamdeck.monitor._resolve never closes a moved activity; streamdeck.monitor._open, for moved, posts the note that names the former and the new workstation to the deck's thread when an activity of that type is open on the deck, whoever it is assigned to.</field>
+        <field name="achievement">streamdeck.monitor._resolve never closes a moved activity: a person closes it, or archives the user it is assigned to; streamdeck.monitor._open, for moved, posts the note that names the former and the new workstation to the deck's thread when an activity of that type is open on the deck, whoever it is assigned to.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_mon_r10" model="devops.requirement">
@@ -307,7 +307,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">streamdeck.monitor._watched_domain (active, with a token) bounds every watch of the cron; streamdeck.workstation._end_monitoring of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_workstation.py, called by write, toggle_active and action_revoke_token, closes the silent and service_failed activities of the workstation and the unplugged ones of its decks and clears silent_since; moved activities stay for a person, and the silent event stays in the history.</field>
+        <field name="achievement">streamdeck.monitor._watched_domain (active, with a token) bounds every watch of the cron; streamdeck.workstation._end_monitoring of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_workstation.py, called by write, toggle_active and action_revoke_token, closes the silent and service_failed activities of the workstation and the unplugged ones of its decks and clears silent_since; moved activities stay for a person, and the silent event stays in the history. res.users write and action_archive of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_users.py archive the workstations of a departing user before Odoo deletes the open activities of an archived user, then close the ones still assigned to that user with "the assigned user is archived".</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_mon_r22" model="devops.requirement">
@@ -720,6 +720,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_second_move_adds_a_note_whoever_the_activity_went_to</field>
     </record>
+    <record id="test_sd_mon_r09_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r09" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_archiving_users_from_the_ui_closes_their_activities</field>
+    </record>
     <record id="test_sd_mon_r10_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r10" />
         <field name="sequence" eval="10" />
@@ -989,6 +995,12 @@
         <field name="sequence" eval="50" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_workstation_no_longer_watched_opens_no_failed_or_unplugged</field>
+    </record>
+    <record id="test_sd_mon_r21_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r21" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_archiving_users_from_the_ui_closes_their_activities</field>
     </record>
     <record id="test_sd_mon_r22_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r22" />
