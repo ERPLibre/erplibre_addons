@@ -3,9 +3,11 @@
 from datetime import datetime
 
 from freezegun import freeze_time
+from lxml import etree
 
 from odoo.exceptions import AccessError
 from odoo.tests.common import TransactionCase, new_test_user, tagged
+from odoo.tools.safe_eval import safe_eval
 
 MANAGER_GROUP = "erplibre_streamdeck.group_streamdeck_manager"
 
@@ -234,6 +236,84 @@ class TestStreamdeckHolding(TransactionCase):
             with self.subTest(kind=event.kind, at=event.at):
                 with self.assertRaises(AccessError):
                     event.with_user(self.user_c).read(["kind"])
+
+    def _web_spec(self, user, view_type):
+        """Les champs que le client web demande pour la vue `view_type`
+        des événements, telle que `user` la reçoit : un many2one avec son
+        nom affiché, tout autre champ seul."""
+        Event = self.Event.with_user(user)
+        views = Event.get_views([(False, view_type)])["views"]
+        spec = {}
+        for node in etree.fromstring(views[view_type]["arch"]).iter("field"):
+            name = node.get("name")
+            many2one = Event._fields[name].type == "many2one"
+            spec[name] = {"fields": {"display_name": {}}} if many2one else {}
+        return spec
+
+    def test_an_event_about_a_deck_held_elsewhere_opens_not_its_record(self):
+        # C envoie un événement portant le numéro de série du deck que B
+        # a pris à A, sans le déclarer dans son état : C ne lit ni ne
+        # trouve la fiche du deck, « Mes decks » compris. Il lit son
+        # propre événement et le nom du deck qu'il porte, dans la liste,
+        # le formulaire et le regroupement par deck. A, le prêteur, B, le
+        # détenteur, et M lisent la fiche comme avant.
+        self._lend_to_b()
+        self._report(self.token_c, DAY_BACK, kinds=["plugged"], decks=False)
+        device = self._device()
+        self.assertEqual(device.workstation_id.user_id, self.user_b)
+        my_decks = self.env.ref(
+            "erplibre_streamdeck.action_streamdeck_my_decks"
+        )
+        for user, reads in (
+            (self.user_a, True),
+            (self.user_b, True),
+            (self.manager, True),
+            (self.user_c, False),
+        ):
+            with self.subTest(user=user.name):
+                self.env.invalidate_all()
+                Device = self.Device.with_user(user)
+                expected = device if reads else self.Device
+                self.assertEqual(
+                    Device.search([("id", "=", device.id)]), expected
+                )
+                if user != self.manager:
+                    domain = safe_eval(my_decks.domain, {"uid": user.id})
+                    self.assertEqual(Device.search(domain), expected)
+                if reads:
+                    self.assertEqual(
+                        device.with_user(user).read(["serial"])[0]["serial"],
+                        "SN-HOLD",
+                    )
+                else:
+                    with self.assertRaises(AccessError):
+                        device.with_user(user).read(["serial"])
+        at_c = device.event_ids.filtered(
+            lambda e: e.workstation_id.user_id == self.user_c
+        )
+        self.assertEqual(len(at_c), 1)
+        self.env.invalidate_all()
+        Event = self.Event.with_user(self.user_c)
+        on_deck = [("device_id", "=", device.id)]
+        shown = {"id": device.id, "display_name": device.display_name}
+        self.assertEqual(
+            at_c.with_user(self.user_c).read(["device_id"])[0]["device_id"],
+            (device.id, device.display_name),
+        )
+        listed = Event.web_search_read(
+            on_deck, self._web_spec(self.user_c, "list")
+        )
+        self.assertEqual([row["id"] for row in listed["records"]], at_c.ids)
+        self.assertEqual(listed["records"][0]["device_id"], shown)
+        form = at_c.with_user(self.user_c).web_read(
+            self._web_spec(self.user_c, "form")
+        )
+        self.assertEqual(form[0]["device_id"], shown)
+        groups = Event.web_read_group(on_deck, ["device_id"], ["device_id"])
+        self.assertEqual(
+            [group["device_id"] for group in groups["groups"]],
+            [(device.id, device.display_name)],
+        )
 
     def test_a_late_lender_event_dated_before_the_move_stays_hidden(self):
         # A remonte après le déplacement un événement qu'il a gardé hors

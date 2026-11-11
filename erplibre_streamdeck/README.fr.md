@@ -71,9 +71,10 @@ deck revient après un prêt. Le prêteur lit donc toujours le deck et tout
 son historique depuis sa première détention, y compris les événements
 survenus à l'autre poste : chaque événement porte une copie du nom de son
 poste et de son employé, si bien que le prêteur n'a pas besoin de la fiche
-de l'autre poste, et ne la reçoit pas. L'emprunteur, ou un poste qui
-déclare le numéro de série d'un autre deck, ne lit rien d'avant son
-arrivée.
+de l'autre poste, et ne la reçoit pas. L'emprunteur ne lit rien d'avant
+son arrivée. Un poste qui envoie seulement un événement portant le numéro
+de série d'un deck tenu ailleurs lit cet événement et le nom du deck qu'il
+porte, jamais la fiche du deck ni son historique.
 
 Quand un poste remonte un deck que tient un autre poste, le deck passe à ce
 poste sans confirmation, et Odoo ajoute un événement *Changé de poste*

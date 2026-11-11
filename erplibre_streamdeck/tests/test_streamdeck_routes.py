@@ -468,18 +468,14 @@ class TestStreamdeckPairingWizard(TransactionCase):
                 ("SN-MOVED", ws_a),
             )
         )
-        # Le deck déplacé a été branché sur le poste du gestionnaire avant
-        # de passer sur celui de l'employé A.
-        self.env["streamdeck.event"].create(
+        # Le deck déplacé a été détenu par le poste du gestionnaire avant
+        # de passer sur celui de l'employé A : la détention que le service
+        # pose à la création du deck chez le gestionnaire.
+        self.env["streamdeck.device.holding"].create(
             {
-                "uuid": "00000000-0000-4000-8000-000000000001",
-                "kind": "plugged",
-                "at": "2026-01-01 10:00:00",
-                "received_at": "2026-01-01 10:00:01",
                 "device_id": deck_moved.id,
-                "workstation_id": ws_m.id,
-                "workstation_name": ws_m.name,
-                "employee_name": self.manager.name,
+                "user_id": self.manager.id,
+                "since": "2026-01-01 10:00:00",
             }
         )
         my_workstations = (

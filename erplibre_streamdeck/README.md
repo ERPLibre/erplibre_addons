@@ -67,8 +67,10 @@ back after a loan. The lender therefore still reads the deck and its whole
 history from their first holding on, the events at the other workstation
 included: each event carries a copy of the name of its workstation and of
 its employee, so the lender never needs, nor gets, the other workstation's
-record. The borrower, or a workstation that reports the serial number of
-another deck, reads nothing from before its arrival.
+record. The borrower reads nothing from before its arrival. A workstation
+that only sends an event carrying the serial number of a deck held
+elsewhere reads that event and the deck's name on it, never the deck's
+record nor its history.
 
 When a workstation reports a deck that another workstation holds, the deck
 moves to it without confirmation, and Odoo adds an event *Changed
