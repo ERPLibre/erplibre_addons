@@ -319,10 +319,12 @@ class StreamdeckWorkstation(models.Model):
 
     def _check_profile_pick(self, vals):
         """Raise AccessError unless the employee's `vals` leaves
-        `config_profile_id` alone or sets it to a selectable profile on
-        workstations whose current profile is empty or selectable: an
-        employee never clears a profile nor replaces one the manager
-        assigned without making it selectable."""
+        `config_profile_id` alone or sets it to an active selectable
+        profile on workstations whose current profile is empty or
+        selectable: an employee never clears a profile nor replaces one
+        the manager assigned without making it selectable. An archived
+        profile is no layer of `_effective`, so picking one would clear
+        the profile and its locks."""
         if "config_profile_id" not in vals:
             return
         profile = (
@@ -331,7 +333,9 @@ class StreamdeckWorkstation(models.Model):
             .browse(vals["config_profile_id"])
         )
         current = self.sudo().mapped("config_profile_id")
-        if not profile.selectable or not all(current.mapped("selectable")):
+        if not (profile.selectable and profile.active) or not all(
+            current.mapped("selectable")
+        ):
             raise AccessError(
                 _(
                     "An employee picks a selectable configuration profile,"
