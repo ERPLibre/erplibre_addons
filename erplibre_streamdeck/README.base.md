@@ -158,7 +158,9 @@ beyond the delay goes silent, then is heard again at its next report.
   types.
 - **Notification.** Odoo tells the assigned user of a new activity as it
   does for any activity (inbox or e-mail, by their preference). The module
-  sends no e-mail and no notification of its own.
+  sends no e-mail and no notification of its own. Such an e-mail goes
+  through Odoo's mail queue: neither a report nor the cron waits on the
+  mail server.
 
 ### Settings › Stream Deck
 
@@ -415,7 +417,8 @@ suivante.
 - **Notification.** Odoo prévient le destinataire d'une nouvelle activité
   comme pour toute activité (boîte de réception ou courriel, selon sa
   préférence). Le module n'envoie aucun courriel ni aucune notification
-  de son côté.
+  de son côté. Ce courriel passe par la file des courriels d'Odoo : ni une
+  remontée ni le cron n'attendent le serveur de courriel.
 
 ### Paramètres › Stream Deck
 
