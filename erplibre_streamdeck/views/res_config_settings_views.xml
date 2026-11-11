@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Paramètres › Stream Deck. Le délai de silence vaut toujours : il
+         date l'historique « Poste muet ». Le reste ne sert qu'aux
+         activités et ne s'affiche que lorsqu'elles sont activées ; chaque
+         délai suit la case de la sorte de problème qu'il retarde. -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.erplibre.streamdeck</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Stream Deck" string="Stream Deck" name="erplibre_streamdeck" groups="base.group_system">
+                    <block title="Monitoring" name="streamdeck_monitoring">
+                        <setting id="streamdeck_silent_setting" string="Workstation silent" help="A workstation that has not reported for this delay is silent. The workstation reports every 15 minutes.">
+                            <field name="streamdeck_silent_after_min" class="text-center" style="width: 6ch;"/>
+                            <span class="ms-2">minutes</span>
+                        </setting>
+                        <setting id="streamdeck_activities_setting" help="Open an Odoo activity for each problem the monitoring detects, and close it when the problem is solved. Without it, the monitoring only writes the history.">
+                            <field name="streamdeck_activities_enabled"/>
+                            <div class="content-group" invisible="not streamdeck_activities_enabled">
+                                <div class="row mt16">
+                                    <label for="streamdeck_activity_recipient" class="col-lg-4 o_light_label"/>
+                                    <field name="streamdeck_activity_recipient" widget="radio" class="col-lg-8"/>
+                                </div>
+                                <div class="row" invisible="streamdeck_activity_recipient == 'employee'">
+                                    <label for="streamdeck_activity_manager_id" class="col-lg-4 o_light_label"/>
+                                    <field name="streamdeck_activity_manager_id" class="col-lg-8" options="{'no_create': True}" required="streamdeck_activities_enabled and streamdeck_activity_recipient != 'employee'"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Problems that open an activity" name="streamdeck_alerts" invisible="not streamdeck_activities_enabled">
+                        <setting id="streamdeck_alert_service_failed_setting" help="The deck service of a workstation stays failed beyond this delay. It closes when the service leaves the failed state.">
+                            <field name="streamdeck_alert_service_failed"/>
+                            <div class="content-group mt8" invisible="not streamdeck_alert_service_failed">
+                                <span class="me-2">After</span>
+                                <field name="streamdeck_service_failed_after_min" class="text-center" style="width: 6ch;"/>
+                                <span class="ms-2">minutes</span>
+                            </div>
+                        </setting>
+                        <setting id="streamdeck_alert_silent_setting" help="A workstation goes silent. It closes at its next report.">
+                            <field name="streamdeck_alert_silent"/>
+                        </setting>
+                        <setting id="streamdeck_alert_moved_setting" help="A deck is reported by another workstation. A person closes it; a new move adds a note to it.">
+                            <field name="streamdeck_alert_moved"/>
+                        </setting>
+                        <setting id="streamdeck_alert_unplugged_setting" help="A deck stays unplugged beyond this delay. It closes when the deck is plugged again.">
+                            <field name="streamdeck_alert_unplugged"/>
+                            <div class="content-group mt8" invisible="not streamdeck_alert_unplugged">
+                                <span class="me-2">After</span>
+                                <field name="streamdeck_unplugged_after_h" class="text-center" style="width: 6ch;"/>
+                                <span class="ms-2">hours</span>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'erplibre_streamdeck', 'bin_size': False}</field>
+    </record>
+
+</odoo>

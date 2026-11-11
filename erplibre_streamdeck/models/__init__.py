@@ -7,4 +7,5 @@ from . import streamdeck_holding
 from . import streamdeck_thread_visibility
 from . import streamdeck_pairing_code
 from . import res_users
+from . import res_config_settings
 from . import streamdeck_service
