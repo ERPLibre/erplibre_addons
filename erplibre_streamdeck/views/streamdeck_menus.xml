@@ -65,6 +65,13 @@
               groups="group_streamdeck_manager"
               sequence="20"/>
 
+    <menuitem id="menu_streamdeck_config_policy"
+              name="First pilot"
+              parent="menu_streamdeck_configuration"
+              action="action_streamdeck_config_policy"
+              groups="group_streamdeck_manager"
+              sequence="30"/>
+
     <menuitem id="menu_streamdeck_settings"
               name="Settings"
               parent="menu_streamdeck_root"

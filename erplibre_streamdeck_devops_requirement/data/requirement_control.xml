@@ -149,14 +149,13 @@
         <field name="sequence" eval="100" />
         <field name="moscow">must</field>
         <field name="requirement_type">security</field>
-        <field name="devsecops_stage">code</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">streamdeck_first_pilot_policy of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, stored as the ir.config_parameter erplibre_streamdeck.first_pilot_policy, ask by default and an unknown value read as ask; like every Stream Deck setting, only a Settings administrator writes it; under a forced policy a client choice counts for nothing, and a locked key is never in ask.</field>
-        <field name="missing">The decision gives the forcing to the Stream Deck manager, but only a Settings administrator writes the policy: res.config.settings is its only writer, and test_only_a_settings_administrator_sets_the_first_pilot_policy of ERPLibre_erplibre_addons:erplibre_streamdeck/tests/test_streamdeck_config_settings.py shows a Stream Deck manager without Settings rights refused. Left: a form under Stream Deck › Configuration with a write guard on the parameter, or a decision that names the Settings administrator.</field>
-        <field name="notes">Origin: violated; its unit test shows the violation.</field>
+        <field name="achievement">streamdeck_first_pilot_policy of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, stored as the ir.config_parameter erplibre_streamdeck.first_pilot_policy, ask by default and an unknown value read as ask; the Stream Deck manager writes it through the form streamdeck.config.policy of ERPLibre_erplibre_addons:erplibre_streamdeck/wizard/streamdeck_config_policy.py, under Stream Deck › Configuration › First pilot, and a Settings administrator through Settings › Stream Deck; an employee writes it neither way; under a forced policy a client choice counts for nothing, and a locked key is never in ask.</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r11" model="devops.requirement">
         <field name="code">SD-CTL-R11</field>
@@ -1015,13 +1014,13 @@
         <field name="requirement_id" ref="req_sd_ctl_r10" />
         <field name="sequence" eval="30" />
         <field name="kind">python</field>
-        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_only_a_settings_administrator_sets_the_first_pilot_policy</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_only_the_manager_sets_the_first_pilot_policy</field>
     </record>
     <record id="test_sd_ctl_r10_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r10" />
         <field name="sequence" eval="40" />
         <field name="kind">python</field>
-        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_first_pilot_setting_is_the_administrator_s_only</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_first_pilot_setting_is_the_manager_s_only</field>
     </record>
     <record id="test_sd_ctl_r10_5" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r10" />
@@ -1052,6 +1051,12 @@
         <field name="sequence" eval="90" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::locked_keys_still_need_the_usual_apply_after_keep_local</field>
+    </record>
+    <record id="test_sd_ctl_r10_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_the_settings_page_writes_it_for_its_administrator_only</field>
     </record>
     <record id="test_sd_ctl_r11_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r11" />

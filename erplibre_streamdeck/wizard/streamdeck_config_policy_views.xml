@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- La politique du premier pilotage, pour le gestionnaire du Stream
+         Deck : le même paramètre que la page Paramètres › Stream Deck,
+         que seul l'administrateur des Paramètres ouvre. -->
+    <record id="view_streamdeck_config_policy_form" model="ir.ui.view">
+        <field name="name">streamdeck.config.policy.form</field>
+        <field name="model">streamdeck.config.policy</field>
+        <field name="arch" type="xml">
+            <form string="First pilot">
+                <p>
+                    At the first report of a piloted workstation, the free settings whose local value differs from Odoo's.
+                </p>
+                <group>
+                    <field name="first_pilot_policy" widget="radio"/>
+                </group>
+                <p class="text-muted">
+                    Locked settings are always offered to the employee, who confirms them as any new configuration.
+                </p>
+                <footer>
+                    <button name="action_save" type="object" string="Save" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_config_policy" model="ir.actions.act_window">
+        <field name="name">First pilot</field>
+        <field name="res_model">streamdeck.config.policy</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

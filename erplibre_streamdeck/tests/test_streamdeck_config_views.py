@@ -294,7 +294,37 @@ class TestStreamdeckConfigViews(TransactionCase):
         listed = self._arch(self.Profile.with_user(self.manager), "list")
         self.assertIn("selectable", listed.xpath("//field/@name"))
 
-    def test_the_first_pilot_setting_is_the_administrator_s_only(self):
+    def test_the_first_pilot_setting_is_the_manager_s_only(self):
+        # Stream Deck › Configuration › Premier pilotage : un formulaire
+        # du gestionnaire, que l'employé ne voit ni n'ouvre.
+        menu = self.env.ref(
+            "erplibre_streamdeck.menu_streamdeck_config_policy"
+        )
+        self.assertEqual(menu.name, "First pilot")
+        self.assertEqual(
+            menu.parent_id,
+            self.env.ref("erplibre_streamdeck.menu_streamdeck_configuration"),
+        )
+        self.assertIn(menu, self._visible_menus(self.manager))
+        self.assertNotIn(menu, self._visible_menus(self.employee))
+        self.assertEqual(menu.action.res_model, "streamdeck.config.policy")
+        self.assertEqual(menu.action.target, "new")
+        Policy = self.env["streamdeck.config.policy"]
+        self.assertTrue(Policy.with_user(self.manager).has_access("create"))
+        self.assertFalse(Policy.with_user(self.employee).has_access("read"))
+        form = self._arch(Policy.with_user(self.manager), "form")
+        (field,) = form.xpath("//field[@name='first_pilot_policy']")
+        self.assertEqual(field.get("widget"), "radio")
+        self.assertIn(
+            "Locked settings are always offered", "".join(form.itertext())
+        )
+        self.assertEqual(
+            form.xpath("//footer/button[@type='object']/@name"),
+            ["action_save"],
+        )
+
+        # La page Paramètres › Stream Deck porte le même réglage pour son
+        # administrateur, et reste fermée au gestionnaire.
         settings = self._arch(self.env["res.config.settings"], "form")
         (app,) = settings.xpath("//app[@name='erplibre_streamdeck']")
         (setting,) = app.xpath(

@@ -54,7 +54,9 @@ class ResConfigSettings(models.TransientModel):
     and the first-pilot policy of the managed configuration.
 
     Each setting lives in `ir.config_parameter` under PARAM_PREFIX, so
-    only the Settings page (`base.group_system`) writes it. The four alert
+    only the Settings page (`base.group_system`) writes it; the
+    first-pilot policy has a second writer, the Stream Deck manager's form
+    `streamdeck.config.policy`. The four alert
     boxes are checked by default; Odoo's `config_parameter` deletes the
     parameter of a cleared box, which would bring the default back, so
     `get_values` / `set_values` store them as "True" / "False" instead.

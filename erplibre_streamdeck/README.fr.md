@@ -24,7 +24,7 @@ Personne ne l'écrit à la main : seules les routes des postes l'écrivent.
 | Stream Deck › Mes postes | tout employé | ses postes ; le bouton *Ajouter un poste* affiche un code d'appairage |
 | Stream Deck › Mes decks | tout employé | les decks que ses postes tiennent ou ont tenus |
 | Stream Deck › Parc › Postes, Decks, Événements | gestionnaire | tout, en lecture, sauf le nom, l'archivage, le jeton et la configuration d'un poste |
-| Stream Deck › Configuration › Profils, Modèles de deck | gestionnaire | les couches de configuration : les profils réutilisables, et les réglages de chaque modèle de deck |
+| Stream Deck › Configuration › Profils, Modèles de deck, Premier pilotage | gestionnaire | les couches de configuration : les profils réutilisables, et les réglages de chaque modèle de deck ; la politique du premier pilotage |
 | Stream Deck › Paramètres | administrateur | la section *Stream Deck* des Paramètres : la surveillance et le premier pilotage |
 
 Un poste montre ce que disait sa dernière remontée : système
@@ -295,8 +295,10 @@ et la fiche dit qu'elle est trop ancienne.
 ### Premier pilotage
 
 La première fois qu'un poste est piloté, ses réglages libres peuvent
-porter des valeurs locales qui diffèrent de celles d'Odoo. *Paramètres ›
-Stream Deck › Premier pilotage* décide :
+porter des valeurs locales qui diffèrent de celles d'Odoo. Le
+gestionnaire du Stream Deck en décide dans *Stream Deck › Configuration ›
+Premier pilotage*, comme l'administrateur des Paramètres dans
+*Paramètres › Stream Deck* :
 
 - **Demander à l'employé**, le défaut : l'extension demande une seule fois
   s'il garde les valeurs locales, qui deviennent alors des surcharges du
