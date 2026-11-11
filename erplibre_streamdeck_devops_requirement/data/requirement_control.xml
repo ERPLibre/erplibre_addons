@@ -412,7 +412,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">configBody and settleConfig of erplibre-home-gnome-extension:lib/inventory.js, readCurrent of lib/deck-config.js; _parse_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers 400 to an unknown choice.</field>
+        <field name="achievement">configBody and settleConfig of erplibre-home-gnome-extension:lib/inventory.js, readCurrent of lib/deck-config.js; a streamdeck.conf that exists but cannot be read sends no config rather than null values; _parse_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers 400 to an unknown choice.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r29" model="devops.requirement">
@@ -1058,6 +1058,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_the_settings_page_writes_it_for_its_administrator_only</field>
     </record>
+    <record id="test_sd_ctl_r10_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="110" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::an_answer_odoo_settles_without_a_new_revision_is_announced</field>
+    </record>
     <record id="test_sd_ctl_r11_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r11" />
         <field name="sequence" eval="10" />
@@ -1603,6 +1609,12 @@
         <field name="sequence" eval="60" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_an_unknown_choice_is_400</field>
+    </record>
+    <record id="test_sd_ctl_r28_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::an_unreadable_conf_sends_no_pilot_config</field>
     </record>
     <record id="test_sd_ctl_r29_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r29" />
