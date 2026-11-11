@@ -277,7 +277,8 @@ proposée* augmente de un. La réponse porte la révision et l'extension
 l'annonce ; rien ne change sur le poste tant que son employé n'a pas
 cliqué *Appliquer*. L'extension réécrit alors les lignes gérées de
 `streamdeck.conf`, garde toute autre ligne, et redémarre le service du
-deck quand un réglage qui l'exige a changé. Sa remontée suivante dit si
+deck quand un réglage qui l'exige a changé et que le service tourne ; un
+service du deck arrêté n'est jamais démarré. Sa remontée suivante dit si
 la révision a été appliquée ou refusée, et pourquoi.
 
 | Configuration | Sens |

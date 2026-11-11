@@ -266,7 +266,8 @@ the *Offered revision* grows by one. The reply carries the revision and
 the extension announces it; nothing changes on the workstation until its
 employee clicks *Apply*. The extension then rewrites the managed lines of
 `streamdeck.conf`, keeps every other line, and restarts the deck service
-when a setting that needs it changed. Its next report says whether the
+when a setting that needs it changed and the service is running; a
+stopped deck service is never started. Its next report says whether the
 revision was applied or refused, and why.
 
 | Configuration | Meaning |
