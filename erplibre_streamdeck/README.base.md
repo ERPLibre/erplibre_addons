@@ -72,8 +72,10 @@ back after a loan. The lender therefore still reads the deck and its whole
 history from their first holding on, the events at the other workstation
 included: each event carries a copy of the name of its workstation and of
 its employee, so the lender never needs, nor gets, the other workstation's
-record. The borrower, or a workstation that reports the serial number of
-another deck, reads nothing from before its arrival.
+record. The borrower reads nothing from before its arrival. A workstation
+that only sends an event carrying the serial number of a deck held
+elsewhere reads that event and the deck's name on it, never the deck's
+record nor its history.
 
 When a workstation reports a deck that another workstation holds, the deck
 moves to it without confirmation, and Odoo adds an event *Changed
@@ -333,9 +335,10 @@ deck revient après un prêt. Le prêteur lit donc toujours le deck et tout
 son historique depuis sa première détention, y compris les événements
 survenus à l'autre poste : chaque événement porte une copie du nom de son
 poste et de son employé, si bien que le prêteur n'a pas besoin de la fiche
-de l'autre poste, et ne la reçoit pas. L'emprunteur, ou un poste qui
-déclare le numéro de série d'un autre deck, ne lit rien d'avant son
-arrivée.
+de l'autre poste, et ne la reçoit pas. L'emprunteur ne lit rien d'avant
+son arrivée. Un poste qui envoie seulement un événement portant le numéro
+de série d'un deck tenu ailleurs lit cet événement et le nom du deck qu'il
+porte, jamais la fiche du deck ni son historique.
 
 Quand un poste remonte un deck que tient un autre poste, le deck passe à ce
 poste sans confirmation, et Odoo ajoute un événement *Changé de poste*

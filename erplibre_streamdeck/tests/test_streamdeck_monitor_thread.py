@@ -175,8 +175,8 @@ class TestStreamdeckMonitorThread(TransactionCase):
         # Le fil du deck suit la borne de son historique : B ne lit ni
         # note ni activité d'avant son arrivée, sauf une activité qui lui
         # est assignée ; A, le prêteur, et M lisent tout ; C, dont un
-        # événement porte le numéro du deck sans le détenir, lit le deck
-        # et rien de son fil.
+        # événement porte le numéro du deck sans le détenir, ne lit ni le
+        # deck ni rien de son fil.
         self._report(self.token_a, DAY_A)
         device = self._device()
         before = DAY_A.replace(hour=12)
@@ -208,7 +208,6 @@ class TestStreamdeckMonitorThread(TransactionCase):
             self.user_a: (notes, activities),
             self.manager: (notes, activities),
             self.user_b: (note_after, for_b_before | act_after),
-            self.user_c: (notes.browse(), activities.browse()),
         }
         for user, (read_notes, read_activities) in expected.items():
             with self.subTest(user=user.name):
@@ -226,6 +225,13 @@ class TestStreamdeckMonitorThread(TransactionCase):
                 for record in hidden:
                     with self.assertRaises(AccessError):
                         record.with_user(user).read(["create_date"])
+        self.env.invalidate_all()
+        with self.assertRaises(AccessError):
+            device.with_user(self.user_c).read(["message_ids"])
+        for record in list(notes) + list(activities):
+            with self.subTest(user=self.user_c.name, record=record):
+                with self.assertRaises(AccessError):
+                    record.with_user(self.user_c).read(["create_date"])
         # Le fil d'un autre modèle ne change pas : B lit celui de son poste.
         own = self._note(self.workstation_b, after, "On host-b")
         self.env.invalidate_all()
@@ -296,8 +302,9 @@ class TestStreamdeckMonitorThread(TransactionCase):
                 for attachment in files - readable:
                     with self.assertRaises(AccessError):
                         attachment.with_user(user).read(["datas"])
-        # C lit toujours le deck, par son événement.
-        self.assertTrue(device.with_user(self.user_c).read(["key"]))
+        # Son événement n'ouvre pas à C la fiche du deck.
+        with self.assertRaises(AccessError):
+            device.with_user(self.user_c).read(["key"])
         # Un fichier d'un autre modèle ne change pas : B lit celui de son
         # poste.
         own = self._attachment(self.workstation_b, DAY_C, "own.txt")
