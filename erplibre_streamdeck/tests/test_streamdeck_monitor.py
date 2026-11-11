@@ -1089,3 +1089,79 @@ class TestStreamdeckMonitor(TransactionCase):
             self._activities(self.workstation_a, "silent"),
             [{"user_id": self.manager.id, "automated": True}],
         )
+
+    def _closing(self, activity, kind):
+        """Le message qui ferme `activity`, de la sorte `kind` : celui du
+        fil de son enregistrement qui nomme son destinataire, une personne
+        l'ayant fermée pour lui."""
+        record = self.env[activity.res_model].browse(activity.res_id)
+        name = activity.user_id.name
+        return self._done_messages(record, kind).filtered(
+            lambda message: name in message.body
+        )
+
+    def test_archiving_users_from_the_ui_closes_their_activities(self):
+        # Archiver un utilisateur depuis Paramètres › Utilisateurs passe
+        # par action_archive, où Odoo supprime ses activités ouvertes avant
+        # de l'archiver. Celles de la surveillance se ferment d'abord et
+        # restent faites : celles du poste de l'employé et de ses decks,
+        # pour tous, le poste archivé ; celle qui lui reste, le deck changé
+        # de poste, l'utilisateur archivé. Le gestionnaire archivé à son
+        # tour garde de même les siennes, faites.
+        self._enable(recipient="both")
+        self._report(self.token_b, T0, decks=[OTHER_DECK])
+        self._unplug(self.token_a, T0, service_state="failed")
+        self._report(
+            self.token_a,
+            T0 + 20 * MIN,
+            decks=[OTHER_DECK],
+            service_state="failed",
+        )
+        self._cron(T0 + 73 * HOUR)
+        kind_of = {self.env.ref(xmlid): kind for kind, xmlid in TYPES.items()}
+        of_a = self._activities().filtered(lambda a: a.user_id == self.user_a)
+        self.assertEqual(
+            set(kind_of[t] for t in of_a.activity_type_id), set(TYPES)
+        )
+        on_b = self._activities(self.workstation_b)
+        on_a = self._activities().filtered(
+            lambda a: kind_of[a.activity_type_id] != "moved"
+            and a.user_id == self.manager
+            and a not in on_b
+        )
+        self.assertEqual(len(on_a), 3)
+        kinds = {
+            activity: kind_of[activity.activity_type_id]
+            for activity in of_a | on_a
+        }
+        admin = self.env.ref("base.user_admin")
+        self.user_a.with_user(admin).action_archive()
+        self.assertFalse(self.user_a.active)
+        for activity, kind in kinds.items():
+            with self.subTest(activity=activity.id, kind=kind):
+                self.assertTrue(activity.exists())
+                self.assertFalse(activity.active)
+                body = self._closing(activity, kind).body
+                self.assertIn("Resolved at", body)
+                if kind == "moved":
+                    self.assertIn("user is archived", body)
+                else:
+                    self.assertIn("workstation is archived", body)
+        # Ce qui reste ouvert est au gestionnaire, le deck changé de poste
+        # qu'une personne ferme et le silence du poste de B, et à B.
+        left = self._activities()
+        self.assertEqual(left.user_id, self.manager | self.user_b)
+        of_manager = left.filtered(lambda a: a.user_id == self.manager)
+        self.assertEqual(len(of_manager), 2)
+        kinds = {
+            activity: kind_of[activity.activity_type_id]
+            for activity in of_manager
+        }
+        self.manager.with_user(admin).action_archive()
+        for activity, kind in kinds.items():
+            with self.subTest(activity=activity.id, kind=kind):
+                self.assertTrue(activity.exists())
+                self.assertFalse(activity.active)
+                body = self._closing(activity, kind).body
+                self.assertIn("user is archived", body)
+        self.assertEqual(self._activities(), left - of_manager)

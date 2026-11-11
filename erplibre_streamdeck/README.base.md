@@ -143,8 +143,11 @@ beyond the delay goes silent, then is heard again at its next report.
   workstation or its employee, or revoking its token, closes its
   activities and the *Deck unplugged for long* activities of its decks
   with « the workstation is archived » or « the workstation is
-  unenrolled ». Closing does not depend on the Settings: an activity
-  opened before they were disabled still closes.
+  unenrolled ». Archiving a user, from the Settings or by their departure,
+  closes the activities still assigned to them, *Deck changed workstation*
+  included, with « the assigned user is archived », where Odoo would
+  delete them. Closing does not depend on the Settings: an activity opened
+  before they were disabled still closes.
 - **Archived manager.** When the named manager is archived later, only
   the employee part opens, and each run of the cron writes a warning to
   the log, which names nobody.
@@ -402,8 +405,11 @@ suivante.
   destinataire (UTC à défaut) et le texte dans sa langue. Archiver un
   poste ou son employé, ou révoquer son jeton, ferme ses activités et les
   activités *Deck débranché longtemps* de ses decks avec « le poste est
-  archivé » ou « le poste est désinscrit ». La fermeture ne dépend pas des
-  Paramètres : une activité ouverte avant leur désactivation se ferme
+  archivé » ou « le poste est désinscrit ». Archiver un utilisateur,
+  depuis les Paramètres ou par son départ, ferme les activités qui lui
+  restent, *Deck changé de poste* compris, avec « l'utilisateur assigné
+  est archivé », là où Odoo les supprimerait. La fermeture ne dépend pas
+  des Paramètres : une activité ouverte avant leur désactivation se ferme
   encore.
 - **Gestionnaire archivé.** Si le gestionnaire nommé est archivé ensuite,
   seule la part de l'employé s'ouvre, et chaque passage du cron écrit au
