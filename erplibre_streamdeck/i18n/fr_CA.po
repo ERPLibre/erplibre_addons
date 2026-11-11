@@ -67,6 +67,11 @@ msgid "Activities"
 msgstr "Activités"
 
 #. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_mail_activity
+msgid "Activity"
+msgstr "Activité"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_exception_decoration
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_decoration
 msgid "Activity Exception Decoration"
@@ -364,6 +369,14 @@ msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome par ex. fa-tasks"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_activity__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_mail__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_message__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_thread_visibility__streamdeck_visible_to_me
+msgid "From my deck holding"
+msgstr "Depuis ma détention du deck"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__visible_to_me
 msgid "From my holding"
 msgstr "Depuis ma détention"
@@ -508,6 +521,11 @@ msgstr "Événements perdus"
 #: model:res.groups,name:erplibre_streamdeck.group_streamdeck_manager
 msgid "Manager"
 msgstr "Gestionnaire"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_mail_message
+msgid "Message"
+msgstr "Message"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_has_error
@@ -773,6 +791,11 @@ msgstr "Événement Stream Deck"
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_pairing_code
 msgid "Stream Deck pairing code"
 msgstr "Code d'appairage Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_thread_visibility
+msgid "Stream Deck thread visibility"
+msgstr "Visibilité du fil Stream Deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_workstation
