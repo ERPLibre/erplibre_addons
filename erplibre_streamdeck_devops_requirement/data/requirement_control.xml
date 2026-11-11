@@ -144,18 +144,19 @@
     </record>
     <record id="req_sd_ctl_r10" model="devops.requirement">
         <field name="code">SD-CTL-R10</field>
-        <field name="name">An organisation setting in Settings › Stream Deck forces the first-pilot choice: ask the employee, the default, keep the local values or take Odoo's; locked settings are offered for confirmation under every policy</field>
+        <field name="name">An organisation setting in Settings › Stream Deck lets the manager force the first-pilot choice: ask the employee, the default, keep the local values or take Odoo's; locked settings are offered for confirmation under every policy</field>
         <field name="category_id" ref="cat_sd_ctl" />
         <field name="sequence" eval="100" />
         <field name="moscow">must</field>
         <field name="requirement_type">security</field>
-        <field name="devsecops_stage">test</field>
+        <field name="devsecops_stage">code</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
+        <field name="done" eval="False" />
         <field name="security_relevant" eval="True" />
         <field name="achievement">streamdeck_first_pilot_policy of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, stored as the ir.config_parameter erplibre_streamdeck.first_pilot_policy, ask by default and an unknown value read as ask; like every Stream Deck setting, only a Settings administrator writes it; under a forced policy a client choice counts for nothing, and a locked key is never in ask.</field>
-        <field name="notes">Origin: covered by a test.</field>
+        <field name="missing">The decision gives the forcing to the Stream Deck manager, but only a Settings administrator writes the policy: res.config.settings is its only writer, and test_only_a_settings_administrator_sets_the_first_pilot_policy of ERPLibre_erplibre_addons:erplibre_streamdeck/tests/test_streamdeck_config_settings.py shows a Stream Deck manager without Settings rights refused. Left: a form under Stream Deck › Configuration with a write guard on the parameter, or a decision that names the Settings administrator.</field>
+        <field name="notes">Origin: violated; its unit test shows the violation.</field>
     </record>
     <record id="req_sd_ctl_r11" model="devops.requirement">
         <field name="code">SD-CTL-R11</field>
