@@ -259,3 +259,30 @@ class TestStreamdeckMonitorEvents(TransactionCase):
             with self.subTest(kind=kind):
                 event = self.Service._server_event(self.workstation, kind, T0)
                 self.assertEqual(event.label, label)
+
+    def test_the_event_label_follows_the_reader_language(self):
+        # Le libellé n'est pas stocké : il se calcule dans la langue de
+        # qui le lit, même après une lecture dans une autre langue au
+        # cours de la même transaction.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(
+            ["erplibre_streamdeck"], ["fr_CA"], overwrite=True
+        )
+        failed = self._event("service_changed", service_state="failed")
+        self._report_ok(T0, events=[failed])
+        event = self.Event.search([("uuid", "=", failed["uuid"])])
+        silent = self.Service._server_event(self.workstation, "silent", T0)
+        for record, english, french in (
+            (event, "Service failed", "Service en échec"),
+            (silent, "Workstation silent", "Poste muet"),
+        ):
+            with self.subTest(kind=record.kind):
+                self.assertEqual(
+                    record.with_context(lang="en_US").label, english
+                )
+                self.assertEqual(
+                    record.with_context(lang="fr_CA").label, french
+                )
+                self.assertEqual(
+                    record.with_context(lang="en_US").label, english
+                )
