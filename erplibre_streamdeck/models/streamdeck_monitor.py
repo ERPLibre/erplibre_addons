@@ -10,7 +10,7 @@ a deck unplugged for its delay. The report service calls `_on_report()`
 for what a report reveals or solves: a deck that changed workstation, a
 service that left `failed`, a workstation heard again, a deck plugged in
 again. Archiving a workstation or clearing its token calls
-`_resolve_all()`.
+`_resolve_all()`; archiving a user calls `_resolve_assigned()`.
 
 An activity is unique per (record, activity type, assigned user) while it
 is open. It closes with `action_feedback`, which keeps it done because
@@ -63,6 +63,7 @@ SERVICE_LEFT_FAILED = {
 ENDINGS = {
     "archived": _lt("the workstation is archived"),
     "unenrolled": _lt("the workstation is unenrolled"),
+    "user_archived": _lt("the assigned user is archived"),
 }
 
 
@@ -260,9 +261,14 @@ class StreamdeckMonitor(models.AbstractModel):
         time in their time zone. A `moved` activity is left to a person."""
         if kind == "moved":
             return
+        self._close(self._open_activities(record, kind), what)
+
+    def _close(self, activities, what):
+        """Close `activities` with the feedback « Resolved at <time>:
+        <what> », as `_resolve` describes."""
         self = self._queued()
         now = fields.Datetime.now()
-        for activity in self._open_activities(record, kind):
+        for activity in activities.with_env(self.env).sudo():
             user = activity.user_id
             env = self._in_language(self.env, user)
             try:
@@ -289,6 +295,28 @@ class StreamdeckMonitor(models.AbstractModel):
             self._resolve(workstation, kind, what)
         for device in workstation.device_ids:
             self._resolve(device, "unplugged", what)
+
+    def _resolve_assigned(self, users, reason):
+        """Close the open monitoring activities assigned to `users`, of
+        every kind, `moved` included, `reason` a key of ENDINGS: Odoo
+        deletes the open activities of the users it archives, and a
+        closed activity keeps its record of the problem."""
+        types = self.env["mail.activity.type"]
+        for kind in ACTIVITY_TYPES:
+            types |= self._activity_type(kind)
+        if not types or not users:
+            return
+        activities = (
+            self.env["mail.activity"]
+            .sudo()
+            .search(
+                [
+                    ("user_id", "in", users.ids),
+                    ("activity_type_id", "in", types.ids),
+                ]
+            )
+        )
+        self._close(activities, ENDINGS[reason])
 
     # -- report ----------------------------------------------------------
 

@@ -143,8 +143,11 @@ suivante.
   destinataire (UTC à défaut) et le texte dans sa langue. Archiver un
   poste ou son employé, ou révoquer son jeton, ferme ses activités et les
   activités *Deck débranché longtemps* de ses decks avec « le poste est
-  archivé » ou « le poste est désinscrit ». La fermeture ne dépend pas des
-  Paramètres : une activité ouverte avant leur désactivation se ferme
+  archivé » ou « le poste est désinscrit ». Archiver un utilisateur,
+  depuis les Paramètres ou par son départ, ferme les activités qui lui
+  restent, *Deck changé de poste* compris, avec « l'utilisateur assigné
+  est archivé », là où Odoo les supprimerait. La fermeture ne dépend pas
+  des Paramètres : une activité ouverte avant leur désactivation se ferme
   encore.
 - **Gestionnaire archivé.** Si le gestionnaire nommé est archivé ensuite,
   seule la part de l'employé s'ouvre, et chaque passage du cron écrit au
