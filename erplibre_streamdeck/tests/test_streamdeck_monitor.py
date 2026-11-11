@@ -974,3 +974,59 @@ class TestStreamdeckMonitor(TransactionCase):
             ),
             bodies,
         )
+
+    # -- design rules of the monitoring ---------------------------------
+
+    def test_a_deck_unplugged_long_writes_no_event_of_its_own(self):
+        # L'événement « débranché » date déjà le débranchement : le délai
+        # n'ouvre qu'une activité. Le cron n'écrit que le silence du poste.
+        self._enable()
+        self._unplug(self.token_a, T0)
+        device = self._device()
+        before = self.Event.search([])
+        self._cron(T0 + 73 * HOUR)
+        self.assertEqual(len(self._activities(device, "unplugged")), 1)
+        written = self.Event.search([]) - before
+        self.assertEqual(written.mapped("kind"), ["silent"])
+        self.assertFalse(written.device_id)
+
+    def test_a_report_leaves_the_time_based_work_to_the_cron(self):
+        # Une remontée ne touche que son poste et ses decks : le silence,
+        # le service en échec et le deck débranché d'un autre poste, tous
+        # au-delà de leur délai, attendent le cron.
+        self._enable()
+        self._unplug(self.token_b, T0, deck=OTHER_DECK, service_state="failed")
+        self._report(self.token_a, T0 + 73 * HOUR, decks=[DECK])
+        self.assertFalse(self.workstation_b.silent_since)
+        self.assertFalse(self._events(self.workstation_b, "silent"))
+        self.assertFalse(self._activities(active=None))
+        self._cron(T0 + 73 * HOUR)
+        self.assertTrue(self.workstation_b.silent_since)
+        for record, kind in (
+            (self.workstation_b, "silent"),
+            (self.workstation_b, "service_failed"),
+            (self._device(OTHER_DECK), "unplugged"),
+        ):
+            with self.subTest(kind=kind):
+                self.assertEqual(len(self._activities(record, kind)), 1)
+
+    def test_an_employee_reads_no_message_of_another_workstation(self):
+        # Le fil d'un poste se lit avec le poste : A lit la note posée sur
+        # le sien, aucune de celle posée sur le poste de B.
+        notes = {
+            workstation: workstation.message_post(
+                body="Checked", message_type="comment"
+            )
+            for workstation in (self.workstation_a, self.workstation_b)
+        }
+        self.env.invalidate_all()
+        Message = self.env["mail.message"].with_user(self.user_a)
+        readable = Message.search(
+            [
+                ("model", "=", "streamdeck.workstation"),
+                ("id", "in", [note.id for note in notes.values()]),
+            ]
+        )
+        self.assertEqual(readable, notes[self.workstation_a])
+        with self.assertRaises(AccessError):
+            notes[self.workstation_b].with_user(self.user_a).read(["body"])
