@@ -187,7 +187,7 @@ class StreamdeckMonitor(models.AbstractModel):
 
     # -- opening and closing ---------------------------------------------
 
-    def _open(self, record, kind, note, settings=None):
+    def _open(self, record, kind, note, settings=None, still=None):
         """Open an activity of `kind` on `record` for each recipient that
         has no open one of that kind there, its note `note` (a lazy
         translation) in the recipient's language; return the activities
@@ -195,7 +195,11 @@ class StreamdeckMonitor(models.AbstractModel):
         box of `kind` is cleared. For `moved`, a recipient whose activity
         is still open gets none, and `note` is posted once to the record's
         thread instead, so a deck moved twice keeps one activity and its
-        thread tells the second move."""
+        thread tells the second move.
+
+        With `still`, the domain that made the cron pick `record`, the row
+        is first taken by `_lock()`, and nothing opens unless it is
+        free and `record` still matches `still`."""
         settings = settings or self._settings()
         Activity = self.env["mail.activity"].sudo()
         activity_type = self._activity_type(kind)
@@ -221,6 +225,8 @@ class StreamdeckMonitor(models.AbstractModel):
                     "automated": True,
                 }
             )
+        if values and still is not None and not self._lock(record, still):
+            return Activity
         if kind == "moved" and already:
             env = self._in_language(self.env, already[0].user_id)
             record.message_post(
@@ -331,8 +337,11 @@ class StreamdeckMonitor(models.AbstractModel):
         Any other one would alert without end."""
         return [("active", "=", True), ("token_hash", "!=", False)]
 
-    def _silent_candidates(self, domain):
-        return self.env["streamdeck.workstation"].sudo().search(domain)
+    def _candidates(self, model, domain):
+        """The records of `model` that match `domain`, read before any
+        lock: each one is locked and checked again before it is
+        written."""
+        return self.env[model].sudo().search(domain)
 
     def _watch_silent(self, now, settings):
         """Mark silent each watched workstation that has not reported for
@@ -346,13 +355,8 @@ class StreamdeckMonitor(models.AbstractModel):
             ("silent_since", "=", False),
             ("last_report", "<", now - delay),
         ]
-        Workstation = self.env["streamdeck.workstation"].sudo()
-        for workstation in self._silent_candidates(domain):
-            if not self._lock(workstation):
-                continue
-            if not Workstation.search_count(
-                domain + [("id", "=", workstation.id)]
-            ):
+        for workstation in self._candidates("streamdeck.workstation", domain):
+            if not self._lock(workstation, domain):
                 continue
             silent_since = workstation.last_report + delay
             workstation.write({"silent_since": silent_since})
@@ -366,52 +370,64 @@ class StreamdeckMonitor(models.AbstractModel):
             )
             self._open(workstation, "silent", note, settings)
 
-    def _lock(self, workstation):
-        """Lock the row of `workstation` until the end of the transaction
-        and drop its cached values; False, leaving it unlocked, when a
-        report holds it or changed it since this transaction began."""
+    def _lock(self, record, domain):
+        """Lock and write the row of `record` (a workstation or a device)
+        until the end of the transaction, drop its cached values and tell
+        whether it still matches `domain`. False when it no longer does,
+        and when a report holds the row or changed it since this
+        transaction began, the row then left untouched: the cron skips the
+        record until its next run.
+
+        The write keeps a value as it is, so that the row has a new
+        version: a report that waits on the lock then fails on a
+        serialization error once the cron commits, and Odoo runs it again
+        with a snapshot that sees what the cron opened, which a lock alone
+        would leave it blind to. The two skips are expected and logged
+        nowhere."""
         self.env.flush_all()
+        table = SQL.identifier(record._table)
         try:
             with self.env.cr.savepoint(flush=False):
                 self.env.cr.execute(
                     SQL(
-                        "SELECT id FROM streamdeck_workstation"
-                        " WHERE id = %s FOR UPDATE NOWAIT",
-                        workstation.id,
-                    )
+                        "SELECT id FROM %s WHERE id = %s FOR UPDATE NOWAIT",
+                        table,
+                        record.id,
+                    ),
+                    log_exceptions=False,
                 )
         except (
             psycopg2.errors.LockNotAvailable,
             psycopg2.errors.SerializationFailure,
         ):
             return False
-        workstation.invalidate_recordset()
-        return True
-
-    def _watch_service_failed(self, now, settings):
-        minutes = settings["service_failed_after_min"]
-        workstations = (
-            self.env["streamdeck.workstation"]
-            .sudo()
-            .search(
-                self._watched_domain()
-                + [
-                    ("service_state", "=", "failed"),
-                    (
-                        "service_state_since",
-                        "<=",
-                        now - timedelta(minutes=minutes),
-                    ),
-                ]
+        self.env.cr.execute(
+            SQL(
+                "UPDATE %s SET write_date = write_date WHERE id = %s",
+                table,
+                record.id,
             )
         )
+        record.invalidate_recordset()
+        return bool(record.search_count(domain + [("id", "=", record.id)]))
+
+    def _watch_service_failed(self, now, settings):
+        """Open the activity of each watched workstation whose deck
+        service has been `failed` for the delay."""
+        minutes = settings["service_failed_after_min"]
+        domain = self._watched_domain() + [
+            ("service_state", "=", "failed"),
+            ("service_state_since", "<=", now - timedelta(minutes=minutes)),
+        ]
         note = _lt(
             "The deck service has been in the failed state for at least"
             " %(minutes)s minutes.",
             minutes=minutes,
         )
-        for workstation in workstations:
-            self._open(workstation, "service_failed", note, settings)
+        for workstation in self._candidates("streamdeck.workstation", domain):
+            self._open(
+                workstation, "service_failed", note, settings, still=domain
+            )
 
     def _watch_unplugged(self, now, settings):
         """Open the activity of each disconnected deck of a watched
@@ -428,23 +444,17 @@ class StreamdeckMonitor(models.AbstractModel):
             " AND e.kind = 'unplugged')) <= %s",
             now - timedelta(hours=hours),
         )
-        devices = (
-            self.env["streamdeck.device"]
-            .sudo()
-            .search(
-                [
-                    ("connected", "=", False),
-                    ("workstation_id", "any", self._watched_domain()),
-                    ("id", "in", SQL("(%s)", out_of_sight)),
-                ]
-            )
-        )
+        domain = [
+            ("connected", "=", False),
+            ("workstation_id", "any", self._watched_domain()),
+            ("id", "in", SQL("(%s)", out_of_sight)),
+        ]
         note = _lt(
             "The deck has been unplugged for at least %(hours)s hours.",
             hours=hours,
         )
-        for device in devices:
-            self._open(device, "unplugged", note, settings)
+        for device in self._candidates("streamdeck.device", domain):
+            self._open(device, "unplugged", note, settings, still=domain)
 
 
 class MailActivity(models.Model):
