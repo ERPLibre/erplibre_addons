@@ -23,12 +23,20 @@ Nobody writes it by hand: only the workstation routes write it.
 | Stream Deck › My workstations | every employee | their workstations; the button *Add a workstation* shows a pairing code |
 | Stream Deck › My decks | every employee | the decks their workstations hold or have held |
 | Stream Deck › Fleet › Workstations, Decks, Events | manager | everything, read-only, except the name, the archive flag and the token of a workstation |
+| Stream Deck › Settings | administrator | the *Stream Deck* section of the Settings: the monitoring |
 
 A workstation shows what its last report said: operating system, GNOME
 Shell, extension and contract versions, branch and commit of the ERPLibre
-checkout, deck program and the state of its service, its decks and its
-events. Its employee may rename it and revoke its token; the manager may
-also archive it.
+checkout, deck program and the state of its service since when, its decks
+and its events. Its employee may rename it and revoke its token; the
+manager may also archive it. *Fleet › Workstations* adds the column
+*Silent since* and the filter *Silent*.
+
+A workstation and a deck each carry their thread, where the monitoring
+posts its activities and notes. Every list of events names each event by
+its label: the state of the service for a service change (*Service
+started*, *failed*, *stopped*, *absent*), the kind for any other; the
+history filters on each label.
 
 ## Enrolling a workstation
 
@@ -80,6 +88,105 @@ nothing.
 Archiving a user archives their workstations and revokes their tokens; the
 workstations, their decks and their events stay readable by the manager.
 Pairing codes are readable by nobody.
+
+## Monitoring
+
+Odoo watches four problems: a deck service that stays failed, a silent
+workstation, a deck unplugged for long and a deck that changed
+workstation. It always writes the history. It opens Odoo activities only
+when *Settings › Stream Deck* enables them, which is off by default.
+
+### History, always
+
+| Event | Written by | When |
+|---|---|---|
+| *Service started*, *failed*, *stopped*, *absent* (`service_changed`) | the workstation | its deck service changes state |
+| *Workstation silent* (`silent`) | Odoo | the workstation has sent no report for the silent delay; dated the end of that delay after its last report |
+| *Workstation heard again* (`heard_again`) | Odoo | the first report after a silence; dated its reception |
+| *Changed workstation* (`moved`) | Odoo | a workstation reports a deck that another one holds (see Access) |
+
+A deck unplugged for long has no event of its own: its `unplugged` event
+already dates it.
+
+The cron *Stream Deck: watch workstations and decks* runs every 5
+minutes, which is the granularity of every delay. It marks a workstation
+silent once (*Silent since*); its next report clears the mark. A
+workstation that is archived, has no token (unenrolled or revoked) or has
+never reported never goes silent. The extension reports every 15 minutes
+and not while the screen is locked: a workstation turned off for the
+night, asleep or locked beyond the delay goes silent, then is heard again
+at its next report.
+
+### Activities, on demand
+
+| Problem | Activity type, on | Opens | Closes |
+|---|---|---|---|
+| Deck service failed | *Deck service failed*, on the workstation | the service has stayed `failed` for its delay | by itself, at the report that carries another state |
+| Workstation silent | *Workstation silent*, on the workstation | the workstation goes silent | by itself, at its next report |
+| Deck unplugged for long | *Deck unplugged for long*, on the deck | the deck has been unplugged for its delay, counted from its last sighting or its last `unplugged` event, whichever is later | by itself, at the report that shows it plugged in |
+| Deck changed workstation | *Deck changed workstation*, on the deck | at the report that moves the deck | by a person; a new move adds a note to the open activity, whoever it is assigned to |
+
+- **Recipient.** *Employee*: the employee of the workstation, or of the
+  workstation that holds the deck; for a move, the new holder, the lender
+  reads the move in the history. *Manager*, the default: the user named
+  in the Settings. *Employee and manager*: one activity for each.
+- **Never a duplicate.** A record has at most one open activity of a type
+  per assigned user, and a deck one open *Deck changed workstation*
+  activity. A *Deck service failed* or *Deck unplugged for long*
+  activity marked done while its problem lasts opens again at the next
+  run of the cron; a silence opens its activity once.
+- **Closing.** A closed activity stays done, with the feedback « Resolved
+  at <time>: <what happened> », the time in the time zone of the assigned
+  user (UTC without one) and the text in their language. Archiving a
+  workstation or its employee, or revoking its token, closes its
+  activities and the *Deck unplugged for long* activities of its decks
+  with « the workstation is archived » or « the workstation is
+  unenrolled ». Closing does not depend on the Settings: an activity
+  opened before they were disabled still closes.
+- **Archived manager.** When the named manager is archived later, only
+  the employee part opens, and each run of the cron writes a warning to
+  the log, which names nobody.
+- **Access.** An activity is read with its record. An employee reads the
+  activities of their workstations, the manager's included, and those of
+  the decks they hold or held, from their first holding on, plus those
+  assigned to them; never those of another employee's workstation. On a
+  workstation's thread, the employee posts, edits their own messages and
+  closes their own activities; only a manager edits, closes or deletes
+  those of others. Only the monitoring creates activities of its four
+  types.
+- **Notification.** Odoo tells the assigned user of a new activity as it
+  does for any activity (inbox or e-mail, by their preference). The module
+  sends no e-mail and no notification of its own.
+
+### Settings › Stream Deck
+
+Reserved to administrators, as the whole Settings page. Each setting is
+the `ir.config_parameter` `erplibre_streamdeck.<key>`.
+
+| Setting | Key | Default | Bound |
+|---|---|---|---|
+| Stream Deck detection activities | `activities_enabled` | off | — |
+| Activities for | `activity_recipient` | Manager | Employee, Manager, Employee and manager |
+| Activity manager | `activity_manager_id` | empty | required to enable the activities for Manager or Employee and manager; offered among the Stream Deck managers |
+| Deck service failed, Workstation silent, Deck changed workstation, Deck unplugged for long | `alert_service_failed`, `alert_silent`, `alert_moved`, `alert_unplugged` | on | — |
+| Silent after (minutes) | `silent_after_min` | 60 | 30 at least: one missed heartbeat is not silence |
+| Unplugged for long after (hours) | `unplugged_after_h` | 72 | 1 at least |
+| Service failed for (minutes) | `service_failed_after_min` | 10 | 0 at least |
+
+The silent delay also dates the *Workstation silent* event, so it holds
+with the activities disabled. The 72 hours cover a weekend without an
+alert for a laptop taken home; the 10 minutes let the deck service restart
+by itself after a brief failure.
+
+### What stays history only
+
+- Every problem while the activities are disabled, the default.
+- A problem whose box is cleared.
+- A deck service failed, or a deck unplugged, for less than its delay.
+- Nothing leaves Odoo: no e-mail, push notification or message beyond
+  Odoo activities. The delays are global, never per workstation or per
+  employee, and the health of the deck itself (firmware, keys) is not
+  watched.
 
 ## Wire protocol 1.0
 
@@ -165,12 +272,20 @@ Personne ne l'écrit à la main : seules les routes des postes l'écrivent.
 | Stream Deck › Mes postes | tout employé | ses postes ; le bouton *Ajouter un poste* affiche un code d'appairage |
 | Stream Deck › Mes decks | tout employé | les decks que ses postes tiennent ou ont tenus |
 | Stream Deck › Parc › Postes, Decks, Événements | gestionnaire | tout, en lecture, sauf le nom, l'archivage et le jeton d'un poste |
+| Stream Deck › Paramètres | administrateur | la section *Stream Deck* des Paramètres : la surveillance |
 
 Un poste montre ce que disait sa dernière remontée : système
 d'exploitation, versions de GNOME Shell, de l'extension et du contrat,
 branche et commit du checkout ERPLibre, programme du deck et état de son
-service, ses decks et ses événements. Son employé peut le renommer et
-révoquer son jeton ; le gestionnaire peut aussi l'archiver.
+service depuis quand, ses decks et ses événements. Son employé peut le
+renommer et révoquer son jeton ; le gestionnaire peut aussi l'archiver.
+*Parc › Postes* ajoute la colonne *Muet depuis* et le filtre *Muets*.
+
+Un poste et un deck portent chacun leur fil, où la surveillance pose ses
+activités et ses notes. Chaque liste d'événements nomme l'événement par
+son libellé : l'état du service pour un changement de service (*Service
+démarré*, *en échec*, *arrêté*, *absent*), la sorte pour tout autre ;
+l'historique filtre sur chaque libellé.
 
 ## Inscrire un poste
 
@@ -225,6 +340,109 @@ poste qui remonte de nouveau le deck ne déplace rien.
 Archiver un utilisateur archive ses postes et révoque leurs jetons ; les
 postes, leurs decks et leurs événements restent lisibles du gestionnaire.
 Les codes d'appairage ne sont lisibles de personne.
+
+## Surveillance
+
+Odoo surveille quatre problèmes : un service du deck qui reste en échec,
+un poste muet, un deck débranché longtemps et un deck changé de poste. Il
+écrit toujours l'historique. Il n'ouvre d'activités Odoo que si
+*Paramètres › Stream Deck* les active, ce qui n'est pas le cas par défaut.
+
+### L'historique, toujours
+
+| Événement | Écrit par | Quand |
+|---|---|---|
+| *Service démarré*, *en échec*, *arrêté*, *absent* (`service_changed`) | le poste | son service du deck change d'état |
+| *Poste muet* (`silent`) | Odoo | le poste n'a envoyé aucune remontée pendant le délai de silence ; daté de la fin de ce délai après sa dernière remontée |
+| *Poste revenu* (`heard_again`) | Odoo | la première remontée après un silence ; daté de sa réception |
+| *Changé de poste* (`moved`) | Odoo | un poste remonte un deck que tient un autre poste (voir Accès) |
+
+Un deck débranché longtemps n'a pas d'événement à lui : son événement
+`unplugged` le date déjà.
+
+Le cron *Stream Deck : surveiller les postes et les decks* tourne toutes
+les 5 minutes, ce qui donne la granularité de chaque délai. Il marque un
+poste muet une seule fois (*Muet depuis*) ; sa remontée suivante efface la
+marque. Un poste archivé, sans jeton (désinscrit ou révoqué) ou qui n'a
+jamais remonté ne devient jamais muet. L'extension remonte toutes les 15
+minutes, et pas pendant que l'écran est verrouillé : un poste éteint la
+nuit, en veille ou verrouillé au-delà du délai devient muet, puis revient
+à sa remontée suivante.
+
+### Les activités, sur demande
+
+| Problème | Type d'activité, sur | S'ouvre | Se ferme |
+|---|---|---|---|
+| Service du deck en échec | *Service du deck en échec*, sur le poste | le service est resté `failed` pendant son délai | seule, à la remontée qui porte un autre état |
+| Poste muet | *Poste muet*, sur le poste | le poste devient muet | seule, à sa remontée suivante |
+| Deck débranché longtemps | *Deck débranché longtemps*, sur le deck | le deck est débranché depuis son délai, compté de sa dernière apparition ou de son dernier événement `unplugged`, le plus récent des deux | seule, à la remontée qui le montre branché |
+| Deck changé de poste | *Deck changé de poste*, sur le deck | à la remontée qui déplace le deck | par une personne ; un nouveau déplacement ajoute une note à l'activité ouverte, quel que soit son destinataire |
+
+- **Destinataire.** *Employé* : l'employé du poste, ou du poste qui tient
+  le deck ; pour un déplacement, le nouveau détenteur, le prêteur
+  l'apprend par l'historique. *Gestionnaire*, par défaut : l'utilisateur
+  nommé dans les Paramètres. *Employé et gestionnaire* : une activité à
+  chacun.
+- **Jamais de doublon.** Un enregistrement a au plus une activité ouverte
+  d'un type par destinataire, et un deck une seule activité *Deck changé
+  de poste* ouverte. Une activité *Service du deck en échec* ou *Deck
+  débranché longtemps* marquée faite pendant que son problème dure se
+  rouvre au passage suivant du cron ; un silence n'ouvre son activité
+  qu'une fois.
+- **Fermeture.** Une activité fermée reste faite, avec le retour « Résolu
+  à <heure> : <ce qui s'est passé> », l'heure dans le fuseau du
+  destinataire (UTC à défaut) et le texte dans sa langue. Archiver un
+  poste ou son employé, ou révoquer son jeton, ferme ses activités et les
+  activités *Deck débranché longtemps* de ses decks avec « le poste est
+  archivé » ou « le poste est désinscrit ». La fermeture ne dépend pas des
+  Paramètres : une activité ouverte avant leur désactivation se ferme
+  encore.
+- **Gestionnaire archivé.** Si le gestionnaire nommé est archivé ensuite,
+  seule la part de l'employé s'ouvre, et chaque passage du cron écrit au
+  journal un avertissement qui ne nomme personne.
+- **Accès.** Une activité se lit avec son enregistrement. Un employé lit
+  les activités de ses postes, celles du gestionnaire comprises, et
+  celles des decks qu'il détient ou a détenus, à partir de sa première
+  détention, plus celles qui lui sont assignées ; jamais celles du poste
+  d'un autre employé. Au fil d'un poste, l'employé publie, modifie ses
+  propres messages et ferme ses propres activités ; seul un gestionnaire
+  modifie, ferme ou supprime ceux des autres. Seule la surveillance crée
+  des activités de ses quatre types.
+- **Notification.** Odoo prévient le destinataire d'une nouvelle activité
+  comme pour toute activité (boîte de réception ou courriel, selon sa
+  préférence). Le module n'envoie aucun courriel ni aucune notification
+  de son côté.
+
+### Paramètres › Stream Deck
+
+Réservés aux administrateurs, comme toute la page Paramètres. Chaque
+paramètre est l'`ir.config_parameter` `erplibre_streamdeck.<clé>`.
+
+| Paramètre | Clé | Défaut | Borne |
+|---|---|---|---|
+| Activités de détection Stream Deck | `activities_enabled` | désactivé | — |
+| Activités pour | `activity_recipient` | Gestionnaire | Employé, Gestionnaire, Employé et gestionnaire |
+| Gestionnaire des activités | `activity_manager_id` | vide | requis pour activer les activités pour Gestionnaire ou Employé et gestionnaire ; proposé parmi les gestionnaires Stream Deck |
+| Service du deck en échec, Poste muet, Deck changé de poste, Deck débranché longtemps | `alert_service_failed`, `alert_silent`, `alert_moved`, `alert_unplugged` | cochés | — |
+| Muet après (minutes) | `silent_after_min` | 60 | 30 au moins : un battement manqué n'est pas un silence |
+| Débranché longtemps après (heures) | `unplugged_after_h` | 72 | 1 au moins |
+| Service en échec depuis (minutes) | `service_failed_after_min` | 10 | 0 au moins |
+
+Le délai de silence date aussi l'événement *Poste muet* : il vaut même
+activités désactivées. Les 72 heures couvrent une fin de semaine sans
+alerte pour un portable emporté ; les 10 minutes laissent le service du
+deck repartir seul après un échec bref.
+
+### Ce qui reste de l'historique seulement
+
+- Tout problème tant que les activités sont désactivées, le défaut.
+- Un problème dont la case est décochée.
+- Un service du deck en échec, ou un deck débranché, moins longtemps que
+  son délai.
+- Rien ne sort d'Odoo : ni courriel, ni notification push, ni message
+  hors des activités Odoo. Les délais sont globaux, jamais par poste ni
+  par employé, et la santé du deck lui-même (firmware, touches) n'est pas
+  surveillée.
 
 ## Protocole de remontée 1.0
 

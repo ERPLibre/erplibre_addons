@@ -10,7 +10,8 @@
         <field name="name">streamdeck.workstation.list</field>
         <field name="model">streamdeck.workstation</field>
         <field name="arch" type="xml">
-            <list decoration-muted="not token_active">
+            <list decoration-muted="not token_active"
+                  decoration-warning="silent_since">
                 <header>
                     <button name="%(action_streamdeck_pairing_wizard)d"
                             type="action"
@@ -32,6 +33,7 @@
                        decoration-warning="service_state == 'inactive'"
                        optional="show"/>
                 <field name="last_report" optional="show"/>
+                <field name="silent_since" optional="show"/>
                 <field name="token_active" optional="show"/>
                 <field name="lost_events_total" optional="hide"/>
                 <field name="active" column_invisible="True"
@@ -77,12 +79,15 @@
                             <field name="contract_version" readonly="True"/>
                             <field name="deck_program" readonly="True"/>
                             <field name="service_state" readonly="True"/>
+                            <field name="service_state_since" readonly="True"/>
                         </group>
                         <group string="Reports">
                             <field name="token_active" readonly="True"/>
                             <field name="token_created" readonly="True"/>
                             <field name="token_last_used" readonly="True"/>
                             <field name="last_report" readonly="True"/>
+                            <field name="silent_since" readonly="True"
+                                   invisible="not silent_since"/>
                             <field name="lost_events_total" readonly="True"/>
                         </group>
                     </group>
@@ -103,15 +108,17 @@
                             <field name="event_ids" readonly="True">
                                 <list>
                                     <field name="at"/>
-                                    <field name="kind"/>
+                                    <field name="label"/>
+                                    <field name="kind" optional="hide"/>
                                     <field name="device_id"/>
-                                    <field name="service_state"/>
+                                    <field name="service_state" optional="hide"/>
                                     <field name="received_at" optional="hide"/>
                                 </list>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -132,6 +139,8 @@
                 <separator/>
                 <filter name="service_failed" string="Deck service failed"
                         domain="[('service_state', '=', 'failed')]"/>
+                <filter name="silent" string="Silent"
+                        domain="[('silent_since', '!=', False)]"/>
                 <separator/>
                 <filter name="archived" string="Archived"
                         domain="[('active', '=', False)]"/>

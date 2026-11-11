@@ -53,7 +53,8 @@
                             <field name="event_ids" readonly="True">
                                 <list>
                                     <field name="at"/>
-                                    <field name="kind"/>
+                                    <field name="label"/>
+                                    <field name="kind" optional="hide"/>
                                     <field name="workstation_name"/>
                                     <field name="employee_name"/>
                                     <field name="previous_workstation_name"
@@ -64,6 +65,7 @@
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

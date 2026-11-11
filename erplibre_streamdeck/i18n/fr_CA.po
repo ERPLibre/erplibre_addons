@@ -858,6 +858,7 @@ msgstr "Numéro de série"
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service absent"
 msgstr "Service absent"
 
@@ -870,6 +871,7 @@ msgstr "Service changé"
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service failed"
 msgstr "Service en échec"
 
@@ -881,12 +883,14 @@ msgstr "Service en échec depuis (minutes)"
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service started"
 msgstr "Service démarré"
 
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service stopped"
 msgstr "Service arrêté"
 
@@ -904,6 +908,11 @@ msgstr ""
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_settings
 msgid "Settings"
 msgstr "Paramètres"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Silent"
+msgstr "Muets"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_silent_after_min
@@ -1155,6 +1164,7 @@ msgstr "Poste"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__heard_again
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Workstation heard again"
 msgstr "Poste revenu"
 
@@ -1168,6 +1178,7 @@ msgstr "Nom du poste"
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__silent
 #: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_silent
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Workstation silent"
 msgstr "Poste muet"
 
