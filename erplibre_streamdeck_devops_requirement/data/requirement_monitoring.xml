@@ -535,7 +535,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">streamdeck.monitor._on_report works on the reporting workstation and its decks only, closing by record and opening only for a deck that changed workstation; every search over the fleet runs in the cron.</field>
+        <field name="achievement">streamdeck.monitor._on_report works on the reporting workstation and its decks only, closing by record and opening only for a deck that changed workstation; every search over the fleet runs in the cron. The mail notices of the activities it opens or closes go to Odoo's mail queue, so a report never waits on the mail server.</field>
         <field name="notes">Origin: unit test missing; a unit test pins it.</field>
     </record>
     <record id="req_sd_mon_r38" model="devops.requirement">
@@ -1294,5 +1294,11 @@
         <field name="sequence" eval="10" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_report_leaves_the_time_based_work_to_the_cron</field>
+    </record>
+    <record id="test_sd_mon_r37_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r37" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_report_never_sends_the_notices_of_its_activities</field>
     </record>
 </odoo>
