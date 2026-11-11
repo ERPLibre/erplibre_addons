@@ -105,12 +105,12 @@ already dates it.
 
 The cron *Stream Deck: watch workstations and decks* runs every 5
 minutes, which is the granularity of every delay. It marks a workstation
-silent once (*Silent since*); its next report clears the mark. A
-workstation that is archived, has no token (unenrolled or revoked) or has
-never reported never goes silent. The extension reports every 15 minutes
-and not while the screen is locked: a workstation turned off for the
-night, asleep or locked beyond the delay goes silent, then is heard again
-at its next report.
+silent once (*Silent since*); its next report clears the mark, and so do
+archiving it and removing its token. A workstation that is archived, has
+no token (unenrolled or revoked) or has never reported never goes
+silent. The extension reports every 15 minutes and not while the screen
+is locked: a workstation turned off for the night, asleep or locked
+beyond the delay goes silent, then is heard again at its next report.
 
 ### Activities, on demand
 
