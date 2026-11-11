@@ -602,6 +602,38 @@ class TestStreamdeckMonitor(TransactionCase):
                 self.assertFalse(self._events(workstation, "silent"))
                 self.assertFalse(self._activities(workstation, active=None))
 
+    def test_a_silent_workstation_unenrolled_or_archived_is_no_longer_silent(
+        self,
+    ):
+        # Le cron ne revoit plus un poste sans jeton : la marque laissée
+        # le garderait au filtre « Muets » et en couleur au Parc sans fin.
+        self._enable()
+        for token in (self.token_a, self.token_b, self.token_c):
+            self._report(token, T0)
+        self._cron(T0 + 2 * HOUR)
+        ended = (self.workstation_a, self.workstation_b, self.workstation_c)
+        for workstation in ended:
+            self.assertTrue(workstation.silent_since)
+        self.Service.unenroll(self.token_a, {"protocol": "1.0"})
+        self.workstation_b.with_user(self.manager).action_revoke_token()
+        self.workstation_c.with_user(self.manager).action_archive()
+        silent = self.env["streamdeck.workstation"].with_context(
+            active_test=False
+        )
+        for workstation in ended:
+            with self.subTest(workstation=workstation.name):
+                self.assertFalse(workstation.silent_since)
+                self.assertFalse(
+                    silent.search(
+                        [
+                            ("silent_since", "!=", False),
+                            ("id", "=", workstation.id),
+                        ]
+                    )
+                )
+                # L'historique garde le silence.
+                self.assertEqual(len(self._events(workstation, "silent")), 1)
+
     def test_archiving_a_workstation_closes_its_activities(self):
         self._enable()
         self._unplug(self.token_a, T0, deck=DECK, service_state="failed")

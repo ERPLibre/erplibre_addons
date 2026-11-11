@@ -33,7 +33,8 @@ class StreamdeckWorkstation(models.Model):
     Archiving a workstation or clearing its token closes, before anything
     else, the monitoring activities it will never solve
     (`streamdeck.monitor._resolve_all`): Odoo deletes the open activities
-    of an archived record, so they are closed first and stay done.
+    of an archived record, so they are closed first and stay done. It
+    clears `silent_since` too, which no report will clear any more.
     """
 
     _name = "streamdeck.workstation"
@@ -154,10 +155,14 @@ class StreamdeckWorkstation(models.Model):
 
     def _end_monitoring(self, reason):
         """Close the monitoring activities of these workstations, `reason`
-        being "archived" or "unenrolled"."""
+        being "archived" or "unenrolled", and clear their `silent_since`:
+        the cron watches only active workstations with a token, so a mark
+        left there would never be cleared. The `silent` event stays in
+        the history."""
         Monitor = self.env["streamdeck.monitor"]
         for workstation in self:
             Monitor._resolve_all(workstation, reason)
+        self.sudo().filtered("silent_since").write({"silent_since": False})
 
     def _check_writable(self, vals):
         """Raise AccessError when `vals` holds a field that the current
