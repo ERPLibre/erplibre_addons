@@ -54,7 +54,25 @@ DECISIONS = ("SD-MON-R07",)
 
 # Les requis encore à faire : chacun décrit son écart dans Ce qui manque,
 # et le passer à fait passe par cette liste.
-TO_DO = ("SD-MON-R17", "SD-MON-R23", "SD-MON-R38")
+TO_DO = (
+    "SD-MON-R05",
+    "SD-MON-R17",
+    "SD-MON-R18",
+    "SD-MON-R19",
+    "SD-MON-R23",
+    "SD-MON-R38",
+)
+
+# Un requis dont la garantie repose sur un autre en dépend, et reste à
+# faire tant que celui-là ne l'est pas. Une activité d'un type de la
+# surveillance posée par un autre que la surveillance occupe la place de
+# celle qu'elle ouvrirait pour le même utilisateur ; ceux qui promettent
+# qu'une activité s'ouvre pour un destinataire reposent donc sur SD-MON-R17.
+DEPENDS_ON = {
+    "SD-MON-R05": ["SD-MON-R17"],
+    "SD-MON-R18": ["SD-MON-R17"],
+    "SD-MON-R19": ["SD-MON-R17"],
+}
 
 FRENCH = {
     "cat_sd_mon": "Surveillance",
@@ -198,6 +216,21 @@ class TestRequirementMonitoring(TransactionCase):
             sorted(self.requirements.filtered(lambda r: not r.done).ids),
             sorted(self._requirement(code).id for code in TO_DO),
         )
+
+    def test_a_requirement_is_not_done_before_what_it_rests_on(self):
+        for code, depends_on in DEPENDS_ON.items():
+            self.assertEqual(
+                sorted(self._requirement(code).depends_on_ids.mapped("code")),
+                depends_on,
+                code,
+            )
+        for requirement in self.requirements:
+            undone = requirement.depends_on_ids.filtered(lambda r: not r.done)
+            with self.subTest(code=requirement.code):
+                if undone:
+                    self.assertFalse(requirement.done)
+                for code in undone.mapped("code"):
+                    self.assertIn(code, requirement.missing or "")
 
     def test_security_requirements_are_must_and_flagged(self):
         security = self.requirements.filtered(

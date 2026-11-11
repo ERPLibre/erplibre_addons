@@ -87,13 +87,17 @@ that each part of the work is checked on its own. Its proofs are Odoo
 tests of `erplibre_streamdeck`. A design decision that no Odoo test can
 hold, such as a locked workstation counted as silent, is done without a
 proof, MoSCoW *Should*, *Non-functional*, its reason in *Achievement*. A
-gap the code still has stays to do and *What is missing* describes it.
+gap the code still has stays to do and *What is missing* describes it. A
+requirement whose guarantee rests on another one lists it under *Depends
+on*, and stays to do, naming it in *What is missing*, as long as that one
+is not done.
 
 The test `tests/test_requirement_monitoring.py` checks that each proof
 names an Odoo test that runs under `--test-tags /<module>`, that each test
 of the files `test_streamdeck_monitor*.py` and `test_streamdeck_settings.py`
-of `erplibre_streamdeck` proves at least one requirement, and that the
-requirements still to do are exactly those it names.
+of `erplibre_streamdeck` proves at least one requirement, that the
+requirements still to do are exactly those it names, and that none is done
+while one it depends on is not.
 
 ## Proofs and verdicts
 

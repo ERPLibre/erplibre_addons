@@ -76,12 +76,13 @@
         <field name="sequence" eval="50" />
         <field name="moscow">must</field>
         <field name="requirement_type">functional</field>
-        <field name="devsecops_stage">test</field>
+        <field name="devsecops_stage">code</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
+        <field name="done" eval="False" />
         <field name="achievement">ALERT_KINDS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, one alert_&lt;kind&gt; parameter each, kept as False when cleared so that the default never comes back; streamdeck.monitor._open opens nothing for a kind whose box is cleared, and its history is still written.</field>
-        <field name="notes">Origin: covered by a test.</field>
+        <field name="missing">Holds only once SD-MON-R17 is done: until then, an employee who creates an activity of a monitoring type on their workstation, with the type given by the context key default_activity_type_id, takes the place of the one the monitoring opens for its user, and that user gets none for the problem.</field>
+        <field name="notes">Origin: violated.</field>
     </record>
     <record id="req_sd_mon_r06" model="devops.requirement">
         <field name="code">SD-MON-R06</field>
@@ -262,12 +263,13 @@
         <field name="sequence" eval="180" />
         <field name="moscow">must</field>
         <field name="requirement_type">functional</field>
-        <field name="devsecops_stage">test</field>
+        <field name="devsecops_stage">code</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
+        <field name="done" eval="False" />
         <field name="achievement">streamdeck.monitor._recipients of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_monitor.py; mail.activity has a single user_id.</field>
-        <field name="notes">Origin: covered by a test.</field>
+        <field name="missing">Holds only once SD-MON-R17 is done: until then, an employee who gives the named manager an activity of a monitoring type on their workstation, with the type given by the context key default_activity_type_id, leaves the manager without the activity of the problem, so the recipient both gives only the employee's.</field>
+        <field name="notes">Origin: violated.</field>
     </record>
     <record id="req_sd_mon_r19" model="devops.requirement">
         <field name="code">SD-MON-R19</field>
@@ -276,12 +278,13 @@
         <field name="sequence" eval="190" />
         <field name="moscow">must</field>
         <field name="requirement_type">functional</field>
-        <field name="devsecops_stage">test</field>
+        <field name="devsecops_stage">code</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
+        <field name="done" eval="False" />
         <field name="achievement">_check_streamdeck_settings of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py refuses the save, and the field's domain lists the internal users of the manager group; streamdeck.monitor._named_manager drops an archived or deleted manager with a warning, logged only while the activities are enabled.</field>
-        <field name="notes">Origin: covered by a test.</field>
+        <field name="missing">Holds only once SD-MON-R17 is done: until then, an activity of a monitoring type created on a workstation by its employee, with the type given by the context key default_activity_type_id, takes the place of the part of the user it is assigned to, the named manager or the employee.</field>
+        <field name="notes">Origin: violated.</field>
     </record>
     <record id="req_sd_mon_r20" model="devops.requirement">
         <field name="code">SD-MON-R20</field>
@@ -550,6 +553,15 @@
         <field name="achievement">Examples are invented (host-a, SN-MON-1, Employee A); erplibre:script/analyse/check_comment_hygiene.py reports identifying data in comments, and the commit-msg hook of erplibre:script/git/hooks refuses an address, an email or an account path in a commit body.</field>
         <field name="missing">No test sweeps the files of the monitoring: check_comment_hygiene.py runs by hand and from the pre-commit hook, which lists its findings without blocking the commit.</field>
         <field name="notes">Origin: unit test missing.</field>
+    </record>
+    <!-- Ce qui attend SD-MON-R17 : ref() ne nomme qu'un enregistrement déjà
+         chargé, et R05 précède R17 quand R18 et R19 le suivent ; le lien
+         s'écrit donc une fois tous les requis chargés. -->
+    <record id="req_sd_mon_r17" model="devops.requirement">
+        <field
+            name="dependent_ids"
+            eval="[(6, 0, [ref('req_sd_mon_r05'), ref('req_sd_mon_r18'), ref('req_sd_mon_r19')])]"
+        />
     </record>
     <record id="test_sd_mon_r01_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r01" />
@@ -1084,6 +1096,12 @@
         <field name="sequence" eval="110" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_the_monitoring_reads_in_fr_CA</field>
+    </record>
+    <record id="test_sd_mon_r24_12" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="120" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_a_requirement_is_not_done_before_what_it_rests_on</field>
     </record>
     <record id="test_sd_mon_r25_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r25" />
