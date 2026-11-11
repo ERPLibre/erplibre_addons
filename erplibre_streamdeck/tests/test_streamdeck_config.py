@@ -179,6 +179,31 @@ class TestStreamdeckConfig(TransactionCase):
         with self.assertRaises(ValidationError):
             line.write({"value": "maybe"})
 
+    def test_a_line_that_changes_only_its_key_keeps_to_the_schema(self):
+        # Sans `value` dans l'écriture, la valeur en place est jugée sous
+        # la nouvelle clé : « on » n'est pas un programme du deck.
+        profile = self._profile()
+        for label, line, user in (
+            ("profile", self._line(profile, "games", "on"), self.env.user),
+            (
+                "workstation",
+                self.Line.with_user(self.user).create(
+                    {
+                        "workstation_id": self.ws.id,
+                        "key": "games",
+                        "value": "on",
+                    }
+                ),
+                self.user,
+            ),
+        ):
+            with self.subTest(layer=label):
+                with self.assertRaises(ValidationError):
+                    with self.cr.savepoint():
+                        line.with_user(user).write({"key": "deck_program"})
+                self.assertEqual(line.key, "games")
+                self.assertEqual(line.value, '"on"')
+
     def test_profile_then_model_then_workstation(self):
         profile = self._profile()
         self._line(profile, "deck_program", "tiler")
