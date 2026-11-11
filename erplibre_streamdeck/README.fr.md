@@ -160,7 +160,8 @@ suivante.
 - **Notification.** Odoo prévient le destinataire d'une nouvelle activité
   comme pour toute activité (boîte de réception ou courriel, selon sa
   préférence). Le module n'envoie aucun courriel ni aucune notification
-  de son côté.
+  de son côté. Ce courriel passe par la file des courriels d'Odoo : ni une
+  remontée ni le cron n'attendent le serveur de courriel.
 
 ### Paramètres › Stream Deck
 
