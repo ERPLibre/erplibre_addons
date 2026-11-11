@@ -1,6 +1,7 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import fields, models
+from odoo.tools import SQL
 
 from .streamdeck_workstation import SERVICE_STATES
 
@@ -19,6 +20,11 @@ class StreamdeckEvent(models.Model):
     drawn by Odoo and the reception time as `at`. `workstation_id` is the
     new holder and `previous_workstation_id` the one it left, its name
     copied in `previous_workstation_name` as the other names are.
+
+    `visible_to_me` is true for the current user on the events of a deck
+    they hold or held, dated from their first holding on
+    (`streamdeck.device.holding`); the record rule of the employees
+    opens these, besides the events of their own workstations.
     """
 
     _name = "streamdeck.event"
@@ -62,7 +68,51 @@ class StreamdeckEvent(models.Model):
     previous_workstation_name = fields.Char(string="Previous workstation name")
     employee_name = fields.Char(string="Employee")
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
+    visible_to_me = fields.Boolean(
+        string="From my holding",
+        compute="_compute_visible_to_me",
+        search="_search_visible_to_me",
+        help="An event of a deck you hold or held, dated from the first"
+        " moment one of your workstations held it.",
+    )
 
     _sql_constraints = [
         ("uuid_unique", "UNIQUE(uuid)", "An event uuid is unique."),
     ]
+
+    def _held_by_me_sql(self):
+        """The ids of the events that `visible_to_me` selects, for the
+        user of the environment, sudo or not: an event of a deck with a
+        holding of this user whose `since` is not after the event."""
+        self.env["streamdeck.device.holding"].flush_model()
+        self.flush_model(["device_id", "at"])
+        return SQL(
+            "SELECT e.id FROM streamdeck_event e"
+            " JOIN streamdeck_device_holding h"
+            " ON h.device_id = e.device_id AND h.since <= e.at"
+            " WHERE h.user_id = %s",
+            self.env.uid,
+        )
+
+    def _compute_visible_to_me(self):
+        ids = [event.id for event in self if isinstance(event.id, int)]
+        self.env.cr.execute(
+            SQL("%s AND e.id = ANY(%s)", self._held_by_me_sql(), ids)
+        )
+        visible = {row[0] for row in self.env.cr.fetchall()}
+        for event in self:
+            event.visible_to_me = event.id in visible
+
+    def _search_visible_to_me(self, operator, value):
+        if operator not in ("=", "!=") or not isinstance(value, bool):
+            raise NotImplementedError(
+                "visible_to_me is searched with = or != and a boolean"
+            )
+        selected = (operator == "=") == value
+        return [
+            (
+                "id",
+                "in" if selected else "not in",
+                SQL("(%s)", self._held_by_me_sql()),
+            )
+        ]
