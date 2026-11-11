@@ -340,6 +340,11 @@ msgid "Configuration"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_applied
+msgid "Configuration applied"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_line_ids
 msgid "Configuration overrides"
 msgstr ""
@@ -352,6 +357,16 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_profile_id
 msgid "Configuration profile"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_refused
+msgid "Configuration refused"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_revision
+msgid "Configuration revision"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -421,6 +436,11 @@ msgstr ""
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__model_id
 msgid "Deck model"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
+msgid "Deck plugins"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -814,6 +834,11 @@ msgid "Layer"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_adopted
+msgid "Local setting adopted"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 msgid "Lock"
@@ -1076,6 +1101,7 @@ msgid "Received"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_reason
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_reason
 msgid "Refusal reason"
 msgstr ""
@@ -1190,11 +1216,26 @@ msgid "Setting"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_drift
+msgid "Setting changed locally"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_settings
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__line_ids
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__line_ids
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_settings
 msgid "Settings"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_ask
+msgid "Settings asked"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_keys
+msgid "Settings involved"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -1367,6 +1408,25 @@ msgstr ""
 msgid ""
 "The employee is the one of the workstation, or of the workstation that holds"
 " the deck. Both give one activity to each."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_ask
+msgid ""
+"The free settings, separated by commas, whose local value the employee is "
+"asked to keep or replace by Odoo's: the first pilot waits for their choice."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
+msgid ""
+"The ids of the deck plugins found on the workstation's disk, separated by "
+"commas, as its last report of protocol 1.1 or later listed them."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__config_keys
+msgid "The managed settings the event is about."
 msgstr ""
 
 #. module: erplibre_streamdeck

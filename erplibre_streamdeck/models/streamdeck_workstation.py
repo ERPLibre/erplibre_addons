@@ -106,6 +106,13 @@ class StreamdeckWorkstation(models.Model):
     erplibre_branch = fields.Char(string="ERPLibre branch")
     erplibre_commit = fields.Char(string="ERPLibre commit")
     deck_program = fields.Char(string="Deck program")
+    deck_plugins = fields.Text(
+        string="Deck plugins",
+        readonly=True,
+        help="The ids of the deck plugins found on the workstation's disk,"
+        " separated by commas, as its last report of protocol 1.1 or later"
+        " listed them.",
+    )
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
     service_state_since = fields.Datetime(
         string="Deck service state since",
@@ -205,6 +212,14 @@ class StreamdeckWorkstation(models.Model):
     )
     config_pending_since = fields.Datetime(
         string="Configuration pending since", readonly=True, copy=False
+    )
+    config_ask = fields.Char(
+        string="Settings asked",
+        readonly=True,
+        copy=False,
+        help="The free settings, separated by commas, whose local value"
+        " the employee is asked to keep or replace by Odoo's: the first"
+        " pilot waits for their choice.",
     )
     config_first_choice = fields.Selection(
         FIRST_CHOICES,
