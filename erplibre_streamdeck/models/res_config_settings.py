@@ -17,6 +17,11 @@ DELAY_FLOORS = {
     "unplugged_after_h": 1,
     "service_failed_after_min": 0,
 }
+DELAY_DEFAULTS = {
+    "silent_after_min": 60,
+    "unplugged_after_h": 72,
+    "service_failed_after_min": 10,
+}
 
 RECIPIENTS = [
     ("employee", "Employee"),
@@ -91,7 +96,7 @@ class ResConfigSettings(models.TransientModel):
     )
     streamdeck_silent_after_min = fields.Integer(
         string="Silent after (minutes)",
-        default=60,
+        default=DELAY_DEFAULTS["silent_after_min"],
         config_parameter=PARAM_PREFIX + "silent_after_min",
         help=(
             "A workstation that has not reported for this delay is"
@@ -100,12 +105,12 @@ class ResConfigSettings(models.TransientModel):
     )
     streamdeck_unplugged_after_h = fields.Integer(
         string="Unplugged for long after (hours)",
-        default=72,
+        default=DELAY_DEFAULTS["unplugged_after_h"],
         config_parameter=PARAM_PREFIX + "unplugged_after_h",
     )
     streamdeck_service_failed_after_min = fields.Integer(
         string="Service failed for (minutes)",
-        default=10,
+        default=DELAY_DEFAULTS["service_failed_after_min"],
         config_parameter=PARAM_PREFIX + "service_failed_after_min",
         help=(
             "The deck service restarts by itself after a failure: a"

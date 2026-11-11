@@ -473,7 +473,8 @@ class StreamdeckService(models.AbstractModel):
         """Apply a valid report to the workstation of `token`. A
         `service_state` that differs from the stored one, or that has no
         date yet, is dated `now`; a silent workstation is no longer, and
-        gets a `heard_again` event dated `now`."""
+        gets a `heard_again` event dated `now`. The monitoring then hears
+        what the report solved or revealed."""
         _check_protocol(payload)
         workstation = self._workstation_of(token)
         state, decks, events, lost = _parse_report(payload)
@@ -489,6 +490,7 @@ class StreamdeckService(models.AbstractModel):
             or not workstation.service_state_since
         ):
             values["service_state_since"] = now
+        previous_service_state = workstation.service_state
         was_silent = bool(workstation.silent_since)
         if was_silent:
             values["silent_since"] = False
@@ -497,8 +499,15 @@ class StreamdeckService(models.AbstractModel):
             self._server_event(
                 workstation, "heard_again", now, received_at=now
             )
-        self._apply_decks(workstation, decks, now)
+        moved, replugged = self._apply_decks(workstation, decks, now)
         accepted = self._store_events(workstation, events, now)
+        self.env["streamdeck.monitor"]._on_report(
+            workstation,
+            moved,
+            replugged,
+            previous_service_state,
+            heard_again=was_silent,
+        )
         return _reply(accepted=accepted, heartbeat_s=HEARTBEAT_S)
 
     def _deck_key(self, workstation, deck):
@@ -545,8 +554,13 @@ class StreamdeckService(models.AbstractModel):
         `now`, which keeps both workstations, and the employee of
         `workstation` holds it from `now` unless they held it before; a
         deck created by this report, or already held by `workstation`,
-        gets none."""
-        seen = self.env["streamdeck.device"]
+        gets none.
+
+        Returns `(moved, replugged)`: the `(device, previous workstation)`
+        pairs of the decks taken from another workstation, and the decks
+        connected by this report that were not."""
+        seen = replugged = self.env["streamdeck.device"]
+        moved = []
         for deck in decks:
             device = self._device(workstation, deck, now)
             previous = device.workstation_id
@@ -562,6 +576,9 @@ class StreamdeckService(models.AbstractModel):
                 self.env["streamdeck.device.holding"]._hold(
                     device, workstation.user_id, now
                 )
+                moved.append((device, previous))
+            if not device.connected:
+                replugged |= device
             values = {"last_seen": now, "connected": True}
             if not device.connected or previous != workstation:
                 values["connected_since"] = now
@@ -575,6 +592,7 @@ class StreamdeckService(models.AbstractModel):
         (workstation.device_ids - seen).filtered("connected").write(
             {"connected": False, "connected_since": False}
         )
+        return moved, replugged
 
     def _server_event(
         self,

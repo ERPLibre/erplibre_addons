@@ -295,6 +295,7 @@ msgstr "Deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_moved
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_moved
 msgid "Deck changed workstation"
 msgstr "Deck changé de poste"
 
@@ -317,6 +318,7 @@ msgstr "Service du deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_service_failed
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_service_failed
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Deck service failed"
 msgstr "Service du deck en échec"
@@ -328,6 +330,7 @@ msgstr "État du service du deck depuis"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_unplugged
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_unplugged
 msgid "Deck unplugged for long"
 msgstr "Deck débranché longtemps"
 
@@ -759,6 +762,12 @@ msgid "One of your workstations holds this deck or held it."
 msgstr "Un de vos postes détient ce deck ou l'a détenu."
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "Only the Stream Deck monitoring opens activities of this type."
+msgstr "Seule la surveillance Stream Deck ouvre des activités de ce type."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activities_enabled
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid ""
@@ -815,6 +824,12 @@ msgstr "Reçu"
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Reports"
 msgstr "Remontées"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "Resolved at %s: %s"
+msgstr "Résolu à %s : %s"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_user_id
@@ -942,6 +957,11 @@ msgid "Stream Deck event"
 msgstr "Événement Stream Deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_monitor
+msgid "Stream Deck monitoring"
+msgstr "Surveillance Stream Deck"
+
+#. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_pairing_code
 msgid "Stream Deck pairing code"
 msgstr "Code d'appairage Stream Deck"
@@ -962,9 +982,34 @@ msgid "Stream Deck workstation service"
 msgstr "Service des postes Stream Deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.actions.server,name:erplibre_streamdeck.ir_cron_streamdeck_watch_ir_actions_server
+msgid "Stream Deck: watch workstations and decks"
+msgstr "Stream Deck : surveiller les postes et les decks"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_manager_id
 msgid "The Stream Deck manager who receives the activities."
 msgstr "Le gestionnaire Stream Deck qui reçoit les activités."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "The deck has been unplugged for at least %(hours)s hours."
+msgstr "Le deck est débranché depuis au moins %(hours)s heures."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "The deck moved from workstation %(previous)s to %(current)s."
+msgstr "Le deck est passé du poste %(previous)s au poste %(current)s."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid ""
+"The deck service has been in the failed state for at least %(minutes)s "
+"minutes."
+msgstr "Le service du deck est en échec depuis au moins %(minutes)s minutes."
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
@@ -999,6 +1044,12 @@ msgid ""
 msgstr ""
 "L'employé est celui du poste, ou du poste qui tient le deck. Les deux "
 "donnent une activité à chacun."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "The workstation has sent no report for %(minutes)s minutes."
+msgstr "Le poste n'a envoyé aucune remontée depuis %(minutes)s minutes."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__token_active
@@ -1115,6 +1166,7 @@ msgstr "Nom du poste"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_silent
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__silent
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_silent
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid "Workstation silent"
 msgstr "Poste muet"
@@ -1124,3 +1176,45 @@ msgstr "Poste muet"
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet_workstations
 msgid "Workstations"
 msgstr "Postes"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck is plugged in again"
+msgstr "le deck est rebranché"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck service is absent"
+msgstr "le service du deck est absent"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck service is active"
+msgstr "le service du deck est actif"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck service is stopped"
+msgstr "le service du deck est arrêté"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the workstation is archived"
+msgstr "le poste est archivé"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the workstation is unenrolled"
+msgstr "le poste est désinscrit"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the workstation reported again"
+msgstr "le poste est revenu"

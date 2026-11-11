@@ -18,6 +18,8 @@
         "security/streamdeck_security.xml",
         "security/ir.model.access.csv",
         "security/streamdeck_rules.xml",
+        "data/streamdeck_activity_types.xml",
+        "data/streamdeck_cron.xml",
         "wizard/streamdeck_pairing_wizard_views.xml",
         "views/streamdeck_workstation_views.xml",
         "views/streamdeck_device_views.xml",
