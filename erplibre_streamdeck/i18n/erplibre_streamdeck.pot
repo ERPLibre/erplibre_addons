@@ -824,6 +824,7 @@ msgstr ""
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service absent"
 msgstr ""
 
@@ -836,6 +837,7 @@ msgstr ""
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service failed"
 msgstr ""
 
@@ -847,12 +849,14 @@ msgstr ""
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service started"
 msgstr ""
 
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service stopped"
 msgstr ""
 
@@ -867,6 +871,11 @@ msgstr ""
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_settings
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_settings
 msgid "Settings"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Silent"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -1102,6 +1111,7 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__heard_again
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Workstation heard again"
 msgstr ""
 
@@ -1115,6 +1125,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__silent
 #: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_silent
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Workstation silent"
 msgstr ""
 

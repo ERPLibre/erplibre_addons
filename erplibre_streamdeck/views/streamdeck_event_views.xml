@@ -13,12 +13,13 @@
         <field name="arch" type="xml">
             <list create="false" delete="false" edit="false">
                 <field name="at"/>
-                <field name="kind"/>
+                <field name="label"/>
+                <field name="kind" optional="hide"/>
                 <field name="device_id"/>
                 <field name="workstation_name"/>
                 <field name="employee_name"/>
                 <field name="previous_workstation_name" optional="show"/>
-                <field name="service_state" optional="show"/>
+                <field name="service_state" optional="hide"/>
                 <field name="received_at" optional="hide"/>
                 <field name="uuid" optional="hide"/>
             </list>
@@ -33,6 +34,7 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="label"/>
                             <field name="kind" readonly="True"/>
                             <field name="at" readonly="True"/>
                             <field name="received_at" readonly="True"/>
@@ -54,6 +56,9 @@
         </field>
     </record>
 
+    <!-- Le libellé (`label`) n'est pas stocké : chaque filtre le retrouve
+         par `kind`, et par `service_state` pour un `service_changed`. Les
+         filtres forment un seul groupe, donc se cumulent par « ou ». -->
     <record id="view_streamdeck_event_search" model="ir.ui.view">
         <field name="name">streamdeck.event.search</field>
         <field name="model">streamdeck.event</field>
@@ -71,6 +76,18 @@
                         domain="[('kind', '=', 'service_changed')]"/>
                 <filter name="moved" string="Changed workstation"
                         domain="[('kind', '=', 'moved')]"/>
+                <filter name="silent" string="Workstation silent"
+                        domain="[('kind', '=', 'silent')]"/>
+                <filter name="heard_again" string="Workstation heard again"
+                        domain="[('kind', '=', 'heard_again')]"/>
+                <filter name="service_started" string="Service started"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'active')]"/>
+                <filter name="service_failed" string="Service failed"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'failed')]"/>
+                <filter name="service_stopped" string="Service stopped"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'inactive')]"/>
+                <filter name="service_absent" string="Service absent"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'absent')]"/>
                 <separator/>
                 <filter name="filter_at" string="Time" date="at"/>
                 <group expand="0" string="Group By">
