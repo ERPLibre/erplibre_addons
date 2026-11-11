@@ -668,6 +668,47 @@ class TestStreamdeckService(TransactionCase):
             self.Event.search_count([("uuid", "=", again["uuid"])]), 1
         )
 
+    def test_an_event_stored_by_a_concurrent_report_is_acknowledged(self):
+        # Deux postes d'une même base (deux destinations de l'extension)
+        # remontent au même instant les événements d'un même uuid : la
+        # recherche des uuids connus de la seconde remontée ne voit pas
+        # ceux que la première vient d'écrire. L'insertion en double est
+        # alors un uuid connu, pas une erreur de la remontée.
+        first = self._enroll(self.user_a)["token"]
+        second_enrolled = self._enroll(
+            self.user_a, fingerprint=FINGERPRINT_B, hostname="host-b"
+        )
+        second = self.Workstation.browse(second_enrolled["workstation_id"])
+        deck = self._deck("SN-RACE")
+        events = [
+            self._event("plugged", deck),
+            self._event("service_changed", service_state="failed"),
+        ]
+        status, _body = self._report(first, decks=[deck], events=events)
+        self.assertEqual(status, 200)
+        new = self._event("unplugged", deck)
+        uuids = [e["uuid"] for e in events] + [new["uuid"]]
+        Event = type(self.Event)
+        search = Event.search
+
+        def snapshot_search(model, domain, *args, **kwargs):
+            if domain and tuple(domain[0])[:2] == ("uuid", "in"):
+                return model.browse()
+            return search(model, domain, *args, **kwargs)
+
+        with patch.object(Event, "search", snapshot_search):
+            status, body = self._report(
+                second_enrolled["token"], events=[*events, new]
+            )
+        self.assertEqual(status, 200, body)
+        self.assertEqual(body["accepted"], uuids)
+        for uuid_ in uuids:
+            self.assertEqual(
+                self.Event.search_count([("uuid", "=", uuid_)]), 1
+            )
+        stored = self.Event.search([("workstation_id", "=", second.id)])
+        self.assertEqual(stored.mapped("uuid"), [new["uuid"]])
+
     def test_events_keep_their_time_deck_and_snapshot(self):
         enrolled = self._enroll(self.user_a)
         workstation = self.Workstation.browse(enrolled["workstation_id"])

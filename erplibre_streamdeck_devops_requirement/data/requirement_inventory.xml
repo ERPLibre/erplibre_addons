@@ -1421,6 +1421,12 @@
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the first scan sends the full state, without events</field>
     </record>
+    <record id="test_sd_inv_r15_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r15" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_an_event_stored_by_a_concurrent_report_is_acknowledged</field>
+    </record>
     <record id="test_sd_inv_r16_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r16" />
         <field name="sequence" eval="10" />
