@@ -110,11 +110,12 @@ Un deck débranché longtemps n'a pas d'événement à lui : son événement
 Le cron *Stream Deck : surveiller les postes et les decks* tourne toutes
 les 5 minutes, ce qui donne la granularité de chaque délai. Il marque un
 poste muet une seule fois (*Muet depuis*) ; sa remontée suivante efface la
-marque. Un poste archivé, sans jeton (désinscrit ou révoqué) ou qui n'a
-jamais remonté ne devient jamais muet. L'extension remonte toutes les 15
-minutes, et pas pendant que l'écran est verrouillé : un poste éteint la
-nuit, en veille ou verrouillé au-delà du délai devient muet, puis revient
-à sa remontée suivante.
+marque, tout comme son archivage et le retrait de son jeton. Un poste
+archivé, sans jeton (désinscrit ou révoqué) ou qui n'a jamais remonté ne
+devient jamais muet. L'extension remonte toutes les 15 minutes, et pas
+pendant que l'écran est verrouillé : un poste éteint la nuit, en veille ou
+verrouillé au-delà du délai devient muet, puis revient à sa remontée
+suivante.
 
 ### Les activités, sur demande
 
