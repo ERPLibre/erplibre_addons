@@ -131,7 +131,7 @@
     </record>
     <record id="req_sd_inv_r09" model="devops.requirement">
         <field name="code">SD-INV-R09</field>
-        <field name="name">A lent deck follows its current workstation; an employee whose workstation held it keeps reading the deck and its events from their first holding on, those at the later holders included, never the events from before that holding, the holder's workstation nor its other decks</field>
+        <field name="name">A lent deck follows its current workstation; an employee whose workstation held it keeps reading the deck and its events from their first holding on, those at the later holders included, never the events from before that holding, the holder's workstation nor its other decks; a workstation that only sends an event carrying the serial of a deck held elsewhere reads that event, never the deck's record</field>
         <field name="category_id" ref="cat_sd_inv" />
         <field name="sequence" eval="90" />
         <field name="moscow">must</field>
@@ -141,7 +141,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">streamdeck.device.holding of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_holding.py keeps the first holding of each employee, which the report dates at the reception when it creates a deck on their workstation or moves it there; the record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml open a device to the employees whose workstation holds it, held it or has an event of it, and an event to the employee of its workstation and to those whose holding of its deck is not later than it; the report moves a deck to the workstation that declares it.</field>
+        <field name="achievement">streamdeck.device.holding of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_holding.py keeps the first holding of each employee, which the report dates at the reception when it creates a deck on their workstation or moves it there; the record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml open a device to the employees whose workstation holds it or held it, never through an event, and an event to the employee of its workstation and to those whose holding of its deck is not later than it; the report moves a deck to the workstation that declares it.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_inv_r10" model="devops.requirement">
@@ -1078,6 +1078,12 @@
         <field name="sequence" eval="160" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_backfill_dates_a_creator_without_events</field>
+    </record>
+    <record id="test_sd_inv_r09_17" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="170" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_an_event_about_a_deck_held_elsewhere_opens_not_its_record</field>
     </record>
     <record id="test_sd_inv_r10_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r10" />

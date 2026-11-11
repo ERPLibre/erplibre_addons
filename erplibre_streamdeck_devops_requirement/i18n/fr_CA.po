@@ -764,12 +764,16 @@ msgid ""
 "A lent deck follows its current workstation; an employee whose workstation "
 "held it keeps reading the deck and its events from their first holding on, "
 "those at the later holders included, never the events from before that "
-"holding, the holder's workstation nor its other decks"
+"holding, the holder's workstation nor its other decks; a workstation that "
+"only sends an event carrying the serial of a deck held elsewhere reads that "
+"event, never the deck's record"
 msgstr ""
 "Un deck prêté suit son poste actuel ; un employé dont un poste l'a détenu "
 "garde la lecture du deck et de ses événements depuis sa première détention, "
 "ceux des détenteurs suivants compris, jamais les événements d'avant cette "
-"détention, le poste du détenteur ni ses autres decks"
+"détention, le poste du détenteur ni ses autres decks ; un poste qui envoie "
+"seulement un événement portant le numéro de série d'un deck tenu ailleurs "
+"lit cet événement, jamais la fiche du deck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r130

@@ -609,7 +609,9 @@ msgid ""
 "A lent deck follows its current workstation; an employee whose workstation "
 "held it keeps reading the deck and its events from their first holding on, "
 "those at the later holders included, never the events from before that "
-"holding, the holder's workstation nor its other decks"
+"holding, the holder's workstation nor its other decks; a workstation that "
+"only sends an event carrying the serial of a deck held elsewhere reads that "
+"event, never the deck's record"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
