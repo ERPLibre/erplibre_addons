@@ -25,6 +25,12 @@ class StreamdeckThreadVisibility(models.AbstractModel):
     event alone, holding nothing, reads nothing of it. A file attached to
     the deck is part of its thread: Odoo would otherwise open it to
     anyone who reads the deck.
+
+    A model whose `_streamdeck_origin_field` is set dates a record by that
+    field when it is filled, by `_streamdeck_date_field` otherwise: the
+    message that closes an activity of a deck counts from the creation of
+    that activity, so a new holder reads neither the activity nor its
+    closing when it was opened before their arrival.
     """
 
     _name = "streamdeck.thread.visibility"
@@ -33,6 +39,7 @@ class StreamdeckThreadVisibility(models.AbstractModel):
     _streamdeck_model_field = "model"
     _streamdeck_date_field = "date"
     _streamdeck_user_field = None
+    _streamdeck_origin_field = None
 
     streamdeck_visible_to_me = fields.Boolean(
         string="From my deck holding",
@@ -71,16 +78,22 @@ class StreamdeckThreadVisibility(models.AbstractModel):
         if self.env.user.has_group(MANAGER_GROUP):
             return expression.TRUE_DOMAIN
         model_field = self._streamdeck_model_field
-        date_field = self._streamdeck_date_field
+        date_fields = [self._streamdeck_date_field]
+        if self._streamdeck_origin_field:
+            date_fields.insert(0, self._streamdeck_origin_field)
         self.env["streamdeck.device.holding"].flush_model()
-        self.flush_model([model_field, "res_id", date_field])
+        self.flush_model([model_field, "res_id"] + date_fields)
+        dated = SQL(
+            "COALESCE(%s)",
+            SQL(", ").join(SQL.identifier("t", name) for name in date_fields),
+        )
         held = SQL(
             "SELECT t.id FROM %s t"
             " JOIN streamdeck_device_holding h"
             " ON h.device_id = t.res_id AND h.since <= %s"
             " WHERE %s = %s AND h.user_id = %s",
             SQL.identifier(self._table),
-            SQL.identifier("t", date_field),
+            dated,
             SQL.identifier("t", model_field),
             DEVICE_MODEL,
             self.env.uid,
@@ -102,6 +115,16 @@ class MailMessage(models.Model):
     _name = "mail.message"
     _inherit = ["mail.message", "streamdeck.thread.visibility"]
 
+    _streamdeck_origin_field = "streamdeck_activity_created"
+
+    streamdeck_activity_created = fields.Datetime(
+        string="Closed activity created on",
+        readonly=True,
+        copy=False,
+        help="For the message that closes an activity of a deck, the"
+        " creation of that activity, which bounds who reads it.",
+    )
+
 
 class MailActivity(models.Model):
     _name = "mail.activity"
@@ -110,6 +133,29 @@ class MailActivity(models.Model):
     _streamdeck_model_field = "res_model"
     _streamdeck_date_field = "create_date"
     _streamdeck_user_field = "user_id"
+
+    def _action_done(self, feedback=False, attachment_ids=None):
+        """Close the activities as Odoo does, those of a deck one at a
+        time, so that the message closing each one carries the creation
+        of that activity in `streamdeck_activity_created`. Returns Odoo's
+        (messages, next activities)."""
+        on_decks = self.filtered(lambda a: a.res_model == DEVICE_MODEL)
+        others = self - on_decks
+        messages = self.env["mail.message"]
+        next_activities = self.env["mail.activity"]
+        if others:
+            messages, next_activities = super(
+                MailActivity, others
+            )._action_done(feedback=feedback, attachment_ids=attachment_ids)
+        for activity in on_decks:
+            created = activity.create_date
+            closing, following = super(MailActivity, activity)._action_done(
+                feedback=feedback, attachment_ids=attachment_ids
+            )
+            closing.sudo().write({"streamdeck_activity_created": created})
+            messages |= closing
+            next_activities |= following
+        return messages, next_activities
 
 
 class IrAttachment(models.Model):

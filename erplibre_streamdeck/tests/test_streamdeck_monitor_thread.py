@@ -1,6 +1,6 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from freezegun import freeze_time
 
@@ -303,3 +303,89 @@ class TestStreamdeckMonitorThread(TransactionCase):
         own = self._attachment(self.workstation_b, DAY_C, "own.txt")
         self.env.invalidate_all()
         self.assertEqual(own.with_user(self.user_b).raw, b"probe")
+
+    def _created_at(self, activities, moment):
+        """Date `activities` de `moment`, comme `_activity`."""
+        activities.flush_recordset()
+        self.env.cr.execute(
+            "UPDATE mail_activity SET create_date = %s WHERE id IN %s",
+            (moment, tuple(activities.ids)),
+        )
+        activities.invalidate_recordset(["create_date"])
+
+    def test_a_new_holder_reads_no_closing_of_an_earlier_activity(self):
+        # Le deck débranché longtemps chez A a son activité, pour A et
+        # pour M. B le branche : sa remontée les ferme, et le message qui
+        # ferme chacune, nommant A et M, date de l'ouverture de l'activité,
+        # d'avant l'arrivée de B, qui ne le lit pas. L'activité que B
+        # reçoit à son arrivée, et le message qui la ferme, B les lit.
+        params = self.env["ir.config_parameter"].sudo()
+        for name, value in (
+            ("activities_enabled", "True"),
+            ("activity_recipient", "both"),
+            ("activity_manager_id", str(self.manager.id)),
+        ):
+            params.set_param("erplibre_streamdeck.%s" % name, value)
+        self._report(self.token_a, DAY_A)
+        unplugged = {
+            "uuid": "00000000-0000-4000-8000-000000000003",
+            "kind": "unplugged",
+            "at": DAY_A.replace(hour=11).isoformat() + "Z",
+            "serial": self.DECK["serial"],
+            "usb_product_id": self.DECK["usb_product_id"],
+            "usb_path": self.DECK["usb_path"],
+        }
+        self._report(
+            self.token_a,
+            DAY_A.replace(hour=11),
+            decks=False,
+            events=[unplugged],
+        )
+        device = self._device()
+        opened = DAY_A + timedelta(hours=73)
+        with freeze_time(opened):
+            self.env["streamdeck.monitor"]._cron_watch()
+        earlier = device.activity_ids
+        self.assertEqual(earlier.user_id, self.user_a | self.manager)
+        self._created_at(earlier, opened)
+        arrival = opened + timedelta(hours=1)
+        self._report(self.token_b, arrival)
+        self.assertFalse(earlier.exists().filtered("active"))
+        moved = device.activity_ids.filtered(
+            lambda activity: activity.user_id == self.user_b
+        )
+        self.assertEqual(len(moved), 1)
+        self._created_at(moved, arrival)
+        with freeze_time(arrival + timedelta(hours=1)):
+            moved.with_user(self.user_b).action_feedback(feedback="Seen")
+        closings = self.env["mail.message"].search(
+            [
+                ("model", "=", "streamdeck.device"),
+                ("res_id", "=", device.id),
+                ("mail_activity_type_id", "!=", False),
+            ]
+        )
+        of_b = closings.filtered(
+            lambda message: message.mail_activity_type_id
+            == moved.activity_type_id
+        )
+        self.assertEqual(len(closings), 3)
+        self.assertEqual(len(of_b), 1)
+        expected = {
+            self.user_a: closings,
+            self.manager: closings,
+            self.user_b: of_b,
+            self.user_c: closings.browse(),
+        }
+        for user, readable in expected.items():
+            with self.subTest(user=user.name):
+                self.env.invalidate_all()
+                self.assertEqual(
+                    closings.with_user(user).search(
+                        [("id", "in", closings.ids)]
+                    ),
+                    readable,
+                )
+                for message in closings - readable:
+                    with self.assertRaises(AccessError):
+                        message.with_user(user).read(["body"])

@@ -153,10 +153,11 @@ beyond the delay goes silent, then is heard again at its next report.
   the decks they hold or held, from their first holding on, plus those
   assigned to them; never those of another employee's workstation. The
   rest of a deck's thread, its messages and attached files, is read from
-  the first holding on as well. On a workstation's thread, the employee
-  posts, edits their own messages and closes their own activities; only a
-  manager edits, closes or deletes those of others. Only the monitoring
-  creates activities of its four types.
+  the first holding on as well, the message that closes an activity
+  counting from the opening of that activity. On a workstation's thread,
+  the employee posts, edits their own messages and closes their own
+  activities; only a manager edits, closes or deletes those of others.
+  Only the monitoring creates activities of its four types.
 - **Notification.** Odoo tells the assigned user of a new activity as it
   does for any activity (inbox or e-mail, by their preference). The module
   sends no e-mail and no notification of its own. Such an e-mail goes
@@ -412,7 +413,8 @@ suivante.
   des decks qu'il détient ou a détenus, à partir de sa première détention,
   plus celles qui lui sont assignées ; jamais celles du poste d'un autre
   employé. Le reste du fil d'un deck, ses messages et ses fichiers joints,
-  se lit lui aussi à partir de la première détention. Au fil d'un poste,
+  se lit lui aussi à partir de la première détention, le message qui ferme
+  une activité comptant de l'ouverture de celle-ci. Au fil d'un poste,
   l'employé publie, modifie ses propres messages et ferme ses propres
   activités ; seul un gestionnaire modifie, ferme ou supprime ceux des
   autres. Seule la surveillance crée des activités de ses quatre types.

@@ -154,7 +154,8 @@ suivante.
   des decks qu'il détient ou a détenus, à partir de sa première détention,
   plus celles qui lui sont assignées ; jamais celles du poste d'un autre
   employé. Le reste du fil d'un deck, ses messages et ses fichiers joints,
-  se lit lui aussi à partir de la première détention. Au fil d'un poste,
+  se lit lui aussi à partir de la première détention, le message qui ferme
+  une activité comptant de l'ouverture de celle-ci. Au fil d'un poste,
   l'employé publie, modifie ses propres messages et ferme ses propres
   activités ; seul un gestionnaire modifie, ferme ou supprime ceux des
   autres. Seule la surveillance crée des activités de ses quatre types.
