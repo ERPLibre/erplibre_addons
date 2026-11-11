@@ -131,7 +131,7 @@
     </record>
     <record id="req_sd_inv_r09" model="devops.requirement">
         <field name="code">SD-INV-R09</field>
-        <field name="name">A lent deck follows its current workstation; an employee whose workstation had it keeps reading the deck and all its events, those of the holder included, never the holder's workstation nor its other decks</field>
+        <field name="name">A lent deck follows its current workstation; an employee whose workstation held it keeps reading the deck and its events from their first holding on, those at the later holders included, never the events from before that holding, the holder's workstation nor its other decks</field>
         <field name="category_id" ref="cat_sd_inv" />
         <field name="sequence" eval="90" />
         <field name="moscow">must</field>
@@ -141,7 +141,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">The record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml open a device to the employees whose workstation holds it, has an event of it, or is the one a changed-workstation event took it from, and its events with it; the report moves a deck to the workstation that declares it.</field>
+        <field name="achievement">streamdeck.device.holding of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_holding.py keeps the first holding of each employee, which the report dates at the reception when it creates a deck on their workstation or moves it there; the record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml open a device to the employees whose workstation holds it, held it or has an event of it, and an event to the employee of its workstation and to those whose holding of its deck is not later than it; the report moves a deck to the workstation that declares it.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_inv_r10" model="devops.requirement">
@@ -993,7 +993,7 @@
         <field name="requirement_id" ref="req_sd_inv_r09" />
         <field name="sequence" eval="20" />
         <field name="kind">python</field>
-        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_current_holder_reads_the_deck_history</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_current_holder_reads_the_deck_not_its_earlier_history</field>
     </record>
     <record id="test_sd_inv_r09_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r09" />
@@ -1012,6 +1012,54 @@
         <field name="sequence" eval="50" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_service.TestStreamdeckService.test_a_moved_deck_is_read_by_the_lender_and_the_holder_only</field>
+    </record>
+    <record id="test_sd_inv_r09_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_new_holder_reads_nothing_before_their_arrival</field>
+    </record>
+    <record id="test_sd_inv_r09_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_lender_keeps_the_whole_history</field>
+    </record>
+    <record id="test_sd_inv_r09_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_holder_coming_back_keeps_their_first_since</field>
+    </record>
+    <record id="test_sd_inv_r09_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_manager_reads_everything</field>
+    </record>
+    <record id="test_sd_inv_r09_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_third_employee_reads_nothing</field>
+    </record>
+    <record id="test_sd_inv_r09_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="110" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_reported_time_never_opens_the_history_before_arrival</field>
+    </record>
+    <record id="test_sd_inv_r09_12" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="120" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_holdings_cannot_be_written_by_an_employee</field>
+    </record>
+    <record id="test_sd_inv_r09_13" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="130" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_backfill_dates_each_holder_from_the_history</field>
     </record>
     <record id="test_sd_inv_r10_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r10" />

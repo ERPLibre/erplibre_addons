@@ -53,6 +53,7 @@ KINDS = {
 # aucune ligne du registre.
 INVENTORY_TEST_FILES = (
     "test_streamdeck_access",
+    "test_streamdeck_holding",
     "test_streamdeck_service",
     "test_streamdeck_routes",
     "test_streamdeck_i18n",

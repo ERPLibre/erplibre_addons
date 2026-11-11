@@ -737,12 +737,14 @@ msgstr "Un fichier __pycache__/game_*.pyc resté en place est sans effet"
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r09
 msgid ""
 "A lent deck follows its current workstation; an employee whose workstation "
-"had it keeps reading the deck and all its events, those of the holder "
-"included, never the holder's workstation nor its other decks"
+"held it keeps reading the deck and its events from their first holding on, "
+"those at the later holders included, never the events from before that "
+"holding, the holder's workstation nor its other decks"
 msgstr ""
-"Un deck prêté suit son poste actuel ; un employé dont un poste l'a eu garde "
-"la lecture du deck et de tous ses événements, ceux du détenteur compris, "
-"jamais le poste du détenteur ni ses autres decks"
+"Un deck prêté suit son poste actuel ; un employé dont un poste l'a détenu "
+"garde la lecture du deck et de ses événements depuis sa première détention, "
+"ceux des détenteurs suivants compris, jamais les événements d'avant cette "
+"détention, le poste du détenteur ni ses autres decks"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r130
