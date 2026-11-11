@@ -232,6 +232,40 @@ class TestStreamdeckConfigAccess(TransactionCase):
         self.assertTrue(locked_here.exists())
         self.assertEqual(free.key, "plugins_off")
 
+    def test_an_employee_cannot_move_a_locked_line_to_another_key(self):
+        # La clé de destination est libre ; c'est la clé de départ que le
+        # gestionnaire verrouille, et le verrou partirait avec la ligne.
+        locked = self._line(
+            {
+                "workstation_id": self.ws_a.id,
+                "key": "deck_program",
+                "value": "tiler",
+                "locked": True,
+            }
+        )
+        for vals in ({"key": "games", "value": "on"}, {"key": "games"}):
+            with self.subTest(vals=sorted(vals)):
+                with self.assertRaises(AccessError):
+                    with self.cr.savepoint():
+                        locked.with_user(self.user_a).write(vals)
+                with self.assertRaises(AccessError):
+                    with self.cr.savepoint():
+                        self.ws_a.with_user(self.user_a).write(
+                            {
+                                "config_line_ids": [
+                                    Command.update(locked.id, vals)
+                                ]
+                            }
+                        )
+        self.assertEqual(locked.key, "deck_program")
+        self.assertEqual(locked.value, '"tiler"')
+        self.assertEqual(
+            self.env["streamdeck.config.schema"]._effective(self.ws_a)[
+                "locked"
+            ],
+            ["deck_program"],
+        )
+
     def test_an_employee_cannot_set_locked_or_source(self):
         values = {
             "workstation_id": self.ws_a.id,
