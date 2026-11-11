@@ -10,3 +10,4 @@ access_streamdeck_config_profile_manager,streamdeck.config.profile manager,model
 access_streamdeck_config_model_user,streamdeck.config.model user,model_streamdeck_config_model,group_streamdeck_user,1,0,0,0
 access_streamdeck_config_model_manager,streamdeck.config.model manager,model_streamdeck_config_model,group_streamdeck_manager,1,1,1,1
 access_streamdeck_config_line_user,streamdeck.config.line user,model_streamdeck_config_line,group_streamdeck_user,1,1,1,1
+access_streamdeck_config_policy_manager,streamdeck.config.policy manager,model_streamdeck_config_policy,group_streamdeck_manager,1,1,1,0
