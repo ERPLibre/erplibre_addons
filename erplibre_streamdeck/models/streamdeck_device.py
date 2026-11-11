@@ -51,6 +51,7 @@ class StreamdeckDevice(models.Model):
     """
 
     _name = "streamdeck.device"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
     _description = "Stream Deck device"
     _order = "model_name, serial, id"
 

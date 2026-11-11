@@ -109,8 +109,9 @@ carries `protocol`; an error reply adds `error`.
   (serial number, USB product id, USB path, firmware). The decks of the
   workstation missing from the list become disconnected.
 - `events`: `plugged`, `unplugged` or `service_changed`, each with its own
-  uuid and the time it was observed. `moved` is written by Odoo only: a
-  report that carries it is a 400 `bad_request`. A uuid already stored is
+  uuid and the time it was observed. `moved`, `silent` and `heard_again`
+  are written by Odoo only: a report that carries one is a 400
+  `bad_request`. A uuid already stored is
   acknowledged again without change, so a report sent again creates
   nothing. A time more than 5 minutes ahead of the reception is replaced
   by the reception time.
@@ -254,8 +255,9 @@ une réponse d'erreur y ajoute `error`.
   chemin USB, firmware). Les decks du poste absents de la liste deviennent
   débranchés.
 - `events` : `plugged`, `unplugged` ou `service_changed`, chacun avec son
-  propre uuid et l'heure où il a été observé. `moved` n'est écrit que par
-  Odoo : une remontée qui le porte est un 400 `bad_request`. Un uuid déjà
+  propre uuid et l'heure où il a été observé. `moved`, `silent` et
+  `heard_again` ne sont écrits que par Odoo : une remontée qui en porte un
+  est un 400 `bad_request`. Un uuid déjà
   enregistré est accusé de nouveau sans changement : une remontée renvoyée
   ne crée rien. Une heure de plus de 5 minutes en avance sur la réception
   est remplacée par l'heure de réception.
