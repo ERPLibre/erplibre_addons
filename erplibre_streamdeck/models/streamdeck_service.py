@@ -74,6 +74,9 @@ REFUSAL_REASONS = frozenset(
     ["write_failed", "restart_failed", "unit_missing"]
     + ["invalid:%s" % key for key in KEYS]
 )
+# The refusals that come after the revision is written to the file: the
+# file holds its values though the deck unit does not run them.
+WRITTEN_REASONS = ("restart_failed", "unit_missing")
 
 ERRORS = (
     "bad_request",
@@ -782,8 +785,8 @@ class StreamdeckService(models.AbstractModel):
         local value differs from Odoo's by the organisation's policy, or
         under `ask` by the employee's `choice`, until then listed in
         `ask`; after a first pilot, a managed key changed in the file
-        since the revision the workstation applied is adopted when free
-        and offered again when locked (`_config_drift`). The effective
+        since the last revision written to it is adopted when free and
+        offered again when locked (`_config_drift`). The effective
         configuration then gets a new revision when its hash differs from
         the offered one, or when a drift asks for it with the same
         values.
@@ -877,26 +880,27 @@ class StreamdeckService(models.AbstractModel):
 
     def _config_drift(self, workstation, effective, current):
         """`(adopt, drift)` for a workstation whose file `current` follows
-        its applied revision: `adopt` maps each free key whose local value
-        changed since that revision, and differs from Odoo's, to the local
-        value; `drift` lists the managed keys changed to another value,
-        when locked, or to None, which holds nothing to adopt. A drift is
-        listed only while the applied revision is the offered one: a
-        revision already pending restores the key once applied, and
-        listing it at each report would renew the revision each time.
-        A key the applied revision did not set has no baseline and is
-        skipped."""
+        its applied revision. The baseline is `config_written`: the
+        values of that revision, or of a later one refused after its
+        write, which the file holds as well. `adopt` maps each free key
+        whose local value differs from the baseline, and from Odoo's, to
+        the local value; `drift` lists the managed keys changed to
+        another value, when locked, or to None, which holds nothing to
+        adopt. A drift is listed only while the applied revision is the
+        offered one: a revision already pending restores the key once
+        applied, and listing it at each report would renew the revision
+        each time. A key the baseline does not set is skipped."""
         schema = self.env["streamdeck.config.schema"]
-        applied = json.loads(workstation.config_applied or "{}")
+        baseline = json.loads(workstation.config_written or "{}")
         settled = workstation.config_revision == (
             workstation.config_applied_revision
         )
         adopt, drift = {}, []
         for key, value in effective["settings"].items():
-            if key not in applied:
+            if key not in baseline:
                 continue
             local = current[key]
-            if local == schema._load(key, json.dumps(applied[key])):
+            if local == schema._load(key, json.dumps(baseline[key])):
                 continue
             if key in effective["locked"] or local is None:
                 if settled and local != value:
@@ -928,10 +932,13 @@ class StreamdeckService(models.AbstractModel):
         """Record `result` when it is about the offered revision; a result
         about another revision, or already recorded, changes nothing.
 
-        `applied` stores the offered values as the applied ones, ends the
-        pending state and, at a first pilot not settled yet, records the
-        choice `take_odoo`: the employee took Odoo's values. `refused`
-        keeps the reason. Each recorded result writes its event, dated as
+        `applied` stores the offered values as the applied and written
+        ones, ends the pending state and, at a first pilot not settled
+        yet, records the choice `take_odoo`: the employee took Odoo's
+        values. `refused` keeps the reason, and for a reason of
+        WRITTEN_REASONS stores the offered values as the written ones,
+        the applied revision staying as it was. Each recorded result
+        writes its event, dated as
         the workstation reports it, a moment more than
         FUTURE_TOLERANCE_MIN minutes ahead of `now` taking `now`."""
         if not result or not workstation.config_hash:
@@ -948,6 +955,7 @@ class StreamdeckService(models.AbstractModel):
             values = {
                 "config_applied_revision": revision,
                 "config_applied": workstation.config_offered,
+                "config_written": workstation.config_offered,
                 "config_state": "applied",
                 "config_reason": False,
                 "config_pending_since": False,
@@ -967,9 +975,10 @@ class StreamdeckService(models.AbstractModel):
             workstation.config_reason == (result["reason"] or False)
         ):
             return
-        workstation.write(
-            {"config_state": "refused", "config_reason": result["reason"]}
-        )
+        values = {"config_state": "refused", "config_reason": result["reason"]}
+        if result["reason"] in WRITTEN_REASONS:
+            values["config_written"] = workstation.config_offered
+        workstation.write(values)
         self._server_event(
             workstation,
             "config_refused",

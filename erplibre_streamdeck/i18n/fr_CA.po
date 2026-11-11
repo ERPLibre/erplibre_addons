@@ -371,6 +371,11 @@ msgid "Configuration applied"
 msgstr "Configuration appliquée"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_written
+msgid "Configuration in the file"
+msgstr "Configuration dans le fichier"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_line_ids
 msgid "Configuration overrides"
 msgstr "Surcharges de configuration"
@@ -797,6 +802,17 @@ msgstr "Valeur invalide pour le réglage Stream Deck %(key)s."
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_is_follower
 msgid "Is Follower"
 msgstr "Est un abonné"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_written
+msgid ""
+"JSON of the settings of the last revision written to the workstation's file:"
+" the applied one, or a later one refused after its write. A local change is "
+"measured against them."
+msgstr ""
+"JSON des réglages de la dernière révision écrite dans le fichier du poste : "
+"l'appliquée, ou une plus récente refusée après son écriture. Un changement "
+"local se mesure par rapport à eux."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_offered

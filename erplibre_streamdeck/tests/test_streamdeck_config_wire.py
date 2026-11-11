@@ -455,6 +455,50 @@ class TestStreamdeckConfigWire(HttpCase):
             )
         )
 
+    def test_values_written_then_refused_are_not_adopted(self):
+        # Refusée après son écriture, une révision laisse ses valeurs dans
+        # le fichier : une couche qui change ensuite la clé libre ne fait
+        # pas d'elles la valeur locale de l'employé.
+        Profile = self.env["streamdeck.config.profile"]
+        for reason in ("restart_failed", "unit_missing"):
+            with self.subTest(reason=reason):
+                profile = Profile.create({"name": "W-%s" % reason})
+                line = self.Line.create(
+                    {
+                        "profile_id": profile.id,
+                        "key": "plugins_off",
+                        "value": '["sound"]',
+                    }
+                )
+                workstation, token = self._workstation(profile=profile)
+                first = {"plugins_off": ["sound"]}
+                revision = self._applied(token, workstation, first)
+                line.value = '["sound", "timers"]'
+                self._report(token, self._pilot(first, revision))
+                written = {"plugins_off": ["sound", "timers"]}
+                refused = self._result(revision + 1, "refused", reason)
+                self._report(token, self._pilot(written, revision, refused))
+                self.assertEqual(workstation.config_state, "refused")
+                line.value = '["sound"]'
+                for _report in range(2):
+                    config = self._report(
+                        token, self._pilot(written, revision)
+                    )["config"]
+                    self.assertEqual(config["revision"], revision + 2)
+                    self.assertEqual(config["settings"], first)
+                    self.assertEqual(workstation.config_state, "pending")
+                    self.assertFalse(workstation.config_line_ids)
+                    self.assertFalse(
+                        self._events(workstation, "config_adopted")
+                    )
+                # Changée ensuite dans le fichier, la clé est adoptée.
+                local = {"plugins_off": []}
+                config = self._report(token, self._pilot(local, revision))[
+                    "config"
+                ]
+                self.assertEqual(config["settings"], local)
+                self.assertEqual(workstation.config_line_ids.source, "local")
+
     def test_a_locked_local_change_is_reoffered_as_drift(self):
         workstation, token = self._workstation()
         revision = self._applied(token, workstation)
@@ -875,6 +919,7 @@ class TestStreamdeckConfigWire(HttpCase):
             "config_revision",
             "config_offered",
             "config_applied",
+            "config_written",
             "config_ask",
             "deck_plugins",
         ]
@@ -902,6 +947,7 @@ class TestStreamdeckConfigWire(HttpCase):
             {"config_revision": 9},
             {"config_first_choice": "keep_local"},
             {"config_ask": "games"},
+            {"config_written": "{}"},
             {"deck_plugins": "x"},
         ):
             with self.subTest(values=values):
