@@ -927,24 +927,40 @@ class StreamdeckService(models.AbstractModel):
         """`(adopt, drift)` for a workstation whose file `current` follows
         its applied revision. The baseline is `config_written`: the
         values of that revision, or of a later one refused after its
-        write, which the file holds as well. `adopt` maps each free key
-        whose local value differs from the baseline, and from Odoo's, to
-        the local value; `drift` lists the managed keys changed to
-        another value, when locked, or to None, which holds nothing to
-        adopt. A drift is listed only while the applied revision is the
-        offered one: a revision already pending restores the key once
-        applied, and listing it at each report would renew the revision
-        each time. A key the baseline does not set is skipped."""
+        write, which the file holds as well; `config_applied` when
+        `config_written` is empty. `adopt` maps each free key whose local
+        value differs from the baseline, and from Odoo's, to the local
+        value; `drift` lists the managed keys changed to another value,
+        when locked, or to None, which holds nothing to adopt. A drift is
+        listed only while the applied revision is the offered one: a
+        revision already pending restores the key once applied, and
+        listing it at each report would renew the revision each time.
+
+        A key the baseline does not set fails closed. Set by the offered
+        revision, it counts as changed when its local value differs from
+        Odoo's: a drift when locked or None, so an empty baseline never
+        hides a locked key; never adopted when free, so an empty baseline
+        never turns a local value into an override. A key the offered
+        revision does not set either is skipped: its hash differs from
+        the offered one, and the new revision offers it."""
         schema = self.env["streamdeck.config.schema"]
-        baseline = json.loads(workstation.config_written or "{}")
+        baseline = json.loads(
+            workstation.config_written or workstation.config_applied or "{}"
+        )
+        offered = json.loads(workstation.config_offered or "{}")
         settled = workstation.config_revision == (
             workstation.config_applied_revision
         )
         adopt, drift = {}, []
         for key, value in effective["settings"].items():
-            if key not in baseline:
-                continue
             local = current[key]
+            if key not in baseline:
+                if key not in offered or local == value:
+                    continue
+                if key in effective["locked"] or local is None:
+                    if settled:
+                        drift.append(key)
+                continue
             if local == schema._load(key, json.dumps(baseline[key])):
                 continue
             if key in effective["locked"] or local is None:
