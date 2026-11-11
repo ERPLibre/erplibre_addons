@@ -3,9 +3,10 @@
 <!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
 
-    <!-- Seul le nom s'écrit à la main ; le reste vient des remontées du
-         poste. Le champ `active` ne figure qu'au gestionnaire : le client
-         web n'offre « Archiver » que s'il est dans la vue. -->
+    <!-- Seuls le nom, le profil et les surcharges de configuration
+         s'écrivent à la main ; le reste vient des remontées du poste. Le
+         champ `active` ne figure qu'au gestionnaire : le client web
+         n'offre « Archiver » que s'il est dans la vue. -->
     <record id="view_streamdeck_workstation_list" model="ir.ui.view">
         <field name="name">streamdeck.workstation.list</field>
         <field name="model">streamdeck.workstation</field>
@@ -36,6 +37,12 @@
                 <field name="silent_since" optional="show"/>
                 <field name="token_active" optional="show"/>
                 <field name="lost_events_total" optional="hide"/>
+                <field name="config_state"
+                       widget="badge"
+                       decoration-success="config_state == 'applied'"
+                       decoration-warning="config_state in ('pending', 'drift')"
+                       decoration-danger="config_state == 'refused'"
+                       optional="hide"/>
                 <field name="active" column_invisible="True"
                        groups="erplibre_streamdeck.group_streamdeck_manager"/>
             </list>
@@ -116,6 +123,94 @@
                                 </list>
                             </field>
                         </page>
+                        <!-- L'employé choisit un profil « au choix » tant
+                             que celui en place l'est aussi, et surcharge
+                             les réglages libres de son poste ; seul le
+                             gestionnaire assigne n'importe quel profil et
+                             pose un verrou. Les gardes du serveur
+                             (`_check_profile_pick`, lignes) tiennent ces
+                             bornes : la vue ne fait que les montrer. -->
+                        <page string="Configuration" name="configuration">
+                            <div class="alert alert-warning" role="alert"
+                                 invisible="not config_too_old">
+                                The extension of this workstation is too old
+                                for Odoo to pilot its deck: piloting starts
+                                with contract 1.3 of the extension.
+                            </div>
+                            <div class="alert alert-warning" role="alert"
+                                 invisible="not config_several_models">
+                                Decks of several models are connected to this
+                                workstation: the settings of their models
+                                apply by ascending USB product id, the highest
+                                one winning.
+                            </div>
+                            <div class="alert alert-info" role="status"
+                                 invisible="not config_ask">
+                                Waiting for the employee's choice: keep the
+                                local values of these settings or take
+                                Odoo's.
+                                <field name="config_ask" readonly="True"/>
+                            </div>
+                            <group>
+                                <group string="Profile">
+                                    <field name="config_profile_id"
+                                           options="{'no_create': True}"
+                                           groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="config_profile_id"
+                                           domain="[('selectable', '=', True)]"
+                                           readonly="config_profile_id and not config_profile_selectable"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           groups="!erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="config_profile_selectable"
+                                           invisible="True"/>
+                                    <field name="config_several_models"
+                                           invisible="True"/>
+                                    <field name="config_too_old"
+                                           invisible="True"/>
+                                    <field name="config_first_choice"
+                                           readonly="True"/>
+                                </group>
+                                <group string="State">
+                                    <field name="config_state" readonly="True"
+                                           widget="badge"
+                                           decoration-success="config_state == 'applied'"
+                                           decoration-warning="config_state in ('pending', 'drift')"
+                                           decoration-danger="config_state == 'refused'"/>
+                                    <field name="config_revision" readonly="True"/>
+                                    <field name="config_applied_revision"
+                                           readonly="True"/>
+                                    <field name="config_pending_since"
+                                           readonly="True"
+                                           invisible="not config_pending_since"/>
+                                    <field name="config_reason" readonly="True"
+                                           invisible="not config_reason"/>
+                                </group>
+                            </group>
+                            <separator string="Effective configuration"/>
+                            <field name="config_effective_html" nolabel="1"
+                                   readonly="True"/>
+                            <separator string="Overrides of this workstation"/>
+                            <field name="config_line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="key"
+                                           groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="key" readonly="locked"
+                                           groups="!erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="value"
+                                           groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="value" readonly="locked"
+                                           groups="!erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="locked"
+                                           groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="locked" readonly="True"
+                                           groups="!erplibre_streamdeck.group_streamdeck_manager"/>
+                                    <field name="source" readonly="True"/>
+                                </list>
+                            </field>
+                            <group>
+                                <field name="deck_plugins" readonly="True"/>
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter/>
@@ -141,6 +236,11 @@
                         domain="[('service_state', '=', 'failed')]"/>
                 <filter name="silent" string="Silent"
                         domain="[('silent_since', '!=', False)]"/>
+                <separator/>
+                <filter name="config_pending" string="Configuration pending"
+                        domain="[('config_state', '=', 'pending')]"/>
+                <filter name="config_refused" string="Configuration refused"
+                        domain="[('config_state', '=', 'refused')]"/>
                 <separator/>
                 <filter name="archived" string="Archived"
                         domain="[('active', '=', False)]"/>

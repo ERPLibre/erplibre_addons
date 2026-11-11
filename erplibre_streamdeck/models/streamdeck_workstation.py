@@ -1,5 +1,7 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+import re
+
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
@@ -25,6 +27,11 @@ CONFIG_STATES = [
     ("refused", "Refused"),
     ("drift", "Changed locally"),
 ]
+
+# The first contract of the GNOME extension that takes in the managed
+# configuration (protocol 1.1): an older one reports and is never piloted.
+PILOT_CONTRACT = (1, 3)
+_VERSION_RE = re.compile(r"(\d+)\.(\d+)")
 
 # How the first pilot of a workstation settled the free settings whose
 # local value differed from Odoo's.
@@ -242,6 +249,22 @@ class StreamdeckWorkstation(models.Model):
         compute="_compute_config_effective_html",
         sanitize=False,
     )
+    config_profile_selectable = fields.Boolean(
+        related="config_profile_id.selectable",
+        string="Profile selectable",
+    )
+    config_several_models = fields.Boolean(
+        string="Several deck models",
+        compute="_compute_config_several_models",
+        help="Decks of several models that have a settings layer are"
+        " connected: their layers apply by ascending USB product id.",
+    )
+    config_too_old = fields.Boolean(
+        string="Extension too old to pilot",
+        compute="_compute_config_too_old",
+        help="The contract version the workstation reports is older than"
+        " the first one that takes in the managed configuration.",
+    )
 
     _sql_constraints = [
         (
@@ -292,6 +315,24 @@ class StreamdeckWorkstation(models.Model):
                 "<th>%s</th><th>%s</th><th>%s</th></tr></thead>"
                 "<tbody>%s</tbody></table>"
             ) % (_("Setting"), _("Value"), _("Layer"), _("Lock"), rows)
+
+    def _compute_config_several_models(self):
+        schema = self.env["streamdeck.config.schema"]
+        for workstation in self:
+            layers = schema._layers(workstation)
+            workstation.config_several_models = (
+                sum(1 for layer, _lines in layers if layer == "model") > 1
+            )
+
+    @api.depends("contract_version")
+    def _compute_config_too_old(self):
+        """True when `contract_version` reads `<major>.<minor>` below
+        PILOT_CONTRACT; an empty or unreadable version tells nothing."""
+        for workstation in self:
+            match = _VERSION_RE.fullmatch(workstation.contract_version or "")
+            workstation.config_too_old = bool(match) and (
+                tuple(int(part) for part in match.groups()) < PILOT_CONTRACT
+            )
 
     def write(self, vals):
         if not self.env.su:

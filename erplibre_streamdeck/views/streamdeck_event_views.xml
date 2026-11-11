@@ -20,6 +20,8 @@
                 <field name="employee_name"/>
                 <field name="previous_workstation_name" optional="show"/>
                 <field name="service_state" optional="hide"/>
+                <field name="config_revision" optional="hide"/>
+                <field name="config_keys" optional="hide"/>
                 <field name="received_at" optional="hide"/>
                 <field name="uuid" optional="hide"/>
             </list>
@@ -40,6 +42,12 @@
                             <field name="received_at" readonly="True"/>
                             <field name="service_state" readonly="True"
                                    invisible="kind != 'service_changed'"/>
+                            <field name="config_revision" readonly="True"
+                                   invisible="kind not in ('config_applied', 'config_refused')"/>
+                            <field name="config_reason" readonly="True"
+                                   invisible="kind != 'config_refused'"/>
+                            <field name="config_keys" readonly="True"
+                                   invisible="kind not in ('config_adopted', 'config_drift')"/>
                         </group>
                         <group>
                             <field name="device_id" readonly="True"/>
@@ -80,6 +88,14 @@
                         domain="[('kind', '=', 'silent')]"/>
                 <filter name="heard_again" string="Workstation heard again"
                         domain="[('kind', '=', 'heard_again')]"/>
+                <filter name="config_applied" string="Configuration applied"
+                        domain="[('kind', '=', 'config_applied')]"/>
+                <filter name="config_refused" string="Configuration refused"
+                        domain="[('kind', '=', 'config_refused')]"/>
+                <filter name="config_adopted" string="Local setting adopted"
+                        domain="[('kind', '=', 'config_adopted')]"/>
+                <filter name="config_drift" string="Setting changed locally"
+                        domain="[('kind', '=', 'config_drift')]"/>
                 <filter name="service_started" string="Service started"
                         domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'active')]"/>
                 <filter name="service_failed" string="Service failed"

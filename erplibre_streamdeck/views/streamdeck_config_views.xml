@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Les couches de configuration du gestionnaire : profils et modèles
+         de deck. La valeur d'une ligne se tape nue (un mot, des
+         identifiants séparés par des virgules, un nombre) et se range en
+         JSON ; `source` ne s'écrit jamais à la main. -->
+    <record id="view_streamdeck_config_profile_list" model="ir.ui.view">
+        <field name="name">streamdeck.config.profile.list</field>
+        <field name="model">streamdeck.config.profile</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="selectable"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_config_profile_form" model="ir.ui.view">
+        <field name="name">streamdeck.config.profile.form</field>
+        <field name="model">streamdeck.config.profile</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="True"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <field name="selectable"/>
+                    </group>
+                    <notebook>
+                        <page string="Settings" name="settings">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="key"/>
+                                    <field name="value"/>
+                                    <field name="locked"/>
+                                    <field name="source" readonly="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Workstations" name="workstations">
+                            <field name="workstation_ids" readonly="True">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="user_id"/>
+                                    <field name="config_state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_config_profile_search" model="ir.ui.view">
+        <field name="name">streamdeck.config.profile.search</field>
+        <field name="model">streamdeck.config.profile</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="selectable" string="Selectable"
+                        domain="[('selectable', '=', True)]"/>
+                <separator/>
+                <filter name="archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_config_model_list" model="ir.ui.view">
+        <field name="name">streamdeck.config.model.list</field>
+        <field name="model">streamdeck.config.model</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="usb_product_id"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_config_model_form" model="ir.ui.view">
+        <field name="name">streamdeck.config.model.form</field>
+        <field name="model">streamdeck.config.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="True"/></h1>
+                    </div>
+                    <group>
+                        <field name="usb_product_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Settings" name="settings">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="key"/>
+                                    <field name="value"/>
+                                    <field name="locked"/>
+                                    <field name="source" readonly="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_config_profiles" model="ir.actions.act_window">
+        <field name="name">Profiles</field>
+        <field name="res_model">streamdeck.config.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a configuration profile
+            </p>
+            <p>
+                A profile is a reusable set of deck settings. Assign it to
+                workstations, or mark it selectable so that employees pick
+                it for their own workstations.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_config_models" model="ir.actions.act_window">
+        <field name="name">Deck models</field>
+        <field name="res_model">streamdeck.config.model</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create the settings of a deck model
+            </p>
+            <p>
+                The settings of a deck model apply to every workstation to
+                which a deck of that USB product id is connected, over its
+                profile.
+            </p>
+        </field>
+    </record>
+
+</odoo>
