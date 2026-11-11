@@ -124,17 +124,19 @@ beyond the delay goes silent, then is heard again at its next report.
 | Deck service failed | *Deck service failed*, on the workstation | the service has stayed `failed` for its delay | by itself, at the report that carries another state |
 | Workstation silent | *Workstation silent*, on the workstation | the workstation goes silent | by itself, at its next report |
 | Deck unplugged for long | *Deck unplugged for long*, on the deck | the deck has been unplugged for its delay, counted from its last sighting or its last `unplugged` event, whichever is later | by itself, at the report that shows it plugged in |
-| Deck changed workstation | *Deck changed workstation*, on the deck | at the report that moves the deck | by a person; a new move adds a note to the open activity, whoever it is assigned to |
+| Deck changed workstation | *Deck changed workstation*, on the deck | at the report that moves the deck | by a person; while one is open, whoever it is assigned to, a new move opens none and posts a note to the deck's thread |
 
 - **Recipient.** *Employee*: the employee of the workstation, or of the
   workstation that holds the deck; for a move, the new holder, the lender
   reads the move in the history. *Manager*, the default: the user named
   in the Settings. *Employee and manager*: one activity for each.
 - **Never a duplicate.** A record has at most one open activity of a type
-  per assigned user, and a deck one open *Deck changed workstation*
-  activity. A *Deck service failed* or *Deck unplugged for long*
-  activity marked done while its problem lasts opens again at the next
-  run of the cron; a silence opens its activity once.
+  per assigned user. A deck with an open *Deck changed workstation*
+  activity opens no other at a new move, even for another holder: the
+  move is posted as a note to the deck's thread. A *Deck service
+  failed* or *Deck unplugged for long* activity marked done while its
+  problem lasts opens again at the next run of the cron; a silence opens
+  its activity once.
 - **Closing.** A closed activity stays done, with the feedback « Resolved
   at <time>: <what happened> », the time in the time zone of the assigned
   user (UTC without one) and the text in their language. Archiving a
@@ -377,7 +379,7 @@ suivante.
 | Service du deck en échec | *Service du deck en échec*, sur le poste | le service est resté `failed` pendant son délai | seule, à la remontée qui porte un autre état |
 | Poste muet | *Poste muet*, sur le poste | le poste devient muet | seule, à sa remontée suivante |
 | Deck débranché longtemps | *Deck débranché longtemps*, sur le deck | le deck est débranché depuis son délai, compté de sa dernière apparition ou de son dernier événement `unplugged`, le plus récent des deux | seule, à la remontée qui le montre branché |
-| Deck changé de poste | *Deck changé de poste*, sur le deck | à la remontée qui déplace le deck | par une personne ; un nouveau déplacement ajoute une note à l'activité ouverte, quel que soit son destinataire |
+| Deck changé de poste | *Deck changé de poste*, sur le deck | à la remontée qui déplace le deck | par une personne ; tant qu'une est ouverte, quel que soit son destinataire, un nouveau déplacement n'en ouvre aucune et ajoute une note au fil du deck |
 
 - **Destinataire.** *Employé* : l'employé du poste, ou du poste qui tient
   le deck ; pour un déplacement, le nouveau détenteur, le prêteur
@@ -385,11 +387,12 @@ suivante.
   nommé dans les Paramètres. *Employé et gestionnaire* : une activité à
   chacun.
 - **Jamais de doublon.** Un enregistrement a au plus une activité ouverte
-  d'un type par destinataire, et un deck une seule activité *Deck changé
-  de poste* ouverte. Une activité *Service du deck en échec* ou *Deck
-  débranché longtemps* marquée faite pendant que son problème dure se
-  rouvre au passage suivant du cron ; un silence n'ouvre son activité
-  qu'une fois.
+  d'un type par destinataire. Un deck qui a une activité *Deck changé de
+  poste* ouverte n'en ouvre aucune autre à un nouveau déplacement, même
+  pour un autre détenteur : le déplacement s'ajoute en note au fil du
+  deck. Une activité *Service du deck en échec* ou *Deck débranché
+  longtemps* marquée faite pendant que son problème dure se rouvre au
+  passage suivant du cron ; un silence n'ouvre son activité qu'une fois.
 - **Fermeture.** Une activité fermée reste faite, avec le retour « Résolu
   à <heure> : <ce qui s'est passé> », l'heure dans le fuseau du
   destinataire (UTC à défaut) et le texte dans sa langue. Archiver un

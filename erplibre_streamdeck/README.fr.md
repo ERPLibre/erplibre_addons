@@ -124,7 +124,7 @@ suivante.
 | Service du deck en échec | *Service du deck en échec*, sur le poste | le service est resté `failed` pendant son délai | seule, à la remontée qui porte un autre état |
 | Poste muet | *Poste muet*, sur le poste | le poste devient muet | seule, à sa remontée suivante |
 | Deck débranché longtemps | *Deck débranché longtemps*, sur le deck | le deck est débranché depuis son délai, compté de sa dernière apparition ou de son dernier événement `unplugged`, le plus récent des deux | seule, à la remontée qui le montre branché |
-| Deck changé de poste | *Deck changé de poste*, sur le deck | à la remontée qui déplace le deck | par une personne ; un nouveau déplacement ajoute une note à l'activité ouverte, quel que soit son destinataire |
+| Deck changé de poste | *Deck changé de poste*, sur le deck | à la remontée qui déplace le deck | par une personne ; tant qu'une est ouverte, quel que soit son destinataire, un nouveau déplacement n'en ouvre aucune et ajoute une note au fil du deck |
 
 - **Destinataire.** *Employé* : l'employé du poste, ou du poste qui tient
   le deck ; pour un déplacement, le nouveau détenteur, le prêteur
@@ -132,11 +132,12 @@ suivante.
   nommé dans les Paramètres. *Employé et gestionnaire* : une activité à
   chacun.
 - **Jamais de doublon.** Un enregistrement a au plus une activité ouverte
-  d'un type par destinataire, et un deck une seule activité *Deck changé
-  de poste* ouverte. Une activité *Service du deck en échec* ou *Deck
-  débranché longtemps* marquée faite pendant que son problème dure se
-  rouvre au passage suivant du cron ; un silence n'ouvre son activité
-  qu'une fois.
+  d'un type par destinataire. Un deck qui a une activité *Deck changé de
+  poste* ouverte n'en ouvre aucune autre à un nouveau déplacement, même
+  pour un autre détenteur : le déplacement s'ajoute en note au fil du
+  deck. Une activité *Service du deck en échec* ou *Deck débranché
+  longtemps* marquée faite pendant que son problème dure se rouvre au
+  passage suivant du cron ; un silence n'ouvre son activité qu'une fois.
 - **Fermeture.** Une activité fermée reste faite, avec le retour « Résolu
   à <heure> : <ce qui s'est passé> », l'heure dans le fuseau du
   destinataire (UTC à défaut) et le texte dans sa langue. Archiver un
