@@ -479,17 +479,21 @@ class MailActivity(models.Model):
     """The activity types of the monitoring belong to it: an activity of
     one of them, created or retyped by hand, would make the monitoring
     believe the problem already has its activity, so only sudo writes
-    them."""
+    them.
+
+    The check reads the type of the activities created, not the values
+    given: the type may come from the values, from the context key
+    `default_activity_type_id` or from the default of the model. The
+    AccessError it raises rolls the creation back with the transaction."""
 
     _inherit = "mail.activity"
 
     @api.model_create_multi
     def create(self, vals_list):
+        activities = super().create(vals_list)
         if not self.env.su:
-            self._check_not_monitoring(
-                vals.get("activity_type_id") for vals in vals_list
-            )
-        return super().create(vals_list)
+            self._check_not_monitoring(activities.activity_type_id.ids)
+        return activities
 
     def write(self, vals):
         if not self.env.su and "activity_type_id" in vals:
