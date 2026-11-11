@@ -1,0 +1,2249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<!-- Le domaine Pilotage : un requis par décision de l'utilisateur,
+     choix de conception et anti-objectif de la conception du pilotage,
+     sous-lot des réglages, code SD-CTL-R<nn>, puis ses preuves. Une
+     preuve nomme un test Odoo par son chemin pointé (kind python), un
+     test node de l'extension ou un test unitaire d'ERPLibre par
+     <dépôt>:<chemin>::<test>, la référence que pousse son lanceur.
+     noupdate : un requis retouché à la main garde sa retouche à la
+     mise à jour du module. -->
+<odoo noupdate="1">
+    <record id="cat_sd_ctl" model="devops.requirement.category">
+        <field name="name">Control</field>
+        <field name="code">sd_ctl</field>
+        <field name="sequence" eval="130" />
+    </record>
+    <record id="req_sd_ctl_r01" model="devops.requirement">
+        <field name="code">SD-CTL-R01</field>
+        <field name="name">Odoo holds a desired Stream Deck configuration for each workstation: the deck program, the plugins turned off and the settings of the deck service, its session refresh delay and the games; the key layout comes with lot 3b</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="10" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.config.line of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_config.py holds one setting per line, its key one of deck_program, plugins_off, session_refresh_sec and games (KEYS of streamdeck.config.schema), its value the canonical JSON that the schema validates.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r02" model="devops.requirement">
+        <field name="code">SD-CTL-R02</field>
+        <field name="name">The configuration comes from reusable profiles, from settings per deck model and from overrides per workstation</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="20" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.config.profile, streamdeck.config.model, one per USB product id, and the config_line_ids of streamdeck.workstation in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_config.py; a workstation takes the profile of its config_profile_id and the model layers of its connected decks.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r03" model="devops.requirement">
+        <field name="code">SD-CTL-R03</field>
+        <field name="name">The priority goes from the profile to the deck model, then to the workstation; a setting the manager locks is not overridden by a lower layer</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="30" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.config.schema._effective folds the layers in that order and stops a key at the first layer that locks it; the reply lists the locked keys.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r04" model="devops.requirement">
+        <field name="code">SD-CTL-R04</field>
+        <field name="name">The employee sets the configuration within the manager's limits: the manager locks some settings, and the employee sets the others on their own workstations</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="40" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">The record rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml give an employee the lines of their own workstations; streamdeck.config.line refuses an employee a key locked at any layer, and the fields locked and source.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r05" model="devops.requirement">
+        <field name="code">SD-CTL-R05</field>
+        <field name="name">A setting changed locally, through TODO › Stream Deck: Odoo offers a locked one again at the next report, and a free one goes up to Odoo as a new override of the workstation</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="50" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_apply_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py compares the local values with those last written to the file of the workstation (config_written): a locked key changed gives a new revision with the same values, a free key changed a workstation line of source local.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r06" model="devops.requirement">
+        <field name="code">SD-CTL-R06</field>
+        <field name="name">The employee confirms: the extension announces a new configuration and the employee clicks to apply it, which restarts the deck service</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="60" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">InventoryService.applyConfig of erplibre-home-gnome-extension:lib/inventory-service.js runs from a click only: the Apply action of the notification of extension.js, the entry of the deck menu of indicators/device.js, or the Apply button of the preferences through inventory-apply-request.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r07" model="devops.requirement">
+        <field name="code">SD-CTL-R07</field>
+        <field name="name">The extension receives the configuration with the report, applies it through the same paths as TODO › Stream Deck, the settings file and the restart of the deck service, and reports what is applied, or the refusal and its reason</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="70" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">rewriteConf of erplibre-home-gnome-extension:lib/deck-config.js gives the bytes of settings_text of erplibre:script/todo/erplibre_home_service.py on the shared fixtures of test/fixtures/streamdeck_conf; the restart goes through the argv of lib/deck-service.js; the result rides the next report, and Odoo records it with a Configuration applied or Configuration refused event.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r08" model="devops.requirement">
+        <field name="code">SD-CTL-R08</field>
+        <field name="name">With several Odoo, the destination checked Pilot in the preferences pilots the workstation; no destination is the pilot by default</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="80" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The GSettings key inventory-pilot of erplibre-home-gnome-extension:schemas holds the id of the pilot destination, empty by default; only that destination reads streamdeck.conf, sends a pilot body and has the configuration of its reply announced or applied.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r09" model="devops.requirement">
+        <field name="code">SD-CTL-R09</field>
+        <field name="name">At the first pilot, when free settings differ between the workstation and Odoo, the employee is asked whether to keep their local values, which become the overrides of the workstation, or to take Odoo's</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="90" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">Under the policy ask, the reply lists in ask the free managed keys whose local value is set and differs, until config_first_choice of the workstation is set; the extension asks in a notification, the deck menu and the preferences: Keep my settings writes nothing and sends the choice keep_local, Use Odoo's settings applies and sends take_odoo.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r10" model="devops.requirement">
+        <field name="code">SD-CTL-R10</field>
+        <field name="name">An organisation setting in Settings › Stream Deck forces the first-pilot choice: ask the employee, the default, keep the local values or take Odoo's; locked settings are offered for confirmation under every policy</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="100" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">streamdeck_first_pilot_policy of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, stored as the ir.config_parameter erplibre_streamdeck.first_pilot_policy, ask by default and an unknown value read as ask; like every Stream Deck setting, only a Settings administrator writes it; under a forced policy a client choice counts for nothing, and a locked key is never in ask.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r11" model="devops.requirement">
+        <field name="code">SD-CTL-R11</field>
+        <field name="name">The manager marks profiles selectable; the employee picks one of them for each of their workstations, the manager assigns any profile, and a profile that is not selectable is assigned by the manager alone</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="110" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">_check_profile_pick of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_workstation.py lets an employee set config_profile_id of their own workstation to an active selectable profile only, and only when the current one is empty or selectable; the form of the employee offers the selectable profiles and is read only on a profile the manager assigned.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r12" model="devops.requirement">
+        <field name="code">SD-CTL-R12</field>
+        <field name="name">A locked setting offered again follows the same path: a new revision that the employee confirms; nothing applies without a click</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="120" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">A local change of a locked key renews the revision with the same values in _apply_config; the extension announces it as any revision and writes nothing before applyConfig.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r13" model="devops.requirement">
+        <field name="code">SD-CTL-R13</field>
+        <field name="name">The settings Odoo sets are a closed list, the same on both sides of the wire, written in CONTRACT.md of the extension and held by tests in the three repositories: no path, no environment variable, no command, no plugin to turn on</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="130" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">CONFIG_KEYS of erplibre-home-gnome-extension:lib/deck-config.js, KEYS and _validate of streamdeck.config.schema, and PROGRAMS, GAMES_VALUES, SESSION_REFRESH_RANGE and CONFIG_LINES of erplibre:script/todo/erplibre_home_service.py, each equal to the table of CONTRACT.md; plugins_off only turns plugins off.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r14" model="devops.requirement">
+        <field name="code">SD-CTL-R14</field>
+        <field name="name">The workstation checks every value against the schema before it writes; a value outside it refuses the whole revision with the reason invalid:&lt;key&gt;, and nothing is half written</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="140" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">validateConfig of erplibre-home-gnome-extension:lib/deck-config.js refuses the whole configuration of a reply at its first key outside the schema, and rewriteConf throws before it builds anything; the inventory service reports the revision refused once and writes nothing.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r15" model="devops.requirement">
+        <field name="code">SD-CTL-R15</field>
+        <field name="name">Only the keys a layer sets are managed: a key no layer sets stays the employee's, locally, and Odoo never adopts it</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="150" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The settings of the reply are those of _effective, the keys some layer sets; the adoption and the first-pilot question look at those keys only, and a workstation no layer configures gets no configuration.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r16" model="devops.requirement">
+        <field name="code">SD-CTL-R16</field>
+        <field name="name">The revision is computed at the report: Odoo takes a SHA-256 fingerprint of the canonical JSON of the effective configuration and moves the revision of the workstation when it changes, with no trigger on the layers</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="160" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.config.schema._hash; _apply_config compares it with config_hash of the workstation at each report and moves config_revision on a new fingerprint.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r17" model="devops.requirement">
+        <field name="code">SD-CTL-R17</field>
+        <field name="name">A revision already in place is not offered: when the file already holds Odoo's values, the extension reports it applied with no notification and no restart</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="170" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_onConfig of erplibre-home-gnome-extension:lib/inventory-service.js reports applied a valid revision whose values the file holds and which carries no ask, unless a restart is still owed; an adopted override comes back that way and Odoo ends applied.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r18" model="devops.requirement">
+        <field name="code">SD-CTL-R18</field>
+        <field name="name">A workstation has one pilot destination; the other destinations receive its report and send no configuration back</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="180" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">A destination that is not the pilot sends config as pilot false; _parse_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers it without configuration, and the extension applies the configuration of the pilot only.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r19" model="devops.requirement">
+        <field name="code">SD-CTL-R19</field>
+        <field name="name">The history gains four kinds that Odoo alone writes, a workstation that sends one getting 400: Configuration applied, Configuration refused, Local setting adopted and Setting changed locally; this lot opens no activity</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="190" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">SERVER_KINDS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_event.py gains config_applied, config_refused, config_adopted and config_drift, with the revision, the keys and the reason; the history filters and shows them.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r20" model="devops.requirement">
+        <field name="code">SD-CTL-R20</field>
+        <field name="name">Profiles, deck models, one per USB product id and named from the known models, and lines carrying a key, a value, a lock, a source and exactly one parent among profile, deck model and workstation, one line per parent and key, each value checked by the schema of the workstation</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="200" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.config.profile, streamdeck.config.model and streamdeck.config.line of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_config.py: _check_one_parent, the SQL uniqueness per parent and key, and _check_value through streamdeck.config.schema._validate; the Configuration tab of the workstation shows its fields.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r21" model="devops.requirement">
+        <field name="code">SD-CTL-R21</field>
+        <field name="name">The effective configuration takes, for each key, the last layer that sets it, profile then deck model then workstation, stopping at the first layer that locks it; the deck models are those of the connected decks, by ascending USB product id, and the workstation warns when several apply</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="210" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.config.schema._layers and _effective of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_config.py; config_several_models of the workstation shows the warning on its Configuration tab.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r22" model="devops.requirement">
+        <field name="code">SD-CTL-R22</field>
+        <field name="name">Only the manager sets a lock, on a line of a profile, of a deck model or of a workstation</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="220" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">_check_employee_vals of streamdeck.config.line refuses locked and source to an employee, and a locked line keeps its key and value; the manager writes every layer.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r23" model="devops.requirement">
+        <field name="code">SD-CTL-R23</field>
+        <field name="name">The manager writes everything; an employee reads the profiles of their workstations, the selectable profiles and the deck model layers, writes the lines of their own workstations whose key no layer locks, never locked nor source, and never the state fields of the configuration, which the service alone writes</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="230" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">The access rights of ERPLibre_erplibre_addons:erplibre_streamdeck/security/ir.model.access.csv and the rules of security/streamdeck_rules.xml; the config_* state fields of the workstation are read only and written in sudo by streamdeck_service.py; the Configuration menus are the manager's.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r24" model="devops.requirement">
+        <field name="code">SD-CTL-R24</field>
+        <field name="name">A report in protocol 1.1 or later from a workstation with a managed key gets the configuration in its reply; a workstation in 1.0 stays unmanaged, and its form says the extension is too old to be piloted</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="240" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_report of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py reads config from protocol 1.1 on; config_too_old of the workstation reads its contract version below 1.3.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r25" model="devops.requirement">
+        <field name="code">SD-CTL-R25</field>
+        <field name="name">Odoo compares each managed key with the value it last wrote to the file: a locked key changed gives a Setting changed locally event and a new revision, a free key changed a workstation line of source local and a Local setting adopted event; before any application the first-pilot rule applies</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="250" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_config_drift and _config_adopt of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py measure against config_written, the values of the last revision written, and only when the report follows that revision; a free key cleared locally is offered again, never adopted.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r26" model="devops.requirement">
+        <field name="code">SD-CTL-R26</field>
+        <field name="name">Stream Deck › Configuration › Profiles and Deck models for the manager; a Configuration tab on the workstation with the profile, the effective table, the editable overrides, the state, the offered and applied revisions, the refusal reason and the pending date; the fleet filters the pending and refused configurations; in English and Canadian French</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="260" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">ERPLibre_erplibre_addons:erplibre_streamdeck/views/streamdeck_config_views.xml, the Configuration page of views/streamdeck_workstation_views.xml and the filters config_pending and config_refused of its search view; i18n/fr_CA.po.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r27" model="devops.requirement">
+        <field name="code">SD-CTL-R27</field>
+        <field name="name">The wire moves to protocol 1.1 and the contract of the extension to 1.3, MINOR versions: Odoo still accepts a report in 1.0, and the contract file of ERPLibre holds 1.3</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="270" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">PROTOCOL of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py, INVENTORY_PROTOCOL of erplibre-home-gnome-extension:lib/inventory.js, CONTRACT_VERSION of lib/inventory-service.js and the Versioning section of CONTRACT.md; erplibre:script/gnome-extension/erplibre_home_contract holds 1.3.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r28" model="devops.requirement">
+        <field name="code">SD-CTL-R28</field>
+        <field name="name">The report body carries config: pilot, the applied revision, the local values read from streamdeck.conf as the settings library reads them, a value missing or invalid going up null, the result and the first-pilot choice; a destination that is not the pilot sends only pilot false and gets nothing</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="280" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">configBody and settleConfig of erplibre-home-gnome-extension:lib/inventory.js, readCurrent of lib/deck-config.js; _parse_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers 400 to an unknown choice.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r29" model="devops.requirement">
+        <field name="code">SD-CTL-R29</field>
+        <field name="name">The reply of a piloted workstation carries config: its revision, the fingerprint, Odoo's settings, the locked keys, and ask while the first-pilot question stands</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="290" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_apply_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py builds it; parseReply of erplibre-home-gnome-extension:lib/inventory.js validates it through validateConfig of lib/deck-config.js, and ignores a reply outside the shape.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r30" model="devops.requirement">
+        <field name="code">SD-CTL-R30</field>
+        <field name="name">state.deck_plugins lists the ids of the plugins on disk, those of the checkout and of the plugin directory of the user, at most 128 ids of the plugin pattern, which the workstation form shows</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="300" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">deckPluginIds and collectFacts of erplibre-home-gnome-extension:lib/inventory-service.js, buildState of lib/inventory.js; deck_plugins of the workstation in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_workstation.py; deck_plugin_ids of erplibre:script/todo/erplibre_home_service.py keeps the same pattern.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r31" model="devops.requirement">
+        <field name="code">SD-CTL-R31</field>
+        <field name="name">A refusal reason holds at most 256 code points, the local values and the settings only the keys of the table, a key the other side does not know is ignored, and Odoo answers 400 bad_request to a value outside the schema in the local values or in the result</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="310" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">_parse_config and REFUSAL_REASONS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py; configBody of erplibre-home-gnome-extension:lib/inventory.js sends null for a local value outside the schema and cuts the reason.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r32" model="devops.requirement">
+        <field name="code">SD-CTL-R32</field>
+        <field name="name">A Pilot switch per destination on the Inventory page of the preferences: checking one unchecks the others</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="320" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">setPilot of erplibre-home-gnome-extension:lib/inventory-prefs.js writes the GSettings key inventory-pilot, which holds one destination id.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r33" model="devops.requirement">
+        <field name="code">SD-CTL-R33</field>
+        <field name="name">At each report the pilot reads streamdeck.conf again for the local values</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="330" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The report of the pilot in erplibre-home-gnome-extension:lib/inventory-service.js reads the file as bytes and passes it to readCurrent of lib/deck-config.js.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r34" model="devops.requirement">
+        <field name="code">SD-CTL-R34</field>
+        <field name="name">A new revision is announced, never in a modal way: one GNOME notification per revision with an Apply action, an entry Apply Stream Deck configuration in the deck menu listing the keys that change, and an Apply button on the destination in the preferences; a revision already announced is not notified again</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="340" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The announce signal of erplibre-home-gnome-extension:lib/inventory-service.js, once per revision kept in the state file; _announceConfig of extension.js, the deck menu of indicators/device.js, and requestApply of lib/inventory-prefs.js through the GSettings key inventory-apply-request.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r35" model="devops.requirement">
+        <field name="code">SD-CTL-R35</field>
+        <field name="name">The application rewrites streamdeck.conf by the rule of write_settings: read again just before, each managed line replaced and a missing one added, every other line kept, replaced atomically with its mode kept</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="350" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">rewriteConf of erplibre-home-gnome-extension:lib/deck-config.js gives the bytes of settings_text of erplibre:script/todo/erplibre_home_service.py; _replaceKeepingMode of lib/inventory-service.js writes a temporary file next to the target, sets its mode and renames it over the target, a link followed.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r36" model="devops.requirement">
+        <field name="code">SD-CTL-R36</field>
+        <field name="name">The deck service restarts when the deck program, the plugins turned off or the session refresh delay changed and the service is running; the games alone restart nothing, and a stopped service is never started</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="360" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">needsRestart of erplibre-home-gnome-extension:lib/deck-config.js and _applyOffer of lib/inventory-service.js, which restarts through the argv of lib/deck-service.js only a unit read as active, and keeps a restart owed for keys written without one.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r37" model="devops.requirement">
+        <field name="code">SD-CTL-R37</field>
+        <field name="name">The result of an application goes to Odoo in a report sent at once, refused with invalid:&lt;key&gt;, write_failed, restart_failed or unit_missing, the last when the program changed with no deck unit installed, the file then written</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="370" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_applyOffer of erplibre-home-gnome-extension:lib/inventory-service.js; a result decided by a reply waits for the next report when its own report was already sent at once, so that replies never chain reports; a refusal after the write keeps the revision pending.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r38" model="devops.requirement">
+        <field name="code">SD-CTL-R38</field>
+        <field name="name">The journal has one line per application, with the destination, the revision, the keys changed and the result, never a token</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="380" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">The inventory config line of erplibre-home-gnome-extension:lib/inventory-service.js names the label of the destination, the revision, the keys and the status.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r39" model="devops.requirement">
+        <field name="code">SD-CTL-R39</field>
+        <field name="name">The extension writes $XDG_STATE_HOME/erplibre-home/pilot.json, mode 0600, with no secret: the label of the destination, the revision and the locked keys; ERPLibre reads it only to warn in the TODO menu</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="390" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">pilotFilePath of erplibre-home-gnome-extension:lib/inventory-service.js, removed with the offer; read_pilot of erplibre:script/todo/erplibre_home_service.py ignores a missing or malformed file and cleans the label.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r40" model="devops.requirement">
+        <field name="code">SD-CTL-R40</field>
+        <field name="name">Before TODO › Stream Deck changes a key that pilot.json lists as locked, one line warns that Odoo locks it for that destination and will offer it again; the change is still allowed</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="400" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_streamdeck_write and _streamdeck_warn_locked of erplibre:script/todo/streamdeck_menu.py, for the four setting entries and the program chosen at the Stream Deck install; the line is in script/todo/todo_i18n.py.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r41" model="devops.requirement">
+        <field name="code">SD-CTL-R41</field>
+        <field name="name">An interconnection test holds the table of CONTRACT.md equal to the constants of erplibre_home_service.py and to the plugin id pattern of deck_plugin_ids, and both writers of streamdeck.conf agree on the shared fixtures</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="410" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">erplibre:test/test_erplibre_home_pilot.py reads the CONTRACT.md and the fixtures of the extension clone, and skips with its reason when the clone is absent or older than 1.3.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r42" model="devops.requirement">
+        <field name="code">SD-CTL-R42</field>
+        <field name="name">The requirements of the control live in the registry, domain Control, apart from the inventory and the monitoring, each done one with the tests that prove it</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="420" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">ERPLibre_erplibre_addons:erplibre_streamdeck_devops_requirement/data/requirement_control.xml; tests/test_requirement_control.py checks the proofs against the Odoo tests and the committed trees of the extension and of ERPLibre.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r43" model="devops.requirement">
+        <field name="code">SD-CTL-R43</field>
+        <field name="name">Anti-goal: an Odoo, or whoever controls it, that makes a workstation run code, write an arbitrary path or turn a plugin on</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="430" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">The closed list of CONTRACT.md: four keys, each a word of a list, ids turned off or a bounded number; the extension writes streamdeck.conf only, refuses a whole revision outside the schema and restarts the deck unit through a fixed argv.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r44" model="devops.requirement">
+        <field name="code">SD-CTL-R44</field>
+        <field name="name">Anti-goal: a configuration applied without the click of the employee</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="440" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">applyConfig and keepLocal of erplibre-home-gnome-extension:lib/inventory-service.js are the only paths that write or answer, and each starts from a click; a reply only announces.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r45" model="devops.requirement">
+        <field name="code">SD-CTL-R45</field>
+        <field name="name">Anti-goal: a streamdeck.conf written halfway, or a line of the employee, a comment or an unmanaged key, lost at the write</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="450" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">rewriteConf keeps every byte outside the managed lines, and the write goes through a temporary file renamed over the target, removed on failure.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r46" model="devops.requirement">
+        <field name="code">SD-CTL-R46</field>
+        <field name="name">Anti-goal: two Odoo that fight over a workstation</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="460" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">One pilot destination at most, the inventory-pilot key; only its reply is announced or applied, and Odoo sends no configuration to a destination that is not the pilot.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r47" model="devops.requirement">
+        <field name="code">SD-CTL-R47</field>
+        <field name="name">Anti-goal: an employee who changes a locked setting in Odoo, or reads the configuration of another employee</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="470" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">The line guards of streamdeck.config.line, _check_profile_pick and the user rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r48" model="devops.requirement">
+        <field name="code">SD-CTL-R48</field>
+        <field name="name">Anti-goal: GNOME Shell blocked during the write or the restart</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="480" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The application in erplibre-home-gnome-extension:lib/inventory-service.js is asynchronous from end to end, each step cut at TIMEOUT_S; GNOME Shell itself is checked on the manual checklist.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r49" model="devops.requirement">
+        <field name="code">SD-CTL-R49</field>
+        <field name="name">Anti-goal: identifying data in the code, the data, the comments or the commits</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="490" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="False" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">Examples are invented (host-a, SN-CFG, SN-PLUS); erplibre:script/analyse/check_comment_hygiene.py reports identifying data in comments, and the commit-msg hook of erplibre:script/git/hooks refuses an address, an email or an account path in a commit body.</field>
+        <field name="missing">No test sweeps the files of the control: check_comment_hygiene.py runs by hand and from the pre-commit hook, which lists its findings without blocking the commit.</field>
+        <field name="notes">Origin: unit test missing.</field>
+    </record>
+    <record id="test_sd_ctl_r01_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r01" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_each_key_accepts_its_values_and_refuses_others</field>
+    </record>
+    <record id="test_sd_ctl_r01_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r01" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_value_is_stored_as_canonical_json</field>
+    </record>
+    <record id="test_sd_ctl_r01_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r01" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::the closed list of settings is the four keys of the contract</field>
+    </record>
+    <record id="test_sd_ctl_r02_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r02" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_profile_then_model_then_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r02_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r02" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_two_connected_models_apply_by_product_id</field>
+    </record>
+    <record id="test_sd_ctl_r02_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r02" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_profile_and_model_forms_hold_their_lines</field>
+    </record>
+    <record id="test_sd_ctl_r03_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r03" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_profile_then_model_then_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r03_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r03" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_profile_lock_ignores_model_and_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r03_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r03" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_model_lock_ignores_the_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r03_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r03" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_pilot_report_gets_revision_hash_settings_locked</field>
+    </record>
+    <record id="test_sd_ctl_r04_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r04" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_overrides_a_free_key_of_their_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r04_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r04" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_override_a_locked_key</field>
+    </record>
+    <record id="test_sd_ctl_r04_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r04" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_set_locked_or_source</field>
+    </record>
+    <record id="test_sd_ctl_r04_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r04" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_employee_edits_overrides_but_never_locks_or_sources</field>
+    </record>
+    <record id="test_sd_ctl_r05_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r05" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_locked_local_change_is_reoffered_as_drift</field>
+    </record>
+    <record id="test_sd_ctl_r05_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r05" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_free_local_change_is_adopted_once</field>
+    </record>
+    <record id="test_sd_ctl_r05_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r05" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_a_locked_key_warns_and_still_writes</field>
+    </record>
+    <record id="test_sd_ctl_r06_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r06" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::nothing_applies_without_a_click</field>
+    </record>
+    <record id="test_sd_ctl_r06_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r06" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_revision_is_announced_once</field>
+    </record>
+    <record id="test_sd_ctl_r06_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r06" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::a new revision is notified once, its Apply action applies it</field>
+    </record>
+    <record id="test_sd_ctl_r06_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r06" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the deck menu offers a pending configuration, applied on a click</field>
+    </record>
+    <record id="test_sd_ctl_r06_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r06" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::apply_button_writes_the_request</field>
+    </record>
+    <record id="test_sd_ctl_r06_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r06" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply_writes_then_restarts_an_active_unit</field>
+    </record>
+    <record id="test_sd_ctl_r07_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r07" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_write_settings_and_the_extension_rewrite_agree_on_the_fixtures</field>
+    </record>
+    <record id="test_sd_ctl_r07_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r07" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::rewrite_keeps_every_other_line</field>
+    </record>
+    <record id="test_sd_ctl_r07_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r07" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_result_goes_in_the_next_report_at_once</field>
+    </record>
+    <record id="test_sd_ctl_r07_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r07" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_applied_result_records_values_and_event</field>
+    </record>
+    <record id="test_sd_ctl_r07_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r07" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_refused_result_keeps_the_reason</field>
+    </record>
+    <record id="test_sd_ctl_r08_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r08" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::only_the_pilot_destination_is_applied</field>
+    </record>
+    <record id="test_sd_ctl_r08_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r08" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the schema holds the pilot and the apply request, empty by default</field>
+    </record>
+    <record id="test_sd_ctl_r08_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r08" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::checking_pilot_unchecks_the_others</field>
+    </record>
+    <record id="test_sd_ctl_r08_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r08" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::only the pilot shows a pending configuration</field>
+    </record>
+    <record id="test_sd_ctl_r09_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_first_pilot_under_ask_offers_odoo_values_and_lists_differing_free_keys</field>
+    </record>
+    <record id="test_sd_ctl_r09_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_no_ask_when_free_local_values_already_match_or_are_null</field>
+    </record>
+    <record id="test_sd_ctl_r09_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_choice_keep_local_adopts_free_values_and_offers_locked_ones</field>
+    </record>
+    <record id="test_sd_ctl_r09_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_choice_take_odoo_adopts_nothing</field>
+    </record>
+    <record id="test_sd_ctl_r09_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_ask_ends_after_a_choice_or_an_applied_result</field>
+    </record>
+    <record id="test_sd_ctl_r09_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_form_tells_while_the_employee_is_asked</field>
+    </record>
+    <record id="test_sd_ctl_r09_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::the_first_pilot_asks_before_applying</field>
+    </record>
+    <record id="test_sd_ctl_r09_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_first_pilot_asks_before_applying: the question, not an apply</field>
+    </record>
+    <record id="test_sd_ctl_r09_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::keep_local_writes_nothing_and_reports_the_choice</field>
+    </record>
+    <record id="test_sd_ctl_r09_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::take_odoo_applies_and_reports_the_choice</field>
+    </record>
+    <record id="test_sd_ctl_r09_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="110" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::keep_local_is_refused_without_ask</field>
+    </record>
+    <record id="test_sd_ctl_r09_12" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="120" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_question_is_asked_once_per_revision</field>
+    </record>
+    <record id="test_sd_ctl_r09_13" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="130" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the deck menu asks the first-pilot question with two entries</field>
+    </record>
+    <record id="test_sd_ctl_r09_14" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="140" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::ask_shows_use_odoo_and_keep_buttons</field>
+    </record>
+    <record id="test_sd_ctl_r09_15" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r09" />
+        <field name="sequence" eval="150" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::keep_button_writes_the_keep_local_request</field>
+    </record>
+    <record id="test_sd_ctl_r10_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_the_first_pilot_policy_defaults_to_ask</field>
+    </record>
+    <record id="test_sd_ctl_r10_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_an_unknown_first_pilot_policy_reads_as_ask</field>
+    </record>
+    <record id="test_sd_ctl_r10_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_settings.TestStreamdeckConfigSettings.test_only_a_settings_administrator_sets_the_first_pilot_policy</field>
+    </record>
+    <record id="test_sd_ctl_r10_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_first_pilot_setting_is_the_administrator_s_only</field>
+    </record>
+    <record id="test_sd_ctl_r10_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_policy_keep_local_adopts_without_asking</field>
+    </record>
+    <record id="test_sd_ctl_r10_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_policy_take_odoo_offers_without_asking</field>
+    </record>
+    <record id="test_sd_ctl_r10_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_locked_keys_are_offered_under_every_policy</field>
+    </record>
+    <record id="test_sd_ctl_r10_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_forced_policy_ignores_the_client_choice</field>
+    </record>
+    <record id="test_sd_ctl_r10_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r10" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::locked_keys_still_need_the_usual_apply_after_keep_local</field>
+    </record>
+    <record id="test_sd_ctl_r11_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_the_manager_assigns_any_profile</field>
+    </record>
+    <record id="test_sd_ctl_r11_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_picks_a_selectable_profile_for_their_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r11_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_pick_a_non_selectable_profile</field>
+    </record>
+    <record id="test_sd_ctl_r11_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_replace_a_manager_assigned_profile</field>
+    </record>
+    <record id="test_sd_ctl_r11_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_clear_the_profile</field>
+    </record>
+    <record id="test_sd_ctl_r11_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_pick_an_archived_profile</field>
+    </record>
+    <record id="test_sd_ctl_r11_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_pick_for_another_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r11_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_mark_a_profile_selectable</field>
+    </record>
+    <record id="test_sd_ctl_r11_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_picking_a_selectable_profile_offers_a_new_revision</field>
+    </record>
+    <record id="test_sd_ctl_r11_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_an_employee_is_offered_only_selectable_profiles</field>
+    </record>
+    <record id="test_sd_ctl_r11_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="110" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_profile_is_read_only_to_the_employee_when_not_selectable</field>
+    </record>
+    <record id="test_sd_ctl_r11_12" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r11" />
+        <field name="sequence" eval="120" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_manager_assigns_any_profile_from_the_form</field>
+    </record>
+    <record id="test_sd_ctl_r12_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r12" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_locked_local_change_is_reoffered_as_drift</field>
+    </record>
+    <record id="test_sd_ctl_r12_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r12" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_revision_is_announced_once</field>
+    </record>
+    <record id="test_sd_ctl_r12_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r12" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::nothing_applies_without_a_click</field>
+    </record>
+    <record id="test_sd_ctl_r12_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r12" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::locked_keys_still_need_the_usual_apply_after_keep_local</field>
+    </record>
+    <record id="test_sd_ctl_r13_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r13" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the configuration table is the closed list of deck-config.js</field>
+    </record>
+    <record id="test_sd_ctl_r13_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r13" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_the_contract_table_matches_the_service_constants</field>
+    </record>
+    <record id="test_sd_ctl_r13_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r13" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_each_key_accepts_its_values_and_refuses_others</field>
+    </record>
+    <record id="test_sd_ctl_r13_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r13" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::the closed list of settings is the four keys of the contract</field>
+    </record>
+    <record id="test_sd_ctl_r13_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r13" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::each key accepts the values of the schema</field>
+    </record>
+    <record id="test_sd_ctl_r14_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r14" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a_bad_value_refuses_the_whole_revision</field>
+    </record>
+    <record id="test_sd_ctl_r14_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r14" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::every refusal names a key of the table, as Odoo receives it</field>
+    </record>
+    <record id="test_sd_ctl_r14_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r14" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a key locked or asked out of place refuses as invalid:&lt;key&gt;</field>
+    </record>
+    <record id="test_sd_ctl_r14_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r14" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a value outside the schema refuses the revision once, writes nothing</field>
+    </record>
+    <record id="test_sd_ctl_r14_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r14" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_refused_result_keeps_the_reason</field>
+    </record>
+    <record id="test_sd_ctl_r15_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r15" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_workstation_no_layer_configures_gets_no_config</field>
+    </record>
+    <record id="test_sd_ctl_r15_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r15" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_first_pilot_under_ask_offers_odoo_values_and_lists_differing_free_keys</field>
+    </record>
+    <record id="test_sd_ctl_r15_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r15" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_key_added_after_the_applied_revision_is_offered</field>
+    </record>
+    <record id="test_sd_ctl_r15_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r15" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_picking_a_selectable_profile_offers_a_new_revision</field>
+    </record>
+    <record id="test_sd_ctl_r16_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r16" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_hash_is_stable_and_order_free</field>
+    </record>
+    <record id="test_sd_ctl_r16_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r16" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_the_revision_moves_only_when_the_hash_changes</field>
+    </record>
+    <record id="test_sd_ctl_r16_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r16" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_configuration_withdrawn_then_restored_gets_a_new_revision</field>
+    </record>
+    <record id="test_sd_ctl_r17_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r17" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::an_unchanged_revision_is_applied_silently</field>
+    </record>
+    <record id="test_sd_ctl_r17_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r17" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::silent applications decided by replies do not chain reports</field>
+    </record>
+    <record id="test_sd_ctl_r17_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r17" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_free_local_change_is_adopted_once</field>
+    </record>
+    <record id="test_sd_ctl_r18_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r18" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_non_pilot_destination_gets_nothing</field>
+    </record>
+    <record id="test_sd_ctl_r18_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r18" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the_body_carries_config_only_for_the_pilot</field>
+    </record>
+    <record id="test_sd_ctl_r18_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r18" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::only_the_pilot_destination_is_applied</field>
+    </record>
+    <record id="test_sd_ctl_r19_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r19" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_client_cannot_send_config_kinds</field>
+    </record>
+    <record id="test_sd_ctl_r19_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r19" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_applied_result_records_values_and_event</field>
+    </record>
+    <record id="test_sd_ctl_r19_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r19" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_refused_result_keeps_the_reason</field>
+    </record>
+    <record id="test_sd_ctl_r19_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r19" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_refused_result_sent_again_is_recorded_once</field>
+    </record>
+    <record id="test_sd_ctl_r19_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r19" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_result_dated_ahead_is_dated_when_received</field>
+    </record>
+    <record id="test_sd_ctl_r19_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r19" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_each_config_kind_has_its_history_filter_and_fields</field>
+    </record>
+    <record id="test_sd_ctl_r20_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r20" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_line_has_exactly_one_parent</field>
+    </record>
+    <record id="test_sd_ctl_r20_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r20" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_value_is_stored_as_canonical_json</field>
+    </record>
+    <record id="test_sd_ctl_r20_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r20" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_line_that_changes_only_its_key_keeps_to_the_schema</field>
+    </record>
+    <record id="test_sd_ctl_r20_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r20" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_configuration_tab_shows_the_pilot_of_the_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r21_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r21" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_profile_then_model_then_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r21_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r21" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_profile_lock_ignores_model_and_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r21_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r21" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_a_model_lock_ignores_the_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r21_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r21" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_two_connected_models_apply_by_product_id</field>
+    </record>
+    <record id="test_sd_ctl_r21_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r21" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_form_warns_about_several_deck_models</field>
+    </record>
+    <record id="test_sd_ctl_r22_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r22" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_the_manager_writes_every_layer</field>
+    </record>
+    <record id="test_sd_ctl_r22_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r22" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_set_locked_or_source</field>
+    </record>
+    <record id="test_sd_ctl_r22_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r22" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_move_a_locked_line_to_another_key</field>
+    </record>
+    <record id="test_sd_ctl_r22_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r22" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_manager_locks_overrides_of_a_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r23_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r23" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_reads_selectable_and_own_profiles_and_the_model_layers_only</field>
+    </record>
+    <record id="test_sd_ctl_r23_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r23" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_touch_another_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r23_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r23" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_write_config_first_choice</field>
+    </record>
+    <record id="test_sd_ctl_r23_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r23" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_overrides_a_free_key_of_their_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r23_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r23" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_only_the_owner_reads_the_config_of_a_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r23_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r23" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_configuration_menus_are_the_manager_s_only</field>
+    </record>
+    <record id="test_sd_ctl_r24_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r24" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_1_0_report_gets_no_config_and_stays_unmanaged</field>
+    </record>
+    <record id="test_sd_ctl_r24_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r24" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_pilot_report_gets_revision_hash_settings_locked</field>
+    </record>
+    <record id="test_sd_ctl_r24_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r24" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_form_says_an_old_extension_cannot_be_piloted</field>
+    </record>
+    <record id="test_sd_ctl_r25_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_locked_local_change_is_reoffered_as_drift</field>
+    </record>
+    <record id="test_sd_ctl_r25_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_free_local_change_is_adopted_once</field>
+    </record>
+    <record id="test_sd_ctl_r25_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_values_written_then_refused_are_not_adopted</field>
+    </record>
+    <record id="test_sd_ctl_r25_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_file_that_follows_another_revision_is_left_alone</field>
+    </record>
+    <record id="test_sd_ctl_r25_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_free_key_cleared_locally_is_reoffered</field>
+    </record>
+    <record id="test_sd_ctl_r25_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_result_for_another_revision_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r25_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_result_without_an_offered_revision_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r26_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r26" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_configuration_tab_shows_the_pilot_of_the_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r26_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r26" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_configuration_menus_are_the_manager_s_only</field>
+    </record>
+    <record id="test_sd_ctl_r26_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r26" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_profile_and_model_forms_hold_their_lines</field>
+    </record>
+    <record id="test_sd_ctl_r26_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r26" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_fleet_filters_pending_and_refused_configurations</field>
+    </record>
+    <record id="test_sd_ctl_r26_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r26" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_views.TestStreamdeckConfigViews.test_the_employee_edits_overrides_but_never_locks_or_sources</field>
+    </record>
+    <record id="test_sd_ctl_r26_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r26" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_i18n.TestStreamdeckConfigI18n.test_every_configuration_term_has_its_fr_CA_text</field>
+    </record>
+    <record id="test_sd_ctl_r27_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r27" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.3 since Odoo pilots the deck settings</field>
+    </record>
+    <record id="test_sd_ctl_r27_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r27" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_1_0_report_gets_no_config_and_stays_unmanaged</field>
+    </record>
+    <record id="test_sd_ctl_r27_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r27" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_extension_repo.py::LeContrat::test_the_contract_file_holds_one_version</field>
+    </record>
+    <record id="test_sd_ctl_r27_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r27" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_extension_repo.py::LeContrat::test_the_clone_shares_its_major</field>
+    </record>
+    <record id="test_sd_ctl_r28_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the_body_carries_config_only_for_the_pilot</field>
+    </record>
+    <record id="test_sd_ctl_r28_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the_body_carries_the_choice_once</field>
+    </record>
+    <record id="test_sd_ctl_r28_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::readCurrent_matches_the_settings_library</field>
+    </record>
+    <record id="test_sd_ctl_r28_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a_key_the_file_lacks_reads_null</field>
+    </record>
+    <record id="test_sd_ctl_r28_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_non_pilot_destination_gets_nothing</field>
+    </record>
+    <record id="test_sd_ctl_r28_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r28" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_an_unknown_choice_is_400</field>
+    </record>
+    <record id="test_sd_ctl_r29_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r29" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_pilot_report_gets_revision_hash_settings_locked</field>
+    </record>
+    <record id="test_sd_ctl_r29_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r29" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract states the config shapes of the body and the reply</field>
+    </record>
+    <record id="test_sd_ctl_r29_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r29" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::parseReply validates the config a reply carries</field>
+    </record>
+    <record id="test_sd_ctl_r29_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r29" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::an_ask_key_outside_the_free_keys_refuses</field>
+    </record>
+    <record id="test_sd_ctl_r29_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r29" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a reply outside the shape is ignored, nothing to refuse</field>
+    </record>
+    <record id="test_sd_ctl_r30_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r30" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_deck_plugins_are_stored_and_bounded</field>
+    </record>
+    <record id="test_sd_ctl_r30_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r30" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::collectFacts lists the deck plugins of the checkout and the user</field>
+    </record>
+    <record id="test_sd_ctl_r30_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r30" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the report carries the deck plugins of the facts</field>
+    </record>
+    <record id="test_sd_ctl_r30_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r30" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the deck plugins go sorted, once each, within Odoo's bounds</field>
+    </record>
+    <record id="test_sd_ctl_r30_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r30" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LesIdentifiantsDePlugin::test_deck_plugin_ids_keeps_only_ids_the_wire_accepts</field>
+    </record>
+    <record id="test_sd_ctl_r31_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r31" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_out_of_schema_current_or_result_is_400</field>
+    </record>
+    <record id="test_sd_ctl_r31_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r31" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_an_unknown_current_key_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r31_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r31" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the pilot body holds only what Odoo accepts</field>
+    </record>
+    <record id="test_sd_ctl_r31_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r31" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a valid reply comes back normalised, unknown keys ignored</field>
+    </record>
+    <record id="test_sd_ctl_r32_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r32" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::checking_pilot_unchecks_the_others</field>
+    </record>
+    <record id="test_sd_ctl_r32_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r32" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the schema holds the pilot and the apply request, empty by default</field>
+    </record>
+    <record id="test_sd_ctl_r33_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r33" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the pilot body carries the local values, read again at each report</field>
+    </record>
+    <record id="test_sd_ctl_r33_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r33" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::readCurrent reads numbers and lists as the shell does</field>
+    </record>
+    <record id="test_sd_ctl_r34_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_revision_is_announced_once</field>
+    </record>
+    <record id="test_sd_ctl_r34_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::a new revision is notified once, its Apply action applies it</field>
+    </record>
+    <record id="test_sd_ctl_r34_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the deck menu offers a pending configuration, applied on a click</field>
+    </record>
+    <record id="test_sd_ctl_r34_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::apply_button_writes_the_request</field>
+    </record>
+    <record id="test_sd_ctl_r34_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the preferences ask through inventory-apply-request, cleared after</field>
+    </record>
+    <record id="test_sd_ctl_r34_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::disable withdraws the notification source</field>
+    </record>
+    <record id="test_sd_ctl_r34_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r34" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::the strings of the deck menu and the notification are translated</field>
+    </record>
+    <record id="test_sd_ctl_r35_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::rewrite_keeps_every_other_line</field>
+    </record>
+    <record id="test_sd_ctl_r35_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::rewriteConf on a text gives a text, a missing file a new one</field>
+    </record>
+    <record id="test_sd_ctl_r35_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_write_settings_and_the_extension_rewrite_agree_on_the_fixtures</field>
+    </record>
+    <record id="test_sd_ctl_r35_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply_writes_then_restarts_an_active_unit</field>
+    </record>
+    <record id="test_sd_ctl_r35_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply follows a linked streamdeck.conf and renames over its target</field>
+    </record>
+    <record id="test_sd_ctl_r35_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply renames over a conf of several names, never in place</field>
+    </record>
+    <record id="test_sd_ctl_r35_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r35" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply creates a missing streamdeck.conf by a rename too</field>
+    </record>
+    <record id="test_sd_ctl_r36_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply_writes_then_restarts_an_active_unit</field>
+    </record>
+    <record id="test_sd_ctl_r36_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply_does_not_restart_for_games_only</field>
+    </record>
+    <record id="test_sd_ctl_r36_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::games_alone_needs_no_restart</field>
+    </record>
+    <record id="test_sd_ctl_r36_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::an_inactive_unit_is_not_started</field>
+    </record>
+    <record id="test_sd_ctl_r36_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_failed_unit_is_not_started</field>
+    </record>
+    <record id="test_sd_ctl_r36_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::an_unreadable_unit_state_starts_nothing</field>
+    </record>
+    <record id="test_sd_ctl_r36_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_restart_still_owed_is_offered_with_the_next_revision</field>
+    </record>
+    <record id="test_sd_ctl_r36_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_restart_owed_for_a_key_odoo_no_longer_sets_is_dropped</field>
+    </record>
+    <record id="test_sd_ctl_r36_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r36" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_restart_owed_outlives_a_screen_lock</field>
+    </record>
+    <record id="test_sd_ctl_r37_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_result_goes_in_the_next_report_at_once</field>
+    </record>
+    <record id="test_sd_ctl_r37_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_write_failure_refuses_write_failed_and_leaves_the_file</field>
+    </record>
+    <record id="test_sd_ctl_r37_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_restart_failure_refuses_restart_failed</field>
+    </record>
+    <record id="test_sd_ctl_r37_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_missing_unit_refuses_unit_missing_after_writing</field>
+    </record>
+    <record id="test_sd_ctl_r37_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_refused_restart_stays_pending_when_odoo_sends_it_again</field>
+    </record>
+    <record id="test_sd_ctl_r37_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_unit_missing_refusal_stays_pending_until_the_unit_runs</field>
+    </record>
+    <record id="test_sd_ctl_r37_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::refusals decided by replies do not chain reports</field>
+    </record>
+    <record id="test_sd_ctl_r37_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a chained report that decides nothing delays no later result</field>
+    </record>
+    <record id="test_sd_ctl_r37_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a click still reports at once after a reply-decided result</field>
+    </record>
+    <record id="test_sd_ctl_r37_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r37" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract states the first-pilot rule and the apply rules</field>
+    </record>
+    <record id="test_sd_ctl_r38_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r38" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_journal_names_keys_never_tokens</field>
+    </record>
+    <record id="test_sd_ctl_r39_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r39" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::pilot_json_is_0600_and_holds_no_secret</field>
+    </record>
+    <record id="test_sd_ctl_r39_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r39" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a reply without config withdraws the offer and the pilot file</field>
+    </record>
+    <record id="test_sd_ctl_r39_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r39" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::ERPLibre finds the pilot file and the shared fixtures the contract states</field>
+    </record>
+    <record id="test_sd_ctl_r39_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r39" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeFichierPilote::test_read_pilot_reads_the_state_file</field>
+    </record>
+    <record id="test_sd_ctl_r39_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r39" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeFichierPilote::test_a_missing_or_bad_pilot_file_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r39_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r39" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeFichierPilote::test_unknown_keys_drop_and_the_label_cannot_steer_the_terminal</field>
+    </record>
+    <record id="test_sd_ctl_r40_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_a_locked_key_warns_and_still_writes</field>
+    </record>
+    <record id="test_sd_ctl_r40_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_the_warning_is_translated</field>
+    </record>
+    <record id="test_sd_ctl_r40_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_a_free_key_does_not_warn</field>
+    </record>
+    <record id="test_sd_ctl_r40_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_an_unchanged_value_does_not_warn</field>
+    </record>
+    <record id="test_sd_ctl_r40_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_a_missing_or_bad_pilot_file_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r40_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_the_stream_deck_install_warns_on_a_locked_program</field>
+    </record>
+    <record id="test_sd_ctl_r40_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r40" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LAvertissementDuMenu::test_the_stream_deck_install_keeping_the_program_does_not_warn</field>
+    </record>
+    <record id="test_sd_ctl_r41_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r41" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_the_contract_table_matches_the_service_constants</field>
+    </record>
+    <record id="test_sd_ctl_r41_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r41" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_write_settings_and_the_extension_rewrite_agree_on_the_fixtures</field>
+    </record>
+    <record id="test_sd_ctl_r41_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r41" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_the_shared_fixtures_cover_what_the_writers_must_keep</field>
+    </record>
+    <record id="test_sd_ctl_r41_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r41" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LesIdentifiantsDePlugin::test_deck_plugin_ids_keeps_only_ids_the_wire_accepts</field>
+    </record>
+    <record id="test_sd_ctl_r41_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r41" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::ERPLibre finds the pilot file and the shared fixtures the contract states</field>
+    </record>
+    <record id="test_sd_ctl_r42_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_the_control_domain_numbers_its_requirements</field>
+    </record>
+    <record id="test_sd_ctl_r42_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_every_proof_has_the_reference_of_its_runner</field>
+    </record>
+    <record id="test_sd_ctl_r42_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_python_proofs_name_tests_their_module_runs</field>
+    </record>
+    <record id="test_sd_ctl_r42_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_every_control_test_of_the_module_proves_a_requirement</field>
+    </record>
+    <record id="test_sd_ctl_r42_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_the_review_focus_tests_prove_a_requirement</field>
+    </record>
+    <record id="test_sd_ctl_r42_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_extension_proofs_name_its_committed_tests</field>
+    </record>
+    <record id="test_sd_ctl_r42_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_erplibre_proofs_name_its_committed_tests</field>
+    </record>
+    <record id="test_sd_ctl_r42_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_a_done_requirement_has_a_proof_and_nothing_missing</field>
+    </record>
+    <record id="test_sd_ctl_r42_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_what_stays_to_do_is_named</field>
+    </record>
+    <record id="test_sd_ctl_r42_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_security_requirements_are_must_and_flagged</field>
+    </record>
+    <record id="test_sd_ctl_r42_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="110" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_the_lot_states_its_anti_goals</field>
+    </record>
+    <record id="test_sd_ctl_r42_12" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="120" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_notes_open_on_an_origin_and_texts_read_alone</field>
+    </record>
+    <record id="test_sd_ctl_r42_13" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="130" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_the_control_data_is_noupdate</field>
+    </record>
+    <record id="test_sd_ctl_r42_14" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r42" />
+        <field name="sequence" eval="140" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_control.TestRequirementControl.test_the_control_reads_in_fr_CA</field>
+    </record>
+    <record id="test_sd_ctl_r43_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a_bad_value_refuses_the_whole_revision</field>
+    </record>
+    <record id="test_sd_ctl_r43_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::every refusal names a key of the table, as Odoo receives it</field>
+    </record>
+    <record id="test_sd_ctl_r43_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the configuration table is the closed list of deck-config.js</field>
+    </record>
+    <record id="test_sd_ctl_r43_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a value outside the schema refuses the revision once, writes nothing</field>
+    </record>
+    <record id="test_sd_ctl_r43_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_each_key_accepts_its_values_and_refuses_others</field>
+    </record>
+    <record id="test_sd_ctl_r44_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r44" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::nothing_applies_without_a_click</field>
+    </record>
+    <record id="test_sd_ctl_r44_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r44" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_first_pilot_asks_before_applying: the question, not an apply</field>
+    </record>
+    <record id="test_sd_ctl_r44_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r44" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/extension.test.js::the_first_pilot_asks_before_applying</field>
+    </record>
+    <record id="test_sd_ctl_r44_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r44" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::keep_local_writes_nothing_and_reports_the_choice</field>
+    </record>
+    <record id="test_sd_ctl_r45_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r45" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::rewrite_keeps_every_other_line</field>
+    </record>
+    <record id="test_sd_ctl_r45_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r45" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_write_failure_refuses_write_failed_and_leaves_the_file</field>
+    </record>
+    <record id="test_sd_ctl_r45_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r45" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a failed rename leaves the file whole and no temporary file</field>
+    </record>
+    <record id="test_sd_ctl_r45_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r45" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_write_settings_and_the_extension_rewrite_agree_on_the_fixtures</field>
+    </record>
+    <record id="test_sd_ctl_r46_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r46" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::only_the_pilot_destination_is_applied</field>
+    </record>
+    <record id="test_sd_ctl_r46_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r46" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-prefs.test.js::checking_pilot_unchecks_the_others</field>
+    </record>
+    <record id="test_sd_ctl_r46_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r46" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_non_pilot_destination_gets_nothing</field>
+    </record>
+    <record id="test_sd_ctl_r47_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_override_a_locked_key</field>
+    </record>
+    <record id="test_sd_ctl_r47_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_move_a_locked_line_to_another_key</field>
+    </record>
+    <record id="test_sd_ctl_r47_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_replace_a_manager_assigned_profile</field>
+    </record>
+    <record id="test_sd_ctl_r47_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_clear_the_profile</field>
+    </record>
+    <record id="test_sd_ctl_r47_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_cannot_touch_another_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r47_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_access.TestStreamdeckConfigAccess.test_an_employee_reads_selectable_and_own_profiles_and_the_model_layers_only</field>
+    </record>
+    <record id="test_sd_ctl_r47_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_only_the_owner_reads_the_config_of_a_workstation</field>
+    </record>
+    <record id="test_sd_ctl_r48_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r48" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_main_loop_never_waits_on_apply</field>
+    </record>
+    <record id="test_sd_ctl_r48_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r48" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_unit_state_past_the_deadline_starts_nothing</field>
+    </record>
+</odoo>
