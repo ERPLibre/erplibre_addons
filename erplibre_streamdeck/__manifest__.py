@@ -11,6 +11,7 @@
     "application": False,
     "depends": [
         "base",
+        "mail",
         "web",
     ],
     "data": [

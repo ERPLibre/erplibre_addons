@@ -1,9 +1,12 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import fields, models
+from odoo import _, api, fields, models
 from odoo.tools import SQL
 
 from .streamdeck_workstation import SERVICE_STATES
+
+# The kinds that Odoo writes itself; no workstation sends them.
+SERVER_KINDS = frozenset({"moved", "silent", "heard_again"})
 
 
 class StreamdeckEvent(models.Model):
@@ -20,6 +23,12 @@ class StreamdeckEvent(models.Model):
     drawn by Odoo and the reception time as `at`. `workstation_id` is the
     new holder and `previous_workstation_id` the one it left, its name
     copied in `previous_workstation_name` as the other names are.
+
+    `silent` and `heard_again` are Odoo's own too, about a workstation and
+    no deck: `silent` is dated the end of the silent delay after the last
+    report, `heard_again` the reception of the report that ends the
+    silence. `label` names the event in the user's language: the state of
+    the service for a `service_changed`, the kind for any other.
 
     `visible_to_me` is true for the current user on the events of a deck
     they hold or held, dated from their first holding on
@@ -39,9 +48,12 @@ class StreamdeckEvent(models.Model):
             ("unplugged", "Unplugged"),
             ("service_changed", "Service changed"),
             ("moved", "Changed workstation"),
+            ("silent", "Workstation silent"),
+            ("heard_again", "Workstation heard again"),
         ],
         required=True,
     )
+    label = fields.Char(string="Event", compute="_compute_label")
     at = fields.Datetime(string="Time")
     received_at = fields.Datetime(string="Received")
     device_id = fields.Many2one(
@@ -79,6 +91,22 @@ class StreamdeckEvent(models.Model):
     _sql_constraints = [
         ("uuid_unique", "UNIQUE(uuid)", "An event uuid is unique."),
     ]
+
+    @api.depends("kind", "service_state")
+    @api.depends_context("lang")
+    def _compute_label(self):
+        services = {
+            "active": _("Service started"),
+            "failed": _("Service failed"),
+            "inactive": _("Service stopped"),
+            "absent": _("Service absent"),
+        }
+        kinds = dict(self._fields["kind"]._description_selection(self.env))
+        for event in self:
+            label = False
+            if event.kind == "service_changed":
+                label = services.get(event.service_state)
+            event.label = label or kinds.get(event.kind, False)
 
     def _held_by_me_sql(self):
         """The ids of the events that `visible_to_me` selects, for the

@@ -22,9 +22,17 @@ class StreamdeckWorkstation(models.Model):
     change: the name for its employee, the name and the archive flag for
     the manager. Archiving a workstation clears its token hash, so an
     archived workstation can no longer report.
+
+    `silent_since` marks a workstation that stopped reporting: it is dated
+    the end of the silent delay after `last_report`, and the next report
+    clears it. `service_state_since` is the reception time of the report
+    that first carried the current `service_state`, or of the next report
+    when it has no date. Neither is in the writable sets: only sudo writes
+    them.
     """
 
     _name = "streamdeck.workstation"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
     _description = "Stream Deck workstation"
     _order = "name, id"
 
@@ -62,7 +70,21 @@ class StreamdeckWorkstation(models.Model):
     erplibre_commit = fields.Char(string="ERPLibre commit")
     deck_program = fields.Char(string="Deck program")
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
+    service_state_since = fields.Datetime(
+        string="Deck service state since",
+        readonly=True,
+        copy=False,
+        help="When this database first received the current state of the"
+        " deck service.",
+    )
     last_report = fields.Datetime(string="Last report")
+    silent_since = fields.Datetime(
+        string="Silent since",
+        readonly=True,
+        copy=False,
+        help="Set when the workstation has not reported for the silent"
+        " delay, dated the end of that delay; its next report clears it.",
+    )
     token_hash = fields.Char(
         string="Token hash",
         groups="base.group_system",

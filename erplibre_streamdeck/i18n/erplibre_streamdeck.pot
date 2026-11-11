@@ -44,10 +44,40 @@ msgid "Absent"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_needaction
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__active
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__active
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__active
 msgid "Active"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_exception_decoration
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_state
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_type_icon
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
+msgid "Activity Type Icon"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -85,6 +115,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Archived"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_attachment_count
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_attachment_count
+msgid "Attachment Count"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -184,6 +220,11 @@ msgid "Deck service failed"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__service_state_since
+msgid "Deck service state since"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_fleet_decks
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__device_ids
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet_decks
@@ -238,6 +279,11 @@ msgid "Enrolled"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__label
+msgid "Event"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_fleet_events
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__event_ids
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__event_ids
@@ -288,6 +334,24 @@ msgid "Fleet"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_follower_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_partner_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_type_icon
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__visible_to_me
 msgid "From my holding"
 msgstr ""
@@ -310,6 +374,12 @@ msgid ""
 "HMAC-SHA256 of the machine identifier, keyed by the Linux user, the URL of "
 "this Odoo and this database: the raw identifier never leaves the "
 "workstation, and two Odoo destinations cannot match the same workstation."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__has_message
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__has_message
+msgid "Has Message"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -338,9 +408,39 @@ msgid "ID"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_exception_icon
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_exception_icon
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_needaction
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_has_error
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__inactive
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__inactive
 msgid "Inactive"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_is_follower
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_is_follower
+msgid "Is Follower"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -395,9 +495,27 @@ msgid "Manager"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_has_error
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__model_name
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
 msgid "Model"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__my_activity_date_deadline
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__my_activity_date_deadline
+msgid "My Activity Deadline"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -418,6 +536,24 @@ msgid "Name"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_date_deadline
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_summary
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_type_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
 msgid "No deck reported yet"
 msgstr ""
@@ -430,6 +566,30 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Not enrolled"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_needaction_counter
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_has_error_counter
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_needaction_counter
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_has_error_counter
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_has_error_counter
+msgid "Number of messages with delivery error"
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -488,6 +648,12 @@ msgid "Reports"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_user_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Revoke the token"
 msgstr ""
@@ -505,9 +671,55 @@ msgid "Serial number"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+msgid "Service absent"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__service_changed
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Service changed"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+msgid "Service failed"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+msgid "Service started"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+msgid "Service stopped"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__silent_since
+msgid ""
+"Set when the workstation has not reported for the silent delay, dated the "
+"end of that delay; its next report clears it."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__silent_since
+msgid "Silent since"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_state
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -588,6 +800,12 @@ msgid "Token last used"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_exception_decoration
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__usb_product_id
 msgid "USB product id"
 msgstr ""
@@ -620,14 +838,30 @@ msgid "Valid until"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__service_state_since
+msgid ""
+"When this database first received the current state of the deck service."
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__workstation_id
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Workstation"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__heard_again
+msgid "Workstation heard again"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__workstation_name
 msgid "Workstation name"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__silent
+msgid "Workstation silent"
 msgstr ""
 
 #. module: erplibre_streamdeck
