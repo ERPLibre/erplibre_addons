@@ -1,6 +1,6 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-"""Enrollment and report of workstations, protocol 1.0.
+"""Enrollment and report of workstations, protocol 1.1.
 
 Every public method takes the decoded JSON body and returns
 `(http_status, body)`, the body always carrying `protocol`; an error body
@@ -12,6 +12,11 @@ reports: valid credentials of any other account, a portal one included,
 and the token of an employee who is no longer such a user, are answered
 403 `user_inactive`, as for an archived employee.
 
+A report of protocol 1.1 or later may carry `config`, the managed
+configuration as the workstation holds it (`_parse_config`); the reply to
+the pilot of a workstation that a layer configures carries the revision
+Odoo offers (`_apply_config`). A report of protocol 1.0 gets no `config`.
+
 Secrets: the workstation token is returned once by `enroll` and only its
 SHA-256 is stored; an API key or a password is checked and dropped. No
 log line carries any of them.
@@ -19,6 +24,7 @@ log line carries any of them.
 
 import contextlib
 import hashlib
+import json
 import logging
 import re
 import secrets
@@ -26,14 +32,15 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from odoo import api, fields, models
-from odoo.exceptions import AccessDenied
+from odoo.exceptions import AccessDenied, ValidationError
 
+from .streamdeck_config import KEYS, PLUGIN_ID_RE
 from .streamdeck_event import SERVER_KINDS
-from .streamdeck_workstation import SERVICE_STATES
+from .streamdeck_workstation import FIRST_CHOICES, SERVICE_STATES
 
 _logger = logging.getLogger(__name__)
 
-PROTOCOL = "1.0"
+PROTOCOL = "1.1"
 HEARTBEAT_S = 900
 PAIRING_TTL_MIN = 10
 FUTURE_TOLERANCE_MIN = 5
@@ -50,6 +57,7 @@ MAX_TEXT = 256
 MAX_SECRET = 4096
 MAX_DECKS = 128
 MAX_EVENTS = 10000
+MAX_DECK_PLUGINS = 128
 # The largest value of an Integer field, a PostgreSQL `integer` column.
 MAX_COUNT = 2**31 - 1
 
@@ -58,6 +66,14 @@ ENROLL_METHODS = ("pairing_code", "api_key", "password")
 # Odoo only, so a report that carries one is refused as any unknown kind.
 EVENT_KINDS = ("plugged", "unplugged", "service_changed")
 SERVICE_STATE_KEYS = tuple(key for key, _label in SERVICE_STATES)
+
+CONFIG_STATUSES = ("applied", "refused")
+CONFIG_CHOICES = tuple(key for key, _label in FIRST_CHOICES)
+# Why a workstation refused a revision (CONTRACT.md of the extension).
+REFUSAL_REASONS = frozenset(
+    ["write_failed", "restart_failed", "unit_missing"]
+    + ["invalid:%s" % key for key in KEYS]
+)
 
 ERRORS = (
     "bad_request",
@@ -127,8 +143,9 @@ def _list(obj, key, bound):
 
 
 def _check_protocol(payload):
-    """Raise unless `payload` is a dict whose `protocol` has major 1; a
-    newer minor is accepted and its unknown keys are ignored."""
+    """Return the minor of `payload`'s `protocol`; raise unless `payload`
+    is a dict whose `protocol` has major 1. A newer minor is accepted and
+    its unknown keys are ignored."""
     if not isinstance(payload, dict):
         raise _bad()
     protocol = payload.get("protocol")
@@ -139,6 +156,7 @@ def _check_protocol(payload):
         raise _bad()
     if int(match.group(1)) != int(PROTOCOL.split(".")[0]):
         raise RequestError(400, "protocol_unsupported")
+    return int(match.group(2))
 
 
 def _parse_at(value):
@@ -208,6 +226,16 @@ def _parse_state(state):
         "deck_program": _text(state, "deck_program"),
         "service_state": service_state,
     }
+    plugins = state.get("deck_plugins")
+    if plugins is not None:
+        if not isinstance(plugins, list) or len(plugins) > MAX_DECK_PLUGINS:
+            raise _bad()
+        if not all(
+            isinstance(plugin, str) and PLUGIN_ID_RE.fullmatch(plugin)
+            for plugin in plugins
+        ):
+            raise _bad()
+        values["deck_plugins"] = ",".join(dict.fromkeys(plugins))
     # The host name is validated but never written: it names the
     # workstation at enrollment only, and the employee may rename it.
     _text(state, "hostname")
@@ -240,15 +268,46 @@ def _parse_event(event):
     return parsed
 
 
+def _count(value, nullable=False):
+    """`value`, an integer from 0 to MAX_COUNT (None too when `nullable`);
+    raises a 400 for anything else, a boolean included."""
+    if value is None and nullable:
+        return None
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise _bad()
+    if not 0 <= value <= MAX_COUNT:
+        raise _bad()
+    return value
+
+
 def _parse_report(payload):
     state, decks = _parse_state(_dict(payload, "state"))
     events = [_parse_event(e) for e in _list(payload, "events", MAX_EVENTS)]
-    lost = payload.get("lost_events")
-    if not isinstance(lost, int) or isinstance(lost, bool):
-        raise _bad()
-    if not 0 <= lost <= MAX_COUNT:
-        raise _bad()
+    lost = _count(payload.get("lost_events"))
     return state, decks, events, lost
+
+
+def _parse_result(result):
+    """The `result` of a pilot's `config`: None, or `{revision, status,
+    reason, at}` with a reason of REFUSAL_REASONS or None."""
+    if result is None:
+        return None
+    if not isinstance(result, dict):
+        raise _bad()
+    status = result.get("status")
+    if status not in CONFIG_STATUSES:
+        raise _bad()
+    reason = result.get("reason")
+    if reason is not None and (
+        not isinstance(reason, str) or reason not in REFUSAL_REASONS
+    ):
+        raise _bad()
+    return {
+        "revision": _count(result.get("revision")),
+        "status": status,
+        "reason": reason,
+        "at": _parse_at(result.get("at")),
+    }
 
 
 def _hash_token(token):
@@ -474,10 +533,13 @@ class StreamdeckService(models.AbstractModel):
         `service_state` that differs from the stored one, or that has no
         date yet, is dated `now`; a silent workstation is no longer, and
         gets a `heard_again` event dated `now`. The monitoring then hears
-        what the report solved or revealed."""
-        _check_protocol(payload)
+        what the report solved or revealed. Last, the `config` of a pilot
+        report of protocol 1.1 or later is taken in, and the reply
+        carries the configuration Odoo offers (`_apply_config`)."""
+        minor = _check_protocol(payload)
         workstation = self._workstation_of(token)
         state, decks, events, lost = _parse_report(payload)
+        config = self._parse_config(payload) if minor >= 1 else None
         now = fields.Datetime.now()
         values = dict(
             state,
@@ -508,7 +570,11 @@ class StreamdeckService(models.AbstractModel):
             previous_service_state,
             heard_again=was_silent,
         )
-        return _reply(accepted=accepted, heartbeat_s=HEARTBEAT_S)
+        reply = {"accepted": accepted, "heartbeat_s": HEARTBEAT_S}
+        offered = self._apply_config(workstation, config, now)
+        if offered:
+            reply["config"] = offered
+        return _reply(**reply)
 
     def _deck_key(self, workstation, deck):
         """`sn:<serial>`, shared by every workstation that reports the
@@ -602,14 +668,16 @@ class StreamdeckService(models.AbstractModel):
         device=None,
         previous=None,
         received_at=None,
+        **values,
     ):
         """Create and return an event of `kind`, one of SERVER_KINDS, at
         `workstation`, dated `at` and received at `received_at`, the
-        current time by default. The names of `workstation` and of
-        `previous`, the workstation a moved deck left, are copied as those
-        of a reported event are. The uuid is drawn here: no workstation
-        sends these events. Raises ValueError for a kind that a
-        workstation reports."""
+        current time by default; `values` sets further fields, as the
+        `config_*` ones. The names of `workstation` and of `previous`, the
+        workstation a moved deck left, are copied as those of a reported
+        event are. The uuid is drawn here: no workstation sends these
+        events. Raises ValueError for a kind that a workstation
+        reports."""
         if kind not in SERVER_KINDS:
             raise ValueError("%r is not an event kind of the server" % kind)
         return self.env["streamdeck.event"].create(
@@ -626,6 +694,7 @@ class StreamdeckService(models.AbstractModel):
                 "previous_workstation_name": (
                     previous.name if previous else False
                 ),
+                **values,
             }
         )
 
@@ -660,3 +729,252 @@ class StreamdeckService(models.AbstractModel):
             )
         Event.create(values)
         return uuids
+
+    # -- managed configuration -------------------------------------------
+
+    def _parse_config(self, payload):
+        """The `config` of a report: None when absent, null or from a
+        destination that is not the pilot (`{"pilot": false}`, whatever
+        else it holds); for the pilot, `{revision_applied, current,
+        result, choice}`. `current` holds every key of KEYS, validated by
+        the schema and normalised, None for a key absent or null; a key
+        outside KEYS is ignored. Raises a 400 for any other shape or
+        value."""
+        config = payload.get("config")
+        if config is None:
+            return None
+        if not isinstance(config, dict):
+            raise _bad()
+        pilot = config.get("pilot")
+        if not isinstance(pilot, bool):
+            raise _bad()
+        if not pilot:
+            return None
+        schema = self.env["streamdeck.config.schema"]
+        local = _dict(config, "current")
+        current = {}
+        for key in KEYS:
+            value = local.get(key)
+            if value is not None:
+                try:
+                    value = schema._validate(key, value)
+                except ValidationError as error:
+                    raise _bad() from error
+            current[key] = value
+        choice = config.get("choice")
+        if choice is not None and choice not in CONFIG_CHOICES:
+            raise _bad()
+        return {
+            "revision_applied": _count(
+                config.get("revision_applied"), nullable=True
+            ),
+            "current": current,
+            "result": _parse_result(config.get("result")),
+            "choice": choice,
+        }
+
+    def _apply_config(self, workstation, config, now):
+        """Take in the pilot's `config` and return the reply's `config`.
+
+        Returns None, and changes nothing, for `config` None. Otherwise,
+        in this order: the `result` of the offered revision is recorded
+        (`_config_result`); a first pilot settles the free keys whose
+        local value differs from Odoo's by the organisation's policy, or
+        under `ask` by the employee's `choice`, until then listed in
+        `ask`; after a first pilot, a managed key changed in the file
+        since the revision the workstation applied is adopted when free
+        and offered again when locked (`_config_drift`). The effective
+        configuration then gets a new revision when its hash differs from
+        the offered one, or when a drift asks for it with the same
+        values.
+
+        A workstation that no layer configures is `unmanaged` and gets no
+        `config`; its hash is cleared, so a later configuration gets a
+        new revision whatever its values.
+        """
+        if config is None:
+            return None
+        schema = self.env["streamdeck.config.schema"]
+        self._config_result(workstation, config["result"], now)
+        effective = schema._effective(workstation)
+        if not effective["settings"]:
+            workstation.write(
+                {
+                    "config_state": "unmanaged",
+                    "config_hash": False,
+                    "config_offered": False,
+                    "config_ask": False,
+                    "config_pending_since": False,
+                }
+            )
+            return None
+        current = config["current"]
+        ask, drift, adopt = [], [], {}
+        if (
+            not workstation.config_first_choice
+            and not workstation.config_applied_revision
+        ):
+            differing = self._config_differing(effective, current)
+            policy = schema._first_pilot_policy()
+            choice = config["choice"] if policy == "ask" else policy
+            if choice == "keep_local":
+                adopt = {key: current[key] for key in differing}
+            if choice:
+                workstation.config_first_choice = choice
+            else:
+                ask = differing
+        elif workstation.config_applied_revision and (
+            config["revision_applied"] == workstation.config_applied_revision
+        ):
+            adopt, drift = self._config_drift(workstation, effective, current)
+        if adopt:
+            self._config_adopt(workstation, adopt, now)
+            effective = schema._effective(workstation)
+        settings = effective["settings"]
+        digest = schema._hash(settings)
+        values = {"config_ask": ",".join(ask) or False}
+        renewed = digest != workstation.config_hash or bool(drift)
+        if renewed:
+            values.update(
+                config_revision=workstation.config_revision + 1,
+                config_hash=digest,
+                config_offered=json.dumps(settings),
+                config_pending_since=now,
+                config_reason=False,
+            )
+        revision = values.get("config_revision", workstation.config_revision)
+        if revision == workstation.config_applied_revision:
+            values.update(config_state="applied", config_pending_since=False)
+        elif drift:
+            values["config_state"] = "drift"
+        elif renewed or workstation.config_state != "refused":
+            values["config_state"] = "pending"
+        workstation.write(values)
+        if drift:
+            self._server_event(
+                workstation, "config_drift", now, config_keys=", ".join(drift)
+            )
+        offered = {
+            "revision": workstation.config_revision,
+            "hash": digest,
+            "settings": settings,
+            "locked": effective["locked"],
+        }
+        if ask:
+            offered["ask"] = ask
+        return offered
+
+    def _config_differing(self, effective, current):
+        """The free keys of `effective` whose local value in `current` is
+        not None and differs from Odoo's, in KEYS order."""
+        return [
+            key
+            for key, value in effective["settings"].items()
+            if key not in effective["locked"]
+            and current[key] is not None
+            and current[key] != value
+        ]
+
+    def _config_drift(self, workstation, effective, current):
+        """`(adopt, drift)` for a workstation whose file `current` follows
+        its applied revision: `adopt` maps each free key whose local value
+        changed since that revision, and differs from Odoo's, to the local
+        value; `drift` lists the managed keys changed to another value,
+        when locked, or to None, which holds nothing to adopt. A drift is
+        listed only while the applied revision is the offered one: a
+        revision already pending restores the key once applied, and
+        listing it at each report would renew the revision each time.
+        A key the applied revision did not set has no baseline and is
+        skipped."""
+        schema = self.env["streamdeck.config.schema"]
+        applied = json.loads(workstation.config_applied or "{}")
+        settled = workstation.config_revision == (
+            workstation.config_applied_revision
+        )
+        adopt, drift = {}, []
+        for key, value in effective["settings"].items():
+            if key not in applied:
+                continue
+            local = current[key]
+            if local == schema._load(key, json.dumps(applied[key])):
+                continue
+            if key in effective["locked"] or local is None:
+                if settled and local != value:
+                    drift.append(key)
+            elif local != value:
+                adopt[key] = local
+        return adopt, drift
+
+    def _config_adopt(self, workstation, values, now):
+        """Write each `{key: value}` as the workstation's own line, not
+        locked, `source` "local", and record one `config_adopted` event.
+        The keys are free: no layer locks them, so the line is the value
+        of the effective configuration."""
+        Line = self.env["streamdeck.config.line"]
+        lines = {line.key: line for line in workstation.config_line_ids}
+        for key, value in values.items():
+            line_values = {"value": json.dumps(value), "source": "local"}
+            if key in lines:
+                lines[key].write(line_values)
+            else:
+                Line.create(
+                    dict(line_values, key=key, workstation_id=workstation.id)
+                )
+        self._server_event(
+            workstation, "config_adopted", now, config_keys=", ".join(values)
+        )
+
+    def _config_result(self, workstation, result, now):
+        """Record `result` when it is about the offered revision; a result
+        about another revision, or already recorded, changes nothing.
+
+        `applied` stores the offered values as the applied ones, ends the
+        pending state and, at a first pilot not settled yet, records the
+        choice `take_odoo`: the employee took Odoo's values. `refused`
+        keeps the reason. Each recorded result writes its event, dated as
+        the workstation reports it, a moment more than
+        FUTURE_TOLERANCE_MIN minutes ahead of `now` taking `now`."""
+        if not result or not workstation.config_hash:
+            return
+        revision = result["revision"]
+        if revision != workstation.config_revision:
+            return
+        at = result["at"]
+        if at > now + timedelta(minutes=FUTURE_TOLERANCE_MIN):
+            at = now
+        if result["status"] == "applied":
+            if workstation.config_applied_revision == revision:
+                return
+            values = {
+                "config_applied_revision": revision,
+                "config_applied": workstation.config_offered,
+                "config_state": "applied",
+                "config_reason": False,
+                "config_pending_since": False,
+            }
+            if not workstation.config_first_choice:
+                values["config_first_choice"] = "take_odoo"
+            workstation.write(values)
+            self._server_event(
+                workstation,
+                "config_applied",
+                at,
+                received_at=now,
+                config_revision=revision,
+            )
+            return
+        if workstation.config_state == "refused" and (
+            workstation.config_reason == (result["reason"] or False)
+        ):
+            return
+        workstation.write(
+            {"config_state": "refused", "config_reason": result["reason"]}
+        )
+        self._server_event(
+            workstation,
+            "config_refused",
+            at,
+            received_at=now,
+            config_revision=revision,
+            config_reason=result["reason"],
+        )

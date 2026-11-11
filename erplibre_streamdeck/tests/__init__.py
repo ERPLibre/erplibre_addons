@@ -4,6 +4,7 @@ from . import test_streamdeck_access
 from . import test_streamdeck_config
 from . import test_streamdeck_config_access
 from . import test_streamdeck_config_settings
+from . import test_streamdeck_config_wire
 from . import test_streamdeck_groups
 from . import test_streamdeck_holding
 from . import test_streamdeck_i18n

@@ -6,7 +6,17 @@ from odoo.tools import SQL
 from .streamdeck_workstation import SERVICE_STATES
 
 # The kinds that Odoo writes itself; no workstation sends them.
-SERVER_KINDS = frozenset({"moved", "silent", "heard_again"})
+SERVER_KINDS = frozenset(
+    {
+        "moved",
+        "silent",
+        "heard_again",
+        "config_applied",
+        "config_refused",
+        "config_adopted",
+        "config_drift",
+    }
+)
 
 
 class StreamdeckEvent(models.Model):
@@ -30,6 +40,13 @@ class StreamdeckEvent(models.Model):
     silence. `label` names the event in the user's language: the state of
     the service for a `service_changed`, the kind for any other.
 
+    The `config_*` kinds are Odoo's own as well, about the managed
+    configuration of a workstation (`streamdeck.service._apply_config`):
+    `config_applied` and `config_refused` carry the revision the
+    workstation reported, a refusal its reason; `config_adopted` lists the
+    keys whose local value became a workstation line, `config_drift` the
+    managed keys changed in the workstation's file that Odoo offers again.
+
     `visible_to_me` is true for the current user on the events of a deck
     they hold or held, dated from their first holding on
     (`streamdeck.device.holding`); the record rule of the employees
@@ -50,6 +67,10 @@ class StreamdeckEvent(models.Model):
             ("moved", "Changed workstation"),
             ("silent", "Workstation silent"),
             ("heard_again", "Workstation heard again"),
+            ("config_applied", "Configuration applied"),
+            ("config_refused", "Configuration refused"),
+            ("config_adopted", "Local setting adopted"),
+            ("config_drift", "Setting changed locally"),
         ],
         required=True,
     )
@@ -80,6 +101,12 @@ class StreamdeckEvent(models.Model):
     previous_workstation_name = fields.Char(string="Previous workstation name")
     employee_name = fields.Char(string="Employee")
     service_state = fields.Selection(SERVICE_STATES, string="Deck service")
+    config_revision = fields.Integer(string="Configuration revision")
+    config_keys = fields.Char(
+        string="Settings involved",
+        help="The managed settings the event is about.",
+    )
+    config_reason = fields.Char(string="Refusal reason")
     visible_to_me = fields.Boolean(
         string="From my holding",
         compute="_compute_visible_to_me",

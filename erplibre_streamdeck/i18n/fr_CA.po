@@ -366,6 +366,11 @@ msgid "Configuration"
 msgstr "Configuration"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_applied
+msgid "Configuration applied"
+msgstr "Configuration appliquée"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_line_ids
 msgid "Configuration overrides"
 msgstr "Surcharges de configuration"
@@ -379,6 +384,16 @@ msgstr "Configuration en attente depuis"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_profile_id
 msgid "Configuration profile"
 msgstr "Profil de configuration"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_refused
+msgid "Configuration refused"
+msgstr "Configuration refusée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_revision
+msgid "Configuration revision"
+msgstr "Révision de la configuration"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__connected
@@ -448,6 +463,11 @@ msgstr "Deck changé de poste"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__model_id
 msgid "Deck model"
 msgstr "Modèle de deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
+msgid "Deck plugins"
+msgstr "Plugins du deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__deck_program
@@ -848,6 +868,11 @@ msgid "Layer"
 msgstr "Couche"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_adopted
+msgid "Local setting adopted"
+msgstr "Réglage local adopté"
+
+#. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 msgid "Lock"
@@ -1123,6 +1148,7 @@ msgid "Received"
 msgstr "Reçu"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_reason
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_reason
 msgid "Refusal reason"
 msgstr "Raison du refus"
@@ -1242,12 +1268,27 @@ msgid "Setting"
 msgstr "Réglage"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_drift
+msgid "Setting changed locally"
+msgstr "Réglage changé localement"
+
+#. module: erplibre_streamdeck
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_settings
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__line_ids
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__line_ids
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_settings
 msgid "Settings"
 msgstr "Paramètres"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_ask
+msgid "Settings asked"
+msgstr "Réglages demandés"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_keys
+msgid "Settings involved"
+msgstr "Réglages concernés"
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
@@ -1432,6 +1473,31 @@ msgid ""
 msgstr ""
 "L'employé est celui du poste, ou du poste qui tient le deck. Les deux "
 "donnent une activité à chacun."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_ask
+msgid ""
+"The free settings, separated by commas, whose local value the employee is "
+"asked to keep or replace by Odoo's: the first pilot waits for their choice."
+msgstr ""
+"Les réglages libres, séparés par des virgules, dont l'employé est appelé à "
+"garder la valeur locale ou à la remplacer par celle d'Odoo : le premier "
+"pilotage attend son choix."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
+msgid ""
+"The ids of the deck plugins found on the workstation's disk, separated by "
+"commas, as its last report of protocol 1.1 or later listed them."
+msgstr ""
+"Les identifiants des plugins du deck trouvés sur le disque du poste, séparés"
+" par des virgules, tels que sa dernière remontée en protocole 1.1 ou plus "
+"récent les a listés."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__config_keys
+msgid "The managed settings the event is about."
+msgstr "Les réglages gérés dont parle l'événement."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_profile_id
