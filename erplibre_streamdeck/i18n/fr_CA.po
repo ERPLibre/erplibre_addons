@@ -206,6 +206,11 @@ msgid "Archived"
 msgstr "Archivé"
 
 #. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_ir_attachment
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_attachment_count
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_attachment_count
 msgid "Attachment Count"
@@ -471,6 +476,7 @@ msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome par ex. fa-tasks"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_ir_attachment__streamdeck_visible_to_me
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_activity__streamdeck_visible_to_me
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_mail__streamdeck_visible_to_me
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_message__streamdeck_visible_to_me
