@@ -23,6 +23,15 @@ DELAY_DEFAULTS = {
     "service_failed_after_min": 10,
 }
 
+# What Odoo does at the first pilot report of a workstation whose free
+# local values differ from Odoo's: ask its employee, or the choice the
+# organisation forces.
+FIRST_PILOT_POLICIES = [
+    ("ask", "Ask the employee"),
+    ("keep_local", "Keep local values"),
+    ("take_odoo", "Take Odoo's values"),
+]
+
 RECIPIENTS = [
     ("employee", "Employee"),
     ("manager", "Manager"),
@@ -41,13 +50,17 @@ def _manager_domain(settings):
 
 
 class ResConfigSettings(models.TransientModel):
-    """Settings › Stream Deck: what the monitoring does beyond history.
+    """Settings › Stream Deck: what the monitoring does beyond history,
+    and the first-pilot policy of the managed configuration.
 
     Each setting lives in `ir.config_parameter` under PARAM_PREFIX, so
     only the Settings page (`base.group_system`) writes it. The four alert
     boxes are checked by default; Odoo's `config_parameter` deletes the
     parameter of a cleared box, which would bring the default back, so
     `get_values` / `set_values` store them as "True" / "False" instead.
+
+    `streamdeck_first_pilot_policy` reads "ask" when its parameter is
+    missing or unknown (`streamdeck.config.schema._first_pilot_policy`).
 
     `set_values` refuses, with ValidationError, a delay below its floor
     and activities enabled for a manager nobody is named for.
@@ -118,8 +131,25 @@ class ResConfigSettings(models.TransientModel):
         ),
     )
 
+    streamdeck_first_pilot_policy = fields.Selection(
+        FIRST_PILOT_POLICIES,
+        string="First pilot",
+        default="ask",
+        required=True,
+        config_parameter=PARAM_PREFIX + "first_pilot_policy",
+        help=(
+            "At the first report of a piloted workstation, the free"
+            " settings whose local value differs from Odoo's: the"
+            " employee chooses, or this choice applies. Locked settings"
+            " are always offered for the employee's confirmation."
+        ),
+    )
+
     def get_values(self):
         res = super().get_values()
+        res["streamdeck_first_pilot_policy"] = self.env[
+            "streamdeck.config.schema"
+        ]._first_pilot_policy()
         params = self.env["ir.config_parameter"].sudo()
         for kind in ALERT_KINDS:
             stored = params.get_param(PARAM_PREFIX + "alert_" + kind)

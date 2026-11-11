@@ -1,5 +1,7 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+from markupsafe import Markup
+
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
@@ -11,6 +13,24 @@ SERVICE_STATES = [
     ("failed", "Failed"),
     ("inactive", "Inactive"),
     ("absent", "Absent"),
+]
+
+# Where the managed configuration of a workstation stands: no managed key;
+# a revision offered and not yet applied; the offered revision applied;
+# refused by the workstation; a locked key changed in the workstation file.
+CONFIG_STATES = [
+    ("unmanaged", "Unmanaged"),
+    ("pending", "Pending"),
+    ("applied", "Applied"),
+    ("refused", "Refused"),
+    ("drift", "Changed locally"),
+]
+
+# How the first pilot of a workstation settled the free settings whose
+# local value differed from Odoo's.
+FIRST_CHOICES = [
+    ("keep_local", "Keep local values"),
+    ("take_odoo", "Take Odoo's values"),
 ]
 
 
@@ -30,6 +50,13 @@ class StreamdeckWorkstation(models.Model):
     when it has no date. Neither is in the writable sets: only sudo writes
     them.
 
+    The managed configuration: `config_profile_id` and `config_line_ids`
+    are layers of `streamdeck.config.schema._effective`. The employee
+    writes them on their own workstations within the manager's limits:
+    `_check_profile_pick` bounds the profile, `streamdeck.config.line`
+    the overrides. The other `config_*` fields are the state of the
+    configuration offered to the workstation; only sudo writes them.
+
     Archiving a workstation or clearing its token closes, before anything
     else, the monitoring activities it will never solve
     (`streamdeck.monitor._resolve_all`): Odoo deletes the open activities
@@ -42,8 +69,12 @@ class StreamdeckWorkstation(models.Model):
     _description = "Stream Deck workstation"
     _order = "name, id"
 
-    _USER_WRITABLE = frozenset({"name"})
-    _MANAGER_WRITABLE = frozenset({"name", "active"})
+    _USER_WRITABLE = frozenset(
+        {"name", "config_profile_id", "config_line_ids"}
+    )
+    _MANAGER_WRITABLE = frozenset(
+        {"name", "active", "config_profile_id", "config_line_ids"}
+    )
 
     user_id = fields.Many2one(
         "res.users",
@@ -124,6 +155,71 @@ class StreamdeckWorkstation(models.Model):
         "streamdeck.event", "workstation_id", string="Events"
     )
 
+    config_profile_id = fields.Many2one(
+        "streamdeck.config.profile",
+        string="Configuration profile",
+        index="btree_not_null",
+        ondelete="restrict",
+        help="The manager assigns any profile; the employee picks a"
+        " selectable one, unless the manager assigned one that is not.",
+    )
+    config_line_ids = fields.One2many(
+        "streamdeck.config.line",
+        "workstation_id",
+        string="Configuration overrides",
+    )
+    config_revision = fields.Integer(
+        string="Offered revision",
+        readonly=True,
+        copy=False,
+        help="Grows each time the effective configuration changes.",
+    )
+    config_hash = fields.Char(
+        string="Offered configuration hash", readonly=True, copy=False
+    )
+    config_offered = fields.Text(
+        string="Offered configuration",
+        readonly=True,
+        copy=False,
+        help="JSON of the settings of the offered revision.",
+    )
+    config_applied_revision = fields.Integer(
+        string="Applied revision", readonly=True, copy=False
+    )
+    config_applied = fields.Text(
+        string="Applied configuration",
+        readonly=True,
+        copy=False,
+        help="JSON of the settings the workstation last applied.",
+    )
+    config_state = fields.Selection(
+        CONFIG_STATES,
+        string="Configuration",
+        default="unmanaged",
+        required=True,
+        readonly=True,
+        copy=False,
+    )
+    config_reason = fields.Char(
+        string="Refusal reason", readonly=True, copy=False
+    )
+    config_pending_since = fields.Datetime(
+        string="Configuration pending since", readonly=True, copy=False
+    )
+    config_first_choice = fields.Selection(
+        FIRST_CHOICES,
+        string="First pilot choice",
+        readonly=True,
+        copy=False,
+        help="Set once, at the first pilot of the workstation, by the"
+        " employee's answer or by the organisation's policy.",
+    )
+    config_effective_html = fields.Html(
+        string="Effective configuration",
+        compute="_compute_config_effective_html",
+        sanitize=False,
+    )
+
     _sql_constraints = [
         (
             "user_fingerprint_unique",
@@ -137,9 +233,48 @@ class StreamdeckWorkstation(models.Model):
         for workstation in self:
             workstation.token_active = bool(workstation.token_hash)
 
+    def _compute_config_effective_html(self):
+        """A table of the effective configuration: setting, value as a
+        person reads it, layer it comes from, lock."""
+        schema = self.env["streamdeck.config.schema"]
+        keys = dict(
+            self.env["streamdeck.config.line"]
+            ._fields["key"]
+            ._description_selection(self.env)
+        )
+        layer_names = {
+            "profile": _("Profile"),
+            "model": _("Deck model"),
+            "workstation": _("Workstation"),
+        }
+        for workstation in self:
+            effective = schema._effective(workstation)
+            if not effective["settings"]:
+                workstation.config_effective_html = Markup("<p>%s</p>") % _(
+                    "Odoo manages no setting of this workstation."
+                )
+                continue
+            rows = Markup().join(
+                Markup("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>")
+                % (
+                    keys.get(key, key),
+                    schema._format(key, value),
+                    layer_names[effective["sources"][key]],
+                    _("Locked") if key in effective["locked"] else "",
+                )
+                for key, value in effective["settings"].items()
+            )
+            workstation.config_effective_html = Markup(
+                '<table class="table table-sm"><thead><tr><th>%s</th>'
+                "<th>%s</th><th>%s</th><th>%s</th></tr></thead>"
+                "<tbody>%s</tbody></table>"
+            ) % (_("Setting"), _("Value"), _("Layer"), _("Lock"), rows)
+
     def write(self, vals):
         if not self.env.su:
             self._check_writable(vals)
+            if not self.env.user.has_group(MANAGER_GROUP):
+                self._check_profile_pick(vals)
         if "active" in vals and not vals["active"]:
             self.filtered("active")._end_monitoring("archived")
         elif "token_hash" in vals and not vals["token_hash"]:
@@ -179,6 +314,28 @@ class StreamdeckWorkstation(models.Model):
                     "These workstation fields come from the workstation's"
                     " reports and cannot be changed by hand: %(fields)s",
                     fields=", ".join(refused),
+                )
+            )
+
+    def _check_profile_pick(self, vals):
+        """Raise AccessError unless the employee's `vals` leaves
+        `config_profile_id` alone or sets it to a selectable profile on
+        workstations whose current profile is empty or selectable: an
+        employee never clears a profile nor replaces one the manager
+        assigned without making it selectable."""
+        if "config_profile_id" not in vals:
+            return
+        profile = (
+            self.env["streamdeck.config.profile"]
+            .sudo()
+            .browse(vals["config_profile_id"])
+        )
+        current = self.sudo().mapped("config_profile_id")
+        if not profile.selectable or not all(current.mapped("selectable")):
+            raise AccessError(
+                _(
+                    "An employee picks a selectable configuration profile,"
+                    " in place of no profile or of a selectable one."
                 )
             )
 
