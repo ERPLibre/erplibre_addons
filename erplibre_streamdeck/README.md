@@ -153,7 +153,9 @@ beyond the delay goes silent, then is heard again at its next report.
   types.
 - **Notification.** Odoo tells the assigned user of a new activity as it
   does for any activity (inbox or e-mail, by their preference). The module
-  sends no e-mail and no notification of its own.
+  sends no e-mail and no notification of its own. Such an e-mail goes
+  through Odoo's mail queue: neither a report nor the cron waits on the
+  mail server.
 
 ### Settings › Stream Deck
 

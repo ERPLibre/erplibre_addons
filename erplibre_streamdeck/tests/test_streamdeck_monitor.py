@@ -1010,6 +1010,34 @@ class TestStreamdeckMonitor(TransactionCase):
             with self.subTest(kind=kind):
                 self.assertEqual(len(self._activities(record, kind)), 1)
 
+    def test_a_report_never_sends_the_notices_of_its_activities(self):
+        # Une activité ouverte pour un autre utilisateur lui vaut l'avis
+        # d'Odoo, par courriel selon sa préférence. Celui d'une remontée
+        # part dans la file des courriels : la remontée n'attend jamais le
+        # serveur de courriel.
+        self._enable(recipient="both")
+        (self.user_b | self.manager).write({"notification_type": "email"})
+        self._report(self.token_a, T0, decks=[DECK])
+        Mail = type(self.env["mail.mail"])
+        with patch.object(Mail, "send", autospec=True) as send:
+            self._report(self.token_b, T0 + HOUR, decks=[DECK])
+        self.assertEqual(
+            self._activities(self._device(), "moved").user_id,
+            self.user_b | self.manager,
+        )
+        send.assert_not_called()
+        queued = self.env["mail.mail"].search(
+            [
+                ("model", "=", "streamdeck.device"),
+                ("res_id", "=", self._device().id),
+                ("state", "=", "outgoing"),
+            ]
+        )
+        self.assertEqual(
+            queued.recipient_ids,
+            (self.user_b | self.manager).partner_id,
+        )
+
     def test_an_employee_reads_no_message_of_another_workstation(self):
         # Le fil d'un poste se lit avec le poste : A lit la note posée sur
         # le sien, aucune de celle posée sur le poste de B.

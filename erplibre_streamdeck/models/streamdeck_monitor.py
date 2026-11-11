@@ -17,6 +17,10 @@ is open. It closes with `action_feedback`, which keeps it done because
 its type has `keep_done`, and a « Resolved at <time>: <what> » feedback,
 the time in the assigned user's time zone, UTC without one. A `moved`
 activity is closed by a person only.
+
+The mail notices these activities cause, as Odoo's notice to the user of
+a new activity, go to Odoo's mail queue: neither a report nor the cron
+waits on the mail server.
 """
 
 import logging
@@ -184,6 +188,13 @@ class StreamdeckMonitor(models.AbstractModel):
             )
         )
 
+    def _queued(self):
+        """This model with the mail notices of its activities and thread
+        messages queued: Odoo otherwise sends them by SMTP when the
+        transaction commits, before the report that caused them gets its
+        answer."""
+        return self.with_context(mail_notify_force_send=False)
+
     @staticmethod
     def _in_language(env, user):
         return env(context=dict(env.context, lang=user.lang or "en_US"))
@@ -205,13 +216,14 @@ class StreamdeckMonitor(models.AbstractModel):
         is first taken by `_lock()`, and nothing opens unless it is
         free and `record` still matches `still`."""
         settings = settings or self._settings()
+        self = self._queued()
         Activity = self.env["mail.activity"].sudo()
         activity_type = self._activity_type(kind)
         if not settings["enabled"] or not settings["alerts"][kind]:
             return Activity
         if not activity_type:
             return Activity
-        record = record.sudo()
+        record = record.with_env(self.env).sudo()
         already = self._open_activities(record, kind)
         if kind == "moved" and already:
             env = self._in_language(self.env, already[0].user_id)
@@ -248,6 +260,7 @@ class StreamdeckMonitor(models.AbstractModel):
         time in their time zone. A `moved` activity is left to a person."""
         if kind == "moved":
             return
+        self = self._queued()
         now = fields.Datetime.now()
         for activity in self._open_activities(record, kind):
             user = activity.user_id
