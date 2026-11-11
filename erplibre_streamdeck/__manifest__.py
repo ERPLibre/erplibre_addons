@@ -22,6 +22,7 @@
         "views/streamdeck_workstation_views.xml",
         "views/streamdeck_device_views.xml",
         "views/streamdeck_event_views.xml",
+        "views/res_config_settings_views.xml",
         "views/streamdeck_menus.xml",
     ],
     "installable": True,
