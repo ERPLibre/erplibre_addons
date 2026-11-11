@@ -104,8 +104,9 @@ carries `protocol`; an error reply adds `error`.
   (serial number, USB product id, USB path, firmware). The decks of the
   workstation missing from the list become disconnected.
 - `events`: `plugged`, `unplugged` or `service_changed`, each with its own
-  uuid and the time it was observed. `moved` is written by Odoo only: a
-  report that carries it is a 400 `bad_request`. A uuid already stored is
+  uuid and the time it was observed. `moved`, `silent` and `heard_again`
+  are written by Odoo only: a report that carries one is a 400
+  `bad_request`. A uuid already stored is
   acknowledged again without change, so a report sent again creates
   nothing. A time more than 5 minutes ahead of the reception is replaced
   by the reception time.

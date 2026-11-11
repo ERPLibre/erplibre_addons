@@ -109,8 +109,9 @@ une réponse d'erreur y ajoute `error`.
   chemin USB, firmware). Les decks du poste absents de la liste deviennent
   débranchés.
 - `events` : `plugged`, `unplugged` ou `service_changed`, chacun avec son
-  propre uuid et l'heure où il a été observé. `moved` n'est écrit que par
-  Odoo : une remontée qui le porte est un 400 `bad_request`. Un uuid déjà
+  propre uuid et l'heure où il a été observé. `moved`, `silent` et
+  `heard_again` ne sont écrits que par Odoo : une remontée qui en porte un
+  est un 400 `bad_request`. Un uuid déjà
   enregistré est accusé de nouveau sans changement : une remontée renvoyée
   ne crée rien. Une heure de plus de 5 minutes en avance sur la réception
   est remplacée par l'heure de réception.

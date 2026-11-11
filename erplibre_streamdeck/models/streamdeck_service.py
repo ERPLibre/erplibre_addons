@@ -28,6 +28,7 @@ from uuid import uuid4
 from odoo import api, fields, models
 from odoo.exceptions import AccessDenied
 
+from .streamdeck_event import SERVER_KINDS
 from .streamdeck_workstation import SERVICE_STATES
 
 _logger = logging.getLogger(__name__)
@@ -53,8 +54,8 @@ MAX_EVENTS = 10000
 MAX_COUNT = 2**31 - 1
 
 ENROLL_METHODS = ("pairing_code", "api_key", "password")
-# The kinds a workstation reports. `moved` is written by Odoo only, so a
-# report that carries it is refused as any unknown kind.
+# The kinds a workstation reports. Those of SERVER_KINDS are written by
+# Odoo only, so a report that carries one is refused as any unknown kind.
 EVENT_KINDS = ("plugged", "unplugged", "service_changed")
 SERVICE_STATE_KEYS = tuple(key for key, _label in SERVICE_STATES)
 
@@ -469,18 +470,33 @@ class StreamdeckService(models.AbstractModel):
         return workstation
 
     def _report(self, token, payload):
+        """Apply a valid report to the workstation of `token`. A
+        `service_state` that differs from the stored one, or that has no
+        date yet, is dated `now`; a silent workstation is no longer, and
+        gets a `heard_again` event dated `now`."""
         _check_protocol(payload)
         workstation = self._workstation_of(token)
         state, decks, events, lost = _parse_report(payload)
         now = fields.Datetime.now()
-        workstation.write(
-            dict(
-                state,
-                last_report=now,
-                token_last_used=now,
-                lost_events_total=max(workstation.lost_events_total, lost),
-            )
+        values = dict(
+            state,
+            last_report=now,
+            token_last_used=now,
+            lost_events_total=max(workstation.lost_events_total, lost),
         )
+        if (
+            state["service_state"] != workstation.service_state
+            or not workstation.service_state_since
+        ):
+            values["service_state_since"] = now
+        was_silent = bool(workstation.silent_since)
+        if was_silent:
+            values["silent_since"] = False
+        workstation.write(values)
+        if was_silent:
+            self._server_event(
+                workstation, "heard_again", now, received_at=now
+            )
         self._apply_decks(workstation, decks, now)
         accepted = self._store_events(workstation, events, now)
         return _reply(accepted=accepted, heartbeat_s=HEARTBEAT_S)
@@ -531,13 +547,17 @@ class StreamdeckService(models.AbstractModel):
         deck created by this report, or already held by `workstation`,
         gets none."""
         seen = self.env["streamdeck.device"]
-        moves = []
         for deck in decks:
             device = self._device(workstation, deck, now)
             previous = device.workstation_id
             if previous and previous != workstation:
-                moves.append(
-                    self._moved_values(device, previous, workstation, now)
+                self._server_event(
+                    workstation,
+                    "moved",
+                    now,
+                    device=device,
+                    previous=previous,
+                    received_at=now,
                 )
                 self.env["streamdeck.device.holding"]._hold(
                     device, workstation.user_id, now
@@ -555,25 +575,41 @@ class StreamdeckService(models.AbstractModel):
         (workstation.device_ids - seen).filtered("connected").write(
             {"connected": False, "connected_since": False}
         )
-        self.env["streamdeck.event"].create(moves)
 
-    def _moved_values(self, device, previous, workstation, now):
-        """The values of the `moved` event of `device`, taken by
-        `workstation` from `previous`, with the names of both copied as
-        those of a reported event are. The uuid is drawn here: no
-        workstation sends this event."""
-        return {
-            "uuid": str(uuid4()),
-            "kind": "moved",
-            "at": now,
-            "received_at": now,
-            "device_id": device.id,
-            "workstation_id": workstation.id,
-            "workstation_name": workstation.name,
-            "employee_name": workstation.user_id.name,
-            "previous_workstation_id": previous.id,
-            "previous_workstation_name": previous.name,
-        }
+    def _server_event(
+        self,
+        workstation,
+        kind,
+        at,
+        device=None,
+        previous=None,
+        received_at=None,
+    ):
+        """Create and return an event of `kind`, one of SERVER_KINDS, at
+        `workstation`, dated `at` and received at `received_at`, the
+        current time by default. The names of `workstation` and of
+        `previous`, the workstation a moved deck left, are copied as those
+        of a reported event are. The uuid is drawn here: no workstation
+        sends these events. Raises ValueError for a kind that a
+        workstation reports."""
+        if kind not in SERVER_KINDS:
+            raise ValueError("%r is not an event kind of the server" % kind)
+        return self.env["streamdeck.event"].create(
+            {
+                "uuid": str(uuid4()),
+                "kind": kind,
+                "at": at,
+                "received_at": received_at or fields.Datetime.now(),
+                "device_id": device.id if device else False,
+                "workstation_id": workstation.id,
+                "workstation_name": workstation.name,
+                "employee_name": workstation.user_id.name,
+                "previous_workstation_id": previous.id if previous else False,
+                "previous_workstation_name": (
+                    previous.name if previous else False
+                ),
+            }
+        )
 
     def _store_events(self, workstation, events, now):
         """Create the events whose uuid is new and return every uuid of
