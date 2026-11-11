@@ -15,6 +15,7 @@ from . import test_streamdeck_monitor_events
 from . import test_streamdeck_monitor_i18n
 from . import test_streamdeck_monitor_thread
 from . import test_streamdeck_monitor_views
+from . import test_streamdeck_readme
 from . import test_streamdeck_routes
 from . import test_streamdeck_settings
 from . import test_streamdeck_service
