@@ -120,7 +120,13 @@ class TestStreamdeckMonitorViews(TransactionCase):
     def test_the_fleet_shows_and_filters_silent_workstations(self):
         self.workstation_a.silent_since = T0
         listed = self._arch(self.Workstation, "list")
-        self.assertIn("silent_since", listed.xpath("//field/@name"))
+        # `decoration-warning="silent_since"` makes `get_views` add the
+        # field as a hidden column when the list names it nowhere: the
+        # column is the node that the user may show or hide.
+        column = listed.xpath("/list/field[@name='silent_since']")
+        self.assertEqual(len(column), 1)
+        self.assertEqual(column[0].get("optional"), "show")
+        self.assertIsNone(column[0].get("column_invisible"))
         form = self._arch(self.Workstation, "form")
         self.assertIn("silent_since", form.xpath("//field/@name"))
         self.assertIn("service_state_since", form.xpath("//field/@name"))
