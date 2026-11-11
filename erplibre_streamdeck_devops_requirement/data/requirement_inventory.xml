@@ -1061,6 +1061,24 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_backfill_dates_each_holder_from_the_history</field>
     </record>
+    <record id="test_sd_inv_r09_14" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="140" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_an_event_about_a_deck_held_elsewhere_opens_nothing</field>
+    </record>
+    <record id="test_sd_inv_r09_15" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="150" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_late_lender_event_dated_before_the_move_stays_hidden</field>
+    </record>
+    <record id="test_sd_inv_r09_16" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r09" />
+        <field name="sequence" eval="160" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_backfill_dates_a_creator_without_events</field>
+    </record>
     <record id="test_sd_inv_r10_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_inv_r10" />
         <field name="sequence" eval="10" />
