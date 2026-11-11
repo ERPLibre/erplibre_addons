@@ -269,7 +269,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">A destination that is not the pilot sends config as pilot false; _parse_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers it without configuration, and the extension applies the configuration of the pilot only.</field>
+        <field name="achievement">A destination that is not the pilot sends config as pilot false; _parse_config of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py answers it without configuration, and _config_release makes its workstation unmanaged, so a revision it can no longer receive does not stay pending; the extension applies the configuration of the pilot only.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r19" model="devops.requirement">
@@ -1291,6 +1291,12 @@
         <field name="sequence" eval="30" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::only_the_pilot_destination_is_applied</field>
+    </record>
+    <record id="test_sd_ctl_r18_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r18" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_destination_no_longer_pilot_releases_the_workstation</field>
     </record>
     <record id="test_sd_ctl_r19_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r19" />

@@ -272,7 +272,7 @@ revision was applied or refused, and why.
 
 | Configuration | Meaning |
 |---|---|
-| Unmanaged | no layer sets a setting of the workstation, or it never reported with protocol 1.1 |
+| Unmanaged | no layer sets a setting of the workstation, it never reported with protocol 1.1, or its extension does not check this database as the pilot; a revision pending until then is withdrawn |
 | Pending | a revision is offered and not applied yet, since *Configuration pending since* |
 | Applied | the workstation applied the offered revision |
 | Refused | the workstation refused it; *Refusal reason* says why: `invalid:<key>`, `write_failed`, `restart_failed` or `unit_missing` |
