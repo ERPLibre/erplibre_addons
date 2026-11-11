@@ -35,7 +35,7 @@
                         </setting>
                     </block>
                     <block title="Problems that open an activity" name="streamdeck_alerts" invisible="not streamdeck_activities_enabled">
-                        <setting id="streamdeck_alert_service_failed_setting" help="The deck service of a workstation stays failed beyond this delay. It closes when the service leaves the failed state.">
+                        <setting id="streamdeck_alert_service_failed_setting" help="The deck service of a workstation stays failed beyond this delay. The activity closes when the service leaves the failed state.">
                             <field name="streamdeck_alert_service_failed"/>
                             <div class="content-group mt8" invisible="not streamdeck_alert_service_failed">
                                 <span class="me-2">After</span>
@@ -43,13 +43,13 @@
                                 <span class="ms-2">minutes</span>
                             </div>
                         </setting>
-                        <setting id="streamdeck_alert_silent_setting" help="A workstation goes silent. It closes at its next report.">
+                        <setting id="streamdeck_alert_silent_setting" help="A workstation goes silent. The activity closes at the next report of the workstation.">
                             <field name="streamdeck_alert_silent"/>
                         </setting>
-                        <setting id="streamdeck_alert_moved_setting" help="A deck is reported by another workstation. A person closes it; a new move adds a note to it.">
+                        <setting id="streamdeck_alert_moved_setting" help="A deck is reported by another workstation. A person closes the activity; a new move adds a note to it.">
                             <field name="streamdeck_alert_moved"/>
                         </setting>
-                        <setting id="streamdeck_alert_unplugged_setting" help="A deck stays unplugged beyond this delay. It closes when the deck is plugged again.">
+                        <setting id="streamdeck_alert_unplugged_setting" help="A deck stays unplugged beyond this delay. The activity closes when the deck is plugged again.">
                             <field name="streamdeck_alert_unplugged"/>
                             <div class="content-group mt8" invisible="not streamdeck_alert_unplugged">
                                 <span class="me-2">After</span>
