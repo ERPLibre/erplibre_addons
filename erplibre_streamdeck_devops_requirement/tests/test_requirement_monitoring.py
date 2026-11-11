@@ -54,10 +54,7 @@ DECISIONS = ("SD-MON-R07",)
 
 # Les requis encore à faire : chacun décrit son écart dans Ce qui manque,
 # et le passer à fait passe par cette liste.
-TO_DO = (
-    "SD-MON-R23",
-    "SD-MON-R38",
-)
+TO_DO = ("SD-MON-R38",)
 
 # Un requis dont la garantie repose sur un autre en dépend, et reste à
 # faire tant que celui-là ne l'est pas. Une activité d'un type de la

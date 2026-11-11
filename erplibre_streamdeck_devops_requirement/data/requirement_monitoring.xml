@@ -332,14 +332,13 @@
         <field name="sequence" eval="230" />
         <field name="moscow">must</field>
         <field name="requirement_type">security</field>
-        <field name="devsecops_stage">code</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">Odoo's access of mail.message and mail.activity follows the record; streamdeck.thread.visibility of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_thread_visibility.py bounds the messages and activities of a deck by the reader's holding, and streamdeck.workstation._get_mail_message_access asks for the unlink right, which no employee has, to write or delete in a workstation's thread. Reading stays Odoo's, modifying is narrower.</field>
-        <field name="missing">The attachments of a deck are bounded by nothing but the deck: an ir.attachment with res_model streamdeck.device follows the read access of the deck, so a new holder reads the attachments posted to it before their arrival, while the messages and activities of that time stay hidden.</field>
-        <field name="notes">Origin: violated.</field>
+        <field name="achievement">Odoo's access of mail.message and mail.activity follows the record; streamdeck.thread.visibility of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_thread_visibility.py bounds the messages, activities and attached files of a deck by the reader's holding through global read rules, and dates the message that closes an activity of a deck from the creation of that activity; streamdeck.workstation._get_mail_message_access asks for the unlink right, which no employee has, to write or delete in a workstation's thread. Reading stays Odoo's, modifying is narrower.</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_mon_r24" model="devops.requirement">
         <field name="code">SD-MON-R24</field>
@@ -1032,6 +1031,18 @@
         <field name="sequence" eval="40" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_thread.TestStreamdeckMonitorThread.test_a_new_holder_reads_the_deck_thread_from_their_arrival</field>
+    </record>
+    <record id="test_sd_mon_r23_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_thread.TestStreamdeckMonitorThread.test_a_deck_attachment_follows_the_thread_bound</field>
+    </record>
+    <record id="test_sd_mon_r23_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_thread.TestStreamdeckMonitorThread.test_a_new_holder_reads_no_closing_of_an_earlier_activity</field>
     </record>
     <record id="test_sd_mon_r24_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r24" />
