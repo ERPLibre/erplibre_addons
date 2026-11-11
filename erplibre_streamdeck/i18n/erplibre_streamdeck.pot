@@ -40,14 +40,14 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid ""
-"A deck is reported by another workstation. A person closes it; a new move "
-"adds a note to it."
+"A deck is reported by another workstation. A person closes the activity; a "
+"new move adds a note to it."
 msgstr ""
 
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
-msgid "A deck is unplugged for long after %(floor)s hour at the least."
+msgid "A deck is unplugged for long after %(floor)s hour at least."
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -58,8 +58,8 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid ""
-"A deck stays unplugged beyond this delay. It closes when the deck is plugged"
-" again."
+"A deck stays unplugged beyond this delay. The activity closes when the deck "
+"is plugged again."
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -74,14 +74,16 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
-msgid "A workstation goes silent. It closes at its next report."
+msgid ""
+"A workstation goes silent. The activity closes at the next report of the "
+"workstation."
 msgstr ""
 
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
 msgid ""
-"A workstation is silent after %(floor)s minutes at the least: one missed "
+"A workstation is silent after %(floor)s minutes at least: one missed "
 "heartbeat is not silence."
 msgstr ""
 
@@ -927,8 +929,8 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid ""
-"The deck service of a workstation stays failed beyond this delay. It closes "
-"when the service leaves the failed state."
+"The deck service of a workstation stays failed beyond this delay. The "
+"activity closes when the service leaves the failed state."
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -941,14 +943,14 @@ msgstr ""
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
-msgid "The delay of a failed deck service is %(floor)s minutes at the least."
+msgid "The delay of a failed deck service is %(floor)s minutes at least."
 msgstr ""
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_recipient
 msgid ""
 "The employee is the one of the workstation, or of the workstation that holds"
-" the deck. Both gives one activity to each."
+" the deck. Both give one activity to each."
 msgstr ""
 
 #. module: erplibre_streamdeck

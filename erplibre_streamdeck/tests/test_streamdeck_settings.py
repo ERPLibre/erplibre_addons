@@ -162,6 +162,50 @@ class TestStreamdeckSettings(TransactionCase):
                     accepted,
                 )
 
+    def test_the_floor_messages_say_at_least(self):
+        for name, refused in (
+            ("silent_after_min", 29),
+            ("unplugged_after_h", 0),
+            ("service_failed_after_min", -1),
+        ):
+            with self.subTest(delay=name):
+                with self.assertRaises(ValidationError) as caught:
+                    self._save(**{name: refused})
+                message = str(caught.exception)
+                self.assertIn(" at least", message)
+                self.assertNotIn("at the least", message)
+
+    def test_each_alert_help_names_the_activity_it_closes(self):
+        # Chaque aide d'alerte dit ce qui se ferme : l'activité. Un
+        # pronom n'y renvoie à rien, le seul nom de la phrase étant le
+        # poste, le deck ou le service.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(
+            ["erplibre_streamdeck"], ["fr_CA"], overwrite=True
+        )
+        for lang, closes in (
+            ("en_US", ("The activity closes", "closes the activity")),
+            ("fr_CA", ("L'activité se ferme", "ferme l'activité")),
+        ):
+            arch = self.Settings.with_context(lang=lang).get_views(
+                [(False, "form")]
+            )["views"]["form"]["arch"]
+            root = etree.fromstring(arch)
+            for kind in ALERTS:
+                with self.subTest(lang=lang, alert=kind):
+                    (setting,) = root.xpath(
+                        "//setting[@id='streamdeck_alert_%s_setting']" % kind
+                    )
+                    text = setting.get("help")
+                    self.assertTrue(
+                        any(words in text for words in closes), text
+                    )
+
+        recipient = self.Settings.with_context(lang="fr_CA").fields_get(
+            ["streamdeck_activity_recipient"]
+        )["streamdeck_activity_recipient"]["help"]
+        self.assertIn("Les deux donnent une activité à chacun.", recipient)
+
     def test_an_alert_turned_off_stays_off(self):
         # Une case cochée par défaut doit pouvoir se décocher : le
         # paramètre garde « False » au lieu de disparaître, ce qui

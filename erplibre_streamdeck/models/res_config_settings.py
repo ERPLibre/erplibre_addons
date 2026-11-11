@@ -66,7 +66,7 @@ class ResConfigSettings(models.TransientModel):
         config_parameter=PARAM_PREFIX + "activity_recipient",
         help=(
             "The employee is the one of the workstation, or of the"
-            " workstation that holds the deck. Both gives one activity"
+            " workstation that holds the deck. Both give one activity"
             " to each."
         ),
     )
@@ -141,7 +141,7 @@ class ResConfigSettings(models.TransientModel):
                 raise ValidationError(
                     _(
                         "A workstation is silent after %(floor)s minutes at"
-                        " the least: one missed heartbeat is not silence.",
+                        " least: one missed heartbeat is not silence.",
                         floor=floors["silent_after_min"],
                     )
                 )
@@ -152,7 +152,7 @@ class ResConfigSettings(models.TransientModel):
                 raise ValidationError(
                     _(
                         "A deck is unplugged for long after %(floor)s hour at"
-                        " the least.",
+                        " least.",
                         floor=floors["unplugged_after_h"],
                     )
                 )
@@ -163,7 +163,7 @@ class ResConfigSettings(models.TransientModel):
                 raise ValidationError(
                     _(
                         "The delay of a failed deck service is %(floor)s"
-                        " minutes at the least.",
+                        " minutes at least.",
                         floor=floors["service_failed_after_min"],
                     )
                 )
