@@ -1,6 +1,7 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
+from odoo.tools import SQL
 
 # USB product id (four lowercase hex digits, vendor 0fd9) -> model name.
 # The ids are those of the `streamdeck` Python library that drives the
@@ -43,6 +44,10 @@ class StreamdeckDevice(models.Model):
     `workstation_id` is the workstation that reported it last: a deck
     moved to another workstation follows it, with a `moved` event that
     names both, and its events keep the workstation where each happened.
+
+    `held_by_me` is true for the current user on a deck one of their
+    workstations holds or held, as `streamdeck.device.holding` records
+    it; the record rule of the employees and « My decks » read it.
     """
 
     _name = "streamdeck.device"
@@ -68,6 +73,12 @@ class StreamdeckDevice(models.Model):
     event_ids = fields.One2many(
         "streamdeck.event", "device_id", string="Events"
     )
+    held_by_me = fields.Boolean(
+        string="Held by me",
+        compute="_compute_held_by_me",
+        search="_search_held_by_me",
+        help="One of your workstations holds this deck or held it.",
+    )
 
     _sql_constraints = [
         ("key_unique", "UNIQUE(key)", "A deck key is unique."),
@@ -84,3 +95,33 @@ class StreamdeckDevice(models.Model):
             device.display_name = " ".join(
                 part for part in (device.model_name, device.serial) if part
             )
+
+    def _holdings_of_me_sql(self):
+        """The ids of the decks that `held_by_me` selects, for the user
+        of the environment, sudo or not."""
+        self.env["streamdeck.device.holding"].flush_model()
+        return SQL(
+            "SELECT device_id FROM streamdeck_device_holding"
+            " WHERE user_id = %s",
+            self.env.uid,
+        )
+
+    def _compute_held_by_me(self):
+        self.env.cr.execute(self._holdings_of_me_sql())
+        held = {row[0] for row in self.env.cr.fetchall()}
+        for device in self:
+            device.held_by_me = device.id in held
+
+    def _search_held_by_me(self, operator, value):
+        if operator not in ("=", "!=") or not isinstance(value, bool):
+            raise NotImplementedError(
+                "held_by_me is searched with = or != and a boolean"
+            )
+        selected = (operator == "=") == value
+        return [
+            (
+                "id",
+                "in" if selected else "not in",
+                SQL("(%s)", self._holdings_of_me_sql()),
+            )
+        ]

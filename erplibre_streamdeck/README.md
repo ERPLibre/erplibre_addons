@@ -47,23 +47,30 @@ credentials from one address are put on Odoo's login cooldown.
 
 | Group | Workstations | Decks | Events |
 |---|---|---|---|
-| User (every internal user) | their own: read, rename, revoke the token | those their workstations hold or have held, read-only | those of their workstations, and every event of a deck they can read |
+| User (every internal user) | their own: read, rename, revoke the token | those their workstations hold or have held, read-only | those of their workstations, and those of a deck they hold or have held, from their first holding on |
 | Manager | all: read, rename, archive, revoke the token | all, read-only | all, read-only |
 
-A deck lent to another employee follows the workstation that holds it. The
-lender still reads the deck and its whole history, the events at the other
-workstation included: each event carries a copy of the name of its
-workstation and of its employee, so the lender never needs, nor gets, the
-other workstation's record.
+A deck lent to another employee follows the workstation that holds it.
+Each employee reads the history of a deck from the moment one of their
+workstations first held it: when the deck was created on it, or when a
+*Changed workstation* event moved it there. Odoo dates that moment itself,
+never with a time the workstation sent, and keeps it when the deck comes
+back after a loan. The lender therefore still reads the deck and its whole
+history from their first holding on, the events at the other workstation
+included: each event carries a copy of the name of its workstation and of
+its employee, so the lender never needs, nor gets, the other workstation's
+record. The borrower, or a workstation that reports the serial number of
+another deck, reads nothing from before its arrival.
 
 When a workstation reports a deck that another workstation holds, the deck
 moves to it without confirmation, and Odoo adds an event *Changed
 workstation* (`moved`) dated at the reception. It names the new workstation
 and its employee, and the workstation the deck left, each by a copy of its
-name. This event alone proves that the former workstation had the deck: its
-employee keeps reading the deck and its history, even when that
-workstation never sent an event of it. The same workstation reporting the
-deck again moves nothing.
+name. Its employee becomes a holder of the deck from that moment, unless
+they held it before; the employee of the former workstation keeps
+reading the deck and its history, even when that workstation never sent
+an event of it. The same workstation reporting the deck again moves
+nothing.
 
 Archiving a user archives their workstations and revokes their tokens; the
 workstations, their decks and their events stay readable by the manager.

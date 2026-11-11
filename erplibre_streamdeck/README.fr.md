@@ -51,23 +51,30 @@ connexions d'Odoo.
 
 | Groupe | Postes | Decks | Événements |
 |---|---|---|---|
-| Utilisateur (tout utilisateur interne) | les siens : lire, renommer, révoquer le jeton | ceux que ses postes tiennent ou ont tenus, en lecture | ceux de ses postes, et tous ceux d'un deck qu'il peut lire |
+| Utilisateur (tout utilisateur interne) | les siens : lire, renommer, révoquer le jeton | ceux que ses postes tiennent ou ont tenus, en lecture | ceux de ses postes, et ceux d'un deck qu'il détient ou a détenu, à partir de sa première détention |
 | Gestionnaire | tous : lire, renommer, archiver, révoquer le jeton | tous, en lecture | tous, en lecture |
 
-Un deck prêté à un autre employé suit le poste qui le tient. Le prêteur lit
-toujours le deck et tout son historique, y compris les événements survenus
-à l'autre poste : chaque événement porte une copie du nom de son poste et
-de son employé, si bien que le prêteur n'a pas besoin de la fiche de
-l'autre poste, et ne la reçoit pas.
+Un deck prêté à un autre employé suit le poste qui le tient. Chaque
+employé lit l'historique d'un deck à partir du moment où un de ses postes
+l'a détenu pour la première fois : la création du deck sur ce poste, ou
+l'événement *Changé de poste* qui l'y a amené. Odoo date ce moment
+lui-même, jamais avec une heure envoyée par le poste, et le garde quand le
+deck revient après un prêt. Le prêteur lit donc toujours le deck et tout
+son historique depuis sa première détention, y compris les événements
+survenus à l'autre poste : chaque événement porte une copie du nom de son
+poste et de son employé, si bien que le prêteur n'a pas besoin de la fiche
+de l'autre poste, et ne la reçoit pas. L'emprunteur, ou un poste qui
+déclare le numéro de série d'un autre deck, ne lit rien d'avant son
+arrivée.
 
 Quand un poste remonte un deck que tient un autre poste, le deck passe à ce
 poste sans confirmation, et Odoo ajoute un événement *Changé de poste*
 (`moved`) daté de la réception. Il nomme le nouveau poste et son employé,
-et le poste que le deck a quitté, chacun par une copie de son nom. Cet
-événement suffit à prouver que l'ancien poste a eu le deck : son employé
-lit toujours le deck et son historique, même si ce poste n'en a jamais
-envoyé d'événement. Le même poste qui remonte de nouveau le deck ne
-déplace rien.
+et le poste que le deck a quitté, chacun par une copie de son nom. Son
+employé devient détenteur du deck à ce moment, à moins de l'avoir détenu
+avant ; l'employé de l'ancien poste lit toujours le deck et son
+historique, même si ce poste n'en a jamais envoyé d'événement. Le même
+poste qui remonte de nouveau le deck ne déplace rien.
 
 Archiver un utilisateur archive ses postes et révoque leurs jetons ; les
 postes, leurs decks et leurs événements restent lisibles du gestionnaire.

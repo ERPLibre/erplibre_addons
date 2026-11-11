@@ -37,6 +37,11 @@ msgid "A pairing code is unique."
 msgstr "Un code d'appairage est unique."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_device_holding_device_user_unique
+msgid "A user has one first holding per deck."
+msgstr "Un utilisateur a une seule première détention par deck."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__absent
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__absent
 msgid "Absent"
@@ -67,6 +72,15 @@ msgstr "Ajouter un poste"
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_workstation_user_fingerprint_unique
 msgid "An employee has one workstation per fingerprint."
 msgstr "Un employé a un seul poste par empreinte."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__visible_to_me
+msgid ""
+"An event of a deck you hold or held, dated from the first moment one of your"
+" workstations held it."
+msgstr ""
+"Un événement d'un deck que vous détenez ou avez détenu, daté à partir du "
+"premier moment où un de vos postes l'a détenu."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_event_uuid_unique
@@ -124,6 +138,7 @@ msgstr "Version du contrat"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__create_uid
@@ -133,6 +148,7 @@ msgstr "Créé par"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__create_date
@@ -147,6 +163,7 @@ msgid "Current workstation"
 msgstr "Poste actuel"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__device_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__device_id
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
@@ -195,6 +212,7 @@ msgstr "Débranché"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__display_name
@@ -213,6 +231,7 @@ msgid "ERPLibre commit"
 msgstr "Commit ERPLibre"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__user_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__employee_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__user_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__user_id
@@ -281,6 +300,11 @@ msgid "Fleet"
 msgstr "Parc"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__visible_to_me
+msgid "From my holding"
+msgstr "Depuis ma détention"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__gnome_shell
 msgid "GNOME Shell version"
 msgstr "Version de GNOME Shell"
@@ -304,12 +328,23 @@ msgstr ""
 " le poste, et deux destinations Odoo ne peuvent pas recouper le même poste."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__held_by_me
+msgid "Held by me"
+msgstr "Détenu par moi"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__since
+msgid "Held since"
+msgstr "Détenu depuis"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__name
 msgid "Host name given at enrollment; the employee may rename it."
 msgstr "Nom d'hôte donné à l'inscription ; l'employé peut le renommer."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__id
@@ -336,6 +371,7 @@ msgstr "Sorte"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__write_uid
@@ -345,6 +381,7 @@ msgstr "Dernière modification par"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__write_date
@@ -424,6 +461,11 @@ msgstr ""
 "                    fois, jusqu'à l'heure ci-dessous."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__held_by_me
+msgid "One of your workstations holds this deck or held it."
+msgstr "Un de vos postes détient ce deck ou l'a détenu."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__os_name
 msgid "Operating system"
 msgstr "Système d'exploitation"
@@ -498,6 +540,11 @@ msgstr "Stream Deck"
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_device
 msgid "Stream Deck device"
 msgstr "Deck Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_device_holding
+msgid "Stream Deck device holding"
+msgstr "Détention d'un Stream Deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_event

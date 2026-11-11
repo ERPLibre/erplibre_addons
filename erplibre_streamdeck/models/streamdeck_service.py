@@ -497,9 +497,10 @@ class StreamdeckService(models.AbstractModel):
             deck["usb_path"] or "",
         )
 
-    def _device(self, workstation, deck):
+    def _device(self, workstation, deck, now):
         """The device of `deck`, created on `workstation`, disconnected,
-        when unknown."""
+        when unknown; the employee of `workstation` then holds it from
+        `now`."""
         Device = self.env["streamdeck.device"]
         key = self._deck_key(workstation, deck)
         device = Device.search([("key", "=", key)], limit=1)
@@ -513,6 +514,9 @@ class StreamdeckService(models.AbstractModel):
                     "connected": False,
                 }
             )
+            self.env["streamdeck.device.holding"]._hold(
+                device, workstation.user_id, now
+            )
         return device
 
     def _apply_decks(self, workstation, decks, now):
@@ -522,16 +526,21 @@ class StreamdeckService(models.AbstractModel):
         one: the deck service may hold the device and hide it.
 
         A deck taken from another workstation gets a `moved` event dated
-        `now`, which keeps both workstations; a deck created by this
-        report, or already held by `workstation`, gets none."""
+        `now`, which keeps both workstations, and the employee of
+        `workstation` holds it from `now` unless they held it before; a
+        deck created by this report, or already held by `workstation`,
+        gets none."""
         seen = self.env["streamdeck.device"]
         moves = []
         for deck in decks:
-            device = self._device(workstation, deck)
+            device = self._device(workstation, deck, now)
             previous = device.workstation_id
             if previous and previous != workstation:
                 moves.append(
                     self._moved_values(device, previous, workstation, now)
+                )
+                self.env["streamdeck.device.holding"]._hold(
+                    device, workstation.user_id, now
                 )
             values = {"last_seen": now, "connected": True}
             if not device.connected or previous != workstation:
@@ -581,7 +590,7 @@ class StreamdeckService(models.AbstractModel):
                 continue
             known.add(event["uuid"])
             deck = event["deck"]
-            device = self._device(workstation, deck) if deck else None
+            device = self._device(workstation, deck, now) if deck else None
             values.append(
                 {
                     "uuid": event["uuid"],

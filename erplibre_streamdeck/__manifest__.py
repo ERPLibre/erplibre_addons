@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "ERPLibre Stream Deck",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Productivity",
     "summary": "Inventory of the employees' workstations and Stream Decks.",
     "author": "TechnoLibre",
