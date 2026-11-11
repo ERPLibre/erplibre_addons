@@ -31,8 +31,11 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
+from psycopg2 import errors
+
 from odoo import api, fields, models
 from odoo.exceptions import AccessDenied, ValidationError
+from odoo.tools import mute_logger
 
 from .streamdeck_config import KEYS, PLUGIN_ID_RE
 from .streamdeck_event import SERVER_KINDS
@@ -44,6 +47,8 @@ PROTOCOL = "1.1"
 HEARTBEAT_S = 900
 PAIRING_TTL_MIN = 10
 FUTURE_TOLERANCE_MIN = 5
+# The unique index of the event uuid, as PostgreSQL names it in an error.
+UUID_CONSTRAINT = "streamdeck_event_uuid_unique"
 
 USER_GROUP = "erplibre_streamdeck.group_streamdeck_user"
 
@@ -705,8 +710,10 @@ class StreamdeckService(models.AbstractModel):
     def _store_events(self, workstation, events, now):
         """Create the events whose uuid is new and return every uuid of
         the report once, in order: a uuid already stored is acknowledged
-        again without change. An event dated more than
-        FUTURE_TOLERANCE_MIN minutes after `now` takes `now`."""
+        again without change, also when a concurrent report stores it
+        between the search and the insert (`_create_events`). An event
+        dated more than FUTURE_TOLERANCE_MIN minutes after `now` takes
+        `now`."""
         Event = self.env["streamdeck.event"]
         uuids = list(dict.fromkeys(event["uuid"] for event in events))
         known = set(Event.search([("uuid", "in", uuids)]).mapped("uuid"))
@@ -731,8 +738,32 @@ class StreamdeckService(models.AbstractModel):
                     "service_state": event.get("service_state") or False,
                 }
             )
-        Event.create(values)
+        self._create_events(values)
         return uuids
+
+    def _create_events(self, values):
+        """Create the events of `values`. The search of known uuids reads
+        the transaction's snapshot, which misses an event that another
+        report, from another workstation of the same extension, commits
+        meanwhile: its insert then breaks the uuid's unique constraint.
+        The batch is inserted first; refused, each event is inserted
+        alone, and one refused again is a known uuid, skipped."""
+        if values and not self._insert_events(values):
+            for vals in values:
+                self._insert_events([vals])
+
+    def _insert_events(self, values):
+        """Create `values` in a savepoint and return True; return False,
+        nothing created, when one of their uuids is stored already. Any
+        other error is raised. The failed insert is not logged."""
+        try:
+            with mute_logger("odoo.sql_db"), self.env.cr.savepoint():
+                self.env["streamdeck.event"].create(values)
+        except errors.UniqueViolation as error:
+            if error.diag.constraint_name != UUID_CONSTRAINT:
+                raise
+            return False
+        return True
 
     # -- managed configuration -------------------------------------------
 
