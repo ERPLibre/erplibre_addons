@@ -60,12 +60,14 @@ class StreamdeckDeviceHolding(models.Model):
         """Date the holdings of a history written without them, keeping
         any row that exists.
 
-        A user holds a deck from the earliest of: the creation of the
-        deck, for the user who first had it (the one the earliest
-        `moved` event took it from, or its current holder when it never
-        moved); the reception of an event at one of their workstations,
-        a `moved` event to it included. Only times written by Odoo count,
-        never the `at` a workstation sent with its own events.
+        A user holds a deck from the earliest of the two moments the
+        report service dates: the creation of the deck, for the user who
+        first had it (the one the earliest `moved` event took it from, or
+        its current holder when it never moved); the reception of a
+        `moved` event to one of their workstations. Any other event at a
+        workstation dates nothing: it may carry the serial of a deck held
+        elsewhere. Only times written by Odoo count, never the `at` a
+        workstation sent with its own events.
         """
         self.env.flush_all()
         self.env.cr.execute(
@@ -92,7 +94,7 @@ class StreamdeckDeviceHolding(models.Model):
                 SELECT e.device_id, w.user_id, e.received_at
                   FROM streamdeck_event e
                   JOIN streamdeck_workstation w ON w.id = e.workstation_id
-                 WHERE e.device_id IS NOT NULL
+                 WHERE e.device_id IS NOT NULL AND e.kind = 'moved'
               ) held
              WHERE held.since IS NOT NULL
              GROUP BY held.device_id, held.user_id

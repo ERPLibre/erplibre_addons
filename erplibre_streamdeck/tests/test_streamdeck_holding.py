@@ -88,10 +88,10 @@ class TestStreamdeckHolding(TransactionCase):
             "usb_path": self.DECK["usb_path"],
         }
 
-    def _report(self, token, moment, kinds=(), decks=True):
+    def _report(self, token, moment, kinds=(), decks=True, at=None):
         """Une remontée à `moment` (heure du serveur) : le deck dans
         l'état si `decks`, et un événement du deck par sorte de `kinds`,
-        daté de `moment`."""
+        daté de `at`, ou de `moment` à défaut."""
         with freeze_time(moment):
             status, body = self.Service.report(
                 token,
@@ -103,7 +103,9 @@ class TestStreamdeckHolding(TransactionCase):
                         "service_state": "active",
                         "decks": [self.DECK] if decks else [],
                     },
-                    "events": [self._event(kind, moment) for kind in kinds],
+                    "events": [
+                        self._event(kind, at or moment) for kind in kinds
+                    ],
                     "lost_events": 0,
                 },
             )
@@ -205,6 +207,57 @@ class TestStreamdeckHolding(TransactionCase):
                 with self.assertRaises(AccessError):
                     event.with_user(as_c).read(["kind"])
 
+    def test_an_event_about_a_deck_held_elsewhere_opens_nothing(self):
+        # C envoie un événement portant le numéro de série du deck de A,
+        # sans le déclarer dans son état : le deck reste chez A et C ne
+        # le détient pas. C lit son propre événement, aucun de A, ni
+        # d'avant ni d'après.
+        self._report(self.token_a, DAY_A, kinds=["plugged"])
+        self._report(self.token_c, DAY_B, kinds=["plugged"], decks=False)
+        self._report(self.token_a, DAY_BACK, kinds=["unplugged"])
+        device = self._device()
+        self.assertEqual(device.workstation_id.user_id, self.user_a)
+        self.assertFalse(
+            self.Holding.search(
+                [
+                    ("device_id", "=", device.id),
+                    ("user_id", "=", self.user_c.id),
+                ]
+            )
+        )
+        at_c = device.event_ids.filtered(
+            lambda e: e.workstation_id.user_id == self.user_c
+        )
+        self.assertEqual(len(at_c), 1)
+        self.assertEqual(self._seen(self.user_c), at_c)
+        for event in device.event_ids - at_c:
+            with self.subTest(kind=event.kind, at=event.at):
+                with self.assertRaises(AccessError):
+                    event.with_user(self.user_c).read(["kind"])
+
+    def test_a_late_lender_event_dated_before_the_move_stays_hidden(self):
+        # A remonte après le déplacement un événement qu'il a gardé hors
+        # ligne, daté d'avant l'arrivée du deck chez B : la visibilité
+        # compare la détention de B à l'heure de l'événement, non à sa
+        # réception.
+        at_a, _since_b = self._lend_to_b()
+        self._report(
+            self.token_a,
+            DAY_B.replace(hour=13),
+            kinds=["unplugged"],
+            decks=False,
+            at=DAY_A.replace(hour=12),
+        )
+        late = self._device().event_ids.filtered(
+            lambda e: e.received_at == DAY_B.replace(hour=13)
+        )
+        self.assertEqual(len(late), 1)
+        self.assertEqual(late.at, DAY_A.replace(hour=12))
+        self.assertNotIn(late, self._seen(self.user_b))
+        with self.assertRaises(AccessError):
+            late.with_user(self.user_b).read(["kind"])
+        self.assertIn(late, self._seen(self.user_a))
+
     def test_a_reported_time_never_opens_the_history_before_arrival(self):
         # L'heure d'un événement vient du poste : B la recule avant
         # l'arrivée du deck chez lui. Il lit cet événement, le sien, mais
@@ -266,10 +319,24 @@ class TestStreamdeckHolding(TransactionCase):
                     holding.with_user(user).unlink()
         self.assertEqual(holding.since, DAY_B)
 
+    def _backfill_from_scratch(self, device):
+        """Efface toute détention et la refait depuis l'historique, le
+        deck daté de sa création chez A, comme une base écrite avant les
+        détentions."""
+        self.env.cr.execute(
+            "UPDATE streamdeck_device SET create_date = %s WHERE id = %s",
+            (DAY_A, device.id),
+        )
+        self.Holding.search([]).unlink()
+        self.Holding._backfill()
+        self.Holding.invalidate_model()
+        return self.Holding.search([("device_id", "=", device.id)])
+
     def test_the_backfill_dates_each_holder_from_the_history(self):
         # Un historique écrit avant les détentions : le deck né chez A,
         # passé chez B par un déplacement, et un événement au poste de C,
-        # qui n'a jamais été déclaré dans un état.
+        # qui ne l'a jamais déclaré dans un état. Seuls la création et le
+        # déplacement datent une détention : C n'en reçoit aucune.
         self._lend_to_b()
         with freeze_time(DAY_BACK):
             self.Service.report(
@@ -285,26 +352,42 @@ class TestStreamdeckHolding(TransactionCase):
                     "lost_events": 0,
                 },
             )
-        device = self._device()
-        self.env.cr.execute(
-            "UPDATE streamdeck_device SET create_date = %s WHERE id = %s",
-            (DAY_A, device.id),
+        self._report(
+            self.token_b, DAY_BACK.replace(hour=12), kinds=["plugged"]
         )
-        self.Holding.search([]).unlink()
-        self.Holding._backfill()
-        self.Holding.invalidate_model()
-        holdings = self.Holding.search([("device_id", "=", device.id)])
-        # C est daté par la réception de son événement, jamais par l'heure
-        # que le poste y a écrite.
+        device = self._device()
+        holdings = self._backfill_from_scratch(device)
         self.assertEqual(
             {(h.user_id, h.since) for h in holdings},
-            {
-                (self.user_a, DAY_A),
-                (self.user_b, DAY_B),
-                (self.user_c, DAY_BACK),
-            },
+            {(self.user_a, DAY_A), (self.user_b, DAY_B)},
         )
+        at_c = device.event_ids.filtered(
+            lambda e: e.workstation_id.user_id == self.user_c
+        )
+        self.assertEqual(self._seen(self.user_c), at_c)
+        # L'événement de C est daté d'avant la détention de A.
+        self.assertEqual(self._seen(self.user_a), device.event_ids - at_c)
         self.Holding._backfill()
         self.assertEqual(
-            self.Holding.search_count([("device_id", "=", device.id)]), 3
+            self.Holding.search_count([("device_id", "=", device.id)]), 2
         )
+
+    def test_the_backfill_dates_a_creator_without_events(self):
+        # A n'a déclaré le deck que dans son état, sans aucun événement,
+        # puis le deck est passé chez B : la création du deck date la
+        # détention de A, et A garde tout l'historique.
+        self._report(self.token_a, DAY_A)
+        self._report(self.token_b, DAY_B, kinds=["plugged"])
+        device = self._device()
+        self.assertFalse(
+            device.event_ids.filtered(
+                lambda e: e.workstation_id.user_id == self.user_a
+            )
+        )
+        holdings = self._backfill_from_scratch(device)
+        self.assertEqual(
+            {(h.user_id, h.since) for h in holdings},
+            {(self.user_a, DAY_A), (self.user_b, DAY_B)},
+        )
+        self.assertEqual(len(device.event_ids), 2)
+        self.assertEqual(self._seen(self.user_a), device.event_ids)
