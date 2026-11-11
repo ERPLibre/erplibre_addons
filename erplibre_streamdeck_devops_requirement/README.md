@@ -53,7 +53,10 @@ violation*.
 
 Each requirement carries a stable code `SD-<DOMAIN>-R<row>`, for example
 `SD-DEFECTS-R02`. The data is loaded **once**: it is `noupdate`, so a
-requirement edited by hand keeps its edit when the module is updated.
+requirement edited by hand keeps its edit when the module is updated. The
+exception is a requirement whose text a new version rewrites: the
+migration of that version loads it again from its file, as it does a
+proof whose reference changed, and its French comes back from the catalog.
 
 ## The Inventory domain
 
