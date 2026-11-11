@@ -299,6 +299,15 @@ msgstr ""
 "format_mismatch:jpeg_model_requires_jpeg"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r32
+msgid ""
+"A Pilot switch per destination on the Inventory page of the preferences: "
+"checking one unchecks the others"
+msgstr ""
+"Un interrupteur Pilote par destination dans la page Inventaire des "
+"préférences : en cocher un décoche les autres"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r113
 msgid ""
 "A SIGTERM during a build resets the deck and exits 143; SigtermExit passes "
@@ -785,6 +794,15 @@ msgstr ""
 "par « Modifier l'instance »"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r12
+msgid ""
+"A locked setting offered again follows the same path: a new revision that "
+"the employee confirms; nothing applies without a click"
+msgstr ""
+"Un réglage verrouillé reproposé suit la même voie : une nouvelle révision "
+"que l'employé confirme ; rien ne s'applique sans clic"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r07
 msgid ""
 "A locked workstation is accepted as silent: it goes silent after the delay "
@@ -840,6 +858,21 @@ msgstr ""
 "Une nouvelle migration crée la table SQLite editable_repos(slug PK, "
 "baseline_sha NOT NULL, build_id NOT NULL, promoted_at INTEGER NOT NULL, "
 "head_sha)"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r34
+msgid ""
+"A new revision is announced, never in a modal way: one GNOME notification "
+"per revision with an Apply action, an entry Apply Stream Deck configuration "
+"in the deck menu listing the keys that change, and an Apply button on the "
+"destination in the preferences; a revision already announced is not notified"
+" again"
+msgstr ""
+"Une nouvelle révision s'annonce, jamais de façon modale : une notification "
+"GNOME par révision avec une action Appliquer, une entrée Appliquer la "
+"configuration du Stream Deck dans le menu du deck qui liste les clés qui "
+"changent, et un bouton Appliquer sur la destination dans les préférences ; "
+"une révision déjà annoncée n'est pas notifiée de nouveau"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r48
@@ -998,6 +1031,19 @@ msgstr ""
 "Une session recyclée est retirée du tableau de bord et de la page de session"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r31
+msgid ""
+"A refusal reason holds at most 256 code points, the local values and the "
+"settings only the keys of the table, a key the other side does not know is "
+"ignored, and Odoo answers 400 bad_request to a value outside the schema in "
+"the local values or in the result"
+msgstr ""
+"Une raison de refus tient en 256 points de code au plus, les valeurs locales"
+" et les réglages seulement les clés du tableau, une clé que l'autre côté ne "
+"connaît pas est ignorée, et Odoo répond 400 bad_request à une valeur hors du"
+" schéma dans les valeurs locales ou dans le résultat"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r73
 msgid ""
 "A reinstall that rewrites an enabled unit runs reenable; a disabled one "
@@ -1030,6 +1076,28 @@ msgid ""
 msgstr ""
 "Un games/ géré par repo dont le .git est un lien symbolique n'est jamais "
 "déplacé par l'installateur"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r24
+msgid ""
+"A report in protocol 1.1 or later from a workstation with a managed key gets"
+" the configuration in its reply; a workstation in 1.0 stays unmanaged, and "
+"its form says the extension is too old to be piloted"
+msgstr ""
+"Une remontée en protocole 1.1 ou plus d'un poste qui a une clé gérée reçoit "
+"la configuration dans sa réponse ; un poste en 1.0 reste non géré, et son "
+"formulaire dit l'extension trop ancienne pour le pilotage"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r17
+msgid ""
+"A revision already in place is not offered: when the file already holds "
+"Odoo's values, the extension reports it applied with no notification and no "
+"restart"
+msgstr ""
+"Une révision déjà en place n'est pas proposée : quand le fichier porte déjà "
+"les valeurs d'Odoo, l'extension la remonte appliquée sans notification ni "
+"redémarrage"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r26
@@ -1093,6 +1161,17 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r55
 msgid "A session whose pid is 0 or absent is kept"
 msgstr "Une session dont le pid vaut 0 ou est absent est gardée"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r05
+msgid ""
+"A setting changed locally, through TODO › Stream Deck: Odoo offers a locked "
+"one again at the next report, and a free one goes up to Odoo as a new "
+"override of the workstation"
+msgstr ""
+"Un réglage changé localement, par TODO › Stream Deck : Odoo repropose un "
+"réglage verrouillé à la remontée suivante, et un réglage libre remonte à "
+"Odoo comme nouvelle surcharge du poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r54
@@ -1194,6 +1273,15 @@ msgid ""
 msgstr ""
 "Un poste s'inscrit par code d'appairage, par la clé d'API de l'employé, ou "
 "par identifiant et mot de passe"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r18
+msgid ""
+"A workstation has one pilot destination; the other destinations receive its "
+"report and send no configuration back"
+msgstr ""
+"Un poste a une seule destination pilote ; les autres destinations reçoivent "
+"sa remontée et ne lui renvoient aucune configuration"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r16
@@ -1451,6 +1539,19 @@ msgstr ""
 "games.save-<date>/"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r41
+msgid ""
+"An interconnection test holds the table of CONTRACT.md equal to the "
+"constants of erplibre_home_service.py and to the plugin id pattern of "
+"deck_plugin_ids, and both writers of streamdeck.conf agree on the shared "
+"fixtures"
+msgstr ""
+"Un test d'interconnexion tient le tableau de CONTRACT.md égal aux constantes"
+" d'erplibre_home_service.py et au motif d'identifiant de plugin de "
+"deck_plugin_ids, et les deux écrivains de streamdeck.conf s'accordent sur "
+"les fixtures partagées"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r79
 msgid "An invalid CIDR is skipped with a notification"
 msgstr "Un CIDR invalide est ignoré avec une notification"
@@ -1478,6 +1579,18 @@ msgstr ""
 msgid "An open error is journaled again when it changes"
 msgstr ""
 "Une erreur d'ouverture est de nouveau inscrite au journal quand elle change"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r10
+msgid ""
+"An organisation setting in Settings › Stream Deck forces the first-pilot "
+"choice: ask the employee, the default, keep the local values or take Odoo's;"
+" locked settings are offered for confirmation under every policy"
+msgstr ""
+"Un réglage d'organisation dans Paramètres › Stream Deck force le choix du "
+"premier pilotage : demander à l'employé, par défaut, garder les valeurs "
+"locales ou prendre celles d'Odoo ; les réglages verrouillés sont proposés à "
+"confirmer sous toute politique"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r46
@@ -1526,6 +1639,17 @@ msgstr ""
 "USB_DEVICE_ATTACHED et la méta-donnée @xml/streamdeck_devices"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r48
+msgid "Anti-goal: GNOME Shell blocked during the write or the restart"
+msgstr ""
+"Anti-objectif : GNOME Shell bloqué pendant l'écriture ou le redémarrage"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r44
+msgid "Anti-goal: a configuration applied without the click of the employee"
+msgstr "Anti-objectif : une configuration appliquée sans le clic de l'employé"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r37
 msgid "Anti-goal: a report slowed down by the monitoring"
 msgstr "Anti-objectif : une remontée ralentie par la surveillance"
@@ -1539,12 +1663,39 @@ msgstr ""
 "un journal"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r45
+msgid ""
+"Anti-goal: a streamdeck.conf written halfway, or a line of the employee, a "
+"comment or an unmanaged key, lost at the write"
+msgstr ""
+"Anti-objectif : un streamdeck.conf écrit à moitié, ou une ligne de "
+"l'employé, un commentaire ou une clé non gérée, perdue à l'écriture"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r43
+msgid ""
+"Anti-goal: an Odoo, or whoever controls it, that makes a workstation run "
+"code, write an arbitrary path or turn a plugin on"
+msgstr ""
+"Anti-objectif : un Odoo, ou quiconque le contrôle, qui fait exécuter du "
+"code, écrire un chemin arbitraire ou activer un plugin sur un poste"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r34
 msgid ""
 "Anti-goal: an activity created while the Settings disable the activities"
 msgstr ""
 "Anti-objectif : une activité créée alors que les Paramètres désactivent les "
 "activités"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r47
+msgid ""
+"Anti-goal: an employee who changes a locked setting in Odoo, or reads the "
+"configuration of another employee"
+msgstr ""
+"Anti-objectif : un employé qui change un réglage verrouillé dans Odoo, ou "
+"qui lit la configuration d'un autre employé"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r40
@@ -1581,6 +1732,7 @@ msgid ""
 msgstr "Anti-objectif : un poste désinscrit ou archivé qui alerte sans fin"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r49
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r38
 msgid ""
 "Anti-goal: identifying data in the code, the data, the comments or the "
@@ -1597,6 +1749,11 @@ msgid ""
 msgstr ""
 "Anti-objectif : une donnée identifiante dans le code, les données de démo, "
 "les commentaires ou les commits"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r46
+msgid "Anti-goal: two Odoo that fight over a workstation"
+msgstr "Anti-objectif : deux Odoo qui se disputent un poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r33
@@ -1653,6 +1810,14 @@ msgstr ""
 " et historique restent visibles du gestionnaire"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r33
+msgid ""
+"At each report the pilot reads streamdeck.conf again for the local values"
+msgstr ""
+"À chaque remontée, la destination pilote relit streamdeck.conf pour les "
+"valeurs locales"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r104
 msgid ""
 "At enable, the sync repository is pulled with git pull --rebase, theirs "
@@ -1678,6 +1843,17 @@ msgid ""
 msgstr ""
 "À l'arrêt, l'application met d'abord running à faux, avant d'attendre le "
 "verrou"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r09
+msgid ""
+"At the first pilot, when free settings differ between the workstation and "
+"Odoo, the employee is asked whether to keep their local values, which become"
+" the overrides of the workstation, or to take Odoo's"
+msgstr ""
+"Au premier pilotage, quand des réglages libres diffèrent entre le poste et "
+"Odoo, l'employé choisit de garder ses valeurs locales, qui deviennent les "
+"surcharges du poste, ou de prendre celles d'Odoo"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r04
@@ -1742,6 +1918,17 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r25
 msgid "Base level gets no service"
 msgstr "Le niveau de base n'a aucun service"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r40
+msgid ""
+"Before TODO › Stream Deck changes a key that pilot.json lists as locked, one"
+" line warns that Odoo locks it for that destination and will offer it again;"
+" the change is still allowed"
+msgstr ""
+"Avant que TODO › Stream Deck change une clé que pilot.json liste comme "
+"verrouillée, une ligne prévient qu'Odoo la verrouille pour cette destination"
+" et la reproposera ; le changement reste permis"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_defects_r88
@@ -2118,6 +2305,11 @@ msgstr ""
 "Contrats 1.2 et 2.0 : la galerie n'écoute que sur 127.0.0.1, vérifie Host et"
 " Sec-Fetch-Site, et exige son en-tête sur les routes qui agissent, en-tête "
 "qu'un client sans Sec-Fetch-Site ne peut pas ajouter"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_ctl
+msgid "Control"
+msgstr "Pilotage"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r67
@@ -4065,6 +4257,32 @@ msgstr ""
 "envoie un reçoit 400 bad_request"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r25
+msgid ""
+"Odoo compares each managed key with the value it last wrote to the file: a "
+"locked key changed gives a Setting changed locally event and a new revision,"
+" a free key changed a workstation line of source local and a Local setting "
+"adopted event; before any application the first-pilot rule applies"
+msgstr ""
+"Odoo compare chaque clé gérée à la valeur qu'il a écrite en dernier dans le "
+"fichier : une clé verrouillée changée donne un événement Réglage changé "
+"localement et une nouvelle révision, une clé libre changée une ligne de "
+"poste de source local et un événement Réglage local adopté ; avant toute "
+"application, la règle du premier pilotage s'applique"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r01
+msgid ""
+"Odoo holds a desired Stream Deck configuration for each workstation: the "
+"deck program, the plugins turned off and the settings of the deck service, "
+"its session refresh delay and the games; the key layout comes with lot 3b"
+msgstr ""
+"Odoo porte une configuration souhaitée du Stream Deck pour chaque poste : le"
+" programme du deck, les plugins coupés et les réglages du service du deck, "
+"son délai de rafraîchissement de session et les jeux ; la disposition des "
+"touches vient avec le lot 3b"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r01
 msgid ""
 "Odoo keeps the history of each deck and each workstation: deck plugged and "
@@ -4260,6 +4478,24 @@ msgstr ""
 "Seul showOverLockScreen permet à un appui de touche d'allumer l'écran ; "
 "sinon un appui n'amène l'application au premier plan que sur un écran "
 "allumé, et à défaut il envoie seulement keyChanged"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r15
+msgid ""
+"Only the keys a layer sets are managed: a key no layer sets stays the "
+"employee's, locally, and Odoo never adopts it"
+msgstr ""
+"Seules les clés qu'une couche fixe sont gérées : une clé qu'aucune couche ne"
+" fixe reste à l'employé, localement, et Odoo ne l'adopte jamais"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r22
+msgid ""
+"Only the manager sets a lock, on a line of a profile, of a deck model or of "
+"a workstation"
+msgstr ""
+"Seul le gestionnaire pose un verrou, sur une ligne de profil, de modèle de "
+"deck ou de poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r06
@@ -4670,6 +4906,19 @@ msgid ""
 msgstr ""
 "Le profil plus l'outil de base le lance deux fois (sans effet) ; plus "
 "l'outil Stream Deck ajoute le niveau"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r20
+msgid ""
+"Profiles, deck models, one per USB product id and named from the known "
+"models, and lines carrying a key, a value, a lock, a source and exactly one "
+"parent among profile, deck model and workstation, one line per parent and "
+"key, each value checked by the schema of the workstation"
+msgstr ""
+"Des profils, des modèles de deck, un par identifiant produit USB et nommé "
+"d'après les modèles connus, et des lignes portant une clé, une valeur, un "
+"verrou, une source et un seul parent parmi profil, modèle de deck et poste, "
+"une ligne par parent et clé, chaque valeur vérifiée par le schéma du poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r32
@@ -5224,6 +5473,21 @@ msgstr ""
 #: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_mobplug
 msgid "Stream Deck mobile plugin"
 msgstr "Plugin mobile du Stream Deck"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r26
+msgid ""
+"Stream Deck › Configuration › Profiles and Deck models for the manager; a "
+"Configuration tab on the workstation with the profile, the effective table, "
+"the editable overrides, the state, the offered and applied revisions, the "
+"refusal reason and the pending date; the fleet filters the pending and "
+"refused configurations; in English and Canadian French"
+msgstr ""
+"Stream Deck › Configuration › Profils et Modèles de deck pour le "
+"gestionnaire ; un onglet Configuration sur le poste avec le profil, le "
+"tableau effectif, les surcharges éditables, l'état, les révisions proposée "
+"et appliquée, la raison du refus et la date d'attente ; le parc filtre les "
+"configurations en attente et refusées ; en anglais et en français canadien"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r73
@@ -5805,6 +6069,17 @@ msgstr ""
 "fichiers épars, pas en archive"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r35
+msgid ""
+"The application rewrites streamdeck.conf by the rule of write_settings: read"
+" again just before, each managed line replaced and a missing one added, "
+"every other line kept, replaced atomically with its mode kept"
+msgstr ""
+"L'application récrit streamdeck.conf selon la règle de write_settings : relu"
+" juste avant, chaque ligne gérée remplacée et une ligne absente ajoutée, "
+"toute autre ligne gardée, remplacé de façon atomique en gardant son mode"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r61
 msgid "The attribute is read from the standard output of keepassxc-cli"
 msgstr "L'attribut se lit sur la sortie standard de keepassxc-cli"
@@ -5872,6 +6147,15 @@ msgstr "Le clone reçoit le mode de l'umask, pas le 0700 de mktemp"
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r76
 msgid "The code generator's repo init keeps the streamdeck group"
 msgstr "Le repo init du générateur de code garde le groupe streamdeck"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r02
+msgid ""
+"The configuration comes from reusable profiles, from settings per deck model"
+" and from overrides per workstation"
+msgstr ""
+"La configuration vient de profils réutilisables, de réglages par modèle de "
+"deck et de surcharges par poste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r32
@@ -5959,6 +6243,18 @@ msgstr ""
 msgid "The deck program, the controller and the service never look at games/"
 msgstr ""
 "Le programme du deck, le contrôleur et le service ne regardent jamais games/"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r36
+msgid ""
+"The deck service restarts when the deck program, the plugins turned off or "
+"the session refresh delay changed and the service is running; the games "
+"alone restart nothing, and a stopped service is never started"
+msgstr ""
+"Le service du deck redémarre quand le programme du deck, les plugins coupés "
+"ou le délai de rafraîchissement de session ont changé et que le service "
+"tourne ; les jeux seuls ne redémarrent rien, et un service arrêté n'est "
+"jamais démarré"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r08
@@ -6050,6 +6346,40 @@ msgid "The editable head_sha is updated on every commit"
 msgstr "Le head_sha modifiable est mis à jour à chaque commit"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r21
+msgid ""
+"The effective configuration takes, for each key, the last layer that sets "
+"it, profile then deck model then workstation, stopping at the first layer "
+"that locks it; the deck models are those of the connected decks, by "
+"ascending USB product id, and the workstation warns when several apply"
+msgstr ""
+"La configuration effective prend, pour chaque clé, la dernière couche qui la"
+" fixe, profil puis modèle de deck puis poste, en s'arrêtant à la première "
+"couche qui la verrouille ; les modèles de deck sont ceux des decks branchés,"
+" par identifiant produit USB croissant, et le poste avertit quand plusieurs "
+"s'appliquent"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r06
+msgid ""
+"The employee confirms: the extension announces a new configuration and the "
+"employee clicks to apply it, which restarts the deck service"
+msgstr ""
+"L'employé confirme : l'extension annonce une nouvelle configuration et "
+"l'employé clique pour l'appliquer, ce qui redémarre le service du deck"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r04
+msgid ""
+"The employee sets the configuration within the manager's limits: the manager"
+" locks some settings, and the employee sets the others on their own "
+"workstations"
+msgstr ""
+"L'employé règle la configuration dans les limites du gestionnaire : le "
+"gestionnaire verrouille certains réglages, et l'employé règle les autres sur"
+" ses propres postes"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r11
 msgid "The enable-* keys of the six indicators default to true"
 msgstr "Les clés enable-* des six indicateurs valent true par défaut"
@@ -6124,6 +6454,18 @@ msgstr ""
 "suppose sans l'énoncer comme une décision."
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r07
+msgid ""
+"The extension receives the configuration with the report, applies it through"
+" the same paths as TODO › Stream Deck, the settings file and the restart of "
+"the deck service, and reports what is applied, or the refusal and its reason"
+msgstr ""
+"L'extension reçoit la configuration avec la remontée, l'applique par les "
+"mêmes chemins que TODO › Stream Deck, le fichier de réglages et le "
+"redémarrage du service du deck, et remonte ce qui est appliqué, ou le refus "
+"et sa raison"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r12
 msgid ""
 "The extension shows an Odoo inventory page in its preferences (destinations,"
@@ -6133,6 +6475,17 @@ msgstr ""
 "L'extension affiche une page Inventaire Odoo dans ses préférences "
 "(destinations, inscription, état détaillé) et une ligne d'état dans le menu "
 "du deck du panneau"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r39
+msgid ""
+"The extension writes $XDG_STATE_HOME/erplibre-home/pilot.json, mode 0600, "
+"with no secret: the label of the destination, the revision and the locked "
+"keys; ERPLibre reads it only to warn in the TODO menu"
+msgstr ""
+"L'extension écrit $XDG_STATE_HOME/erplibre-home/pilot.json, mode 0600, sans "
+"secret : le libellé de la destination, la révision et les clés verrouillées "
+"; ERPLibre le lit seulement pour avertir dans le menu TODO"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r15
@@ -6427,6 +6780,17 @@ msgstr ""
 "deck débranché et un changement d'état du service deck"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r19
+msgid ""
+"The history gains four kinds that Odoo alone writes, a workstation that "
+"sends one getting 400: Configuration applied, Configuration refused, Local "
+"setting adopted and Setting changed locally; this lot opens no activity"
+msgstr ""
+"L'historique gagne quatre sortes qu'Odoo seul écrit, un poste qui en envoie "
+"une recevant 400 : Configuration appliquée, Configuration refusée, Réglage "
+"local adopté et Réglage changé localement ; ce lot n'ouvre aucune activité"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r35
 msgid ""
 "The home screen re-renders on its own; home_period 0.0 means every pass, and"
@@ -6565,6 +6929,15 @@ msgid "The journal entry of a handle failure carries the traceback"
 msgstr "L'entrée du journal d'un échec de handle porte la trace d'appels"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r38
+msgid ""
+"The journal has one line per application, with the destination, the "
+"revision, the keys changed and the result, never a token"
+msgstr ""
+"Le journal a une ligne par application, avec la destination, la révision, "
+"les clés changées et le résultat, jamais un jeton"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r41b
 msgid "The key callback on_key takes the lock"
 msgstr "Le rappel des touches on_key prend le verrou"
@@ -6668,6 +7041,32 @@ msgstr ""
 "Les cibles make erplibre_home_uninstall_extension, erplibre_home_reload, "
 "erplibre_home_reload_clean, erplibre_home_dev_nested et "
 "erplibre_home_e2e_nested existent"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r11
+msgid ""
+"The manager marks profiles selectable; the employee picks one of them for "
+"each of their workstations, the manager assigns any profile, and a profile "
+"that is not selectable is assigned by the manager alone"
+msgstr ""
+"Le gestionnaire marque des profils au choix ; l'employé en choisit un pour "
+"chacun de ses postes, le gestionnaire assigne n'importe quel profil, et un "
+"profil qui n'est pas au choix ne s'assigne que par lui"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r23
+msgid ""
+"The manager writes everything; an employee reads the profiles of their "
+"workstations, the selectable profiles and the deck model layers, writes the "
+"lines of their own workstations whose key no layer locks, never locked nor "
+"source, and never the state fields of the configuration, which the service "
+"alone writes"
+msgstr ""
+"Le gestionnaire écrit tout ; un employé lit les profils de ses postes, les "
+"profils au choix et les couches de modèle de deck, écrit les lignes de ses "
+"propres postes dont aucune couche ne verrouille la clé, jamais locked ni "
+"source, et jamais les champs d'état de la configuration, que le service seul"
+" écrit"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r28
@@ -6931,6 +7330,15 @@ msgstr ""
 "modification, suppression et glisser-déposer"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r03
+msgid ""
+"The priority goes from the profile to the deck model, then to the "
+"workstation; a setting the manager locks is not overridden by a lower layer"
+msgstr ""
+"La priorité va du profil au modèle de deck, puis au poste ; un réglage que "
+"le gestionnaire verrouille ne se surcharge pas plus bas"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r46
 msgid ""
 "The product's installers and tests take the name erplibre_home "
@@ -7032,11 +7440,47 @@ msgstr ""
 "avec une ligne de journal."
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r29
+msgid ""
+"The reply of a piloted workstation carries config: its revision, the "
+"fingerprint, Odoo's settings, the locked keys, and ask while the first-pilot"
+" question stands"
+msgstr ""
+"La réponse d'un poste piloté porte config : sa révision, l'empreinte, les "
+"réglages d'Odoo, les clés verrouillées, et ask tant que la question du "
+"premier pilotage tient"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r28
+msgid ""
+"The report body carries config: pilot, the applied revision, the local "
+"values read from streamdeck.conf as the settings library reads them, a value"
+" missing or invalid going up null, the result and the first-pilot choice; a "
+"destination that is not the pilot sends only pilot false and gets nothing"
+msgstr ""
+"Le corps de la remontée porte config : pilot, la révision appliquée, les "
+"valeurs locales lues dans streamdeck.conf comme la bibliothèque de réglages "
+"les lit, une valeur absente ou invalide remontant null, le résultat et le "
+"choix du premier pilotage ; une destination qui n'est pas pilote n'envoie "
+"que pilot false et ne reçoit rien"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r54
 msgid "The repository's home button orders 10 to 90 reproduce the home row"
 msgstr ""
 "Les ordres 10 à 90 des boutons d'accueil du dépôt reproduisent la rangée "
 "d'accueil"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r42
+msgid ""
+"The requirements of the control live in the registry, domain Control, apart "
+"from the inventory and the monitoring, each done one with the tests that "
+"prove it"
+msgstr ""
+"Les requis du pilotage vivent dans le registre, domaine Pilotage, à part de "
+"l'inventaire et de la surveillance, chacun de ceux qui sont faits avec les "
+"tests qui le prouvent"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r13
@@ -7056,6 +7500,29 @@ msgstr ""
 "Les requis de la surveillance vivent dans le registre, domaine Surveillance,"
 " à part de l'inventaire, chacun de ceux qui sont faits avec les tests qui le"
 " prouvent"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r37
+msgid ""
+"The result of an application goes to Odoo in a report sent at once, refused "
+"with invalid:<key>, write_failed, restart_failed or unit_missing, the last "
+"when the program changed with no deck unit installed, the file then written"
+msgstr ""
+"Le résultat d'une application part vers Odoo dans une remontée envoyée "
+"aussitôt, refusé avec invalid:<clé>, write_failed, restart_failed ou "
+"unit_missing, ce dernier quand le programme a changé sans unité de deck "
+"installée, le fichier alors écrit"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r16
+msgid ""
+"The revision is computed at the report: Odoo takes a SHA-256 fingerprint of "
+"the canonical JSON of the effective configuration and moves the revision of "
+"the workstation when it changes, with no trigger on the layers"
+msgstr ""
+"La révision se calcule à la remontée : Odoo prend une empreinte SHA-256 du "
+"JSON canonique de la configuration effective et avance la révision du poste "
+"quand elle change, sans déclencheur sur les couches"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r73
@@ -7090,6 +7557,19 @@ msgstr ""
 "L'identifiant de schéma org.gnome.shell.extensions.erplibre-home, le chemin "
 "dconf /org/gnome/shell/extensions/erplibre-home/, le nom du fichier de "
 "schéma et le settings-schema de metadata.json concordent"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r13
+msgid ""
+"The settings Odoo sets are a closed list, the same on both sides of the "
+"wire, written in CONTRACT.md of the extension and held by tests in the three"
+" repositories: no path, no environment variable, no command, no plugin to "
+"turn on"
+msgstr ""
+"Les réglages qu'Odoo fixe forment une liste fermée, la même des deux côtés "
+"du fil, écrite dans CONTRACT.md de l'extension et tenue par des tests dans "
+"les trois dépôts : aucun chemin, aucune variable d'environnement, aucune "
+"commande, aucun plugin à activer"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r69
@@ -7312,6 +7792,17 @@ msgstr ""
 "de venv ; le python3 du système exécute la migration"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r27
+msgid ""
+"The wire moves to protocol 1.1 and the contract of the extension to 1.3, "
+"MINOR versions: Odoo still accepts a report in 1.0, and the contract file of"
+" ERPLibre holds 1.3"
+msgstr ""
+"Le fil passe au protocole 1.1 et le contrat de l'extension à 1.3, des "
+"versions MINOR : Odoo accepte encore une remontée en 1.0, et le fichier de "
+"contrat d'ERPLibre porte 1.3"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r27
 msgid ""
 "The workstation and deck forms show their thread and activities, the fleet "
@@ -7321,6 +7812,17 @@ msgstr ""
 "Les fiches poste et deck montrent leur fil et leurs activités, le parc "
 "montre Muet depuis et filtre les postes muets, et l'historique nomme chaque "
 "événement par son libellé et filtre dessus"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r14
+msgid ""
+"The workstation checks every value against the schema before it writes; a "
+"value outside it refuses the whole revision with the reason invalid:<key>, "
+"and nothing is half written"
+msgstr ""
+"Le poste vérifie chaque valeur contre le schéma avant d'écrire ; une valeur "
+"hors du schéma refuse toute la révision avec la raison invalid:<clé>, et "
+"rien n'est écrit à moitié"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r19
@@ -7726,6 +8228,15 @@ msgstr "Sans touche enregistrée, tout le deck affiche le flash"
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r77
 msgid "With no network, the dropdown shows '(no network detected)'"
 msgstr "Sans réseau, le menu déroulant affiche '(no network detected)'"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r08
+msgid ""
+"With several Odoo, the destination checked Pilot in the preferences pilots "
+"the workstation; no destination is the pilot by default"
+msgstr ""
+"Avec plusieurs Odoo, la destination cochée Pilote dans les préférences "
+"pilote le poste ; aucune destination n'est pilote par défaut"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r39
@@ -8830,6 +9341,17 @@ msgid ""
 msgstr ""
 "started_ms lit le champ 22 après la dernière « ) » de /proc/<pid>/stat et "
 "rend None quand le processus a disparu"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r30
+msgid ""
+"state.deck_plugins lists the ids of the plugins on disk, those of the "
+"checkout and of the plugin directory of the user, at most 128 ids of the "
+"plugin pattern, which the workstation form shows"
+msgstr ""
+"state.deck_plugins liste les identifiants des plugins sur disque, ceux du "
+"checkout et du répertoire de plugins de l'utilisateur, au plus 128 "
+"identifiants du motif de plugin, que le formulaire du poste montre"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r38

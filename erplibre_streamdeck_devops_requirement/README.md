@@ -6,12 +6,13 @@ The requirements of the ERPLibre Stream Deck — the deck programs, the GNOME
 extension ERPLibre Home, its installation, the games and the mobile plugin —
 as `devops.requirement` records, each with the repository tests that prove
 it. They come from the audit of the Stream Deck design specifications, row
-by row, and from the designs of the Odoo inventory and of its monitoring,
-and live here instead of in a document.
+by row, and from the designs of the Odoo inventory, of its monitoring and
+of its control of the deck settings, and live here instead of in a
+document.
 
 The module depends on `erplibre_streamdeck` and `erplibre_devops_requirement`,
 and adds no model, no view and no menu: the requirements show in the
-Requirements application, under twelve domains whose code starts with
+Requirements application, under thirteen domains whose code starts with
 `sd_`.
 
 ## What the data holds
@@ -101,6 +102,23 @@ of the files `test_streamdeck_monitor*.py` and `test_streamdeck_settings.py`
 of `erplibre_streamdeck` proves at least one requirement, that the
 requirements still to do are exactly those it names, and that none is done
 while one it depends on is not.
+
+## The Control domain
+
+The domain *Control* (`sd_ctl`, file `data/requirement_control.xml`) holds
+the requirements of the control of the deck settings by Odoo, the settings
+part of the third lot: one per user decision, design choice and anti-goal
+of its design, coded `SD-CTL-R<nn>`. Its proofs are Odoo tests of
+`erplibre_streamdeck`, Node tests of the extension and unit tests of
+ERPLibre, since the configuration crosses the three repositories. The key
+layout, the second part of the lot, adds its requirements after these.
+
+The test `tests/test_requirement_control.py` checks that each proof names
+a test that exists, under the same rules as the inventory; that each test
+of the files `test_streamdeck_config*.py` of `erplibre_streamdeck` proves
+at least one requirement; that the tests holding the review points of the
+lot are cited; and that the requirements still to do are exactly those it
+names.
 
 ## Proofs and verdicts
 

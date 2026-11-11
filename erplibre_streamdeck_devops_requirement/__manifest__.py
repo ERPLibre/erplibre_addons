@@ -24,6 +24,7 @@
         "data/devops_requirement_test.xml",
         "data/requirement_inventory.xml",
         "data/requirement_monitoring.xml",
+        "data/requirement_control.xml",
     ],
     "installable": True,
 }
