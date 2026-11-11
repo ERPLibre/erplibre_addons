@@ -1058,3 +1058,34 @@ class TestStreamdeckMonitor(TransactionCase):
         self.assertEqual(readable, notes[self.workstation_a])
         with self.assertRaises(AccessError):
             notes[self.workstation_b].with_user(self.user_a).read(["body"])
+
+    # -- final review round ----------------------------------------------
+
+    def test_a_type_from_the_context_forges_no_monitoring_activity(self):
+        # Le type d'une activité vient de ses valeurs, de la clé de
+        # contexte default_activity_type_id ou du défaut du modèle : le
+        # refus porte sur l'activité créée, quelle que soit la voie. Sans
+        # lui, l'activité de A tiendrait la place de celle de M, qui ne
+        # recevrait rien pour le silence.
+        self._enable()
+        silent = self.env.ref(TYPES["silent"])
+        Activity = self.Activity.with_user(self.user_a).with_context(
+            default_activity_type_id=silent.id
+        )
+        values = {
+            "res_model_id": self.env["ir.model"]._get_id(
+                "streamdeck.workstation"
+            ),
+            "res_id": self.workstation_a.id,
+            "user_id": self.manager.id,
+            "summary": "probe",
+        }
+        with self.assertRaises(AccessError):
+            Activity.create(values)
+        self.assertFalse(self._activities(self.workstation_a, active=None))
+        self._report(self.token_a, T0)
+        self._cron(T0 + 61 * MIN)
+        self.assertRecordValues(
+            self._activities(self.workstation_a, "silent"),
+            [{"user_id": self.manager.id, "automated": True}],
+        )
