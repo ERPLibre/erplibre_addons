@@ -362,7 +362,98 @@ class TestStreamdeckConfigWire(HttpCase):
             )
         )
 
+    def test_a_refused_result_sent_again_is_recorded_once(self):
+        # L'extension renvoie son résultat tant qu'une remontée n'a pas eu
+        # sa réponse : la même raison ne fait qu'un événement.
+        workstation, token = self._workstation()
+        revision = self._report(token, self._pilot())["config"]["revision"]
+        refused = self._result(revision, "refused", "restart_failed")
+        for _attempt in range(2):
+            self._report(token, self._pilot(self._settings(), result=refused))
+        self.assertEqual(workstation.config_state, "refused")
+        self.assertEqual(len(self._events(workstation, "config_refused")), 1)
+
+    def test_a_result_without_an_offered_revision_is_ignored(self):
+        # Jamais offerte, ou retirée depuis : aucune révision n'attend de
+        # résultat.
+        never, token = self._workstation()
+        never.config_profile_id = False
+        refused = self._result(0, "refused", "write_failed")
+        self._report(token, self._pilot(result=refused))
+        withdrawn, token = self._workstation()
+        revision = self._report(token, self._pilot())["config"]["revision"]
+        withdrawn.config_profile_id = False
+        self._report(token, self._pilot())
+        result = self._result(revision)
+        self._report(token, self._pilot(self._settings(), revision, result))
+        for workstation in (never, withdrawn):
+            self.assertEqual(workstation.config_state, "unmanaged")
+            self.assertFalse(workstation.config_reason)
+            self.assertFalse(workstation.config_applied_revision)
+        self.assertFalse(
+            self.Event.search(
+                [
+                    ("workstation_id", "in", (never | withdrawn).ids),
+                    ("kind", "in", CONFIG_KINDS),
+                ]
+            )
+        )
+
+    def test_a_result_dated_ahead_is_dated_when_received(self):
+        workstation, token = self._workstation()
+        revision = self._report(token, self._pilot())["config"]["revision"]
+        result = dict(self._result(revision), at="2999-01-01T00:00:00Z")
+        self._report(token, self._pilot(self._settings(), revision, result))
+        event = self._events(workstation, "config_applied")
+        self.assertEqual(len(event), 1)
+        self.assertEqual(event.at, event.received_at)
+
+    def test_a_configuration_withdrawn_then_restored_gets_a_new_revision(
+        self,
+    ):
+        workstation, token = self._workstation()
+        revision = self._applied(token, workstation)
+        workstation.config_profile_id = False
+        body = self._report(token, self._pilot(self._settings(), revision))
+        self.assertNotIn("config", body)
+        self.assertEqual(workstation.config_state, "unmanaged")
+        # Les mêmes valeurs revenues : une révision neuve, à confirmer.
+        workstation.config_profile_id = self.profile
+        body = self._report(token, self._pilot(self._settings(), revision))
+        self.assertEqual(body["config"]["revision"], revision + 1)
+        self.assertEqual(body["config"]["settings"], self._settings())
+        self.assertEqual(workstation.config_state, "pending")
+
     # -- local changes ---------------------------------------------------
+
+    def test_a_key_added_after_the_applied_revision_is_offered(self):
+        # La révision appliquée ne fixait pas la clé : sa valeur locale n'a
+        # pas de référence, ni adoptée ni écart.
+        workstation, token = self._workstation()
+        revision = self._applied(token, workstation)
+        self.Line.create(
+            {
+                "workstation_id": workstation.id,
+                "key": "session_refresh_sec",
+                "value": "2",
+            }
+        )
+        local = self._settings(session_refresh_sec=5)
+        body = self._report(token, self._pilot(local, revision))
+        self.assertEqual(body["config"]["revision"], revision + 1)
+        self.assertEqual(
+            body["config"]["settings"], self._settings(session_refresh_sec=2)
+        )
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertEqual(len(workstation.config_line_ids), 1)
+        self.assertFalse(
+            self.Event.search(
+                [
+                    ("workstation_id", "=", workstation.id),
+                    ("kind", "in", ("config_adopted", "config_drift")),
+                ]
+            )
+        )
 
     def test_a_locked_local_change_is_reoffered_as_drift(self):
         workstation, token = self._workstation()
