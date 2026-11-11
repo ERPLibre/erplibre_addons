@@ -112,6 +112,67 @@
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
+    <!-- La configuration voulue : l'employé lit les profils « au choix »
+         et ceux de ses postes ; les couches modèle de deck n'ont pas de
+         règle, elles ne portent rien de personnel. -->
+    <record id="rule_streamdeck_config_profile_user" model="ir.rule">
+        <field name="name">Stream Deck config profile: selectable and own</field>
+        <field name="model_id" ref="model_streamdeck_config_profile"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|',
+            ('selectable', '=', True),
+            ('workstation_ids.user_id', '=', user.id),
+        ]</field>
+    </record>
+
+    <!-- Une ligne se lit avec sa couche : celle d'un poste de l'employé,
+         d'un modèle de deck, ou d'un profil qu'il lit. -->
+    <record id="rule_streamdeck_config_line_user_read" model="ir.rule">
+        <field name="name">Stream Deck config line: readable layers</field>
+        <field name="model_id" ref="model_streamdeck_config_line"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('model_id', '!=', False),
+            ('profile_id.selectable', '=', True),
+            ('profile_id.workstation_ids.user_id', '=', user.id),
+        ]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- L'employé écrit les lignes de ses postes seulement ; les clés
+         verrouillées, `locked` et `source` sont gardés par le modèle
+         (streamdeck.config.line). -->
+    <record id="rule_streamdeck_config_line_user_write" model="ir.rule">
+        <field name="name">Stream Deck config line: own workstations</field>
+        <field name="model_id" ref="model_streamdeck_config_line"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[('workstation_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_streamdeck_config_profile_manager" model="ir.rule">
+        <field name="name">Stream Deck config profile: all</field>
+        <field name="model_id" ref="model_streamdeck_config_profile"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_config_line_manager" model="ir.rule">
+        <field name="name">Stream Deck config line: all</field>
+        <field name="model_id" ref="model_streamdeck_config_line"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <!-- L'assistant d'appairage porte un code valide : une règle globale
          le réserve à l'utilisateur qui l'a créé, gestionnaire compris. -->
     <record id="rule_streamdeck_pairing_wizard_own" model="ir.rule">

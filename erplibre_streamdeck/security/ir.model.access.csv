@@ -5,3 +5,8 @@ access_streamdeck_event_user,streamdeck.event user,model_streamdeck_event,group_
 access_streamdeck_device_holding_none,streamdeck.device.holding nobody,model_streamdeck_device_holding,,0,0,0,0
 access_streamdeck_pairing_code_none,streamdeck.pairing.code nobody,model_streamdeck_pairing_code,,0,0,0,0
 access_streamdeck_pairing_wizard_user,streamdeck.pairing.wizard user,model_streamdeck_pairing_wizard,group_streamdeck_user,1,1,1,0
+access_streamdeck_config_profile_user,streamdeck.config.profile user,model_streamdeck_config_profile,group_streamdeck_user,1,0,0,0
+access_streamdeck_config_profile_manager,streamdeck.config.profile manager,model_streamdeck_config_profile,group_streamdeck_manager,1,1,1,1
+access_streamdeck_config_model_user,streamdeck.config.model user,model_streamdeck_config_model,group_streamdeck_user,1,0,0,0
+access_streamdeck_config_model_manager,streamdeck.config.model manager,model_streamdeck_config_model,group_streamdeck_manager,1,1,1,1
+access_streamdeck_config_line_user,streamdeck.config.line user,model_streamdeck_config_line,group_streamdeck_user,1,1,1,1
