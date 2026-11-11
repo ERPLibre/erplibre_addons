@@ -350,6 +350,30 @@ class TestStreamdeckConfigAccess(TransactionCase):
             ws.write({"config_profile_id": False})
         self.assertEqual(self.ws_a.config_profile_id, self.selectable)
 
+    def test_an_employee_cannot_pick_an_archived_profile(self):
+        # Un profil archivé ne compte plus comme couche : le choisir
+        # reviendrait à vider le profil, et ses verrous avec.
+        Schema = self.env["streamdeck.config.schema"]
+        self._line(
+            {
+                "profile_id": self.selectable.id,
+                "key": "plugins_off",
+                "value": "sound",
+                "locked": True,
+            }
+        )
+        archived = self.Profile.create(
+            {"name": "Archived", "selectable": True, "active": False}
+        )
+        ws = self.ws_a.with_user(self.user_a)
+        ws.write({"config_profile_id": self.selectable.id})
+        before = Schema._effective(self.ws_a)
+        self.assertEqual(before["locked"], ["plugins_off"])
+        with self.assertRaises(AccessError):
+            ws.write({"config_profile_id": archived.id})
+        self.assertEqual(self.ws_a.config_profile_id, self.selectable)
+        self.assertEqual(Schema._effective(self.ws_a), before)
+
     def test_an_employee_cannot_pick_for_another_workstation(self):
         self.ws_b.config_profile_id = self.selectable
         with self.assertRaises(AccessError):
