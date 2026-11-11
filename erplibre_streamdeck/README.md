@@ -119,17 +119,19 @@ beyond the delay goes silent, then is heard again at its next report.
 | Deck service failed | *Deck service failed*, on the workstation | the service has stayed `failed` for its delay | by itself, at the report that carries another state |
 | Workstation silent | *Workstation silent*, on the workstation | the workstation goes silent | by itself, at its next report |
 | Deck unplugged for long | *Deck unplugged for long*, on the deck | the deck has been unplugged for its delay, counted from its last sighting or its last `unplugged` event, whichever is later | by itself, at the report that shows it plugged in |
-| Deck changed workstation | *Deck changed workstation*, on the deck | at the report that moves the deck | by a person; a new move adds a note to the open activity, whoever it is assigned to |
+| Deck changed workstation | *Deck changed workstation*, on the deck | at the report that moves the deck | by a person; while one is open, whoever it is assigned to, a new move opens none and posts a note to the deck's thread |
 
 - **Recipient.** *Employee*: the employee of the workstation, or of the
   workstation that holds the deck; for a move, the new holder, the lender
   reads the move in the history. *Manager*, the default: the user named
   in the Settings. *Employee and manager*: one activity for each.
 - **Never a duplicate.** A record has at most one open activity of a type
-  per assigned user, and a deck one open *Deck changed workstation*
-  activity. A *Deck service failed* or *Deck unplugged for long*
-  activity marked done while its problem lasts opens again at the next
-  run of the cron; a silence opens its activity once.
+  per assigned user. A deck with an open *Deck changed workstation*
+  activity opens no other at a new move, even for another holder: the
+  move is posted as a note to the deck's thread. A *Deck service
+  failed* or *Deck unplugged for long* activity marked done while its
+  problem lasts opens again at the next run of the cron; a silence opens
+  its activity once.
 - **Closing.** A closed activity stays done, with the feedback « Resolved
   at <time>: <what happened> », the time in the time zone of the assigned
   user (UTC without one) and the text in their language. Archiving a
