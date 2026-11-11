@@ -6,6 +6,7 @@ from unittest.mock import patch
 from freezegun import freeze_time
 
 from odoo.exceptions import AccessError
+from odoo.sql_db import Cursor
 from odoo.tests.common import TransactionCase, new_test_user, tagged
 
 MANAGER_GROUP = "erplibre_streamdeck.group_streamdeck_manager"
@@ -181,6 +182,34 @@ class TestStreamdeckMonitor(TransactionCase):
             ]
         )
 
+    def _solved_after_the_read(self, record, query, params):
+        """Un contexte où le cron lit ses candidats comme d'habitude, puis,
+        si `record` en est, `query` écrit sa ligne : une remontée écrite
+        par une autre transaction entre la lecture du cron et son
+        écriture, qui ne repasse pas par le cache de celle-ci."""
+        monitor = type(self.Monitor)
+        read = monitor._candidates
+        env = self.env
+
+        def candidates(self, model, domain):
+            found = read(self, model, domain)
+            if model == record._name and record.id in found.ids:
+                env.flush_all()
+                env.cr.execute(query, params)
+            return found
+
+        return patch.object(monitor, "_candidates", candidates)
+
+    def _ctid(self, record):
+        """L'emplacement de la ligne de `record`, qui change à chaque
+        écriture de la ligne."""
+        self.env.flush_all()
+        self.env.cr.execute(
+            "SELECT ctid::text FROM %s WHERE id = %%s" % record._table,
+            (record.id,),
+        )
+        return self.env.cr.fetchone()[0]
+
     def _unplug(self, token, moment, deck=DECK, service_state="active"):
         """Le poste remonte le deck, puis, un quart d'heure plus tard, son
         débranchement daté de cinq minutes avant : rend l'heure du
@@ -355,21 +384,11 @@ class TestStreamdeckMonitor(TransactionCase):
         self._report(self.token_a, T0)
         workstation = self.workstation_a
         self.assertEqual(workstation.last_report, T0)
-
-        def candidates(monitor, domain):
-            # La lecture du cron, faite avant la remontée ; la remontée,
-            # écrite par une autre transaction, ne repasse pas par le
-            # cache de celle-ci.
-            self.env.flush_all()
-            self.env.cr.execute(
-                "UPDATE streamdeck_workstation SET last_report = %s"
-                " WHERE id = %s",
-                (T0 + 60 * MIN, workstation.id),
-            )
-            return workstation
-
-        with patch.object(
-            type(self.Monitor), "_silent_candidates", candidates
+        with self._solved_after_the_read(
+            workstation,
+            "UPDATE streamdeck_workstation SET last_report = %s"
+            " WHERE id = %s",
+            (T0 + 60 * MIN, workstation.id),
         ):
             self._cron(T0 + 61 * MIN)
         workstation.invalidate_recordset()
@@ -690,3 +709,88 @@ class TestStreamdeckMonitor(TransactionCase):
         self.assertEqual(
             len(self._activities(self.workstation_a, "silent")), 1
         )
+
+    # -- review round ----------------------------------------------------
+
+    def test_a_problem_solved_since_the_cron_read_opens_nothing(self):
+        # Comme pour le silence : une remontée qui règle le problème entre
+        # la lecture du cron et son écriture (service reparti, deck
+        # rebranché) ne laisse pas derrière elle une activité que plus
+        # rien ne fermerait. Le poste B, que rien ne règle, sert de témoin.
+        self._enable()
+        for token, deck in ((self.token_a, DECK), (self.token_b, OTHER_DECK)):
+            self._unplug(token, T0, deck=deck, service_state="failed")
+        workstation, device = self.workstation_a, self._device(DECK)
+        with self._solved_after_the_read(
+            workstation,
+            "UPDATE streamdeck_workstation SET service_state = 'active',"
+            " service_state_since = %s WHERE id = %s",
+            (T0 + 20 * MIN, workstation.id),
+        ):
+            self._cron(T0 + 30 * MIN)
+        self.assertFalse(self._activities(workstation, "service_failed"))
+        self.assertEqual(
+            len(self._activities(self.workstation_b, "service_failed")), 1
+        )
+        with self._solved_after_the_read(
+            device,
+            "UPDATE streamdeck_device SET connected = TRUE, last_seen = %s"
+            " WHERE id = %s",
+            (T0 + 73 * HOUR, device.id),
+        ):
+            self._cron(T0 + 73 * HOUR)
+        self.assertFalse(self._activities(device, "unplugged"))
+        self.assertEqual(
+            len(self._activities(self._device(OTHER_DECK), "unplugged")), 1
+        )
+
+    def test_the_cron_writes_the_row_it_opens_an_activity_on(self):
+        # Le verrou seul laisse une remontée qui l'attendait poursuivre
+        # avec une image de la base antérieure à l'activité, qu'elle ne
+        # fermerait pas ; la ligne réécrite la fait échouer, puis rejouer
+        # avec une image qui voit l'activité. Rien n'est réécrit quand
+        # rien ne s'ouvre.
+        self._enable()
+        self._unplug(self.token_a, T0, service_state="failed")
+        # Une remontée récente : le poste n'est pas muet, le cron n'écrit
+        # pas `silent_since`.
+        self._report(
+            self.token_a, T0 + 73 * HOUR - 5 * MIN, service_state="failed"
+        )
+        records = (self.workstation_a, self._device())
+        before = [self._ctid(record) for record in records]
+        self._cron(T0 + 73 * HOUR)
+        self.assertEqual(
+            len(self._activities(self.workstation_a, "service_failed")), 1
+        )
+        self.assertEqual(len(self._activities(self._device(), "unplugged")), 1)
+        after = [self._ctid(record) for record in records]
+        for record, old, new in zip(records, before, after):
+            with self.subTest(model=record._name):
+                self.assertNotEqual(old, new)
+        self._cron(T0 + 73 * HOUR + 5 * MIN)
+        self.assertEqual([self._ctid(record) for record in records], after)
+
+    def test_a_skipped_lock_writes_no_error_to_the_log(self):
+        # Une remontée qui tient la ligne, ou l'a changée depuis l'image du
+        # cron : le cron passe ce poste, c'est prévu, et n'écrit aucune
+        # erreur SQL au journal du serveur.
+        self._report(self.token_a, T0)
+        execute = Cursor.execute
+        for code in ("lock_not_available", "serialization_failure"):
+
+            def refused(cr, query, params=None, log_exceptions=True):
+                if "FOR UPDATE NOWAIT" in getattr(query, "code", str(query)):
+                    query = (
+                        "DO $$ BEGIN RAISE EXCEPTION 'busy'"
+                        " USING ERRCODE = '%s'; END $$" % code
+                    )
+                return execute(cr, query, params, log_exceptions)
+
+            with self.subTest(code=code):
+                with patch.object(Cursor, "execute", refused):
+                    with self.assertNoLogs("odoo.sql_db", "ERROR"):
+                        self._cron(T0 + 61 * MIN)
+                self.assertFalse(self.workstation_a.silent_since)
+        self._cron(T0 + 61 * MIN)
+        self.assertTrue(self.workstation_a.silent_since)
