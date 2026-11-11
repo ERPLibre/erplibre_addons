@@ -1242,9 +1242,10 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r10
 msgid ""
-"An organisation setting in Settings › Stream Deck forces the first-pilot "
-"choice: ask the employee, the default, keep the local values or take Odoo's;"
-" locked settings are offered for confirmation under every policy"
+"An organisation setting in Settings › Stream Deck lets the manager force the"
+" first-pilot choice: ask the employee, the default, keep the local values or"
+" take Odoo's; locked settings are offered for confirmation under every "
+"policy"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
