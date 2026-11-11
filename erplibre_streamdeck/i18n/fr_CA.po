@@ -239,6 +239,12 @@ msgid "Close"
 msgstr "Fermer"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_mail__streamdeck_activity_created
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_message__streamdeck_activity_created
+msgid "Closed activity created on"
+msgstr "Création de l'activité fermée"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__code
 msgid "Code"
 msgstr "Code"
@@ -474,6 +480,16 @@ msgstr "Abonnés (Partenaires)"
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_mail_mail__streamdeck_activity_created
+#: model:ir.model.fields,help:erplibre_streamdeck.field_mail_message__streamdeck_activity_created
+msgid ""
+"For the message that closes an activity of a deck, the creation of that "
+"activity, which bounds who reads it."
+msgstr ""
+"Pour le message qui ferme une activité d'un deck, la création de cette "
+"activité, qui borne qui le lit."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_ir_attachment__streamdeck_visible_to_me
