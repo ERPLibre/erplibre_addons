@@ -55,10 +55,6 @@ DECISIONS = ("SD-MON-R07",)
 # Les requis encore à faire : chacun décrit son écart dans Ce qui manque,
 # et le passer à fait passe par cette liste.
 TO_DO = (
-    "SD-MON-R05",
-    "SD-MON-R17",
-    "SD-MON-R18",
-    "SD-MON-R19",
     "SD-MON-R23",
     "SD-MON-R38",
 )
