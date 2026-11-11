@@ -336,6 +336,11 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r03
+msgid "A cron detects the silent workstations"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r05
 msgid "A dashboard tap opens what the key showed at the last render"
 msgstr ""
@@ -359,6 +364,13 @@ msgid ""
 "A deck program in a game holds the lock through the inherited fd; one with "
 "closed fds runs under the game ancestor and takes the lock over when the "
 "game releases it"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r13
+msgid ""
+"A deck unplugged for long writes no event of its own: the unplugged event "
+"already dates it, and only the activity comes from the delay"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -397,6 +409,14 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r18
 msgid "A failed archive fetch raises BundleNotShippedError(slug)"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r16
+msgid ""
+"A failed deck service and a silent workstation open their activity on the "
+"workstation, a deck unplugged for long and a deck that changed workstation "
+"on the deck; both carry a thread and activities"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -597,6 +617,13 @@ msgstr ""
 msgid ""
 "A local instance's sub-menu offers the KeePassXC actions configured through "
 "Edit instance"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r07
+msgid ""
+"A locked workstation is accepted as silent: it goes silent after the delay "
+"and is heard again at unlock, like a workstation off for the night"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -872,6 +899,15 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r20
+msgid ""
+"A solved activity closes with action_feedback, kept done, the feedback "
+"\"Resolved at <time>: <what happened>\" in the language of its user and the "
+"time in their time zone, UTC without one; a deck service that leaves failed "
+"for any other state closes it, naming the new state"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r26
 msgid ""
 "A store that returns True asks for one render; a pass renders at most once"
@@ -916,6 +952,14 @@ msgid ""
 "A workstation is identified by an HMAC-SHA256 of /etc/machine-id keyed by "
 "the Linux user and the destination's URL and database: two Odoo cannot match"
 " it, the raw id never leaves it"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r04
+msgid ""
+"A workstation is silent after one hour without a report, a delay set in the "
+"Settings; a workstation off for the night goes silent every evening and is "
+"heard again at its first report"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -1031,6 +1075,32 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r23
+msgid ""
+"An activity and a thread are read with their record: an employee reads those"
+" of their workstations and of the decks they read, a deck's from their first"
+" holding on, never those of another employee's workstation; only a Stream "
+"Deck manager modifies or deletes what others posted on a workstation"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r06
+msgid ""
+"An activity closes by itself, with \"Resolved at <time>\" in its thread, "
+"once its problem is solved: deck service running again, workstation heard "
+"again, deck plugged in again; never two open activities for one problem"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r21
+msgid ""
+"An archived workstation and a workstation without token never go silent; "
+"archiving it, the departure of its employee, unenrolling it or revoking its "
+"token closes its open activities, with \"archived\" or \"unenrolled\", and "
+"clears its silent mark"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_deploy_r04
 msgid ""
 "An automatic login on the user's machine would open the session without a "
@@ -1042,6 +1112,15 @@ msgstr ""
 msgid ""
 "An employee gets a pairing code in Odoo from Stream Deck › My workstations ›"
 " Add a workstation"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r10
+msgid ""
+"An employee reads the events of a deck from the time they first held it: the"
+" first holder reads them all, a lender keeps all those from their holding "
+"on, those at the borrower included, and a borrower reads none from before "
+"their arrival; the manager reads them all"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -1123,9 +1202,20 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r37
+msgid "Anti-goal: a report slowed down by the monitoring"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r39
 msgid ""
 "Anti-goal: a secret in clear on the workstation, in its settings or in a log"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r34
+msgid ""
+"Anti-goal: an activity created while the Settings disable the activities"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -1137,6 +1227,13 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r36
+msgid ""
+"Anti-goal: an employee who sees the activities or the thread of another "
+"employee's workstation"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r41
 msgid ""
 "Anti-goal: an extension that slows GNOME Shell down when Odoo is slow or "
@@ -1144,10 +1241,30 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r35
+msgid ""
+"Anti-goal: an unenrolled or archived workstation that alerts without end"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r38
+msgid ""
+"Anti-goal: identifying data in the code, the data, the comments or the "
+"commits"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r42
 msgid ""
 "Anti-goal: identifying data in the code, the demo data, the comments or the "
 "commits"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r33
+msgid ""
+"Anti-goal: two open activities for one problem, on the same record, of the "
+"same type, for the same user"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -1912,6 +2029,14 @@ msgid "Each poll keeps its own time stamp"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r17
+msgid ""
+"Each problem has its own activity type, four noupdate types that serve as "
+"the key against duplicates and filter My activities by problem; only the "
+"monitoring opens activities of these types"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r93
 msgid "Each reference file names its inputs"
 msgstr ""
@@ -1940,6 +2065,15 @@ msgstr ""
 msgid ""
 "Enabled means ACTIVE in a running session: GetExtensionInfo state 1 and "
 "empty error; enabled-extensions alone is not enough"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r19
+msgid ""
+"Enabling the activities for the manager or for both needs a named manager, "
+"chosen among the Stream Deck managers; a manager archived since gets "
+"nothing, a warning without name is logged, and the employee part is still "
+"created"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -2316,6 +2450,14 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r25
+msgid ""
+"History always runs: the events Workstation silent and Workstation heard "
+"again are written whatever the Settings say; only the activities depend on "
+"them"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r53
 msgid ""
 "Home buttons fill row 0 by order, overflow to row 1 when the deck has 3 rows"
@@ -2675,6 +2817,11 @@ msgid "Mobile code bundle"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_mon
+msgid "Monitoring"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r81
 msgid ""
 "Moving the games to their own repository changes no game, no behaviour of "
@@ -2803,6 +2950,35 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mon_r31
+msgid ""
+"Non-goal of the monitoring: Odoo never opens a connection to the "
+"workstation; driving the workstation comes with a later lot."
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mon_r32
+msgid ""
+"Non-goal of the monitoring: Odoo watches the deck service, the reports and "
+"the connection of the deck, not the device itself."
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mon_r29
+msgid ""
+"Non-goal of the monitoring: a problem reaches people as an Odoo activity and"
+" in the history only; the notice Odoo itself sends to the user of a new "
+"activity follows their notification preference."
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_mon_r30
+msgid ""
+"Non-goal of the monitoring: the Settings are global, one set of boxes and "
+"delays for the whole fleet."
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r73
 msgid "Non-goal: Bluetooth control, which belongs to a separate plugin"
 msgstr ""
@@ -2839,6 +3015,13 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r29
+msgid ""
+"Non-goal: an email, a push notification or any message outside the Odoo "
+"activities"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r74
 msgid "Non-goal: animations as a plugin feature"
 msgstr ""
@@ -2849,9 +3032,21 @@ msgid "Non-goal: any configuration pushed from Odoo to the workstation"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r31
+msgid "Non-goal: any driving of the workstation from Odoo"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r72
 msgid ""
 "Non-goal: desktop-only features (tiling D-Bus, wpctl, gnome-shell reload)"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r32
+msgid ""
+"Non-goal: monitoring the health of the deck hardware, its firmware or its "
+"keys"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -2948,6 +3143,11 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r30
+msgid "Non-goal: thresholds per workstation or per employee"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r56
 msgid ""
 "Non-goals: no LFS, no submodules, no signed commits, no online conflict "
@@ -2968,6 +3168,21 @@ msgid ""
 "Notice says why: lock holder (exit 2), no visual deck (exit 3), the --check "
 "line for Result=exec-condition or the unmet condition with its three causes,"
 " or the state/status of a failed or auto-restart(-queued) program"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r12
+msgid ""
+"Odoo alone writes the events Workstation silent and Workstation heard again:"
+" a workstation that sends one gets 400 bad_request"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r01
+msgid ""
+"Odoo keeps the history of each deck and each workstation: deck plugged and "
+"unplugged, deck service started, failed, stopped or absent, workstation "
+"silent and heard again"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -3041,6 +3256,14 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r06
 msgid "Once running is false, Kernel.render draws nothing"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r05
+msgid ""
+"Once the activities are enabled, four problems open one, each with its box, "
+"all checked by default: deck service failed, workstation silent, deck "
+"changed workstation, deck unplugged for long"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -3705,6 +3928,14 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r11
+msgid ""
+"Service states are not new event kinds: a service_changed event carries its "
+"state, and the history shows and filters it as Service started, failed, "
+"stopped or absent; the report contract does not change"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r58
 msgid ""
 "Service: start/stop/restart via systemctl --user with output; live log "
@@ -3740,6 +3971,15 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r02
+msgid ""
+"Settings › Stream Deck sets the detection activities: enabled or not, for "
+"whom (employee, manager or both, the manager by default, a user named in the"
+" Settings), for which problems and after which delays; a new database has "
+"them disabled, history only"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r18
 msgid ""
 "Shebangs stay #!/usr/bin/env python3: a shebang cannot name a checkout-"
@@ -3750,6 +3990,14 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r69
 msgid ""
 "Show details opens a modal with the scanned hostname, latency and ports"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r26
+msgid ""
+"Silent since and Deck service state since come from the reports and the "
+"cron, never from a write by hand; the service state date moves only when the"
+" state changes"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4185,6 +4433,14 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r22
+msgid ""
+"The Stream Deck settings are Odoo Settings, stored as ir.config_parameter "
+"under the prefix erplibre_streamdeck., and only a Settings administrator "
+"writes them"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r94
 msgid "The Sync preferences page has a Sync now button"
 msgstr ""
@@ -4338,6 +4594,23 @@ msgid "The controller's Open prefs item opens the preferences window"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r15
+msgid ""
+"The cron runs every 5 minutes, active from the installation, and may run "
+"again at any time: a workstation is marked silent once, an activity opens "
+"only when none is open for its record, type and user, and a report that "
+"comes during the cron is never lost"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r09
+msgid ""
+"The deck changed workstation activity is closed by a person; while it is "
+"open, a new move adds a note to the deck's thread instead of a second "
+"activity"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r85
 msgid ""
 "The deck controller program writes <cache>/erplibre-home/controller.pid "
@@ -4378,6 +4651,14 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r60
 msgid "The deck program, the controller and the service never look at games/"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r08
+msgid ""
+"The default delays are 60 minutes for a silent workstation, 10 minutes for a"
+" failed deck service, 72 hours for an unplugged deck, and none for a deck "
+"that changed workstation"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -5014,6 +5295,13 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r28
+msgid ""
+"The monitoring reads in Canadian French, and the README of the module "
+"describes it in English and in French"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r66
 msgid ""
 "The nested end-to-end check includes the journal line [ERPLibreHome] enabled"
@@ -5157,6 +5445,14 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r18
+msgid ""
+"The recipient both gives two activities, one per user; the employee is the "
+"employee of the workstation, and for a deck the employee of the workstation "
+"that holds it, the new holder for a deck that changed workstation"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r36
 msgid ""
 "The refusal message names the setting, its file and how to enable the games "
@@ -5204,6 +5500,13 @@ msgstr ""
 msgid ""
 "The requirements of the inventory live in the registry, domain Inventory, "
 "each done one with the tests that prove it"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r24
+msgid ""
+"The requirements of the monitoring live in the registry, domain Monitoring, "
+"apart from the inventory, each done one with the tests that prove it"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -5264,6 +5567,14 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r106
 msgid ""
 "The shutdown proceeds without the lock after 5 s, with one journal line"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r14
+msgid ""
+"The silent delay is at least 30 minutes, two missed reports, so that one "
+"missed report is never a silence; the unplugged delay is at least 1 hour and"
+" the failed service delay at least 0 minutes"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -5391,6 +5702,14 @@ msgstr ""
 msgid ""
 "The venv is created by --stream-deck only; a base install has no venv; the "
 "system python3 runs the migration"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r27
+msgid ""
+"The workstation and deck forms show their thread and activities, the fleet "
+"shows Silent since and filters the silent workstations, and the history "
+"names each event by its label and filters on it"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement

@@ -1,0 +1,1274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<!-- Le domaine Surveillance : un requis par décision de l'utilisateur,
+     choix, élément du côté Odoo, non-objectif et anti-objectif de la
+     conception de la surveillance, code SD-MON-R<nn>, puis ses preuves.
+     Une preuve nomme un test Odoo par son chemin pointé (kind python), la
+     référence que pousse odoo_test_report.py. noupdate : un requis
+     retouché à la main garde sa retouche à la mise à jour du module. -->
+<odoo noupdate="1">
+    <record id="cat_sd_mon" model="devops.requirement.category">
+        <field name="name">Monitoring</field>
+        <field name="code">sd_mon</field>
+        <field name="sequence" eval="120" />
+    </record>
+    <record id="req_sd_mon_r01" model="devops.requirement">
+        <field name="code">SD-MON-R01</field>
+        <field name="name">Odoo keeps the history of each deck and each workstation: deck plugged and unplugged, deck service started, failed, stopped or absent, workstation silent and heard again</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="10" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.event of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_event.py stores the plugged, unplugged and service_changed events the workstation sends and the silent and heard_again events Odoo writes; its label names each one (Plugged, Unplugged, Service started, Service failed, Service stopped, Service absent, Workstation silent, Workstation heard again), and the Events tabs of the workstation and the deck and the Stream Deck history list it and filter on it.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r02" model="devops.requirement">
+        <field name="code">SD-MON-R02</field>
+        <field name="name">Settings › Stream Deck sets the detection activities: enabled or not, for whom (employee, manager or both, the manager by default, a user named in the Settings), for which problems and after which delays; a new database has them disabled, history only</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="20" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The streamdeck_* fields of res.config.settings in ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, stored as ir.config_parameter erplibre_streamdeck.&lt;setting&gt;, shown in the Stream Deck block of ERPLibre_erplibre_addons:erplibre_streamdeck/views/res_config_settings_views.xml and under Stream Deck › Settings; streamdeck.monitor._settings reads them, a missing key taking its default: disabled, manager, four boxes checked, 60 min, 72 h and 10 min.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r03" model="devops.requirement">
+        <field name="code">SD-MON-R03</field>
+        <field name="name">A cron detects the silent workstations</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="30" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">ir_cron_streamdeck_watch of ERPLibre_erplibre_addons:erplibre_streamdeck/data/streamdeck_cron.xml runs streamdeck.monitor._cron_watch of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_monitor.py, which marks silent each active workstation with a token whose last report is older than the silent delay: silent_since set, a silent event written, its activity opened when the Settings allow it.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r04" model="devops.requirement">
+        <field name="code">SD-MON-R04</field>
+        <field name="name">A workstation is silent after one hour without a report, a delay set in the Settings; a workstation off for the night goes silent every evening and is heard again at its first report</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="40" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">silent_after_min, 60 by default; the cron dates silent_since and the silent event at the last report plus the delay, and the next report clears silent_since and writes heard_again. The extension reports every 15 minutes, so one hour is four missed reports.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r05" model="devops.requirement">
+        <field name="code">SD-MON-R05</field>
+        <field name="name">Once the activities are enabled, four problems open one, each with its box, all checked by default: deck service failed, workstation silent, deck changed workstation, deck unplugged for long</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="50" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">ALERT_KINDS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py, one alert_&lt;kind&gt; parameter each, kept as False when cleared so that the default never comes back; streamdeck.monitor._open opens nothing for a kind whose box is cleared, and its history is still written.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r06" model="devops.requirement">
+        <field name="code">SD-MON-R06</field>
+        <field name="name">An activity closes by itself, with "Resolved at &lt;time&gt;" in its thread, once its problem is solved: deck service running again, workstation heard again, deck plugged in again; never two open activities for one problem</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="60" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._on_report closes, at the report that solves it, the service_failed, silent or unplugged activity of the record; streamdeck.monitor._open opens none for a user who already has an open one of that type on that record, so a problem has at most one open activity per assigned user.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r07" model="devops.requirement">
+        <field name="code">SD-MON-R07</field>
+        <field name="name">A locked workstation is accepted as silent: it goes silent after the delay and is heard again at unlock, like a workstation off for the night</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="70" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">Decision of the lot: GNOME Shell disables an extension on the lock screen unless its metadata declares session-modes, and erplibre-home-gnome-extension:metadata.json declares none, so a locked workstation stops reporting and Odoo treats it as any silence (SD-MON-R04). No Odoo test can lock a GNOME session.</field>
+        <field name="notes">Origin: documented only.</field>
+    </record>
+    <record id="req_sd_mon_r08" model="devops.requirement">
+        <field name="code">SD-MON-R08</field>
+        <field name="name">The default delays are 60 minutes for a silent workstation, 10 minutes for a failed deck service, 72 hours for an unplugged deck, and none for a deck that changed workstation</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="80" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">DELAY_DEFAULTS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py; the cron counts a failed service from service_state_since and an unplugged deck from its last unplugged event or its last report as connected, whichever is later, and the report that finds a deck on another workstation opens its activity at once. 72 hours covers a weekend, and 10 minutes lets the deck service restart itself.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r09" model="devops.requirement">
+        <field name="code">SD-MON-R09</field>
+        <field name="name">The deck changed workstation activity is closed by a person; while it is open, a new move adds a note to the deck's thread instead of a second activity</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="90" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._resolve never closes a moved activity; streamdeck.monitor._open, for moved, posts the note that names the former and the new workstation to the deck's thread when an activity of that type is open on the deck, whoever it is assigned to.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r10" model="devops.requirement">
+        <field name="code">SD-MON-R10</field>
+        <field name="name">An employee reads the events of a deck from the time they first held it: the first holder reads them all, a lender keeps all those from their holding on, those at the borrower included, and a borrower reads none from before their arrival; the manager reads them all</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="100" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">streamdeck.device.holding of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_holding.py keeps the first holding of each employee, dated when the report creates the deck on their workstation or moves it there; the event rule of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml opens an event to the employee of its workstation and to those whose holding of its deck is not later than it. SD-INV-R09 states the same bound for the inventory.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r11" model="devops.requirement">
+        <field name="code">SD-MON-R11</field>
+        <field name="name">Service states are not new event kinds: a service_changed event carries its state, and the history shows and filters it as Service started, failed, stopped or absent; the report contract does not change</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="110" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The label field of streamdeck.event, computed in the reader's language from kind and service_state and not stored; the history filters of ERPLibre_erplibre_addons:erplibre_streamdeck/views/streamdeck_event_views.xml select on kind and service_state; protocol 1.0 and the contract 1.2 of the extension are unchanged.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r12" model="devops.requirement">
+        <field name="code">SD-MON-R12</field>
+        <field name="name">Odoo alone writes the events Workstation silent and Workstation heard again: a workstation that sends one gets 400 bad_request</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="120" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">SERVER_KINDS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_event.py (moved, silent, heard_again): streamdeck.service refuses a report that carries one and writes nothing, and _server_event, which accepts only them, copies the workstation and employee names and draws a uuid4; the cron writes silent, the first report after a silence writes heard_again.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r13" model="devops.requirement">
+        <field name="code">SD-MON-R13</field>
+        <field name="name">A deck unplugged for long writes no event of its own: the unplugged event already dates it, and only the activity comes from the delay</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="130" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._watch_unplugged opens the activity and writes nothing to streamdeck.event.</field>
+        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
+    </record>
+    <record id="req_sd_mon_r14" model="devops.requirement">
+        <field name="code">SD-MON-R14</field>
+        <field name="name">The silent delay is at least 30 minutes, two missed reports, so that one missed report is never a silence; the unplugged delay is at least 1 hour and the failed service delay at least 0 minutes</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="140" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">DELAY_FLOORS of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py: the Settings refuse a lower value with a message that says "at least", and streamdeck.monitor._settings raises a lower stored value to its floor and gives an unreadable one its default.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r15" model="devops.requirement">
+        <field name="code">SD-MON-R15</field>
+        <field name="name">The cron runs every 5 minutes, active from the installation, and may run again at any time: a workstation is marked silent once, an activity opens only when none is open for its record, type and user, and a report that comes during the cron is never lost</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="150" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._lock takes the row with SELECT … FOR UPDATE NOWAIT, skips it while a report holds it or changed it since, checks the record again against the cron's domain and rewrites the row, so that a report waiting on it runs again and sees the activity; silent_since set keeps a workstation out of the silent search.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r16" model="devops.requirement">
+        <field name="code">SD-MON-R16</field>
+        <field name="name">A failed deck service and a silent workstation open their activity on the workstation, a deck unplugged for long and a deck that changed workstation on the deck; both carry a thread and activities</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="160" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.workstation and streamdeck.device inherit mail.thread and mail.activity.mixin, the module depends on mail, and each activity type of ERPLibre_erplibre_addons:erplibre_streamdeck/data/streamdeck_activity_types.xml names its model in res_model; the forms show the chatter.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r17" model="devops.requirement">
+        <field name="code">SD-MON-R17</field>
+        <field name="name">Each problem has its own activity type, four noupdate types that serve as the key against duplicates and filter My activities by problem; only the monitoring opens activities of these types</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="170" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">code</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="False" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">ERPLibre_erplibre_addons:erplibre_streamdeck/data/streamdeck_activity_types.xml, with keep_done and no chained type; mail.activity create and write in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_monitor.py refuse a monitoring type outside sudo, and a deleted type opens nothing and breaks no report.</field>
+        <field name="missing">The guard reads the type in the create values only: an employee who creates an activity on their workstation with the type given by the context key default_activity_type_id gets an activity of a monitoring type, and the cron then opens none for the user it is assigned to. The check has to run on the created and written records.</field>
+        <field name="notes">Origin: violated.</field>
+    </record>
+    <record id="req_sd_mon_r18" model="devops.requirement">
+        <field name="code">SD-MON-R18</field>
+        <field name="name">The recipient both gives two activities, one per user; the employee is the employee of the workstation, and for a deck the employee of the workstation that holds it, the new holder for a deck that changed workstation</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="180" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._recipients of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_monitor.py; mail.activity has a single user_id.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r19" model="devops.requirement">
+        <field name="code">SD-MON-R19</field>
+        <field name="name">Enabling the activities for the manager or for both needs a named manager, chosen among the Stream Deck managers; a manager archived since gets nothing, a warning without name is logged, and the employee part is still created</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="190" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_check_streamdeck_settings of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py refuses the save, and the field's domain lists the internal users of the manager group; streamdeck.monitor._named_manager drops an archived or deleted manager with a warning, logged only while the activities are enabled.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r20" model="devops.requirement">
+        <field name="code">SD-MON-R20</field>
+        <field name="name">A solved activity closes with action_feedback, kept done, the feedback "Resolved at &lt;time&gt;: &lt;what happened&gt;" in the language of its user and the time in their time zone, UTC without one; a deck service that leaves failed for any other state closes it, naming the new state</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="200" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._resolve of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_monitor.py; keep_done on the four types keeps the closed activity readable, done.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r21" model="devops.requirement">
+        <field name="code">SD-MON-R21</field>
+        <field name="name">An archived workstation and a workstation without token never go silent; archiving it, the departure of its employee, unenrolling it or revoking its token closes its open activities, with "archived" or "unenrolled", and clears its silent mark</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="210" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._watched_domain (active, with a token) bounds every watch of the cron; streamdeck.workstation._end_monitoring of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_workstation.py, called by write, toggle_active and action_revoke_token, closes the silent and service_failed activities of the workstation and the unplugged ones of its decks and clears silent_since; moved activities stay for a person, and the silent event stays in the history.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r22" model="devops.requirement">
+        <field name="code">SD-MON-R22</field>
+        <field name="name">The Stream Deck settings are Odoo Settings, stored as ir.config_parameter under the prefix erplibre_streamdeck., and only a Settings administrator writes them</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="220" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">res.config.settings and ir.config_parameter need base.group_system, which the Stream Deck manager group does not give; the menu Stream Deck › Settings is restricted to base.group_system.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r23" model="devops.requirement">
+        <field name="code">SD-MON-R23</field>
+        <field name="name">An activity and a thread are read with their record: an employee reads those of their workstations and of the decks they read, a deck's from their first holding on, never those of another employee's workstation; only a Stream Deck manager modifies or deletes what others posted on a workstation</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="230" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">code</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="False" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">Odoo's access of mail.message and mail.activity follows the record; streamdeck.thread.visibility of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_thread_visibility.py bounds the messages and activities of a deck by the reader's holding, and streamdeck.workstation._get_mail_message_access asks for the unlink right, which no employee has, to write or delete in a workstation's thread. Reading stays Odoo's, modifying is narrower.</field>
+        <field name="missing">The attachments of a deck are bounded by nothing but the deck: an ir.attachment with res_model streamdeck.device follows the read access of the deck, so a new holder reads the attachments posted to it before their arrival, while the messages and activities of that time stay hidden.</field>
+        <field name="notes">Origin: violated.</field>
+    </record>
+    <record id="req_sd_mon_r24" model="devops.requirement">
+        <field name="code">SD-MON-R24</field>
+        <field name="name">The requirements of the monitoring live in the registry, domain Monitoring, apart from the inventory, each done one with the tests that prove it</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="240" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">data/requirement_monitoring.xml of this module; its test checks that every proof names an Odoo test its module runs, and that every test of the files test_streamdeck_monitor*.py and test_streamdeck_settings.py of erplibre_streamdeck proves a requirement.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r25" model="devops.requirement">
+        <field name="code">SD-MON-R25</field>
+        <field name="name">History always runs: the events Workstation silent and Workstation heard again are written whatever the Settings say; only the activities depend on them</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="250" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._cron_watch marks the silent workstations before it checks whether the activities are enabled, and streamdeck.service writes heard_again at the first report after a silence; streamdeck.monitor._open returns before any activity while the activities are disabled, a box is cleared or a type is deleted.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r26" model="devops.requirement">
+        <field name="code">SD-MON-R26</field>
+        <field name="name">Silent since and Deck service state since come from the reports and the cron, never from a write by hand; the service state date moves only when the state changes</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="260" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_check_writable of streamdeck.workstation in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_workstation.py refuses both fields to the employee and to the manager; streamdeck.service sets service_state_since when the reported state differs from the stored one or has no date yet, and clears silent_since at a report.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r27" model="devops.requirement">
+        <field name="code">SD-MON-R27</field>
+        <field name="name">The workstation and deck forms show their thread and activities, the fleet shows Silent since and filters the silent workstations, and the history names each event by its label and filters on it</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="270" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">ERPLibre_erplibre_addons:erplibre_streamdeck/views/streamdeck_workstation_views.xml, streamdeck_device_views.xml and streamdeck_event_views.xml: the chatter after the sheet, the Silent since column, the Silent filter, the label columns and one filter per label.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r28" model="devops.requirement">
+        <field name="code">SD-MON-R28</field>
+        <field name="name">The monitoring reads in Canadian French, and the README of the module describes it in English and in French</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="280" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">ERPLibre_erplibre_addons:erplibre_streamdeck/i18n/fr_CA.po translates every term of the monitoring, and the notes and feedbacks of the activities are written in the language of their user; README.base.md of the module generates README.md and README.fr.md through mmg.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r29" model="devops.requirement">
+        <field name="code">SD-MON-R29</field>
+        <field name="name">Non-goal: an email, a push notification or any message outside the Odoo activities</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="290" />
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="description">Non-goal of the monitoring: a problem reaches people as an Odoo activity and in the history only; the notice Odoo itself sends to the user of a new activity follows their notification preference.</field>
+        <field name="notes">Origin: documented only.</field>
+    </record>
+    <record id="req_sd_mon_r30" model="devops.requirement">
+        <field name="code">SD-MON-R30</field>
+        <field name="name">Non-goal: thresholds per workstation or per employee</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="300" />
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="description">Non-goal of the monitoring: the Settings are global, one set of boxes and delays for the whole fleet.</field>
+        <field name="notes">Origin: documented only.</field>
+    </record>
+    <record id="req_sd_mon_r31" model="devops.requirement">
+        <field name="code">SD-MON-R31</field>
+        <field name="name">Non-goal: any driving of the workstation from Odoo</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="310" />
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="description">Non-goal of the monitoring: Odoo never opens a connection to the workstation; driving the workstation comes with a later lot.</field>
+        <field name="notes">Origin: documented only.</field>
+    </record>
+    <record id="req_sd_mon_r32" model="devops.requirement">
+        <field name="code">SD-MON-R32</field>
+        <field name="name">Non-goal: monitoring the health of the deck hardware, its firmware or its keys</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="320" />
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="description">Non-goal of the monitoring: Odoo watches the deck service, the reports and the connection of the deck, not the device itself.</field>
+        <field name="notes">Origin: documented only.</field>
+    </record>
+    <record id="req_sd_mon_r33" model="devops.requirement">
+        <field name="code">SD-MON-R33</field>
+        <field name="name">Anti-goal: two open activities for one problem, on the same record, of the same type, for the same user</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="330" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._open searches the open activities of the type on the record before it creates any, under the row lock in the cron; a deck that changed workstation keeps one open activity whoever it went to.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r34" model="devops.requirement">
+        <field name="code">SD-MON-R34</field>
+        <field name="name">Anti-goal: an activity created while the Settings disable the activities</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="340" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._open and _cron_watch return before any activity while activities_enabled is false; the history is still written.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r35" model="devops.requirement">
+        <field name="code">SD-MON-R35</field>
+        <field name="name">Anti-goal: an unenrolled or archived workstation that alerts without end</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="350" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">Every watch of the cron is bounded to the active workstations with a token, and leaving that set closes the open activities and clears the silent mark (SD-MON-R21).</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r36" model="devops.requirement">
+        <field name="code">SD-MON-R36</field>
+        <field name="name">Anti-goal: an employee who sees the activities or the thread of another employee's workstation</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="360" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">The workstation rule of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml opens an employee's own workstations only, and the messages and activities of a workstation follow it.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_mon_r37" model="devops.requirement">
+        <field name="code">SD-MON-R37</field>
+        <field name="name">Anti-goal: a report slowed down by the monitoring</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="370" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.monitor._on_report works on the reporting workstation and its decks only, closing by record and opening only for a deck that changed workstation; every search over the fleet runs in the cron.</field>
+        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
+    </record>
+    <record id="req_sd_mon_r38" model="devops.requirement">
+        <field name="code">SD-MON-R38</field>
+        <field name="name">Anti-goal: identifying data in the code, the data, the comments or the commits</field>
+        <field name="category_id" ref="cat_sd_mon" />
+        <field name="sequence" eval="380" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="False" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">Examples are invented (host-a, SN-MON-1, Employee A); erplibre:script/analyse/check_comment_hygiene.py reports identifying data in comments, and the commit-msg hook of erplibre:script/git/hooks refuses an address, an email or an account path in a commit body.</field>
+        <field name="missing">No test sweeps the files of the monitoring: check_comment_hygiene.py runs by hand and from the pre-commit hook, which lists its findings without blocking the commit.</field>
+        <field name="notes">Origin: unit test missing.</field>
+    </record>
+    <record id="test_sd_mon_r01_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r01" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_the_event_label_names_the_service_state</field>
+    </record>
+    <record id="test_sd_mon_r01_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r01" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_silent_workstation_gets_one_event_and_one_activity</field>
+    </record>
+    <record id="test_sd_mon_r01_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r01" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_every_event_list_names_the_event_by_its_label</field>
+    </record>
+    <record id="test_sd_mon_r01_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r01" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_each_history_filter_selects_the_events_of_its_label</field>
+    </record>
+    <record id="test_sd_mon_r02_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r02" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_defaults_are_history_only</field>
+    </record>
+    <record id="test_sd_mon_r02_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r02" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_the_settings_page_has_a_stream_deck_section</field>
+    </record>
+    <record id="test_sd_mon_r02_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r02" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_settings_are_read_with_their_defaults_and_floors</field>
+    </record>
+    <record id="test_sd_mon_r03_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r03" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_job_and_the_activity_types_exist</field>
+    </record>
+    <record id="test_sd_mon_r03_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r03" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_silent_workstation_gets_one_event_and_one_activity</field>
+    </record>
+    <record id="test_sd_mon_r04_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r04" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_silent_workstation_gets_one_event_and_one_activity</field>
+    </record>
+    <record id="test_sd_mon_r04_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r04" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_twice_creates_nothing_more</field>
+    </record>
+    <record id="test_sd_mon_r04_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r04" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_report_after_silence_writes_heard_again_and_clears_it</field>
+    </record>
+    <record id="test_sd_mon_r05_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r05" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_defaults_are_history_only</field>
+    </record>
+    <record id="test_sd_mon_r05_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r05" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_an_alert_turned_off_stays_off</field>
+    </record>
+    <record id="test_sd_mon_r05_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r05" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_each_alert_help_names_the_activity_it_closes</field>
+    </record>
+    <record id="test_sd_mon_r05_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r05" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_alert_turned_off_opens_nothing_of_its_kind</field>
+    </record>
+    <record id="test_sd_mon_r06_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r06" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_heard_again_closes_the_silent_activity_with_the_time</field>
+    </record>
+    <record id="test_sd_mon_r06_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r06" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_failed_service_waits_its_delay_then_closes_as_it_leaves_failed</field>
+    </record>
+    <record id="test_sd_mon_r06_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r06" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_unplugged_deck_alerts_after_72_hours_and_closes_when_plugged</field>
+    </record>
+    <record id="test_sd_mon_r06_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r06" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_twice_creates_nothing_more</field>
+    </record>
+    <record id="test_sd_mon_r08_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r08" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_settings_are_read_with_their_defaults_and_floors</field>
+    </record>
+    <record id="test_sd_mon_r08_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r08" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_failed_service_waits_its_delay_then_closes_as_it_leaves_failed</field>
+    </record>
+    <record id="test_sd_mon_r08_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r08" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_unplugged_deck_alerts_after_72_hours_and_closes_when_plugged</field>
+    </record>
+    <record id="test_sd_mon_r08_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r08" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_deck_gone_without_its_event_counts_from_last_seen</field>
+    </record>
+    <record id="test_sd_mon_r08_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r08" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_moved_deck_opens_one_activity_and_a_second_move_adds_a_note</field>
+    </record>
+    <record id="test_sd_mon_r09_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r09" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_moved_deck_opens_one_activity_and_a_second_move_adds_a_note</field>
+    </record>
+    <record id="test_sd_mon_r09_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r09" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_second_move_adds_a_note_whoever_the_activity_went_to</field>
+    </record>
+    <record id="test_sd_mon_r10_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r10" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_new_holder_reads_nothing_before_their_arrival</field>
+    </record>
+    <record id="test_sd_mon_r10_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r10" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_lender_keeps_the_whole_history</field>
+    </record>
+    <record id="test_sd_mon_r10_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r10" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_holder_coming_back_keeps_their_first_since</field>
+    </record>
+    <record id="test_sd_mon_r10_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r10" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_the_manager_reads_everything</field>
+    </record>
+    <record id="test_sd_mon_r10_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r10" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_holding.TestStreamdeckHolding.test_a_third_employee_reads_nothing</field>
+    </record>
+    <record id="test_sd_mon_r11_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r11" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_the_event_label_names_the_service_state</field>
+    </record>
+    <record id="test_sd_mon_r11_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r11" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_the_event_label_follows_the_reader_language</field>
+    </record>
+    <record id="test_sd_mon_r11_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r11" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_each_history_filter_selects_the_events_of_its_label</field>
+    </record>
+    <record id="test_sd_mon_r12_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r12" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_client_cannot_send_silent_or_heard_again</field>
+    </record>
+    <record id="test_sd_mon_r12_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r12" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_server_event_copies_the_names_and_draws_its_uuid</field>
+    </record>
+    <record id="test_sd_mon_r12_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r12" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_report_after_silence_writes_heard_again_and_clears_it</field>
+    </record>
+    <record id="test_sd_mon_r12_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r12" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_report_without_silence_writes_no_heard_again</field>
+    </record>
+    <record id="test_sd_mon_r12_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r12" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_refused_report_after_silence_leaves_it_silent</field>
+    </record>
+    <record id="test_sd_mon_r13_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r13" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_deck_unplugged_long_writes_no_event_of_its_own</field>
+    </record>
+    <record id="test_sd_mon_r14_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r14" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_silent_delay_below_thirty_minutes_is_refused</field>
+    </record>
+    <record id="test_sd_mon_r14_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r14" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_delays_below_their_floor_are_refused</field>
+    </record>
+    <record id="test_sd_mon_r14_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r14" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_the_floor_messages_say_at_least</field>
+    </record>
+    <record id="test_sd_mon_r14_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r14" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_settings_are_read_with_their_defaults_and_floors</field>
+    </record>
+    <record id="test_sd_mon_r15_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r15" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_job_and_the_activity_types_exist</field>
+    </record>
+    <record id="test_sd_mon_r15_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r15" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_twice_creates_nothing_more</field>
+    </record>
+    <record id="test_sd_mon_r15_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r15" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_workstation_that_reported_since_is_not_marked</field>
+    </record>
+    <record id="test_sd_mon_r15_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r15" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_problem_solved_since_the_cron_read_opens_nothing</field>
+    </record>
+    <record id="test_sd_mon_r15_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r15" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_writes_the_row_it_opens_an_activity_on</field>
+    </record>
+    <record id="test_sd_mon_r15_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r15" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_skipped_lock_writes_no_error_to_the_log</field>
+    </record>
+    <record id="test_sd_mon_r16_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r16" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_job_and_the_activity_types_exist</field>
+    </record>
+    <record id="test_sd_mon_r16_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r16" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_the_workstation_and_deck_forms_show_their_thread</field>
+    </record>
+    <record id="test_sd_mon_r17_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r17" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_job_and_the_activity_types_exist</field>
+    </record>
+    <record id="test_sd_mon_r17_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r17" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_only_the_monitoring_opens_its_activity_types</field>
+    </record>
+    <record id="test_sd_mon_r17_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r17" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_deleted_activity_type_breaks_no_report</field>
+    </record>
+    <record id="test_sd_mon_r18_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r18" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_recipient_both_gives_two_activities_employee_gives_the_owner_only</field>
+    </record>
+    <record id="test_sd_mon_r19_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r19" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_enabling_for_the_manager_needs_a_named_manager</field>
+    </record>
+    <record id="test_sd_mon_r19_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r19" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_employee_only_needs_no_manager</field>
+    </record>
+    <record id="test_sd_mon_r19_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r19" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_the_manager_is_chosen_among_streamdeck_managers</field>
+    </record>
+    <record id="test_sd_mon_r19_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r19" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_archived_manager_gets_nothing_and_breaks_nothing</field>
+    </record>
+    <record id="test_sd_mon_r19_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r19" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_disabled_activities_never_warn_about_the_manager</field>
+    </record>
+    <record id="test_sd_mon_r20_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r20" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_heard_again_closes_the_silent_activity_with_the_time</field>
+    </record>
+    <record id="test_sd_mon_r20_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r20" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_failed_service_waits_its_delay_then_closes_as_it_leaves_failed</field>
+    </record>
+    <record id="test_sd_mon_r20_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r20" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_unplugged_deck_alerts_after_72_hours_and_closes_when_plugged</field>
+    </record>
+    <record id="test_sd_mon_r20_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r20" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_note_and_the_feedback_speak_the_recipient_language</field>
+    </record>
+    <record id="test_sd_mon_r21_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r21" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_unenrolled_revoked_or_archived_workstations_never_go_silent</field>
+    </record>
+    <record id="test_sd_mon_r21_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r21" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_silent_workstation_unenrolled_or_archived_is_no_longer_silent</field>
+    </record>
+    <record id="test_sd_mon_r21_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r21" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_archiving_a_workstation_closes_its_activities</field>
+    </record>
+    <record id="test_sd_mon_r21_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r21" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_archiving_the_employee_closes_their_workstation_activities</field>
+    </record>
+    <record id="test_sd_mon_r21_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r21" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_workstation_no_longer_watched_opens_no_failed_or_unplugged</field>
+    </record>
+    <record id="test_sd_mon_r22_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r22" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_only_settings_admins_write_them</field>
+    </record>
+    <record id="test_sd_mon_r22_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r22" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_the_settings_page_has_a_stream_deck_section</field>
+    </record>
+    <record id="test_sd_mon_r22_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r22" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_an_alert_turned_off_stays_off</field>
+    </record>
+    <record id="test_sd_mon_r23_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_employee_reads_activities_of_their_records_only</field>
+    </record>
+    <record id="test_sd_mon_r23_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_employee_reads_no_message_of_another_workstation</field>
+    </record>
+    <record id="test_sd_mon_r23_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_thread.TestStreamdeckMonitorThread.test_an_employee_keeps_the_thread_of_others_on_their_workstation</field>
+    </record>
+    <record id="test_sd_mon_r23_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_thread.TestStreamdeckMonitorThread.test_a_new_holder_reads_the_deck_thread_from_their_arrival</field>
+    </record>
+    <record id="test_sd_mon_r24_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_the_monitoring_domain_numbers_its_requirements</field>
+    </record>
+    <record id="test_sd_mon_r24_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_every_proof_is_an_odoo_test_reference</field>
+    </record>
+    <record id="test_sd_mon_r24_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_python_proofs_name_tests_their_module_runs</field>
+    </record>
+    <record id="test_sd_mon_r24_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_every_monitoring_test_of_the_module_proves_a_requirement</field>
+    </record>
+    <record id="test_sd_mon_r24_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_a_done_requirement_has_a_proof_and_nothing_missing</field>
+    </record>
+    <record id="test_sd_mon_r24_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_what_stays_to_do_is_named</field>
+    </record>
+    <record id="test_sd_mon_r24_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_security_requirements_are_must_and_flagged</field>
+    </record>
+    <record id="test_sd_mon_r24_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_the_lot_states_its_non_goals_and_anti_goals</field>
+    </record>
+    <record id="test_sd_mon_r24_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_notes_open_on_an_origin_and_texts_read_alone</field>
+    </record>
+    <record id="test_sd_mon_r24_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_the_monitoring_data_is_noupdate</field>
+    </record>
+    <record id="test_sd_mon_r24_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="110" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_the_monitoring_reads_in_fr_CA</field>
+    </record>
+    <record id="test_sd_mon_r25_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r25" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_no_activity_while_disabled</field>
+    </record>
+    <record id="test_sd_mon_r25_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r25" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_alert_turned_off_opens_nothing_of_its_kind</field>
+    </record>
+    <record id="test_sd_mon_r25_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r25" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_deleted_activity_type_breaks_no_report</field>
+    </record>
+    <record id="test_sd_mon_r25_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r25" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_disabled_activities_never_warn_about_the_manager</field>
+    </record>
+    <record id="test_sd_mon_r26_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r26" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_silent_and_service_dates_are_never_written_by_hand</field>
+    </record>
+    <record id="test_sd_mon_r26_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r26" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_service_state_since_moves_only_when_the_state_changes</field>
+    </record>
+    <record id="test_sd_mon_r26_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r26" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_state_without_its_date_is_dated_by_the_next_report</field>
+    </record>
+    <record id="test_sd_mon_r26_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r26" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_a_report_after_silence_writes_heard_again_and_clears_it</field>
+    </record>
+    <record id="test_sd_mon_r27_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r27" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_the_workstation_and_deck_forms_show_their_thread</field>
+    </record>
+    <record id="test_sd_mon_r27_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r27" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_the_fleet_shows_and_filters_silent_workstations</field>
+    </record>
+    <record id="test_sd_mon_r27_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r27" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_every_event_list_names_the_event_by_its_label</field>
+    </record>
+    <record id="test_sd_mon_r27_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r27" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_views.TestStreamdeckMonitorViews.test_each_history_filter_selects_the_events_of_its_label</field>
+    </record>
+    <record id="test_sd_mon_r28_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r28" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_i18n.TestStreamdeckMonitorI18n.test_every_monitoring_term_has_its_fr_CA_text</field>
+    </record>
+    <record id="test_sd_mon_r28_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r28" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_events.TestStreamdeckMonitorEvents.test_the_event_label_follows_the_reader_language</field>
+    </record>
+    <record id="test_sd_mon_r28_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r28" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_note_and_the_feedback_speak_the_recipient_language</field>
+    </record>
+    <record id="test_sd_mon_r28_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r28" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_each_alert_help_names_the_activity_it_closes</field>
+    </record>
+    <record id="test_sd_mon_r33_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r33" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_the_cron_twice_creates_nothing_more</field>
+    </record>
+    <record id="test_sd_mon_r33_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r33" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_failed_service_waits_its_delay_then_closes_as_it_leaves_failed</field>
+    </record>
+    <record id="test_sd_mon_r33_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r33" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_unplugged_deck_alerts_after_72_hours_and_closes_when_plugged</field>
+    </record>
+    <record id="test_sd_mon_r33_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r33" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_second_move_adds_a_note_whoever_the_activity_went_to</field>
+    </record>
+    <record id="test_sd_mon_r34_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r34" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_no_activity_while_disabled</field>
+    </record>
+    <record id="test_sd_mon_r34_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r34" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_disabled_activities_never_warn_about_the_manager</field>
+    </record>
+    <record id="test_sd_mon_r34_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r34" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_settings.TestStreamdeckSettings.test_defaults_are_history_only</field>
+    </record>
+    <record id="test_sd_mon_r35_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r35" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_unenrolled_revoked_or_archived_workstations_never_go_silent</field>
+    </record>
+    <record id="test_sd_mon_r35_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r35" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_silent_workstation_unenrolled_or_archived_is_no_longer_silent</field>
+    </record>
+    <record id="test_sd_mon_r35_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r35" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_workstation_no_longer_watched_opens_no_failed_or_unplugged</field>
+    </record>
+    <record id="test_sd_mon_r35_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r35" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_archiving_a_workstation_closes_its_activities</field>
+    </record>
+    <record id="test_sd_mon_r35_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r35" />
+        <field name="sequence" eval="50" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_archiving_the_employee_closes_their_workstation_activities</field>
+    </record>
+    <record id="test_sd_mon_r36_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r36" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_employee_reads_activities_of_their_records_only</field>
+    </record>
+    <record id="test_sd_mon_r36_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r36" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_an_employee_reads_no_message_of_another_workstation</field>
+    </record>
+    <record id="test_sd_mon_r37_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r37" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_report_leaves_the_time_based_work_to_the_cron</field>
+    </record>
+</odoo>

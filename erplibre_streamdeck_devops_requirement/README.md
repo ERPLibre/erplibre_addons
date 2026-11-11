@@ -6,12 +6,12 @@ The requirements of the ERPLibre Stream Deck — the deck programs, the GNOME
 extension ERPLibre Home, its installation, the games and the mobile plugin —
 as `devops.requirement` records, each with the repository tests that prove
 it. They come from the audit of the Stream Deck design specifications, row
-by row, and from the design of the Odoo inventory, and live here instead of
-in a document.
+by row, and from the designs of the Odoo inventory and of its monitoring,
+and live here instead of in a document.
 
 The module depends on `erplibre_streamdeck` and `erplibre_devops_requirement`,
 and adds no model, no view and no menu: the requirements show in the
-Requirements application, under eleven domains whose code starts with
+Requirements application, under twelve domains whose code starts with
 `sd_`.
 
 ## What the data holds
@@ -73,9 +73,27 @@ a test that exists: an Odoo test is imported and must run under
 extension or of ERPLibre must be in the committed tree of its repository
 (that check is skipped outside a checkout). A Node test declared in a
 `for … of` loop over a literal array is named once per value of the loop;
-a name the loop does not produce is not a test. Each test of the four
+a name the loop does not produce is not a test. Each test of the five
 inventory test files of `erplibre_streamdeck` proves at least one
 requirement.
+
+## The Monitoring domain
+
+The domain *Monitoring* (`sd_mon`, file `data/requirement_monitoring.xml`)
+holds the requirements of the monitoring of the workstations and their
+decks: one per user decision, design choice, Odoo-side item, non-goal and
+anti-goal of its design, coded `SD-MON-R<nn>`, apart from the inventory so
+that each part of the work is checked on its own. Its proofs are Odoo
+tests of `erplibre_streamdeck`. A design decision that no Odoo test can
+hold, such as a locked workstation counted as silent, is done without a
+proof, MoSCoW *Should*, *Non-functional*, its reason in *Achievement*. A
+gap the code still has stays to do and *What is missing* describes it.
+
+The test `tests/test_requirement_monitoring.py` checks that each proof
+names an Odoo test that runs under `--test-tags /<module>`, that each test
+of the files `test_streamdeck_monitor*.py` and `test_streamdeck_settings.py`
+of `erplibre_streamdeck` proves at least one requirement, and that the
+requirements still to do are exactly those it names.
 
 ## Proofs and verdicts
 
