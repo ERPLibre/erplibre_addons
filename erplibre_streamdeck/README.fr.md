@@ -150,13 +150,14 @@ suivante.
   seule la part de l'employé s'ouvre, et chaque passage du cron écrit au
   journal un avertissement qui ne nomme personne.
 - **Accès.** Une activité se lit avec son enregistrement. Un employé lit
-  les activités de ses postes, celles du gestionnaire comprises, et
-  celles des decks qu'il détient ou a détenus, à partir de sa première
-  détention, plus celles qui lui sont assignées ; jamais celles du poste
-  d'un autre employé. Au fil d'un poste, l'employé publie, modifie ses
-  propres messages et ferme ses propres activités ; seul un gestionnaire
-  modifie, ferme ou supprime ceux des autres. Seule la surveillance crée
-  des activités de ses quatre types.
+  les activités de ses postes, celles du gestionnaire comprises, et celles
+  des decks qu'il détient ou a détenus, à partir de sa première détention,
+  plus celles qui lui sont assignées ; jamais celles du poste d'un autre
+  employé. Le reste du fil d'un deck, ses messages et ses fichiers joints,
+  se lit lui aussi à partir de la première détention. Au fil d'un poste,
+  l'employé publie, modifie ses propres messages et ferme ses propres
+  activités ; seul un gestionnaire modifie, ferme ou supprime ceux des
+  autres. Seule la surveillance crée des activités de ses quatre types.
 - **Notification.** Odoo prévient le destinataire d'une nouvelle activité
   comme pour toute activité (boîte de réception ou courriel, selon sa
   préférence). Le module n'envoie aucun courriel ni aucune notification

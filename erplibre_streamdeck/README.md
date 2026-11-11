@@ -146,11 +146,12 @@ beyond the delay goes silent, then is heard again at its next report.
 - **Access.** An activity is read with its record. An employee reads the
   activities of their workstations, the manager's included, and those of
   the decks they hold or held, from their first holding on, plus those
-  assigned to them; never those of another employee's workstation. On a
-  workstation's thread, the employee posts, edits their own messages and
-  closes their own activities; only a manager edits, closes or deletes
-  those of others. Only the monitoring creates activities of its four
-  types.
+  assigned to them; never those of another employee's workstation. The
+  rest of a deck's thread, its messages and attached files, is read from
+  the first holding on as well. On a workstation's thread, the employee
+  posts, edits their own messages and closes their own activities; only a
+  manager edits, closes or deletes those of others. Only the monitoring
+  creates activities of its four types.
 - **Notification.** Odoo tells the assigned user of a new activity as it
   does for any activity (inbox or e-mail, by their preference). The module
   sends no e-mail and no notification of its own. Such an e-mail goes

@@ -12,16 +12,19 @@ DEVICE_MODEL = "streamdeck.device"
 class StreamdeckThreadVisibility(models.AbstractModel):
     """What the current user reads of the thread of a deck.
 
-    Mixed into `mail.message` and `mail.activity`, whose global read rule
-    (`streamdeck_rules.xml`) asks for `streamdeck_visible_to_me`. A record
-    about any other model is visible, and Odoo's own access decides. A
-    record about a deck is visible to a Stream Deck manager, to the user
-    named by `_streamdeck_user_field` when the model has one, and to a
-    user whose `streamdeck.device.holding` of that deck has a `since` not
-    after the record's `_streamdeck_date_field`: the bound that limits the
-    history of the deck's events, so a new holder reads nothing of the
-    thread from before their arrival, and a user who reads the deck
-    through an event alone, holding nothing, reads nothing of it.
+    Mixed into `mail.message`, `mail.activity` and `ir.attachment`, whose
+    global read rule (`streamdeck_rules.xml`) asks for
+    `streamdeck_visible_to_me`. A record about any other model is
+    visible, and Odoo's own access decides. A record about a deck is
+    visible to a Stream Deck manager, to the user named by
+    `_streamdeck_user_field` when the model has one, and to a user whose
+    `streamdeck.device.holding` of that deck has a `since` not after the
+    record's `_streamdeck_date_field`: the bound that limits the history
+    of the deck's events, so a new holder reads nothing of the thread
+    from before their arrival, and a user who reads the deck through an
+    event alone, holding nothing, reads nothing of it. A file attached to
+    the deck is part of its thread: Odoo would otherwise open it to
+    anyone who reads the deck.
     """
 
     _name = "streamdeck.thread.visibility"
@@ -107,3 +110,11 @@ class MailActivity(models.Model):
     _streamdeck_model_field = "res_model"
     _streamdeck_date_field = "create_date"
     _streamdeck_user_field = "user_id"
+
+
+class IrAttachment(models.Model):
+    _name = "ir.attachment"
+    _inherit = ["ir.attachment", "streamdeck.thread.visibility"]
+
+    _streamdeck_model_field = "res_model"
+    _streamdeck_date_field = "create_date"
