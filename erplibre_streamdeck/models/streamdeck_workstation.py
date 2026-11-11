@@ -157,6 +157,28 @@ class StreamdeckWorkstation(models.Model):
                 )
             )
 
+    def _get_mail_message_access(self, res_ids, operation, model_name=None):
+        """Name the right on the workstation that `operation` on a message
+        or an activity of its thread requires.
+
+        Odoo lets a user who writes a record modify or delete any message
+        and any activity of its thread. An employee writes their
+        workstation only to rename it, so for anyone but a Stream Deck
+        manager a write or an unlink there asks for the unlink right on
+        the workstation, which ir.model.access.csv grants no group. The
+        employee still posts on the thread, edits their own messages, and
+        modifies or closes the activities assigned to them or created by
+        them: mail.activity's own rule allows those.
+        """
+        check = super()._get_mail_message_access(
+            res_ids, operation, model_name=model_name
+        )
+        if operation in ("write", "unlink") and not self.env.user.has_group(
+            MANAGER_GROUP
+        ):
+            return "unlink"
+        return check
+
     def action_revoke_token(self):
         """Clear the token hash of workstations the current user may
         write: the workstation must enroll again to report."""
