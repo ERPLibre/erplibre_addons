@@ -55,7 +55,10 @@ l'écart).
 Chaque requis porte un code stable `SD-<DOMAINE>-R<ligne>`, par exemple
 `SD-DEFECTS-R02`. Les données se chargent **une fois** : elles sont
 `noupdate`, un requis retouché à la main garde donc sa retouche à la mise à
-jour du module.
+jour du module. L'exception est un requis dont une nouvelle version récrit
+le texte : la migration de cette version le recharge de son fichier, comme
+une preuve dont la référence a changé, et son français revient du
+catalogue.
 
 ## Le domaine Inventaire
 
