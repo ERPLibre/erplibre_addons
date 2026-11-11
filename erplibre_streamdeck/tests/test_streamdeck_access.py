@@ -71,13 +71,20 @@ class TestStreamdeckAccess(TransactionCase):
             }
         )
 
-    def _event(self, kind, workstation, device=None):
+    def _hold(self, device, user, since):
+        """La détention que le service pose à la création du deck chez
+        `user` ou à son déplacement vers un poste de `user`."""
+        self.env["streamdeck.device.holding"].create(
+            {"device_id": device.id, "user_id": user.id, "since": since}
+        )
+
+    def _event(self, kind, workstation, device=None, at="2026-01-01 10:00:00"):
         type(self)._uuid += 1
         return self.Event.create(
             {
                 "uuid": "00000000-0000-4000-8000-%012d" % self._uuid,
                 "kind": kind,
-                "at": "2026-01-01 10:00:00",
+                "at": at,
                 "received_at": "2026-01-01 10:00:01",
                 "device_id": device.id if device else False,
                 "workstation_id": workstation.id,
@@ -94,13 +101,20 @@ class TestStreamdeckAccess(TransactionCase):
             self.ws_b.with_user(self.user_a).read(["name"])
 
     def test_a_deck_lent_keeps_its_whole_history_for_the_lender(self):
+        # A détient le deck depuis 9 h, B depuis midi : A lit tout, B ne lit
+        # que ce qui suit son arrivée.
         deck = self._device("SN-LENT", self.ws_b)
+        self._hold(deck, self.user_a, "2026-01-01 09:00:00")
+        self._hold(deck, self.user_b, "2026-01-01 12:00:00")
         events = (
-            self._event("plugged", self.ws_a, deck)
-            | self._event("unplugged", self.ws_a, deck)
-            | self._event("plugged", self.ws_b, deck)
+            self._event("plugged", self.ws_a, deck, "2026-01-01 10:00:00")
+            | self._event("unplugged", self.ws_a, deck, "2026-01-01 11:00:00")
+            | self._event("plugged", self.ws_b, deck, "2026-01-01 12:00:00")
         )
-        for user in (self.user_a, self.user_b):
+        for user, readable in (
+            (self.user_a, events),
+            (self.user_b, events[2]),
+        ):
             seen_deck = self.Device.with_user(user).search(
                 [("id", "=", deck.id)]
             )
@@ -108,7 +122,7 @@ class TestStreamdeckAccess(TransactionCase):
             seen = self.Event.with_user(user).search(
                 [("device_id", "=", deck.id)]
             )
-            self.assertEqual(seen, events)
+            self.assertEqual(seen, readable)
         at_b = events[2].with_user(self.user_a)
         values = at_b.read(
             ["workstation_name", "employee_name", "workstation_id"]
@@ -119,10 +133,14 @@ class TestStreamdeckAccess(TransactionCase):
         with self.assertRaises(AccessError):
             self.ws_b.with_user(self.user_a).read(["name"])
 
-    def test_the_current_holder_reads_the_deck_history(self):
-        # Le deck tenu par le poste de B n'a d'événement qu'au poste de A :
-        # B le lit par son poste actuel, pas par l'historique.
+    def test_the_current_holder_reads_the_deck_not_its_earlier_history(
+        self,
+    ):
+        # Le deck tenu par le poste de B n'a d'événement qu'au poste de A,
+        # avant l'arrivée du deck chez B : B lit le deck par son poste
+        # actuel, et aucun de ces événements.
         deck = self._device("SN-HELD", self.ws_b)
+        self._hold(deck, self.user_b, "2026-01-01 12:00:00")
         events = self._event("plugged", self.ws_a, deck) | self._event(
             "unplugged", self.ws_a, deck
         )
@@ -130,10 +148,13 @@ class TestStreamdeckAccess(TransactionCase):
             self.Device.with_user(self.user_b).search([("id", "=", deck.id)]),
             deck,
         )
-        seen = self.Event.with_user(self.user_b).search(
-            [("device_id", "=", deck.id)]
+        self.assertFalse(
+            self.Event.with_user(self.user_b).search(
+                [("device_id", "=", deck.id)]
+            )
         )
-        self.assertEqual(seen, events)
+        with self.assertRaises(AccessError):
+            events[0].with_user(self.user_b).read(["kind"])
 
     def test_an_employee_reads_the_service_history_of_their_workstation(
         self,

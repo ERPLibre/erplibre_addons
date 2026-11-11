@@ -100,8 +100,8 @@
         <field name="domain">[
             '|', '|',
             ('workstation_id.user_id', '=', uid),
+            ('held_by_me', '=', True),
             ('event_ids.workstation_id.user_id', '=', uid),
-            ('event_ids.previous_workstation_id.user_id', '=', uid),
         ]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_empty_folder">

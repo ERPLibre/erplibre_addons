@@ -2,5 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_streamdeck_workstation_user,streamdeck.workstation user,model_streamdeck_workstation,group_streamdeck_user,1,1,0,0
 access_streamdeck_device_user,streamdeck.device user,model_streamdeck_device,group_streamdeck_user,1,0,0,0
 access_streamdeck_event_user,streamdeck.event user,model_streamdeck_event,group_streamdeck_user,1,0,0,0
+access_streamdeck_device_holding_none,streamdeck.device.holding nobody,model_streamdeck_device_holding,,0,0,0,0
 access_streamdeck_pairing_code_none,streamdeck.pairing.code nobody,model_streamdeck_pairing_code,,0,0,0,0
 access_streamdeck_pairing_wizard_user,streamdeck.pairing.wizard user,model_streamdeck_pairing_wizard,group_streamdeck_user,1,1,1,0

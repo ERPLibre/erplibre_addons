@@ -52,23 +52,30 @@ credentials from one address are put on Odoo's login cooldown.
 
 | Group | Workstations | Decks | Events |
 |---|---|---|---|
-| User (every internal user) | their own: read, rename, revoke the token | those their workstations hold or have held, read-only | those of their workstations, and every event of a deck they can read |
+| User (every internal user) | their own: read, rename, revoke the token | those their workstations hold or have held, read-only | those of their workstations, and those of a deck they hold or have held, from their first holding on |
 | Manager | all: read, rename, archive, revoke the token | all, read-only | all, read-only |
 
-A deck lent to another employee follows the workstation that holds it. The
-lender still reads the deck and its whole history, the events at the other
-workstation included: each event carries a copy of the name of its
-workstation and of its employee, so the lender never needs, nor gets, the
-other workstation's record.
+A deck lent to another employee follows the workstation that holds it.
+Each employee reads the history of a deck from the moment one of their
+workstations first held it: when the deck was created on it, or when a
+*Changed workstation* event moved it there. Odoo dates that moment itself,
+never with a time the workstation sent, and keeps it when the deck comes
+back after a loan. The lender therefore still reads the deck and its whole
+history from their first holding on, the events at the other workstation
+included: each event carries a copy of the name of its workstation and of
+its employee, so the lender never needs, nor gets, the other workstation's
+record. The borrower, or a workstation that reports the serial number of
+another deck, reads nothing from before its arrival.
 
 When a workstation reports a deck that another workstation holds, the deck
 moves to it without confirmation, and Odoo adds an event *Changed
 workstation* (`moved`) dated at the reception. It names the new workstation
 and its employee, and the workstation the deck left, each by a copy of its
-name. This event alone proves that the former workstation had the deck: its
-employee keeps reading the deck and its history, even when that
-workstation never sent an event of it. The same workstation reporting the
-deck again moves nothing.
+name. Its employee becomes a holder of the deck from that moment, unless
+they held it before; the employee of the former workstation keeps
+reading the deck and its history, even when that workstation never sent
+an event of it. The same workstation reporting the deck again moves
+nothing.
 
 Archiving a user archives their workstations and revokes their tokens; the
 workstations, their decks and their events stay readable by the manager.
@@ -189,23 +196,30 @@ connexions d'Odoo.
 
 | Groupe | Postes | Decks | Événements |
 |---|---|---|---|
-| Utilisateur (tout utilisateur interne) | les siens : lire, renommer, révoquer le jeton | ceux que ses postes tiennent ou ont tenus, en lecture | ceux de ses postes, et tous ceux d'un deck qu'il peut lire |
+| Utilisateur (tout utilisateur interne) | les siens : lire, renommer, révoquer le jeton | ceux que ses postes tiennent ou ont tenus, en lecture | ceux de ses postes, et ceux d'un deck qu'il détient ou a détenu, à partir de sa première détention |
 | Gestionnaire | tous : lire, renommer, archiver, révoquer le jeton | tous, en lecture | tous, en lecture |
 
-Un deck prêté à un autre employé suit le poste qui le tient. Le prêteur lit
-toujours le deck et tout son historique, y compris les événements survenus
-à l'autre poste : chaque événement porte une copie du nom de son poste et
-de son employé, si bien que le prêteur n'a pas besoin de la fiche de
-l'autre poste, et ne la reçoit pas.
+Un deck prêté à un autre employé suit le poste qui le tient. Chaque
+employé lit l'historique d'un deck à partir du moment où un de ses postes
+l'a détenu pour la première fois : la création du deck sur ce poste, ou
+l'événement *Changé de poste* qui l'y a amené. Odoo date ce moment
+lui-même, jamais avec une heure envoyée par le poste, et le garde quand le
+deck revient après un prêt. Le prêteur lit donc toujours le deck et tout
+son historique depuis sa première détention, y compris les événements
+survenus à l'autre poste : chaque événement porte une copie du nom de son
+poste et de son employé, si bien que le prêteur n'a pas besoin de la fiche
+de l'autre poste, et ne la reçoit pas. L'emprunteur, ou un poste qui
+déclare le numéro de série d'un autre deck, ne lit rien d'avant son
+arrivée.
 
 Quand un poste remonte un deck que tient un autre poste, le deck passe à ce
 poste sans confirmation, et Odoo ajoute un événement *Changé de poste*
 (`moved`) daté de la réception. Il nomme le nouveau poste et son employé,
-et le poste que le deck a quitté, chacun par une copie de son nom. Cet
-événement suffit à prouver que l'ancien poste a eu le deck : son employé
-lit toujours le deck et son historique, même si ce poste n'en a jamais
-envoyé d'événement. Le même poste qui remonte de nouveau le deck ne
-déplace rien.
+et le poste que le deck a quitté, chacun par une copie de son nom. Son
+employé devient détenteur du deck à ce moment, à moins de l'avoir détenu
+avant ; l'employé de l'ancien poste lit toujours le deck et son
+historique, même si ce poste n'en a jamais envoyé d'événement. Le même
+poste qui remonte de nouveau le deck ne déplace rien.
 
 Archiver un utilisateur archive ses postes et révoque leurs jetons ; les
 postes, leurs decks et leurs événements restent lisibles du gestionnaire.
