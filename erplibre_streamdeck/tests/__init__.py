@@ -5,5 +5,6 @@ from . import test_streamdeck_groups
 from . import test_streamdeck_holding
 from . import test_streamdeck_i18n
 from . import test_streamdeck_monitor_events
+from . import test_streamdeck_monitor_thread
 from . import test_streamdeck_routes
 from . import test_streamdeck_service
