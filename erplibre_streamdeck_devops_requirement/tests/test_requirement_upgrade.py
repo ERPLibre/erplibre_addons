@@ -10,12 +10,19 @@ from odoo.tools.misc import file_path
 
 MODULE = "erplibre_streamdeck_devops_requirement"
 MIGRATION = "%s/migrations/18.0.1.2.0/post-migrate.py" % MODULE
+MIGRATION_1_3 = "%s/migrations/18.0.1.3.0/post-migrate.py" % MODULE
 INVENTORY = "%s/data/requirement_inventory.xml" % MODULE
 # Une référence de preuve à un test qui n'existe pas, comme celle qu'une
 # base du lot 1 garde d'un test renommé depuis.
 GONE = (
     "odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access."
     "TestStreamdeckAccess.test_a_test_renamed_since"
+)
+# Le nom qu'un test de contrat de l'extension portait jusqu'à son
+# contrat 1.3, et qu'une base de la version 18.0.1.2.0 cite encore.
+CONTRACT_1_2 = (
+    "erplibre-home-gnome-extension:test/unit/contract.test.js::"
+    "the contract is at 1.2 since the extension reports to Odoo"
 )
 
 
@@ -31,9 +38,9 @@ class TestRequirementUpgrade(TransactionCase):
     écraser, comme la mise à niveau qui le suit.
     """
 
-    def _migrate(self, version):
+    def _migrate(self, version, migration=MIGRATION):
         spec = importlib.util.spec_from_file_location(
-            "streamdeck_requirement_post_migrate", file_path(MIGRATION)
+            "streamdeck_requirement_post_migrate", file_path(migration)
         )
         script = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(script)
@@ -101,3 +108,18 @@ class TestRequirementUpgrade(TransactionCase):
         proof.write({"reference": GONE})
         self._migrate(None)
         self.assertEqual(proof.reference, GONE)
+
+    def test_an_upgrade_to_1_3_follows_the_renamed_contract_test(self):
+        requirement = self.env.ref("%s.req_sd_inv_r24" % MODULE)
+        proof = self.env.ref("%s.test_sd_inv_r24_1" % MODULE)
+        requirement.write({"achievement": "An outdated way"})
+        proof.write({"reference": CONTRACT_1_2})
+        self._migrate("18.0.1.2.0", MIGRATION_1_3)
+        self.env.invalidate_all()
+        reference = self._in_file("test_sd_inv_r24_1", "reference")
+        self.assertNotEqual(reference, CONTRACT_1_2)
+        self.assertEqual(proof.reference, reference)
+        self.assertEqual(
+            requirement.achievement,
+            self._in_file("req_sd_inv_r24", "achievement"),
+        )
