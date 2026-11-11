@@ -8,6 +8,11 @@ enrolls with this database, then reports its state and its deck events
 here: which decks are plugged in, since when, which program drives them and
 whether their service runs. Odoo never opens a connection to a workstation.
 
+Odoo also holds the deck settings it wants on each workstation: the deck
+program, the plugins turned off, the session refresh and the games. The
+workstation receives them in the reply to its report, and its employee
+applies them with a click (see Configuration).
+
 The inventory belongs to its employee; a manager sees the whole fleet.
 Nobody writes it by hand: only the workstation routes write it.
 
@@ -17,15 +22,20 @@ Nobody writes it by hand: only the workstation routes write it.
 |---|---|---|
 | Stream Deck › My workstations | every employee | their workstations; the button *Add a workstation* shows a pairing code |
 | Stream Deck › My decks | every employee | the decks their workstations hold or have held |
-| Stream Deck › Fleet › Workstations, Decks, Events | manager | everything, read-only, except the name, the archive flag and the token of a workstation |
-| Stream Deck › Settings | administrator | the *Stream Deck* section of the Settings: the monitoring |
+| Stream Deck › Fleet › Workstations, Decks, Events | manager | everything, read-only, except the name, the archive flag, the token and the configuration of a workstation |
+| Stream Deck › Configuration › Profiles, Deck models | manager | the configuration layers: reusable profiles, and the settings of each deck model |
+| Stream Deck › Settings | administrator | the *Stream Deck* section of the Settings: the monitoring and the first pilot |
 
 A workstation shows what its last report said: operating system, GNOME
 Shell, extension and contract versions, branch and commit of the ERPLibre
 checkout, deck program and the state of its service since when, its decks
 and its events. Its employee may rename it and revoke its token; the
 manager may also archive it. *Fleet › Workstations* adds the column
-*Silent since* and the filter *Silent*.
+*Silent since* and the filter *Silent*. The filters *Configuration
+pending* and *Configuration refused* select the workstations by the state
+of their configuration, and the tab *Configuration* of a workstation shows
+its profile, its effective settings with the layer and the lock of each,
+its overrides and the state of the revision offered to it.
 
 A workstation and a deck each carry their thread, where the monitoring
 posts its activities and notes. Every list of events names each event by
@@ -55,8 +65,8 @@ credentials from one address are put on Odoo's login cooldown.
 
 | Group | Workstations | Decks | Events |
 |---|---|---|---|
-| User (every internal user) | their own: read, rename, revoke the token | those their workstations hold or have held, read-only | those of their workstations, and those of a deck they hold or have held, from their first holding on |
-| Manager | all: read, rename, archive, revoke the token | all, read-only | all, read-only |
+| User (every internal user) | their own: read, rename, revoke the token, pick a selectable profile, override the free settings | those their workstations hold or have held, read-only | those of their workstations, and those of a deck they hold or have held, from their first holding on |
+| Manager | all: read, rename, archive, revoke the token, assign any profile, override and lock settings | all, read-only | all, read-only |
 
 A deck lent to another employee follows the workstation that holds it.
 Each employee reads the history of a deck from the moment one of their
@@ -85,6 +95,19 @@ nothing.
 Archiving a user archives their workstations and revokes their tokens; the
 workstations, their decks and their events stay readable by the manager.
 Pairing codes are readable by nobody.
+
+The configuration layers. A manager creates and changes the profiles, the
+deck models and every settings line, and alone sets a lock. An employee
+reads the selectable profiles, the profile of each of their workstations
+and every deck-model layer, which hold nothing personal; never a profile
+assigned only to another employee's workstation, nor the overrides of
+another employee. On their own workstations they create, change and
+delete the overrides of the settings that no layer locks, never *Locked*
+nor *Source*. They pick a selectable profile, in place of no profile or of
+another selectable one only: a profile the manager assigned without
+making it selectable stays, and an employee never clears a profile. The
+state of the configuration (revisions, offered and applied values, state,
+reason, first-pilot choice) is written by the report route only.
 
 ## Monitoring
 
@@ -178,6 +201,7 @@ the `ir.config_parameter` `erplibre_streamdeck.<key>`.
 | Silent after (minutes) | `silent_after_min` | 60 | 30 at least: one missed heartbeat is not silence |
 | Unplugged for long after (hours) | `unplugged_after_h` | 72 | 1 at least |
 | Service failed for (minutes) | `service_failed_after_min` | 10 | 0 at least |
+| First pilot | `first_pilot_policy` | Ask the employee | Keep local values, Take Odoo's values; see Configuration |
 
 The silent delay also dates the *Workstation silent* event, so it holds
 with the activities disabled. The 72 hours cover a weekend without an
@@ -194,7 +218,111 @@ by itself after a brief failure.
   employee, and the health of the deck itself (firmware, keys) is not
   watched.
 
-## Wire protocol 1.0
+## Configuration
+
+Odoo manages a closed list of four settings, each one line of the
+workstation's `~/.config/erplibre-home/streamdeck.conf`:
+
+| Setting | Key on the wire | Line of the file | Values | Restarts the deck service |
+|---|---|---|---|---|
+| Deck program | `deck_program` | `DECK_PROGRAM` | `tiler`, `controller`, `none` | yes |
+| Plugins turned off | `plugins_off` | `DECK_PLUGINS_OFF` | at most 64 plugin ids `[a-z][a-z0-9_]{0,63}`, joined by commas | yes |
+| Session refresh (seconds) | `session_refresh_sec` | `DECK_SESSION_REFRESH_SEC` | a number from 0.5 to 60 | yes |
+| Games | `games` | `GAMES` | `on`, `off` | no |
+
+No path, no command and no plugin to turn on: Odoo cannot make a
+workstation run anything. A value is typed bare in a line (a word, plugin
+ids separated by commas, a number) and stored as JSON; a value outside
+this list is refused at the write. The tab *Configuration* lists the
+plugins the workstation found on its disk.
+
+### Layers and locks
+
+A setting takes its value from the last of three layers that sets it:
+
+1. the **profile** of the workstation (*Configuration › Profiles*); an
+   archived profile counts for nothing;
+2. the **deck model**: the settings of the model of each connected deck
+   (*Configuration › Deck models*, by USB product id). With decks of
+   several models, their layers apply by ascending product id, the
+   highest winning, and the workstation form warns about it;
+3. the **workstation** itself: its overrides, in its tab *Configuration*.
+
+A line marked *Locked* stops its setting there: a locked profile line
+ignores the models and the workstation, a locked model line ignores the
+next models and the workstation. Only a manager sets a lock. A setting
+that no layer sets stays the employee's, on the workstation, and Odoo
+never adopts it.
+
+A profile marked *Selectable* is offered to the employees, who each pick
+one for their own workstations. The manager assigns any profile to any
+workstation.
+
+### Offer and application
+
+At each report of the pilot, Odoo computes the effective configuration
+of the workstation. When its SHA-256 differs from the last one offered,
+the *Offered revision* grows by one. The reply carries the revision and
+the extension announces it; nothing changes on the workstation until its
+employee clicks *Apply*. The extension then rewrites the managed lines of
+`streamdeck.conf`, keeps every other line, and restarts the deck service
+when a setting that needs it changed. Its next report says whether the
+revision was applied or refused, and why.
+
+| Configuration | Meaning |
+|---|---|
+| Unmanaged | no layer sets a setting of the workstation, or it never reported with protocol 1.1 |
+| Pending | a revision is offered and not applied yet, since *Configuration pending since* |
+| Applied | the workstation applied the offered revision |
+| Refused | the workstation refused it; *Refusal reason* says why: `invalid:<key>`, `write_failed`, `restart_failed` or `unit_missing` |
+| Changed locally | a setting changed in the file; Odoo offers it again |
+
+An extension older than contract 1.3 reports without being piloted, and
+the form says that it is too old.
+
+### First pilot
+
+The first time a workstation is piloted, its free settings may hold local
+values that differ from Odoo's. *Settings › Stream Deck › First pilot*
+decides:
+
+- **Ask the employee**, the default: the extension asks once whether to
+  keep the local values, which then become overrides of the workstation
+  with the source *Workstation file*, or to take Odoo's. The form says
+  that Odoo waits for this choice and names the settings concerned.
+- **Keep local values**: Odoo adopts them at once, without asking.
+- **Take Odoo's values**: nothing is adopted.
+
+A local value that is empty, or already Odoo's, raises no question.
+Locked settings are always offered for the usual confirmation, whatever
+the choice. The workstation keeps the answer in *First pilot choice*;
+applying a first revision counts as *Take Odoo's values*.
+
+### Local changes
+
+After a revision is applied, a managed setting changed in the file, from
+the menu TODO › Stream Deck for instance, is handled at the next report:
+
+- a **free** setting becomes an override of the workstation, with the
+  source *Workstation file*, and raises no question: the next revision
+  equals the file, and the extension records it applied silently;
+- a **locked** setting, or a setting removed from the file or made
+  invalid there, is offered again under a new revision, which the
+  employee confirms as any other.
+
+### History of the configuration
+
+| Event | When |
+|---|---|
+| *Configuration applied* (`config_applied`) | the workstation reports the offered revision applied; with its revision |
+| *Configuration refused* (`config_refused`) | the workstation reports it refused; with its revision and reason |
+| *Local setting adopted* (`config_adopted`) | a free local value becomes an override; with its settings |
+| *Setting changed locally* (`config_drift`) | a locked setting, or a removed one, is offered again; with its settings |
+
+Odoo alone writes them, and they open no activity: the state is read on
+the workstation. The history filters on each of them.
+
+## Wire protocol 1.1
 
 The extension's
 [CONTRACT.md](https://github.com/TechnoLibre/erplibre-home-gnome-extension/blob/main/CONTRACT.md)
@@ -203,14 +331,15 @@ describes the same protocol from the workstation side.
 The client first sends `GET <url>/web/login?db=<db>` with a cookie jar to
 select the database, then each call is a `POST` of a JSON object, answered
 by a JSON object, under `/streamdeck/v1/`. Another HTTP method gets 405.
-Every body carries `"protocol": "1.0"`: an unknown major version is refused,
+Every body carries `"protocol"`, `"1.1"` for a workstation that takes in
+the configuration, `"1.0"` before it: an unknown major version is refused,
 a newer minor version is accepted and its unknown keys ignored. Every reply
-carries `protocol`; an error reply adds `error`.
+carries `"protocol": "1.1"`; an error reply adds `error`.
 
 | Route | Authentication | Body | Reply 200 |
 |---|---|---|---|
 | `enroll` | the method's credentials | `method` (`pairing_code`, `api_key` or `password`), `code`, `key` or `login` + `password`, `fingerprint`, `hostname` | `workstation_id`, `token` |
-| `report` | `Authorization: Bearer <token>` | `state`, `events`, `lost_events` | `accepted` (the uuids of the events), `heartbeat_s` (900) |
+| `report` | `Authorization: Bearer <token>` | `state`, `events`, `lost_events`, `config` (1.1) | `accepted` (the uuids of the events), `heartbeat_s` (900), `config` (1.1, to the pilot of a configured workstation) |
 | `unenroll` | `Authorization: Bearer <token>` | nothing else | nothing else; the token is revoked |
 
 - `fingerprint`: 64 lowercase hexadecimal digits, the HMAC-SHA256 of the
@@ -220,16 +349,33 @@ carries `protocol`; an error reply adds `error`.
   versions, ERPLibre branch and commit, deck program, service state
   (`active`, `failed`, `inactive`, `absent`) and the decks connected now
   (serial number, USB product id, USB path, firmware). The decks of the
-  workstation missing from the list become disconnected.
+  workstation missing from the list become disconnected. In 1.1,
+  `deck_plugins` lists at most 128 ids of the deck plugins found on the
+  workstation's disk; its repeats are dropped.
 - `events`: `plugged`, `unplugged` or `service_changed`, each with its own
-  uuid and the time it was observed. `moved`, `silent` and `heard_again`
-  are written by Odoo only: a report that carries one is a 400
-  `bad_request`. A uuid already stored is
+  uuid and the time it was observed. `moved`, `silent`, `heard_again`
+  and the four `config_*` kinds are written by Odoo only: a report that
+  carries one is a 400 `bad_request`. A uuid already stored is
   acknowledged again without change, so a report sent again creates
   nothing. A time more than 5 minutes ahead of the reception is replaced
   by the reception time.
 - `lost_events`: the running total of events the workstation dropped
   unsent; Odoo keeps the largest total received.
+- `config` (1.1, ignored in a 1.0 body): `{"pilot": false}` from a
+  destination that is not the pilot of the workstation, which gets no
+  `config` back. From the pilot, `{"pilot": true, "revision_applied",
+  "current", "result", "choice"}`: `current` the four settings as the file
+  holds them, null when absent or invalid; `result` the outcome of the
+  last revision, `{"revision", "status", "reason", "at"}` with `status`
+  `applied` or `refused`; `choice` the answer to the first-pilot question,
+  `keep_local` or `take_odoo`, sent once. A value outside the schema, or
+  an unknown status, reason or choice, is a 400 `bad_request`; a key
+  outside the four settings is ignored.
+- `config` of the reply: `{"revision", "hash", "settings", "locked"}`,
+  plus `ask` during a first pilot under *Ask the employee*. `hash` is the
+  SHA-256 of the canonical JSON of `settings` (keys sorted, no space),
+  `locked` the locked settings, `ask` the free settings whose local value
+  differs from Odoo's.
 - A deck is known by its serial number, key `sn:<serial>`; a deck without
   a readable serial number is known by its workstation, product id and
   USB path, key `nosn:<workstation>:<product>:<path>`, and is never

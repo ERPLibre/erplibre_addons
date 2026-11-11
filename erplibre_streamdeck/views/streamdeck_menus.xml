@@ -45,6 +45,26 @@
               action="action_streamdeck_fleet_events"
               sequence="30"/>
 
+    <menuitem id="menu_streamdeck_configuration"
+              name="Configuration"
+              parent="menu_streamdeck_root"
+              groups="group_streamdeck_manager"
+              sequence="80"/>
+
+    <menuitem id="menu_streamdeck_config_profiles"
+              name="Profiles"
+              parent="menu_streamdeck_configuration"
+              action="action_streamdeck_config_profiles"
+              groups="group_streamdeck_manager"
+              sequence="10"/>
+
+    <menuitem id="menu_streamdeck_config_models"
+              name="Deck models"
+              parent="menu_streamdeck_configuration"
+              action="action_streamdeck_config_models"
+              groups="group_streamdeck_manager"
+              sequence="20"/>
+
     <menuitem id="menu_streamdeck_settings"
               name="Settings"
               parent="menu_streamdeck_root"

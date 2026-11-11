@@ -6,7 +6,8 @@
     <!-- Paramètres › Stream Deck. Le délai de silence vaut toujours : il
          date l'historique « Poste muet ». Le reste ne sert qu'aux
          activités et ne s'affiche que lorsqu'elles sont activées ; chaque
-         délai suit la case de la sorte de problème qu'il retarde. -->
+         délai suit la case de la sorte de problème qu'il retarde. Le
+         premier pilotage vaut pour toute l'organisation. -->
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.erplibre.streamdeck</field>
         <field name="model">res.config.settings</field>
@@ -55,6 +56,14 @@
                                 <span class="me-2">After</span>
                                 <field name="streamdeck_unplugged_after_h" class="text-center" style="width: 6ch;"/>
                                 <span class="ms-2">hours</span>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Configuration" name="streamdeck_configuration">
+                        <setting id="streamdeck_first_pilot_setting" string="First pilot" help="At the first report of a piloted workstation, the free settings whose local value differs from Odoo's.">
+                            <field name="streamdeck_first_pilot_policy" widget="radio"/>
+                            <div class="text-muted mt8">
+                                Locked settings are always offered to the employee, who confirms them as any new configuration.
                             </div>
                         </setting>
                     </block>
