@@ -536,9 +536,10 @@ class StreamdeckService(models.AbstractModel):
         `service_state` that differs from the stored one, or that has no
         date yet, is dated `now`; a silent workstation is no longer, and
         gets a `heard_again` event dated `now`. The monitoring then hears
-        what the report solved or revealed. Last, the `config` of a pilot
-        report of protocol 1.1 or later is taken in, and the reply
-        carries the configuration Odoo offers (`_apply_config`)."""
+        what the report solved or revealed. Last, the `config` of a report
+        of protocol 1.1 or later is taken in: a pilot's reply carries the
+        configuration Odoo offers, a non-pilot's releases the workstation
+        (`_apply_config`)."""
         minor = _check_protocol(payload)
         workstation = self._workstation_of(token)
         state, decks, events, lost = _parse_report(payload)
@@ -736,13 +737,13 @@ class StreamdeckService(models.AbstractModel):
     # -- managed configuration -------------------------------------------
 
     def _parse_config(self, payload):
-        """The `config` of a report: None when absent, null or from a
-        destination that is not the pilot (`{"pilot": false}`, whatever
-        else it holds); for the pilot, `{revision_applied, current,
-        result, choice}`. `current` holds every key of KEYS, validated by
-        the schema and normalised, None for a key absent or null; a key
-        outside KEYS is ignored. Raises a 400 for any other shape or
-        value."""
+        """The `config` of a report: None when absent or null, which says
+        nothing of the pilot; `{"pilot": False}` from a destination that
+        is not the pilot, whatever else it holds; for the pilot,
+        `{pilot: True, revision_applied, current, result, choice}`.
+        `current` holds every key of KEYS, validated by the schema and
+        normalised, None for a key absent or null; a key outside KEYS is
+        ignored. Raises a 400 for any other shape or value."""
         config = payload.get("config")
         if config is None:
             return None
@@ -752,7 +753,7 @@ class StreamdeckService(models.AbstractModel):
         if not isinstance(pilot, bool):
             raise _bad()
         if not pilot:
-            return None
+            return {"pilot": False}
         schema = self.env["streamdeck.config.schema"]
         local = _dict(config, "current")
         current = {}
@@ -768,6 +769,7 @@ class StreamdeckService(models.AbstractModel):
         if choice is not None and choice not in CONFIG_CHOICES:
             raise _bad()
         return {
+            "pilot": True,
             "revision_applied": _count(
                 config.get("revision_applied"), nullable=True
             ),
@@ -779,17 +781,19 @@ class StreamdeckService(models.AbstractModel):
     def _apply_config(self, workstation, config, now):
         """Take in the pilot's `config` and return the reply's `config`.
 
-        Returns None, and changes nothing, for `config` None. Otherwise,
-        in this order: the `result` of the offered revision is recorded
-        (`_config_result`); a first pilot settles the free keys whose
-        local value differs from Odoo's by the organisation's policy, or
-        under `ask` by the employee's `choice`, until then listed in
-        `ask`; after a first pilot, a managed key changed in the file
-        since the last revision written to it is adopted when free and
-        offered again when locked (`_config_drift`). The effective
-        configuration then gets a new revision when its hash differs from
-        the offered one, or when a drift asks for it with the same
-        values.
+        Returns None, and changes nothing, for `config` None. A
+        destination that is not the pilot gets None and releases the
+        workstation (`_config_release`): this Odoo no longer offers it a
+        revision. Otherwise, in this order: the `result` of the offered
+        revision is recorded (`_config_result`); a first pilot settles the
+        free keys whose local value differs from Odoo's by the
+        organisation's policy, or under `ask` by the employee's `choice`,
+        until then listed in `ask`; after a first pilot, a managed key
+        changed in the file since the last revision written to it is
+        adopted when free and offered again when locked
+        (`_config_drift`). The effective configuration then gets a new
+        revision when its hash differs from the offered one, or when a
+        drift asks for it with the same values.
 
         A workstation that no layer configures is `unmanaged` and gets no
         `config`; its hash is cleared, so a later configuration gets a
@@ -797,19 +801,14 @@ class StreamdeckService(models.AbstractModel):
         """
         if config is None:
             return None
+        if not config["pilot"]:
+            self._config_release(workstation)
+            return None
         schema = self.env["streamdeck.config.schema"]
         self._config_result(workstation, config["result"], now)
         effective = schema._effective(workstation)
         if not effective["settings"]:
-            workstation.write(
-                {
-                    "config_state": "unmanaged",
-                    "config_hash": False,
-                    "config_offered": False,
-                    "config_ask": False,
-                    "config_pending_since": False,
-                }
-            )
+            self._config_release(workstation)
             return None
         current = config["current"]
         ask, drift, adopt = [], [], {}
@@ -866,6 +865,21 @@ class StreamdeckService(models.AbstractModel):
         if ask:
             offered["ask"] = ask
         return offered
+
+    def _config_release(self, workstation):
+        """Make `workstation` `unmanaged`: no revision offered, pending
+        or asked. Its hash is cleared, so the next pilot report gets a
+        new revision whatever its values; what it applied and wrote, and
+        its first-pilot choice, stay."""
+        values = {
+            "config_state": "unmanaged",
+            "config_hash": False,
+            "config_offered": False,
+            "config_ask": False,
+            "config_pending_since": False,
+        }
+        if any(workstation[name] != value for name, value in values.items()):
+            workstation.write(values)
 
     def _config_differing(self, effective, current):
         """The free keys of `effective` whose local value in `current` is

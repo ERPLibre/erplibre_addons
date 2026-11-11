@@ -246,6 +246,44 @@ class TestStreamdeckConfigWire(HttpCase):
                 self.assertEqual(workstation.config_state, "unmanaged")
                 self.assertFalse(workstation.config_revision)
 
+    def test_a_destination_no_longer_pilot_releases_the_workstation(self):
+        workstation, token = self._workstation()
+        applied = self._applied(token, workstation)
+        self.profile.line_ids.filtered(
+            lambda line: line.key == "games"
+        ).value = '"off"'
+        self._report(token, self._pilot(self._settings(), applied))
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertTrue(workstation.config_pending_since)
+
+        # Un corps sans `config` ne dit rien du pilotage : l'état reste.
+        self.assertNotIn("config", self._report(token, None))
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertTrue(workstation.config_pending_since)
+
+        # `{"pilot": false}` : cet Odoo ne pilote plus le poste, qui
+        # quitte « Configuration en attente » ; ce qu'il a appliqué et
+        # son choix du premier pilotage restent.
+        body = self._report(token, {"pilot": False})
+        self.assertNotIn("config", body)
+        self.assertEqual(workstation.config_state, "unmanaged")
+        self.assertFalse(workstation.config_pending_since)
+        self.assertFalse(workstation.config_ask)
+        self.assertFalse(workstation.config_hash)
+        self.assertEqual(workstation.config_applied_revision, applied)
+        self.assertEqual(workstation.config_first_choice, "take_odoo")
+        pending = self.Workstation.search(
+            [("config_state", "=", "pending"), ("id", "=", workstation.id)]
+        )
+        self.assertFalse(pending)
+
+        # Piloté de nouveau, il reçoit une révision neuve.
+        again = self._report(token, self._pilot(self._settings(), applied))
+        self.assertGreater(again["config"]["revision"], applied + 1)
+        self.assertEqual(again["config"]["settings"]["games"], "off")
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertTrue(workstation.config_pending_since)
+
     def test_a_workstation_no_layer_configures_gets_no_config(self):
         workstation, token = self._workstation()
         workstation.config_profile_id = False

@@ -283,7 +283,7 @@ la révision a été appliquée ou refusée, et pourquoi.
 
 | Configuration | Sens |
 |---|---|
-| Non gérée | aucune couche ne fixe de réglage du poste, ou il n'a jamais remonté en protocole 1.1 |
+| Non gérée | aucune couche ne fixe de réglage du poste, il n'a jamais remonté en protocole 1.1, ou son extension ne coche pas cette base comme pilote ; une révision jusque-là en attente est retirée |
 | En attente | une révision est proposée et pas encore appliquée, depuis *Configuration en attente depuis* |
 | Appliquée | le poste a appliqué la révision proposée |
 | Refusée | le poste l'a refusée ; *Raison du refus* dit pourquoi : `invalid:<clé>`, `write_failed`, `restart_failed` ou `unit_missing` |

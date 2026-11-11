@@ -277,7 +277,7 @@ revision was applied or refused, and why.
 
 | Configuration | Meaning |
 |---|---|
-| Unmanaged | no layer sets a setting of the workstation, or it never reported with protocol 1.1 |
+| Unmanaged | no layer sets a setting of the workstation, it never reported with protocol 1.1, or its extension does not check this database as the pilot; a revision pending until then is withdrawn |
 | Pending | a revision is offered and not applied yet, since *Configuration pending since* |
 | Applied | the workstation applied the offered revision |
 | Refused | the workstation refused it; *Refusal reason* says why: `invalid:<key>`, `write_failed`, `restart_failed` or `unit_missing` |
@@ -695,7 +695,7 @@ la révision a été appliquée ou refusée, et pourquoi.
 
 | Configuration | Sens |
 |---|---|
-| Non gérée | aucune couche ne fixe de réglage du poste, ou il n'a jamais remonté en protocole 1.1 |
+| Non gérée | aucune couche ne fixe de réglage du poste, il n'a jamais remonté en protocole 1.1, ou son extension ne coche pas cette base comme pilote ; une révision jusque-là en attente est retirée |
 | En attente | une révision est proposée et pas encore appliquée, depuis *Configuration en attente depuis* |
 | Appliquée | le poste a appliqué la révision proposée |
 | Refusée | le poste l'a refusée ; *Raison du refus* dit pourquoi : `invalid:<clé>`, `write_failed`, `restart_failed` ou `unit_missing` |
