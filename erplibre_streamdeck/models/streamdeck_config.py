@@ -64,11 +64,12 @@ class StreamdeckConfigSchema(models.AbstractModel):
         """Return `value` normalised for `key`, or raise ValidationError.
 
         `deck_program` and `games` are one of their strings; `plugins_off`
-        is a list of at most PLUGINS_OFF_MAX plugin ids, its order kept
-        and its duplicates dropped; `session_refresh_sec` is a number,
-        returned as a float, within SESSION_REFRESH_RANGE. A boolean is
-        not a number, an integer too large for a float is out of range,
-        and an unknown key is invalid.
+        is a list of plugin ids, returned with its repeats dropped and its
+        order kept, at most PLUGINS_OFF_MAX of them once dropped (the rule
+        of the extension's deck-config.js); `session_refresh_sec` is a
+        number, returned as a float, within SESSION_REFRESH_RANGE. A
+        boolean is not a number, an integer too large for a float is out
+        of range, and an unknown key is invalid.
         """
         if key == "deck_program":
             if isinstance(value, str) and value in PROGRAMS:
@@ -77,15 +78,13 @@ class StreamdeckConfigSchema(models.AbstractModel):
             if isinstance(value, str) and value in GAMES_VALUES:
                 return value
         elif key == "plugins_off":
-            if (
-                isinstance(value, list)
-                and len(value) <= PLUGINS_OFF_MAX
-                and all(
-                    isinstance(item, str) and PLUGIN_ID_RE.fullmatch(item)
-                    for item in value
-                )
+            if isinstance(value, list) and all(
+                isinstance(item, str) and PLUGIN_ID_RE.fullmatch(item)
+                for item in value
             ):
-                return list(dict.fromkeys(value))
+                ids = list(dict.fromkeys(value))
+                if len(ids) <= PLUGINS_OFF_MAX:
+                    return ids
         elif key == "session_refresh_sec":
             # The bounds are compared before any conversion: Python
             # compares an int of any size with a float exactly, where

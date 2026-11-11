@@ -96,6 +96,8 @@ class TestStreamdeckConfig(TransactionCase):
             ),
             ("plugins_off", ["b", "a", "b"], ["b", "a"]),
             ("plugins_off", sixty_four, sixty_four),
+            # La borne compte les identifiants, répétitions retirées.
+            ("plugins_off", sixty_four + ["p0"], sixty_four),
             ("session_refresh_sec", 0.5, 0.5),
             ("session_refresh_sec", 60, 60.0),
             ("session_refresh_sec", 2, 2.0),
