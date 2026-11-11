@@ -182,6 +182,19 @@ class TestStreamdeckMonitor(TransactionCase):
             ]
         )
 
+    def _notes(self, device):
+        """Les notes du fil de `device` qui ne sont pas des messages
+        d'activité."""
+        return self.env["mail.message"].search(
+            [
+                ("model", "=", "streamdeck.device"),
+                ("res_id", "=", device.id),
+                ("message_type", "=", "comment"),
+                ("subtype_id", "=", self.env.ref("mail.mt_note").id),
+                ("mail_activity_type_id", "=", False),
+            ]
+        )
+
     def _solved_after_the_read(self, record, query, params):
         """Un contexte où le cron lit ses candidats comme d'habitude, puis,
         si `record` en est, `query` écrit sa ligne : une remontée écrite
@@ -505,17 +518,10 @@ class TestStreamdeckMonitor(TransactionCase):
         self.assertRecordValues(activity, [{"user_id": self.manager.id}])
         self.assertIn("host-a", activity.note)
         self.assertIn("host-b", activity.note)
-        notes_domain = [
-            ("model", "=", "streamdeck.device"),
-            ("res_id", "=", device.id),
-            ("message_type", "=", "comment"),
-            ("subtype_id", "=", self.env.ref("mail.mt_note").id),
-            ("mail_activity_type_id", "=", False),
-        ]
-        notes = self.env["mail.message"].search(notes_domain)
+        notes = self._notes(device)
         self._report(self.token_c, T0 + 2 * HOUR, decks=[DECK])
         self.assertEqual(self._activities(device, "moved"), activity)
-        added = self.env["mail.message"].search(notes_domain) - notes
+        added = self._notes(device) - notes
         self.assertEqual(len(added), 1)
         self.assertIn("host-b", added.body)
         self.assertIn("host-c", added.body)
@@ -794,3 +800,27 @@ class TestStreamdeckMonitor(TransactionCase):
                 self.assertFalse(self.workstation_a.silent_since)
         self._cron(T0 + 61 * MIN)
         self.assertTrue(self.workstation_a.silent_since)
+
+    def test_a_second_move_adds_a_note_whoever_the_activity_went_to(self):
+        # « Changé de poste » reste une seule activité ouverte par deck,
+        # que le destinataire soit l'employé ou les deux : le nouveau
+        # détenteur d'un deck déplacé une seconde fois n'en reçoit pas une
+        # de plus, le fil du deck reçoit une note.
+        for recipient, deck, first in (
+            ("employee", DECK, self.user_b),
+            ("both", OTHER_DECK, self.user_b | self.manager),
+        ):
+            with self.subTest(recipient=recipient):
+                self._enable(recipient=recipient)
+                self._report(self.token_a, T0, decks=[deck])
+                self._report(self.token_b, T0 + HOUR, decks=[deck])
+                device = self._device(deck)
+                activities = self._activities(device, "moved")
+                self.assertEqual(activities.user_id, first)
+                notes = self._notes(device)
+                self._report(self.token_c, T0 + 2 * HOUR, decks=[deck])
+                self.assertEqual(self._activities(device, "moved"), activities)
+                added = self._notes(device) - notes
+                self.assertEqual(len(added), 1)
+                self.assertIn("host-b", added.body)
+                self.assertIn("host-c", added.body)
