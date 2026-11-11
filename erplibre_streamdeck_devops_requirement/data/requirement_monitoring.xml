@@ -86,7 +86,7 @@
     </record>
     <record id="req_sd_mon_r06" model="devops.requirement">
         <field name="code">SD-MON-R06</field>
-        <field name="name">An activity closes by itself, with "Resolved at &lt;time&gt;" in its thread, once its problem is solved: deck service running again, workstation heard again, deck plugged in again; never two open activities for one problem</field>
+        <field name="name">An activity closes by itself, with "Resolved at &lt;time&gt;" in its thread, once its problem is solved: deck service running again, workstation heard again, deck plugged in again; never two open activities for one problem and one user</field>
         <field name="category_id" ref="cat_sd_mon" />
         <field name="sequence" eval="60" />
         <field name="moscow">must</field>
@@ -1102,6 +1102,12 @@
         <field name="sequence" eval="120" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_a_requirement_is_not_done_before_what_it_rests_on</field>
+    </record>
+    <record id="test_sd_mon_r24_13" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r24" />
+        <field name="sequence" eval="130" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_requirement_monitoring.TestRequirementMonitoring.test_one_open_activity_per_problem_is_counted_per_user</field>
     </record>
     <record id="test_sd_mon_r25_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r25" />

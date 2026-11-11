@@ -74,6 +74,21 @@ DEPENDS_ON = {
     "SD-MON-R19": ["SD-MON-R17"],
 }
 
+# Un problème a une activité ouverte par utilisateur, et le destinataire
+# « les deux » en ouvre deux (SD-MON-R18) : un requis qui refuse deux
+# activités ouvertes pour un problème borne ce refus à un utilisateur, dans
+# chaque langue où il se lit.
+ONE_OPEN_ACTIVITY = {
+    "en_US": (
+        re.compile(r"\btwo open activities\b"),
+        re.compile(r"\b(?:one|same) user\b"),
+    ),
+    "fr_CA": (
+        re.compile(r"\bdeux activités ouvertes\b"),
+        re.compile(r"\b(?:un|le) même utilisateur\b"),
+    ),
+}
+
 FRENCH = {
     "cat_sd_mon": "Surveillance",
     "SD-MON-R12": (
@@ -231,6 +246,20 @@ class TestRequirementMonitoring(TransactionCase):
                     self.assertFalse(requirement.done)
                 for code in undone.mapped("code"):
                     self.assertIn(code, requirement.missing or "")
+
+    def test_one_open_activity_per_problem_is_counted_per_user(self):
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(
+            [MODULE], ["fr_CA"], overwrite=True
+        )
+        for lang, (refusal, per_user) in ONE_OPEN_ACTIVITY.items():
+            refusing = self.requirements.with_context(lang=lang).filtered(
+                lambda r: refusal.search(r.name)
+            )
+            self.assertIn("SD-MON-R06", refusing.mapped("code"), lang)
+            for requirement in refusing:
+                with self.subTest(lang=lang, code=requirement.code):
+                    self.assertRegex(requirement.name, per_user)
 
     def test_security_requirements_are_must_and_flagged(self):
         security = self.requirements.filtered(

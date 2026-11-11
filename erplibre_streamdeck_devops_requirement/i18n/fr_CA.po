@@ -1376,11 +1376,13 @@ msgstr ""
 msgid ""
 "An activity closes by itself, with \"Resolved at <time>\" in its thread, "
 "once its problem is solved: deck service running again, workstation heard "
-"again, deck plugged in again; never two open activities for one problem"
+"again, deck plugged in again; never two open activities for one problem "
+"and one user"
 msgstr ""
 "Une activité se ferme seule, « Résolu à <heure> » à son fil, une fois son "
 "problème réglé : service du deck reparti, poste revenu, deck rebranché ; "
-"jamais deux activités ouvertes pour un même problème"
+"jamais deux activités ouvertes pour un même problème et un même "
+"utilisateur"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r21
