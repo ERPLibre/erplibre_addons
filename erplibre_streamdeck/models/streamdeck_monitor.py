@@ -192,10 +192,11 @@ class StreamdeckMonitor(models.AbstractModel):
         has no open one of that kind there, its note `note` (a lazy
         translation) in the recipient's language; return the activities
         created. Nothing opens while the activities are disabled or the
-        box of `kind` is cleared. For `moved`, a recipient whose activity
-        is still open gets none, and `note` is posted once to the record's
-        thread instead, so a deck moved twice keeps one activity and its
-        thread tells the second move.
+        box of `kind` is cleared. For `moved`, an activity still open on
+        `record`, whoever it is assigned to, keeps it unique: nothing
+        opens, and `note` is posted once to the record's thread instead,
+        so a deck moved twice keeps its activity and its thread tells the
+        second move.
 
         With `still`, the domain that made the cron pick `record`, the row
         is first taken by `_lock()`, and nothing opens unless it is
@@ -209,6 +210,14 @@ class StreamdeckMonitor(models.AbstractModel):
             return Activity
         record = record.sudo()
         already = self._open_activities(record, kind)
+        if kind == "moved" and already:
+            env = self._in_language(self.env, already[0].user_id)
+            record.message_post(
+                body=Markup("<p>%s</p>") % env._(note),
+                message_type="comment",
+                subtype_xmlid="mail.mt_note",
+            )
+            return Activity
         values = []
         for user in self._recipients(record, settings):
             if user in already.user_id:
@@ -227,13 +236,6 @@ class StreamdeckMonitor(models.AbstractModel):
             )
         if values and still is not None and not self._lock(record, still):
             return Activity
-        if kind == "moved" and already:
-            env = self._in_language(self.env, already[0].user_id)
-            record.message_post(
-                body=Markup("<p>%s</p>") % env._(note),
-                message_type="comment",
-                subtype_xmlid="mail.mt_note",
-            )
         return Activity.create(values)
 
     def _resolve(self, record, kind, what):
