@@ -345,6 +345,11 @@ msgid "Configuration applied"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_written
+msgid "Configuration in the file"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_line_ids
 msgid "Configuration overrides"
 msgstr ""
@@ -762,6 +767,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_is_follower
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_is_follower
 msgid "Is Follower"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_written
+msgid ""
+"JSON of the settings of the last revision written to the workstation's file:"
+" the applied one, or a later one refused after its write. A local change is "
+"measured against them."
 msgstr ""
 
 #. module: erplibre_streamdeck

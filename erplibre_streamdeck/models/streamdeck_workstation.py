@@ -199,6 +199,14 @@ class StreamdeckWorkstation(models.Model):
         copy=False,
         help="JSON of the settings the workstation last applied.",
     )
+    config_written = fields.Text(
+        string="Configuration in the file",
+        readonly=True,
+        copy=False,
+        help="JSON of the settings of the last revision written to the"
+        " workstation's file: the applied one, or a later one refused after"
+        " its write. A local change is measured against them.",
+    )
     config_state = fields.Selection(
         CONFIG_STATES,
         string="Configuration",
