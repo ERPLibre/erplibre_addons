@@ -305,11 +305,13 @@ msgstr "Archivé"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__ask
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__ask
 msgid "Ask the employee"
 msgstr "Demander à l'employé"
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
 msgid ""
 "At the first report of a piloted workstation, the free settings whose local "
 "value differs from Odoo's."
@@ -319,6 +321,7 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_first_pilot_policy
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_policy__first_pilot_policy
 msgid ""
 "At the first report of a piloted workstation, the free settings whose local "
 "value differs from Odoo's: the employee chooses, or this choice applies. "
@@ -339,6 +342,11 @@ msgstr "Pièce jointe"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_attachment_count
 msgid "Attachment Count"
 msgstr "Nombre de pièces jointes"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid "Cancel"
+msgstr "Annuler"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__drift
@@ -463,6 +471,7 @@ msgstr "Créez les réglages d'un modèle de deck"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_uid
@@ -476,6 +485,7 @@ msgstr "Créé par"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_date
@@ -603,6 +613,7 @@ msgstr "Débranché"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__display_name
@@ -711,8 +722,12 @@ msgid "Firmware"
 msgstr "Firmware"
 
 #. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_config_policy
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_first_pilot_policy
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__first_pilot_policy
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_policy
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
 msgid "First pilot"
 msgstr "Premier pilotage"
 
@@ -720,6 +735,11 @@ msgstr "Premier pilotage"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_first_choice
 msgid "First pilot choice"
 msgstr "Choix du premier pilotage"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_policy
+msgid "First pilot policy"
+msgstr "Politique du premier pilotage"
 
 #. module: erplibre_streamdeck
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet
@@ -830,6 +850,7 @@ msgstr "Nom d'hôte donné à l'inscription ; l'employé peut le renommer."
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__id
@@ -905,6 +926,7 @@ msgstr "JSON des réglages que le poste a appliqués en dernier."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__keep_local
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__keep_local
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_first_choice__keep_local
 msgid "Keep local values"
 msgstr "Garder les valeurs locales"
@@ -923,6 +945,7 @@ msgstr "Sorte"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_uid
@@ -936,6 +959,7 @@ msgstr "Dernière modification par"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_date
@@ -990,6 +1014,7 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
 msgid ""
 "Locked settings are always offered to the employee, who confirms them as any"
 " new configuration."
@@ -1178,6 +1203,13 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #. odoo-python
+#: code:addons/erplibre_streamdeck/wizard/streamdeck_config_policy.py:0
+msgid "Only a Stream Deck manager sets the first-pilot policy."
+msgstr ""
+"Seul un gestionnaire du Stream Deck règle la politique du premier pilotage."
+
+#. module: erplibre_streamdeck
+#. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
 msgid "Only the Stream Deck monitoring opens activities of this type."
 msgstr "Seule la surveillance Stream Deck ouvre des activités de ce type."
@@ -1309,6 +1341,11 @@ msgid ""
 "workstation."
 msgstr ""
 "SHA-256 du jeton du poste ; le jeton lui-même n'est gardé que par le poste."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid "Save"
+msgstr "Enregistrer"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__selectable
@@ -1539,6 +1576,7 @@ msgstr "Stream Deck : surveiller les postes et les decks"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__take_odoo
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__take_odoo
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_first_choice__take_odoo
 msgid "Take Odoo's values"
 msgstr "Prendre les valeurs d'Odoo"

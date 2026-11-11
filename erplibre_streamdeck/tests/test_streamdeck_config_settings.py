@@ -9,14 +9,15 @@ PARAM = "erplibre_streamdeck.first_pilot_policy"
 
 @tagged("post_install", "-at_install")
 class TestStreamdeckConfigSettings(TransactionCase):
-    """Paramètres › Stream Deck : la politique du premier pilotage.
+    """La politique du premier pilotage.
 
     Au premier pilotage d'un poste, l'employé choisit entre ses valeurs
     locales et celles d'Odoo (`ask`), à moins que l'organisation ne force
     `keep_local` ou `take_odoo`. Le paramètre vit en
-    `ir.config_parameter`, écrit par la page Paramètres seule, donc par
-    son administrateur (`base.group_system`), qui est aussi gestionnaire
-    du Stream Deck ; une valeur inconnue s'y lit `ask`.
+    `ir.config_parameter` ; le gestionnaire du Stream Deck l'écrit par le
+    formulaire `streamdeck.config.policy` (Stream Deck › Configuration ›
+    Premier pilotage), l'administrateur des Paramètres aussi par la page
+    Paramètres › Stream Deck. Une valeur inconnue s'y lit `ask`.
     """
 
     @classmethod
@@ -72,23 +73,55 @@ class TestStreamdeckConfigSettings(TransactionCase):
                     read,
                 )
 
-    def test_only_a_settings_administrator_sets_the_first_pilot_policy(
-        self,
-    ):
+    def test_only_the_manager_sets_the_first_pilot_policy(self):
+        Policy = self.env["streamdeck.config.policy"]
         self.Param.set_param(PARAM, "ask")
-        # L'employé, et le gestionnaire du Stream Deck sans les droits de
-        # la page Paramètres, ne l'écrivent ni par la page ni par le
-        # paramètre : Odoo réserve la page Paramètres à `base.group_system`.
+        # L'employé n'ouvre pas le formulaire, n'enregistre pas celui d'un
+        # autre et n'écrit pas le paramètre.
+        with self.assertRaises(AccessError):
+            Policy.with_user(self.employee).create(
+                {"first_pilot_policy": "take_odoo"}
+            )
+        form = Policy.with_user(self.manager).create(
+            {"first_pilot_policy": "take_odoo"}
+        )
+        with self.assertRaises(AccessError):
+            form.with_user(self.employee).action_save()
+        with self.assertRaises(AccessError):
+            self.env["ir.config_parameter"].with_user(self.employee).set_param(
+                PARAM, "take_odoo"
+            )
+        self.assertEqual(self.Schema._first_pilot_policy(), "ask")
+
+        # Le gestionnaire, sans les droits de la page Paramètres, force
+        # chaque politique, et le formulaire s'ouvre sur celle en place.
+        self.assertFalse(self.manager.has_group("base.group_system"))
+        for policy in ("keep_local", "take_odoo", "ask"):
+            with self.subTest(policy=policy):
+                form = Policy.with_user(self.manager).create(
+                    {"first_pilot_policy": policy}
+                )
+                action = form.action_save()
+                self.assertEqual(action["type"], "ir.actions.act_window_close")
+                self.assertEqual(self.Param.get_param(PARAM), policy)
+                self.assertEqual(self.Schema._first_pilot_policy(), policy)
+                self.assertEqual(
+                    Policy.with_user(self.manager)
+                    .create({})
+                    .first_pilot_policy,
+                    policy,
+                )
+
+    def test_the_settings_page_writes_it_for_its_administrator_only(self):
+        self.Param.set_param(PARAM, "ask")
+        # La page Paramètres reste à `base.group_system` : le gestionnaire
+        # du Stream Deck passe par son propre formulaire.
         for user in (self.employee, self.manager):
             with self.subTest(user=user.login):
                 with self.assertRaises(AccessError):
                     self.Settings.with_user(user).create(
                         {"streamdeck_first_pilot_policy": "take_odoo"}
                     ).execute()
-                with self.assertRaises(AccessError):
-                    self.env["ir.config_parameter"].with_user(user).set_param(
-                        PARAM, "take_odoo"
-                    )
                 self.assertEqual(self.Schema._first_pilot_policy(), "ask")
 
         for policy in ("keep_local", "take_odoo", "ask"):

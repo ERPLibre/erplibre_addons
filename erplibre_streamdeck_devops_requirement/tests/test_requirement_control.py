@@ -62,7 +62,7 @@ SECURITY = (
 
 # Les requis encore à faire : chacun décrit son écart dans Ce qui manque,
 # et le passer à fait passe par cette liste.
-TO_DO = ("SD-CTL-R10", "SD-CTL-R49")
+TO_DO = ("SD-CTL-R49",)
 
 ODOO = "odoo.addons.erplibre_streamdeck.tests."
 EXTENSION = "erplibre-home-gnome-extension:test/unit/"

@@ -23,7 +23,7 @@ Nobody writes it by hand: only the workstation routes write it.
 | Stream Deck › My workstations | every employee | their workstations; the button *Add a workstation* shows a pairing code |
 | Stream Deck › My decks | every employee | the decks their workstations hold or have held |
 | Stream Deck › Fleet › Workstations, Decks, Events | manager | everything, read-only, except the name, the archive flag, the token and the configuration of a workstation |
-| Stream Deck › Configuration › Profiles, Deck models | manager | the configuration layers: reusable profiles, and the settings of each deck model |
+| Stream Deck › Configuration › Profiles, Deck models, First pilot | manager | the configuration layers: reusable profiles, and the settings of each deck model; the first-pilot policy |
 | Stream Deck › Settings | administrator | the *Stream Deck* section of the Settings: the monitoring and the first pilot |
 
 A workstation shows what its last report said: operating system, GNOME
@@ -284,8 +284,9 @@ the form says that it is too old.
 ### First pilot
 
 The first time a workstation is piloted, its free settings may hold local
-values that differ from Odoo's. *Settings › Stream Deck › First pilot*
-decides:
+values that differ from Odoo's. The Stream Deck manager decides in
+*Stream Deck › Configuration › First pilot*, as a Settings administrator
+does in *Settings › Stream Deck*:
 
 - **Ask the employee**, the default: the extension asks once whether to
   keep the local values, which then become overrides of the workstation

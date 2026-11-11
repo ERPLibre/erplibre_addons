@@ -17,6 +17,7 @@ CONFIG_TERMS = {
     "Deck models": "Modèles de deck",
     "Selectable": "Au choix",
     "First pilot": "Premier pilotage",
+    "First pilot policy": "Politique du premier pilotage",
     "Ask the employee": "Demander à l'employé",
     "Keep local values": "Garder les valeurs locales",
     "Take Odoo's values": "Prendre les valeurs d'Odoo",
@@ -59,6 +60,7 @@ class TestStreamdeckConfigI18n(TransactionCase):
             ("menu_streamdeck_configuration", "Configuration"),
             ("menu_streamdeck_config_profiles", "Profils"),
             ("menu_streamdeck_config_models", "Modèles de deck"),
+            ("menu_streamdeck_config_policy", "Premier pilotage"),
         ):
             with self.subTest(menu=xmlid):
                 self.assertEqual(fr.ref("%s.%s" % (MODULE, xmlid)).name, name)
