@@ -45,4 +45,11 @@
               action="action_streamdeck_fleet_events"
               sequence="30"/>
 
+    <menuitem id="menu_streamdeck_settings"
+              name="Settings"
+              parent="menu_streamdeck_root"
+              action="action_streamdeck_settings"
+              groups="base.group_system"
+              sequence="90"/>
+
 </odoo>

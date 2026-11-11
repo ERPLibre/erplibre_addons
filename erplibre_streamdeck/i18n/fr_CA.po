@@ -18,6 +18,21 @@ msgstr ""
 "X-Generator: Odoo\n"
 
 #. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "<span class=\"me-2\">After</span>"
+msgstr "<span class=\"me-2\">Après</span>"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "<span class=\"ms-2\">hours</span>"
+msgstr "<span class=\"ms-2\">heures</span>"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "<span class=\"ms-2\">minutes</span>"
+msgstr "<span class=\"ms-2\">minutes</span>"
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
 msgid ""
 "A deck appears here once one of your enrolled workstations\n"
@@ -27,9 +42,33 @@ msgstr ""
 "                le signale."
 
 #. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A deck is reported by another workstation. A person closes it; a new move "
+"adds a note to it."
+msgstr ""
+"Un deck est remonté par un autre poste. Une personne la ferme ; un nouveau "
+"déplacement y ajoute une note."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid "A deck is unplugged for long after %(floor)s hour at the least."
+msgstr "Un deck est débranché longtemps après %(floor)s heure au moins."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_device_key_unique
 msgid "A deck key is unique."
 msgstr "La clé d'un deck est unique."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A deck stays unplugged beyond this delay. It closes when the deck is plugged"
+" again."
+msgstr ""
+"Un deck reste débranché au-delà de ce délai. Elle se ferme quand le deck est"
+" rebranché."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_pairing_code_code_unique
@@ -40,6 +79,31 @@ msgstr "Un code d'appairage est unique."
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_device_holding_device_user_unique
 msgid "A user has one first holding per deck."
 msgstr "Un utilisateur a une seule première détention par deck."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "A workstation goes silent. It closes at its next report."
+msgstr "Un poste devient muet. Elle se ferme à sa remontée suivante."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid ""
+"A workstation is silent after %(floor)s minutes at the least: one missed "
+"heartbeat is not silence."
+msgstr ""
+"Un poste devient muet après %(floor)s minutes au moins : un battement manqué"
+" n'est pas un silence."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_silent_after_min
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A workstation that has not reported for this delay is silent. The "
+"workstation reports every 15 minutes."
+msgstr ""
+"Un poste qui n'a rien remonté pendant ce délai est muet. Le poste remonte "
+"toutes les 15 minutes."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__absent
@@ -67,6 +131,11 @@ msgid "Activities"
 msgstr "Activités"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_recipient
+msgid "Activities for"
+msgstr "Activités pour"
+
+#. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_mail_activity
 msgid "Activity"
 msgstr "Activité"
@@ -88,6 +157,11 @@ msgstr "Statut de l'activité"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "Icône de type d'activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_manager_id
+msgid "Activity manager"
+msgstr "Gestionnaire des activités"
 
 #. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_pairing_wizard
@@ -162,6 +236,11 @@ msgid "Code"
 msgstr "Code"
 
 #. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__connected
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
 msgid "Connected"
@@ -212,6 +291,11 @@ msgid "Deck"
 msgstr "Deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_moved
+msgid "Deck changed workstation"
+msgstr "Deck changé de poste"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__deck_program
 msgid "Deck program"
 msgstr "Programme du deck"
@@ -229,6 +313,7 @@ msgid "Deck service"
 msgstr "Service du deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_service_failed
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Deck service failed"
 msgstr "Service du deck en échec"
@@ -237,6 +322,11 @@ msgstr "Service du deck en échec"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__service_state_since
 msgid "Deck service state since"
 msgstr "État du service du deck depuis"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_unplugged
+msgid "Deck unplugged for long"
+msgstr "Deck débranché longtemps"
 
 #. module: erplibre_streamdeck
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_fleet_decks
@@ -281,10 +371,16 @@ msgstr "Commit ERPLibre"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__employee_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__user_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__user_id
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__employee
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Employee"
 msgstr "Employé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__both
+msgid "Employee and manager"
+msgstr "Employé et gestionnaire"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__token_active
@@ -518,6 +614,7 @@ msgid "Lost events"
 msgstr "Événements perdus"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__manager
 #: model:res.groups,name:erplibre_streamdeck.group_streamdeck_manager
 msgid "Manager"
 msgstr "Gestionnaire"
@@ -546,6 +643,11 @@ msgid "Model"
 msgstr "Modèle"
 
 #. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "Monitoring"
+msgstr "Surveillance"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__my_activity_date_deadline
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__my_activity_date_deadline
 msgid "My Activity Deadline"
@@ -567,6 +669,16 @@ msgstr "Mes postes"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__name
 msgid "Name"
 msgstr "Nom"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid ""
+"Name the manager who receives the Stream Deck activities, or send them to "
+"the employee only."
+msgstr ""
+"Nommez le gestionnaire qui reçoit les activités Stream Deck, ou envoyez-les "
+"à l'employé seulement."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_date_deadline
@@ -644,6 +756,18 @@ msgid "One of your workstations holds this deck or held it."
 msgstr "Un de vos postes détient ce deck ou l'a détenu."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activities_enabled
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"Open an Odoo activity for each problem the monitoring detects, and close it "
+"when the problem is solved. Without it, the monitoring only writes the "
+"history."
+msgstr ""
+"Ouvrir une activité Odoo pour chaque problème que la surveillance détecte, "
+"et la fermer quand le problème est réglé. Sans cela, la surveillance n'écrit"
+" que l'historique."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__os_name
 msgid "Operating system"
 msgstr "Système d'exploitation"
@@ -673,6 +797,11 @@ msgstr "Poste précédent"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__previous_workstation_name
 msgid "Previous workstation name"
 msgstr "Nom du poste précédent"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "Problems that open an activity"
+msgstr "Problèmes qui ouvrent une activité"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__received_at
@@ -727,6 +856,11 @@ msgid "Service failed"
 msgstr "Service en échec"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_service_failed_after_min
+msgid "Service failed for (minutes)"
+msgstr "Service en échec depuis (minutes)"
+
+#. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
 msgid "Service started"
@@ -746,6 +880,17 @@ msgid ""
 msgstr ""
 "Posé quand le poste n'a rien remonté pendant le délai de silence, daté de la"
 " fin de ce délai ; sa remontée suivante l'efface."
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_settings
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_settings
+msgid "Settings"
+msgstr "Paramètres"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_silent_after_min
+msgid "Silent after (minutes)"
+msgstr "Muet après (minutes)"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__silent_since
@@ -769,8 +914,14 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model:ir.module.category,name:erplibre_streamdeck.module_category_streamdeck
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_root
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid "Stream Deck"
 msgstr "Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_activities_enabled
+msgid "Stream Deck detection activities"
+msgstr "Activités de détection Stream Deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_device
@@ -806,6 +957,45 @@ msgstr "Poste Stream Deck"
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_service
 msgid "Stream Deck workstation service"
 msgstr "Service des postes Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_manager_id
+msgid "The Stream Deck manager who receives the activities."
+msgstr "Le gestionnaire Stream Deck qui reçoit les activités."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"The deck service of a workstation stays failed beyond this delay. It closes "
+"when the service leaves the failed state."
+msgstr ""
+"Le service du deck d'un poste reste en échec au-delà de ce délai. Elle se "
+"ferme quand le service quitte l'échec."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_service_failed_after_min
+msgid ""
+"The deck service restarts by itself after a failure: a failure shorter than "
+"this delay opens no activity."
+msgstr ""
+"Le service du deck se relance seul après un échec : un échec plus court que "
+"ce délai n'ouvre aucune activité."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid "The delay of a failed deck service is %(floor)s minutes at the least."
+msgstr ""
+"Le délai d'un service du deck en échec est de %(floor)s minutes au moins."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_recipient
+msgid ""
+"The employee is the one of the workstation, or of the workstation that holds"
+" the deck. Both gives one activity to each."
+msgstr ""
+"L'employé est celui du poste, ou du poste qui tient le deck. Les deux donne "
+"une activité à chacun."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__token_active
@@ -875,6 +1065,11 @@ msgid "Unplugged"
 msgstr "Débranché"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_unplugged_after_h
+msgid "Unplugged for long after (hours)"
+msgstr "Débranché longtemps après (heures)"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__used
 msgid "Used"
 msgstr "Utilisé"
@@ -915,7 +1110,9 @@ msgid "Workstation name"
 msgstr "Nom du poste"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_silent
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__silent
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid "Workstation silent"
 msgstr "Poste muet"
 
