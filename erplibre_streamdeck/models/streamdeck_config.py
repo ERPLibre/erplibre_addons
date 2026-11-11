@@ -3,7 +3,6 @@
 import hashlib
 import json
 import logging
-import math
 import re
 
 from odoo import _, api, fields, models
@@ -68,7 +67,8 @@ class StreamdeckConfigSchema(models.AbstractModel):
         is a list of at most PLUGINS_OFF_MAX plugin ids, its order kept
         and its duplicates dropped; `session_refresh_sec` is a number,
         returned as a float, within SESSION_REFRESH_RANGE. A boolean is
-        not a number, and an unknown key is invalid.
+        not a number, an integer too large for a float is out of range,
+        and an unknown key is invalid.
         """
         if key == "deck_program":
             if isinstance(value, str) and value in PROGRAMS:
@@ -87,9 +87,13 @@ class StreamdeckConfigSchema(models.AbstractModel):
             ):
                 return list(dict.fromkeys(value))
         elif key == "session_refresh_sec":
+            # The bounds are compared before any conversion: Python
+            # compares an int of any size with a float exactly, where
+            # float() of a huge int raises OverflowError. NaN and the
+            # infinities fail the comparison.
             if isinstance(value, (int, float)) and not isinstance(value, bool):
                 low, high = SESSION_REFRESH_RANGE
-                if math.isfinite(value) and low <= value <= high:
+                if low <= value <= high:
                     return float(value)
         raise self._invalid(key)
 
