@@ -30,6 +30,7 @@ DECK = {
     "firmware": None,
 }
 OTHER_DECK = dict(DECK, serial="SN-MON-2", usb_path="1-3")
+THIRD_DECK = dict(DECK, serial="SN-MON-3", usb_path="1-4")
 
 
 @tagged("post_install", "-at_install")
@@ -839,3 +840,105 @@ class TestStreamdeckMonitor(TransactionCase):
         self.assertEqual(len(self._events(self.workstation_b, "moved")), 1)
         self.assertEqual(len(self._events(self.workstation_a, "silent")), 1)
         self.assertFalse(self._activities(active=None))
+
+    def test_archiving_the_employee_closes_their_workstation_activities(
+        self,
+    ):
+        # Le départ de l'employé (lot 1) archive son poste par write(),
+        # hors du chemin d'action_archive : ses activités se ferment là
+        # aussi, « archived », au lieu de partir avec le poste archivé.
+        self._enable()
+        self._unplug(self.token_a, T0, service_state="failed")
+        self._cron(T0 + 73 * HOUR)
+        opened = (
+            (self.workstation_a, "silent"),
+            (self.workstation_a, "service_failed"),
+            (self._device(), "unplugged"),
+        )
+        for record, kind in opened:
+            self.assertEqual(len(self._activities(record, kind)), 1)
+        self.user_a.active = False
+        self.assertFalse(self.workstation_a.active)
+        for record, kind in opened:
+            with self.subTest(kind=kind):
+                self.assertFalse(self._activities(record, kind))
+                self.assertEqual(
+                    len(self._activities(record, kind, active=False)), 1
+                )
+                body = self._done_messages(record, kind).body
+                self.assertIn("Resolved at", body)
+                self.assertIn("archived", body)
+
+    def test_a_workstation_no_longer_watched_opens_no_failed_or_unplugged(
+        self,
+    ):
+        # Révoqué ou archivé, un poste ne remontera plus : figé « en
+        # échec », son deck débranché, il alerterait sans fin. B, inscrit,
+        # sert de témoin.
+        self._enable()
+        for token, deck in (
+            (self.token_a, DECK),
+            (self.token_b, OTHER_DECK),
+            (self.token_c, THIRD_DECK),
+        ):
+            self._unplug(token, T0, deck=deck, service_state="failed")
+        self.workstation_a.with_user(self.manager).action_revoke_token()
+        self.workstation_c.with_user(self.manager).action_archive()
+        self._cron(T0 + 73 * HOUR)
+        self.assertEqual(
+            len(self._activities(self.workstation_b, "service_failed")), 1
+        )
+        self.assertEqual(
+            len(self._activities(self._device(OTHER_DECK), "unplugged")), 1
+        )
+        for workstation, deck in (
+            (self.workstation_a, DECK),
+            (self.workstation_c, THIRD_DECK),
+        ):
+            with self.subTest(workstation=workstation.name):
+                self.assertFalse(
+                    self._activities(
+                        workstation, "service_failed", active=None
+                    )
+                )
+                self.assertFalse(
+                    self._activities(
+                        self._device(deck), "unplugged", active=None
+                    )
+                )
+
+    def test_the_note_and_the_feedback_speak_the_recipient_language(self):
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(
+            ["erplibre_streamdeck"], ["fr_CA"], overwrite=True
+        )
+        self.user_a.lang = "fr_CA"
+        self._enable(recipient="both")
+        self._report(self.token_a, T0)
+        self._cron(T0 + 61 * MIN)
+        activities = self._activities(self.workstation_a, "silent")
+        french = activities.filtered(lambda a: a.user_id == self.user_a)
+        self.assertIn("aucune remontée depuis 60 minutes", french.note)
+        self.assertIn(
+            "has sent no report for 60 minutes", (activities - french).note
+        )
+        self._report(self.token_a, T0 + 3 * HOUR)
+        bodies = self._done_messages(self.workstation_a, "silent").mapped(
+            "body"
+        )
+        self.assertTrue(
+            any(
+                "Résolu à 2026-04-06 12:00 UTC" in b
+                and "le poste est revenu" in b
+                for b in bodies
+            ),
+            bodies,
+        )
+        self.assertTrue(
+            any(
+                "Resolved at 2026-04-06 08:00 EDT" in b
+                and "the workstation reported again" in b
+                for b in bodies
+            ),
+            bodies,
+        )
