@@ -14,8 +14,9 @@ class TestStreamdeckConfigSettings(TransactionCase):
     Au premier pilotage d'un poste, l'employé choisit entre ses valeurs
     locales et celles d'Odoo (`ask`), à moins que l'organisation ne force
     `keep_local` ou `take_odoo`. Le paramètre vit en
-    `ir.config_parameter`, écrit par la page Paramètres seule ; une valeur
-    inconnue s'y lit `ask`.
+    `ir.config_parameter`, écrit par la page Paramètres seule, donc par
+    son administrateur (`base.group_system`), qui est aussi gestionnaire
+    du Stream Deck ; une valeur inconnue s'y lit `ask`.
     """
 
     @classmethod
@@ -71,11 +72,13 @@ class TestStreamdeckConfigSettings(TransactionCase):
                     read,
                 )
 
-    def test_only_the_manager_sets_the_first_pilot_policy(self):
+    def test_only_a_settings_administrator_sets_the_first_pilot_policy(
+        self,
+    ):
         self.Param.set_param(PARAM, "ask")
         # L'employé, et le gestionnaire du Stream Deck sans les droits de
         # la page Paramètres, ne l'écrivent ni par la page ni par le
-        # paramètre.
+        # paramètre : Odoo réserve la page Paramètres à `base.group_system`.
         for user in (self.employee, self.manager):
             with self.subTest(user=user.login):
                 with self.assertRaises(AccessError):
