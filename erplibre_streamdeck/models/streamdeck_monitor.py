@@ -76,8 +76,10 @@ class StreamdeckMonitor(models.AbstractModel):
     @api.model
     def _settings(self):
         """The Settings › Stream Deck as a dict: `enabled`, `recipient`
-        (one of RECIPIENTS), `manager` (a res.users, empty when none is
-        named or the one named is archived or deleted, with a warning),
+        (one of RECIPIENTS), `manager` (a res.users, empty when the
+        activities are disabled, when the recipient leaves the manager
+        out, when none is named, or when the one named is archived or
+        deleted, with a warning; so no warning while nothing can open),
         `alerts` (kind -> bool, a missing box meaning checked) and the
         three delays, an unreadable delay taking its default and none
         going below its floor."""
@@ -86,14 +88,15 @@ class StreamdeckMonitor(models.AbstractModel):
         def get(name):
             return params.get_param(PARAM_PREFIX + name) or ""
 
+        enabled = str2bool(get("activities_enabled") or "False", False)
         recipient = get("activity_recipient")
         if recipient not in dict(RECIPIENTS):
             recipient = "manager"
         manager = self.env["res.users"]
-        if recipient != "employee":
+        if enabled and recipient != "employee":
             manager = self._named_manager(get("activity_manager_id"))
         settings = {
-            "enabled": str2bool(get("activities_enabled") or "False", False),
+            "enabled": enabled,
             "recipient": recipient,
             "manager": manager,
             "alerts": {

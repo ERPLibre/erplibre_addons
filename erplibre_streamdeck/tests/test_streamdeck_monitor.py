@@ -824,3 +824,18 @@ class TestStreamdeckMonitor(TransactionCase):
                 self.assertEqual(len(added), 1)
                 self.assertIn("host-b", added.body)
                 self.assertIn("host-c", added.body)
+
+    def test_disabled_activities_never_warn_about_the_manager(self):
+        # Activités désactivées, aucune part du gestionnaire ne peut
+        # naître : son archivage n'a rien à signaler, ni au cron ni à une
+        # remontée qui déplace un deck.
+        self._enable(recipient="both")
+        self._set(activities_enabled=False)
+        self.manager.active = False
+        with self.assertNoLogs(LOGGER, "WARNING"):
+            self._report(self.token_a, T0, decks=[DECK])
+            self._report(self.token_b, T0 + HOUR, decks=[DECK])
+            self._cron(T0 + 3 * HOUR)
+        self.assertEqual(len(self._events(self.workstation_b, "moved")), 1)
+        self.assertEqual(len(self._events(self.workstation_a, "silent")), 1)
+        self.assertFalse(self._activities(active=None))
