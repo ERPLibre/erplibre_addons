@@ -493,6 +493,26 @@ class TestStreamdeckConfigWire(HttpCase):
             )
         )
 
+    def test_a_locked_key_added_after_the_applied_revision_is_no_drift(self):
+        # Une clé verrouillée ajoutée à une couche n'a jamais été écrite :
+        # la nouvelle révision l'offre, sans écart local.
+        workstation, token = self._workstation()
+        revision = self._applied(token, workstation)
+        self.Line.create(
+            {
+                "workstation_id": workstation.id,
+                "key": "session_refresh_sec",
+                "value": "2",
+                "locked": True,
+            }
+        )
+        local = self._settings(session_refresh_sec=5)
+        body = self._report(token, self._pilot(local, revision))
+        self.assertEqual(body["config"]["revision"], revision + 1)
+        self.assertIn("session_refresh_sec", body["config"]["locked"])
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertFalse(self._events(workstation, "config_drift"))
+
     def test_values_written_then_refused_are_not_adopted(self):
         # Refusée après son écriture, une révision laisse ses valeurs dans
         # le fichier : une couche qui change ensuite la clé libre ne fait
@@ -560,6 +580,69 @@ class TestStreamdeckConfigWire(HttpCase):
             token, self._pilot(self._settings(), revision + 1, result)
         )
         self.assertEqual(workstation.config_state, "applied")
+
+    def test_a_locked_change_without_a_written_baseline_is_reoffered(self):
+        # Un poste appliqué dont la référence écrite manque, ou toute
+        # référence : la clé verrouillée qui diffère d'Odoo est un écart.
+        for cleared in (
+            ("config_written",),
+            ("config_written", "config_applied"),
+        ):
+            with self.subTest(cleared=cleared):
+                workstation, token = self._workstation()
+                revision = self._applied(token, workstation)
+                workstation.write(dict.fromkeys(cleared, False))
+                changed = self._settings(deck_program="controller")
+                body = self._report(token, self._pilot(changed, revision))
+                self.assertEqual(body["config"]["revision"], revision + 1)
+                self.assertEqual(body["config"]["settings"], self._settings())
+                self.assertEqual(workstation.config_state, "drift")
+                drift = self._events(workstation, "config_drift")
+                self.assertEqual(drift.config_keys, "deck_program")
+                self.assertFalse(workstation.config_line_ids)
+
+    def test_a_free_change_without_any_baseline_is_not_adopted(self):
+        # Sans aucune référence, une valeur locale libre n'est pas une
+        # surcharge : ni adoptée ni reproposée. Effacée, elle ne tient rien
+        # et la révision est reproposée.
+        workstation, token = self._workstation()
+        revision = self._applied(token, workstation)
+        workstation.write({"config_written": False, "config_applied": False})
+        local = self._settings(games="off", plugins_off=[])
+        body = self._report(token, self._pilot(local, revision))
+        self.assertEqual(body["config"]["revision"], revision)
+        self.assertEqual(workstation.config_state, "applied")
+        self.assertFalse(workstation.config_line_ids)
+        self.assertFalse(
+            self.Event.search(
+                [
+                    ("workstation_id", "=", workstation.id),
+                    ("kind", "in", ("config_adopted", "config_drift")),
+                ]
+            )
+        )
+        cleared = self._settings(games=None)
+        body = self._report(token, self._pilot(cleared, revision))
+        self.assertEqual(body["config"]["revision"], revision + 1)
+        self.assertEqual(workstation.config_state, "drift")
+        self.assertEqual(
+            self._events(workstation, "config_drift").config_keys, "games"
+        )
+        self.assertFalse(workstation.config_line_ids)
+
+    def test_a_free_change_without_a_written_baseline_is_adopted(self):
+        # Sans référence écrite, la révision appliquée sert de référence.
+        workstation, token = self._workstation()
+        revision = self._applied(token, workstation)
+        workstation.config_written = False
+        local = self._settings(games="off")
+        body = self._report(token, self._pilot(local, revision))
+        self.assertEqual(body["config"]["revision"], revision + 1)
+        self.assertEqual(body["config"]["settings"], local)
+        self.assertEqual(
+            self._events(workstation, "config_adopted").config_keys, "games"
+        )
+        self.assertEqual(workstation.config_line_ids.source, "local")
 
     def test_a_file_that_follows_another_revision_is_left_alone(self):
         # Sans la révision appliquée qu'Odoo connaît, l'écart n'a pas de

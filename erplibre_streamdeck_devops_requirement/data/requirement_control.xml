@@ -370,7 +370,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">_config_drift and _config_adopt of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py measure against config_written, the values of the last revision written, and only when the report follows that revision; a free key cleared locally is offered again, never adopted.</field>
+        <field name="achievement">_config_drift and _config_adopt of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py measure against config_written, the values of the last revision written, or config_applied when it is empty, and only when the report follows that revision; a free key cleared locally is offered again, never adopted; a key of the offered revision that this baseline does not set fails closed: offered again when locked or cleared, never adopted when free.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r26" model="devops.requirement">
@@ -1513,6 +1513,30 @@
         <field name="sequence" eval="70" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_result_without_an_offered_revision_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r25_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_locked_change_without_a_written_baseline_is_reoffered</field>
+    </record>
+    <record id="test_sd_ctl_r25_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_free_change_without_any_baseline_is_not_adopted</field>
+    </record>
+    <record id="test_sd_ctl_r25_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_free_change_without_a_written_baseline_is_adopted</field>
+    </record>
+    <record id="test_sd_ctl_r25_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r25" />
+        <field name="sequence" eval="110" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_a_locked_key_added_after_the_applied_revision_is_no_drift</field>
     </record>
     <record id="test_sd_ctl_r26_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r26" />
