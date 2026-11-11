@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Un type par sorte de problème : il sert de clé de dédoublonnage à
+         la surveillance (une activité ouverte par enregistrement, type et
+         destinataire) et laisse filtrer « Mes activités » par sorte.
+         keep_done garde l'activité fermée, faite, avec son retour ; aucun
+         enchaînement n'en ouvre une autre. Seule la surveillance, en sudo,
+         crée des activités de ces types. -->
+    <data noupdate="1">
+
+        <record id="activity_type_streamdeck_service_failed" model="mail.activity.type">
+            <field name="name">Deck service failed</field>
+            <field name="res_model">streamdeck.workstation</field>
+            <field name="icon">fa-exclamation-triangle</field>
+            <field name="decoration_type">warning</field>
+            <field name="keep_done" eval="True"/>
+            <field name="sequence">90</field>
+        </record>
+
+        <record id="activity_type_streamdeck_silent" model="mail.activity.type">
+            <field name="name">Workstation silent</field>
+            <field name="res_model">streamdeck.workstation</field>
+            <field name="icon">fa-volume-off</field>
+            <field name="decoration_type">warning</field>
+            <field name="keep_done" eval="True"/>
+            <field name="sequence">91</field>
+        </record>
+
+        <record id="activity_type_streamdeck_unplugged" model="mail.activity.type">
+            <field name="name">Deck unplugged for long</field>
+            <field name="res_model">streamdeck.device</field>
+            <field name="icon">fa-plug</field>
+            <field name="decoration_type">warning</field>
+            <field name="keep_done" eval="True"/>
+            <field name="sequence">92</field>
+        </record>
+
+        <record id="activity_type_streamdeck_moved" model="mail.activity.type">
+            <field name="name">Deck changed workstation</field>
+            <field name="res_model">streamdeck.device</field>
+            <field name="icon">fa-exchange</field>
+            <field name="keep_done" eval="True"/>
+            <field name="sequence">93</field>
+        </record>
+
+    </data>
+</odoo>

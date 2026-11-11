@@ -29,6 +29,11 @@ class StreamdeckWorkstation(models.Model):
     that first carried the current `service_state`, or of the next report
     when it has no date. Neither is in the writable sets: only sudo writes
     them.
+
+    Archiving a workstation or clearing its token closes, before anything
+    else, the monitoring activities it will never solve
+    (`streamdeck.monitor._resolve_all`): Odoo deletes the open activities
+    of an archived record, so they are closed first and stay done.
     """
 
     _name = "streamdeck.workstation"
@@ -134,10 +139,25 @@ class StreamdeckWorkstation(models.Model):
     def write(self, vals):
         if not self.env.su:
             self._check_writable(vals)
+        if "active" in vals and not vals["active"]:
+            self.filtered("active")._end_monitoring("archived")
+        elif "token_hash" in vals and not vals["token_hash"]:
+            self.sudo().filtered("token_hash")._end_monitoring("unenrolled")
         result = super().write(vals)
         if "active" in vals and not vals["active"]:
             self.sudo().write({"token_hash": False})
         return result
+
+    def toggle_active(self):
+        self.filtered("active")._end_monitoring("archived")
+        return super().toggle_active()
+
+    def _end_monitoring(self, reason):
+        """Close the monitoring activities of these workstations, `reason`
+        being "archived" or "unenrolled"."""
+        Monitor = self.env["streamdeck.monitor"]
+        for workstation in self:
+            Monitor._resolve_all(workstation, reason)
 
     def _check_writable(self, vals):
         """Raise AccessError when `vals` holds a field that the current
