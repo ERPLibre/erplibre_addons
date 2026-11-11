@@ -232,3 +232,74 @@ class TestStreamdeckMonitorThread(TransactionCase):
         self.assertIn(
             own, self.workstation_b.with_user(self.user_b).message_ids
         )
+
+    def _attachment(self, record, moment, name):
+        """Un fichier joint au fil de `record`, créé à `moment` ; la date
+        est posée en SQL, comme pour une activité."""
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": name,
+                "raw": b"probe",
+                "res_model": record._name,
+                "res_id": record.id,
+            }
+        )
+        attachment.flush_recordset()
+        self.env.cr.execute(
+            "UPDATE ir_attachment SET create_date = %s WHERE id = %s",
+            (moment, attachment.id),
+        )
+        attachment.invalidate_recordset(["create_date"])
+        return attachment
+
+    def test_a_deck_attachment_follows_the_thread_bound(self):
+        # Un fichier joint au deck se lit comme son fil : B ne lit rien de
+        # joint avant son arrivée ; C, dont un événement porte le numéro du
+        # deck sans le détenir, ne lit aucun fichier du deck ; A, le
+        # prêteur, et M lisent tout.
+        self._report(self.token_a, DAY_A)
+        device = self._device()
+        before = self._attachment(device, DAY_A.replace(hour=12), "a.txt")
+        self._report(self.token_b, DAY_B)
+        after = self._attachment(device, DAY_B.replace(hour=12), "b.txt")
+        unplugged = {
+            "uuid": "00000000-0000-4000-8000-000000000002",
+            "kind": "unplugged",
+            "at": DAY_C.isoformat() + "Z",
+            "serial": self.DECK["serial"],
+            "usb_product_id": self.DECK["usb_product_id"],
+            "usb_path": self.DECK["usb_path"],
+        }
+        self._report(self.token_c, DAY_C, decks=False, events=[unplugged])
+        files = before | after
+        expected = {
+            self.user_a: files,
+            self.manager: files,
+            self.user_b: after,
+            self.user_c: files.browse(),
+        }
+        for user, readable in expected.items():
+            with self.subTest(user=user.name):
+                self.env.invalidate_all()
+                Attachment = self.env["ir.attachment"].with_user(user)
+                self.assertEqual(
+                    Attachment.search(
+                        [
+                            ("res_model", "=", "streamdeck.device"),
+                            ("res_id", "=", device.id),
+                        ]
+                    ),
+                    readable,
+                )
+                for attachment in readable:
+                    self.assertEqual(attachment.with_user(user).raw, b"probe")
+                for attachment in files - readable:
+                    with self.assertRaises(AccessError):
+                        attachment.with_user(user).read(["datas"])
+        # C lit toujours le deck, par son événement.
+        self.assertTrue(device.with_user(self.user_c).read(["key"]))
+        # Un fichier d'un autre modèle ne change pas : B lit celui de son
+        # poste.
+        own = self._attachment(self.workstation_b, DAY_C, "own.txt")
+        self.env.invalidate_all()
+        self.assertEqual(own.with_user(self.user_b).raw, b"probe")
