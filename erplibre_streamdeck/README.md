@@ -138,8 +138,11 @@ beyond the delay goes silent, then is heard again at its next report.
   workstation or its employee, or revoking its token, closes its
   activities and the *Deck unplugged for long* activities of its decks
   with « the workstation is archived » or « the workstation is
-  unenrolled ». Closing does not depend on the Settings: an activity
-  opened before they were disabled still closes.
+  unenrolled ». Archiving a user, from the Settings or by their departure,
+  closes the activities still assigned to them, *Deck changed workstation*
+  included, with « the assigned user is archived », where Odoo would
+  delete them. Closing does not depend on the Settings: an activity opened
+  before they were disabled still closes.
 - **Archived manager.** When the named manager is archived later, only
   the employee part opens, and each run of the cron writes a warning to
   the log, which names nobody.

@@ -1158,6 +1158,12 @@ msgstr ""
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the assigned user is archived"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
 msgid "the deck is plugged in again"
 msgstr ""
 
