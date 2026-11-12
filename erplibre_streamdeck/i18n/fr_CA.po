@@ -437,12 +437,6 @@ msgstr "Nombre de pièces jointes"
 
 #. module: erplibre_streamdeck
 #. odoo-python
-#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
-msgid "Automatic layout: no layer lays out this deck model."
-msgstr "Disposition automatique : aucune couche ne dispose ce modèle de deck."
-
-#. module: erplibre_streamdeck
-#. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
 msgid "Black key"
 msgstr "Touche noire"
@@ -1372,6 +1366,18 @@ msgstr "Aucun deck n'est branché à ce poste."
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
 msgid "No deck reported yet"
 msgstr "Aucun deck remonté pour l'instant"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid ""
+"No layer lays out this deck model, and Odoo sends it no layout: the deck "
+"keeps the layout last applied to its keymap.json, if any, else places its "
+"keys itself."
+msgstr ""
+"Aucune couche ne dispose ce modèle de deck, et Odoo ne lui envoie aucune "
+"disposition : le deck garde la dernière disposition appliquée à son "
+"keymap.json, s'il y en a une, sinon il place lui-même ses touches."
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_catalog

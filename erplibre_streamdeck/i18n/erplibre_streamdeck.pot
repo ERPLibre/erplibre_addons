@@ -398,12 +398,6 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #. odoo-python
-#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
-msgid "Automatic layout: no layer lays out this deck model."
-msgstr ""
-
-#. module: erplibre_streamdeck
-#. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
 msgid "Black key"
 msgstr ""
@@ -1303,6 +1297,15 @@ msgstr ""
 #. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
 msgid "No deck reported yet"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid ""
+"No layer lays out this deck model, and Odoo sends it no layout: the deck "
+"keeps the layout last applied to its keymap.json, if any, else places its "
+"keys itself."
 msgstr ""
 
 #. module: erplibre_streamdeck

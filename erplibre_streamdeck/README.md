@@ -347,8 +347,11 @@ the workstation, in the setting `key_layouts` of the revision, which is
 locked when one of them is; the extension writes them to
 `~/.config/erplibre-home/keymap.json` when the employee applies the
 revision, and keeps there the layouts of the models Odoo does not send.
-A model that no layer lays out keeps the automatic layout of the deck
-program.
+Odoo never takes a layout out of the file: a model that no layer lays
+out, or no longer does, keeps there the layout last applied to it, and
+a model the file does not name gets the automatic layout of the deck
+program. The *Configuration* tab of the workstation says so for each
+connected model that Odoo sends no layout.
 
 Each workstation gets the layouts within the catalog of its own report,
 since it refuses the whole revision for a key its deck program cannot
