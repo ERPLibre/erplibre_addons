@@ -390,7 +390,7 @@
     </record>
     <record id="req_sd_ctl_r27" model="devops.requirement">
         <field name="code">SD-CTL-R27</field>
-        <field name="name">The wire moves to protocol 1.1 and the contract of the extension to 1.3, MINOR versions: Odoo still accepts a report in 1.0, and the contract file of ERPLibre holds 1.3</field>
+        <field name="name">The wire moves to protocol 1.1 and the contract of the extension to 1.3, MINOR versions: Odoo still accepts a report in 1.0, and the contract file of ERPLibre holds 1.3 or later</field>
         <field name="category_id" ref="cat_sd_ctl" />
         <field name="sequence" eval="270" />
         <field name="moscow">should</field>
@@ -999,7 +999,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">validateKeyLayouts of erplibre-home-gnome-extension:lib/deck-config.js, run through validateConfig when the reply comes and again at the click in lib/inventory-service.js.</field>
+        <field name="achievement">validateKeyLayouts of erplibre-home-gnome-extension:lib/deck-config.js, run by _layoutsRefused of lib/inventory-service.js when a reply of the pilot comes (_onConfig) and again at the click (_applyOffer).</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r70" model="devops.requirement">
@@ -2992,6 +2992,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_key_layouts_go_only_for_connected_models_and_change_the_hash</field>
     </record>
+    <record id="test_sd_ctl_r58_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r58" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_layout_has_exactly_one_parent_one_per_model</field>
+    </record>
     <record id="test_sd_ctl_r59_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r59" />
         <field name="sequence" eval="10" />
@@ -3015,6 +3021,12 @@
         <field name="sequence" eval="10" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_key_index_outside_the_model_is_refused</field>
+    </record>
+    <record id="test_sd_ctl_r60_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r60" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_layout_names_each_key_once</field>
     </record>
     <record id="test_sd_ctl_r61_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r61" />
