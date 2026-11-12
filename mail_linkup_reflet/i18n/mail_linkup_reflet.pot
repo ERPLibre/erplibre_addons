@@ -243,10 +243,22 @@ msgstr ""
 
 #. module: mail_linkup_reflet
 #. odoo-python
+#: code:addons/mail_linkup_reflet/models/contact_privacy.py:0
+msgid "A LinkUp member does not group the contact details of the other people."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
 #: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
 msgid ""
 "A LinkUp member enters a channel when a LinkUp administrator or a linked "
 "member adds them, or through its invitation link."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid "A LinkUp member enters a group when a linked member of it adds them."
 msgstr ""
 
 #. module: mail_linkup_reflet
@@ -310,6 +322,14 @@ msgid ""
 "slowly; sincere, it strengthens the bond; too fast, it drives people away. "
 "It marks a sensitive point, expressed or understood. What was not said is "
 "not reformulated."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid ""
+"A guest or a portal user and a LinkUp member do not meet in a group or a "
+"direct conversation."
 msgstr ""
 
 #. module: mail_linkup_reflet
@@ -1769,6 +1789,11 @@ msgstr ""
 #. module: mail_linkup_reflet
 #: model:ir.model,name:mail_linkup_reflet.model_linkup_category
 msgid "LinkUp category of communication"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_contact_privacy
+msgid "LinkUp contact details closed to a member"
 msgstr ""
 
 #. module: mail_linkup_reflet

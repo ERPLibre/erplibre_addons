@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-# The mixin first: the models below inherit from it.
+# The mixins first: the models below inherit from them.
+from . import contact_privacy  # isort: skip
 from . import linkup_server_record  # isort: skip
 from . import (
     discuss_channel,
@@ -17,8 +18,10 @@ from . import (
     linkup_reflet,
     linkup_reflet_secret,
     linkup_report,
+    mail_followers,
     mail_message,
     mail_notification,
+    mail_thread,
     res_config_settings,
     res_partner,
     res_users,

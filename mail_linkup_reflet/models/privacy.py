@@ -21,6 +21,9 @@ CONTACT_FIELDS = frozenset(
     }
 )
 USER_CONTACT_FIELDS = CONTACT_FIELDS | {"login"}
+# Fields of a partner whose changes its history keeps: ``mail`` tracks the
+# address, the phone and the postal address on one line.
+TRACKED_CONTACT_FIELDS = CONTACT_FIELDS | {"contact_address_inline"}
 # Fields of a message that hold the address of its author: Odoo writes
 # ``email_from`` and ``reply_to`` from the address of the partner who posts.
 AUTHOR_CONTACT_FIELDS = frozenset({"email_from", "reply_to"})

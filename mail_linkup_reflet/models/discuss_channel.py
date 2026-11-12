@@ -89,11 +89,11 @@ class DiscussChannel(models.Model):
 
         In a direct conversation, the condition belongs to the pair: it
         holds when the link of its two LinkUp members is ``active``, or
-        when one party is not a restricted LinkUp member (a system
+        when one party is not a plain LinkUp member (a LinkUp or system
         administrator, a user outside LinkUp), so that both parties read
         the same answer. In a group or a channel, it holds when ``user``
         has an active link with another member of the conversation whose
-        account is not archived, or is not a restricted member.
+        account is not archived, or is not a plain member.
         """
         self.ensure_one()
         # sudo: discuss.channel.member - the parties of the conversation
@@ -104,9 +104,7 @@ class DiscussChannel(models.Model):
         )
         Link = self.env["linkup.link"].sudo()
         if self.channel_type == "chat":
-            members = users.filtered(
-                lambda u: u._linkup_is_restricted_member()
-            )
+            members = users.filtered(lambda u: u._linkup_is_plain_member())
             if len(members) < 2 or len(users) != 2:
                 return True
             # A blocked pair reads as it did before the block, so that the
@@ -116,7 +114,7 @@ class DiscussChannel(models.Model):
             return link.state == "active" or bool(
                 link.state == "blocked" and link.first_link_date
             )
-        if not user._linkup_is_restricted_member():
+        if not user._linkup_is_plain_member():
             return True
         # The link of an archived account opens no group: the conversation
         # goes on with the others only.
@@ -141,11 +139,11 @@ class DiscussChannel(models.Model):
 
     def _linkup_start_rule_blocks(self, user):
         """Tell whether the start rule refuses the free text of ``user``
-        here: a restricted member, in a ``strict`` conversation that no
+        here: a plain member, in a ``strict`` conversation that no
         confirmed reflection opened yet."""
         self.ensure_one()
         return (
-            user._linkup_is_restricted_member()
+            user._linkup_is_plain_member()
             and self._linkup_start_rule() == "strict"
             and not self._linkup_start_rule_satisfied(user)
         )
@@ -389,32 +387,36 @@ class DiscussChannel(models.Model):
     # Creation of conversations (LU-F-063 RM2)
     # ------------------------------------------------------------------
 
-    def _linkup_check_member_channel_type(self, vals_list):
-        """Keep a restricted member from creating a channel.
+    def _linkup_check_member_channel_type(self):
+        """Keep a plain member from creating a channel.
 
         A channel (``channel_type = 'channel'``) has no start rule of its
         own and may be open to every internal user: a member who created
         one would talk there with anyone, past the start rule, and widen
         their scope to whoever joins. Only an administrator creates one. A
         thread of a channel (``parent_channel_id``) stays open to members:
-        it follows the start rule of its parent. Neither the type nor the
+        it follows the start rule of its parent. A LinkUp administrator or
+        a system administrator creates any channel. Neither the type nor the
         parent of a conversation changes once it exists. The check reads
-        the real user, ``sudo`` included.
+        the created records, whose values come from the values given, the
+        ``default_*`` keys of the context or the defaults of the fields,
+        and the real user, ``sudo`` included.
         """
-        if not self.env.user._linkup_is_restricted_member():
+        if not self.env.user._linkup_is_plain_member():
             return
-        for vals in vals_list:
-            if vals.get("channel_type") == "channel" and not vals.get(
-                "parent_channel_id"
-            ):
-                raise AccessError(
-                    _("Only a LinkUp administrator creates a channel.")
-                )
+        if any(
+            channel.channel_type == "channel" and not channel.parent_channel_id
+            for channel in self.sudo()
+        ):
+            raise AccessError(
+                _("Only a LinkUp administrator creates a channel.")
+            )
 
     @api.model_create_multi
     def create(self, vals_list):
-        self._linkup_check_member_channel_type(vals_list)
-        return super().create(vals_list)
+        channels = super().create(vals_list)
+        channels._linkup_check_member_channel_type()
+        return channels
 
     @api.depends("channel_type")
     def _compute_group_public_id(self):
@@ -440,7 +442,7 @@ class DiscussChannel(models.Model):
         user = self.env.user
         if {"channel_type", "parent_channel_id"}.intersection(
             vals
-        ) and user._linkup_is_restricted_member():
+        ) and user._linkup_is_plain_member():
             raise AccessError(
                 _(
                     "Only a LinkUp administrator changes the type of a"
@@ -491,21 +493,21 @@ class DiscussChannel(models.Model):
 
     @api.model
     def _linkup_check_direct_contact(self, partner_ids):
-        """Keep a restricted member from opening a direct conversation that
-        no confirmed reflection opened.
+        """Keep a plain member from opening a direct conversation that no
+        confirmed reflection opened; a LinkUp administrator opens any.
 
         A member creates the direct conversation of a pair with an
         ``active`` link only, and so never with a member a block separates
         from them, nor with an archived account. Opening again a direct
         conversation the member already belongs to adds nobody and stays
         allowed. The server opens the others itself, to carry a
-        reflection, inside ``authorization.linkup_post``. Every refusal is the same, whatever
-        the reason, so that it tells nothing of a block. ``sudo`` calls are
-        the server's own and are not checked here; the creation of the
-        members still is (``discuss.channel.member``).
+        reflection, inside ``authorization.linkup_post``. Every refusal is
+        the same, whatever the reason, so that it tells nothing of a block.
+        ``sudo`` calls are the server's own and are not checked here; the
+        creation of the members still is (``discuss.channel.member``).
         """
         user = self.env.user
-        if self.env.su or not user._linkup_is_restricted_member():
+        if self.env.su or not user._linkup_is_plain_member():
             return
         others = set(partner_ids or []) - {user.partner_id.id}
         post = current_post(self.env)
@@ -630,6 +632,27 @@ class DiscussChannel(models.Model):
                 reflet.message_id = message
         self._linkup_extinguish_highlights(message, post)
         return super()._message_post_after_hook(message, msg_vals)
+
+    def _linkup_holds_plain_members(self):
+        """Whether a plain member, an archived account included, belongs to
+        the conversation; LinkUp administrators and system administrators
+        do not count."""
+        self.ensure_one()
+        # sudo: discuss.channel.member - the partners of the members
+        partners = self.sudo().channel_member_ids.partner_id
+        return bool(partners._linkup_plain_member_partners())
+
+    def _linkup_holds_outsiders(self):
+        """Whether a guest, or a partner that no internal user holds,
+        belongs to the conversation
+        (``res.partner._linkup_outsider_partners``)."""
+        self.ensure_one()
+        # sudo: discuss.channel.member - the guests and the partners of the
+        # members
+        members = self.sudo().channel_member_ids
+        return bool(
+            members.guest_id or members.partner_id._linkup_outsider_partners()
+        )
 
     def _linkup_chat_users(self):
         """The two internal users of a direct conversation, or an empty

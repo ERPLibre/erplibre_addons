@@ -39,10 +39,11 @@ Covered:
   ``res.partner.im_search``, ``get_mention_suggestions``,
   ``get_mention_suggestions_from_channel``, ``search_for_channel_invite``
   (count included) and ``discuss.channel.get_mention_suggestions``.
-* A member adds to a channel, a group or a chat only the partners already in
-  their scope: ``add_members``, ``create_group``, ``channel_get`` and the
-  creation of a channel refuse any other partner id, so an invitation cannot
-  widen the scope.
+* A plain member adds to a channel, a group or a chat only the partners
+  already in their scope: ``add_members``, ``create_group``,
+  ``channel_get`` and the creation of a channel refuse any other partner
+  id, so an invitation cannot widen the scope. A LinkUp administrator adds
+  anyone, as a system administrator does.
 * Discuss keeps working for a member: loading the messaging data, opening a
   channel and its member list, posting, fetching messages, opening a direct
   conversation with a channel peer.
@@ -77,9 +78,23 @@ Covered:
   the creator of the channel publishes it, in "Channel settings": Odoo 18
   gives a channel no administrator among its members
   (``discuss.channel.member`` holds no role). Anybody else, through RPC
-  as well, is refused. Direct conversations, groups and live chats keep
-  the native rule, their members only; the start rule and the scope of a
-  member still apply.
+  as well, is refused, at the creation of a channel or a thread too, the
+  values set by the defaults of the context included; a thread follows
+  its channel. Direct conversations, groups and live chats keep the
+  native rule, their members only; the start rule and the scope of a
+  member still apply. The invitation link of a group or a direct
+  conversation lets no plain member in, and no outsider while a plain
+  member belongs to it: a member enters a group that already has members
+  only when a linked member of it adds them. An outsider is anyone who is
+  not an internal user: a visitor, whom the link adds as a guest, a portal
+  user, or a contact without a user. Such a conversation never holds an
+  outsider and a plain member together: whoever adds one while the other
+  is there, through the link or the ORM, is refused, unless a LinkUp
+  administrator or a system administrator brings them together. Its
+  members open it by the link as Discuss shows it. A group without a
+  plain member, the meeting of internal users or of administrators, the
+  default Administrator included, keeps the behaviour of Odoo: a visitor
+  joins it as a guest, a portal user as themself.
 * What a member reads of the others (LU-F-082 RM2, CA1, LU-F-112 RM3, CA3,
   LU-NF-009, ``models/privacy.py``, ``tests/test_contact_privacy.py``):
   the address, the phone and the login of any other user or partner are
@@ -89,10 +104,17 @@ Covered:
   carries the address of a member, whoever reads, nor any address to a
   member; the address of the author of a message (``email_from``,
   ``reply_to``) is blanked and never searched the same way, and a display
-  name holds no address, whatever ``show_email`` says. The values are
-  blanked after the reading rather than by ``groups=``, which would refuse
-  the whole reading of the Discuss screens that ask for them. LinkUp
-  administrators and system administrators keep them.
+  name holds no address, whatever ``show_email`` says. The followers of a
+  document (``mail.followers``) carry no address either, read, sent or
+  searched; the recipients a chatter suggests carry none, and an address
+  that matches no partner is not suggested at all; the history of
+  a partner leaves out the changes of its contact details. A grouping or
+  an aggregate on them (``read_group``) is refused, an order on them is
+  left out, and an export blanks them but in the member's own rows
+  (``models/contact_privacy.py``). The values are blanked after the
+  reading rather than by ``groups=``, which would refuse the whole reading
+  of the Discuss screens that ask for them. LinkUp administrators and
+  system administrators keep them.
 * An archived account, banned or deleted, opens nothing to a member
   (``tests/test_archived_accounts.py``): its link opens no new direct
   conversation and no strict group, it is added to no group, and its
@@ -357,17 +379,20 @@ Start rule
   "Make a reflection" in a direct conversation, which opens the Help bar
   and gives it the focus; in ``incitative`` mode, the banner sits above a
   usable composer.
-* Contact is initiated by the server (LU-F-063 RM1): a member creates the
-  direct conversation of a pair with an ``active`` link only
+* Contact is initiated by the server (LU-F-063 RM1): a plain member
+  creates the direct conversation of a pair with an ``active`` link only
   (``channel_get``, which the chat windows, the avatar cards and the
   "Start a conversation" field of Discuss call), and opens again one they
   already belong to; the server opens the others to carry a reflection,
   inside ``authorization.linkup_post``. Every refusal is the same
   ``AccessError``. The Reflet view offers to open the conversation of a
   contact only when it exists or the link is active. A group, which has no
-  rule by default, takes from a member only the people of an ``active``
-  link (``create_group``, ``add_members``, ORM), and only a LinkUp
-  administrator creates a channel or changes the type of a conversation.
+  rule by default, takes from a plain member only the people of an
+  ``active`` link (``create_group``, ``add_members``, ORM); a LinkUp
+  administrator opens any conversation and adds anyone. Only a LinkUp
+  administrator or a system administrator creates a channel, the type a
+  creation without one defaults to, or changes the type of a
+  conversation.
   A member changes neither the name nor the description of a direct
   conversation, and those of a group or a channel under the start rule
   only.
@@ -742,13 +767,14 @@ Decided by the owner (2026-11-12):
   invitation only": a member enters it when a LinkUp administrator, or a
   linked member of it, adds them, or through its invitation link. A
   published channel is open to every member, who joins it alone. A LinkUp
-  administrator or an administrator of the channel publishes it.
-
-Applied by default, to confirm:
-
-* The administrator of a channel is its creator, Odoo 18 holding no role
-  of member; a member creating no channel, the creator is a LinkUp or
-  system administrator, or an internal user outside LinkUp.
+  administrator, a system administrator or the creator of the channel
+  publishes it.
+* LinkUp administrators and system administrators keep full access: they
+  add anyone to a channel or a group, and start meetings with outsiders.
+  Internal users outside LinkUp, portal users and the website keep the
+  behaviour of Odoo in a conversation that holds no plain member.
+* A group or a direct conversation never holds a plain member together
+  with an outsider: a guest, a portal user or a contact without a user.
 
 Status
 ======

@@ -31,7 +31,10 @@ RECIPIENT_FIELDS = frozenset(
 
 
 class MailMessage(models.Model):
-    _inherit = "mail.message"
+    _inherit = ["mail.message", "linkup.contact.privacy"]
+    _name = "mail.message"
+
+    _linkup_contact_fields = privacy.AUTHOR_CONTACT_FIELDS
 
     # Reverse side of linkup.reflet.message_id, kept to the administrators:
     # members reach the reflection of a message through the Store only.
@@ -106,6 +109,11 @@ class MailMessage(models.Model):
                     if fname in vals:
                         vals[fname] = False
         return result
+
+    def _linkup_contact_own(self):
+        own = self.env.user.partner_id
+        # sudo: mail.message - the author of the messages read
+        return self.filtered(lambda message: message.sudo().author_id == own)
 
     def _condition_to_sql(self, alias, fname, operator, value, query):
         """A restricted member searches no message by the address of its

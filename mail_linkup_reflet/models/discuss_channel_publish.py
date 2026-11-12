@@ -3,8 +3,6 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
-from .res_users import ADMIN_GROUP
-
 
 class DiscussChannel(models.Model):
     """The access of a plain member to a channel (LU-F-112 RM1).
@@ -46,15 +44,19 @@ class DiscussChannel(models.Model):
         for channel in self:
             channel.linkup_can_publish = channel._linkup_can_publish()
 
+    @api.model
+    def _linkup_publishes_all(self):
+        """Whether the real user publishes any channel: a LinkUp
+        administrator or a system administrator."""
+        return self.env.user._linkup_is_administrator()
+
     def _linkup_can_publish(self):
         """Whether the real user may publish or unpublish the channel: a
         LinkUp administrator, a system administrator, or the creator of a
         channel, a thread of a channel following its channel."""
         self.ensure_one()
         user = self.env.user
-        if user._is_superuser() or user.has_group("base.group_system"):
-            return True
-        if user._linkup_has_group_id(ADMIN_GROUP):
+        if self._linkup_publishes_all():
             return True
         channel = self.sudo()
         return (
@@ -63,16 +65,39 @@ class DiscussChannel(models.Model):
             and channel.create_uid == user
         )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Apply to a creation the check of ``write``: the creator of a
+        channel publishes it, never a thread, whose reading follows its
+        channel, nor a group or a direct conversation. The rules open a
+        published conversation, and its member list, to every member,
+        whoever created it. The check reads the created records, whose
+        values may come from the ``default_*`` keys of the context."""
+        channels = super().create(vals_list)
+        if not self._linkup_publishes_all() and any(
+            channel.linkup_published
+            and (
+                channel.parent_channel_id or channel.channel_type != "channel"
+            )
+            for channel in channels.sudo()
+        ):
+            raise self._linkup_publish_refused()
+        return channels
+
     def write(self, vals):
         if "linkup_published" in vals:
             refused = self.filtered(
                 lambda channel: not channel._linkup_can_publish()
             )
             if refused:
-                raise AccessError(
-                    _(
-                        "Only a LinkUp administrator or the creator of a"
-                        " channel publishes it."
-                    )
-                )
+                raise self._linkup_publish_refused()
         return super().write(vals)
+
+    @api.model
+    def _linkup_publish_refused(self):
+        return AccessError(
+            _(
+                "Only a LinkUp administrator or the creator of a channel"
+                " publishes it."
+            )
+        )

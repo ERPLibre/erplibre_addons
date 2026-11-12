@@ -15,6 +15,7 @@ class DiscussChannelMember(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         self._linkup_check_self_join(vals_list)
+        self._linkup_check_outsider_join(vals_list)
         self._linkup_check_partners_in_scope(vals_list)
         return super().create(vals_list)
 
@@ -33,8 +34,12 @@ class DiscussChannelMember(models.Model):
         checked (``channel_access.channel_invitation``). A published
         channel (``linkup_published``) takes any member who joins it alone.
         A thread of a channel stays open to the members of that channel.
-        The check reads the real user, ``sudo`` included: the invitation
-        link joins the user under ``sudo``.
+        A group takes from a member only the people of an ``active`` link
+        (``_linkup_check_partners_linked``): a member enters a group that
+        already has members when one of them adds them, never by themself,
+        its invitation link included; the creation of a group adds its
+        creator with the others. The check reads the real user, ``sudo``
+        included: the invitation link joins the user under ``sudo``.
         """
         user = self.env.user
         if not user._linkup_is_plain_member():
@@ -49,6 +54,15 @@ class DiscussChannelMember(models.Model):
         for channel in (
             self.env["discuss.channel"].sudo().browse(list(channel_ids))
         ):
+            if channel.channel_type == "group":
+                if channel.channel_member_ids and not current_post(self.env):
+                    raise AccessError(
+                        _(
+                            "A LinkUp member enters a group when a linked"
+                            " member of it adds them."
+                        )
+                    )
+                continue
             if channel.channel_type != "channel":
                 continue
             if channel.linkup_published or invited_by_link(channel.id):
@@ -65,8 +79,65 @@ class DiscussChannelMember(models.Model):
             )
 
     @api.model
+    def _linkup_check_outsider_join(self, vals_list):
+        """Keep the outsiders and the plain members apart in the groups and
+        the direct conversations.
+
+        An outsider is a guest, or a partner that no internal user holds:
+        the partner of a portal user, or a contact without a user
+        (``res.partner._linkup_outsider_partners``). The invitation link of
+        a group, ``/chat/<id>/<token>``, adds an anonymous visitor as a
+        guest, and a portal user as themself, under ``sudo``: a group has
+        no authorized group to refuse them, and they would read the
+        messages, the pseudonyms and the avatars of its members. Such a
+        conversation never takes an outsider while it holds a plain member,
+        nor a plain member while it holds an outsider, whether the other
+        arrives in the same creation or was already there. A LinkUp
+        administrator or a system administrator brings them together; the
+        live chats keep their guests, and a conversation without a plain
+        member, a meeting of internal users or of administrators included,
+        keeps the behaviour of ``mail``. The check reads the real user,
+        ``sudo`` included.
+        """
+        if self.env.user._linkup_is_administrator():
+            return
+        added = {}
+        for vals in vals_list:
+            if vals.get("channel_id") and (
+                vals.get("guest_id") or vals.get("partner_id")
+            ):
+                added.setdefault(vals["channel_id"], []).append(vals)
+        # sudo: discuss.channel - the type and the members of the targets
+        channels = self.env["discuss.channel"].sudo().browse(list(added))
+        Partner = self.env["res.partner"]
+        for channel in channels:
+            if channel.channel_type not in ("group", "chat"):
+                continue
+            partners = Partner.browse(
+                [
+                    vals["partner_id"]
+                    for vals in added[channel.id]
+                    if vals.get("partner_id")
+                ]
+            )
+            plain = partners._linkup_plain_member_partners()
+            outsider_added = bool(partners._linkup_outsider_partners()) or any(
+                vals.get("guest_id") for vals in added[channel.id]
+            )
+            if (plain and channel._linkup_holds_outsiders()) or (
+                outsider_added
+                and (plain or channel._linkup_holds_plain_members())
+            ):
+                raise AccessError(
+                    _(
+                        "A guest or a portal user and a LinkUp member do not"
+                        " meet in a group or a direct conversation."
+                    )
+                )
+
+    @api.model
     def _linkup_check_partners_in_scope(self, vals_list):
-        """Refuse to a restricted member to add a partner outside their scope.
+        """Refuse to a plain member to add a partner outside their scope.
 
         Sharing a channel puts two partners in the reading scope of each other
         (``security/linkup_rules.xml``): without this check, a member widens
@@ -79,7 +150,8 @@ class DiscussChannelMember(models.Model):
         The single exception is the contact the server opens itself: inside
         ``authorization.linkup_post``, the author of the reflection being
         posted may add the partners of its two parties, and no other. A
-        suspended member adds nobody.
+        suspended member adds nobody. A LinkUp administrator adds anyone,
+        as a system administrator does.
         """
         user = self.env.user
         if not user._linkup_is_restricted_member():
@@ -93,6 +165,8 @@ class DiscussChannelMember(models.Model):
         if not partner_ids:
             return
         user._linkup_check_not_suspended()
+        if not user._linkup_is_plain_member():
+            return
         # The active test stays on: an archived partner, and the users of
         # an archived account in the paths of the scope, are out of it.
         visible = (
@@ -112,8 +186,8 @@ class DiscussChannelMember(models.Model):
 
     @api.model
     def _linkup_check_partners_linked(self, vals_list, partner_ids):
-        """Refuse to a restricted member to bring someone into a
-        conversation past the start rule (LU-F-063 RM1).
+        """Refuse to a plain member to bring someone into a conversation
+        past the start rule (LU-F-063 RM1).
 
         A group or a channel has no start rule by default: a member who
         could put there anyone of their scope would hold with them the free

@@ -181,6 +181,19 @@ class TestLinkupStartRuleBypass(LinkupStartRuleMixin, LinkupRefletCase):
         with self.assertRaises(AccessError):
             Channel.create({"name": "Place", "channel_type": "channel"})
         with self.assertRaises(AccessError):
+            Channel.create({"name": "Place"})
+        with self.assertRaises(AccessError):
+            Channel.sudo().with_context(default_channel_type="channel").create(
+                {"name": "Place"}
+            )
+        with self.assertRaises(AccessError):
+            Channel.with_context(default_parent_channel_id=False).create(
+                {"name": "Place"}
+            )
+        self.assertFalse(
+            self.env["discuss.channel"].search([("name", "=", "Place")])
+        )
+        with self.assertRaises(AccessError):
             self.workshop.with_user(self.sam).write(
                 {"channel_type": "channel"}
             )

@@ -10,6 +10,7 @@ scope of the others.
 
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.mail.tools.discuss import Store
+from odoo.exceptions import AccessError
 from odoo.tests import HttpCase, tagged
 
 from .common import MEMBER, LinkupRefletCase
@@ -152,6 +153,162 @@ class TestLinkupContactPrivacy(LinkupContactCase):
         own = message.with_user(self.france).read(["email_from"])[0]
         self.assertEqual(own["email_from"], message.sudo().email_from)
 
+    def test_no_grouping_on_contact_details(self):
+        """``read_group`` groups or aggregates no address, phone nor login
+        for Sam, and an order on them sorts nothing; the administrator
+        keeps them."""
+        self._post(self.france, "Bonjour")
+        Partner = self.Partner.with_user(self.sam)
+        Users = self.Users.with_user(self.sam)
+        Message = self.env["mail.message"].with_user(self.sam)
+        refused = (
+            (Partner, [], ["email:array_agg"]),
+            (Partner, ["email"], ["__count"]),
+            (Partner, ["phone"], ["__count"]),
+            (Users, ["login"], ["__count"]),
+            (Users, [], ["email:max"]),
+            (Message, [], ["email_from:array_agg"]),
+        )
+        for model, groupby, aggregates in refused:
+            with self.subTest(model=model._name, groupby=groupby):
+                with self.assertRaises(AccessError):
+                    model._read_group([], groupby, aggregates)
+        rows = self.Partner.with_user(self.admin)._read_group(
+            [("id", "=", self.france.partner_id.id)], ["email"], ["__count"]
+        )
+        self.assertEqual(rows, [(self.france.email, 1)])
+        users = self.sam | self.france | self.jacques
+        orders = (
+            (Users, [("id", "in", users.ids)], "email"),
+            (Users, [("id", "in", users.ids)], "login"),
+            (Partner, [("id", "in", users.partner_id.ids)], "email"),
+        )
+        for model, domain, fname in orders:
+            with self.subTest(model=model._name, fname=fname):
+                self.assertEqual(
+                    model.search(domain, order=f"{fname} asc, id").ids,
+                    model.search(domain, order=f"{fname} desc, id").ids,
+                )
+
+    def test_export_blanks_contact_details(self):
+        """An export of Sam, who holds the export group, carries no address,
+        phone nor login of the others; his own stay."""
+        self.sam.groups_id |= self.env.ref("base.group_allow_export")
+        partners = (self.france | self.sam).partner_id.with_user(self.sam)
+        rows = partners.export_data(["name", "email", "phone"])["datas"]
+        self.assertEqual(
+            rows,
+            [
+                ["France", "", ""],
+                ["Sam", self.sam.email, ""],
+            ],
+        )
+        users = (self.france | self.sam).with_user(self.sam)
+        rows = users.export_data(["login", "partner_id/email"])["datas"]
+        self.assertEqual(rows, [["", ""], [self.sam.login, self.sam.email]])
+
+    def test_partner_history_holds_no_address(self):
+        """France changes her address: the history of her partner, as Sam
+        reads it, holds neither the former address nor the new one; she
+        reads both."""
+        former = self.france.email
+        # ``mail`` leaves a record out of the tracking within the
+        # transaction that creates it: the precommit hooks close it, as a
+        # commit does. The records of the test users carry ``mail_notrack``.
+        self.env.cr.precommit.run()
+        partner = self.Partner.browse(self.france.partner_id.id)
+        partner.write({"email": "linkup_rf_france_new@example.com"})
+        self.env.cr.precommit.run()
+        messages = self.env["mail.message"].search(
+            [
+                ("model", "=", "res.partner"),
+                ("res_id", "=", self.france.partner_id.id),
+            ]
+        )
+        self.assertTrue(messages.sudo().tracking_value_ids)
+        data = str(
+            Store(messages.with_user(self.sam), for_current_user=True)
+            .get_result()
+            .get("mail.message")
+        )
+        self.assertNotIn(former, data)
+        self.assertNotIn("linkup_rf_france_new", data)
+        own = str(
+            Store(messages.with_user(self.france), for_current_user=True)
+            .get_result()
+            .get("mail.message")
+        )
+        self.assertIn("linkup_rf_france_new", own)
+
+    def test_followers_hold_no_address(self):
+        """The followers of a document Sam reads carry no address of
+        France, read, sent in the Store or searched; his own stays."""
+        self.sam.partner_id.message_subscribe(
+            (self.sam | self.france).partner_id.ids
+        )
+        Followers = self.env["mail.followers"].with_user(self.sam)
+        domain = [
+            ("res_model", "=", "res.partner"),
+            ("res_id", "=", self.sam.partner_id.id),
+        ]
+        rows = {
+            row["partner_id"][0]: row["email"]
+            for row in Followers.search_read(domain, ["partner_id", "email"])
+        }
+        self.assertEqual(
+            rows,
+            {
+                self.france.partner_id.id: False,
+                self.sam.partner_id.id: self.sam.email,
+            },
+        )
+        data = str(Store(Followers.search(domain)).get_result())
+        self.assertNotIn(self.france.email, data)
+        probe = domain + [("email", "=ilike", "linkup_rf_france%")]
+        self.assertEqual(Followers.search_count(probe), 0)
+        self.assertEqual(
+            self.env["mail.followers"]
+            .with_user(self.admin)
+            .search_count(probe),
+            1,
+        )
+        with self.assertRaises(AccessError):
+            Followers._read_group(domain, [], ["email:array_agg"])
+
+    def test_suggested_recipients_hold_no_address(self):
+        """The partner of France, as Sam reads its chatter, suggests itself
+        without its address."""
+        recipients = self.france.partner_id.with_user(
+            self.sam
+        )._message_get_suggested_recipients()
+        self.assertIn(
+            self.france.partner_id.id,
+            [recipient.get("partner_id") for recipient in recipients],
+        )
+        self.assertNotIn(self.france.email, str(recipients))
+
+    def test_suggested_address_without_partner_dropped(self):
+        """An address that matches no partner Sam reads suggests nothing
+        to him, its name included, however often it comes; an
+        administrator keeps one suggestion of it."""
+        address = "Inconnue <linkup_cp_unknown@example.com>"
+        for reader, expected in ((self.sam, 0), (self.admin, 1)):
+            with self.subTest(reader=reader.login):
+                thread = self.sam.partner_id.with_user(reader)
+                result = []
+                for __ in range(2):
+                    thread._message_add_suggested_recipient(
+                        result, email=address
+                    )
+                unknown = [
+                    recipient
+                    for recipient in result
+                    if not recipient.get("partner_id")
+                ]
+                self.assertEqual(len(unknown), expected)
+                if not expected:
+                    self.assertNotIn("linkup_cp_unknown", str(result))
+
     def test_administrators_read_everything(self):
         """A system administrator and a LinkUp administrator keep the
         contact details and their searches."""
@@ -203,10 +360,17 @@ class TestLinkupContactPrivacyRoutes(LinkupContactCase, HttpCase):
                 "channels_as_member": True,
             },
         }
+        payloads["/mail/thread/data"] = {
+            "thread_model": "res.partner",
+            "thread_id": self.france.partner_id.id,
+            "request_list": ["followers", "suggestedRecipients"],
+        }
+        self.france.partner_id.message_subscribe(self.jacques.partner_id.ids)
         for route, params in payloads.items():
             with self.subTest(route=route):
                 result = self.make_jsonrpc_request(route, params)
                 text = str(result)
                 self.assertIn("France", text)
                 self.assertNotIn(self.france.email, text)
+                self.assertNotIn(self.jacques.email, text)
                 self.assertNotIn(FRANCE_PHONE, text)

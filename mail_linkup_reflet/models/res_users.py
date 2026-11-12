@@ -21,7 +21,10 @@ MEMBER_TEMPLATE_XMLID = "mail_linkup_reflet.user_linkup_member_template"
 
 
 class ResUsers(models.Model):
-    _inherit = "res.users"
+    _inherit = ["res.users", "linkup.contact.privacy"]
+    _name = "res.users"
+
+    _linkup_contact_fields = privacy.USER_CONTACT_FIELDS
 
     # Both sides of the LinkUp links of the user; the record rules of
     # security/linkup_rules.xml walk them to open the linked members.
@@ -70,6 +73,16 @@ class ResUsers(models.Model):
             MEMBER_GROUP
         ) and not self._linkup_has_group_id("base.group_system")
 
+    def _linkup_is_administrator(self):
+        """A LinkUp administrator, a system administrator or the
+        superuser."""
+        self.ensure_one()
+        return (
+            self._is_superuser()
+            or self._linkup_has_group_id(ADMIN_GROUP)
+            or self._linkup_has_group_id("base.group_system")
+        )
+
     def _linkup_is_plain_member(self):
         """A restricted member who is not a LinkUp administrator either.
 
@@ -81,9 +94,9 @@ class ResUsers(models.Model):
         self.ensure_one()
         if self._is_public() or not self._is_internal():
             return False
-        return self._linkup_has_group_id(MEMBER_GROUP) and not (
-            self._linkup_has_group_id(ADMIN_GROUP)
-            or self._linkup_has_group_id("base.group_system")
+        return (
+            self._linkup_has_group_id(MEMBER_GROUP)
+            and not self._linkup_is_administrator()
         )
 
     # ------------------------------------------------------------------
@@ -331,6 +344,9 @@ class ResUsers(models.Model):
                 self.env.uid,
             )
         return result
+
+    def _linkup_contact_own(self):
+        return self & self.env.user
 
     def _condition_to_sql(self, alias, fname, operator, value, query):
         """A restricted member searches no user by their login or contact

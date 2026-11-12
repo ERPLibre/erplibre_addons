@@ -280,6 +280,12 @@ msgstr ""
 
 #. module: mail_linkup_reflet
 #. odoo-python
+#: code:addons/mail_linkup_reflet/models/contact_privacy.py:0
+msgid "A LinkUp member does not group the contact details of the other people."
+msgstr "Un membre LinkUp ne regroupe pas les coordonnées des autres personnes."
+
+#. module: mail_linkup_reflet
+#. odoo-python
 #: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
 msgid ""
 "A LinkUp member enters a channel when a LinkUp administrator or a linked "
@@ -287,6 +293,12 @@ msgid ""
 msgstr ""
 "Un membre LinkUp entre dans un canal quand un administrateur LinkUp ou un"
 " membre lié l'y ajoute, ou par son lien d'invitation."
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid "A LinkUp member enters a group when a linked member of it adds them."
+msgstr "Un membre LinkUp entre dans un groupe quand un membre lié de ce groupe l'y ajoute."
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -361,6 +373,16 @@ msgstr ""
 "Dévoilement superficiel puis progressif et lent ; sincère, il renforce le "
 "lien ; trop rapide, il fait fuir. Marque un point sensible exprimé ou "
 "compris. On ne reformule pas ce qui n'a pas été dit."
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid ""
+"A guest or a portal user and a LinkUp member do not meet in a group or a "
+"direct conversation."
+msgstr ""
+"Un invité ou un utilisateur du portail et un membre LinkUp ne se "
+"rencontrent ni dans un groupe ni dans une conversation directe."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_link_pair_ordered
@@ -1873,6 +1895,11 @@ msgstr "Liste de refus LinkUp des adresses courriel"
 #: model:ir.model,name:mail_linkup_reflet.model_linkup_category
 msgid "LinkUp category of communication"
 msgstr "Catégorie de communication LinkUp"
+
+#. module: mail_linkup_reflet
+#: model:ir.model,name:mail_linkup_reflet.model_linkup_contact_privacy
+msgid "LinkUp contact details closed to a member"
+msgstr "Coordonnées LinkUp fermées à un membre"
 
 #. module: mail_linkup_reflet
 #. odoo-javascript

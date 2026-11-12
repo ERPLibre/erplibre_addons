@@ -12,7 +12,13 @@ DISPLAY_CONTACT_KEYS = ("show_email", "show_address", "show_vat")
 
 
 class ResPartner(models.Model):
-    _inherit = "res.partner"
+    _inherit = ["res.partner", "linkup.contact.privacy"]
+    _name = "res.partner"
+
+    _linkup_contact_fields = privacy.CONTACT_FIELDS
+
+    def _linkup_contact_own(self):
+        return self & self.env.user.partner_id
 
     def _read_format(self, fnames, load="_classic_read"):
         """Blank the contact details of the other partners in what a
@@ -58,6 +64,22 @@ class ResPartner(models.Model):
             return SQL("FALSE")
         return super()._condition_to_sql(alias, fname, operator, value, query)
 
+    def _track_filter_for_display(self, tracking_values):
+        """Leave out of the history of another partner, as a restricted
+        member reads it, the changes of its contact details: each one holds
+        the former value and the new one. A change of the address of a
+        member, in their preferences or their profile, writes their
+        partner, which ``mail`` tracks."""
+        tracking_values = super()._track_filter_for_display(tracking_values)
+        if self == self.env.user.partner_id or not privacy.contact_closed(
+            self.env
+        ):
+            return tracking_values
+        return tracking_values.filtered(
+            lambda tracking: tracking.sudo().field_id.name
+            not in privacy.TRACKED_CONTACT_FIELDS
+        )
+
     def _to_store(self, store: Store, /, **kwargs):
         """Leave the address out of the Discuss Store: for every partner
         when a restricted member reads, and for the partner of a restricted
@@ -81,4 +103,29 @@ class ResPartner(models.Model):
         return any(
             user._linkup_is_restricted_member()
             for user in self.sudo().with_context(active_test=False).user_ids
+        )
+
+    def _linkup_outsider_partners(self):
+        """The partners among these ones that no internal user holds, an
+        archived account included: the partner of a portal user, or a
+        contact without a user."""
+        return self.filtered(
+            lambda partner: not any(
+                not user.share
+                for user in partner.sudo()
+                .with_context(active_test=False)
+                .user_ids
+            )
+        )
+
+    def _linkup_plain_member_partners(self):
+        """The partners of a plain member among these ones, an archived
+        account included (``res.users._linkup_is_plain_member``)."""
+        return self.filtered(
+            lambda partner: any(
+                user._linkup_is_plain_member()
+                for user in partner.sudo()
+                .with_context(active_test=False)
+                .user_ids
+            )
         )
