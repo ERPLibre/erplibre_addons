@@ -12,8 +12,8 @@ extension ERPLibre Home, its installation, the games and the mobile plugin —
 as `devops.requirement` records, each with the repository tests that prove
 it. They come from the audit of the Stream Deck design specifications, row
 by row, and from the designs of the Odoo inventory, of its monitoring and
-of its control of the deck settings, and live here instead of in a
-document.
+of its control of the deck settings and of the key layout, and live here
+instead of in a document.
 
 The module depends on `erplibre_streamdeck` and `erplibre_devops_requirement`,
 and adds no model, no view and no menu: the requirements show in the
@@ -111,17 +111,19 @@ while one it depends on is not.
 ## The Control domain
 
 The domain *Control* (`sd_ctl`, file `data/requirement_control.xml`) holds
-the requirements of the control of the deck settings by Odoo, the settings
-part of the third lot: one per user decision, design choice and anti-goal
-of its design, coded `SD-CTL-R<nn>`. Its proofs are Odoo tests of
-`erplibre_streamdeck`, Node tests of the extension and unit tests of
-ERPLibre, since the configuration crosses the three repositories. The key
-layout, the second part of the lot, adds its requirements after these.
+the requirements of the control of the deck by Odoo, the third lot: one
+per user decision, design choice and anti-goal of its design, coded
+`SD-CTL-R<nn>`. `SD-CTL-R01` to `R49` cover the settings, the first part
+of the lot; `SD-CTL-R50` to `R71` the key layout, the second part, whose
+tests also prove four anti-goals of the first. Its proofs are Odoo tests
+of `erplibre_streamdeck`, Node tests of the extension and unit tests of
+ERPLibre, since the configuration crosses the three repositories.
 
 The test `tests/test_requirement_control.py` checks that each proof names
 a test that exists, under the same rules as the inventory; that each test
-of the files `test_streamdeck_config*.py` of `erplibre_streamdeck` proves
-at least one requirement; that the tests holding the review points of the
+of the files `test_streamdeck_config*.py` and
+`test_streamdeck_key_layout.py` of `erplibre_streamdeck` proves at least
+one requirement; that the tests holding the review points of the
 lot are cited; and that the requirements still to do are exactly those it
 names.
 
@@ -158,8 +160,8 @@ GNOME ERPLibre Home, son installation, les jeux et le plugin mobile — en
 enregistrements `devops.requirement`, chacun avec les tests de dépôt qui le
 prouvent. Ils viennent de l'audit des spécifications de conception du Stream
 Deck, ligne par ligne, et des conceptions de l'inventaire Odoo, de sa
-surveillance et de son pilotage des réglages du deck, et vivent ici plutôt
-que dans un document.
+surveillance et de son pilotage des réglages du deck et de la disposition
+des touches, et vivent ici plutôt que dans un document.
 
 Le module dépend de `erplibre_streamdeck` et de
 `erplibre_devops_requirement`, et n'ajoute aucun modèle, aucune vue ni aucun
@@ -259,18 +261,20 @@ requis dont il dépend ne l'est pas.
 ## Le domaine Pilotage
 
 Le domaine *Pilotage* (`sd_ctl`, fichier `data/requirement_control.xml`)
-porte les requis du pilotage des réglages du deck par Odoo, la partie
-réglages du troisième lot : un par décision de l'utilisateur, choix de
-conception et anti-objectif de sa conception, de code `SD-CTL-R<nn>`. Ses
-preuves sont des tests Odoo d'`erplibre_streamdeck`, des tests Node de
-l'extension et des tests unitaires d'ERPLibre, puisque la configuration
-traverse les trois dépôts. La disposition des touches, seconde partie du
-lot, ajoute ses requis à la suite de ceux-ci.
+porte les requis du pilotage du deck par Odoo, le troisième lot : un par
+décision de l'utilisateur, choix de conception et anti-objectif de sa
+conception, de code `SD-CTL-R<nn>`. `SD-CTL-R01` à `R49` couvrent les
+réglages, la première partie du lot ; `SD-CTL-R50` à `R71` la disposition
+des touches, la seconde, dont les tests prouvent aussi quatre
+anti-objectifs de la première. Ses preuves sont des tests Odoo
+d'`erplibre_streamdeck`, des tests Node de l'extension et des tests
+unitaires d'ERPLibre, puisque la configuration traverse les trois dépôts.
 
 Le test `tests/test_requirement_control.py` vérifie que chaque preuve nomme
 un test qui existe, selon les mêmes règles que l'inventaire ; que chaque
-test des fichiers `test_streamdeck_config*.py` d'`erplibre_streamdeck`
-prouve au moins un requis ; que les tests qui tiennent les points de revue
+test des fichiers `test_streamdeck_config*.py` et
+`test_streamdeck_key_layout.py` d'`erplibre_streamdeck` prouve au moins un
+requis ; que les tests qui tiennent les points de revue
 du lot sont cités ; et que les requis encore à faire sont exactement ceux
 qu'il nomme.
 

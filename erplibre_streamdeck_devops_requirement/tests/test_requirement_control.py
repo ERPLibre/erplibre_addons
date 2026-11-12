@@ -32,14 +32,19 @@ from .test_streamdeck_requirement_data import (
 MODULE = "erplibre_streamdeck_devops_requirement"
 CATEGORY = "sd_ctl"
 # Un requis par décision de l'utilisateur, par choix de conception et par
-# anti-objectif de la conception du pilotage, sous-lot des réglages.
-COUNT = 49
+# anti-objectif de la conception du pilotage : SD-CTL-R01 à R49 pour le
+# sous-lot des réglages, puis ceux de la disposition des touches.
+COUNT = 71
 
 # Les fichiers de test du pilotage dans erplibre_streamdeck, par motif :
 # chacun de leurs tests prouve au moins un requis, et un fichier ajouté
 # sous ce motif l'est sans retouche de cette liste. Les tests de la
-# politique du premier pilotage vivent dans test_streamdeck_config_settings.
-CONTROL_TEST_FILES = ("test_streamdeck_config*.py",)
+# politique du premier pilotage vivent dans test_streamdeck_config_settings,
+# ceux de la disposition des touches dans test_streamdeck_key_layout.
+CONTROL_TEST_FILES = (
+    "test_streamdeck_config*.py",
+    "test_streamdeck_key_layout.py",
+)
 
 # Les requis qui protègent un accès, un verrou, une entrée du fil ou un
 # fichier du poste.
@@ -58,6 +63,11 @@ SECURITY = (
     "SD-CTL-R43",
     "SD-CTL-R47",
     "SD-CTL-R49",
+    "SD-CTL-R54",
+    "SD-CTL-R59",
+    "SD-CTL-R62",
+    "SD-CTL-R67",
+    "SD-CTL-R69",
 )
 
 # Les requis encore à faire : chacun décrit son écart dans Ce qui manque,
@@ -67,6 +77,10 @@ TO_DO = ("SD-CTL-R49",)
 ODOO = "odoo.addons.erplibre_streamdeck.tests."
 EXTENSION = "erplibre-home-gnome-extension:test/unit/"
 ERPLIBRE = "erplibre:test/test_erplibre_home_pilot.py::"
+KEYMAP = "erplibre:test/test_erplibre_streamdeck_keymap.py::"
+HOME = "erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::"
+APP = "erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::"
+KEY_LAYOUT = ODOO + "test_streamdeck_key_layout.TestStreamdeckKeyLayout."
 
 # Les tests qui tiennent les points de revue du pilotage : chacun prouve un
 # requis, de sorte que son verdict atteint le registre.
@@ -96,6 +110,24 @@ REVIEW_FOCUS = (
     EXTENSION
     + "inventory-service.test.js"
     + "::keep_local_writes_nothing_and_reports_the_choice",
+    # Disposition des touches : un keymap.json hostile, un plugin sans
+    # touche, fixtures et tableau de bord, un catalogue trop ancien, un
+    # employé devant une disposition verrouillée ou d'un autre poste.
+    KEYMAP + "LoadTest::test_a_bad_file_is_empty_with_one_line",
+    KEYMAP
+    + "LayoutForTest::test_hostile_entries_are_skipped_one_problem_each",
+    APP + "test_a_hostile_keymap_still_starts_the_deck",
+    HOME + "test_an_unnamed_plugin_gets_no_home_key",
+    KEY_LAYOUT + "test_the_preview_warns_of_plugins_without_a_key",
+    HOME + "test_fixtures_skip_named_keys",
+    HOME + "test_the_dashboard_takes_tiles_keys_first_then_free_keys",
+    EXTENSION
+    + "deck-config.test.js::a_layout_action_outside_the_catalog_refuses",
+    EXTENSION
+    + "inventory-service.test.js::a_layout_action_outside_the_catalog_refuses",
+    KEY_LAYOUT
+    + "test_an_employee_edits_a_free_layout_of_their_workstation_only",
+    KEY_LAYOUT + "test_an_employee_cannot_edit_a_locked_layout",
 )
 
 FRENCH = {
@@ -104,6 +136,11 @@ FRENCH = {
         "Le gestionnaire marque des profils au choix ; l'employé en choisit "
         "un pour chacun de ses postes, le gestionnaire assigne n'importe quel "
         "profil, et un profil qui n'est pas au choix ne s'assigne que par lui"
+    ),
+    "SD-CTL-R51": (
+        "La disposition des touches ne couvre que l'écran d'accueil : les "
+        "touches d'accueil des plugins, le tableau de bord et les touches "
+        "noires"
     ),
 }
 
@@ -187,6 +224,7 @@ class TestRequirementControl(TransactionCase):
             "test_streamdeck_config_access",
             "test_streamdeck_config_settings",
             "test_streamdeck_config_wire",
+            "test_streamdeck_key_layout",
         ):
             self.assertIn(expected, files)
         loader = unittest.TestLoader()
@@ -342,7 +380,8 @@ class TestRequirementControl(TransactionCase):
             self.category.with_context(lang="fr_CA").name,
             FRENCH["cat_sd_ctl"],
         )
-        self.assertEqual(
-            self._requirement("SD-CTL-R11").with_context(lang="fr_CA").name,
-            FRENCH["SD-CTL-R11"],
-        )
+        for code in ("SD-CTL-R11", "SD-CTL-R51"):
+            self.assertEqual(
+                self._requirement(code).with_context(lang="fr_CA").name,
+                FRENCH[code],
+            )
