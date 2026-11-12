@@ -376,8 +376,12 @@ sorted, no space, every character outside ASCII escaped as `\uXXXX`):
   its keys sends it again;
 - a **locked** layout, or one removed from the file, is offered again.
 
-The first-pilot question leaves the layouts out: only the extension
-writes `keymap.json`.
+The first-pilot question covers the free layouts as the free settings:
+a free layout of the file whose hash differs from Odoo's puts
+`key_layouts` in `ask`, unless one of the sent layouts is locked, and
+keeping the local values adopts it as above. A workstation piloted before
+protocol 1.2 has made its choice already: a layout then follows the rule
+of a setting newly managed, offered under a new revision.
 
 ### History of the configuration
 
@@ -455,9 +459,9 @@ accepted and its unknown keys ignored. Every reply carries `"protocol":
   plus `ask` during a first pilot under *Ask the employee*. `hash` is the
   SHA-256 of the canonical JSON of `settings` (keys sorted, no space),
   `locked` the locked settings, `ask` the free settings whose local value
-  differs from Odoo's. In 1.2, `settings.key_layouts` maps the product
-  id of each connected deck that Odoo lays out, within the catalog of the
-  report, to `{"keys": [{"key",
+  differs from Odoo's, `key_layouts` included. In 1.2,
+  `settings.key_layouts` maps the product id of each connected deck that
+  Odoo lays out, within the catalog of the report, to `{"keys": [{"key",
   "action", "icon", "label"}]}`, by ascending key, `icon` and `label`
   only when set, at most 16 models; `locked` then lists `key_layouts`
   when one of these layouts is locked.
