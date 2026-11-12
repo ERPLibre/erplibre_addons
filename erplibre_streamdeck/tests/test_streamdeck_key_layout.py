@@ -44,8 +44,19 @@ LOCK_IN_FILE = (
     "Odoo does not hold the keys of this layout, kept in the workstation's"
     " file: create its keys before locking it."
 )
+NO_LAYOUT_SENT = (
+    "No layer lays out this deck model, and Odoo sends it no layout: the"
+    " deck keeps the layout last applied to its keymap.json, if any, else"
+    " places its keys itself."
+)
 # The terms of the key layouts and their fr_CA text.
 LAYOUT_TERMS = {
+    NO_LAYOUT_SENT: (
+        "Aucune couche ne dispose ce modèle de deck, et Odoo ne lui envoie"
+        " aucune disposition : le deck garde la dernière disposition"
+        " appliquée à son keymap.json, s'il y en a une, sinon il place"
+        " lui-même ses touches."
+    ),
     "Key layouts": "Dispositions des touches",
     "Key layout": "Disposition des touches",
     "Catalog": "Catalogue",
@@ -1156,7 +1167,7 @@ class TestStreamdeckKeyLayoutViews(KeyLayoutCase):
                 self.assertIn("action", action.get("domain"))
 
     def test_the_configuration_tab_shows_the_layouts_of_connected_decks(self):
-        workstation, _token = self._workstation()
+        workstation, _token = self._workstation(decks=(DECK_PLUS, DECK_MINI))
         form = self._arch("streamdeck.workstation", "form", self.user_a)
         (page,) = form.xpath("//page[@name='configuration']")
         self.assertTrue(page.xpath(".//field[@name='config_layouts_html']"))
@@ -1164,6 +1175,12 @@ class TestStreamdeckKeyLayoutViews(KeyLayoutCase):
         html = str(workstation.with_user(self.user_a).config_layouts_html)
         self.assertIn("Minuteries", html)
         self.assertIn("0084", html)
+        # A model no layer lays out gets no layout from Odoo, which cannot
+        # take one out of keymap.json: the tab does not promise the
+        # automatic layout.
+        self.assertIn("0063", html)
+        self.assertIn(NO_LAYOUT_SENT, html)
+        self.assertNotIn("Automatic layout", html)
         for xmlid in (
             "menu_streamdeck_config_layouts",
             "menu_streamdeck_config_catalog",

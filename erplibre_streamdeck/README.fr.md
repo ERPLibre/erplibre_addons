@@ -367,8 +367,12 @@ dispositions des decks branchés vont au poste, dans le réglage
 `key_layouts` de la révision, verrouillé quand l'une d'elles l'est ;
 l'extension les écrit dans `~/.config/erplibre-home/keymap.json` quand
 l'employé applique la révision, et y garde les dispositions des modèles
-qu'Odoo n'envoie pas. Un modèle qu'aucune couche ne dispose garde la
-disposition automatique du programme du deck.
+qu'Odoo n'envoie pas. Odoo ne retire jamais une disposition du fichier :
+un modèle qu'aucune couche ne dispose, ou ne dispose plus, y garde la
+dernière disposition appliquée, et un modèle que le fichier ne nomme
+pas prend la disposition automatique du programme du deck.
+L'onglet *Configuration* du poste le dit pour chaque modèle branché
+auquel Odoo n'envoie pas de disposition.
 
 Chaque poste reçoit les dispositions dans les limites du catalogue de sa
 propre remontée, puisqu'il refuse la révision entière pour une touche que
