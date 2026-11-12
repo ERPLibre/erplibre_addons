@@ -149,6 +149,8 @@ class TestRequirementUpgrade(TransactionCase):
             self.env.ref("%s.%s" % (MODULE, xmlid)).write(
                 {"achievement": "An outdated way"}
             )
+        renamed = self.env.ref("%s.req_sd_ctl_r27" % MODULE)
+        renamed.write({"name": "An outdated name"})
         self._migrate("18.0.1.3.0", MIGRATION_1_4)
         self.env.invalidate_all()
         for xmlid, data in proofs.items():
@@ -165,3 +167,6 @@ class TestRequirementUpgrade(TransactionCase):
                     self.env.ref("%s.%s" % (MODULE, xmlid)).achievement,
                     self._in_file(xmlid, "achievement", CONTROL),
                 )
+        self.assertEqual(
+            renamed.name, self._in_file("req_sd_ctl_r27", "name", CONTROL)
+        )
