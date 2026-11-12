@@ -78,8 +78,10 @@ class ResUsers(models.Model):
         return res
 
     def _init_store_data(self, store: Store, /):
-        """Give a member their network preferences and the number of
-        partners the strongest density keeps."""
+        """Give a member their network preferences, the number of
+        partners the strongest density keeps, and how much their energy
+        decayed (``linkup_energy_decay``): the web client shows the karma
+        less that amount, and adds the points of the session to it."""
         super()._init_store_data(store)
         user = self.env.user
         if user._is_public() or not user._linkup_has_group_id(MEMBER_GROUP):
@@ -89,7 +91,27 @@ class ResUsers(models.Model):
         values["linkup_network_top_count"] = self.env[
             "linkup.link"
         ]._linkup_network_top_count()
+        values["linkup_energy_decay"] = me.karma - me._linkup_network_energy()
         store.add(values)
+
+    # ------------------------------------------------------------------
+    # Energy of the network, decayed (Q-08, Q-41)
+    # ------------------------------------------------------------------
+
+    def _linkup_network_energy(self):
+        """The energy of the member: their karma (Q-08), less what the
+        decay took from their ledger lines (Q-41). The karma earned outside
+        LinkUp keeps its full weight; without decay, the energy is the
+        karma."""
+        self.ensure_one()
+        user = self.sudo()
+        Ledger = self.env["linkup.points.ledger"]
+        if not Ledger._linkup_half_life_days():
+            return user.karma
+        points, energy = Ledger._linkup_energy_sums(
+            [("user_id", "=", user.id)], "user_id"
+        ).get(user.id, (0, 0))
+        return user.karma - points + energy
 
     # ------------------------------------------------------------------
     # Gamification of the other users (LU-NF-012, LU-F-073 RM2)

@@ -5,6 +5,7 @@ from . import (
     gamification_badge,
     gamification_karma_rank,
     linkup_link,
+    linkup_points_ledger,
     linkup_reflet,
     res_config_settings,
     res_users,

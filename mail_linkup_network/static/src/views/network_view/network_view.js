@@ -267,9 +267,9 @@ export class LinkupNetworkView extends Component {
         return imageUrl("res.partner", contact.partner_id, "avatar_128");
     }
 
-    /** The energy of the member, their karma, as the Store follows it. */
+    /** The energy of the member, their decayed karma, as the Store follows it. */
     get energy() {
-        return formatInteger(this.store.linkup_karma ?? this.state.graph?.me.energy ?? 0);
+        return formatInteger(this.store.linkupEnergy ?? this.state.graph?.me.energy ?? 0);
     }
 
     get energyLabel() {

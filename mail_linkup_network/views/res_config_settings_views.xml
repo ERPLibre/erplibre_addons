@@ -15,7 +15,7 @@
                 <setting
           id="linkup_network_setting"
           string="Network view"
-          help="Density X3 of the graph: the strongest partners of the member."
+          help="Density X3 of the graph: the strongest partners of the member. The energy decays with time."
         >
                     <div class="row mt-2">
                         <label
@@ -23,6 +23,13 @@
               class="col-lg-6 o_light_label"
             />
                         <field name="linkup_network_top_count" />
+                    </div>
+                    <div class="row mt-2">
+                        <label
+              for="linkup_energy_half_life_days"
+              class="col-lg-6 o_light_label"
+            />
+                        <field name="linkup_energy_half_life_days" />
                     </div>
                 </setting>
             </block>

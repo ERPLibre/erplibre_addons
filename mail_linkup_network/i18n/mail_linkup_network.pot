@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 12:08+0000\n"
-"PO-Revision-Date: 2026-11-06 12:08+0000\n"
+"POT-Creation-Date: 2026-11-12 06:22+0000\n"
+"PO-Revision-Date: 2026-11-12 06:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -220,6 +220,13 @@ msgid "Confirm this reflection before answering it."
 msgstr ""
 
 #. module: mail_linkup_network
+#: model:ir.model.fields,help:mail_linkup_network.field_res_config_settings__linkup_energy_half_life_days
+msgid ""
+"Days after which a point counts half in the energy of a member and of a "
+"link. 0 turns the decay off."
+msgstr ""
+
+#. module: mail_linkup_network
 #. odoo-javascript
 #: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
 msgid ""
@@ -235,7 +242,9 @@ msgstr ""
 
 #. module: mail_linkup_network
 #: model_terms:ir.ui.view,arch_db:mail_linkup_network.res_config_settings_view_form
-msgid "Density X3 of the graph: the strongest partners of the member."
+msgid ""
+"Density X3 of the graph: the strongest partners of the member. The energy "
+"decays with time."
 msgstr ""
 
 #. module: mail_linkup_network
@@ -326,6 +335,11 @@ msgid "Grey lines"
 msgstr ""
 
 #. module: mail_linkup_network
+#: model:ir.model.fields,field_description:mail_linkup_network.field_res_config_settings__linkup_energy_half_life_days
+msgid "Half-life of the energy (days)"
+msgstr ""
+
+#. module: mail_linkup_network
 #. odoo-javascript
 #: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
 msgid "In the light"
@@ -389,6 +403,11 @@ msgstr ""
 #. module: mail_linkup_network
 #: model:ir.model,name:mail_linkup_network.model_linkup_link
 msgid "LinkUp link between two members"
+msgstr ""
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_linkup_points_ledger
+msgid "LinkUp points ledger"
 msgstr ""
 
 #. module: mail_linkup_network

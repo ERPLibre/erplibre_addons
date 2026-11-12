@@ -50,6 +50,35 @@ class LinkupLink(models.Model):
     _inherit = "linkup.link"
 
     # ------------------------------------------------------------------
+    # Energy of a link, decayed (Q-41)
+    # ------------------------------------------------------------------
+
+    def _linkup_energies_for(self, user):
+        """The energy of each link of ``self`` as ``user`` reads it,
+        ``{link id: energy}``: the points they received in the events of
+        the pair, each line weighted by the decay of its age
+        (``linkup.points.ledger``), in one query. Without decay, the sums
+        the gamification keeps on the links."""
+        Ledger = self.env["linkup.points.ledger"]
+        if not Ledger._linkup_half_life_days():
+            return {
+                link.id: super(LinkupLink, link)._linkup_energy_for(user)
+                for link in self
+            }
+        sums = Ledger._linkup_energy_sums(
+            [("user_id", "=", user.id), ("link_id", "in", self.ids)],
+            "link_id",
+        )
+        return {link.id: sums.get(link.id, (0, 0))[1] for link in self}
+
+    def _linkup_energy_for(self, user):
+        """The energy of the link as ``user`` reads it, decayed: the value
+        of the graph, of "My partners", of the link card and of the panel
+        of the conversation (LU-F-071 RM2)."""
+        self.ensure_one()
+        return self._linkup_energies_for(user)[self.id]
+
+    # ------------------------------------------------------------------
     # Contacts of the network
     # ------------------------------------------------------------------
 
@@ -182,13 +211,15 @@ class LinkupLink(models.Model):
         bounds the nodes, the strongest kept, at most ``MAX_NODES``.
 
         The answer gives ``me`` (``user_id``, ``partner_id``, ``name``,
-        ``energy``: the karma of the member, Q-08), ``nodes`` (each with
-        ``energy``, the energy of the link as the member received it,
-        LU-F-071 RM2, and ``highlight``, an active highlight it sent to the
-        member), ``edges`` (``direct`` ones from the member, with their
-        energy; ``contacts`` ones without any, the energy of a pair being
-        theirs) and ``more``, whether stronger nodes hid weaker ones. Nobody
-        outside the contacts appears, not even as an anonymous node.
+        ``energy``: the karma of the member, Q-08, decayed, Q-41),
+        ``nodes`` (each with ``energy``, the energy of the link as the
+        member received it, LU-F-071 RM2, decayed, and ``highlight``, an
+        active highlight it sent to the member), ``edges`` (``direct`` ones
+        from the member, with their energy; ``contacts`` ones without any,
+        the energy of a pair being theirs) and ``more``, whether stronger
+        nodes hid weaker ones. The nodes and X3 follow the decayed energy.
+        Nobody outside the contacts appears, not even as an anonymous
+        node.
 
         The number of queries does not grow with the number of contacts.
         """
@@ -200,9 +231,10 @@ class LinkupLink(models.Model):
             limit = MAX_NODES
         me = self.env.user
         contacts = self._linkup_network_contacts(me)
+        links = self.sudo().browse([link.id for link in contacts.values()])
+        energy_of = links._linkup_energies_for(me)
         energy = {
-            user_id: link._linkup_energy_for(me)
-            for user_id, link in contacts.items()
+            user_id: energy_of[link.id] for user_id, link in contacts.items()
         }
         users = self.env["res.users"].sudo().browse(list(contacts))
         ordered = users.sorted(self._linkup_sort_key(energy))
@@ -236,7 +268,7 @@ class LinkupLink(models.Model):
                 "user_id": me.id,
                 "partner_id": partner.id,
                 "name": partner.name or me.name,
-                "energy": me.sudo().karma,
+                "energy": me._linkup_network_energy(),
             },
             "nodes": nodes,
             "edges": edges,
@@ -281,7 +313,8 @@ class LinkupLink(models.Model):
         each pair (LU-F-074), the value of the link card. ``active`` ranks
         the contacts who show their energy (``linkup_energy_visible``) by
         the points they received from anybody, penalties left out, rounded
-        to the hundred (LU-F-073 RM2). ``period`` is ``all`` or ``30d``.
+        to the hundred (LU-F-073 RM2). Both weigh each line by the decay of
+        its age (Q-41). ``period`` is ``all`` or ``30d``.
 
         Each row gives ``position``, ``user_id``, ``partner_id``, ``name``,
         ``value`` and ``highlight``; equal values go by name.
@@ -306,38 +339,33 @@ class LinkupLink(models.Model):
         if PERIODS[period]:
             since = fields.Datetime.now() - timedelta(days=PERIODS[period])
             domain.append(("date", ">=", since))
-        Ledger = self.env["linkup.points.ledger"].sudo()
+        Ledger = self.env["linkup.points.ledger"]
         if kind == "partners":
-            totals = dict(
-                Ledger._read_group(
-                    domain
-                    + [
-                        ("user_id", "=", me.id),
-                        (
-                            "link_id",
-                            "in",
-                            [link.id for link in contacts.values()],
-                        ),
-                    ],
-                    ["link_id"],
-                    ["points:sum"],
-                )
+            totals = Ledger._linkup_energy_sums(
+                domain
+                + [
+                    ("user_id", "=", me.id),
+                    (
+                        "link_id",
+                        "in",
+                        [link.id for link in contacts.values()],
+                    ),
+                ],
+                "link_id",
             )
             values = {
-                user.id: totals.get(contacts[user.id], 0) for user in users
+                user.id: totals.get(contacts[user.id].id, (0, 0))[1]
+                for user in users
             }
         else:
             users = users.filtered("linkup_energy_visible")
-            totals = dict(
-                Ledger._read_group(
-                    domain
-                    + [("user_id", "in", users.ids), ("points", ">", 0)],
-                    ["user_id"],
-                    ["points:sum"],
-                )
+            totals = Ledger._linkup_energy_sums(
+                domain + [("user_id", "in", users.ids), ("points", ">", 0)],
+                "user_id",
             )
             values = {
-                user.id: round_energy(totals.get(user, 0)) for user in users
+                user.id: round_energy(totals.get(user.id, (0, 0))[1])
+                for user in users
             }
         highlighted = self._linkup_highlighted_by(me, users.ids)
         rows = []
@@ -367,6 +395,7 @@ class LinkupLink(models.Model):
         archived account, gives ``{"available": False}``, whatever the
         reason. The card gives the contact (``user_id``, ``partner_id``,
         ``name``), ``energy`` as the member received it (LU-F-071 RM2),
+        decayed as in "My partners" (Q-41),
         ``first_link_date``, ``channel_id``, the direct conversation for the
         call, the video call and the conversation, ``highlight_sent`` and
         ``highlight_received``, and ``entries``: the thread of the pair,

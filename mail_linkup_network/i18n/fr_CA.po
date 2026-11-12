@@ -223,6 +223,15 @@ msgid "Confirm this reflection before answering it."
 msgstr "Confirme ce reflet avant d'y répondre."
 
 #. module: mail_linkup_network
+#: model:ir.model.fields,help:mail_linkup_network.field_res_config_settings__linkup_energy_half_life_days
+msgid ""
+"Days after which a point counts half in the energy of a member and of a "
+"link. 0 turns the decay off."
+msgstr ""
+"Jours après lesquels un point compte pour moitié dans l'énergie d'un membre"
+" et d'un lien. 0 désactive la décroissance."
+
+#. module: mail_linkup_network
 #. odoo-javascript
 #: code:addons/mail_linkup_network/static/src/core/common/network_guide_patch.js:0
 msgid ""
@@ -240,8 +249,12 @@ msgstr "Densité %(level)s : %(hint)s. Appuie pour %(next)s."
 
 #. module: mail_linkup_network
 #: model_terms:ir.ui.view,arch_db:mail_linkup_network.res_config_settings_view_form
-msgid "Density X3 of the graph: the strongest partners of the member."
-msgstr "Densité X3 du graphe : les partenaires les plus forts du membre."
+msgid ""
+"Density X3 of the graph: the strongest partners of the member. The energy "
+"decays with time."
+msgstr ""
+"Densité X3 du graphe : les partenaires les plus forts du membre. L'énergie"
+" décroît avec le temps."
 
 #. module: mail_linkup_network
 #. odoo-javascript
@@ -337,6 +350,11 @@ msgid "Grey lines"
 msgstr "Traits gris"
 
 #. module: mail_linkup_network
+#: model:ir.model.fields,field_description:mail_linkup_network.field_res_config_settings__linkup_energy_half_life_days
+msgid "Half-life of the energy (days)"
+msgstr "Demi-vie de l'énergie (jours)"
+
+#. module: mail_linkup_network
 #. odoo-javascript
 #: code:addons/mail_linkup_network/static/src/views/network_view/network_view.js:0
 msgid "In the light"
@@ -403,6 +421,11 @@ msgstr "Lien avec %(name)s"
 #: model:ir.model,name:mail_linkup_network.model_linkup_link
 msgid "LinkUp link between two members"
 msgstr "Lien LinkUp entre deux membres"
+
+#. module: mail_linkup_network
+#: model:ir.model,name:mail_linkup_network.model_linkup_points_ledger
+msgid "LinkUp points ledger"
+msgstr "Registre des points LinkUp"
 
 #. module: mail_linkup_network
 #: model:ir.model,name:mail_linkup_network.model_linkup_reflet

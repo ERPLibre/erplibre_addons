@@ -93,7 +93,9 @@ class TestLinkupNetworkRanking(LinkupNetworkCase):
         self.assertNotIn(self.sam.id, luce_ids)
 
     def test_period(self):
-        """The period of 30 days counts the lines of the last 30 days."""
+        """The period of 30 days counts the lines of the last 30 days; all
+        the time counts the old ones, which weigh less with their age
+        (Q-41: 45 days of a half-life of 90)."""
         link = self.Link._get_between(self.sam, self.jean)
         self._pay(self.sam, link, 50000, days=45)
         self._pay(self.jean, link, 50000, days=45)
@@ -107,7 +109,9 @@ class TestLinkupNetworkRanking(LinkupNetworkCase):
             row["name"]: row["value"]
             for row in self._ranking("partners")["rows"]
         }
-        self.assertEqual(all_time["Jean"], PARTNERS["jean"] + 50000)
+        self.assertEqual(
+            all_time["Jean"], PARTNERS["jean"] + round(50000 * 2**-0.5)
+        )
         self.assertEqual(
             self._names(self._ranking("partners")["rows"])[0], "Jean"
         )

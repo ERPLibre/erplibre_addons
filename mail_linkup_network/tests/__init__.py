@@ -4,6 +4,7 @@ from . import (
     test_action_request,
     test_network_adversarial,
     test_network_card,
+    test_network_decay,
     test_network_demo,
     test_network_graph,
     test_network_performance,

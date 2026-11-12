@@ -5,14 +5,14 @@ import {formatInteger} from "@web/views/fields/formatters";
 import {LinkupSidebarSection} from "@mail_linkup_reflet/core/public_web/linkup_sidebar";
 
 // "Network view (n)" in the LinkUp section of the sidebar of Discuss, n
-// being the energy of the member (LU-F-002 RM2); without n when the member
-// hides the points.
+// being the energy of the member, decayed (LU-F-002 RM2, Q-41); without n
+// when the member hides the points.
 patch(LinkupSidebarSection.prototype, {
     get networkLabel() {
         if (this.store.settings?.linkup_hide_gamification) {
             return _t("Network view");
         }
-        return _t("Network view (%(energy)s)", {energy: formatInteger(this.store.linkup_karma || 0)});
+        return _t("Network view (%(energy)s)", {energy: formatInteger(this.store.linkupEnergy || 0)});
     },
 
     openNetworkView() {

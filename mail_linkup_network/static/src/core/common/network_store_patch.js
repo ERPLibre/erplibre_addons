@@ -15,6 +15,25 @@ patch(Store.prototype, {
         this.linkup_energy_visible = false;
         /** The number of partners the density X3 keeps. */
         this.linkup_network_top_count = 2;
+        /**
+         * How much the decay took from the energy of the member, at the
+         * opening of the web client (Q-41).
+         */
+        this.linkup_energy_decay = 0;
+    },
+
+    /**
+     * The energy of the member: their karma (Q-08) less its decay (Q-41).
+     * The points of the session reach the karma at once, with their full
+     * weight; `undefined` until the karma is known.
+     *
+     * @returns {number|undefined}
+     */
+    get linkupEnergy() {
+        if (typeof this.linkup_karma !== "number") {
+            return undefined;
+        }
+        return this.linkup_karma - (this.linkup_energy_decay || 0);
     },
 });
 

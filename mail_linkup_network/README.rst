@@ -30,10 +30,10 @@ Graph
 =====
 
 * ``linkup.link.get_network_graph(level, limit)`` and the route
-  ``/linkup/v1/network/graph`` give ``me`` (the energy of the member: their
-  karma), ``nodes`` and ``edges``. A node gives the energy of the link as
-  the member received it, and ``highlight`` when the contact holds an
-  active highlight to the member.
+  ``/linkup/v1/network/graph`` give ``me`` (the energy of the member:
+  their karma, decayed), ``nodes`` and ``edges``. A node gives the energy
+  of the link as the member received it, and ``highlight`` when the
+  contact holds an active highlight to the member.
 * ``x1`` (or ``2``) draws the direct links, and the grey line between two
   contacts whose own link is ``active`` when both show their links;
   ``x2`` (or ``1``) the direct links; ``x3`` (or ``top``) the strongest
@@ -41,6 +41,30 @@ Graph
   Discuss › LinkUp › Network view*). At most 50 nodes, the strongest first.
 * The graph, the rankings and the card read in a fixed number of queries,
   whatever the number of links; a test runs them with 200 links.
+
+Energy and its decay
+====================
+
+* The energy decays with time (Q-41): a line of the ledger weighs
+  ``2 ** (-d / H)``, ``d`` the whole days since its date, ``H`` the
+  half-life ``linkup.energy_half_life_days`` (90 days, *Settings › Discuss
+  › LinkUp › Network view*). A line counts whole its first day, half after
+  90 days, a quarter after 180.
+* The energy of a member is their karma (Q-08) less what the decay took
+  from their lines; the energy of a link, the points the member received
+  in the events of the pair, each weighted the same way. The graph, X3,
+  "My partners", "The most active", the link card, the panel of a
+  conversation, "Network view (n)" and the energy bubble show the decayed
+  value; the rank and "My points" keep the karma.
+* The decay is computed at the reading, from the dated lines, in one query
+  grouped by link or by member, on the indexes ``(user_id, date)`` and
+  ``link_id``: the ledger, append-only and keyed by ``event_key``, and the
+  karma never change. The web client receives at its opening how much the
+  decay took (``linkup_energy_decay``) and adds the points of the session
+  with their full weight.
+* An unset or invalid half-life takes 90 days; 0, or a negative value,
+  turns the decay off: the energy is then the karma, and the energy of a
+  link the sum the gamification keeps on it.
 
 Rankings
 ========
@@ -143,6 +167,18 @@ Web client
 Choices
 =======
 
+Decided by the owner (2026-11-12):
+
+* Q-41: the energy of a member and of a link decays with a half-life of
+  90 days, a setting (``linkup.energy_half_life_days``); Q-08 stays, the
+  energy being the karma, decayed.
+
+Applied by default, to confirm:
+
+* A half-life of 0 turns the decay off; an unset or invalid one takes 90
+  days. The decay counts whole days, so an energy does not move within
+  the day of a line.
+
 The questions of entry of Lot 3 take the recommendation of the
 specification:
 
@@ -158,7 +194,6 @@ specification:
   active", then "My partners", then the graph again, and the energy bubble
   brings the graph back. On a large screen the rankings open on "My
   partners", the tab every member has.
-* Q-41: the energy does not decrease with time.
 
 License
 =======
