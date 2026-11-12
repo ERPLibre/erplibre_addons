@@ -938,10 +938,11 @@ class StreamdeckService(models.AbstractModel):
 
         From protocol 1.2, the settings carry `key_layouts`, the layouts
         of the connected deck models within the catalog of the report
-        (`_config_settings`), and a layout changed in the workstation's
-        file is adopted or offered again as a key is
-        (`_config_layout_drift`); the first pilot asks nothing of the
-        layouts, which the extension alone writes.
+        (`_config_settings`). A layout changed in the workstation's file
+        is adopted or offered again as a key is (`_config_layout_drift`),
+        and a first pilot settles the free layouts that differ from
+        Odoo's as the free keys (`_config_layouts_differing`), `ask`
+        then naming `key_layouts` unless a sent layout is locked.
 
         A workstation that no layer configures is `unmanaged` and gets no
         `config`; its hash is cleared, so a later configuration gets a
@@ -960,7 +961,9 @@ class StreamdeckService(models.AbstractModel):
         )
         current = config["current"]
         catalog = config.get("catalog")
-        wanted = self._config_settings(effective, layouts, current, catalog)[0]
+        wanted, wanted_locked = self._config_settings(
+            effective, layouts, current, catalog
+        )
         if not wanted:
             self._config_release(workstation)
             return None
@@ -970,14 +973,20 @@ class StreamdeckService(models.AbstractModel):
             and not workstation.config_applied_revision
         ):
             differing = self._config_differing(effective, current)
+            differing_layouts = self._config_layouts_differing(
+                wanted, layouts, config["current_layouts"]
+            )
             policy = schema._first_pilot_policy()
             choice = config["choice"] if policy == "ask" else policy
             if choice == "keep_local":
                 adopt = {key: current[key] for key in differing}
+                adopt_layouts = differing_layouts
             if choice:
                 workstation.config_first_choice = choice
             else:
                 ask = differing
+                if differing_layouts and LAYOUTS_KEY not in wanted_locked:
+                    ask.append(LAYOUTS_KEY)
         elif workstation.config_applied_revision and (
             config["revision_applied"] == workstation.config_applied_revision
         ):
@@ -1123,6 +1132,20 @@ class StreamdeckService(models.AbstractModel):
             elif local != value:
                 adopt[key] = local
         return adopt, drift
+
+    def _config_layouts_differing(self, settings, layouts, current):
+        """`{product id: hash}` of the free layouts of `settings` (the
+        settings Odoo offers) whose hash in the workstation's file,
+        `current`, is not None and differs from Odoo's; a model the file
+        does not lay out holds nothing of the employee's to keep."""
+        schema = self.env["streamdeck.config.schema"]
+        return {
+            product: current[product]
+            for product, layout in (settings.get(LAYOUTS_KEY) or {}).items()
+            if not layouts[product]["locked"]
+            and current.get(product) is not None
+            and current[product] != schema._layout_hash(layout)
+        }
 
     def _config_layout_drift(self, workstation, settings, layouts, current):
         """`(adopt, drift)` of the key layouts, as `_config_drift` for the
