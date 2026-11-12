@@ -7,10 +7,12 @@ from datetime import timedelta
 
 import polib
 from lxml import etree
+from psycopg2 import IntegrityError
 
 from odoo import Command, fields
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests.common import TransactionCase, new_test_user, tagged
+from odoo.tools import mute_logger
 from odoo.tools.misc import file_path
 
 MODULE = "erplibre_streamdeck"
@@ -468,6 +470,18 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         with self.assertRaises(ValidationError):
             self.layout.usb_product_id = "0086"
 
+    def test_a_layout_names_each_key_once(self):
+        # The layout of the profile already names key 1.
+        with mute_logger("odoo.sql_db"), self.assertRaises(IntegrityError):
+            with self.cr.savepoint():
+                self.Key.create({"key_index": 1, "layout_id": self.layout.id})
+        other = self._layout(
+            {"profile_id": self.profile.id},
+            (1, None, None, None),
+            product="0063",
+        )
+        self.assertEqual(other.key_ids.key_index, 1)
+
     # -- layers ----------------------------------------------------------
 
     def test_a_layout_lock_stops_lower_layouts(self):
@@ -496,6 +510,47 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         model_layout.locked = False
         own.unlink()
         self.assertEqual(effective(), (model_layout, "model", False))
+
+    def test_a_layout_has_exactly_one_parent_one_per_model(self):
+        workstation, _token = self._workstation()
+        model = self.env["streamdeck.config.model"].create(
+            {"usb_product_id": "0084"}
+        )
+        # A profile with no layout yet: the parent is the only fault.
+        bare = self.env["streamdeck.config.profile"].create({"name": "Q"})
+        profile = {"profile_id": bare.id}
+        layer = {"model_id": model.id}
+        own = {"workstation_id": workstation.id}
+        for parents in (
+            {},
+            dict(profile, **layer),
+            dict(profile, **own),
+            dict(layer, **own),
+        ):
+            with self.subTest(parents=sorted(parents)):
+                with self.assertRaisesRegex(ValidationError, "exactly one"):
+                    with self.cr.savepoint():
+                        self._layout(parents)
+        # A deck model layer lays out its own model only.
+        with self.assertRaisesRegex(ValidationError, "of that model"):
+            with self.cr.savepoint():
+                self._layout(layer, product="0063")
+        layout = self._layout(own)
+        with self.assertRaisesRegex(ValidationError, "exactly one"):
+            with self.cr.savepoint():
+                layout.write(profile)
+        # One layout per parent and model; another model is free.
+        self._layout(profile)
+        self._layout(layer)
+        for parent in (profile, layer, own):
+            with self.subTest(parent=sorted(parent)):
+                with mute_logger("odoo.sql_db"), self.assertRaises(
+                    IntegrityError
+                ):
+                    with self.cr.savepoint():
+                        self._layout(parent)
+        self._layout(profile, product="0063")
+        self._layout(own, product="0063")
 
     # -- wire ------------------------------------------------------------
 
