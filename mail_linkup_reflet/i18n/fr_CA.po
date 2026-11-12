@@ -283,10 +283,10 @@ msgstr ""
 #: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
 msgid ""
 "A LinkUp member enters a channel when a LinkUp administrator or a linked "
-"member adds them."
+"member adds them, or through its invitation link."
 msgstr ""
-"Un membre LinkUp entre dans un canal quand un administrateur LinkUp ou un "
-"membre lié l'y ajoute."
+"Un membre LinkUp entre dans un canal quand un administrateur LinkUp ou un"
+" membre lié l'y ajoute, ou par son lien d'invitation."
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -371,16 +371,6 @@ msgstr "Un lien unit deux membres distincts, par identifiant croissant."
 #: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_block_pair_unique
 msgid "A member blocks another member once."
 msgstr "Un membre ne bloque un autre membre qu'une fois."
-
-#. module: mail_linkup_reflet
-#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_block_not_self
-msgid "You cannot block yourself."
-msgstr "Tu ne peux pas te bloquer toi-même."
-
-#. module: mail_linkup_reflet
-#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_highlight_sender_not_recipient
-msgid "You cannot put yourself in the light."
-msgstr "Tu ne peux pas te mettre toi-même en lumière."
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -929,6 +919,7 @@ msgstr "Connexion perdue, réessaie."
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+#: model:ir.model,name:mail_linkup_reflet.model_res_partner
 msgid "Contact"
 msgstr "Contact"
 
@@ -1202,6 +1193,22 @@ msgstr "Saisis une adresse courriel valide."
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "Enter a valid phone number."
 msgstr "Saisis un numéro de téléphone valide."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel__linkup_published
+msgid ""
+"Every LinkUp member sees the channel, its description and its members, and "
+"joins it alone. Otherwise a member enters it on invitation only: added by a "
+"linked member of it, or through its invitation link."
+msgstr ""
+"Chaque membre LinkUp voit le canal, sa description et ses membres, et s'y"
+" joint seul. Sinon, un membre n'y entre que sur invitation : ajouté par un"
+" membre lié qui en fait partie, ou par son lien d'invitation."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_max_invitations_per_day
+msgid "Every invitation link sent counts, a new one or one sent again."
+msgstr "Chaque lien d'invitation envoyé compte, nouveau ou renvoyé."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_reflet__response_state__exact
@@ -2030,6 +2037,11 @@ msgid "Make a reflection"
 msgstr "Faire un reflet"
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_can_publish
+msgid "May publish the channel"
+msgstr "Peut publier le canal"
+
+#. module: mail_linkup_reflet
 #: model:res.groups,name:mail_linkup_reflet.group_linkup_member
 msgid "Member"
 msgstr "Membre"
@@ -2345,6 +2357,12 @@ msgstr "Seul un administrateur LinkUp change le type d'une conversation."
 #: code:addons/mail_linkup_reflet/models/discuss_channel.py:0
 msgid "Only a LinkUp administrator creates a channel."
 msgstr "Seul un administrateur LinkUp crée un canal."
+
+#. module: mail_linkup_reflet
+#. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_publish.py:0
+msgid "Only a LinkUp administrator or the creator of a channel publishes it."
+msgstr "Seul un administrateur LinkUp ou le créateur d'un canal le publie."
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -2667,6 +2685,11 @@ msgid "Propose this theme"
 msgstr "Proposer ce thème"
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_published
+msgid "Published to the LinkUp members"
+msgstr "Publié aux membres LinkUp"
+
+#. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_panel.js:0
 msgid "Put %(name)s in the light?"
@@ -2953,11 +2976,6 @@ msgstr "Expéditeur"
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "Sending is not possible."
 msgstr "Envoi impossible."
-
-#. module: mail_linkup_reflet
-#: model:ir.model.fields,help:mail_linkup_reflet.field_res_config_settings__linkup_max_invitations_per_day
-msgid "Every invitation link sent counts, a new one or one sent again."
-msgstr "Chaque lien d'invitation envoyé compte, nouveau ou renvoyé."
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields.selection,name:mail_linkup_reflet.selection__linkup_invitation__state__sent
@@ -3723,6 +3741,12 @@ msgid "Token Hash"
 msgstr "Empreinte du jeton"
 
 #. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
+msgid "Too many attempts for now, try again later."
+msgstr "Trop de tentatives pour l'instant, réessaie plus tard."
+
+#. module: mail_linkup_reflet
 #. odoo-python
 #: code:addons/mail_linkup_reflet/models/linkup_invitation.py:0
 msgid "Too many invitations today, try again tomorrow."
@@ -3733,12 +3757,6 @@ msgstr "Trop d'invitations aujourd'hui, réessaie demain."
 #: code:addons/mail_linkup_reflet/models/linkup_report.py:0
 msgid "Too many reports for now, try again later."
 msgstr "Trop de signalements pour l'instant, réessaie plus tard."
-
-#. module: mail_linkup_reflet
-#. odoo-javascript
-#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
-msgid "Too many attempts for now, try again later."
-msgstr "Trop de tentatives pour l'instant, réessaie plus tard."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -3984,6 +4002,11 @@ msgstr ""
 "demande d'action claire."
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel__linkup_can_publish
+msgid "Whether the current user may publish or unpublish the channel."
+msgstr "Si l'utilisateur courant peut publier ou dépublier le canal."
+
+#. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
 msgid "Who adds to your happiness: %(names)s"
@@ -4101,6 +4124,16 @@ msgstr "Tu peux débloquer %(name)s depuis l'aide LinkUp."
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
 msgid "You can write freely; a confirmed reflection creates the link."
 msgstr "Tu peux écrire librement ; un reflet confirmé crée le lien."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_block_not_self
+msgid "You cannot block yourself."
+msgstr "Tu ne peux pas te bloquer toi-même."
+
+#. module: mail_linkup_reflet
+#: model:ir.model.constraint,message:mail_linkup_reflet.constraint_linkup_highlight_sender_not_recipient
+msgid "You cannot put yourself in the light."
+msgstr "Tu ne peux pas te mettre toi-même en lumière."
 
 #. module: mail_linkup_reflet
 #. odoo-python

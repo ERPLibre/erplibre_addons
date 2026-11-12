@@ -20,6 +20,7 @@
         "security/linkup_rules.xml",
         "views/linkup_menus.xml",
         "views/res_config_settings_views.xml",
+        "views/discuss_channel_views.xml",
         "views/linkup_invitation_templates.xml",
         "data/linkup_data.xml",
         "data/linkup_invitation_data.xml",

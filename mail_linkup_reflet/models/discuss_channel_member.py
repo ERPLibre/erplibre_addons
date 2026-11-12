@@ -5,6 +5,7 @@ from odoo.exceptions import AccessError
 from odoo.osv import expression
 
 from ..authorization import current_post
+from ..channel_access import invited_by_link
 from ..exceptions import LinkupError
 
 
@@ -26,11 +27,14 @@ class DiscussChannelMember(models.Model):
         (``security/linkup_rules.xml``): joining it by themself would open
         them its member list, whoever its authorized group. They enter it
         when a LinkUp administrator adds them, or a member of it with whom
-        they share an ``active`` link (``_linkup_check_partners_linked``).
+        they share an ``active`` link (``_linkup_check_partners_linked``),
+        or through its invitation link (``/chat/<id>/<token>``), which the
+        controller of LinkUp marks once the token of that channel is
+        checked (``channel_access.channel_invitation``). A published
+        channel (``linkup_published``) takes any member who joins it alone.
         A thread of a channel stays open to the members of that channel.
         The check reads the real user, ``sudo`` included: the invitation
-        link of a channel (``/chat/<id>/<token>``) joins the user under
-        ``sudo``.
+        link joins the user under ``sudo``.
         """
         user = self.env.user
         if not user._linkup_is_plain_member():
@@ -47,13 +51,16 @@ class DiscussChannelMember(models.Model):
         ):
             if channel.channel_type != "channel":
                 continue
+            if channel.linkup_published or invited_by_link(channel.id):
+                continue
             parent = channel.parent_channel_id
             if parent and own in parent.channel_member_ids.partner_id.ids:
                 continue
             raise AccessError(
                 _(
                     "A LinkUp member enters a channel when a LinkUp"
-                    " administrator or a linked member adds them."
+                    " administrator or a linked member adds them, or"
+                    " through its invitation link."
                 )
             )
 

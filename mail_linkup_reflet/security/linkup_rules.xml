@@ -79,10 +79,12 @@
 
     <!-- Channels: a member who is not a LinkUp administrator reads a
          channel (channel_type channel) only once they belong to it, or to
-         the channel a thread belongs to (LU-F-112 RM1). A channel opened to
-         base.group_user or to the member group would otherwise give every
-         member its name, its messages with their authors, and its member
-         list, all of which Discuss serves once the channel is readable.
+         the channel a thread belongs to, unless the channel, or the
+         channel of the thread, is published (linkup_published) (LU-F-112
+         RM1). A channel opened to base.group_user or to the member group
+         would otherwise give every member its name, its messages with
+         their authors, and its member list, all of which Discuss serves
+         once the channel is readable.
          Direct conversations, groups and live chats keep the native rule:
          their members only.
 
@@ -92,13 +94,16 @@
          holds the partner id of the reader only, so joining or leaving a
          channel changes the reading at once. The creation of a member
          stays to discuss.channel.member, which refuses that a member joins
-         a channel by themself. -->
+         a channel by themself, unless it is published or the member opens
+         its invitation link. -->
     <record id="rule_discuss_channel_linkup_member" model="ir.rule">
         <field name="name">LinkUp member: channels they belong to</field>
         <field name="model_id" ref="mail.model_discuss_channel" />
         <field name="domain_force">[(1, '=', 1)] if not user._linkup_is_plain_member() else [
-            '|', '|',
+            '|', '|', '|', '|',
             ('channel_type', '!=', 'channel'),
+            ('linkup_published', '=', True),
+            ('parent_channel_id.linkup_published', '=', True),
             ('channel_member_ids.partner_id', '=', user.partner_id.id),
             ('parent_channel_id.channel_member_ids.partner_id', '=', user.partner_id.id),
         ]</field>
@@ -109,8 +114,10 @@
         <field name="name">LinkUp member: members of the channels they belong to</field>
         <field name="model_id" ref="mail.model_discuss_channel_member" />
         <field name="domain_force">[(1, '=', 1)] if not user._linkup_is_plain_member() else [
-            '|', '|',
+            '|', '|', '|', '|',
             ('channel_id.channel_type', '!=', 'channel'),
+            ('channel_id.linkup_published', '=', True),
+            ('channel_id.parent_channel_id.linkup_published', '=', True),
             ('channel_id.channel_member_ids.partner_id', '=', user.partner_id.id),
             ('channel_id.parent_channel_id.channel_member_ids.partner_id', '=', user.partner_id.id),
         ]</field>

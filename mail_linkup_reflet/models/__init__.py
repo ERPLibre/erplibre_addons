@@ -5,6 +5,7 @@ from . import linkup_server_record  # isort: skip
 from . import (
     discuss_channel,
     discuss_channel_member,
+    discuss_channel_publish,
     discuss_channel_rtc_session,
     ir_ui_menu,
     linkup_block,

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 12:08+0000\n"
-"PO-Revision-Date: 2026-11-06 12:08+0000\n"
+"POT-Creation-Date: 2026-11-12 06:22+0000\n"
+"PO-Revision-Date: 2026-11-12 06:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -246,7 +246,7 @@ msgstr ""
 #: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
 msgid ""
 "A LinkUp member enters a channel when a LinkUp administrator or a linked "
-"member adds them."
+"member adds them, or through its invitation link."
 msgstr ""
 
 #. module: mail_linkup_reflet
@@ -852,6 +852,7 @@ msgstr ""
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+#: model:ir.model,name:mail_linkup_reflet.model_res_partner
 msgid "Contact"
 msgstr ""
 
@@ -1117,6 +1118,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_errors.js:0
 msgid "Enter a valid phone number."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel__linkup_published
+msgid ""
+"Every LinkUp member sees the channel, its description and its members, and "
+"joins it alone. Otherwise a member enters it on invitation only: added by a "
+"linked member of it, or through its invitation link."
 msgstr ""
 
 #. module: mail_linkup_reflet
@@ -1923,6 +1932,11 @@ msgid "Make a reflection"
 msgstr ""
 
 #. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_can_publish
+msgid "May publish the channel"
+msgstr ""
+
+#. module: mail_linkup_reflet
 #: model:res.groups,name:mail_linkup_reflet.group_linkup_member
 msgid "Member"
 msgstr ""
@@ -2234,6 +2248,12 @@ msgstr ""
 
 #. module: mail_linkup_reflet
 #. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_publish.py:0
+msgid "Only a LinkUp administrator or the creator of a channel publishes it."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
 #: code:addons/mail_linkup_reflet/models/linkup_reflet.py:0
 msgid "Only a LinkUp member can do this."
 msgstr ""
@@ -2523,6 +2543,11 @@ msgstr ""
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
 #: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.xml:0
 msgid "Propose this theme"
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_published
+msgid "Published to the LinkUp members"
 msgstr ""
 
 #. module: mail_linkup_reflet
@@ -3786,6 +3811,11 @@ msgstr ""
 msgid ""
 "When the other person wants to listen, it is our turn. Vector expression in "
 "five steps: context, trigger, realisation, goal, clear action request."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#: model:ir.model.fields,help:mail_linkup_reflet.field_discuss_channel__linkup_can_publish
+msgid "Whether the current user may publish or unpublish the channel."
 msgstr ""
 
 #. module: mail_linkup_reflet

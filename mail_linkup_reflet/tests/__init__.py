@@ -3,6 +3,7 @@
 from . import (
     test_archived_accounts,
     test_channel_isolation,
+    test_channel_publish,
     test_client_context,
     test_contact_privacy,
     test_error_catalogue,

@@ -64,10 +64,22 @@ Covered:
   A thread is read by the members of its channel. Two global rules hold
   it, on ``discuss.channel`` and ``discuss.channel.member``; the native
   rules are group rules, joined by OR, which a group rule could not
-  narrow. A member does not join a channel by themself, nor through its
-  invitation link: a LinkUp administrator adds them, or a member of it
-  with whom they share an ``active`` link. Direct conversations, groups
-  and live chats keep the native rule, their members only.
+  narrow. A channel is "on invitation only" by default: a member enters
+  it when a LinkUp administrator adds them, or a member of it with whom
+  they share an ``active`` link, or through its invitation link
+  ``/chat/<id>/<token>`` shared by a member of it, once the token of that
+  channel is checked (``controllers/channel_invitation.py``); a guessed id
+  without its token opens nothing. A published channel (``linkup_published``,
+  ``tests/test_channel_publish.py``) reads as Discuss shows an open
+  channel, its name, its description and its members, and any member
+  joins it alone; unpublishing it keeps its members, and a newcomer needs
+  an invitation again. A LinkUp administrator, a system administrator or
+  the creator of the channel publishes it, in "Channel settings": Odoo 18
+  gives a channel no administrator among its members
+  (``discuss.channel.member`` holds no role). Anybody else, through RPC
+  as well, is refused. Direct conversations, groups and live chats keep
+  the native rule, their members only; the start rule and the scope of a
+  member still apply.
 * What a member reads of the others (LU-F-082 RM2, CA1, LU-F-112 RM3, CA3,
   LU-NF-009, ``models/privacy.py``, ``tests/test_contact_privacy.py``):
   the address, the phone and the login of any other user or partner are
@@ -711,14 +723,19 @@ root of the ERPLibre checkout, with the Python of the Odoo environment::
 Choices
 =======
 
+Decided by the owner (2026-11-12):
+
+* The access to a channel is a setting of each channel. By default, "on
+  invitation only": a member enters it when a LinkUp administrator, or a
+  linked member of it, adds them, or through its invitation link. A
+  published channel is open to every member, who joins it alone. A LinkUp
+  administrator or an administrator of the channel publishes it.
+
 Applied by default, to confirm:
 
-* A channel opened to the member group is not a directory: a member joins
-  it when a LinkUp administrator, or a linked member of it, adds them, and
-  never by themself. The specification lets the administrator choose the
-  group of an animation channel (LU-F-063 RM2) without saying whether a
-  member joins it alone; LU-F-112 RM1 (no public directory) and LU-NF-012
-  (the most private setting by default) decide it.
+* The administrator of a channel is its creator, Odoo 18 holding no role
+  of member; a member creating no channel, the creator is a LinkUp or
+  system administrator, or an internal user outside LinkUp.
 
 Status
 ======

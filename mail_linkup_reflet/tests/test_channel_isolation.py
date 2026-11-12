@@ -213,7 +213,8 @@ class TestLinkupChannelIsolation(LinkupChannelCase):
 @tagged("post_install", "-at_install")
 class TestLinkupChannelIsolationRoutes(LinkupChannelCase, HttpCase):
     """The routes of Discuss give Sam nothing of a channel he does not
-    belong to, and its invitation link does not let him in."""
+    belong to, and a wrong token of its invitation link does not let him
+    in."""
 
     def test_routes(self):
         self.authenticate(self.sam.login, self.sam.login)
@@ -235,9 +236,7 @@ class TestLinkupChannelIsolationRoutes(LinkupChannelCase, HttpCase):
                 )
                 self.assertNotIn("Luce", response.text)
                 self.assertNotIn("Bienvenue", response.text)
-        response = self.url_open(
-            f"/chat/{self.channel.id}/{self.channel.sudo().uuid}"
-        )
+        response = self.url_open(f"/chat/{self.channel.id}/not-its-token")
         self.assertEqual(response.status_code, 404)
         self.assertNotIn(
             self.sam.partner_id, self.channel.channel_member_ids.partner_id
