@@ -17,7 +17,8 @@ patch(Store.prototype, {
         this.linkup_network_top_count = 2;
         /**
          * How much the decay took from the energy of the member, at the
-         * opening of the web client (Q-41).
+         * opening of the web client, then at each reading of the Network
+         * view (Q-41).
          */
         this.linkup_energy_decay = 0;
     },

@@ -176,6 +176,28 @@ export class LinkupNetworkView extends Component {
     }
 
     /**
+     * Take the decay of the energy from the graph the server just computed
+     * (Q-41): the decay grows each day and follows the half-life, so the
+     * value received when the web client opened drifts away from the server
+     * in a tab left open. The bubble, the sidebar and this view all read
+     * `store.linkupEnergy`. A karma changed during the call, by points
+     * received on the bus, leaves the decay as it was: the server read the
+     * former one.
+     *
+     * @param {number|undefined} karma the karma of the Store before the call
+     * @param {{me?: {energy?: number}}} graph
+     */
+    refreshEnergyDecay(karma, graph) {
+        const energy = graph?.me?.energy;
+        if (typeof karma !== "number" || typeof energy !== "number") {
+            return;
+        }
+        if (karma === this.store.linkup_karma) {
+            this.store.linkup_energy_decay = karma - energy;
+        }
+    }
+
+    /**
      * Read the graph at the density of the view.
      *
      * @param {{raise?: boolean}} [options] `raise` lets a refusal through,
@@ -183,11 +205,13 @@ export class LinkupNetworkView extends Component {
      */
     async loadGraph({raise = false} = {}) {
         try {
+            const karma = this.store.linkup_karma;
             const graph = await this.orm.silent.call("linkup.link", "get_network_graph", [], {
                 level: this.state.level,
                 limit: LINKUP_NETWORK_LIMIT,
             });
             this.state.graph = graph;
+            this.refreshEnergyDecay(karma, graph);
             this.state.graphError = null;
             this.state.focusIndex = Math.min(this.state.focusIndex, Math.max(graph.nodes.length - 1, 0));
         } catch (error) {

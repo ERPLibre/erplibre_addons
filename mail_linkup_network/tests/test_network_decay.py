@@ -123,6 +123,21 @@ class TestLinkupNetworkDecay(LinkupNetworkCase):
             self.assertEqual(self._energies(), {0: 1000, 90: 1000, 180: 1000})
             self.assertEqual(self._graph()["me"]["energy"], self.sam.karma)
 
+    def test_settings_keep_the_default_of_an_invalid_value(self):
+        """The settings show the 90 days the server applies for an invalid
+        value, and a save keeps them, rather than 0, which turns the decay
+        off."""
+        self._set("ninety")
+        settings = self.env["res.config.settings"].create({})
+        self.assertEqual(settings.linkup_energy_half_life_days, 90)
+        settings.set_values()
+        self.assertEqual(
+            self.env["linkup.points.ledger"]._linkup_half_life_days(), 90
+        )
+        self._set("0")
+        settings = self.env["res.config.settings"].create({})
+        self.assertEqual(settings.linkup_energy_half_life_days, 0)
+
     def test_unset_or_invalid_takes_the_default(self):
         """An unset or invalid half-life takes the 90 days of the
         decision."""

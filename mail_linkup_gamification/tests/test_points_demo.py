@@ -1,8 +1,14 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
+from datetime import timedelta
+
+from freezegun import freeze_time
+from odoo import fields
 from odoo.tests import TransactionCase, tagged
 
 DEMO = "mail_linkup_reflet.demo_"
+# Half-life of the energy, which mail_linkup_network reads when installed.
+HALF_LIFE_PARAM = "linkup.energy_half_life_days"
 
 
 @tagged("post_install", "-at_install")
@@ -33,6 +39,10 @@ class TestPointsDemo(TransactionCase):
         super().setUp()
         if not self.sam:
             self.skipTest("The demonstration data is not loaded.")
+        # The lines of the demonstration are dated at its installation: the
+        # decay of mail_linkup_network off, the energy of a link holds
+        # whatever the age of the database.
+        self.env["ir.config_parameter"].sudo().set_param(HALF_LIFE_PARAM, "0")
 
     def _total(self, user):
         return sum(
@@ -59,8 +69,9 @@ class TestPointsDemo(TransactionCase):
         self.assertTrue(lines)
         self.assertFalse(lines.filtered("capped"))
         link = self.env.ref(f"{DEMO}link_sam_france").sudo()
-        self.assertEqual(link._linkup_energy_for(self.sam), 1950)
-        self.assertEqual(link._linkup_energy_for(self.france), 2000)
+        with freeze_time(fields.Datetime.now() + timedelta(days=30)):
+            self.assertEqual(link._linkup_energy_for(self.sam), 1950)
+            self.assertEqual(link._linkup_energy_for(self.france), 2000)
         fresh = self.env.ref(f"{DEMO}link_sam_jacques")
         self.assertFalse(self.Ledger.search([("link_id", "=", fresh.id)]))
         points = self.Ledger.with_user(self.sam).linkup_my_points()

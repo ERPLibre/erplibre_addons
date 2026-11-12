@@ -60,11 +60,13 @@ Energy and its decay
   grouped by link or by member, on the indexes ``(user_id, date)`` and
   ``link_id``: the ledger, append-only and keyed by ``event_key``, and the
   karma never change. The web client receives at its opening how much the
-  decay took (``linkup_energy_decay``) and adds the points of the session
-  with their full weight.
+  decay took (``linkup_energy_decay``), takes it again from each graph of
+  the Network view, and adds the points of the session with their full
+  weight.
 * An unset or invalid half-life takes 90 days; 0, or a negative value,
   turns the decay off: the energy is then the karma, and the energy of a
-  link the sum the gamification keeps on it.
+  link the sum the gamification keeps on it. The settings show the value
+  the server applies, 90 days for an invalid one, so a save keeps it.
 
 Rankings
 ========

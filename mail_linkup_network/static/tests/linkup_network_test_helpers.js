@@ -86,9 +86,11 @@ export async function setupNetwork() {
  * - The card of Jean is unavailable, as a block makes it.
  *
  * @param {Object} users as `setupNetwork` gives them
- * @param {{steps?: boolean}} [options] `steps` records the calls
+ * @param {{steps?: boolean, decay?: number}} [options] `steps` records the
+ *  calls; `decay` is taken from the energy of the member in the graph, as
+ *  the server decays it (Q-41)
  */
-export function mockNetwork(users, { steps = false } = {}) {
+export function mockNetwork(users, { steps = false, decay = 0 } = {}) {
   const step = (text) => steps && expect.step(text);
   const contact = (name) => ({
     user_id: users[name].userId,
@@ -122,7 +124,7 @@ export function mockNetwork(users, { steps = false } = {}) {
         user_id: serverState.userId,
         partner_id: serverState.partnerId,
         name: "Mitchell Admin",
-        energy: 61563,
+        energy: 61563 - decay,
       },
       nodes,
       edges,
