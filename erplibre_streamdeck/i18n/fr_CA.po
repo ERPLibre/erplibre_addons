@@ -1419,6 +1419,16 @@ msgstr "Nombre de messages avec des erreurs d'envoi"
 
 #. module: erplibre_streamdeck
 #. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"Odoo does not hold the keys of this layout, kept in the workstation's file: "
+"create its keys before locking it."
+msgstr ""
+"Odoo ne tient pas les touches de cette disposition, gardée dans le fichier "
+"du poste : créez ses touches avant de la verrouiller."
+
+#. module: erplibre_streamdeck
+#. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 msgid "Odoo manages no setting of this workstation."
 msgstr "Odoo ne gère aucun réglage de ce poste."

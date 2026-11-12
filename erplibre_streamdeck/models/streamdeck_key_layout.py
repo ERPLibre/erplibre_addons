@@ -488,6 +488,22 @@ class StreamdeckKeyLayout(models.Model):
                     )
                 )
 
+    @api.constrains("locked", "in_file")
+    def _check_lock_held(self):
+        """A lock makes Odoo offer the layout again after a hand edit on
+        the workstation; Odoo does not hold the keys of a layout kept in
+        the workstation's file, so that layout takes no lock until a key
+        of it is created or changed."""
+        for layout in self:
+            if layout.locked and layout.in_file:
+                raise ValidationError(
+                    _(
+                        "Odoo does not hold the keys of this layout, kept in"
+                        " the workstation's file: create its keys before"
+                        " locking it."
+                    )
+                )
+
     @api.constrains("usb_product_id")
     def _check_keys_fit(self):
         for layout in self:
