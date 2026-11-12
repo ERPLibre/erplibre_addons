@@ -357,8 +357,11 @@ the deck program.
 The catalog (*Configuration › Catalog*) is the union of what the
 workstations report: the actions, the icons and the geometry of each
 deck model. An item that no workstation reports any more stays, with the
-date it was last seen, to the hour. A model that no workstation reported takes its
-geometry from a table shipped with the module.
+date it was last seen, to the hour. The geometry of a model is a constant
+of its hardware: a model of the table shipped with the module takes the
+table's, and a model outside it keeps the geometry first reported. No
+report changes it, so no workstation decides the keys Odoo lays out for
+the others.
 
 A layout changed in the file after its revision was applied is handled
 as a setting, by the SHA-256 of each model's layout (canonical JSON: keys
@@ -855,8 +858,11 @@ garde la disposition automatique du programme du deck.
 Le catalogue (*Configuration › Catalogue*) est l'union de ce que
 remontent les postes : les actions, les icônes et la géométrie de chaque
 modèle de deck. Un élément qu'aucun poste ne remonte plus reste, avec la
-date où il a été vu la dernière fois, à l'heure près. Un modèle qu'aucun poste n'a
-remonté prend sa géométrie dans une table livrée avec le module.
+date où il a été vu la dernière fois, à l'heure près. La géométrie d'un
+modèle est une constante de son matériel : un modèle de la table livrée
+avec le module prend celle de la table, et un modèle hors de la table
+garde la géométrie remontée la première. Aucune remontée ne la change :
+aucun poste ne décide des touches qu'Odoo dispose pour les autres.
 
 Une disposition changée dans le fichier après l'application de sa
 révision se traite comme un réglage, par le SHA-256 de la disposition de

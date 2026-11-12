@@ -25,9 +25,9 @@ USB_MODELS = {
 }
 
 # USB product id -> (columns, rows, keys) of the deck's keys, as the class
-# constants of the `streamdeck` library give them. A catalog that a
-# workstation reports takes precedence (`streamdeck.catalog.item`); this
-# table lays out a model before any workstation reported one.
+# constants of the `streamdeck` library give them. The geometry of a model
+# listed here is this one, whatever a workstation reports; a model outside
+# it keeps the geometry first reported (`streamdeck.catalog.item`).
 USB_GEOMETRY = {
     "0060": (5, 3, 15),
     "006d": (5, 3, 15),

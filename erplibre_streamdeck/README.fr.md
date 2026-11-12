@@ -372,8 +372,11 @@ garde la disposition automatique du programme du deck.
 Le catalogue (*Configuration › Catalogue*) est l'union de ce que
 remontent les postes : les actions, les icônes et la géométrie de chaque
 modèle de deck. Un élément qu'aucun poste ne remonte plus reste, avec la
-date où il a été vu la dernière fois, à l'heure près. Un modèle qu'aucun poste n'a
-remonté prend sa géométrie dans une table livrée avec le module.
+date où il a été vu la dernière fois, à l'heure près. La géométrie d'un
+modèle est une constante de son matériel : un modèle de la table livrée
+avec le module prend celle de la table, et un modèle hors de la table
+garde la géométrie remontée la première. Aucune remontée ne la change :
+aucun poste ne décide des touches qu'Odoo dispose pour les autres.
 
 Une disposition changée dans le fichier après l'application de sa
 révision se traite comme un réglage, par le SHA-256 de la disposition de

@@ -353,6 +353,64 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         self._ok(token, workstation, catalog=huge)
         self.assertFalse(self._item("action", "plugin:%s" % ("x" * 60)))
 
+    def test_a_reported_geometry_never_changes_a_known_model(self):
+        # The geometry of a model is a constant of its hardware: a report,
+        # honest or not, never changes the keys Odoo lays out for every
+        # other workstation.
+        ws_a, token_a = self._workstation()
+        ws_b, token_b = self._workstation(self.user_b)
+        for shape in (
+            {"cols": 1, "rows": 1, "keys": 1},
+            {"cols": 16, "rows": 16, "keys": 256},
+        ):
+            with self.subTest(shape=shape):
+                self._ok(
+                    token_b,
+                    ws_b,
+                    catalog=dict(CATALOG, models={"0084": shape}),
+                )
+                self.assertEqual(
+                    (
+                        self.layout.cols,
+                        self.layout.rows,
+                        self.layout.key_count,
+                    ),
+                    (4, 2, 8),
+                )
+                with self.assertRaises(ValidationError):
+                    self.Key.create(
+                        {"layout_id": self.layout.id, "key_index": 200}
+                    )
+                keys = self._ok(token_a, ws_a, self._pilot())["config"][
+                    "settings"
+                ]["key_layouts"]["0084"]["keys"]
+                self.assertEqual([key["key"] for key in keys], [0, 1])
+        model = self._item("model", "0084")
+        self.assertEqual((model.cols, model.rows, model.key_count), (4, 2, 8))
+        # A model of the module's table takes the table's geometry, even
+        # when its first report says otherwise.
+        self._ok(
+            token_b,
+            ws_b,
+            catalog=dict(
+                CATALOG, models={"009a": {"cols": 1, "rows": 1, "keys": 1}}
+            ),
+        )
+        neo = self._item("model", "009a")
+        self.assertEqual((neo.cols, neo.rows, neo.key_count), (4, 2, 8))
+        self.assertEqual(self.Item._geometry("009a"), (4, 2, 8))
+        # A model outside the table keeps its first reported geometry.
+        for keys in (8, 256):
+            self._ok(
+                token_b,
+                ws_b,
+                catalog=dict(
+                    CATALOG,
+                    models={"00aa": {"cols": 16, "rows": 16, "keys": keys}},
+                ),
+            )
+        self.assertEqual(self.Item._geometry("00aa"), (16, 16, 8))
+
     # -- editor ----------------------------------------------------------
 
     def test_create_keys_makes_one_line_per_key_of_the_model(self):
