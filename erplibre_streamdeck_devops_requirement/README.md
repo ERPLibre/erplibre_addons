@@ -7,8 +7,8 @@ extension ERPLibre Home, its installation, the games and the mobile plugin —
 as `devops.requirement` records, each with the repository tests that prove
 it. They come from the audit of the Stream Deck design specifications, row
 by row, and from the designs of the Odoo inventory, of its monitoring and
-of its control of the deck settings, and live here instead of in a
-document.
+of its control of the deck settings and of the key layout, and live here
+instead of in a document.
 
 The module depends on `erplibre_streamdeck` and `erplibre_devops_requirement`,
 and adds no model, no view and no menu: the requirements show in the
@@ -106,17 +106,19 @@ while one it depends on is not.
 ## The Control domain
 
 The domain *Control* (`sd_ctl`, file `data/requirement_control.xml`) holds
-the requirements of the control of the deck settings by Odoo, the settings
-part of the third lot: one per user decision, design choice and anti-goal
-of its design, coded `SD-CTL-R<nn>`. Its proofs are Odoo tests of
-`erplibre_streamdeck`, Node tests of the extension and unit tests of
-ERPLibre, since the configuration crosses the three repositories. The key
-layout, the second part of the lot, adds its requirements after these.
+the requirements of the control of the deck by Odoo, the third lot: one
+per user decision, design choice and anti-goal of its design, coded
+`SD-CTL-R<nn>`. `SD-CTL-R01` to `R49` cover the settings, the first part
+of the lot; `SD-CTL-R50` to `R71` the key layout, the second part, whose
+tests also prove four anti-goals of the first. Its proofs are Odoo tests
+of `erplibre_streamdeck`, Node tests of the extension and unit tests of
+ERPLibre, since the configuration crosses the three repositories.
 
 The test `tests/test_requirement_control.py` checks that each proof names
 a test that exists, under the same rules as the inventory; that each test
-of the files `test_streamdeck_config*.py` of `erplibre_streamdeck` proves
-at least one requirement; that the tests holding the review points of the
+of the files `test_streamdeck_config*.py` and
+`test_streamdeck_key_layout.py` of `erplibre_streamdeck` proves at least
+one requirement; that the tests holding the review points of the
 lot are cited; and that the requirements still to do are exactly those it
 names.
 
