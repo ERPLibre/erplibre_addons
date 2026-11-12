@@ -606,6 +606,51 @@ msgid "A key already taken is skipped by a later fixture"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r58
+msgid ""
+"A key layout belongs to a deck model, by its USB product id, and to exactly "
+"one parent among profile, deck model and workstation, one per parent and "
+"model; it follows the priority of the lines, and its lock, set on the whole "
+"layout, stops the lower layers"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r60
+msgid ""
+"A key of a layout carries its index, an action and an icon of the catalog "
+"and a label, one per layout and index; the geometry of the model bounds the "
+"index, 16 characters with no control character the label, and a plugin has "
+"one key per layout"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r54
+msgid ""
+"A keymap.json missing, unreadable, of an unknown format or with no layout "
+"for the model of the deck leaves today's automatic layout; an invalid entry "
+"is skipped with one journal line, the lines bounded, and a plugin turned off"
+" or absent leaves its key black; the deck starts in every case"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r65
+msgid ""
+"A layout changed locally is handled as a key, through the fingerprint per "
+"model of current.key_layouts: a locked one is offered again, a free one "
+"becomes a workstation layout of source local; a layout changed in Odoo is "
+"offered, never taken from the file, and the first pilot asks about a free "
+"layout of the file"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r61
+msgid ""
+"A layout shows a grid preview, rows by columns, with the label and the icon "
+"name of each key, and warns of the plugins with a home key it leaves without"
+" a key"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r57
 msgid "A leftover __pycache__/game_*.pyc file is harmless"
 msgstr ""
@@ -1207,6 +1252,15 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r71
+msgid ""
+"An interconnection test holds the keymap format of CONTRACT.md equal to the "
+"constants of keymap.py, the catalog to the shape the contract states, and "
+"the loader of the deck to the verdict of each shared keymap fixture, so that"
+" the deck skips nothing the extension writes"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r41
 msgid ""
 "An interconnection test holds the table of CONTRACT.md equal to the "
@@ -1518,6 +1572,15 @@ msgid ""
 "Before TODO › Stream Deck changes a key that pilot.json lists as locked, one"
 " line warns that Odoo locks it for that destination and will offer it again;"
 " the change is still allowed"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r69
+msgid ""
+"Before it writes, the extension checks each layout against the catalog its "
+"checkout printed and the rules of format 1; a layout outside them, an action"
+" the catalog lacks included, refuses the whole revision with "
+"invalid:key_layouts"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -2470,6 +2533,17 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r53
+msgid ""
+"Format 1 maps at most 16 deck models, each by its USB product id in 4 "
+"lowercase hex digits, to at most as many keys as the model has: a key index "
+"unique in [0, total_keys), the action plugin:<id>, tiles or empty, an icon "
+"of ICONS of ui/icons.py or none, a label of at most 16 characters with no "
+"control character or none; the dials and the touch screen stay outside "
+"format 1"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r34
 msgid "Fresh runs claude in the path"
 msgstr ""
@@ -3352,6 +3426,15 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r67
+msgid ""
+"Odoo reads a state.deck_catalog of at most 32 KiB and of format 1, the "
+"extension leaving a larger one out, and current.key_layouts as a fingerprint"
+" or null per model of 4 hex digits; a malformed one gets 400 bad_request, "
+"and the refusal invalid:key_layouts is recorded"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r06
 msgid ""
 "Odoo sees of a workstation its host name (the default name, renamable), "
@@ -3497,6 +3580,14 @@ msgstr ""
 msgid ""
 "Only the keys a layer sets are managed: a key no layer sets stays the "
 "employee's, locally, and Odoo never adopts it"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r59
+msgid ""
+"Only the manager locks a layout; an employee edits the free layouts of their"
+" own workstations only, never a locked one nor one whose model a profile or "
+"deck model layer locks, and never its lock, its source or its parent"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4739,6 +4830,15 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r70
+msgid ""
+"The application writes keymap.json atomically, mode 0644, with "
+"streamdeck.conf or not at all, keeps the layouts of the models Odoo does not"
+" send, and restarts the deck service once, as in lot 3a; a file that already"
+" holds its values is not rewritten"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r61
 msgid "The attribute is read from the standard output of keepassxc-cli"
 msgstr ""
@@ -4775,6 +4875,16 @@ msgid ""
 "The build walks each repository with BINARY_EXT, MANIFEST_SKIP_DIRS and "
 "MAX_BUNDLE_FILE_BYTES, stages it in os.tmpdir()/erplibre-bundle-{slug}-*, "
 "runs tar -czf <slug>.tar.gz -C <stage> . and removes the stage"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r62
+msgid ""
+"The catalog of actions, icons and deck models grows from the "
+"state.deck_catalog of the reports, the union of what the workstations sent: "
+"an item gone stays, with the date it was last seen; the geometry of a model "
+"comes from the table of the module for the models of USB_MODELS, else from "
+"its first report, and no report changes it"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -4848,6 +4958,15 @@ msgstr ""
 msgid ""
 "The deck program is the erplibre_streamdeck package run as a directory: its "
 "__main__.py replaces the single file erplibre_streamdeck.py"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r57
+msgid ""
+"The deck program prints its catalog in JSON with --catalog, without opening "
+"the deck or taking its lock: the actions a layout may name, then tiles and "
+"empty, the icons, and the geometry of each deck model, read from the classes"
+" of the StreamDeck library"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -5306,6 +5425,13 @@ msgid "The hot-reload copy resolves to the same checkout root"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r56
+msgid ""
+"The icon of an entry replaces the icon of the face of the home key, its "
+"label the text; the colour and the dynamic state stay the plugin's"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r22
 msgid ""
 "The import reads erplibre-home.json, and streamdeck-tiler.json only when "
@@ -5413,6 +5539,21 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r41b
 msgid "The key callback on_key takes the lock"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r51
+msgid ""
+"The key layout covers the home screen only: the home keys of the plugins, "
+"the dashboard and the black keys"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r50
+msgid ""
+"The key layout is a versioned JSON format of the deck program of ERPLibre, "
+"edited in Odoo by a simple editor: a grid per deck model, the action and the"
+" icon of each key chosen from a list"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -5793,6 +5934,15 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r64
+msgid ""
+"The reply carries config.settings.key_layouts, the effective layout of each "
+"connected deck model, inside the fingerprint; a layout goes within the "
+"catalog the workstation reported, and a plugin turned off goes as a black "
+"key"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r29
 msgid ""
 "The reply of a piloted workstation carries config: its revision, the "
@@ -5930,6 +6080,17 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r63
+msgid ""
+"The simple editor: the layout form with a Create the keys button, one empty "
+"line per key of the model, the editable list sorted by index with the action"
+" and the icon chosen from the catalog, and the grid preview beside it; "
+"Stream Deck › Configuration › Key layouts and Catalog for the manager, and "
+"the layouts of the connected decks on the Configuration tab of the "
+"workstation; in English and Canadian French"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r75
 msgid "The split renames no earlier design document to follow the new paths."
 msgstr ""
@@ -6062,6 +6223,14 @@ msgid ""
 "The wire moves to protocol 1.1 and the contract of the extension to 1.3, "
 "MINOR versions: Odoo still accepts a report in 1.0, and the contract file of"
 " ERPLibre holds 1.3"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r66
+msgid ""
+"The wire moves to protocol 1.2 and the contract of the extension to 1.4, "
+"MINOR versions: a report in 1.1 gets the settings of lot 3a with no key "
+"layout, and the contract file of ERPLibre holds 1.4 or later"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -6332,6 +6501,15 @@ msgstr ""
 msgid ""
 "When the Cache is evicted (sentinel gone), the next ensureExtracted re-"
 "extracts lazily, on view, never at startup"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r55
+msgid ""
+"When the model of the deck has a layout, the layout holds: the home key of a"
+" plugin it names goes to its key, a plugin with a home key it does not name "
+"has no key, the fixtures take the keys it does not name, and the dashboard "
+"takes the tiles keys, then the keys left"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
@@ -6952,6 +7130,14 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r52
+msgid ""
+"keymap.json lives in ~/.config/erplibre-home, the literal directory of "
+"settings.json and of layouts.json, the latter keeping the window layouts; "
+"the extension alone writes it, and the deck program reads it at start"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r48
 msgid "listDecks lists open decks only"
 msgstr ""
@@ -7278,6 +7464,15 @@ msgstr ""
 msgid ""
 "started_ms reads field 22 after the last ')' of /proc/<pid>/stat and gives "
 "None when the process is gone"
+msgstr ""
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r68
+msgid ""
+"state.deck_catalog is the output of --catalog, run by the interpreter "
+".venv.streamdeck/bin/python of the checkout, read at start and again when "
+"the commit of the checkout changes, cut at TIMEOUT_S like the other reads; "
+"it is left out when the program does not answer"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement

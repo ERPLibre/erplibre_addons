@@ -763,6 +763,73 @@ msgid "A key already taken is skipped by a later fixture"
 msgstr "Une touche déjà prise est sautée par une fixture ultérieure"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r58
+msgid ""
+"A key layout belongs to a deck model, by its USB product id, and to exactly "
+"one parent among profile, deck model and workstation, one per parent and "
+"model; it follows the priority of the lines, and its lock, set on the whole "
+"layout, stops the lower layers"
+msgstr ""
+"Une disposition des touches appartient à un modèle de deck, par son "
+"identifiant produit USB, et à un seul parent parmi profil, modèle de deck et"
+" poste, une par parent et modèle ; elle suit la priorité des lignes, et son "
+"verrou, posé sur la disposition entière, arrête les couches plus basses"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r60
+msgid ""
+"A key of a layout carries its index, an action and an icon of the catalog "
+"and a label, one per layout and index; the geometry of the model bounds the "
+"index, 16 characters with no control character the label, and a plugin has "
+"one key per layout"
+msgstr ""
+"Une touche de disposition porte son index, une action et une icône du "
+"catalogue et un libellé, une par disposition et index ; la géométrie du "
+"modèle borne l'index, 16 caractères sans caractère de contrôle le libellé, "
+"et un plugin a une touche par disposition"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r54
+msgid ""
+"A keymap.json missing, unreadable, of an unknown format or with no layout "
+"for the model of the deck leaves today's automatic layout; an invalid entry "
+"is skipped with one journal line, the lines bounded, and a plugin turned off"
+" or absent leaves its key black; the deck starts in every case"
+msgstr ""
+"Un keymap.json absent, illisible, d'un format inconnu ou sans disposition "
+"pour le modèle du deck laisse la disposition automatique d'aujourd'hui ; une"
+" entrée invalide est sautée avec une ligne de journal, les lignes bornées, "
+"et un plugin coupé ou absent laisse sa touche noire ; le deck démarre dans "
+"tous les cas"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r65
+msgid ""
+"A layout changed locally is handled as a key, through the fingerprint per "
+"model of current.key_layouts: a locked one is offered again, a free one "
+"becomes a workstation layout of source local; a layout changed in Odoo is "
+"offered, never taken from the file, and the first pilot asks about a free "
+"layout of the file"
+msgstr ""
+"Une disposition changée localement se traite comme une clé, par l'empreinte "
+"par modèle de current.key_layouts : une disposition verrouillée est "
+"reproposée, une libre devient une disposition du poste de source locale ; "
+"une disposition changée dans Odoo est proposée, jamais reprise du fichier, "
+"et le premier pilotage pose la question pour une disposition libre du "
+"fichier"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r61
+msgid ""
+"A layout shows a grid preview, rows by columns, with the label and the icon "
+"name of each key, and warns of the plugins with a home key it leaves without"
+" a key"
+msgstr ""
+"Une disposition montre un aperçu en grille, lignes par colonnes, avec le "
+"libellé et le nom d'icône de chaque touche, et avertit des plugins à touche "
+"d'accueil qu'elle laisse sans touche"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r57
 msgid "A leftover __pycache__/game_*.pyc file is harmless"
 msgstr "Un fichier __pycache__/game_*.pyc resté en place est sans effet"
@@ -1539,6 +1606,19 @@ msgstr ""
 "games.save-<date>/"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r71
+msgid ""
+"An interconnection test holds the keymap format of CONTRACT.md equal to the "
+"constants of keymap.py, the catalog to the shape the contract states, and "
+"the loader of the deck to the verdict of each shared keymap fixture, so that"
+" the deck skips nothing the extension writes"
+msgstr ""
+"Un test d'interconnexion tient le format keymap de CONTRACT.md égal aux "
+"constantes de keymap.py, le catalogue à la forme qu'énonce le contrat, et le"
+" chargeur du deck au verdict de chaque fixture keymap partagée, de sorte que"
+" le deck ne saute rien de ce que l'extension écrit"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r41
 msgid ""
 "An interconnection test holds the table of CONTRACT.md equal to the "
@@ -1930,6 +2010,19 @@ msgstr ""
 "Avant que TODO › Stream Deck change une clé que pilot.json liste comme "
 "verrouillée, une ligne prévient qu'Odoo la verrouille pour cette destination"
 " et la reproposera ; le changement reste permis"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r69
+msgid ""
+"Before it writes, the extension checks each layout against the catalog its "
+"checkout printed and the rules of format 1; a layout outside them, an action"
+" the catalog lacks included, refuses the whole revision with "
+"invalid:key_layouts"
+msgstr ""
+"Avant d'écrire, l'extension vérifie chaque disposition contre le catalogue "
+"qu'a écrit son checkout et les règles du format 1 ; une disposition hors de "
+"ces règles, une action absente du catalogue comprise, refuse toute la "
+"révision avec invalid:key_layouts"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_defects_r88
@@ -3154,6 +3247,23 @@ msgstr ""
 "absents"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r53
+msgid ""
+"Format 1 maps at most 16 deck models, each by its USB product id in 4 "
+"lowercase hex digits, to at most as many keys as the model has: a key index "
+"unique in [0, total_keys), the action plugin:<id>, tiles or empty, an icon "
+"of ICONS of ui/icons.py or none, a label of at most 16 characters with no "
+"control character or none; the dials and the touch screen stay outside "
+"format 1"
+msgstr ""
+"Le format 1 associe au plus 16 modèles de deck, chacun par son identifiant "
+"produit USB en 4 chiffres hexadécimaux minuscules, à au plus autant de "
+"touches que le modèle en a : un index de touche unique dans [0, total_keys),"
+" l'action plugin:<id>, tiles ou empty, une icône des ICONS de ui/icons.py ou"
+" aucune, un libellé d'au plus 16 caractères sans caractère de contrôle ou "
+"aucun ; les molettes et l'écran tactile restent hors du format 1"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r34
 msgid "Fresh runs claude in the path"
 msgstr "Fresh lance claude dans le chemin"
@@ -4295,6 +4405,19 @@ msgstr ""
 "et poste revenu"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r67
+msgid ""
+"Odoo reads a state.deck_catalog of at most 32 KiB and of format 1, the "
+"extension leaving a larger one out, and current.key_layouts as a fingerprint"
+" or null per model of 4 hex digits; a malformed one gets 400 bad_request, "
+"and the refusal invalid:key_layouts is recorded"
+msgstr ""
+"Odoo lit un state.deck_catalog d'au plus 32 Kio et de format 1, l'extension "
+"laissant de côté un catalogue plus gros, et current.key_layouts comme une "
+"empreinte ou null par modèle de 4 chiffres hexadécimaux ; un envoi malformé "
+"reçoit 400 bad_request, et le refus invalid:key_layouts est consigné"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_inv_r06
 msgid ""
 "Odoo sees of a workstation its host name (the default name, renamable), "
@@ -4488,6 +4611,18 @@ msgid ""
 msgstr ""
 "Seules les clés qu'une couche fixe sont gérées : une clé qu'aucune couche ne"
 " fixe reste à l'employé, localement, et Odoo ne l'adopte jamais"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r59
+msgid ""
+"Only the manager locks a layout; an employee edits the free layouts of their"
+" own workstations only, never a locked one nor one whose model a profile or "
+"deck model layer locks, and never its lock, its source or its parent"
+msgstr ""
+"Seul le gestionnaire verrouille une disposition ; un employé ne modifie que "
+"les dispositions libres de ses propres postes, jamais une disposition "
+"verrouillée ni une dont le modèle est verrouillé par une couche profil ou "
+"modèle de deck, et jamais son verrou, sa source ou son parent"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r22
@@ -6081,6 +6216,19 @@ msgstr ""
 "toute autre ligne gardée, remplacé de façon atomique en gardant son mode"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r70
+msgid ""
+"The application writes keymap.json atomically, mode 0644, with "
+"streamdeck.conf or not at all, keeps the layouts of the models Odoo does not"
+" send, and restarts the deck service once, as in lot 3a; a file that already"
+" holds its values is not rewritten"
+msgstr ""
+"L'application écrit keymap.json de façon atomique, en mode 0644, avec "
+"streamdeck.conf ou pas du tout, garde les dispositions des modèles qu'Odoo "
+"n'envoie pas, et redémarre le service du deck une fois, comme au lot 3a ; un"
+" fichier qui porte déjà ses valeurs n'est pas réécrit"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r61
 msgid "The attribute is read from the standard output of keepassxc-cli"
 msgstr "L'attribut se lit sur la sortie standard de keepassxc-cli"
@@ -6127,6 +6275,21 @@ msgstr ""
 "La compilation parcourt chaque dépôt avec BINARY_EXT, MANIFEST_SKIP_DIRS et "
 "MAX_BUNDLE_FILE_BYTES, le prépare dans os.tmpdir()/erplibre-bundle-{slug}-*,"
 " lance tar -czf <slug>.tar.gz -C <stage> . et supprime la préparation"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r62
+msgid ""
+"The catalog of actions, icons and deck models grows from the "
+"state.deck_catalog of the reports, the union of what the workstations sent: "
+"an item gone stays, with the date it was last seen; the geometry of a model "
+"comes from the table of the module for the models of USB_MODELS, else from "
+"its first report, and no report changes it"
+msgstr ""
+"Le catalogue des actions, des icônes et des modèles de deck grandit avec le "
+"state.deck_catalog des remontées, union de ce que les postes ont envoyé : un"
+" item disparu reste, avec la date où il a été vu la dernière fois ; la "
+"géométrie d'un modèle vient de la table du module pour les modèles de "
+"USB_MODELS, sinon de sa première remontée, et aucune remontée ne la change"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r26
@@ -6221,6 +6384,19 @@ msgstr ""
 "Le programme du deck est le paquet erplibre_streamdeck lancé comme un "
 "répertoire : son __main__.py remplace le fichier unique "
 "erplibre_streamdeck.py"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r57
+msgid ""
+"The deck program prints its catalog in JSON with --catalog, without opening "
+"the deck or taking its lock: the actions a layout may name, then tiles and "
+"empty, the icons, and the geometry of each deck model, read from the classes"
+" of the StreamDeck library"
+msgstr ""
+"Le programme du deck écrit son catalogue en JSON avec --catalog, sans ouvrir"
+" le deck ni prendre son verrou : les actions qu'une disposition peut nommer,"
+" puis tiles et empty, les icônes, et la géométrie de chaque modèle de deck, "
+"lue dans les classes de la bibliothèque StreamDeck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r11
@@ -6807,6 +6983,15 @@ msgstr ""
 "La copie de rechargement à chaud se résout à la même racine de checkout"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r56
+msgid ""
+"The icon of an entry replaces the icon of the face of the home key, its "
+"label the text; the colour and the dynamic state stay the plugin's"
+msgstr ""
+"L'icône d'une entrée remplace l'icône du visage de la touche d'accueil, son "
+"libellé le texte ; la couleur et l'état dynamique restent ceux du plugin"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r22
 msgid ""
 "The import reads erplibre-home.json, and streamdeck-tiler.json only when "
@@ -6942,6 +7127,26 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r41b
 msgid "The key callback on_key takes the lock"
 msgstr "Le rappel des touches on_key prend le verrou"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r51
+msgid ""
+"The key layout covers the home screen only: the home keys of the plugins, "
+"the dashboard and the black keys"
+msgstr ""
+"La disposition des touches ne couvre que l'écran d'accueil : les touches "
+"d'accueil des plugins, le tableau de bord et les touches noires"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r50
+msgid ""
+"The key layout is a versioned JSON format of the deck program of ERPLibre, "
+"edited in Odoo by a simple editor: a grid per deck model, the action and the"
+" icon of each key chosen from a list"
+msgstr ""
+"La disposition des touches est un format JSON versionné du programme du deck"
+" d'ERPLibre, édité dans Odoo par un éditeur simple : une grille par modèle "
+"de deck, l'action et l'icône de chaque touche choisies dans une liste"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r19
@@ -7441,6 +7646,19 @@ msgstr ""
 "avec une ligne de journal."
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r64
+msgid ""
+"The reply carries config.settings.key_layouts, the effective layout of each "
+"connected deck model, inside the fingerprint; a layout goes within the "
+"catalog the workstation reported, and a plugin turned off goes as a black "
+"key"
+msgstr ""
+"La réponse porte config.settings.key_layouts, la disposition effective de "
+"chaque modèle de deck branché, comprise dans l'empreinte ; une disposition "
+"part dans les limites du catalogue que le poste a remonté, et un plugin "
+"coupé part en touche noire"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r29
 msgid ""
 "The reply of a piloted workstation carries config: its revision, the "
@@ -7627,6 +7845,23 @@ msgstr ""
 " 0 minute"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r63
+msgid ""
+"The simple editor: the layout form with a Create the keys button, one empty "
+"line per key of the model, the editable list sorted by index with the action"
+" and the icon chosen from the catalog, and the grid preview beside it; "
+"Stream Deck › Configuration › Key layouts and Catalog for the manager, and "
+"the layouts of the connected decks on the Configuration tab of the "
+"workstation; in English and Canadian French"
+msgstr ""
+"L'éditeur simple : le formulaire de la disposition avec un bouton Créer les "
+"touches, une ligne vide par touche du modèle, la liste éditable triée par "
+"index avec l'action et l'icône choisies dans le catalogue, et l'aperçu en "
+"grille à côté ; Stream Deck › Configuration › Dispositions des touches et "
+"Catalogue pour le gestionnaire, et les dispositions des decks branchés dans "
+"l'onglet Configuration du poste ; en anglais et en français canadien"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r75
 msgid "The split renames no earlier design document to follow the new paths."
 msgstr ""
@@ -7802,6 +8037,18 @@ msgstr ""
 "Le fil passe au protocole 1.1 et le contrat de l'extension à 1.3, des "
 "versions MINOR : Odoo accepte encore une remontée en 1.0, et le fichier de "
 "contrat d'ERPLibre porte 1.3"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r66
+msgid ""
+"The wire moves to protocol 1.2 and the contract of the extension to 1.4, "
+"MINOR versions: a report in 1.1 gets the settings of lot 3a with no key "
+"layout, and the contract file of ERPLibre holds 1.4 or later"
+msgstr ""
+"Le fil passe au protocole 1.2 et le contrat de l'extension à 1.4, des "
+"versions MINOR : une remontée en 1.1 reçoit les réglages du lot 3a sans "
+"disposition des touches, et le fichier de contrat d'ERPLibre porte 1.4 ou "
+"plus"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r27
@@ -8160,6 +8407,20 @@ msgid ""
 msgstr ""
 "Quand le Cache est évincé (témoin disparu), le prochain ensureExtracted "
 "réextrait paresseusement, à l'affichage, jamais au démarrage"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r55
+msgid ""
+"When the model of the deck has a layout, the layout holds: the home key of a"
+" plugin it names goes to its key, a plugin with a home key it does not name "
+"has no key, the fixtures take the keys it does not name, and the dashboard "
+"takes the tiles keys, then the keys left"
+msgstr ""
+"Quand le modèle du deck a une disposition, elle fait foi : la touche "
+"d'accueil d'un plugin qu'elle nomme va à sa touche, un plugin à touche "
+"d'accueil qu'elle ne nomme pas n'a pas de touche, les fixtures prennent les "
+"touches qu'elle ne nomme pas, et le tableau de bord prend les touches tiles,"
+" puis les touches restantes"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r34
@@ -8928,6 +9189,18 @@ msgstr ""
 "file et, quand le slot est supérieur à 0, --yubikey SLOT[:SERIAL]"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r52
+msgid ""
+"keymap.json lives in ~/.config/erplibre-home, the literal directory of "
+"settings.json and of layouts.json, the latter keeping the window layouts; "
+"the extension alone writes it, and the deck program reads it at start"
+msgstr ""
+"keymap.json vit dans ~/.config/erplibre-home, le répertoire littéral de "
+"settings.json et de layouts.json, ce dernier gardant les dispositions de "
+"fenêtres ; l'extension seule l'écrit, et le programme du deck le lit au "
+"démarrage"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r48
 msgid "listDecks lists open decks only"
 msgstr "listDecks ne liste que les decks ouverts"
@@ -9342,6 +9615,19 @@ msgid ""
 msgstr ""
 "started_ms lit le champ 22 après la dernière « ) » de /proc/<pid>/stat et "
 "rend None quand le processus a disparu"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r68
+msgid ""
+"state.deck_catalog is the output of --catalog, run by the interpreter "
+".venv.streamdeck/bin/python of the checkout, read at start and again when "
+"the commit of the checkout changes, cut at TIMEOUT_S like the other reads; "
+"it is left out when the program does not answer"
+msgstr ""
+"state.deck_catalog est la sortie de --catalog, lancée par l'interpréteur "
+".venv.streamdeck/bin/python du checkout, lue au démarrage et de nouveau "
+"quand le commit du checkout change, coupée au délai TIMEOUT_S comme les "
+"autres lectures ; il est absent quand le programme n'y répond pas"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r30

@@ -3,7 +3,8 @@
 <!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <!-- Le domaine Pilotage : un requis par décision de l'utilisateur,
      choix de conception et anti-objectif de la conception du pilotage,
-     sous-lot des réglages, code SD-CTL-R<nn>, puis ses preuves. Une
+     code SD-CTL-R<nn> : R01 à R49 pour le sous-lot des réglages, puis
+     ceux de la disposition des touches, et leurs preuves. Une
      preuve nomme un test Odoo par son chemin pointé (kind python), un
      test node de l'extension ou un test unitaire d'ERPLibre par
      <dépôt>:<chemin>::<test>, la référence que pousse son lanceur.
@@ -398,7 +399,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">PROTOCOL of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py, INVENTORY_PROTOCOL of erplibre-home-gnome-extension:lib/inventory.js, CONTRACT_VERSION of lib/inventory-service.js and the Versioning section of CONTRACT.md; erplibre:script/gnome-extension/erplibre_home_contract holds 1.3.</field>
+        <field name="achievement">The Versioning section of erplibre-home-gnome-extension:CONTRACT.md lists 1.3, the contract of the settings; _report of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py still accepts a report in 1.0; the wire and the contract have moved on since by MINOR versions only, and erplibre:script/gnome-extension/erplibre_home_contract holds the current contract.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r28" model="devops.requirement">
@@ -626,7 +627,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">The closed list of CONTRACT.md: four keys, each a word of a list, ids turned off or a bounded number; the extension writes streamdeck.conf only, refuses a whole revision outside the schema and restarts the deck unit through a fixed argv.</field>
+        <field name="achievement">The closed list of CONTRACT.md: four settings, each a word of a list, ids turned off or a bounded number, and key layouts whose actions are plugin:&lt;id&gt;, tiles and empty within the catalog of the checkout; the extension writes streamdeck.conf and keymap.json only, refuses a whole revision outside the schema and restarts the deck unit through a fixed argv; the deck program lists a plugin turned off without importing it, and a layout naming it leaves its key black.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r44" model="devops.requirement">
@@ -715,6 +716,319 @@
         <field name="achievement">Examples are invented (host-a, SN-CFG, SN-PLUS); erplibre:script/analyse/check_comment_hygiene.py reports identifying data in comments, and the commit-msg hook of erplibre:script/git/hooks refuses an address, an email or an account path in a commit body.</field>
         <field name="missing">No test sweeps the files of the control: check_comment_hygiene.py runs by hand and from the pre-commit hook, which lists its findings without blocking the commit.</field>
         <field name="notes">Origin: unit test missing.</field>
+    </record>
+    <record id="req_sd_ctl_r50" model="devops.requirement">
+        <field name="code">SD-CTL-R50</field>
+        <field name="name">The key layout is a versioned JSON format of the deck program of ERPLibre, edited in Odoo by a simple editor: a grid per deck model, the action and the icon of each key chosen from a list</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="500" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">keymap.json, format 1, read by erplibre:script/stream_deck/erplibre_streamdeck/keymap.py; streamdeck.key.layout and its keys in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, the action and the icon of each key a Many2one to streamdeck.catalog.item, beside a grid preview.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r51" model="devops.requirement">
+        <field name="code">SD-CTL-R51</field>
+        <field name="name">The key layout covers the home screen only: the home keys of the plugins, the dashboard and the black keys</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="510" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">app.home_layout of erplibre:script/stream_deck/erplibre_streamdeck/app.py hands the layout of the deck's model to the kernel for its home screen alone, placed by home.allocate; its actions are plugin:&lt;id&gt;, tiles and empty, and none names a page of a plugin.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r52" model="devops.requirement">
+        <field name="code">SD-CTL-R52</field>
+        <field name="name">keymap.json lives in ~/.config/erplibre-home, the literal directory of settings.json and of layouts.json, the latter keeping the window layouts; the extension alone writes it, and the deck program reads it at start</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="520" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">KEYMAP_FILE of erplibre:script/stream_deck/erplibre_streamdeck/paths.py; keymap.load reads it at each build of the kernel; keymapFilePath of erplibre-home-gnome-extension:lib/inventory-service.js names the file the extension writes.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r53" model="devops.requirement">
+        <field name="code">SD-CTL-R53</field>
+        <field name="name">Format 1 maps at most 16 deck models, each by its USB product id in 4 lowercase hex digits, to at most as many keys as the model has: a key index unique in [0, total_keys), the action plugin:&lt;id&gt;, tiles or empty, an icon of ICONS of ui/icons.py or none, a label of at most 16 characters with no control character or none; the dials and the touch screen stay outside format 1</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="530" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">FORMAT, MAX_MODELS, LABEL_MAX, PLUGIN_ACTION_RE and FIXED_ACTIONS of erplibre:script/stream_deck/erplibre_streamdeck/keymap.py; validateKeyLayouts of erplibre-home-gnome-extension:lib/deck-config.js holds the same rules, which CONTRACT.md states under Key layouts.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r54" model="devops.requirement">
+        <field name="code">SD-CTL-R54</field>
+        <field name="name">A keymap.json missing, unreadable, of an unknown format or with no layout for the model of the deck leaves today's automatic layout; an invalid entry is skipped with one journal line, the lines bounded, and a plugin turned off or absent leaves its key black; the deck starts in every case</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="540" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">keymap.load gives {} and keymap.layout_for None for the automatic layout, MAX_BYTES bounding the file, and one problem line per skipped entry, of which keymap.capped keeps PROBLEM_LINES; app.home_layout of erplibre:script/stream_deck/erplibre_streamdeck/app.py journals them.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r55" model="devops.requirement">
+        <field name="code">SD-CTL-R55</field>
+        <field name="name">When the model of the deck has a layout, the layout holds: the home key of a plugin it names goes to its key, a plugin with a home key it does not name has no key, the fixtures take the keys it does not name, and the dashboard takes the tiles keys, then the keys left</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="550" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">home.allocate of erplibre:script/stream_deck/erplibre_streamdeck/home.py places the entries of keymap.layout_for, and without a layout keeps the automatic placement unchanged; keymap.layout_for reports the plugins left without a key.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r56" model="devops.requirement">
+        <field name="code">SD-CTL-R56</field>
+        <field name="name">The icon of an entry replaces the icon of the face of the home key, its label the text; the colour and the dynamic state stay the plugin's</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="560" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">The faces of the Allocation of erplibre:script/stream_deck/erplibre_streamdeck/home.py keep the icon and the label of each entry, laid over the face the plugin's home button draws.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r57" model="devops.requirement">
+        <field name="code">SD-CTL-R57</field>
+        <field name="name">The deck program prints its catalog in JSON with --catalog, without opening the deck or taking its lock: the actions a layout may name, then tiles and empty, the icons, and the geometry of each deck model, read from the classes of the StreamDeck library</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="570" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">keymap.catalog of erplibre:script/stream_deck/erplibre_streamdeck/keymap.py, which --catalog of erplibre:script/stream_deck/erplibre_streamdeck/__main__.py runs before any deck or lock; a plugin turned off is listed by its file, never imported.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r58" model="devops.requirement">
+        <field name="code">SD-CTL-R58</field>
+        <field name="name">A key layout belongs to a deck model, by its USB product id, and to exactly one parent among profile, deck model and workstation, one per parent and model; it follows the priority of the lines, and its lock, set on the whole layout, stops the lower layers</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="580" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.key.layout of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py; streamdeck.config.schema._effective_layouts folds profile, deck model and workstation for each connected model and stops at the first locked layout.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r59" model="devops.requirement">
+        <field name="code">SD-CTL-R59</field>
+        <field name="name">Only the manager locks a layout; an employee edits the free layouts of their own workstations only, never a locked one nor one whose model a profile or deck model layer locks, and never its lock, its source or its parent</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="590" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">_check_employee_vals, _check_free and _check_editable of streamdeck.key.layout in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, and the rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml, which mirror those of the configuration lines.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r60" model="devops.requirement">
+        <field name="code">SD-CTL-R60</field>
+        <field name="name">A key of a layout carries its index, an action and an icon of the catalog and a label, one per layout and index; the geometry of the model bounds the index, 16 characters with no control character the label, and a plugin has one key per layout</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="600" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">streamdeck.key.layout.key of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, its constraints on the index, the label, the kind of each catalog item and a plugin named twice.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r61" model="devops.requirement">
+        <field name="code">SD-CTL-R61</field>
+        <field name="name">A layout shows a grid preview, rows by columns, with the label and the icon name of each key, and warns of the plugins with a home key it leaves without a key</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="610" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">preview_html and missing_plugins of streamdeck.key.layout in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, computed from the geometry of the model and the plugin actions of the catalog.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r62" model="devops.requirement">
+        <field name="code">SD-CTL-R62</field>
+        <field name="name">The catalog of actions, icons and deck models grows from the state.deck_catalog of the reports, the union of what the workstations sent: an item gone stays, with the date it was last seen; the geometry of a model comes from the table of the module for the models of USB_MODELS, else from its first report, and no report changes it</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="620" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">streamdeck.catalog.item._take and _geometry of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, USB_GEOMETRY of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_device.py; data/streamdeck_catalog_data.xml seeds tiles and empty.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r63" model="devops.requirement">
+        <field name="code">SD-CTL-R63</field>
+        <field name="name">The simple editor: the layout form with a Create the keys button, one empty line per key of the model, the editable list sorted by index with the action and the icon chosen from the catalog, and the grid preview beside it; Stream Deck › Configuration › Key layouts and Catalog for the manager, and the layouts of the connected decks on the Configuration tab of the workstation; in English and Canadian French</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="630" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">action_create_keys of streamdeck.key.layout, ERPLibre_erplibre_addons:erplibre_streamdeck/views/streamdeck_key_layout_views.xml, config_layouts_html of streamdeck.workstation; i18n/fr_CA.po.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r64" model="devops.requirement">
+        <field name="code">SD-CTL-R64</field>
+        <field name="name">The reply carries config.settings.key_layouts, the effective layout of each connected deck model, inside the fingerprint; a layout goes within the catalog the workstation reported, and a plugin turned off goes as a black key</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="640" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_layout_settings and _wire of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, called by _config_settings of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py; layout_hash is the sha256 of the canonical json.dumps of Python, as the extension computes it.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r65" model="devops.requirement">
+        <field name="code">SD-CTL-R65</field>
+        <field name="name">A layout changed locally is handled as a key, through the fingerprint per model of current.key_layouts: a locked one is offered again, a free one becomes a workstation layout of source local; a layout changed in Odoo is offered, never taken from the file, and the first pilot asks about a free layout of the file</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="650" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_config_layout_drift and _config_adopt of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py measure against the layouts last written to the file, config_written or config_applied; _config_layouts_differing feeds the first-pilot question; layoutHashes of erplibre-home-gnome-extension:lib/deck-config.js gives the fingerprints.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r66" model="devops.requirement">
+        <field name="code">SD-CTL-R66</field>
+        <field name="name">The wire moves to protocol 1.2 and the contract of the extension to 1.4, MINOR versions: a report in 1.1 gets the settings of lot 3a with no key layout, and the contract file of ERPLibre holds 1.4 or later</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="660" />
+        <field name="moscow">should</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">PROTOCOL of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py, INVENTORY_PROTOCOL of erplibre-home-gnome-extension:lib/inventory.js, CONTRACT_VERSION of lib/inventory-service.js and the Versioning section of CONTRACT.md; erplibre:script/gnome-extension/erplibre_home_contract holds the current contract.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r67" model="devops.requirement">
+        <field name="code">SD-CTL-R67</field>
+        <field name="name">Odoo reads a state.deck_catalog of at most 32 KiB and of format 1, the extension leaving a larger one out, and current.key_layouts as a fingerprint or null per model of 4 hex digits; a malformed one gets 400 bad_request, and the refusal invalid:key_layouts is recorded</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="670" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">_parse_catalog, _parse_layout_hashes and LAYOUTS_REFUSAL of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_service.py; CATALOG_MAX and catalogFrom of erplibre-home-gnome-extension:lib/deck-config.js.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r68" model="devops.requirement">
+        <field name="code">SD-CTL-R68</field>
+        <field name="name">state.deck_catalog is the output of --catalog, run by the interpreter .venv.streamdeck/bin/python of the checkout, read at start and again when the commit of the checkout changes, cut at TIMEOUT_S like the other reads; it is left out when the program does not answer</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="680" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">catalogArgv and readCatalog of erplibre-home-gnome-extension:lib/inventory-service.js, cancellable; catalogFrom of lib/deck-config.js keeps a catalog the extension can check.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r69" model="devops.requirement">
+        <field name="code">SD-CTL-R69</field>
+        <field name="name">Before it writes, the extension checks each layout against the catalog its checkout printed and the rules of format 1; a layout outside them, an action the catalog lacks included, refuses the whole revision with invalid:key_layouts</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="690" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">security</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="security_relevant" eval="True" />
+        <field name="achievement">validateKeyLayouts of erplibre-home-gnome-extension:lib/deck-config.js, run through validateConfig when the reply comes and again at the click in lib/inventory-service.js.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r70" model="devops.requirement">
+        <field name="code">SD-CTL-R70</field>
+        <field name="name">The application writes keymap.json atomically, mode 0644, with streamdeck.conf or not at all, keeps the layouts of the models Odoo does not send, and restarts the deck service once, as in lot 3a; a file that already holds its values is not rewritten</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="700" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">_applyOffer of erplibre-home-gnome-extension:lib/inventory-service.js, keymapText of lib/deck-config.js merging per model; a keymap.json that exists but cannot be read is refused write_failed before any write.</field>
+        <field name="notes">Origin: covered by a test.</field>
+    </record>
+    <record id="req_sd_ctl_r71" model="devops.requirement">
+        <field name="code">SD-CTL-R71</field>
+        <field name="name">An interconnection test holds the keymap format of CONTRACT.md equal to the constants of keymap.py, the catalog to the shape the contract states, and the loader of the deck to the verdict of each shared keymap fixture, so that the deck skips nothing the extension writes</field>
+        <field name="category_id" ref="cat_sd_ctl" />
+        <field name="sequence" eval="710" />
+        <field name="moscow">must</field>
+        <field name="requirement_type">non_functional</field>
+        <field name="devsecops_stage">test</field>
+        <field name="accepted" eval="True" />
+        <field name="approved" eval="True" />
+        <field name="done" eval="True" />
+        <field name="achievement">LeContratDesDispositions and LeVerdictDuChargeur of erplibre:test/test_erplibre_home_pilot.py read the CONTRACT.md and the test/fixtures/keymap of the extension clone, and skip with their reason when the clone is absent or older than 1.4.</field>
+        <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="test_sd_ctl_r01_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r01" />
@@ -1578,7 +1892,7 @@
         <field name="requirement_id" ref="req_sd_ctl_r27" />
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
-        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.3 since Odoo pilots the deck settings</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.4 since Odoo lays out the home keys</field>
     </record>
     <record id="test_sd_ctl_r27_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r27" />
@@ -2174,6 +2488,24 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config.TestStreamdeckConfig.test_each_key_accepts_its_values_and_refuses_others</field>
     </record>
+    <record id="test_sd_ctl_r43_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::every_hostile_layout_refuses_invalid_key_layouts</field>
+    </record>
+    <record id="test_sd_ctl_r43_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
+    </record>
+    <record id="test_sd_ctl_r43_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r43" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_an_off_plugin_leaves_its_named_key_empty</field>
+    </record>
     <record id="test_sd_ctl_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r44" />
         <field name="sequence" eval="10" />
@@ -2221,6 +2553,18 @@
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDuPilote::test_write_settings_and_the_extension_rewrite_agree_on_the_fixtures</field>
+    </record>
+    <record id="test_sd_ctl_r45_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r45" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::conf_and_keymap_are_written_together_or_not_at_all</field>
+    </record>
+    <record id="test_sd_ctl_r45_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r45" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply keeps the keymap.json layout of a model Odoo does not send</field>
     </record>
     <record id="test_sd_ctl_r46_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r46" />
@@ -2282,6 +2626,18 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_config_wire.TestStreamdeckConfigWire.test_only_the_owner_reads_the_config_of_a_workstation</field>
     </record>
+    <record id="test_sd_ctl_r47_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="80" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_cannot_edit_a_locked_layout</field>
+    </record>
+    <record id="test_sd_ctl_r47_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="90" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_edits_a_free_layout_of_their_workstation_only</field>
+    </record>
     <record id="test_sd_ctl_r48_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r48" />
         <field name="sequence" eval="10" />
@@ -2293,5 +2649,761 @@
         <field name="sequence" eval="20" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_unit_state_past_the_deadline_starts_nothing</field>
+    </record>
+    <record id="test_sd_ctl_r48_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r48" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_catalog_that_times_out_is_left_out</field>
+    </record>
+    <record id="test_sd_ctl_r50_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r50" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_valid_file_loads</field>
+    </record>
+    <record id="test_sd_ctl_r50_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r50" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_valid_layout</field>
+    </record>
+    <record id="test_sd_ctl_r50_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r50" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_create_keys_makes_one_line_per_key_of_the_model</field>
+    </record>
+    <record id="test_sd_ctl_r50_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r50" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayoutViews.test_the_editor_lists_keys_with_catalog_choices_and_a_preview</field>
+    </record>
+    <record id="test_sd_ctl_r51_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r51" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_named_plugins_take_their_keys</field>
+    </record>
+    <record id="test_sd_ctl_r51_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r51" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_icon_and_label_replace_the_home_face_only</field>
+    </record>
+    <record id="test_sd_ctl_r51_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r51" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_layout_of_the_deck_s_product_id_is_used</field>
+    </record>
+    <record id="test_sd_ctl_r52_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r52" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_the_file_is_the_literal_config_dir_s_keymap_json</field>
+    </record>
+    <record id="test_sd_ctl_r52_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r52" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_the_default_path_is_keymap_file</field>
+    </record>
+    <record id="test_sd_ctl_r52_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r52" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_rebuilt_kernel_reads_the_file_again</field>
+    </record>
+    <record id="test_sd_ctl_r52_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r52" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply writes keymap.json, 0644, with the revision and the layouts</field>
+    </record>
+    <record id="test_sd_ctl_r53_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_sixteen_models_load</field>
+    </record>
+    <record id="test_sd_ctl_r53_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_product_id_is_four_lowercase_hex_digits</field>
+    </record>
+    <record id="test_sd_ctl_r53_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_the_icon_and_label_limits_admit_what_they_name</field>
+    </record>
+    <record id="test_sd_ctl_r53_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_label_of_sixteen_code_points_is_kept</field>
+    </record>
+    <record id="test_sd_ctl_r53_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_unknown_fields_are_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r53_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::the shared keymap fixtures give their verdict</field>
+    </record>
+    <record id="test_sd_ctl_r53_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a plugin has one home key per layout; tiles and empty repeat</field>
+    </record>
+    <record id="test_sd_ctl_r53_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r53" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract states keymap.json as deck-config.js writes it</field>
+    </record>
+    <record id="test_sd_ctl_r54_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_bad_file_is_empty_with_one_line</field>
+    </record>
+    <record id="test_sd_ctl_r54_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_missing_file_is_empty_and_silent</field>
+    </record>
+    <record id="test_sd_ctl_r54_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_directory_in_place_of_the_file_is_empty</field>
+    </record>
+    <record id="test_sd_ctl_r54_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_valid_file_over_max_bytes_is_refused_for_its_size</field>
+    </record>
+    <record id="test_sd_ctl_r54_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_hostile_entries_are_skipped_one_problem_each</field>
+    </record>
+    <record id="test_sd_ctl_r54_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_duplicate_key_or_plugin_is_skipped</field>
+    </record>
+    <record id="test_sd_ctl_r54_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_more_entries_than_keys_keeps_the_automatic_layout</field>
+    </record>
+    <record id="test_sd_ctl_r54_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_layout_without_a_keys_list_keeps_the_automatic_layout</field>
+    </record>
+    <record id="test_sd_ctl_r54_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="90" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_model_absent_or_no_file_keeps_the_automatic_layout</field>
+    </record>
+    <record id="test_sd_ctl_r54_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="100" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_missing_or_off_plugin_leaves_its_key_empty</field>
+    </record>
+    <record id="test_sd_ctl_r54_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="110" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_capped_keeps_the_journal_short</field>
+    </record>
+    <record id="test_sd_ctl_r54_12" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="120" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_hostile_keymap_still_starts_the_deck</field>
+    </record>
+    <record id="test_sd_ctl_r54_13" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="130" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_control_character_labels_are_skipped_on_the_deck</field>
+    </record>
+    <record id="test_sd_ctl_r54_14" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="140" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_journal_of_a_build_is_capped</field>
+    </record>
+    <record id="test_sd_ctl_r54_15" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="150" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_an_off_plugin_leaves_its_named_key_empty</field>
+    </record>
+    <record id="test_sd_ctl_r54_16" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="160" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_layout_of_another_model_is_ignored</field>
+    </record>
+    <record id="test_sd_ctl_r54_17" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r54" />
+        <field name="sequence" eval="170" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_a_named_plugin_not_loaded_leaves_its_key_empty</field>
+    </record>
+    <record id="test_sd_ctl_r55_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_named_plugins_take_their_keys</field>
+    </record>
+    <record id="test_sd_ctl_r55_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_an_unnamed_plugin_gets_no_home_key</field>
+    </record>
+    <record id="test_sd_ctl_r55_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_fixtures_skip_named_keys</field>
+    </record>
+    <record id="test_sd_ctl_r55_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_the_dashboard_takes_tiles_keys_first_then_free_keys</field>
+    </record>
+    <record id="test_sd_ctl_r55_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_without_a_file_the_layout_is_unchanged</field>
+    </record>
+    <record id="test_sd_ctl_r55_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_the_mic_poll_runs_only_while_its_fixture_holds_a_key</field>
+    </record>
+    <record id="test_sd_ctl_r55_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_unnamed_plugins_are_reported</field>
+    </record>
+    <record id="test_sd_ctl_r55_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_without_a_file_the_layout_is_unchanged</field>
+    </record>
+    <record id="test_sd_ctl_r55_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r55" />
+        <field name="sequence" eval="90" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_plugin_without_a_home_button_is_not_said_to_lack_a_key</field>
+    </record>
+    <record id="test_sd_ctl_r56_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r56" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_icon_and_label_replace_the_home_face_only</field>
+    </record>
+    <record id="test_sd_ctl_r57_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_needs_no_deck_and_no_lock</field>
+    </record>
+    <record id="test_sd_ctl_r57_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_lists_plugins_with_a_home_button_icons_and_models</field>
+    </record>
+    <record id="test_sd_ctl_r57_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_from_the_real_library</field>
+    </record>
+    <record id="test_sd_ctl_r57_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_and_list_plugins_are_exclusive</field>
+    </record>
+    <record id="test_sd_ctl_r57_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_help_names_keymap_json_and_catalog</field>
+    </record>
+    <record id="test_sd_ctl_r57_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_the_catalog_is_valid_for_its_own_layouts</field>
+    </record>
+    <record id="test_sd_ctl_r57_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_id_the_format_cannot_name_is_left_out</field>
+    </record>
+    <record id="test_sd_ctl_r57_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
+    </record>
+    <record id="test_sd_ctl_r58_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r58" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_layout_lock_stops_lower_layouts</field>
+    </record>
+    <record id="test_sd_ctl_r58_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r58" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_key_layouts_go_only_for_connected_models_and_change_the_hash</field>
+    </record>
+    <record id="test_sd_ctl_r59_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r59" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_edits_a_free_layout_of_their_workstation_only</field>
+    </record>
+    <record id="test_sd_ctl_r59_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r59" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_cannot_edit_a_locked_layout</field>
+    </record>
+    <record id="test_sd_ctl_r59_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r59" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_never_moves_a_layout_into_a_lock</field>
+    </record>
+    <record id="test_sd_ctl_r60_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r60" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_key_index_outside_the_model_is_refused</field>
+    </record>
+    <record id="test_sd_ctl_r61_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r61" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_the_preview_warns_of_plugins_without_a_key</field>
+    </record>
+    <record id="test_sd_ctl_r61_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r61" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayoutViews.test_the_editor_lists_keys_with_catalog_choices_and_a_preview</field>
+    </record>
+    <record id="test_sd_ctl_r62_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r62" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_the_catalog_grows_from_reports_and_keeps_old_items</field>
+    </record>
+    <record id="test_sd_ctl_r62_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r62" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_reported_geometry_never_changes_a_known_model</field>
+    </record>
+    <record id="test_sd_ctl_r62_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r62" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_create_keys_makes_one_line_per_key_of_the_model</field>
+    </record>
+    <record id="test_sd_ctl_r63_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r63" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_create_keys_makes_one_line_per_key_of_the_model</field>
+    </record>
+    <record id="test_sd_ctl_r63_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r63" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayoutViews.test_the_editor_lists_keys_with_catalog_choices_and_a_preview</field>
+    </record>
+    <record id="test_sd_ctl_r63_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r63" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayoutViews.test_the_configuration_tab_shows_the_layouts_of_connected_decks</field>
+    </record>
+    <record id="test_sd_ctl_r63_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r63" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayoutViews.test_every_key_layout_term_has_its_fr_CA_text</field>
+    </record>
+    <record id="test_sd_ctl_r64_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r64" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_key_layouts_go_only_for_connected_models_and_change_the_hash</field>
+    </record>
+    <record id="test_sd_ctl_r64_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r64" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_layouts_go_within_the_workstation_s_own_catalog</field>
+    </record>
+    <record id="test_sd_ctl_r64_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r64" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_plugin_turned_off_is_sent_as_a_black_key</field>
+    </record>
+    <record id="test_sd_ctl_r64_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r64" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_the_layout_hash_is_the_workstation_s</field>
+    </record>
+    <record id="test_sd_ctl_r64_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r64" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a valid key_layouts comes back in the settings as sent</field>
+    </record>
+    <record id="test_sd_ctl_r64_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r64" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::key_layouts is the fifth wire key, after the lines of the conf</field>
+    </record>
+    <record id="test_sd_ctl_r65_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_free_local_layout_is_adopted_a_locked_one_reoffered</field>
+    </record>
+    <record id="test_sd_ctl_r65_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_layout_changed_in_odoo_is_offered_not_taken_from_the_file</field>
+    </record>
+    <record id="test_sd_ctl_r65_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_pending_layout_is_no_drift_at_each_report</field>
+    </record>
+    <record id="test_sd_ctl_r65_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_first_pilot_asks_about_a_free_layout_of_the_file</field>
+    </record>
+    <record id="test_sd_ctl_r65_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::layoutHashes reads keymap.json, null when it holds no format 1</field>
+    </record>
+    <record id="test_sd_ctl_r65_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::readLocal adds the layout hashes to the values of the conf</field>
+    </record>
+    <record id="test_sd_ctl_r65_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::the layout hash is Python's json.dumps canonical form, sha256</field>
+    </record>
+    <record id="test_sd_ctl_r65_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a layout nested past the bound hashes as null, never throws</field>
+    </record>
+    <record id="test_sd_ctl_r65_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the pilot body carries the hash of each layout of keymap.json</field>
+    </record>
+    <record id="test_sd_ctl_r65_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a keymap.json nested too deep for a stack still lets reports go</field>
+    </record>
+    <record id="test_sd_ctl_r65_11" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r65" />
+        <field name="sequence" eval="110" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the pilot body carries a hash per model of keymap.json, or null</field>
+    </record>
+    <record id="test_sd_ctl_r66_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r66" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.4 since Odoo lays out the home keys</field>
+    </record>
+    <record id="test_sd_ctl_r66_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r66" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LaVersionInscrite::test_the_recorded_contract_covers_the_key_layouts</field>
+    </record>
+    <record id="test_sd_ctl_r66_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r66" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_key_layouts_go_only_for_connected_models_and_change_the_hash</field>
+    </record>
+    <record id="test_sd_ctl_r67_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_malformed_catalog_is_a_bad_request</field>
+    </record>
+    <record id="test_sd_ctl_r67_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_malformed_current_key_layouts_is_a_bad_request</field>
+    </record>
+    <record id="test_sd_ctl_r67_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_a_refusal_of_the_layouts_is_recorded</field>
+    </record>
+    <record id="test_sd_ctl_r67_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::the state carries the deck catalog up to 32 KiB, else none</field>
+    </record>
+    <record id="test_sd_ctl_r67_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a catalog that does not parse, or past 32 KiB, is left out</field>
+    </record>
+    <record id="test_sd_ctl_r67_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::catalogFrom keeps what the extension can check, else null</field>
+    </record>
+    <record id="test_sd_ctl_r67_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r67" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the inventory section states the key layouts on the wire</field>
+    </record>
+    <record id="test_sd_ctl_r68_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r68" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the catalog is the deck program's --catalog of the checkout</field>
+    </record>
+    <record id="test_sd_ctl_r68_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r68" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the_catalog_is_read_once_per_commit</field>
+    </record>
+    <record id="test_sd_ctl_r68_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r68" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_catalog_that_times_out_is_left_out</field>
+    </record>
+    <record id="test_sd_ctl_r68_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r68" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract states the catalog the deck program prints</field>
+    </record>
+    <record id="test_sd_ctl_r69_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::every_hostile_layout_refuses_invalid_key_layouts</field>
+    </record>
+    <record id="test_sd_ctl_r69_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::a_layout_action_outside_the_catalog_refuses</field>
+    </record>
+    <record id="test_sd_ctl_r69_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a_layout_action_outside_the_catalog_refuses</field>
+    </record>
+    <record id="test_sd_ctl_r69_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a layout the catalog does not allow refuses the revision at once</field>
+    </record>
+    <record id="test_sd_ctl_r69_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::the catalog is checked again at the click</field>
+    </record>
+    <record id="test_sd_ctl_r69_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a layout refused by a catalog is reconsidered with the next one</field>
+    </record>
+    <record id="test_sd_ctl_r69_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r69" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a revision applied is not refused by a catalog read later</field>
+    </record>
+    <record id="test_sd_ctl_r70_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="10" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply writes keymap.json, 0644, with the revision and the layouts</field>
+    </record>
+    <record id="test_sd_ctl_r70_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="20" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::apply keeps the keymap.json layout of a model Odoo does not send</field>
+    </record>
+    <record id="test_sd_ctl_r70_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="30" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a keymap.json that cannot be read is not written over</field>
+    </record>
+    <record id="test_sd_ctl_r70_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="40" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a keymap.json that holds the layouts is applied silently</field>
+    </record>
+    <record id="test_sd_ctl_r70_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="50" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::one_restart_for_conf_and_keymap</field>
+    </record>
+    <record id="test_sd_ctl_r70_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="60" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::conf_and_keymap_are_written_together_or_not_at_all</field>
+    </record>
+    <record id="test_sd_ctl_r70_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="70" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/inventory-service.test.js::a click rewrites only the file whose values change</field>
+    </record>
+    <record id="test_sd_ctl_r70_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="80" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::keymapText writes format 1, the revision and the layouts</field>
+    </record>
+    <record id="test_sd_ctl_r70_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="90" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::keymapText keeps the layouts of the models Odoo does not send</field>
+    </record>
+    <record id="test_sd_ctl_r70_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r70" />
+        <field name="sequence" eval="100" />
+        <field name="kind">node_test</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-config.test.js::changedKeys compares the layouts by their hashes</field>
+    </record>
+    <record id="test_sd_ctl_r71_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDesDispositions::test_the_keymap_format_matches_the_loader_constants</field>
+    </record>
+    <record id="test_sd_ctl_r71_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDesDispositions::test_the_loader_refuses_no_label_the_contract_admits</field>
+    </record>
+    <record id="test_sd_ctl_r71_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDesDispositions::test_the_catalog_has_the_shape_the_contract_states</field>
+    </record>
+    <record id="test_sd_ctl_r71_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDesDispositions::test_the_loader_gives_each_keymap_fixture_its_stated_verdict</field>
+    </record>
+    <record id="test_sd_ctl_r71_5" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="50" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDesDispositions::test_the_deck_skips_nothing_the_extension_writes</field>
+    </record>
+    <record id="test_sd_ctl_r71_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="60" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeContratDesDispositions::test_an_off_plugin_turned_on_without_a_home_key_gets_a_black_key</field>
+    </record>
+    <record id="test_sd_ctl_r71_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="70" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeVerdictDuChargeur::test_the_loader_lays_out_the_entries_as_sent</field>
+    </record>
+    <record id="test_sd_ctl_r71_8" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r71" />
+        <field name="sequence" eval="80" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_home_pilot.py::LeVerdictDuChargeur::test_a_loader_that_changes_an_entry_is_not_as_sent</field>
     </record>
 </odoo>

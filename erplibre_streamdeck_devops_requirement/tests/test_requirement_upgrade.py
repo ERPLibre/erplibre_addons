@@ -11,7 +11,9 @@ from odoo.tools.misc import file_path
 MODULE = "erplibre_streamdeck_devops_requirement"
 MIGRATION = "%s/migrations/18.0.1.2.0/post-migrate.py" % MODULE
 MIGRATION_1_3 = "%s/migrations/18.0.1.3.0/post-migrate.py" % MODULE
+MIGRATION_1_4 = "%s/migrations/18.0.1.4.0/post-migrate.py" % MODULE
 INVENTORY = "%s/data/requirement_inventory.xml" % MODULE
+CONTROL = "%s/data/requirement_control.xml" % MODULE
 # Une référence de preuve à un test qui n'existe pas, comme celle qu'une
 # base du lot 1 garde d'un test renommé depuis.
 GONE = (
@@ -23,6 +25,12 @@ GONE = (
 CONTRACT_1_2 = (
     "erplibre-home-gnome-extension:test/unit/contract.test.js::"
     "the contract is at 1.2 since the extension reports to Odoo"
+)
+# Le nom qu'il portait jusqu'au contrat 1.4, qu'une base de la version
+# 18.0.1.3.0 cite encore.
+CONTRACT_1_3 = (
+    "erplibre-home-gnome-extension:test/unit/contract.test.js::"
+    "the contract is at 1.3 since Odoo pilots the deck settings"
 )
 
 
@@ -47,8 +55,8 @@ class TestRequirementUpgrade(TransactionCase):
         script.migrate(self.env.cr, version)
 
     @staticmethod
-    def _in_file(xmlid, field):
-        [node] = etree.parse(file_path(INVENTORY)).xpath(
+    def _in_file(xmlid, field, data=INVENTORY):
+        [node] = etree.parse(file_path(data)).xpath(
             "//record[@id=$xmlid]/field[@name=$field]",
             xmlid=xmlid,
             field=field,
@@ -123,3 +131,37 @@ class TestRequirementUpgrade(TransactionCase):
             requirement.achievement,
             self._in_file("req_sd_inv_r24", "achievement"),
         )
+
+    def test_an_upgrade_to_1_4_follows_the_renamed_contract_test(self):
+        # Le contrat 1.4 renomme le test qui prouve SD-INV-R24 et
+        # SD-CTL-R27 ; la disposition des touches fait mentir ce que
+        # SD-CTL-R27 et SD-CTL-R43 disent de la version et des fichiers.
+        proofs = {
+            "test_sd_inv_r24_1": INVENTORY,
+            "test_sd_ctl_r27_1": CONTROL,
+        }
+        for xmlid in proofs:
+            self.env.ref("%s.%s" % (MODULE, xmlid)).write(
+                {"reference": CONTRACT_1_3}
+            )
+        requirements = ("req_sd_ctl_r27", "req_sd_ctl_r43")
+        for xmlid in requirements:
+            self.env.ref("%s.%s" % (MODULE, xmlid)).write(
+                {"achievement": "An outdated way"}
+            )
+        self._migrate("18.0.1.3.0", MIGRATION_1_4)
+        self.env.invalidate_all()
+        for xmlid, data in proofs.items():
+            with self.subTest(xmlid=xmlid):
+                reference = self._in_file(xmlid, "reference", data)
+                self.assertNotEqual(reference, CONTRACT_1_3)
+                self.assertEqual(
+                    self.env.ref("%s.%s" % (MODULE, xmlid)).reference,
+                    reference,
+                )
+        for xmlid in requirements:
+            with self.subTest(xmlid=xmlid):
+                self.assertEqual(
+                    self.env.ref("%s.%s" % (MODULE, xmlid)).achievement,
+                    self._in_file(xmlid, "achievement", CONTROL),
+                )
