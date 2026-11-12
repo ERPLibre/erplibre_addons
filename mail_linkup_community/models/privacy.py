@@ -1,32 +1,19 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-"""What a restricted member reads of the other people (LU-F-082 RM2, RM3,
-LU-F-112 RM3, LU-NF-009, Q-27).
+"""The photo of the other members, for a restricted member (LU-F-082 RM3,
+Q-27).
 
-The contact details of another person, address, phone and login, are
-never given to a member, and never matched by their searches. The photo of
-another member reaches only the members with whom they share an ``active``
-link; the others see their pseudonym. The values are blanked in what a
-reading returns, after the reading, so the cache of the server keeps them.
+The photo of another member reaches only the members with whom they share
+an ``active`` link; the others see their pseudonym. The values are blanked
+in what a reading returns, after the reading, so the cache of the server
+keeps them. The contact details of the others are closed by the module of
+the reflections (``mail_linkup_reflet.models.privacy``).
 """
 
-from odoo.addons.mail_linkup_reflet.models.res_users import (
-    ADMIN_GROUP,
-    MEMBER_GROUP,
+from odoo.addons.mail_linkup_reflet.models.privacy import (  # noqa: F401
+    blank,
+    contact_closed,
 )
 
-# Contact details of a partner, and of a user through its partner.
-CONTACT_FIELDS = frozenset(
-    {
-        "email",
-        "email_normalized",
-        "email_formatted",
-        "phone",
-        "mobile",
-        "phone_sanitized",
-        "phone_mobile_search",
-    }
-)
-USER_CONTACT_FIELDS = CONTACT_FIELDS | {"login"}
 # The photo, in every size.
 IMAGE_FIELDS = frozenset(
     {
@@ -35,20 +22,6 @@ IMAGE_FIELDS = frozenset(
         for size in (1920, 1024, 512, 256, 128)
     }
 )
-
-
-def contact_closed(env):
-    """Whether the current user reads the contact details of themself only:
-    a restricted member who is not a LinkUp administrator. ``sudo`` does not
-    change it: the Discuss Store reads partners under ``sudo`` for the
-    current user."""
-    user = env.user
-    if user._is_public() or not user._is_internal():
-        return False
-    return user._linkup_has_group_id(MEMBER_GROUP) and not (
-        user._linkup_has_group_id(ADMIN_GROUP)
-        or user._linkup_has_group_id("base.group_system")
-    )
 
 
 def linked_user_ids(env):
@@ -69,45 +42,23 @@ def linked_user_ids(env):
     return set((links.user_a_id | links.user_b_id).ids) - {uid}
 
 
-def blank(field):
-    return [] if field.type in ("one2many", "many2many") else False
-
-
-def mask_rows(records, rows, fnames, contact_fields, own_id, linked):
-    """Blank, in ``rows`` read from ``records``, the contact fields of every
-    row but ``own_id``, and the photo of every row neither ``own_id`` nor in
-    the ids that ``linked()`` returns.
+def mask_images(records, rows, fnames, own_id, linked):
+    """Blank, in ``rows`` read from ``records``, the photo of every row
+    neither ``own_id`` nor in the ids that ``linked()`` returns.
 
     ``linked`` is called only when a photo is read: the readings of the
     Discuss Store, which ask for no photo, then run no query of the links
     of the reader, whose number grows with their contacts.
     """
-    contact = contact_fields.intersection(fnames)
     images = IMAGE_FIELDS.intersection(fnames)
-    if not contact and not images:
+    if not images:
         return rows
-    linked_ids = linked() if images else set()
+    linked_ids = linked()
     for vals in rows:
         row_id = vals.get("id")
-        if row_id == own_id:
+        if row_id == own_id or row_id in linked_ids:
             continue
-        for fname in contact:
+        for fname in images:
             if fname in vals:
                 vals[fname] = blank(records._fields[fname])
-        if row_id not in linked_ids:
-            for fname in images:
-                if fname in vals:
-                    vals[fname] = blank(records._fields[fname])
     return rows
-
-
-def search_closed(model, fname, contact_fields):
-    """Whether a condition of a search on ``fname`` of ``model`` must match
-    nothing: a contact field, searched by a restricted member outside
-    ``sudo``. The conditions reach here from any domain, the ones that
-    ``display_name`` or a path builds included."""
-    return (
-        fname in contact_fields
-        and not model.env.su
-        and contact_closed(model.env)
-    )

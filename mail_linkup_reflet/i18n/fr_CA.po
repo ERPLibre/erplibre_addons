@@ -280,6 +280,16 @@ msgstr ""
 
 #. module: mail_linkup_reflet
 #. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid ""
+"A LinkUp member enters a channel when a LinkUp administrator or a linked "
+"member adds them."
+msgstr ""
+"Un membre LinkUp entre dans un canal quand un administrateur LinkUp ou un "
+"membre lié l'y ajoute."
+
+#. module: mail_linkup_reflet
+#. odoo-python
 #: code:addons/mail_linkup_reflet/models/mail_notification.py:0
 msgid "A LinkUp member notifies nobody outside a conversation."
 msgstr "Un membre LinkUp n'avise personne hors d'une conversation."

@@ -19,6 +19,7 @@ from . import (
     mail_message,
     mail_notification,
     res_config_settings,
+    res_partner,
     res_users,
     res_users_settings,
 )

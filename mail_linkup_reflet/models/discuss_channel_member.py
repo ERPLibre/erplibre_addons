@@ -13,8 +13,49 @@ class DiscussChannelMember(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        self._linkup_check_self_join(vals_list)
         self._linkup_check_partners_in_scope(vals_list)
         return super().create(vals_list)
+
+    @api.model
+    def _linkup_check_self_join(self, vals_list):
+        """Keep a member from joining a channel by themself (LU-F-112 RM1).
+
+        A member who is not a LinkUp administrator reads a channel
+        (``channel_type = 'channel'``) only once they belong to it
+        (``security/linkup_rules.xml``): joining it by themself would open
+        them its member list, whoever its authorized group. They enter it
+        when a LinkUp administrator adds them, or a member of it with whom
+        they share an ``active`` link (``_linkup_check_partners_linked``).
+        A thread of a channel stays open to the members of that channel.
+        The check reads the real user, ``sudo`` included: the invitation
+        link of a channel (``/chat/<id>/<token>``) joins the user under
+        ``sudo``.
+        """
+        user = self.env.user
+        if not user._linkup_is_plain_member():
+            return
+        own = user.partner_id.id
+        channel_ids = {
+            vals["channel_id"]
+            for vals in vals_list
+            if vals.get("partner_id") == own and vals.get("channel_id")
+        }
+        # sudo: discuss.channel - the type and the parent of the targets
+        for channel in (
+            self.env["discuss.channel"].sudo().browse(list(channel_ids))
+        ):
+            if channel.channel_type != "channel":
+                continue
+            parent = channel.parent_channel_id
+            if parent and own in parent.channel_member_ids.partner_id.ids:
+                continue
+            raise AccessError(
+                _(
+                    "A LinkUp member enters a channel when a LinkUp"
+                    " administrator or a linked member adds them."
+                )
+            )
 
     @api.model
     def _linkup_check_partners_in_scope(self, vals_list):
@@ -45,10 +86,12 @@ class DiscussChannelMember(models.Model):
         if not partner_ids:
             return
         user._linkup_check_not_suspended()
+        # The active test stays on: an archived partner, and the users of
+        # an archived account in the paths of the scope, are out of it.
         visible = (
             self.env["res.partner"]
             .with_user(user)
-            .with_context(active_test=False)
+            .with_context(active_test=True)
             .search([("id", "in", list(partner_ids))])
         )
         if set(visible.ids) != partner_ids:
@@ -71,7 +114,8 @@ class DiscussChannelMember(models.Model):
         to a group or a channel only the people they have an ``active`` link
         with; a ``blocked`` link is never ``active``. A direct conversation
         is opened by its own member only: it holds them, either already or
-        in the same creation.
+        in the same creation. The link of an archived account, banned or
+        deleted, opens nothing.
         """
         user = self.env.user
         Link = self.env["linkup.link"].sudo()
@@ -108,7 +152,7 @@ class DiscussChannelMember(models.Model):
             if not all(
                 any(
                     Link._is_active_between(user, other)
-                    for other in partner.user_ids
+                    for other in partner.user_ids.filtered("active")
                 )
                 for partner in partners
             ):

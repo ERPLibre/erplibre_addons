@@ -56,18 +56,41 @@ Covered:
 * A new channel created without an authorized group is kept to the LinkUp
   administrators (``_compute_group_public_id``, LU-F-063 RM2); an
   animation channel names its group, as ``channel_create`` does.
+* A channel (``channel_type = 'channel'``) is read by its members only,
+  whatever its authorized group, ``base.group_user`` and the member group
+  included (LU-F-112 RM1, ``tests/test_channel_isolation.py``): a member
+  outside it reads neither the channel, nor its member list, nor its
+  messages and their authors, through the ORM or the routes of Discuss.
+  A thread is read by the members of its channel. Two global rules hold
+  it, on ``discuss.channel`` and ``discuss.channel.member``; the native
+  rules are group rules, joined by OR, which a group rule could not
+  narrow. A member does not join a channel by themself, nor through its
+  invitation link: a LinkUp administrator adds them, or a member of it
+  with whom they share an ``active`` link. Direct conversations, groups
+  and live chats keep the native rule, their members only.
+* What a member reads of the others (LU-F-082 RM2, CA1, LU-F-112 RM3, CA3,
+  LU-NF-009, ``models/privacy.py``, ``tests/test_contact_privacy.py``):
+  the address, the phone and the login of any other user or partner are
+  blanked in every reading, and never matched by their searches, those of
+  Discuss included (``name_search``, ``im_search``, the mention
+  suggestions, ``search_for_channel_invite``). The Discuss Store never
+  carries the address of a member, whoever reads, nor any address to a
+  member; the address of the author of a message (``email_from``,
+  ``reply_to``) is blanked and never searched the same way, and a display
+  name holds no address, whatever ``show_email`` says. The values are
+  blanked after the reading rather than by ``groups=``, which would refuse
+  the whole reading of the Discuss screens that ask for them. LinkUp
+  administrators and system administrators keep them.
+* An archived account, banned or deleted, opens nothing to a member
+  (``tests/test_archived_accounts.py``): its link opens no new direct
+  conversation and no strict group, it is added to no group, and its
+  direct conversation stays readable but takes no post, reaction or call,
+  with ``linkup.unavailable``.
 
 Not covered yet:
 
-* A channel open to ``base.group_user`` or to the member group is readable
-  by every member, and its member list and message authors are served
-  through ``sudo``: a member sees its people without joining it, and joins
-  it by themself.
 * Moderators read like members; the moderation methods read the reported
   people through ``sudo``.
-* Within the scope, ``login``, ``email`` and ``phone`` of other members stay
-  readable, and the searches still match on email. Field ``groups=`` and the
-  removal of the email search (LU-F-112 RM3, LU-NF-009) remain to do.
 * The tours exercise the sending, the validation and the exact answer, a
   precision with its guess, and the strict start rule
   (``linkup_reflet_send_tour``, ``linkup_reflet_confirm_tour``,
@@ -684,6 +707,18 @@ root of the ERPLibre checkout, with the Python of the Odoo environment::
 * ``mail_linkup_network/tests/test_network_performance.py`` keeps the
   number of queries of each screen from growing with the contacts of the
   member, and under a ceiling.
+
+Choices
+=======
+
+Applied by default, to confirm:
+
+* A channel opened to the member group is not a directory: a member joins
+  it when a LinkUp administrator, or a linked member of it, adds them, and
+  never by themself. The specification lets the administrator choose the
+  group of an animation channel (LU-F-063 RM2) without saying whether a
+  member joins it alone; LU-F-112 RM1 (no public directory) and LU-NF-012
+  (the most private setting by default) decide it.
 
 Status
 ======

@@ -113,17 +113,14 @@ Profile
   ``code`` by default) is in ``SELF_READABLE_FIELDS`` and
   ``SELF_WRITEABLE_FIELDS``; the suspension, the verification, the age and
   the residence are not (LU-F-082 CA2).
-* What a restricted member reads of the others (LU-F-082 RM2, RM3, CA1,
-  LU-F-112 RM3, CA3, LU-NF-009): the address, the phone and the login of
-  any other user or partner are blanked in every reading, and never
-  matched by their searches, those of Discuss included; the Discuss Store
-  never carries the address of a member. The address of the author of a
-  message (``email_from``, ``reply_to``) is blanked and never searched the
-  same way, and a display name holds no address, whatever ``show_email``
-  says. The photo of another member reaches only the members of an
-  ``active`` link: the readings blank it, and ``/web/image`` serves the
-  placeholder (``ir.binary``). A reading reads the links of the member
-  only when it holds a photo, which those of the Discuss Store do not.
+* What a restricted member reads of the others (LU-F-082 RM3, Q-27): the
+  photo of another member reaches only the members of an ``active`` link:
+  the readings blank it, and ``/web/image`` serves the placeholder
+  (``ir.binary``). A reading reads the links of the member only when it
+  holds a photo, which those of the Discuss Store do not. The address,
+  the phone and the login of the others are closed by
+  ``mail_linkup_reflet`` (LU-F-082 RM2, CA1, LU-F-112 RM3, CA3,
+  LU-NF-009).
 
 Discovery and NewLink
 =====================

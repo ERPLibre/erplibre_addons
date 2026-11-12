@@ -22,7 +22,7 @@ from odoo.addons.mail_linkup_reflet.models.res_users import (
 )
 from odoo.exceptions import UserError
 from odoo.http import request
-from odoo.tools import SQL, email_normalize, email_split
+from odoo.tools import email_normalize, email_split
 from odoo.tools.image import base64_to_image
 
 from .. import tools
@@ -1128,31 +1128,23 @@ class ResUsers(models.Model):
         return res
 
     # ------------------------------------------------------------------
-    # Reading of the other users (LU-NF-009, Q-27)
+    # Photo of the other users (Q-27)
     # ------------------------------------------------------------------
 
     def _read_format(self, fnames, load="_classic_read"):
-        """Blank the login and the contact details of the other users, and
-        the photo of those not linked, in what a restricted member reads
-        (LU-F-082 CA1, LU-F-112 CA3)."""
+        """Blank the photo of the users not linked to a restricted member in
+        what they read; ``mail_linkup_reflet`` blanks the login and the
+        contact details (LU-F-082 RM3)."""
         result = super()._read_format(fnames, load)
         if privacy.contact_closed(self.env):
-            privacy.mask_rows(
+            privacy.mask_images(
                 self,
                 result,
                 fnames,
-                privacy.USER_CONTACT_FIELDS,
                 self.env.uid,
                 lambda: privacy.linked_user_ids(self.env),
             )
         return result
-
-    def _condition_to_sql(self, alias, fname, operator, value, query):
-        """A restricted member searches no user by their login or contact
-        details (LU-F-112 CA3)."""
-        if privacy.search_closed(self, fname, privacy.USER_CONTACT_FIELDS):
-            return SQL("FALSE")
-        return super()._condition_to_sql(alias, fname, operator, value, query)
 
     # ------------------------------------------------------------------
     # Web client

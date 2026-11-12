@@ -5,10 +5,11 @@ from odoo.addons.auth_signup.models.res_partner import SignupError
 from odoo.addons.base.models.res_users import is_reified_group
 from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError, UserError, ValidationError
-from odoo.tools import email_normalize
+from odoo.tools import SQL, email_normalize
 
 from ..client_context import server_context
 from ..exceptions import LinkupError
+from . import privacy
 
 MEMBER_GROUP = "mail_linkup_reflet.group_linkup_member"
 ADMIN_GROUP = "mail_linkup_reflet.group_linkup_admin"
@@ -68,6 +69,22 @@ class ResUsers(models.Model):
         return self._linkup_has_group_id(
             MEMBER_GROUP
         ) and not self._linkup_has_group_id("base.group_system")
+
+    def _linkup_is_plain_member(self):
+        """A restricted member who is not a LinkUp administrator either.
+
+        Such a member reads the contact details of themself only
+        (``privacy``), and the channels they belong to only
+        (``security/linkup_rules.xml``); LinkUp administrators and system
+        administrators read them all.
+        """
+        self.ensure_one()
+        if self._is_public() or not self._is_internal():
+            return False
+        return self._linkup_has_group_id(MEMBER_GROUP) and not (
+            self._linkup_has_group_id(ADMIN_GROUP)
+            or self._linkup_has_group_id("base.group_system")
+        )
 
     # ------------------------------------------------------------------
     # Suspension (LU-F-115 RM4)
@@ -296,6 +313,31 @@ class ResUsers(models.Model):
             raise SignupError(str(error)) from error
         invitation._linkup_consume(user)
         return user.login, values.get("password")
+
+    # ------------------------------------------------------------------
+    # Reading of the other users (LU-NF-009, LU-F-112 CA3)
+    # ------------------------------------------------------------------
+
+    def _read_format(self, fnames, load="_classic_read"):
+        """Blank the login and the contact details of the other users in
+        what a restricted member reads (LU-F-082 CA1, LU-F-112 CA3)."""
+        result = super()._read_format(fnames, load)
+        if privacy.contact_closed(self.env):
+            privacy.mask_contact_rows(
+                self,
+                result,
+                fnames,
+                privacy.USER_CONTACT_FIELDS,
+                self.env.uid,
+            )
+        return result
+
+    def _condition_to_sql(self, alias, fname, operator, value, query):
+        """A restricted member searches no user by their login or contact
+        details (LU-F-112 CA3)."""
+        if privacy.search_closed(self, fname, privacy.USER_CONTACT_FIELDS):
+            return SQL("FALSE")
+        return super()._condition_to_sql(alias, fname, operator, value, query)
 
     @api.constrains("groups_id")
     def _check_linkup_member_technical_features(self):

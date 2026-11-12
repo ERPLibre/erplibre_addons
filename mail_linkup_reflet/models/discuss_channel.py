@@ -92,8 +92,8 @@ class DiscussChannel(models.Model):
         when one party is not a restricted LinkUp member (a system
         administrator, a user outside LinkUp), so that both parties read
         the same answer. In a group or a channel, it holds when ``user``
-        has an active link with another member of the conversation, or is
-        not a restricted member.
+        has an active link with another member of the conversation whose
+        account is not archived, or is not a restricted member.
         """
         self.ensure_one()
         # sudo: discuss.channel.member - the parties of the conversation
@@ -118,7 +118,9 @@ class DiscussChannel(models.Model):
             )
         if not user._linkup_is_restricted_member():
             return True
-        others = users - user
+        # The link of an archived account opens no group: the conversation
+        # goes on with the others only.
+        others = (users - user).filtered("active")
         if not others:
             return False
         return bool(
@@ -224,6 +226,20 @@ class DiscussChannel(models.Model):
             == "blocked"
         )
 
+    def _linkup_pair_archived(self):
+        """Tell whether the conversation is a direct conversation whose
+        other party holds an archived account, banned or deleted."""
+        self.ensure_one()
+        if self.channel_type != "chat":
+            return False
+        # sudo: discuss.channel.member - the parties of the conversation
+        users = (
+            self.sudo()
+            .channel_member_ids.partner_id.with_context(active_test=False)
+            .user_ids.filtered(lambda user: not user.share)
+        )
+        return len(users) == 2 and not all(users.mapped("active"))
+
     def _linkup_unavailable(self):
         return LinkupError(
             "linkup.unavailable", _("This conversation is unavailable.")
@@ -235,17 +251,22 @@ class DiscussChannel(models.Model):
 
         A suspended member posts, reacts and calls nowhere. In the direct
         conversation of a ``blocked`` pair, nobody does: the refusal is
-        ``linkup.unavailable``, as for a conversation whose other party no
-        longer exists. A ``notification`` whose text the server writes
-        passes, as for the start rule.
+        ``linkup.unavailable``. A restricted member gets the same refusal
+        in a direct conversation whose other party holds an archived
+        account, the code of a deleted account. A ``notification`` whose
+        text the server writes passes, as for the start rule.
         """
         if message_type == "notification" and (
             self.env.su or in_server_notification()
         ):
             return
-        self.env.user._linkup_check_not_suspended()
+        user = self.env.user
+        user._linkup_check_not_suspended()
+        restricted = user._linkup_is_restricted_member()
         for channel in self:
-            if channel._linkup_pair_blocked():
+            if channel._linkup_pair_blocked() or (
+                restricted and channel._linkup_pair_archived()
+            ):
                 raise channel._linkup_unavailable()
 
     def _linkup_drop_blocked_partners(self, partner_ids):
@@ -475,10 +496,10 @@ class DiscussChannel(models.Model):
 
         A member creates the direct conversation of a pair with an
         ``active`` link only, and so never with a member a block separates
-        from them. Opening again a direct conversation the member already
-        belongs to adds nobody and stays allowed. The server opens the
-        others itself, to carry a reflection, inside
-        ``authorization.linkup_post``. Every refusal is the same, whatever
+        from them, nor with an archived account. Opening again a direct
+        conversation the member already belongs to adds nobody and stays
+        allowed. The server opens the others itself, to carry a
+        reflection, inside ``authorization.linkup_post``. Every refusal is the same, whatever
         the reason, so that it tells nothing of a block. ``sudo`` calls are
         the server's own and are not checked here; the creation of the
         members still is (``discuss.channel.member``).
@@ -512,7 +533,9 @@ class DiscussChannel(models.Model):
         Link = self.env["linkup.link"]
         if any(
             Link._is_active_between(user, other)
-            for other in partner.user_ids.filtered(lambda u: not u.share)
+            for other in partner.user_ids.filtered(
+                lambda u: u.active and not u.share
+            )
         ):
             return
         # sudo: discuss.channel.member - the chats the member belongs to

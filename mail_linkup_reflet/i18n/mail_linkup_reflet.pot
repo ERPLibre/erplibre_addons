@@ -243,6 +243,14 @@ msgstr ""
 
 #. module: mail_linkup_reflet
 #. odoo-python
+#: code:addons/mail_linkup_reflet/models/discuss_channel_member.py:0
+msgid ""
+"A LinkUp member enters a channel when a LinkUp administrator or a linked "
+"member adds them."
+msgstr ""
+
+#. module: mail_linkup_reflet
+#. odoo-python
 #: code:addons/mail_linkup_reflet/models/mail_notification.py:0
 msgid "A LinkUp member notifies nobody outside a conversation."
 msgstr ""

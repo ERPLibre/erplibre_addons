@@ -77,6 +77,48 @@
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
+    <!-- Channels: a member who is not a LinkUp administrator reads a
+         channel (channel_type channel) only once they belong to it, or to
+         the channel a thread belongs to (LU-F-112 RM1). A channel opened to
+         base.group_user or to the member group would otherwise give every
+         member its name, its messages with their authors, and its member
+         list, all of which Discuss serves once the channel is readable.
+         Direct conversations, groups and live chats keep the native rule:
+         their members only.
+
+         The native rules are group rules, joined by OR with any other
+         group rule: these are global, joined by AND, and leave every other
+         user unchanged through the condition on the reader. The domain
+         holds the partner id of the reader only, so joining or leaving a
+         channel changes the reading at once. The creation of a member
+         stays to discuss.channel.member, which refuses that a member joins
+         a channel by themself. -->
+    <record id="rule_discuss_channel_linkup_member" model="ir.rule">
+        <field name="name">LinkUp member: channels they belong to</field>
+        <field name="model_id" ref="mail.model_discuss_channel" />
+        <field name="domain_force">[(1, '=', 1)] if not user._linkup_is_plain_member() else [
+            '|', '|',
+            ('channel_type', '!=', 'channel'),
+            ('channel_member_ids.partner_id', '=', user.partner_id.id),
+            ('parent_channel_id.channel_member_ids.partner_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="perm_create" eval="False" />
+    </record>
+
+    <record id="rule_discuss_channel_member_linkup_member" model="ir.rule">
+        <field name="name">LinkUp member: members of the channels they belong to</field>
+        <field name="model_id" ref="mail.model_discuss_channel_member" />
+        <field name="domain_force">[(1, '=', 1)] if not user._linkup_is_plain_member() else [
+            '|', '|',
+            ('channel_id.channel_type', '!=', 'channel'),
+            ('channel_id.channel_member_ids.partner_id', '=', user.partner_id.id),
+            ('channel_id.parent_channel_id.channel_member_ids.partner_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="perm_create" eval="False" />
+        <field name="perm_write" eval="False" />
+        <field name="perm_unlink" eval="False" />
+    </record>
+
     <!-- Reflections: a member reads those they wrote, and those addressed
          to them once sent. A withdrawn reflection leaves the recipient's
          reading: its content is no longer theirs to see. A phantom one,

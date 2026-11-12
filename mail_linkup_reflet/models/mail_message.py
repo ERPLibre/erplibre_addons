@@ -3,8 +3,10 @@
 from odoo import _, api, fields, models
 from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError
+from odoo.tools import SQL
 
 from ..authorization import in_channel_post
+from . import privacy
 
 # Fields of a carrier message that only the server writes: its content, and
 # what ties it to its conversation and to its author.
@@ -70,6 +72,47 @@ class MailMessage(models.Model):
                 reflets |= reflet
         if reflets and kwargs.get("for_current_user"):
             reflets._linkup_private_to_store(store, self.env.user)
+
+    def _author_to_store(self, store: Store):
+        """Leave out of the Store the address of the author of a message,
+        as ``res.partner._to_store`` leaves it out of the partner: for
+        every message a restricted member reads, and for the messages of a
+        restricted member whoever reads. A client draws the author of a
+        message from its partner."""
+        super()._author_to_store(store)
+        closed = privacy.contact_closed(self.env)
+        members = {}
+        for message in self:
+            author = message.sudo().author_id
+            if author and author.id not in members:
+                members[author.id] = author._linkup_is_member_partner()
+            if closed or members.get(author.id):
+                store.add(message, {"email_from": False})
+
+    def _read_format(self, fnames, load="_classic_read"):
+        """Blank the address of the author in the messages a restricted
+        member reads, but in their own messages."""
+        result = super()._read_format(fnames, load)
+        closed = privacy.AUTHOR_CONTACT_FIELDS.intersection(fnames)
+        if closed and privacy.contact_closed(self.env):
+            own = self.env.user.partner_id.id
+            authors = {
+                message.id: message.author_id.id for message in self.sudo()
+            }
+            for vals in result:
+                if authors.get(vals.get("id")) == own:
+                    continue
+                for fname in closed:
+                    if fname in vals:
+                        vals[fname] = False
+        return result
+
+    def _condition_to_sql(self, alias, fname, operator, value, query):
+        """A restricted member searches no message by the address of its
+        author."""
+        if privacy.search_closed(self, fname, privacy.AUTHOR_CONTACT_FIELDS):
+            return SQL("FALSE")
+        return super()._condition_to_sql(alias, fname, operator, value, query)
 
     def _is_empty(self):
         """A carrier message is never empty: its card is its content."""

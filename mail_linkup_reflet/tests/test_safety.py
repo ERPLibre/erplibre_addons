@@ -710,6 +710,11 @@ class TestLinkupServerContact(LinkupSafetyMixin, LinkupRefletCase):
         self.assertEqual(members.group_public_id, self.env.ref(MEMBER))
         Channel = self.env["discuss.channel"].with_user(self.sam)
         self.assertFalse(Channel.search([("id", "=", place.id)]))
+        self.assertFalse(Channel.search([("id", "=", members.id)]))
+        # Once added, a member reads the channel opened to the members, and
+        # still not the one kept to the administrators (LU-F-112 RM1).
+        (place | members).add_members(partner_ids=self.sam.partner_id.ids)
+        self.assertFalse(Channel.search([("id", "=", place.id)]))
         self.assertTrue(Channel.search([("id", "=", members.id)]))
 
 
