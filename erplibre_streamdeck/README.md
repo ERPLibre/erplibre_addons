@@ -352,8 +352,11 @@ the deck program.
 The catalog (*Configuration › Catalog*) is the union of what the
 workstations report: the actions, the icons and the geometry of each
 deck model. An item that no workstation reports any more stays, with the
-date it was last seen, to the hour. A model that no workstation reported takes its
-geometry from a table shipped with the module.
+date it was last seen, to the hour. The geometry of a model is a constant
+of its hardware: a model of the table shipped with the module takes the
+table's, and a model outside it keeps the geometry first reported. No
+report changes it, so no workstation decides the keys Odoo lays out for
+the others.
 
 A layout changed in the file after its revision was applied is handled
 as a setting, by the SHA-256 of each model's layout (canonical JSON: keys

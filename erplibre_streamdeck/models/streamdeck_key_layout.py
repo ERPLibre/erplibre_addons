@@ -123,18 +123,24 @@ class StreamdeckCatalogItem(models.Model):
         `catalog` has the wire shape `{"actions": [...], "icons": [...],
         "models": {product id: {"cols", "rows", "keys"}}}`, its entries
         already valid. A known item gets the new date when its own is
-        older than LAST_SEEN_STEP, a model its new geometry; no item is
-        removed. Two reports that add the same item at once both succeed
-        (`_insert`)."""
+        older than LAST_SEEN_STEP; no item is removed. A new model takes
+        its geometry from USB_GEOMETRY when listed there, else from
+        `catalog`, and keeps it: the keys of a model are a constant of its
+        hardware, and a report never changes the keys Odoo lays out for
+        every workstation. Two reports that add the same item at once
+        both succeed (`_insert`)."""
         Item = self.sudo()
         now = fields.Datetime.to_datetime(now)
         wanted = {("action", value): {} for value in catalog["actions"]}
         wanted.update({("icon", value): {} for value in catalog["icons"]})
         for product, shape in catalog["models"].items():
+            cols, rows, keys = USB_GEOMETRY.get(
+                product, (shape["cols"], shape["rows"], shape["keys"])
+            )
             wanted[("model", product)] = {
-                "cols": shape["cols"],
-                "rows": shape["rows"],
-                "key_count": shape["keys"],
+                "cols": cols,
+                "rows": rows,
+                "key_count": keys,
             }
         if not wanted:
             return
@@ -162,16 +168,6 @@ class StreamdeckCatalogItem(models.Model):
             ]
         )
         stale.write({"last_seen": now})
-        for (kind, value), geometry in wanted.items():
-            item = known.get((kind, value))
-            if (
-                item
-                and geometry
-                and any(
-                    item[name] != number for name, number in geometry.items()
-                )
-            ):
-                item.write(geometry)
 
     def _insert(self, values):
         """Create `values` in a savepoint and return True; return False,
@@ -186,16 +182,18 @@ class StreamdeckCatalogItem(models.Model):
 
     @api.model
     def _geometry(self, product_id):
-        """`(cols, rows, keys)` of the deck model `product_id`: the last
-        geometry a workstation reported, else the module's table, else
-        None."""
+        """`(cols, rows, keys)` of the deck model `product_id`: the
+        module's table USB_GEOMETRY, else the geometry a workstation first
+        reported, else None."""
+        if (product_id or "") in USB_GEOMETRY:
+            return USB_GEOMETRY[product_id]
         item = self.sudo().search(
             [("kind", "=", "model"), ("value", "=", product_id or "")],
             limit=1,
         )
         if item:
             return item.cols, item.rows, item.key_count
-        return USB_GEOMETRY.get(product_id or "")
+        return None
 
 
 class StreamdeckKeyLayout(models.Model):
