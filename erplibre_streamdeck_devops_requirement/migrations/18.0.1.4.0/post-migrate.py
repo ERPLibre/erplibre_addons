@@ -30,6 +30,7 @@ REWRITTEN = {
         "req_sd_ctl_r27",
         "test_sd_ctl_r27_1",
         "req_sd_ctl_r43",
+        "req_sd_ctl_r47",
     ),
 }
 
