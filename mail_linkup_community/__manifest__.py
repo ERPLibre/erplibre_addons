@@ -42,6 +42,7 @@
             "mail_linkup_community/static/tests/tours/**/*",
         ],
     },
+    "post_init_hook": "post_init_hook",
     "installable": True,
     "application": False,
     "auto_install": False,

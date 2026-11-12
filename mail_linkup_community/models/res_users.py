@@ -1085,6 +1085,19 @@ class ResUsers(models.Model):
         email = self._linkup_clean_email(vals["email"])
         return dict(vals, email=email), email_normalize(email) != current
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Record a consent for each preference that mirrors one and that
+        the creation sets, as ``write`` does: a visibility given at the
+        creation has its proof too (LU-NF-013)."""
+        users = super().create(vals_list)
+        Consent = self.env["linkup.consent"]
+        for user, vals in zip(users, vals_list):
+            for purpose, field in MIRROR_FIELDS.items():
+                if field in vals and field in self._fields:
+                    Consent._linkup_record(user, purpose, vals[field])
+        return users
+
     def write(self, vals):
         """Check the new address a member writes on their own account, which
         the preferences of Odoo allow (``SELF_WRITEABLE_FIELDS``), as the

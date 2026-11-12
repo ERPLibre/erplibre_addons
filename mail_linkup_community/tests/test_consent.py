@@ -3,6 +3,8 @@
 only, versioned and dated, withdrawn at once, required to send."""
 
 from odoo import fields
+from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.addons.mail_linkup_reflet.tests.common import MEMBER
 from odoo.exceptions import AccessError
 from odoo.tests import tagged
 
@@ -159,3 +161,52 @@ class TestLinkupConsent(LinkupCommunityCase):
         self.assertFalse(self.sam.sudo().linkup_links_visible)
         self.Consent.with_user(self.sam).action_grant(["energy_visibility"])
         self.assertTrue(self.sam.sudo().linkup_energy_visible)
+
+    def test_visibility_given_at_creation_is_recorded(self):
+        """LU-NF-013: an account created with its links visible holds the
+        proof of that consent; a preference left unset records none."""
+        if "linkup_links_visible" not in self.Users._fields:
+            self.skipTest("mail_linkup_network is not installed")
+        joanna = mail_new_test_user(
+            self.env,
+            login="linkup_cs_joanna",
+            name="Joanna",
+            email="linkup_cs_joanna@example.com",
+            groups=MEMBER,
+            linkup_links_visible=True,
+        )
+        self.assertTrue(self.Consent._linkup_active(joanna, "link_visibility"))
+        self.assertFalse(
+            self.Consent.sudo().search_count(
+                [
+                    ("user_id", "=", joanna.id),
+                    ("purpose", "=", "energy_visibility"),
+                ]
+            )
+        )
+
+    def test_visibility_granted_before_the_module_is_recorded(self):
+        """LU-NF-013: a visibility granted before this module, as the demo
+        of the Network view grants it, gets its consent at the
+        installation, once; a decision already recorded is kept."""
+        if "linkup_links_visible" not in self.Users._fields:
+            self.skipTest("mail_linkup_network is not installed")
+        demo = self.env.ref(
+            "mail_linkup_reflet.demo_user_france", raise_if_not_found=False
+        )
+        if demo and demo.sudo().linkup_links_visible:
+            self.assertTrue(
+                self.Consent._linkup_active(demo, "link_visibility")
+            )
+        self.france.sudo().write({"linkup_links_visible": True})
+        self.jacques.sudo().write({"linkup_links_visible": False})
+        self.Consent.sudo().search(
+            [("user_id", "in", (self.france | self.jacques).ids)]
+        ).unlink()
+        self.france.action_archive()
+        rows = self.Consent._linkup_record_granted_mirrors()
+        self.assertEqual(
+            [(row.user_id, row.purpose, row.granted) for row in rows],
+            [(self.france, "link_visibility", True)],
+        )
+        self.assertFalse(self.Consent._linkup_record_granted_mirrors())

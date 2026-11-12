@@ -133,6 +133,23 @@ class LinkupConsent(models.Model):
         )
 
     @api.model
+    def _linkup_record_granted_mirrors(self):
+        """Record a granted consent for each preference that mirrors one,
+        holds ``True`` and has no decision recorded yet, archived accounts
+        included. ``write`` and ``create`` of ``res.users`` record every
+        later change; a preference granted before this module, by the
+        Network view say, gets its proof here. Return the rows created."""
+        Users = self.env["res.users"].sudo().with_context(active_test=False)
+        consents = self.browse()
+        for purpose, field in MIRROR_FIELDS.items():
+            if field not in Users._fields:
+                continue
+            recorded = self.sudo().search([("purpose", "=", purpose)]).user_id
+            for user in Users.search([(field, "=", True)]) - recorded:
+                consents |= self._linkup_record(user, purpose, True)
+        return consents
+
+    @api.model
     def _linkup_latest(self, user):
         """The most recent row of each purpose of ``user``, by purpose."""
         latest = {}

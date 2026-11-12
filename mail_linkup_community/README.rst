@@ -88,10 +88,14 @@ Consents
 * The visibility of the links and of the energy are the preferences
   ``linkup_links_visible`` and ``linkup_energy_visible`` of
   ``mail_linkup_network``, which this module does not depend on: when they
-  exist, every write of one, from the Network view or elsewhere, records
-  the consent, and granting or withdrawing the consent writes the
-  preference. Without that module, these purposes are not offered. The
-  same holds for ``linkup_ai_consent`` of the AI module.
+  exist, every write of one, from the Network view or elsewhere, and its
+  value at the creation of an account, records the consent, and granting
+  or withdrawing the consent writes the preference. A preference granted
+  before this module is installed gets its consent at the installation
+  (``post_init_hook``). The grey lines of the Network view read the
+  preference, so they follow the latest decision of both members (Q-09).
+  Without that module, these purposes are not offered. The same holds for
+  ``linkup_ai_consent`` of the AI module.
 * The consent to notifications turns the notifications of LinkUp
   (``res.users.settings``) on or off together.
 

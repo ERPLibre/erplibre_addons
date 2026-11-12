@@ -51,6 +51,38 @@ class TestLinkupNetworkGraph(LinkupNetworkCase):
         self.assertFalse(self._contact_edges(self._graph(level="x3")))
         self.assertEqual(self._contact_edges(self._graph(level=2)), {pair})
 
+    def test_grey_line_follows_the_consents(self):
+        """Q-09 b, LU-NF-013: with the module of the public community, each
+        decision on the visibility of the links is a ``linkup.consent``,
+        whether the profile or the Network view takes it, and the line
+        France-Jacques follows the latest decision of both."""
+        if "linkup.consent" not in self.env:
+            self.skipTest("mail_linkup_community is not installed")
+        Consent = self.env["linkup.consent"]
+        self._activate(self.france, self.jacques)
+        pair = frozenset((self.france.id, self.jacques.id))
+        Consent.with_user(self.france).action_grant(["link_visibility"])
+        self.assertTrue(self.france.sudo().linkup_links_visible)
+        self.assertNotIn(pair, self._contact_edges(self._graph()))
+        self._show(self.jacques, links=True)
+        self.assertTrue(
+            Consent._linkup_active(self.jacques, "link_visibility")
+        )
+        self.assertEqual(self._contact_edges(self._graph()), {pair})
+        Consent.with_user(self.jacques).action_revoke(["link_visibility"])
+        self.assertFalse(self.jacques.sudo().linkup_links_visible)
+        self.assertFalse(self._contact_edges(self._graph()))
+        rows = Consent.sudo().search(
+            [
+                ("user_id", "in", (self.france | self.jacques).ids),
+                ("purpose", "=", "link_visibility"),
+            ]
+        )
+        self.assertEqual(
+            [(row.user_id, row.granted) for row in rows],
+            [(self.jacques, False), (self.jacques, True), (self.france, True)],
+        )
+
     def test_grey_lines_stay_among_contacts(self):
         """Luce is linked to every contact of Sam and shows her links, as
         they do: she never appears in his graph, not even as a line."""
