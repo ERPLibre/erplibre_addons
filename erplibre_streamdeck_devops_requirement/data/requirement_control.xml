@@ -684,7 +684,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">The line guards of streamdeck.config.line, _check_profile_pick and the user rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml.</field>
+        <field name="achievement">The line guards of streamdeck.config.line, _check_profile_pick and the user rules of ERPLibre_erplibre_addons:erplibre_streamdeck/security/streamdeck_rules.xml, among them the one that keeps the plugin actions of the catalog to the workstations that offer them.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r48" model="devops.requirement">
@@ -827,7 +827,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">keymap.catalog of erplibre:script/stream_deck/erplibre_streamdeck/keymap.py, which --catalog of erplibre:script/stream_deck/erplibre_streamdeck/__main__.py runs before any deck or lock; a plugin turned off is listed by its file, never imported.</field>
+        <field name="achievement">keymap.catalog of erplibre:script/stream_deck/erplibre_streamdeck/keymap.py, which --catalog of erplibre:script/stream_deck/erplibre_streamdeck/__main__.py runs before any deck or lock; a plugin turned off is listed by its file, never imported, and left out when its file, read by loader.may_have_home_button of erplibre:script/stream_deck/erplibre_streamdeck/loader.py without being run, shows it has no home button.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r58" model="devops.requirement">
@@ -884,7 +884,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">preview_html and missing_plugins of streamdeck.key.layout in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, computed from the geometry of the model and the plugin actions of the catalog.</field>
+        <field name="achievement">preview_html and missing_plugins of streamdeck.key.layout in ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, computed from the geometry of the model and the plugin actions of the catalog that the layout's workstation offers, or for a profile or a deck model layer that a workstation offers in its last report.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r62" model="devops.requirement">
@@ -899,7 +899,7 @@
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">streamdeck.catalog.item._take and _geometry of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, USB_GEOMETRY of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_device.py; data/streamdeck_catalog_data.xml seeds tiles and empty.</field>
+        <field name="achievement">streamdeck.catalog.item._take and _geometry of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_key_layout.py, USB_GEOMETRY of ERPLibre_erplibre_addons:erplibre_streamdeck/models/streamdeck_device.py; data/streamdeck_catalog_data.xml seeds tiles and empty. An action links the workstations whose last catalog offered it, and an employee reads the plugin actions of their own workstations only.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_ctl_r63" model="devops.requirement">
@@ -2638,6 +2638,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_edits_a_free_layout_of_their_workstation_only</field>
     </record>
+    <record id="test_sd_ctl_r47_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r47" />
+        <field name="sequence" eval="100" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_reads_only_the_plugins_their_workstations_report</field>
+    </record>
     <record id="test_sd_ctl_r48_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r48" />
         <field name="sequence" eval="10" />
@@ -2980,6 +2986,18 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
     </record>
+    <record id="test_sd_ctl_r57_9" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="90" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_whose_file_shows_no_home_button_is_left_out</field>
+    </record>
+    <record id="test_sd_ctl_r57_10" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r57" />
+        <field name="sequence" eval="100" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_reading_a_repo_plugin_agrees_with_importing_it</field>
+    </record>
     <record id="test_sd_ctl_r58_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r58" />
         <field name="sequence" eval="10" />
@@ -3040,6 +3058,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayoutViews.test_the_editor_lists_keys_with_catalog_choices_and_a_preview</field>
     </record>
+    <record id="test_sd_ctl_r61_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r61" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_the_warning_names_only_plugins_a_workstation_reports</field>
+    </record>
     <record id="test_sd_ctl_r62_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r62" />
         <field name="sequence" eval="10" />
@@ -3057,6 +3081,12 @@
         <field name="sequence" eval="30" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_create_keys_makes_one_line_per_key_of_the_model</field>
+    </record>
+    <record id="test_sd_ctl_r62_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_ctl_r62" />
+        <field name="sequence" eval="40" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_key_layout.TestStreamdeckKeyLayout.test_an_employee_reads_only_the_plugins_their_workstations_report</field>
     </record>
     <record id="test_sd_ctl_r63_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r63" />
