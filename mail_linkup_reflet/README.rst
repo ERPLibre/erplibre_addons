@@ -689,7 +689,8 @@ root of the ERPLibre checkout, with the Python of the Odoo environment::
     PYTHONPATH=odoo18.0/odoo .venv.odoo18.0_python3.12.10/bin/python \
         odoo18.0/addons/ERPLibre_erplibre_addons/mail_linkup_reflet/tools/linkup_bench_measure.py \
         -d linkup_bench [--runs 50] [--url http://localhost:18969] \
-        -- -c config.conf
+        [--websocket-url ws://localhost:18972] \
+        [--concurrency 10 25 50] [--rounds 4] -- -c config.conf
 
 * The database holds the six LinkUp modules and a community drawn from a
   fixed seed (``--seed``): 1 000 members (``--members``) named after the
@@ -715,7 +716,19 @@ root of the ERPLibre checkout, with the Python of the Odoo environment::
   of the recipient receives the card; the accounts it logs in with get a
   random password, kept in memory and never shown. ``web.base.url``
   holds the port of ``--http-port``, which the origin of the websocket
-  must match.
+  must match. A server in prefork (``--workers`` above 0) serves the
+  websocket on its gevent port only: ``--websocket-url`` points the
+  websockets there, the origin staying ``--url``.
+* ``--concurrency`` measures, instead, several members at once at each
+  level given: as many senders, each with its own recipient drawn from
+  the seed among the active links that do not involve the reference
+  member, send together while as many readings of the Reflet view and of
+  the graph X1 run as the reference member. In HTTP each recipient keeps
+  its websocket open, and the sending is measured until its card arrives.
+  Each point gives p50, p95 and the maximum, the failed calls and the
+  cards that did not arrive in time; a failure misses the target. In the
+  process, each thread holds up to two connections to PostgreSQL, which
+  must accept twice the highest level plus four beside its other clients.
 * ``mail_linkup_network/tests/test_network_performance.py`` keeps the
   number of queries of each screen from growing with the contacts of the
   member, and under a ceiling.
