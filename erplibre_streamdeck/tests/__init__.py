@@ -10,6 +10,7 @@ from . import test_streamdeck_config_wire
 from . import test_streamdeck_groups
 from . import test_streamdeck_holding
 from . import test_streamdeck_i18n
+from . import test_streamdeck_key_layout
 from . import test_streamdeck_monitor
 from . import test_streamdeck_monitor_events
 from . import test_streamdeck_monitor_i18n

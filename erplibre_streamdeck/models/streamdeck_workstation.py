@@ -7,6 +7,8 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
+from .streamdeck_device import usb_model_name
+
 MANAGER_GROUP = "erplibre_streamdeck.group_streamdeck_manager"
 
 # State of the deck's systemd service, as the workstation reports it.
@@ -77,10 +79,16 @@ class StreamdeckWorkstation(models.Model):
     _order = "name, id"
 
     _USER_WRITABLE = frozenset(
-        {"name", "config_profile_id", "config_line_ids"}
+        {"name", "config_profile_id", "config_line_ids", "layout_ids"}
     )
     _MANAGER_WRITABLE = frozenset(
-        {"name", "active", "config_profile_id", "config_line_ids"}
+        {
+            "name",
+            "active",
+            "config_profile_id",
+            "config_line_ids",
+            "layout_ids",
+        }
     )
 
     user_id = fields.Many2one(
@@ -181,6 +189,18 @@ class StreamdeckWorkstation(models.Model):
         "streamdeck.config.line",
         "workstation_id",
         string="Configuration overrides",
+    )
+    layout_ids = fields.One2many(
+        "streamdeck.key.layout",
+        "workstation_id",
+        string="Key layouts",
+        help="The key layouts of this workstation, over those of its"
+        " profile and of its deck models.",
+    )
+    config_layouts_html = fields.Html(
+        string="Key layouts of the connected decks",
+        compute="_compute_config_layouts_html",
+        sanitize=False,
     )
     config_revision = fields.Integer(
         string="Offered revision",
@@ -315,6 +335,51 @@ class StreamdeckWorkstation(models.Model):
                 "<th>%s</th><th>%s</th><th>%s</th></tr></thead>"
                 "<tbody>%s</tbody></table>"
             ) % (_("Setting"), _("Value"), _("Layer"), _("Lock"), rows)
+
+    def _compute_config_layouts_html(self):
+        """Per connected deck model, the layout Odoo sends: the layer it
+        comes from, its lock and its grid; or why there is none."""
+        schema = self.env["streamdeck.config.schema"]
+        layer_names = {
+            "profile": _("Profile"),
+            "model": _("Deck model"),
+            "workstation": _("Workstation"),
+        }
+        for workstation in self:
+            products = schema._connected_products(workstation)
+            if not products:
+                workstation.config_layouts_html = Markup("<p>%s</p>") % _(
+                    "No deck is connected to this workstation."
+                )
+                continue
+            layouts = schema._effective_layouts(workstation)
+            parts = []
+            for product in products:
+                title = Markup("<h5>%s (%s)</h5>") % (
+                    usb_model_name(product),
+                    product,
+                )
+                entry = layouts.get(product)
+                if not entry:
+                    parts.append(
+                        title
+                        + Markup("<p>%s</p>")
+                        % _(
+                            "Automatic layout: no layer lays out this"
+                            " deck model."
+                        )
+                    )
+                    continue
+                layout = entry["layout"].sudo()
+                origin = layer_names[entry["source"]]
+                if entry["locked"]:
+                    origin = "%s, %s" % (origin, _("Locked"))
+                parts.append(
+                    title
+                    + Markup('<p class="text-muted">%s</p>') % origin
+                    + layout._preview(layout._missing_plugins())
+                )
+            workstation.config_layouts_html = Markup().join(parts)
 
     def _compute_config_several_models(self):
         schema = self.env["streamdeck.config.schema"]

@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "ERPLibre Stream Deck",
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "category": "Productivity",
     "summary": "Inventory of the employees' workstations and Stream Decks.",
     "author": "TechnoLibre",
@@ -20,11 +20,13 @@
         "security/streamdeck_rules.xml",
         "data/streamdeck_activity_types.xml",
         "data/streamdeck_cron.xml",
+        "data/streamdeck_catalog_data.xml",
         "wizard/streamdeck_pairing_wizard_views.xml",
         "views/streamdeck_workstation_views.xml",
         "views/streamdeck_device_views.xml",
         "views/streamdeck_event_views.xml",
         "views/streamdeck_config_views.xml",
+        "views/streamdeck_key_layout_views.xml",
         "wizard/streamdeck_config_policy_views.xml",
         "views/res_config_settings_views.xml",
         "views/streamdeck_menus.xml",

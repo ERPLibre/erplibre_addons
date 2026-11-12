@@ -46,6 +46,16 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Key layouts" name="key_layouts">
+                            <field name="layout_ids">
+                                <list>
+                                    <field name="usb_product_id"/>
+                                    <field name="name"/>
+                                    <field name="locked"/>
+                                    <field name="missing_plugins"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Workstations" name="workstations">
                             <field name="workstation_ids" readonly="True">
                                 <list>
@@ -107,6 +117,17 @@
                                     <field name="value"/>
                                     <field name="locked"/>
                                     <field name="source" readonly="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Key layouts" name="key_layouts">
+                            <field name="layout_ids"
+                                   context="{'default_usb_product_id': usb_product_id}">
+                                <list>
+                                    <field name="usb_product_id"/>
+                                    <field name="name"/>
+                                    <field name="locked"/>
+                                    <field name="missing_plugins"/>
                                 </list>
                             </field>
                         </page>

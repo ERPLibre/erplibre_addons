@@ -18,6 +18,9 @@ _logger = logging.getLogger(__name__)
 # order of the wire and of the effective table. Each is one line of the
 # workstation's streamdeck.conf (CONTRACT.md of the GNOME extension).
 KEYS = ("deck_program", "plugins_off", "session_refresh_sec", "games")
+# The wire key of the key layouts, protocol 1.2: the workstation writes
+# them to keymap.json, not to streamdeck.conf (streamdeck.key.layout).
+LAYOUTS_KEY = "key_layouts"
 KEY_SELECTION = [
     ("deck_program", "Deck program"),
     ("plugins_off", "Plugins turned off"),
@@ -131,6 +134,17 @@ class StreamdeckConfigSchema(models.AbstractModel):
             )
             return None
 
+    def _connected_products(self, workstation):
+        """The USB product ids of the decks connected to `workstation`,
+        lowercase, sorted, each once."""
+        return sorted(
+            {
+                device.usb_product_id.lower()
+                for device in workstation.sudo().device_ids
+                if device.connected and device.usb_product_id
+            }
+        )
+
     def _layers(self, workstation):
         """[(layer, lines)] of `workstation` in folding order: its profile
         when active, the deck-model layers of its connected decks by
@@ -140,17 +154,13 @@ class StreamdeckConfigSchema(models.AbstractModel):
         profile = workstation.config_profile_id
         if profile.active:
             layers.append(("profile", profile.line_ids))
-        products = {
-            device.usb_product_id.lower()
-            for device in workstation.device_ids
-            if device.connected and device.usb_product_id
-        }
+        products = self._connected_products(workstation)
         if products:
             deck_models = (
                 self.env["streamdeck.config.model"]
                 .sudo()
                 .search(
-                    [("usb_product_id", "in", sorted(products))],
+                    [("usb_product_id", "in", products)],
                     order="usb_product_id",
                 )
             )
@@ -235,6 +245,9 @@ class StreamdeckConfigProfile(models.Model):
     line_ids = fields.One2many(
         "streamdeck.config.line", "profile_id", string="Settings"
     )
+    layout_ids = fields.One2many(
+        "streamdeck.key.layout", "profile_id", string="Key layouts"
+    )
     workstation_ids = fields.One2many(
         "streamdeck.workstation",
         "config_profile_id",
@@ -259,6 +272,9 @@ class StreamdeckConfigModel(models.Model):
     name = fields.Char(compute="_compute_name", store=True)
     line_ids = fields.One2many(
         "streamdeck.config.line", "model_id", string="Settings"
+    )
+    layout_ids = fields.One2many(
+        "streamdeck.key.layout", "model_id", string="Key layouts"
     )
 
     _sql_constraints = [

@@ -11,3 +11,7 @@ access_streamdeck_config_model_user,streamdeck.config.model user,model_streamdec
 access_streamdeck_config_model_manager,streamdeck.config.model manager,model_streamdeck_config_model,group_streamdeck_manager,1,1,1,1
 access_streamdeck_config_line_user,streamdeck.config.line user,model_streamdeck_config_line,group_streamdeck_user,1,1,1,1
 access_streamdeck_config_policy_manager,streamdeck.config.policy manager,model_streamdeck_config_policy,group_streamdeck_manager,1,1,1,0
+access_streamdeck_catalog_item_user,streamdeck.catalog.item user,model_streamdeck_catalog_item,group_streamdeck_user,1,0,0,0
+access_streamdeck_catalog_item_manager,streamdeck.catalog.item manager,model_streamdeck_catalog_item,group_streamdeck_manager,1,0,0,1
+access_streamdeck_key_layout_user,streamdeck.key.layout user,model_streamdeck_key_layout,group_streamdeck_user,1,1,1,1
+access_streamdeck_key_layout_key_user,streamdeck.key.layout.key user,model_streamdeck_key_layout_key,group_streamdeck_user,1,1,1,1

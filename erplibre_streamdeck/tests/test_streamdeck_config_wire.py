@@ -158,7 +158,7 @@ class TestStreamdeckConfigWire(HttpCase):
         )
         self.assertEqual(response.status_code, status, response.text)
         body = response.json()
-        self.assertEqual(body["protocol"], "1.1")
+        self.assertEqual(body["protocol"], "1.2")
         return body
 
     def _report(self, token, config=None, **kwargs):

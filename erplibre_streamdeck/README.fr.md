@@ -10,9 +10,10 @@ pilote et si leur service tourne. Odoo n'ouvre jamais de connexion vers un
 poste.
 
 Odoo porte aussi les réglages du deck qu'il veut sur chaque poste : le
-programme du deck, les plugins coupés, le rafraîchissement de session et
-les jeux. Le poste les reçoit dans la réponse à sa remontée, et son
-employé les applique d'un clic (voir Configuration).
+programme du deck, les plugins coupés, le rafraîchissement de session,
+les jeux et la disposition des touches d'accueil de chaque modèle de
+deck. Le poste les reçoit dans la réponse à sa remontée, et son employé
+les applique d'un clic (voir Configuration).
 
 L'inventaire appartient à son employé ; un gestionnaire voit tout le parc.
 Personne ne l'écrit à la main : seules les routes des postes l'écrivent.
@@ -24,7 +25,7 @@ Personne ne l'écrit à la main : seules les routes des postes l'écrivent.
 | Stream Deck › Mes postes | tout employé | ses postes ; le bouton *Ajouter un poste* affiche un code d'appairage |
 | Stream Deck › Mes decks | tout employé | les decks que ses postes tiennent ou ont tenus |
 | Stream Deck › Parc › Postes, Decks, Événements | gestionnaire | tout, en lecture, sauf le nom, l'archivage, le jeton et la configuration d'un poste |
-| Stream Deck › Configuration › Profils, Modèles de deck, Premier pilotage | gestionnaire | les couches de configuration : les profils réutilisables, et les réglages de chaque modèle de deck ; la politique du premier pilotage |
+| Stream Deck › Configuration › Profils, Modèles de deck, Dispositions des touches, Catalogue, Premier pilotage | gestionnaire | les couches de configuration : les profils réutilisables, et les réglages de chaque modèle de deck ; toutes les dispositions des touches et le catalogue où elles choisissent ; la politique du premier pilotage |
 | Stream Deck › Paramètres | administrateur | la section *Stream Deck* des Paramètres : la surveillance et le premier pilotage |
 
 Un poste montre ce que disait sa dernière remontée : système
@@ -36,8 +37,9 @@ renommer et révoquer son jeton ; le gestionnaire peut aussi l'archiver.
 filtres *Configuration en attente* et *Configuration refusée* choisissent
 les postes par l'état de leur configuration, et l'onglet *Configuration*
 d'un poste montre son profil, ses réglages effectifs avec la couche et le
-verrou de chacun, ses surcharges et l'état de la révision qui lui est
-proposée.
+verrou de chacun, ses surcharges, la disposition des touches de chaque
+deck branché, ses propres dispositions et l'état de la révision qui lui
+est proposée.
 
 Un poste et un deck portent chacun leur fil, où la surveillance pose ses
 activités et ses notes. Chaque liste d'événements nomme l'événement par
@@ -113,6 +115,14 @@ choix » : un profil que le gestionnaire a assigné sans le rendre « au
 choix » reste, et un employé ne retire jamais un profil. L'état de la
 configuration (révisions, valeurs proposées et appliquées, état, raison,
 choix du premier pilotage) n'est écrit que par la route de remontée.
+
+Les dispositions des touches suivent les mêmes règles, le verrou portant
+sur une disposition entière : un employé lit les dispositions des couches
+qu'il lit, et sur ses propres postes crée, modifie et supprime les
+dispositions, et leurs touches, des modèles de deck qu'aucune couche ne
+verrouille, jamais *Verrouillé*, *Source* ni *Gardée dans le fichier du
+poste*. Tout le monde lit le catalogue ; seule la route de remontée y
+ajoute.
 
 ## Surveillance
 
@@ -286,11 +296,13 @@ la révision a été appliquée ou refusée, et pourquoi.
 | Non gérée | aucune couche ne fixe de réglage du poste, il n'a jamais remonté en protocole 1.1, ou son extension ne coche pas cette base comme pilote ; une révision jusque-là en attente est retirée |
 | En attente | une révision est proposée et pas encore appliquée, depuis *Configuration en attente depuis* |
 | Appliquée | le poste a appliqué la révision proposée |
-| Refusée | le poste l'a refusée ; *Raison du refus* dit pourquoi : `invalid:<clé>`, `write_failed`, `restart_failed` ou `unit_missing` |
+| Refusée | le poste l'a refusée ; *Raison du refus* dit pourquoi : `invalid:<clé>` (`invalid:key_layouts` pour les dispositions des touches), `write_failed`, `restart_failed` ou `unit_missing` |
 | Changée localement | un réglage a changé dans le fichier ; Odoo le propose de nouveau |
 
 Une extension plus ancienne que le contrat 1.3 remonte sans être pilotée,
-et la fiche dit qu'elle est trop ancienne.
+et la fiche dit qu'elle est trop ancienne. Une extension du contrat 1.3
+est pilotée sans les dispositions des touches, qui commencent au contrat
+1.4 (protocole 1.2).
 
 ### Premier pilotage
 
@@ -327,19 +339,70 @@ remontée suivante :
   invalide, est proposé de nouveau sous une nouvelle révision, que
   l'employé confirme comme toute autre.
 
+### Dispositions des touches
+
+L'écran d'accueil de chaque modèle de deck se dispose dans Odoo. Une
+disposition des touches vaut pour un identifiant produit USB et
+appartient à un profil, à un modèle de deck ou à un poste : l'onglet
+*Dispositions des touches* de chacun, ou *Configuration › Dispositions
+des touches*. Sa fiche liste une ligne par touche : l'index (0 la touche
+en haut à gauche, numérotées rangée par rangée), l'action et l'icône
+choisies dans le catalogue, et un libellé d'au plus 16 caractères sans
+caractère de contrôle. *Créer les touches* ajoute une ligne vide pour
+chaque touche du modèle, et l'aperçu montre la grille. Une action est la
+touche d'accueil d'un plugin (`plugin:<id>`), une touche du tableau de
+bord (`tiles`) ou une touche noire (`empty`) ; une touche sans action est
+laissée au programme du deck, qui y place ses fixtures et son tableau de
+bord. Un plugin a au plus une touche d'accueil par disposition, et un
+plugin que la disposition ne nomme pas n'en a aucune : la fiche avertit
+des *Plugins sans touche*.
+
+Les dispositions d'un modèle se replient comme les réglages, profil <
+modèle de deck < poste, et *Verrouillé* tient la disposition entière :
+une disposition verrouillée arrête le repli pour son modèle. La touche
+d'accueil d'un plugin coupé, par Odoo ou sinon par le fichier du poste,
+part comme une touche noire : le poste refuse une disposition qui nomme
+un plugin coupé. Seules les
+dispositions des decks branchés vont au poste, dans le réglage
+`key_layouts` de la révision, verrouillé quand l'une d'elles l'est ;
+l'extension les écrit dans `~/.config/erplibre-home/keymap.json` quand
+l'employé applique la révision. Un modèle qu'aucune couche ne dispose
+garde la disposition automatique du programme du deck.
+
+Le catalogue (*Configuration › Catalogue*) est l'union de ce que
+remontent les postes : les actions, les icônes et la géométrie de chaque
+modèle de deck. Un élément qu'aucun poste ne remonte plus reste, avec la
+date où il a été vu la dernière fois, à l'heure près. Un modèle qu'aucun poste n'a
+remonté prend sa géométrie dans une table livrée avec le module.
+
+Une disposition changée dans le fichier après l'application de sa
+révision se traite comme un réglage, par le SHA-256 de la disposition de
+chaque modèle (JSON canonique : clés triées, sans espace, tout caractère
+hors ASCII échappé en `\uXXXX`) :
+
+- une disposition **libre** devient une disposition du poste marquée
+  *Gardée dans le fichier du poste*, de source *Fichier du poste*, et
+  Odoo n'envoie plus de disposition pour ce modèle ; créer ou changer une
+  de ses touches la renvoie ;
+- une disposition **verrouillée**, ou retirée du fichier, est proposée de
+  nouveau.
+
+La question du premier pilotage laisse les dispositions de côté : seule
+l'extension écrit `keymap.json`.
+
 ### Historique de la configuration
 
 | Événement | Quand |
 |---|---|
 | *Configuration appliquée* (`config_applied`) | le poste remonte la révision proposée appliquée ; avec sa révision |
 | *Configuration refusée* (`config_refused`) | le poste la remonte refusée ; avec sa révision et sa raison |
-| *Réglage local adopté* (`config_adopted`) | une valeur locale libre devient une surcharge ; avec ses réglages |
-| *Réglage changé localement* (`config_drift`) | un réglage verrouillé, ou retiré, est proposé de nouveau ; avec ses réglages |
+| *Réglage local adopté* (`config_adopted`) | une valeur locale libre devient une surcharge ; avec ses réglages, `key_layouts:<identifiant produit>` pour une disposition gardée dans le fichier |
+| *Réglage changé localement* (`config_drift`) | un réglage verrouillé, ou retiré, est proposé de nouveau ; avec ses réglages, `key_layouts:<identifiant produit>` pour une disposition |
 
 Odoo seul les écrit, et ils n'ouvrent aucune activité : l'état se lit
 sur le poste. L'historique filtre sur chacun d'eux.
 
-## Protocole de remontée 1.1
+## Protocole de remontée 1.2
 
 Le [CONTRACT.md](https://github.com/TechnoLibre/erplibre-home-gnome-extension/blob/main/CONTRACT.md)
 de l'extension décrit le même protocole du côté du poste.
@@ -347,10 +410,11 @@ de l'extension décrit le même protocole du côté du poste.
 Le client envoie d'abord `GET <url>/web/login?db=<base>` avec un pot à
 témoins pour choisir la base, puis chaque appel est un `POST` d'un objet
 JSON, auquel répond un objet JSON, sous `/streamdeck/v1/`. Toute autre
-méthode HTTP reçoit 405. Chaque corps porte `"protocol"`, `"1.1"` pour
-un poste qui reçoit la configuration, `"1.0"` avant : une version majeure
+méthode HTTP reçoit 405. Chaque corps porte `"protocol"` : `"1.2"` pour
+un poste qui reçoit les dispositions des touches, `"1.1"` pour un poste
+qui ne reçoit que les réglages, `"1.0"` avant : une version majeure
 inconnue est refusée, une version mineure plus récente est acceptée et ses
-clés inconnues ignorées. Chaque réponse porte `"protocol": "1.1"` ; une
+clés inconnues ignorées. Chaque réponse porte `"protocol": "1.2"` ; une
 réponse d'erreur y ajoute `error`.
 
 | Route | Authentification | Corps | Réponse 200 |
@@ -369,7 +433,14 @@ réponse d'erreur y ajoute `error`.
   chemin USB, firmware). Les decks du poste absents de la liste deviennent
   débranchés. En 1.1, `deck_plugins` liste au plus 128 identifiants des
   plugins du deck trouvés sur le disque du poste ; ses répétitions sont
-  écartées.
+  écartées. En 1.2, `deck_catalog` est le catalogue du programme du
+  deck, `{"format": 1, "actions", "icons", "models": {<identifiant
+  produit>: {"cols", "rows", "keys"}}}`, ajouté au catalogue d'Odoo ;
+  plus grand que 32 Kio, ou d'un autre format, il est ignoré, et une
+  action ou une icône d'une forme inconnue est sautée, comme un modèle
+  dont la géométrie n'accueille aucune touche (aucune touche, ou plus de
+  touches que de cases). Les nombres d'une géométrie sont des entiers de
+  0 à 256 ; tout autre cas est un 400 `bad_request`.
 - `events` : `plugged`, `unplugged` ou `service_changed`, chacun avec son
   propre uuid et l'heure où il a été observé. `moved`, `silent`,
   `heard_again` et les quatre sortes `config_*` ne sont écrits que par
@@ -388,12 +459,21 @@ réponse d'erreur y ajoute `error`.
   `status` `applied` ou `refused` ; `choice` la réponse à la question du
   premier pilotage, `keep_local` ou `take_odoo`, envoyée une fois. Une
   valeur hors du schéma, ou un statut, une raison ou un choix inconnu, est
-  un 400 `bad_request` ; une clé hors des quatre réglages est ignorée.
+  un 400 `bad_request` ; une clé hors des quatre réglages est ignorée. En
+  1.2, `current.key_layouts` associe l'identifiant produit de chaque
+  disposition de `keymap.json` au SHA-256 de cette disposition, null
+  quand le fichier n'en porte pas (au plus 128), et la raison
+  `invalid:key_layouts` est connue.
 - `config` de la réponse : `{"revision", "hash", "settings", "locked"}`,
   plus `ask` pendant un premier pilotage sous *Demander à l'employé*.
   `hash` est le SHA-256 du JSON canonique de `settings` (clés triées, sans
   espace), `locked` les réglages verrouillés, `ask` les réglages libres
-  dont la valeur locale diffère de celle d'Odoo.
+  dont la valeur locale diffère de celle d'Odoo. En 1.2,
+  `settings.key_layouts` associe l'identifiant produit de chaque deck
+  branché qu'Odoo dispose à `{"keys": [{"key", "action", "icon",
+  "label"}]}`, par touche croissante, `icon` et `label` seulement quand
+  ils sont fixés, au plus 16 modèles ; `locked` liste alors
+  `key_layouts` quand une de ces dispositions est verrouillée.
 - Un deck se reconnaît à son numéro de série, clé `sn:<numéro>` ; un deck
   sans numéro de série lisible se reconnaît à son poste, son identifiant
   produit et son chemin USB, clé `nosn:<poste>:<produit>:<chemin>`, et

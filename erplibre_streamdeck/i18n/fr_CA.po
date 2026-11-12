@@ -24,6 +24,13 @@ msgid "(none)"
 msgstr "(aucun)"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__key_index
+msgid "0 is the top left key; the keys are numbered row by row."
+msgstr ""
+"0 est la touche en haut à gauche ; les touches sont numérotées rangée par "
+"rangée."
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid "<span class=\"me-2\">After</span>"
 msgstr "<span class=\"me-2\">Après</span>"
@@ -41,6 +48,7 @@ msgstr "<span class=\"ms-2\">minutes</span>"
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
 msgid "A USB product id is four hexadecimal digits."
 msgstr "Un identifiant produit USB a quatre chiffres hexadécimaux."
 
@@ -79,6 +87,11 @@ msgid "A deck model has one settings layer."
 msgstr "Un modèle de deck a une seule couche de réglages."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_model_product_unique
+msgid "A deck model layer has one layout."
+msgstr "Une couche de modèle de deck a une seule disposition."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_line_model_key_unique
 msgid "A deck model sets each setting once."
 msgstr "Un modèle de deck fixe chaque réglage une seule fois."
@@ -93,9 +106,46 @@ msgstr ""
 "deck est rebranché."
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "A key label holds at most 16 characters and no control character."
+msgstr ""
+"Le libellé d'une touche compte au plus 16 caractères, sans caractère de "
+"contrôle."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_key_layouts
+msgid ""
+"A key layout belongs to a profile, a deck model or a\n"
+"                workstation: open one of them to add its layouts."
+msgstr ""
+"Une disposition des touches appartient à un profil, à un modèle de deck ou à un\n"
+"                poste : ouvrez l'un d'eux pour lui ajouter des dispositions."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"A key layout belongs to exactly one profile, deck model or workstation."
+msgstr ""
+"Une disposition des touches appartient à exactement un profil, un modèle de "
+"deck ou un poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_key_layout_index_unique
+msgid "A layout names each key once."
+msgstr "Une disposition nomme chaque touche une seule fois."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_pairing_code_code_unique
 msgid "A pairing code is unique."
 msgstr "Un code d'appairage est unique."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "A plugin has one home key in a layout."
+msgstr "Un plugin a une seule touche d'accueil dans une disposition."
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_config_profiles
@@ -107,6 +157,11 @@ msgstr ""
 "Un profil est un ensemble réutilisable de réglages du deck. Assignez-le à\n"
 "                des postes, ou marquez-le « au choix » pour que les employés\n"
 "                le choisissent pour leurs propres postes."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_profile_product_unique
+msgid "A profile lays out each deck model once."
+msgstr "Un profil dispose chaque modèle de deck une seule fois."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_line_profile_key_unique
@@ -152,6 +207,11 @@ msgstr ""
 " n'est pas un silence."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_workstation_product_unique
+msgid "A workstation lays out each deck model once."
+msgstr "Un poste dispose chaque modèle de deck une seule fois."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_line_workstation_key_unique
 msgid "A workstation overrides each setting once."
 msgstr "Un poste surcharge chaque réglage une seule fois."
@@ -173,10 +233,21 @@ msgid "Absent"
 msgstr "Absent"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__action_id
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_catalog_item__kind__action
+msgid "Action"
+msgstr "Action"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_needaction
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_needaction
 msgid "Action Needed"
 msgstr "Nécessite une action"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+msgid "Actions"
+msgstr "Actions"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__active
@@ -245,6 +316,12 @@ msgid "An employee has one workstation per fingerprint."
 msgstr "Un employé a un seul poste par empreinte."
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "An employee lays out the keys of a workstation."
+msgstr "Un employé dispose les touches d'un poste."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_profile__selectable
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_profile_selectable
 msgid "An employee may pick this profile for their own workstations."
@@ -304,10 +381,25 @@ msgid "Archived"
 msgstr "Archivé"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__value
+msgid ""
+"As keymap.json writes it: plugin:<id>, tiles or empty for an action, the "
+"icon name, or the USB product id of a deck model."
+msgstr ""
+"Tel que keymap.json l'écrit : plugin:<id>, tiles ou empty pour une action, "
+"le nom de l'icône, ou l'identifiant produit USB d'un modèle de deck."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__ask
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__ask
 msgid "Ask the employee"
 msgstr "Demander à l'employé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__label
+msgid "At most 16 characters; replaces the text of the plugin's home key."
+msgstr ""
+"Au plus 16 caractères ; remplace le texte de la touche d'accueil du plugin."
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
@@ -344,9 +436,27 @@ msgid "Attachment Count"
 msgstr "Nombre de pièces jointes"
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid "Automatic layout: no layer lays out this deck model."
+msgstr "Disposition automatique : aucune couche ne dispose ce modèle de deck."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Black key"
+msgstr "Touche noire"
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
 msgid "Cancel"
 msgstr "Annuler"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_catalog
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_catalog
+msgid "Catalog"
+msgstr "Catalogue"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__drift
@@ -385,6 +495,12 @@ msgstr "Création de l'activité fermée"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__code
 msgid "Code"
 msgstr "Code"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__cols
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__cols
+msgid "Columns"
+msgstr "Colonnes"
 
 #. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_res_config_settings
@@ -464,11 +580,17 @@ msgid "Create a configuration profile"
 msgstr "Créez un profil de configuration"
 
 #. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid "Create the keys"
+msgstr "Créer les touches"
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_config_models
 msgid "Create the settings of a deck model"
 msgstr "Créez les réglages d'un modèle de deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__create_uid
@@ -476,6 +598,8 @@ msgstr "Créez les réglages d'un modèle de deck"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__create_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__create_uid
@@ -483,6 +607,7 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__create_date
@@ -490,6 +615,8 @@ msgstr "Créé par"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__create_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__create_date
@@ -501,6 +628,12 @@ msgstr "Créé le"
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
 msgid "Current workstation"
 msgstr "Poste actuel"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Dashboard"
+msgstr "Tableau de bord"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__device_id
@@ -520,12 +653,20 @@ msgstr "Deck changé de poste"
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__model_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__name
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_catalog_item__kind__model
 msgid "Deck model"
 msgstr "Modèle de deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__model_id
+msgid "Deck model layer"
+msgstr "Couche du modèle de deck"
+
+#. module: erplibre_streamdeck
 #: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_config_models
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_models
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
 msgid "Deck models"
 msgstr "Modèles de deck"
 
@@ -611,6 +752,7 @@ msgid "Disconnected"
 msgstr "Débranché"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__display_name
@@ -618,6 +760,8 @@ msgstr "Débranché"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__display_name
@@ -647,6 +791,7 @@ msgstr "Configuration effective"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__user_id
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__employee
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__source__employee
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_key_layout__source__employee
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Employee"
@@ -780,6 +925,12 @@ msgid "Four hexadecimal digits, as the deck reports them."
 msgstr "Quatre chiffres hexadécimaux, tels que le deck les remonte."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__usb_product_id
+msgid "Four hexadecimal digits: the deck model this layout is for."
+msgstr ""
+"Quatre chiffres hexadécimaux : le modèle de deck de cette disposition."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_ir_attachment__streamdeck_visible_to_me
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_activity__streamdeck_visible_to_me
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_mail__streamdeck_visible_to_me
@@ -804,8 +955,10 @@ msgid "Games"
 msgstr "Jeux"
 
 #. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Group By"
 msgstr "Regrouper par"
@@ -833,6 +986,11 @@ msgid "Has Message"
 msgstr "A un message"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__file_hash
+msgid "Hash in the workstation's file"
+msgstr "Empreinte dans le fichier du poste"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__held_by_me
 msgid "Held by me"
 msgstr "Détenu par moi"
@@ -848,6 +1006,7 @@ msgid "Host name given at enrollment; the employee may rename it."
 msgstr "Nom d'hôte donné à l'inscription ; l'employé peut le renommer."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__id
@@ -855,6 +1014,8 @@ msgstr "Nom d'hôte donné à l'inscription ; l'employé peut le renommer."
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__id
@@ -863,7 +1024,9 @@ msgstr "ID"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_exception_icon
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__icon_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_icon
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_catalog_item__kind__icon
 msgid "Icon"
 msgstr "Icône"
 
@@ -872,6 +1035,11 @@ msgstr "Icône"
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+msgid "Icons"
+msgstr "Icônes"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_needaction
@@ -932,17 +1100,72 @@ msgid "Keep local values"
 msgstr "Garder les valeurs locales"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__in_file
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
+msgid "Kept in the workstation's file"
+msgstr "Gardée dans le fichier du poste"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__key
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__key_index
 msgid "Key"
 msgstr "Clé"
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Key %(index)s is not a key of the deck model %(model)s."
+msgstr "La touche %(index)s n'est pas une touche du modèle de deck %(model)s."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__layout_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid "Key layout"
+msgstr "Disposition des touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_key_layouts
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__layout_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__layout_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__layout_ids
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_layouts
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_model_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
+msgid "Key layouts"
+msgstr "Dispositions des touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_layouts_html
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Key layouts of the connected decks"
+msgstr "Dispositions des touches des decks branchés"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Key layouts of this workstation"
+msgstr "Dispositions des touches de ce poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__key_count
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__key_ids
+msgid "Keys"
+msgstr "Touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__kind
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__kind
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
 msgid "Kind"
 msgstr "Sorte"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__label
+msgid "Label"
+msgstr "Libellé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__write_uid
@@ -950,6 +1173,8 @@ msgstr "Sorte"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__write_uid
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__write_uid
@@ -957,6 +1182,7 @@ msgid "Last Updated by"
 msgstr "Dernière modification par"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__write_date
@@ -964,6 +1190,8 @@ msgstr "Dernière modification par"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__write_date
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__write_date
@@ -976,9 +1204,15 @@ msgid "Last report"
 msgstr "Dernière remontée"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__last_seen
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__last_seen
 msgid "Last seen"
 msgstr "Vu pour la dernière fois"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_key_layouts
+msgid "Lay out the home keys of a deck model"
+msgstr "Disposez les touches d'accueil d'un modèle de deck"
 
 #. module: erplibre_streamdeck
 #. odoo-python
@@ -1002,6 +1236,8 @@ msgstr "Verrou"
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__locked
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__locked
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
 msgid "Locked"
 msgstr "Verrouillé"
 
@@ -1011,6 +1247,15 @@ msgid "Locked by the manager: no later layer and no employee changes it."
 msgstr ""
 "Verrouillé par le gestionnaire : aucune couche suivante ni aucun employé ne "
 "le change."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__locked
+msgid ""
+"Locked by the manager: no later layer and no employee changes the layout of "
+"this deck model."
+msgstr ""
+"Verrouillée par le gestionnaire : aucune couche suivante ni aucun employé ne"
+" change la disposition de ce modèle de deck."
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
@@ -1030,6 +1275,7 @@ msgstr "Événements perdus"
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__manager
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__source__manager
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_key_layout__source__manager
 #: model:res.groups,name:erplibre_streamdeck.group_streamdeck_manager
 msgid "Manager"
 msgstr "Gestionnaire"
@@ -1081,6 +1327,7 @@ msgid "My workstations"
 msgstr "Mes postes"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__name
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__name
@@ -1116,9 +1363,20 @@ msgid "Next Activity Type"
 msgstr "Type d'activités à venir"
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid "No deck is connected to this workstation."
+msgstr "Aucun deck n'est branché à ce poste."
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
 msgid "No deck reported yet"
 msgstr "Aucun deck remonté pour l'instant"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_catalog
+msgid "No workstation reported its catalog yet"
+msgstr "Aucun poste n'a encore remonté son catalogue"
 
 #. module: erplibre_streamdeck
 #: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_workstations
@@ -1141,6 +1399,11 @@ msgstr "Nombre d'actions"
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_has_error_counter
 msgid "Number of errors"
 msgstr "Nombre d'erreurs"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__key_count
+msgid "Number of keys"
+msgstr "Nombre de touches"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_needaction_counter
@@ -1196,6 +1459,7 @@ msgstr "Un de vos postes détient ce deck ou l'a détenu."
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
 msgid "Only a Stream Deck manager sets locks, profiles and deck models."
 msgstr ""
 "Seul un gestionnaire Stream Deck pose les verrous, les profils et les "
@@ -1258,9 +1522,37 @@ msgid "Plugged"
 msgstr "Branché"
 
 #. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Plugin %(id)s"
+msgstr "Plugin %(id)s"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
+msgid ""
+"Plugins of the catalog that have a home key and that this layout does not "
+"name: they get no key on the home screen."
+msgstr ""
+"Les plugins du catalogue qui ont une touche d'accueil et que cette "
+"disposition ne nomme pas : ils n'ont pas de touche à l'écran d'accueil."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__plugins_off
 msgid "Plugins turned off"
 msgstr "Plugins coupés"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
+msgid "Plugins without a key"
+msgstr "Plugins sans touche"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__preview_html
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid "Preview"
+msgstr "Aperçu"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__previous_workstation_id
@@ -1281,6 +1573,7 @@ msgstr "Problèmes qui ouvrent une activité"
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__profile_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__profile_id
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Profile"
 msgstr "Profil"
@@ -1313,6 +1606,11 @@ msgid "Refused"
 msgstr "Refusée"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__icon_id
+msgid "Replaces the icon of the plugin's home key."
+msgstr "Remplace l'icône de la touche d'accueil du plugin."
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Reports"
 msgstr "Remontées"
@@ -1333,6 +1631,12 @@ msgstr "Utilisateur responsable"
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Revoke the token"
 msgstr "Révoquer le jeton"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__rows
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__rows
+msgid "Rows"
+msgstr "Rangées"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__token_hash
@@ -1475,6 +1779,7 @@ msgstr "Muet depuis"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__source
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__source
 msgid "Source"
 msgstr "Source"
 
@@ -1503,6 +1808,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
 msgid "Stream Deck"
 msgstr "Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_catalog_item
+msgid "Stream Deck catalog item"
+msgstr "Élément du catalogue Stream Deck"
 
 #. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_model
@@ -1545,6 +1855,16 @@ msgid "Stream Deck event"
 msgstr "Événement Stream Deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_key_layout
+msgid "Stream Deck key layout"
+msgstr "Disposition des touches Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_key_layout_key
+msgid "Stream Deck key of a layout"
+msgstr "Touche Stream Deck d'une disposition"
+
+#. module: erplibre_streamdeck
 #: model:ir.model,name:erplibre_streamdeck.model_streamdeck_monitor
 msgid "Stream Deck monitoring"
 msgstr "Surveillance Stream Deck"
@@ -1583,6 +1903,14 @@ msgstr "Prendre les valeurs d'Odoo"
 
 #. module: erplibre_streamdeck
 #. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "The Stream Deck manager locked the key layout of this deck model."
+msgstr ""
+"Le gestionnaire Stream Deck a verrouillé la disposition des touches de ce "
+"modèle de deck."
+
+#. module: erplibre_streamdeck
+#. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
 msgid ""
 "The Stream Deck manager locked the setting %(key)s of this workstation."
@@ -1593,6 +1921,17 @@ msgstr ""
 #: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_manager_id
 msgid "The Stream Deck manager who receives the activities."
 msgstr "Le gestionnaire Stream Deck qui reçoit les activités."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "The action of a key is an action."
+msgstr "L'action d'une touche est une action."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_catalog_item_kind_value_unique
+msgid "The catalog holds each item once."
+msgstr "Le catalogue contient chaque élément une seule fois."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_too_old
@@ -1679,6 +2018,21 @@ msgstr ""
 "pilotage attend son choix."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__action_id
+msgid ""
+"The home key of a plugin, a key of the dashboard, or a black key; empty, the"
+" deck program uses the key as it sees fit."
+msgstr ""
+"La touche d'accueil d'un plugin, une touche du tableau de bord ou une touche"
+" noire ; vide, le programme du deck se sert de la touche à sa guise."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "The icon of a key is an icon."
+msgstr "L'icône d'une touche est une icône."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
 msgid ""
 "The ids of the deck plugins found on the workstation's disk, separated by "
@@ -1687,6 +2041,44 @@ msgstr ""
 "Les identifiants des plugins du deck trouvés sur le disque du poste, séparés"
 " par des virgules, tels que sa dernière remontée en protocole 1.1 ou plus "
 "récent les a listés."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__layout_ids
+msgid ""
+"The key layouts of this workstation, over those of its profile and of its "
+"deck models."
+msgstr ""
+"Les dispositions des touches de ce poste, par-dessus celles de son profil et"
+" de ses modèles de deck."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The keys of the deck model %(model)s are unknown until a workstation reports"
+" its catalog."
+msgstr ""
+"Les touches du modèle de deck %(model)s sont inconnues tant qu'un poste n'a "
+"pas remonté son catalogue."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The keys of this deck model are unknown until a workstation reports its "
+"catalog."
+msgstr ""
+"Les touches de ce modèle de deck sont inconnues tant qu'un poste n'a pas "
+"remonté son catalogue."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The layout of a deck model layer is for the USB product id of that model."
+msgstr ""
+"La disposition d'une couche de modèle de deck est pour l'identifiant produit"
+" USB de ce modèle."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__config_keys
@@ -1734,6 +2126,51 @@ msgstr ""
 "son jeton ?"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__in_file
+msgid ""
+"The workstation's keymap.json holds a layout edited by hand, which Odoo "
+"adopted: Odoo sends no layout for this deck model. Create or change a key to"
+" send this one again."
+msgstr ""
+"Le keymap.json du poste contient une disposition modifiée à la main, qu'Odoo"
+" a adoptée : Odoo n'envoie aucune disposition pour ce modèle de deck. Créez "
+"ou changez une touche pour renvoyer celle-ci."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid ""
+"The workstation's keymap.json holds this layout,\n"
+"                        edited on the workstation: Odoo sends no layout for\n"
+"                        this deck model. Create or change a key to send this\n"
+"                        one again."
+msgstr ""
+"Le keymap.json du poste contient cette disposition,\n"
+"                        modifiée sur le poste : Odoo n'envoie aucune disposition pour\n"
+"                        ce modèle de deck. Créez ou changez une touche pour renvoyer\n"
+"                        celle-ci."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The workstation's keymap.json holds this layout, edited on the workstation: "
+"Odoo sends no layout for this deck model."
+msgstr ""
+"Le keymap.json du poste contient cette disposition, modifiée sur le poste : "
+"Odoo n'envoie aucune disposition pour ce modèle de deck."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_catalog
+msgid ""
+"The workstations report the actions, icons and deck models\n"
+"                that their deck program offers; the key layouts choose from\n"
+"                them."
+msgstr ""
+"Les postes remontent les actions, les icônes et les modèles de deck\n"
+"                qu'offre leur programme du deck ; les dispositions des touches y\n"
+"                choisissent."
+
+#. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 msgid ""
@@ -1773,6 +2210,8 @@ msgstr "Type d'activité d'exception enregistrée."
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__usb_product_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__usb_product_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__usb_product_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
 msgid "USB product id"
 msgstr "Identifiant produit USB"
 
@@ -1816,6 +2255,7 @@ msgstr "Valable jusqu'au"
 #. module: erplibre_streamdeck
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__value
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__value
 msgid "Value"
 msgstr "Valeur"
@@ -1832,12 +2272,30 @@ msgstr ""
 "                                celles d'Odoo."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__last_seen
+msgid ""
+"When a workstation last reported this item; empty for an item the module "
+"ships."
+msgstr ""
+"Quand un poste a remonté cet élément pour la dernière fois ; vide pour un "
+"élément que livre le module."
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__service_state_since
 msgid ""
 "When this database first received the current state of the deck service."
 msgstr ""
 "Moment où cette base a reçu pour la première fois l'état actuel du service "
 "du deck."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__source
+msgid ""
+"Who set the layout: the manager, the employee, or the workstation's own "
+"file, adopted by Odoo."
+msgstr ""
+"Qui a fixé la disposition : le gestionnaire, l'employé, ou le fichier du "
+"poste, adopté par Odoo."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_line__source
@@ -1853,12 +2311,14 @@ msgstr ""
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__workstation_id
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__workstation_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__workstation_id
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
 msgid "Workstation"
 msgstr "Poste"
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__source__local
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_key_layout__source__local
 msgid "Workstation file"
 msgstr "Fichier du poste"
 

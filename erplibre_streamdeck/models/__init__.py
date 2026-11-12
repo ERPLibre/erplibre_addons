@@ -9,5 +9,6 @@ from . import streamdeck_pairing_code
 from . import res_users
 from . import res_config_settings
 from . import streamdeck_config
+from . import streamdeck_key_layout
 from . import streamdeck_monitor
 from . import streamdeck_service

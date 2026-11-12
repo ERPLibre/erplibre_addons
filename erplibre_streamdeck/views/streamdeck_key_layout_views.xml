@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- L'éditeur simple des dispositions des touches : une ligne par
+         touche, action et icône choisies dans le catalogue, aperçu en
+         grille à côté. Le gestionnaire seul pose le verrou ; les gardes
+         du serveur (streamdeck.key.layout) tiennent les bornes de
+         l'employé, la vue ne fait que les montrer. -->
+    <record id="view_streamdeck_key_layout_list" model="ir.ui.view">
+        <field name="name">streamdeck.key.layout.list</field>
+        <field name="model">streamdeck.key.layout</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="usb_product_id"/>
+                <field name="name"/>
+                <field name="profile_id" optional="show"/>
+                <field name="model_id" optional="show"/>
+                <field name="workstation_id" optional="show"/>
+                <field name="locked"/>
+                <field name="in_file" optional="show"/>
+                <field name="source" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_key_layout_form" model="ir.ui.view">
+        <field name="name">streamdeck.key.layout.form</field>
+        <field name="model">streamdeck.key.layout</field>
+        <field name="arch" type="xml">
+            <form string="Key layout">
+                <header>
+                    <button name="action_create_keys"
+                            type="object"
+                            string="Create the keys"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="status"
+                         invisible="not in_file">
+                        The workstation's keymap.json holds this layout,
+                        edited on the workstation: Odoo sends no layout for
+                        this deck model. Create or change a key to send this
+                        one again.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="True"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="usb_product_id"
+                                   readonly="model_id"/>
+                            <field name="cols" readonly="True"/>
+                            <field name="rows" readonly="True"/>
+                            <field name="key_count" readonly="True"/>
+                            <field name="profile_id" readonly="True"
+                                   invisible="not profile_id"/>
+                            <field name="model_id" readonly="True"
+                                   invisible="not model_id"/>
+                            <field name="workstation_id" readonly="True"
+                                   invisible="not workstation_id"/>
+                            <field name="locked"
+                                   groups="erplibre_streamdeck.group_streamdeck_manager"/>
+                            <field name="locked" readonly="True"
+                                   groups="!erplibre_streamdeck.group_streamdeck_manager"/>
+                            <field name="source" readonly="True"/>
+                            <field name="in_file" readonly="True"
+                                   invisible="not in_file"/>
+                            <field name="missing_plugins" readonly="True"
+                                   invisible="not missing_plugins"/>
+                        </group>
+                        <group string="Preview">
+                            <field name="preview_html" nolabel="1"
+                                   colspan="2" readonly="True"/>
+                        </group>
+                    </group>
+                    <field name="key_ids">
+                        <list editable="bottom" default_order="key_index">
+                            <field name="key_index"/>
+                            <field name="action_id"
+                                   domain="[('kind', '=', 'action')]"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="icon_id"
+                                   domain="[('kind', '=', 'icon')]"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="label"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_key_layout_search" model="ir.ui.view">
+        <field name="name">streamdeck.key.layout.search</field>
+        <field name="model">streamdeck.key.layout</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="usb_product_id"/>
+                <field name="profile_id"/>
+                <field name="workstation_id"/>
+                <filter name="locked" string="Locked"
+                        domain="[('locked', '=', True)]"/>
+                <filter name="in_file" string="Kept in the workstation's file"
+                        domain="[('in_file', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_product" string="USB product id"
+                            context="{'group_by': 'usb_product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_catalog_item_list" model="ir.ui.view">
+        <field name="name">streamdeck.catalog.item.list</field>
+        <field name="model">streamdeck.catalog.item</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="kind"/>
+                <field name="value"/>
+                <field name="name"/>
+                <field name="cols" optional="hide"/>
+                <field name="rows" optional="hide"/>
+                <field name="key_count" optional="hide"/>
+                <field name="last_seen"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_catalog_item_search" model="ir.ui.view">
+        <field name="name">streamdeck.catalog.item.search</field>
+        <field name="model">streamdeck.catalog.item</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="value"/>
+                <filter name="actions" string="Actions"
+                        domain="[('kind', '=', 'action')]"/>
+                <filter name="icons" string="Icons"
+                        domain="[('kind', '=', 'icon')]"/>
+                <filter name="models" string="Deck models"
+                        domain="[('kind', '=', 'model')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_kind" string="Kind"
+                            context="{'group_by': 'kind'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_key_layouts" model="ir.actions.act_window">
+        <field name="name">Key layouts</field>
+        <field name="res_model">streamdeck.key.layout</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_product': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Lay out the home keys of a deck model
+            </p>
+            <p>
+                A key layout belongs to a profile, a deck model or a
+                workstation: open one of them to add its layouts.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_catalog" model="ir.actions.act_window">
+        <field name="name">Catalog</field>
+        <field name="res_model">streamdeck.catalog.item</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_group_kind': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No workstation reported its catalog yet
+            </p>
+            <p>
+                The workstations report the actions, icons and deck models
+                that their deck program offers; the key layouts choose from
+                them.
+            </p>
+        </field>
+    </record>
+
+</odoo>
