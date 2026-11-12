@@ -60,7 +60,7 @@
                                    invisible="not model_id"/>
                             <field name="workstation_id" readonly="True"
                                    invisible="not workstation_id"/>
-                            <field name="locked"
+                            <field name="locked" readonly="in_file"
                                    groups="erplibre_streamdeck.group_streamdeck_manager"/>
                             <field name="locked" readonly="True"
                                    groups="!erplibre_streamdeck.group_streamdeck_manager"/>

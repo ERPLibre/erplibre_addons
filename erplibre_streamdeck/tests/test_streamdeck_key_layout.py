@@ -40,6 +40,10 @@ DECK_MINI = {
     "usb_path": "1-2",
     "firmware": None,
 }
+LOCK_IN_FILE = (
+    "Odoo does not hold the keys of this layout, kept in the workstation's"
+    " file: create its keys before locking it."
+)
 # The terms of the key layouts and their fr_CA text.
 LAYOUT_TERMS = {
     "Key layouts": "Dispositions des touches",
@@ -50,6 +54,10 @@ LAYOUT_TERMS = {
     "Kept in the workstation's file": "Gardée dans le fichier du poste",
     "Key layouts of the connected decks": (
         "Dispositions des touches des decks branchés"
+    ),
+    LOCK_IN_FILE: (
+        "Odoo ne tient pas les touches de cette disposition, gardée dans le"
+        " fichier du poste : créez ses touches avant de la verrouiller."
     ),
 }
 
@@ -822,6 +830,12 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         )
         self.assertEqual(workstation.config_revision, adopted_revision)
         self.assertEqual(len(self._events(workstation, "config_adopted")), 1)
+        # Odoo does not hold the keys of the layout kept in the file, so it
+        # could never offer it again: it takes no lock.
+        with self.assertRaises(ValidationError) as refused:
+            own.write({"locked": True})
+        self.assertIn("workstation's file", str(refused.exception))
+        self.assertFalse(own.locked)
 
         # The manager locks the profile's layout: it is offered again,
         # over the kept file.

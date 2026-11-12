@@ -1351,6 +1351,14 @@ msgstr ""
 
 #. module: erplibre_streamdeck
 #. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"Odoo does not hold the keys of this layout, kept in the workstation's file: "
+"create its keys before locking it."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
 msgid "Odoo manages no setting of this workstation."
 msgstr ""

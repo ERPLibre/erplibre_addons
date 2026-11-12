@@ -396,7 +396,10 @@ hors ASCII échappé en `\uXXXX`) :
 - une disposition **libre** devient une disposition du poste marquée
   *Gardée dans le fichier du poste*, de source *Fichier du poste*, et
   Odoo n'envoie plus de disposition pour ce modèle ; créer ou changer une
-  de ses touches la renvoie ;
+  de ses touches la renvoie. Odoo ne tient pas les touches d'une telle
+  disposition, qui ne prend donc aucun verrou d'ici là : un verrou qu'il
+  ne pourrait jamais reproposer laisserait passer une modification à la
+  main ;
 - une disposition **verrouillée**, ou retirée du fichier, est proposée de
   nouveau.
 

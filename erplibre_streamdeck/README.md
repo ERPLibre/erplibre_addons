@@ -373,7 +373,9 @@ sorted, no space, every character outside ASCII escaped as `\uXXXX`):
 - a **free** layout becomes a layout of the workstation marked *Kept in
   the workstation's file*, with the source *Workstation file*, and Odoo
   sends no layout for that model any more; creating or changing one of
-  its keys sends it again;
+  its keys sends it again. Odoo does not hold the keys of such a layout,
+  so it takes no lock until then: a lock it could never offer again
+  would let a hand edit pass unnoticed;
 - a **locked** layout, or one removed from the file, is offered again.
 
 The first-pilot question covers the free layouts as the free settings:
