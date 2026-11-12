@@ -644,8 +644,8 @@ class TestLinkupLivechatRefletRoutes(
     def test_signup_from_the_widget_altcha(self):
         """The "Sign up" answer of the widget leaves it for the page
         ``/web/signup``, whose form asks for the proof of work once the
-        website holds an ALTCHA key: without its solution, the neutral
-        error and no account; with it, the account remembers the
+        website holds an ALTCHA key: without its solution, the refusal of
+        the proof and no account; with it, the account remembers the
         visitor."""
         self.env["ir.config_parameter"].sudo().set_param(
             "auth_signup.invitation_scope", "b2c"
@@ -662,7 +662,9 @@ class TestLinkupLivechatRefletRoutes(
         Users = self.env["res.users"].sudo().with_context(active_test=False)
         refused = self._widget_signup(email)
         self.assertEqual(refused.status_code, 200)
-        self.assertIn("Could not create a new account.", refused.text)
+        self.assertIn(
+            "Could not create the account. Please try again.", refused.text
+        )
         self.assertFalse(Users.search([("email", "=", email)]))
         accepted = self._widget_signup(
             email, altcha=self._linkup_altcha_solution()

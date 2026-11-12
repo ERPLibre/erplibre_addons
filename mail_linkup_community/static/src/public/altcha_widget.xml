@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <!-- The label of the row of the proof of work holds no text and names
+         no field: it only aligns the widget with the labels of a website
+         form. It is hidden from assistive technologies, which read the
+         checkbox of the widget by its own label. -->
+    <t t-inherit="website_altcha.AltchaWidget" t-inherit-mode="extension">
+        <xpath expr="//label[hasclass('s_website_form_label')]" position="attributes">
+            <attribute name="aria-hidden">true</attribute>
+        </xpath>
+    </t>
+</templates>

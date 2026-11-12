@@ -23,11 +23,10 @@ class IrHttp(models.AbstractModel):
         ``website_altcha`` checks the ``altcha`` parameter of the request
         once the website holds an ``altcha_key``; without that key, every
         request passes, as before the module. A refusal, a ``False`` or a
-        ``UserError`` of any provider, becomes "Could not create a new
-        account.", the answer of the other refusals of a signup: it names
-        no provider, and it comes before any lookup of the address, so it
-        is the same whatever the address. Other actions keep the answer of
-        their provider."""
+        ``UserError`` of any provider, becomes "Could not create the
+        account. Please try again.": it names no provider, and it comes
+        before any lookup of the address, so it is the same whatever the
+        address. Other actions keep the answer of their provider."""
         if action != SIGNUP_ACTION:
             return super()._verify_request_recaptcha_token(action)
         try:
@@ -36,5 +35,7 @@ class IrHttp(models.AbstractModel):
             _logger.info("LinkUp: signup refused by the captcha: %s", error)
             verified = False
         if not verified:
-            raise UserError(self.env._("Could not create a new account."))
+            raise UserError(
+                self.env._("Could not create the account. Please try again.")
+            )
         return verified

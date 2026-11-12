@@ -65,8 +65,8 @@ Public signup
   other address receives its link.
 * Once the website holds an ALTCHA key, the form asks for the proof of
   work of ``website_altcha`` before anything else, and a signup without
-  its solution gets the neutral "Could not create a new account." (see
-  Configuration).
+  its solution gets the neutral "Could not create the account. Please try
+  again." (see Configuration).
 
 Consents
 ========
@@ -362,11 +362,17 @@ Proof of work of the signup (ALTCHA):
   solves a challenge of ``/altcha`` once the person ticks it, then posts
   its solution in the ``altcha`` field. A signup without a solution, with
   an invalid or expired one, or with one already used is refused with
-  "Could not create a new account.", the error of the other refusals of a
-  signup (``ir.http._verify_request_recaptcha_token``, action
-  ``signup``, in ``models/ir_http.py``): the check comes before any
-  lookup of the address, so the answer is the same whatever the address.
+  "Could not create the account. Please try again." (fr_CA "Impossible
+  de créer le compte. Réessayez."), which names no captcha
+  (``ir.http._verify_request_recaptcha_token``, action ``signup``, in
+  ``models/ir_http.py``): the check comes before any lookup of the
+  address, so the answer is the same whatever the address.
   A solution serves once, from the IP address that fetched its challenge.
+* The row of the widget (``website_altcha.AltchaWidget``) opens with an
+  empty label that only aligns it with the labels of a website form:
+  ``static/src/public/altcha_widget.xml`` hides it from assistive
+  technologies (``aria-hidden``), which read the checkbox of the widget by
+  its own label. The OCA module stays as it is.
 * ``website_altcha`` brings the ``website`` module, which
   ``mail_linkup_reflet`` does not need, and its directory,
   ``OCA_website``, belongs to the ``addons_path``. Its Python library,
@@ -374,6 +380,13 @@ Proof of work of the signup (ALTCHA):
 
 Choices
 =======
+
+Decided by the owner (2026-11-12):
+
+* Q-31: the retention periods proposed by the specification, each a
+  setting (see Retention), applied to the visitors of the live chat as
+  well (``im_livechat_linkup_reflect``); to validate in the privacy
+  impact assessment.
 
 The entry questions of the lot apply the recommendation of the
 specification, to confirm:
@@ -387,11 +400,10 @@ specification, to confirm:
 * Q-25: NewLink by phone is a share link; no SMS gateway. Typing the
   number stands for its verification, which an SMS would otherwise prove.
 * Q-27: a pseudonym, the photo visible to the linked members only.
-* Q-31: the retention periods proposed by the specification, each a
-  setting (see Retention); 30 days for an account never verified, which
-  the specification does not set. The rejected and expired reflections and
-  the inactive pairs lose their texts rather than their records, which the
-  ledger of the other party points to.
+* Q-31: 30 days for an account never verified, which the specification
+  does not set. The rejected and expired reflections and the inactive
+  pairs lose their texts rather than their records, which the ledger of
+  the other party points to.
 * Q-32: Canada only, by a declaration at signup, without geolocation; the
   terms of use state it.
 * Q-38: no applicative encryption of the content; the disk and the

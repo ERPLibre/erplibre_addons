@@ -213,6 +213,11 @@ registry.category("web_tour.tours").add("linkup_signup_altcha_tour", {
       run: "click",
     },
     {
+      // The empty label of the row of the widget is decorative.
+      trigger:
+        ".oe_signup_form .o_altcha_widget_container label.s_website_form_label[aria-hidden='true']",
+    },
+    {
       trigger: ".oe_signup_form altcha-widget input[type='checkbox']",
       run: "click",
     },

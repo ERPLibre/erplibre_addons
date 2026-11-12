@@ -28,7 +28,9 @@ PASSWORD = "linkup-Signup-2026"
 # verified.
 SENT_PAGE = "o-linkup-SignupSentPage"
 # The neutral error of a refused signup, as the page shows it.
-NEUTRAL_ERROR = "Could not create a new account."
+# The refusal of a signup without its proof of work, which names no
+# captcha.
+PROOF_ERROR = "Could not create the account. Please try again."
 ALERT_RE = re.compile(r'class="alert alert-danger"[^>]*>([^<]*)<')
 
 
@@ -376,7 +378,7 @@ class TestLinkupSignupAltcha(LinkupAltchaMixin, TestLinkupSignup):
         ):
             response = self._post(email, altcha=altcha)
             answers.append((response.status_code, self._alert(response)))
-        self.assertEqual(answers, [(200, NEUTRAL_ERROR)] * 3)
+        self.assertEqual(answers, [(200, PROOF_ERROR)] * 3)
         self.assertFalse(self._user(free))
         self.assertFalse(
             self.env["mail.mail"]
@@ -407,7 +409,7 @@ class TestLinkupSignupAltcha(LinkupAltchaMixin, TestLinkupSignup):
         self._linkup_altcha_enable()
         email = "camille.native@example.com"
         response = self._post(email)
-        self.assertEqual(self._alert(response), NEUTRAL_ERROR)
+        self.assertEqual(self._alert(response), PROOF_ERROR)
         self.assertFalse(self._user(email))
         response = self._post(email, altcha=self._linkup_altcha_solution())
         self.assertNotIn("alert-danger", response.text)
@@ -426,7 +428,8 @@ class TestLinkupSignupAltcha(LinkupAltchaMixin, TestLinkupSignup):
 
     def test_altcha_signup_tour(self):
         """The widget of the form solves the challenge in the browser, and
-        the signup gets the "check your mailbox" page."""
+        the signup gets the "check your mailbox" page. The empty label of
+        the row of the widget is hidden from assistive technologies."""
         self._linkup_altcha_enable()
         self.start_tour("/web/signup", "linkup_signup_altcha_tour")
         self.assertEqual(len(self._user("camille.tour@example.com")), 1)
@@ -459,15 +462,15 @@ class TestLinkupInvitationAltcha(LinkupAltchaMixin, TestLinkupInvitationRoute):
             response = self._signup(token, email)
             self.assertEqual(response.status_code, 200)
             answers.append(self._alert(response))
-        self.assertEqual(answers, [NEUTRAL_ERROR, NEUTRAL_ERROR])
+        self.assertEqual(answers, [PROOF_ERROR, PROOF_ERROR])
         response = self._signup(token, UNKNOWN, altcha="bm90IGEgc29sdXRpb24=")
-        self.assertEqual(self._alert(response), NEUTRAL_ERROR)
+        self.assertEqual(self._alert(response), PROOF_ERROR)
         # A solution serves once, even for a signup refused after it.
         solution = self._linkup_altcha_solution()
         response = self._signup(token, OTHER, altcha=solution)
-        self.assertNotEqual(self._alert(response), NEUTRAL_ERROR)
+        self.assertNotEqual(self._alert(response), PROOF_ERROR)
         response = self._signup(token, UNKNOWN, altcha=solution)
-        self.assertEqual(self._alert(response), NEUTRAL_ERROR)
+        self.assertEqual(self._alert(response), PROOF_ERROR)
         self.assertFalse(self._user(UNKNOWN))
         self.assertEqual(self._invitation(result).state, "sent")
 

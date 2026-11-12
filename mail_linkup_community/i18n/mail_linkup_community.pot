@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 12:08+0000\n"
-"PO-Revision-Date: 2026-11-06 12:08+0000\n"
+"POT-Creation-Date: 2026-11-12 06:22+0000\n"
+"PO-Revision-Date: 2026-11-12 06:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -859,9 +859,14 @@ msgstr ""
 #. module: mail_linkup_community
 #. odoo-python
 #: code:addons/mail_linkup_community/controllers/signup.py:0
-#: code:addons/mail_linkup_community/models/ir_http.py:0
 #: code:addons/mail_linkup_community/models/res_users.py:0
 msgid "Could not create a new account."
+msgstr ""
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/ir_http.py:0
+msgid "Could not create the account. Please try again."
 msgstr ""
 
 #. module: mail_linkup_community
@@ -1224,6 +1229,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail_linkup_community.field_linkup_consent__granted
 #: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_consent_view_search
 msgid "Granted"
+msgstr ""
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_ir_http
+msgid "HTTP Routing"
 msgstr ""
 
 #. module: mail_linkup_community

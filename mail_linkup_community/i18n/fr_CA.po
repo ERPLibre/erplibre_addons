@@ -965,10 +965,15 @@ msgstr "Copier le lien"
 #. module: mail_linkup_community
 #. odoo-python
 #: code:addons/mail_linkup_community/controllers/signup.py:0
-#: code:addons/mail_linkup_community/models/ir_http.py:0
 #: code:addons/mail_linkup_community/models/res_users.py:0
 msgid "Could not create a new account."
 msgstr "Impossible de créer un nouveau compte."
+
+#. module: mail_linkup_community
+#. odoo-python
+#: code:addons/mail_linkup_community/models/ir_http.py:0
+msgid "Could not create the account. Please try again."
+msgstr "Impossible de créer le compte. Réessayez."
 
 #. module: mail_linkup_community
 #. odoo-javascript
@@ -1346,6 +1351,11 @@ msgstr "Donné le %(date)s, version %(version)s"
 #: model_terms:ir.ui.view,arch_db:mail_linkup_community.linkup_consent_view_search
 msgid "Granted"
 msgstr "Donné"
+
+#. module: mail_linkup_community
+#: model:ir.model,name:mail_linkup_community.model_ir_http
+msgid "HTTP Routing"
+msgstr "Routage HTTP"
 
 #. module: mail_linkup_community
 #: model:ir.model.fields,field_description:mail_linkup_community.field_res_config_settings__linkup_help_resources

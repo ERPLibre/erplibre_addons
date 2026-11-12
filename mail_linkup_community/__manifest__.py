@@ -30,6 +30,11 @@
             "mail_linkup_community/static/src/**/*",
             # The dark tints are compiled in the dark bundle only.
             ("remove", "mail_linkup_community/static/src/**/*.dark.scss"),
+            # The public pages load the frontend bundle.
+            ("remove", "mail_linkup_community/static/src/public/**/*"),
+        ],
+        "web.assets_frontend": [
+            "mail_linkup_community/static/src/public/**/*",
         ],
         "web.assets_web_dark": [
             "mail_linkup_community/static/src/**/*.dark.scss",
