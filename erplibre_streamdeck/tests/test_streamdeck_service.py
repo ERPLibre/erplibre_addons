@@ -123,7 +123,7 @@ class TestStreamdeckService(TransactionCase):
     def _assert_error(self, result, status, code):
         self.assertEqual(result[0], status, result[1])
         self.assertEqual(result[1].get("error"), code, result[1])
-        self.assertEqual(result[1].get("protocol"), "1.1")
+        self.assertEqual(result[1].get("protocol"), "1.2")
 
     def _counts(self):
         return (
@@ -159,7 +159,7 @@ class TestStreamdeckService(TransactionCase):
         )
         self.assertEqual(status, 200, body)
         self.assertEqual(set(body), {"protocol", "workstation_id", "token"})
-        self.assertEqual(body["protocol"], "1.1")
+        self.assertEqual(body["protocol"], "1.2")
         token = body["token"]
         self.assertEqual(len(token), 43)
         self.assertRegex(token, r"^[A-Za-z0-9_-]{43}$")
@@ -547,7 +547,7 @@ class TestStreamdeckService(TransactionCase):
             }
         )
         self.assertEqual(status, 200, body)
-        self.assertEqual(body["protocol"], "1.1")
+        self.assertEqual(body["protocol"], "1.2")
         deck = dict(self._deck("SN-MINOR"), future_deck_key=True)
         event = dict(self._event("plugged", deck), future_event_key="x")
         payload = {
@@ -572,7 +572,7 @@ class TestStreamdeckService(TransactionCase):
         status, body = self._report(token, decks=[one, two])
         self.assertEqual(status, 200, body)
         self.assertEqual(
-            body, {"protocol": "1.1", "accepted": [], "heartbeat_s": 900}
+            body, {"protocol": "1.2", "accepted": [], "heartbeat_s": 900}
         )
         decks = self.Device.search([("workstation_id", "=", workstation.id)])
         self.assertEqual(sorted(decks.mapped("serial")), ["SN-ONE", "SN-TWO"])
@@ -1102,7 +1102,7 @@ class TestStreamdeckService(TransactionCase):
         enrolled = self._enroll(self.user_a)
         token = enrolled["token"]
         status, body = self.Service.unenroll(token, {"protocol": "1.0"})
-        self.assertEqual((status, body), (200, {"protocol": "1.1"}))
+        self.assertEqual((status, body), (200, {"protocol": "1.2"}))
         workstation = self.Workstation.browse(enrolled["workstation_id"])
         self.assertFalse(workstation.token_hash)
         self.assertTrue(workstation.active)

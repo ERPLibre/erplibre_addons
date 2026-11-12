@@ -88,7 +88,7 @@ class TestStreamdeckRoutes(HttpCase):
         )
         self.assertIn("no-store", response.headers.get("Cache-Control", ""))
         body = response.json()
-        self.assertEqual(body["protocol"], "1.1")
+        self.assertEqual(body["protocol"], "1.2")
         return body
 
     def _error(self, response, status, code):
@@ -170,7 +170,7 @@ class TestStreamdeckRoutes(HttpCase):
         self.assertEqual(
             body,
             {
-                "protocol": "1.1",
+                "protocol": "1.2",
                 "accepted": [event["uuid"]],
                 "heartbeat_s": 900,
             },
@@ -183,7 +183,7 @@ class TestStreamdeckRoutes(HttpCase):
         body = self._json(
             self._post("unenroll", {"protocol": "1.0"}, token=token), 200
         )
-        self.assertEqual(body, {"protocol": "1.1"})
+        self.assertEqual(body, {"protocol": "1.2"})
         self.assertFalse(workstation.token_hash)
         self._error(
             self._post("report", self._report_payload(), token=token),

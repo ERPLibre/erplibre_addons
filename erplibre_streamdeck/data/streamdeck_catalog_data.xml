@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+
+    <!-- Les deux actions que le format 1 de keymap.json définit hors des
+         plugins : l'éditeur les offre avant toute remontée d'un
+         catalogue. -->
+    <record id="catalog_action_tiles" model="streamdeck.catalog.item">
+        <field name="kind">action</field>
+        <field name="value">tiles</field>
+    </record>
+
+    <record id="catalog_action_empty" model="streamdeck.catalog.item">
+        <field name="kind">action</field>
+        <field name="value">empty</field>
+    </record>
+
+</odoo>
