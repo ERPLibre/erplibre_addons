@@ -68,9 +68,11 @@ class ResConfigSettings(models.TransientModel):
         " sensitive information before sending anything.",
     )
 
+    # Not a ``config_parameter`` field: ``res.config.settings`` refuses a
+    # ``Text`` one, in every reading of the settings, and the resources
+    # take a line each. ``get_values`` and ``set_values`` keep it.
     linkup_help_resources = fields.Text(
         string="Help resources",
-        config_parameter=HELP_RESOURCES_PARAM,
         help="One resource per line, shown under “Need help now” and with a"
         " report of a person in distress. Empty, LinkUp shows the crisis"
         " line 9-8-8 and the emergency number 9-1-1 of Canada.",
@@ -157,11 +159,20 @@ class ResConfigSettings(models.TransientModel):
         res["linkup_email_verification"] = self.env[
             "res.users"
         ]._linkup_verification_enabled()
+        res["linkup_help_resources"] = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param(HELP_RESOURCES_PARAM)
+        )
         return res
 
     def set_values(self):
         super().set_values()
-        self.env["ir.config_parameter"].sudo().set_param(
+        params = self.env["ir.config_parameter"].sudo()
+        params.set_param(
+            HELP_RESOURCES_PARAM, self.linkup_help_resources or False
+        )
+        params.set_param(
             VERIFICATION_PARAM,
             "True" if self.linkup_email_verification else "False",
         )

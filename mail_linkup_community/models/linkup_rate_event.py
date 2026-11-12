@@ -4,12 +4,16 @@ from datetime import timedelta
 
 from odoo import _, api, fields, models
 from odoo.addons.mail_linkup_reflet.exceptions import LinkupError
+from odoo.tools import SQL
 from odoo.tools.misc import hmac
 
 # Scope of the keyed hash of a key of a limit.
 KEY_HASH_SCOPE = "linkup.rate.event"
 # Days an event is kept: the longest window of a limit is one day.
 RETENTION_DAYS = 2
+# Table of one row per locked key, outside the ORM: no record of it is ever
+# read, only written to serialize the transactions on one key.
+LOCK_TABLE = "linkup_rate_event_lock"
 
 
 class LinkupRateEvent(models.Model):
@@ -36,6 +40,16 @@ class LinkupRateEvent(models.Model):
         readonly=True,
     )
     key_hash = fields.Char(required=True, index=True, readonly=True)
+
+    def init(self):
+        super().init()
+        self.env.cr.execute(
+            SQL(
+                "CREATE TABLE IF NOT EXISTS %s (key_hash varchar PRIMARY KEY,"
+                " locked_at timestamp NOT NULL)",
+                SQL.identifier(LOCK_TABLE),
+            )
+        )
 
     @api.model
     def _linkup_key(self, value):
@@ -69,6 +83,35 @@ class LinkupRateEvent(models.Model):
             )
 
     @api.model
+    def _linkup_lock(self, kind, values):
+        """Serialize, until the end of the transaction, the transactions
+        that count and add events of ``kind`` for any of ``values``.
+
+        A limit counts, then adds its event: two transactions at once
+        would each count without the event of the other, and both pass.
+        Each key writes its row of ``LOCK_TABLE``, in a fixed order: a
+        second transaction waits for the first, then, under the
+        ``REPEATABLE READ`` of Odoo, fails with a serialization error once
+        the first commits, since the row changed after its snapshot. The
+        RPC layer retries it (``odoo.service.model.retrying``), and the
+        retry counts the event of the first.
+        """
+        keys = sorted(
+            {f"{kind}:{self._linkup_key(value)}" for value in values}
+        )
+        for key in keys:
+            self.env.cr.execute(
+                SQL(
+                    "INSERT INTO %s (key_hash, locked_at) VALUES (%s, %s)"
+                    " ON CONFLICT (key_hash) DO UPDATE"
+                    " SET locked_at = EXCLUDED.locked_at",
+                    SQL.identifier(LOCK_TABLE),
+                    key,
+                    fields.Datetime.now(),
+                )
+            )
+
+    @api.model
     def _linkup_hit(self, kind, value):
         """Count one event of ``kind`` for ``value``."""
         return self.sudo().create(
@@ -87,4 +130,11 @@ class LinkupRateEvent(models.Model):
                 )
             ]
         ).unlink()
+        self.env.cr.execute(
+            SQL(
+                "DELETE FROM %s WHERE locked_at < %s",
+                SQL.identifier(LOCK_TABLE),
+                fields.Datetime.now() - timedelta(days=RETENTION_DAYS),
+            )
+        )
         return True

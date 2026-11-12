@@ -8,6 +8,7 @@ from . import (
     test_personal_data,
     test_privacy,
     test_profile,
+    test_rate_lock,
     test_retention,
     test_signup,
     test_ui,

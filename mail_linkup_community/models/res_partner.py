@@ -27,3 +27,12 @@ class ResPartner(models.Model):
                 self, result, fnames, self.env.user.partner_id.id, linked
             )
         return result
+
+    def _linkup_export_masks(self, fields):
+        """Blank in an export the photo of the partners not linked to a
+        restricted member."""
+        masks = super()._linkup_export_masks(fields)
+        mask = privacy.export_photo_mask(
+            self, fields, privacy.IMAGE_FIELDS, lambda partner: partner
+        )
+        return masks + [mask] if mask else masks

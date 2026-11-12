@@ -1159,6 +1159,15 @@ class ResUsers(models.Model):
             )
         return result
 
+    def _linkup_export_masks(self, fields):
+        """Blank in an export the photo of the users not linked to a
+        restricted member."""
+        masks = super()._linkup_export_masks(fields)
+        mask = privacy.export_photo_mask(
+            self, fields, privacy.IMAGE_FIELDS, lambda user: user.partner_id
+        )
+        return masks + [mask] if mask else masks
+
     # ------------------------------------------------------------------
     # Web client
     # ------------------------------------------------------------------

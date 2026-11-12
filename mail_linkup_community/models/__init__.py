@@ -2,6 +2,7 @@
 
 from . import (
     discuss_channel,
+    ir_attachment,
     ir_binary,
     ir_http,
     linkup_audit_log,

@@ -42,7 +42,9 @@ Public signup
 * Beyond ``linkup.signup_rate_per_ip_hour`` (3) signups of one address IP
   in the hour, the page answers HTTP 429 and the model refuses with
   ``linkup.rate_limited``. The limits count keyed hashes of the address in
-  ``linkup.rate.event``, purged after two days; no address is kept. An
+  ``linkup.rate.event``, purged after two days; no address is kept. The
+  transactions that count one key run one after the other, on a row of
+  the table ``linkup_rate_event_lock``, which the uninstall hook drops. An
   IPv6 address counts as its /64 network. The address is the one of the
   connection: ``X-Forwarded-For`` counts only with ``proxy_mode``, behind
   the proxy of the instance (LU-NF-007), without which every signup
@@ -119,9 +121,13 @@ Profile
   the residence are not (LU-F-082 CA2).
 * What a restricted member reads of the others (LU-F-082 RM3, Q-27): the
   photo of another member reaches only the members of an ``active`` link:
-  the readings blank it, and ``/web/image`` serves the placeholder
-  (``ir.binary``). A reading reads the links of the member only when it
-  holds a photo, which those of the Discuss Store do not. The address,
+  the readings blank it, the avatar of the author of a message
+  (``author_avatar``) included, ``/web/image`` and ``/web/content`` serve
+  the placeholder (``ir.binary``), and the attachments that store it are
+  left out of what the member finds or reads (``ir.attachment``). An
+  export blanks it as well, through a relation included
+  (``_linkup_export_masks``). A reading reads the links of the member only
+  when it holds a photo, which those of the Discuss Store do not. The address,
   the phone and the login of the others are closed by
   ``mail_linkup_reflet`` (LU-F-082 RM2, CA1, LU-F-112 RM3, CA3,
   LU-NF-009).

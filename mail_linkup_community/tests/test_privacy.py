@@ -7,6 +7,7 @@ another member, no search on them, the photo for the linked members only.
 import io
 
 from odoo.addons.mail.tools.discuss import Store
+from odoo.exceptions import AccessError
 from odoo.tests import HttpCase, tagged
 from PIL import Image
 
@@ -96,6 +97,91 @@ class TestLinkupPrivacy(LinkupCommunityCase):
         self._confirmed()
         self.assertTrue(partner.read(["image_128"])[0]["image_128"])
 
+    def test_photo_in_messages_and_attachments(self):
+        """Q-27: the avatar of the author of a message of France and the
+        attachment that stores her photo reach Sam once their link is
+        active only."""
+        message = self.workshop.with_user(self.france).message_post(
+            body="Bonjour",
+            message_type="comment",
+            subtype_xmlid="mail.mt_comment",
+        )
+        domain = [
+            ("res_model", "=", "res.partner"),
+            ("res_id", "=", self.france.partner_id.id),
+            ("res_field", "=", "image_1920"),
+        ]
+        attachment = self.env["ir.attachment"].search(domain)
+        self.assertTrue(attachment)
+        Attachment = self.env["ir.attachment"].with_user(self.sam)
+
+        def avatar():
+            return message.with_user(self.sam).read(["author_avatar"])[0][
+                "author_avatar"
+            ]
+
+        self.assertFalse(avatar())
+        self.assertFalse(Attachment.search_read(domain, ["datas"]))
+        with self.assertRaises(AccessError):
+            Attachment.browse(attachment.ids).read(["datas"])
+        self._confirmed()
+        self.assertTrue(avatar())
+        self.assertTrue(Attachment.search_read(domain, ["datas"]))
+
+    def test_export_blanks_the_photos(self):
+        """Q-27: an export of Sam, who holds the export group, carries the
+        photo of France, of her user, and the avatar of her messages read
+        through a relation once their link is active only; his own photo
+        stays."""
+        self.sam.groups_id |= self.env.ref("base.group_allow_export")
+        message = self.workshop.with_user(self.france).message_post(
+            body="Bonjour",
+            message_type="comment",
+            subtype_xmlid="mail.mt_comment",
+        )
+        partners = (self.france | self.sam).partner_id.with_user(self.sam)
+        users = (self.france | self.sam).with_user(self.sam)
+        workshop = self.workshop.with_user(self.sam)
+
+        def exported():
+            message_rows = {
+                row[0]: row[1:]
+                for row in workshop.export_data(
+                    [
+                        "message_ids/.id",
+                        "message_ids/author_avatar",
+                        "message_ids/author_id/image_128",
+                    ]
+                )["datas"]
+            }
+            return (
+                [
+                    row[1]
+                    for row in partners.export_data(["name", "image_128"])[
+                        "datas"
+                    ]
+                ],
+                [
+                    row[1]
+                    for row in users.export_data(["name", "avatar_128"])[
+                        "datas"
+                    ]
+                ],
+                message_rows[str(message.id)],
+            )
+
+        partner_photos, user_photos, message_photos = exported()
+        self.assertEqual(partner_photos[0], "")
+        self.assertTrue(partner_photos[1])
+        self.assertEqual(user_photos[0], "")
+        self.assertTrue(user_photos[1])
+        self.assertEqual(message_photos, ["", ""])
+        self._confirmed()
+        partner_photos, user_photos, message_photos = exported()
+        self.assertTrue(partner_photos[0])
+        self.assertTrue(user_photos[0])
+        self.assertTrue(all(message_photos))
+
     def test_store_leaves_the_address_out(self):
         """The Discuss Store gives no address of a member, whoever reads."""
         store = Store(self.france.partner_id.with_user(self.sam).sudo())
@@ -132,3 +218,37 @@ class TestLinkupPrivacyRoute(LinkupCommunityCase, HttpCase):
         self.assertEqual(size(), (1, 1))
         self.authenticate(self.france.login, self.france.login)
         self.assertEqual(size(), (1, 1))
+
+    def test_avatar_of_a_message_and_photo_attachment(self):
+        """The avatar of the author of a message of France, and the
+        attachment of her photo, reach Sam as the placeholder until their
+        link is active."""
+        self.france.partner_id.write({"image_1920": PIXEL})
+        message = self.workshop.with_user(self.france).message_post(
+            body="Bonjour",
+            message_type="comment",
+            subtype_xmlid="mail.mt_comment",
+        )
+        attachment = self.env["ir.attachment"].search(
+            [
+                ("res_model", "=", "res.partner"),
+                ("res_id", "=", self.france.partner_id.id),
+                ("res_field", "=", "image_1920"),
+            ]
+        )
+        urls = (
+            f"/web/image/mail.message/{message.id}/author_avatar",
+            f"/web/content/{attachment.id}",
+        )
+
+        def size(url):
+            return Image.open(io.BytesIO(self.url_open(url).content)).size
+
+        self.authenticate(self.sam.login, self.sam.login)
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertGreater(size(url)[0], 1)
+        self._confirmed()
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertEqual(size(url), (1, 1))

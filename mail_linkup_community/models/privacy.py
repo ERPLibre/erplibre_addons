@@ -22,6 +22,9 @@ IMAGE_FIELDS = frozenset(
         for size in (1920, 1024, 512, 256, 128)
     }
 )
+# Models whose records hold the photo of a person, a user through its
+# partner.
+PHOTO_MODELS = ("res.partner", "res.users")
 
 
 def linked_user_ids(env):
@@ -40,6 +43,19 @@ def linked_user_ids(env):
         )
     )
     return set((links.user_a_id | links.user_b_id).ids) - {uid}
+
+
+def closed_photo_partner_ids(env, partner_ids):
+    """The ids of ``partner_ids`` whose photo the current user does not
+    read: for a restricted member, every partner but their own and those
+    of their ``active`` links; for anybody else, none."""
+    if not contact_closed(env):
+        return set()
+    ids = set(partner_ids) - {env.user.partner_id.id, False}
+    if not ids:
+        return ids
+    linked = env["res.users"].sudo().browse(linked_user_ids(env))
+    return ids - set(linked.partner_id.ids)
 
 
 def mask_images(records, rows, fnames, own_id, linked):
@@ -62,3 +78,25 @@ def mask_images(records, rows, fnames, own_id, linked):
             if fname in vals:
                 vals[fname] = blank(records._fields[fname])
     return rows
+
+
+def export_photo_mask(records, fields, photo_fields, owner):
+    """The mask of the photos in an export of ``records`` by a restricted
+    member (``linkup.contact.privacy._linkup_export_masks``):
+    ``(indexes, kept)``, the columns of ``fields`` that hold a photo of
+    ``photo_fields`` and the records whose photo the reader reads, or
+    ``None``. ``owner`` gives the partner of a record, read under
+    ``sudo``."""
+    if not contact_closed(records.env):
+        return None
+    columns = [
+        index
+        for index, path in enumerate(fields)
+        if len(path) == 1 and path[0] in photo_fields
+    ]
+    if not columns:
+        return None
+    owners = {record.id: owner(record.sudo()).id for record in records}
+    closed = closed_photo_partner_ids(records.env, owners.values())
+    kept = records.filtered(lambda record: owners[record.id] not in closed)
+    return columns, kept
