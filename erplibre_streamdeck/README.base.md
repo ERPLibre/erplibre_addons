@@ -381,8 +381,12 @@ sorted, no space, every character outside ASCII escaped as `\uXXXX`):
   its keys sends it again;
 - a **locked** layout, or one removed from the file, is offered again.
 
-The first-pilot question leaves the layouts out: only the extension
-writes `keymap.json`.
+The first-pilot question covers the free layouts as the free settings:
+a free layout of the file whose hash differs from Odoo's puts
+`key_layouts` in `ask`, unless one of the sent layouts is locked, and
+keeping the local values adopts it as above. A workstation piloted before
+protocol 1.2 has made its choice already: a layout then follows the rule
+of a setting newly managed, offered under a new revision.
 
 ### History of the configuration
 
@@ -460,9 +464,9 @@ accepted and its unknown keys ignored. Every reply carries `"protocol":
   plus `ask` during a first pilot under *Ask the employee*. `hash` is the
   SHA-256 of the canonical JSON of `settings` (keys sorted, no space),
   `locked` the locked settings, `ask` the free settings whose local value
-  differs from Odoo's. In 1.2, `settings.key_layouts` maps the product
-  id of each connected deck that Odoo lays out, within the catalog of the
-  report, to `{"keys": [{"key",
+  differs from Odoo's, `key_layouts` included. In 1.2,
+  `settings.key_layouts` maps the product id of each connected deck that
+  Odoo lays out, within the catalog of the report, to `{"keys": [{"key",
   "action", "icon", "label"}]}`, by ascending key, `icon` and `label`
   only when set, at most 16 models; `locked` then lists `key_layouts`
   when one of these layouts is locked.
@@ -895,8 +899,13 @@ hors ASCII échappé en `\uXXXX`) :
 - une disposition **verrouillée**, ou retirée du fichier, est proposée de
   nouveau.
 
-La question du premier pilotage laisse les dispositions de côté : seule
-l'extension écrit `keymap.json`.
+La question du premier pilotage couvre les dispositions libres comme les
+réglages libres : une disposition libre du fichier dont l'empreinte
+diffère de celle d'Odoo met `key_layouts` dans `ask`, sauf si une des
+dispositions envoyées est verrouillée, et garder les valeurs locales
+l'adopte comme plus haut. Un poste piloté avant le protocole 1.2 a déjà
+fait son choix : une disposition suit alors la règle d'un réglage
+nouvellement géré, proposée sous une nouvelle révision.
 
 ### Historique de la configuration
 
@@ -976,10 +985,10 @@ réponse d'erreur y ajoute `error`.
   plus `ask` pendant un premier pilotage sous *Demander à l'employé*.
   `hash` est le SHA-256 du JSON canonique de `settings` (clés triées, sans
   espace), `locked` les réglages verrouillés, `ask` les réglages libres
-  dont la valeur locale diffère de celle d'Odoo. En 1.2,
-  `settings.key_layouts` associe l'identifiant produit de chaque deck
-  branché qu'Odoo dispose, dans les limites du catalogue de la remontée,
-  à `{"keys": [{"key", "action", "icon",
+  dont la valeur locale diffère de celle d'Odoo, `key_layouts` compris.
+  En 1.2, `settings.key_layouts` associe l'identifiant produit de chaque
+  deck branché qu'Odoo dispose, dans les limites du catalogue de la
+  remontée, à `{"keys": [{"key", "action", "icon",
   "label"}]}`, par touche croissante, `icon` et `label` seulement quand
   ils sont fixés, au plus 16 modèles ; `locked` liste alors
   `key_layouts` quand une de ces dispositions est verrouillée.

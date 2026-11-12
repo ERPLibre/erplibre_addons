@@ -180,7 +180,9 @@ class KeyLayoutCase(TransactionCase):
         ]
 
     @staticmethod
-    def _pilot(layouts=None, applied=None, result=None, **current):
+    def _pilot(
+        layouts=None, applied=None, result=None, choice=None, **current
+    ):
         values = dict.fromkeys(KEYS)
         values.update(current)
         values["key_layouts"] = layouts
@@ -189,7 +191,7 @@ class KeyLayoutCase(TransactionCase):
             "revision_applied": applied,
             "current": values,
             "result": result,
-            "choice": None,
+            "choice": choice,
         }
 
     @staticmethod
@@ -852,6 +854,88 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
             self.assertEqual(config["revision"], revision + 1)
         self.assertEqual(workstation.config_state, "pending")
         self.assertFalse(self._events(workstation, "config_drift"))
+
+    def test_a_first_pilot_asks_about_a_free_layout_of_the_file(self):
+        # The first-pilot question covers the layouts as the free
+        # settings: under « keep local », a free layout of the file that
+        # differs from Odoo's is adopted, kept in the file.
+        workstation, token = self._workstation()
+        mine = {"0084": "e" * 64}
+        config = self._ok(token, workstation, self._pilot(mine))["config"]
+        self.assertEqual(config["ask"], ["key_layouts"])
+        self.assertIn("0084", config["settings"]["key_layouts"])
+        self.assertFalse(workstation.layout_ids)
+        config = self._ok(
+            token, workstation, self._pilot(mine, choice="keep_local")
+        )["config"]
+        self.assertNotIn("ask", config)
+        self.assertEqual(config["settings"], {"games": "on"})
+        own = workstation.layout_ids
+        self.assertEqual(
+            (own.usb_product_id, own.in_file, own.file_hash, own.source),
+            ("0084", True, "e" * 64, "local"),
+        )
+        self.assertEqual(
+            self._events(workstation, "config_adopted").mapped("config_keys"),
+            ["key_layouts:0084"],
+        )
+        self.assertEqual(workstation.config_first_choice, "keep_local")
+        # The same layout, none in the file, or a locked layout: nothing
+        # to ask.
+        wanted = layout_hash(self.layout._wire())
+        for file_layouts in ({"0084": wanted}, {"0084": None}, {}):
+            other, other_token = self._workstation()
+            with self.subTest(file_layouts=file_layouts):
+                config = self._ok(
+                    other_token, other, self._pilot(file_layouts)
+                )["config"]
+                self.assertNotIn("ask", config)
+        self.layout.locked = True
+        other, other_token = self._workstation()
+        config = self._ok(other_token, other, self._pilot(mine))["config"]
+        self.assertNotIn("ask", config)
+        self.assertEqual(config["locked"], ["key_layouts"])
+        # The organisation's policy settles it without asking.
+        self.layout.locked = False
+        param = self.env["ir.config_parameter"].sudo()
+        for policy, adopted in (("keep_local", True), ("take_odoo", False)):
+            with self.subTest(policy=policy):
+                param.set_param(
+                    "erplibre_streamdeck.first_pilot_policy", policy
+                )
+                other, other_token = self._workstation()
+                config = self._ok(other_token, other, self._pilot(mine))[
+                    "config"
+                ]
+                self.assertNotIn("ask", config)
+                self.assertEqual(bool(other.layout_ids.in_file), adopted)
+                self.assertEqual(
+                    "key_layouts" in config["settings"], not adopted
+                )
+        # A locked layout is never adopted, whatever the policy.
+        param.set_param("erplibre_streamdeck.first_pilot_policy", "keep_local")
+        self.layout.locked = True
+        other, other_token = self._workstation()
+        config = self._ok(other_token, other, self._pilot(mine))["config"]
+        self.assertFalse(other.layout_ids)
+        self.assertIn("0084", config["settings"]["key_layouts"])
+        # Under « ask », a free layout beside a locked one is not asked:
+        # the workstation refuses a revision asking a locked setting.
+        param.set_param("erplibre_streamdeck.first_pilot_policy", "ask")
+        self._layout(
+            {"profile_id": self.profile.id},
+            (0, "tiles", None, None),
+            product="0063",
+        )
+        other, other_token = self._workstation(decks=(DECK_PLUS, DECK_MINI))
+        config = self._ok(other_token, other, self._pilot({"0063": "e" * 64}))[
+            "config"
+        ]
+        self.assertEqual(
+            sorted(config["settings"]["key_layouts"]), ["0063", "0084"]
+        )
+        self.assertEqual(config["locked"], ["key_layouts"])
+        self.assertNotIn("ask", config)
 
     # -- preview ---------------------------------------------------------
 
