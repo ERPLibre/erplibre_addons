@@ -680,6 +680,53 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         )
         self.assertEqual(len(self._events(workstation, "config_adopted")), 1)
 
+    def test_a_layout_changed_in_odoo_is_offered_not_taken_from_the_file(
+        self,
+    ):
+        # The file still holds the applied layout while Odoo's changed: a
+        # change to offer, not a hand edit to adopt.
+        workstation, token = self._workstation()
+        revision, layouts = self._applied(token, workstation)
+        self.layout.key_ids.filtered(lambda k: k.key_index == 0).label = "T"
+        config = self._ok(
+            token, workstation, self._pilot(layouts, revision, games="on")
+        )["config"]
+        self.assertEqual(config["revision"], revision + 1)
+        self.assertEqual(
+            config["settings"]["key_layouts"]["0084"]["keys"][0]["label"], "T"
+        )
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertFalse(self._events(workstation, "config_adopted"))
+        self.assertFalse(workstation.layout_ids)
+        self.assertEqual(self.layout.source, "manager")
+
+    def test_a_pending_layout_is_no_drift_at_each_report(self):
+        # A revision that brings a new layout waits for the click: the
+        # file lacks it until then, which is no drift.
+        workstation, token = self._workstation()
+        revision, layouts = self._applied(token, workstation)
+        self._layout(
+            {"profile_id": self.profile.id},
+            (0, "tiles", None, None),
+            product="0063",
+        )
+        self.env["streamdeck.device"].create(
+            {
+                "key": "sn:SN-MINI-P",
+                "serial": "SN-MINI-P",
+                "usb_product_id": "0063",
+                "workstation_id": workstation.id,
+                "connected": True,
+            }
+        )
+        for _report in range(3):
+            config = self._ok(
+                token, workstation, self._pilot(layouts, revision, games="on")
+            )["config"]
+            self.assertEqual(config["revision"], revision + 1)
+        self.assertEqual(workstation.config_state, "pending")
+        self.assertFalse(self._events(workstation, "config_drift"))
+
     # -- preview ---------------------------------------------------------
 
     def test_the_preview_warns_of_plugins_without_a_key(self):
@@ -777,6 +824,31 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         self.layout.locked = True
         with self.assertRaises(AccessError):
             free.with_user(self.user_a).action_create_keys()
+
+    def test_an_employee_never_moves_a_layout_into_a_lock(self):
+        # Neither a key moved into a locked layout, nor a free layout
+        # turned to a deck model that a layer locks.
+        ws_a, _token = self._workstation()
+        env_a = self.env(user=self.user_a)
+        free = self._layout(
+            {"workstation_id": ws_a.id},
+            (5, "tiles", None, None),
+            product="0063",
+            env=env_a,
+        )
+        locked = self._layout(
+            {"workstation_id": ws_a.id, "locked": True},
+            (0, "tiles", None, None),
+        )
+        key = free.with_user(self.user_a).key_ids
+        with self.assertRaises(AccessError):
+            key.write({"layout_id": locked.id})
+        self.assertEqual(key.layout_id, free)
+        locked.unlink()
+        self.layout.locked = True
+        with self.assertRaises(AccessError):
+            free.with_user(self.user_a).write({"usb_product_id": "0084"})
+        self.assertEqual(free.usb_product_id, "0063")
 
 
 @tagged("post_install", "-at_install")
