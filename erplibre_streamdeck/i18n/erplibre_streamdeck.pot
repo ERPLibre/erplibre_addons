@@ -414,6 +414,11 @@ msgid "Catalog"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__catalog_action_ids
+msgid "Catalog actions"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__drift
 msgid "Changed locally"
 msgstr ""
@@ -850,6 +855,11 @@ msgstr ""
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_type_icon
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__workstation_ids
+msgid "For an action, the workstations whose last catalog offered it."
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -1367,6 +1377,11 @@ msgid "Odoo manages no setting of this workstation."
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__workstation_ids
+msgid "Offered by"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_offered
 msgid "Offered configuration"
 msgstr ""
@@ -1461,15 +1476,16 @@ msgid "Plugin %(id)s"
 msgstr ""
 
 #. module: erplibre_streamdeck
-#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
-msgid ""
-"Plugins of the catalog that have a home key and that this layout does not "
-"name: they get no key on the home screen."
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__plugins_off
+msgid "Plugins turned off"
 msgstr ""
 
 #. module: erplibre_streamdeck
-#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__plugins_off
-msgid "Plugins turned off"
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
+msgid ""
+"Plugins with a home key that the workstations offer, those of its own "
+"workstation for a workstation's layout, and that this layout does not name: "
+"they get no key on the home screen."
 msgstr ""
 
 #. module: erplibre_streamdeck
@@ -1845,6 +1861,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
 msgid "The action of a key is an action."
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__catalog_action_ids
+msgid "The actions the last catalog of this workstation offered."
 msgstr ""
 
 #. module: erplibre_streamdeck

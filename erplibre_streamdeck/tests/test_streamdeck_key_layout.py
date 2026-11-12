@@ -60,6 +60,7 @@ LAYOUT_TERMS = {
     "Key layouts": "Dispositions des touches",
     "Key layout": "Disposition des touches",
     "Catalog": "Catalogue",
+    "Offered by": "Offert par",
     "Create the keys": "Créer les touches",
     "Plugins without a key": "Plugins sans touche",
     "Kept in the workstation's file": "Gardée dans le fichier du poste",
@@ -116,7 +117,17 @@ class KeyLayoutCase(TransactionCase):
             name="Manager M",
             groups="base.group_user,%s" % MANAGER_GROUP,
         )
-        cls.Item._take(CATALOG, "2026-01-01 10:00:00")
+        # The workstation whose report fills the catalog of every test.
+        digest = hashlib.sha256(b"reporter").hexdigest()
+        cls.reporter = cls.Workstation.create(
+            {
+                "user_id": cls.manager.id,
+                "name": "reporter",
+                "fingerprint": digest,
+                "token_hash": digest,
+            }
+        )
+        cls.Item._take(CATALOG, "2026-01-01 10:00:00", cls.reporter)
         cls.profile = cls.env["streamdeck.config.profile"].create(
             {"name": "P"}
         )
@@ -1035,11 +1046,117 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
         self.assertFalse(self.layout.missing_plugins)
         self.assertNotIn("alert", str(self.layout.preview_html))
 
+    def test_the_warning_names_only_plugins_a_workstation_reports(self):
+        """A plugin no workstation reports any more, its item kept in the
+        catalog, is no warning; a workstation's tab and its own layouts
+        warn of the plugins of its own catalog."""
+        workstation, token = self._workstation()
+        gone = dict(CATALOG, actions=["plugin:gone", "tiles", "empty"])
+        self._ok(token, workstation, catalog=gone)
+        self.assertTrue(self._item("action", "plugin:gone"))
+        self.assertEqual(self.layout.missing_plugins, "gone, sound")
+        self._ok(token, workstation)
+        self.assertTrue(self._item("action", "plugin:gone"))
+        self.layout.invalidate_recordset(["missing_plugins"])
+        self.assertEqual(self.layout.missing_plugins, "sound")
+        # The workstation reports timers alone: its tab and its own
+        # layout warn of no other plugin.
+        alone = dict(CATALOG, actions=["plugin:timers", "tiles", "empty"])
+        self._ok(token, workstation, catalog=alone)
+        self.assertNotIn(
+            "Plugins without a key", str(workstation.config_layouts_html)
+        )
+        own = self._layout(
+            {"workstation_id": workstation.id},
+            (0, "tiles", None, None),
+        )
+        self.assertEqual(own.missing_plugins, "timers")
+
     # -- access ----------------------------------------------------------
 
+    def test_an_employee_reads_only_the_plugins_their_workstations_report(
+        self,
+    ):
+        """A plugin file of the employee's own directory reaches the
+        catalog by their report; no other employee reads its id, in the
+        catalog, a warning or a key."""
+        ws_a, token_a = self._workstation()
+        ws_b, token_b = self._workstation(self.user_b)
+        mine = dict(CATALOG, actions=["plugin:private_a"] + CATALOG["actions"])
+        self._ok(token_a, ws_a, catalog=mine)
+        self._ok(token_b, ws_b)
+        private = self._item("action", "plugin:private_a")
+        self.assertTrue(private)
+
+        def actions(user):
+            Item = self.Item.with_user(user)
+            found = Item.search([("kind", "=", "action")]).mapped("value")
+            named = [n for _i, n in Item.name_search("private")]
+            return found, named
+
+        found, named = actions(self.user_b)
+        self.assertNotIn("plugin:private_a", found)
+        self.assertEqual(named, [])
+        self.assertEqual(
+            {"plugin:timers", "plugin:sound", "tiles", "empty"}, set(found)
+        )
+        with self.assertRaises(AccessError):
+            private.with_user(self.user_b).read(["value"])
+        for user in (self.user_a, self.manager):
+            with self.subTest(user=user.login):
+                self.assertIn("plugin:private_a", actions(user)[0])
+        # Nor in a warning: the profile's layout, read by B, and B's tab.
+        profile_layout = self.layout.with_user(self.user_b)
+        self.assertEqual(profile_layout.missing_plugins, "sound")
+        self.assertNotIn("private_a", str(profile_layout.preview_html))
+        self.assertNotIn(
+            "private_a", str(ws_b.with_user(self.user_b).config_layouts_html)
+        )
+        self.assertIn(
+            "private_a", str(ws_a.with_user(self.user_a).config_layouts_html)
+        )
+        # Nor through a key B writes with its id.
+        own = self._layout(
+            {"workstation_id": ws_b.id},
+            (0, "tiles", None, None),
+            env=self.env(user=self.user_b),
+        )
+        with self.assertRaises(AccessError):
+            own.with_user(self.user_b).key_ids.write({"action_id": private.id})
+        with self.assertRaises(AccessError):
+            self.Key.with_user(self.user_b).create(
+                {"layout_id": own.id, "key_index": 1, "action_id": private.id}
+            )
+        # A key the manager set to it stays B's to label and to read,
+        # without its id becoming readable in the catalog.
+        self.Key.create(
+            {"layout_id": own.id, "key_index": 2, "action_id": private.id}
+        )
+        # B's request reads the item from the database, as a new one does.
+        self.env.invalidate_all()
+        key = own.with_user(self.user_b).key_ids.filtered(
+            lambda k: k.key_index == 2
+        )
+        key.label = "Tableau"
+        key.label = False
+        self.env.invalidate_all()
+        self.assertIn(
+            "Plugin private_a", str(own.with_user(self.user_b)._preview())
+        )
+        self.assertIn(
+            "Plugin private_a", str(own.with_user(self.user_b).preview_html)
+        )
+        self.assertNotIn("plugin:private_a", actions(self.user_b)[0])
+        # A report without it unlinks it: A no longer reads it.
+        self._ok(token_a, ws_a)
+        self.assertTrue(private.exists())
+        self.assertNotIn("plugin:private_a", actions(self.user_a)[0])
+
     def test_an_employee_edits_a_free_layout_of_their_workstation_only(self):
-        ws_a, _token = self._workstation()
+        ws_a, token = self._workstation()
         ws_b, _token_b = self._workstation(self.user_b)
+        # A names the plugins their own workstation's catalog offers.
+        self._ok(token, ws_a)
         env_a = self.env(user=self.user_a)
         own = self._layout(
             {"workstation_id": ws_a.id},
@@ -1165,6 +1282,8 @@ class TestStreamdeckKeyLayoutViews(KeyLayoutCase):
                     self.assertTrue(keys.xpath(".//field[@name='%s']" % name))
                 (action,) = keys.xpath(".//field[@name='action_id']")
                 self.assertIn("action", action.get("domain"))
+        catalog = self._arch("streamdeck.catalog.item", "list", self.manager)
+        self.assertTrue(catalog.xpath("//field[@name='workstation_ids']"))
 
     def test_the_configuration_tab_shows_the_layouts_of_connected_decks(self):
         workstation, _token = self._workstation(decks=(DECK_PLUS, DECK_MINI))
