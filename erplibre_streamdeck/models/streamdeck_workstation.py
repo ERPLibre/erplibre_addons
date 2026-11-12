@@ -338,7 +338,9 @@ class StreamdeckWorkstation(models.Model):
 
     def _compute_config_layouts_html(self):
         """Per connected deck model, the layout Odoo sends: the layer it
-        comes from, its lock and its grid; or why there is none."""
+        comes from, its lock and its grid; or why there is none. Odoo
+        never takes a layout out of keymap.json: a model it sends none
+        keeps there the one last applied."""
         schema = self.env["streamdeck.config.schema"]
         layer_names = {
             "profile": _("Profile"),
@@ -365,8 +367,10 @@ class StreamdeckWorkstation(models.Model):
                         title
                         + Markup("<p>%s</p>")
                         % _(
-                            "Automatic layout: no layer lays out this"
-                            " deck model."
+                            "No layer lays out this deck model, and Odoo"
+                            " sends it no layout: the deck keeps the"
+                            " layout last applied to its keymap.json, if"
+                            " any, else places its keys itself."
                         )
                     )
                     continue

@@ -352,8 +352,11 @@ the workstation, in the setting `key_layouts` of the revision, which is
 locked when one of them is; the extension writes them to
 `~/.config/erplibre-home/keymap.json` when the employee applies the
 revision, and keeps there the layouts of the models Odoo does not send.
-A model that no layer lays out keeps the automatic layout of the deck
-program.
+Odoo never takes a layout out of the file: a model that no layer lays
+out, or no longer does, keeps there the layout last applied to it, and
+a model the file does not name gets the automatic layout of the deck
+program. The *Configuration* tab of the workstation says so for each
+connected model that Odoo sends no layout.
 
 Each workstation gets the layouts within the catalog of its own report,
 since it refuses the whole revision for a key its deck program cannot
@@ -868,8 +871,12 @@ dispositions des decks branchés vont au poste, dans le réglage
 `key_layouts` de la révision, verrouillé quand l'une d'elles l'est ;
 l'extension les écrit dans `~/.config/erplibre-home/keymap.json` quand
 l'employé applique la révision, et y garde les dispositions des modèles
-qu'Odoo n'envoie pas. Un modèle qu'aucune couche ne dispose garde la
-disposition automatique du programme du deck.
+qu'Odoo n'envoie pas. Odoo ne retire jamais une disposition du fichier :
+un modèle qu'aucune couche ne dispose, ou ne dispose plus, y garde la
+dernière disposition appliquée, et un modèle que le fichier ne nomme
+pas prend la disposition automatique du programme du deck.
+L'onglet *Configuration* du poste le dit pour chaque modèle branché
+auquel Odoo n'envoie pas de disposition.
 
 Chaque poste reçoit les dispositions dans les limites du catalogue de sa
 propre remontée, puisqu'il refuse la révision entière pour une touche que
