@@ -4,10 +4,35 @@ from odoo import api, models
 from odoo.tools import is_html_empty, plaintext2html
 
 from .chatbot_script_step import LINKUP_STEPS
+from .discuss_channel_guide import GUIDE_SCRIPT
 
 
 class ChatbotScript(models.Model):
     _inherit = "chatbot.script"
+
+    def _linkup_is_linkup_script(self):
+        """Whether the script is one of LinkUp: it holds a step of LinkUp,
+        or a rule of a live chat channel of LinkUp runs it, or it is the
+        script of the guide."""
+        self.ensure_one()
+        script = self.sudo()
+        if script == self.env.ref(GUIDE_SCRIPT, raise_if_not_found=False):
+            return True
+        if any(
+            step.step_type in LINKUP_STEPS for step in script.script_step_ids
+        ):
+            return True
+        return bool(
+            self.env["im_livechat.channel.rule"]
+            .sudo()
+            .search_count(
+                [
+                    ("chatbot_script_id", "=", script.id),
+                    ("channel_id.linkup_kind", "!=", False),
+                ],
+                limit=1,
+            )
+        )
 
     @api.onchange("script_step_ids")
     def _onchange_script_step_ids(self):

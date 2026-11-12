@@ -92,6 +92,23 @@ Reflection guide
   to answer: the answers of a choice show as buttons above the composer,
   the composer names the text a step asks for, and an answer the server
   refuses leaves no message and shows its reason.
+* The server alone marks a conversation as a guide and moves its step
+  (``linkup_member_guide``, ``chatbot_current_step_id``): a plain member
+  who writes them on a conversation they belong to, or creates one with
+  them, by its values or the defaults of the context, is refused, while a
+  LinkUp administrator opens the test page of a script; the chatbot
+  answers only in a live chat conversation of the welcome channel whose
+  step belongs to the script of the guide.
+* ``/chatbot/restart`` and ``/chatbot/step/trigger`` run a script only in
+  a live chat conversation, and only its own (``_linkup_check_chatbot``),
+  for a conversation of LinkUp, a LinkUp script or a conversation that
+  holds a plain member: the script of its current step, or, without
+  one, a script of the rules of its live chat channel, or a script of its
+  operator when it holds neither a live chat channel nor a plain member,
+  as the test page of a script opens it; a guide runs the script of the
+  guide alone. Anything else reads ``linkup.unavailable``.
+  The guide of a member answers neither route, the server running its
+  script. Other conversations keep the behaviour of ``im_livechat``.
 
 Distress
 ========
@@ -115,7 +132,10 @@ channel with an available moderator.
   creates no report and brings no moderator: the resources still show at
   once, and the chatbot and the status line say that the request is
   already with the moderation team. A press in a conversation whose report
-  is still open creates none, so the limit never holds it back.
+  is still open creates none, so the limit never holds it back. A press
+  locks the keys it counts until its transaction ends
+  (``linkup.rate.event._linkup_lock``): presses at once, from several
+  conversations of one party or one address, count one after the other.
 * "Need help now" brings a moderator into a welcome conversation that
   its party holds alone with the chatbot only; in one a member already
   operates, the report waits and the resources are posted. Once a

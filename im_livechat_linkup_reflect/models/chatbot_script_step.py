@@ -148,8 +148,10 @@ class ChatbotScriptStep(models.Model):
 
     def _process_step(self, discuss_channel):
         """Post a step of LinkUp with what helps answering it; the other
-        steps are those of ``im_livechat``."""
+        steps are those of ``im_livechat``. The script of the step must be
+        one of the conversation (``_linkup_check_chatbot``)."""
         self.ensure_one()
+        discuss_channel._linkup_check_chatbot(self.chatbot_script_id)
         if self.step_type not in LINKUP_STEPS:
             return super()._process_step(discuss_channel)
         # sudo: discuss.channel - updating current step on the channel is allowed
@@ -241,8 +243,11 @@ class ChatbotScriptStep(models.Model):
     def _process_answer(self, discuss_channel, message_body):
         """Write the answer to a step of the guide into the draft of the
         party before the next step is fetched; an answer the core refuses
-        raises its ``LinkupError``, and the step stays the current one."""
+        raises its ``LinkupError``, and the step stays the current one.
+        The script of the step must be one of the conversation
+        (``_linkup_check_chatbot``)."""
         self.ensure_one()
+        discuss_channel._linkup_check_chatbot(self.chatbot_script_id)
         field = GUIDE_STEPS.get(self.step_type)
         if field:
             self._linkup_save_answer(discuss_channel, message_body, field)

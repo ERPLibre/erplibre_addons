@@ -141,10 +141,33 @@ class LinkupChatbotController(CorsLivechatChatbotScriptController):
     the widget once "Need help now" brought a moderator: ``im_livechat``
     marks a step as having found an operator for ``forward_operator`` only,
     so the widget would trigger the next step, and the end of the script
-    would close the conversation of distress."""
+    would close the conversation of distress.
+
+    The guide of a member answers neither route: the server runs its
+    script as the member posts (``discuss.channel._linkup_guide_answer``),
+    and a trigger would process the last answer once more."""
+
+    @staticmethod
+    def _linkup_is_guide(channel_id):
+        """Whether ``channel_id`` is the guide of a member."""
+        try:
+            channel_id = int(channel_id)
+        except (TypeError, ValueError):
+            return False
+        # sudo: discuss.channel - the mark of a guide only
+        channel = request.env["discuss.channel"].sudo().browse(channel_id)
+        return bool(channel.exists().linkup_member_guide)
+
+    @http.route()
+    def chatbot_restart(self, channel_id, chatbot_script_id):
+        if self._linkup_is_guide(channel_id):
+            return None
+        return super().chatbot_restart(channel_id, chatbot_script_id)
 
     @http.route()
     def chatbot_trigger_step(self, channel_id, chatbot_script_id=None):
+        if self._linkup_is_guide(channel_id):
+            return None
         result = super().chatbot_trigger_step(
             channel_id, chatbot_script_id=chatbot_script_id
         )

@@ -112,3 +112,25 @@ class TestLinkupHelpNowLimit(LinkupLivechatCase):
         channel, guest = self._welcome_session(guest)
         self.assertFalse(self._press(channel, guest)["limited"])
         self.assertEqual(len(self._reports()), 2)
+
+    def test_press_locks_the_keys_of_the_limit(self):
+        """A press locks the keys it counts, the visitor and the address,
+        before it counts them: presses at once from one party or one
+        address count one after the other
+        (``linkup.rate.event._linkup_lock``)."""
+        locked = []
+        Rate = type(self.env["linkup.rate.event"])
+        lock = Rate._linkup_lock
+
+        def record(rate, kind, values):
+            locked.append((kind, tuple(values)))
+            return lock(rate, kind, values)
+
+        self.patch(Rate, "_linkup_lock", record)
+        channel, guest = self._welcome_session()
+        self._press(channel, guest)
+        self.assertTrue(locked)
+        kind, keys = locked[0]
+        self.assertEqual(kind, "livechat_help_now")
+        self.assertIn(f"guest:{guest.id}", keys)
+        self.assertTrue(any(key.startswith("address:") for key in keys))

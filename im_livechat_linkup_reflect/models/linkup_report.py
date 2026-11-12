@@ -273,7 +273,13 @@ class LinkupReport(models.Model):
         ``linkup.livechat_help_now_per_hour`` (3) reports an hour, for the
         party or for the address. A press that finds the report of the
         party still open for this conversation creates none, so it is
-        never beyond the limit."""
+        never beyond the limit.
+
+        The keys of the limit stay locked until the end of the
+        transaction, which adds the event of the report
+        (``_linkup_livechat_distress``): presses at once, from several
+        conversations of one party or one address, count one after the
+        other (``linkup.rate.event._linkup_lock``)."""
         if self._linkup_livechat_open_distress(conversation, user, guest):
             return False
         limit = self.env["linkup.reflet"]._linkup_param(
@@ -282,9 +288,11 @@ class LinkupReport(models.Model):
         if limit < 1:
             limit = DEFAULT_HELP_NOW_RATE
         Rate = self.env["linkup.rate.event"].sudo()
+        keys = self._linkup_help_now_keys(user, guest)
+        Rate._linkup_lock(HELP_NOW_KIND, keys)
         return any(
             Rate._linkup_exceeded(HELP_NOW_KIND, key, limit, HELP_NOW_WINDOW)
-            for key in self._linkup_help_now_keys(user, guest)
+            for key in keys
         )
 
     # ------------------------------------------------------------------

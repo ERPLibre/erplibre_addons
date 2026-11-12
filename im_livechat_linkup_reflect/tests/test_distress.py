@@ -378,6 +378,22 @@ class TestLinkupLivechatDistress(LinkupDistressMixin, LinkupLivechatCase):
             ["Ligne A", "Ligne B"],
         )
 
+    def test_help_resources_through_the_settings_form(self):
+        """The settings open with the resources, a text of several lines,
+        and keep the ones saved."""
+        Settings = self.env["res.config.settings"]
+        settings = Settings.create(
+            {"linkup_help_resources": "Ligne C\nLigne D"}
+        )
+        settings.set_values()
+        self.assertEqual(
+            self.env["linkup.report"]._linkup_help_resources(),
+            ["Ligne C", "Ligne D"],
+        )
+        self.assertEqual(
+            Settings.create({}).linkup_help_resources, "Ligne C\nLigne D"
+        )
+
 
 @tagged("post_install", "-at_install")
 class TestLinkupLivechatDistressRoutes(

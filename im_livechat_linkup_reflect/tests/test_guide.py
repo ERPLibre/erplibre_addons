@@ -3,10 +3,14 @@
 the chatbot, the draft each answer writes, the refusal of an empty text,
 and a chatbot that never sends."""
 
-from odoo.exceptions import AccessError
-from odoo.tests import tagged
+import json
 
-from .common import LinkupLivechatCase
+from odoo import Command
+from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.exceptions import AccessError
+from odoo.tests import HttpCase, tagged
+
+from .common import MEMBER, LinkupLivechatCase
 
 YOU_SAID = "Que la pluie te rend calme."
 UNDERSTOOD = "Que tu aimes les jours tranquilles."
@@ -250,3 +254,243 @@ class TestLinkupLivechatGuide(LinkupLivechatCase):
         self.assertFalse(
             self.Reflet._linkup_guest_draft(other.env.context["guest"])
         )
+
+    def test_guide_kept_to_the_server(self):
+        """Sam marks none of his conversations as a guide, nor chooses the
+        step of its chatbot; a group marked as a guide otherwise gets no
+        answer of the chatbot."""
+        step = self.env.ref("im_livechat_linkup_reflect.guide_step_understood")
+        workshop = self.workshop.with_user(self.sam)
+        for vals in (
+            {"linkup_member_guide": True},
+            {"chatbot_current_step_id": step.id},
+        ):
+            with self.subTest(vals=vals), self.assertRaises(AccessError):
+                workshop.write(vals)
+        group = self.Channel.create(
+            {
+                "name": "Groupe",
+                "channel_type": "group",
+                "channel_partner_ids": [
+                    Command.link(user.partner_id.id)
+                    for user in (self.sam, self.france)
+                ],
+                "linkup_member_guide": True,
+                "chatbot_current_step_id": step.id,
+            }
+        )
+        self._post(group, UNDERSTOOD, user=self.sam)
+        self.assertFalse(self._bot_bodies(group))
+        self.assertFalse(self._drafts(self.sam))
+
+    def test_guide_not_created_by_a_member(self):
+        """Sam creates no conversation marked as a guide or holding a step
+        of its chatbot, through the values or the defaults of the context,
+        the latter under ``sudo`` included; the same group without them
+        opens."""
+        step = self.env.ref("im_livechat_linkup_reflect.guide_step_understood")
+        Channel = self.Channel.with_user(self.sam)
+        vals = {"name": "Groupe", "channel_type": "group"}
+        for channel_vals, context in (
+            (dict(vals, linkup_member_guide=True), {}),
+            (dict(vals, chatbot_current_step_id=step.id), {}),
+            (vals, {"default_linkup_member_guide": True}),
+            (vals, {"default_chatbot_current_step_id": step.id}),
+        ):
+            models = (Channel, Channel.sudo()) if context else (Channel,)
+            for model in models:
+                with self.subTest(vals=channel_vals, context=context):
+                    with self.assertRaisesRegex(AccessError, "guide"):
+                        model.with_context(**context).create(
+                            dict(channel_vals)
+                        )
+        group = Channel.create(dict(vals))
+        self.assertFalse(group.sudo().chatbot_current_step_id)
+
+
+@tagged("post_install", "-at_install")
+class TestLinkupChatbotRoutes(LinkupLivechatCase, HttpCase):
+    """``/chatbot/restart`` and ``/chatbot/step/trigger`` run a script
+    only in a live chat conversation, and only its own."""
+
+    def _rpc(self, route, params):
+        response = self.url_open(
+            route,
+            data=json.dumps(
+                {"jsonrpc": "2.0", "method": "call", "id": 1, "params": params}
+            ),
+            headers={"Content-Type": "application/json"},
+        )
+        self.assertEqual(response.status_code, 200)
+        return response.json()
+
+    def _chat(self):
+        """The direct conversation of Sam and France, opened by a
+        confirmed reflection."""
+        self._confirmed()
+        return self.Channel.with_user(self.sam).channel_get(
+            [self.france.partner_id.id]
+        )
+
+    def test_routes_refused_outside_live_chat(self):
+        """Sam restarts then triggers the welcome script and the script of
+        the guide in his group and his direct conversation: refused, no
+        step is set there and the chatbot posts nothing."""
+        chat = self._chat()
+        self.authenticate(self.sam.login, self.sam.login)
+        for channel in (self.workshop, chat):
+            for script in (self.welcome_script, self.guide_script):
+                params = {
+                    "channel_id": channel.id,
+                    "chatbot_script_id": script.id,
+                }
+                with self.subTest(channel=channel.name, script=script.title):
+                    self.assertIn(
+                        "error", self._rpc("/chatbot/restart", params)
+                    )
+                    self.assertIn(
+                        "error", self._rpc("/chatbot/step/trigger", params)
+                    )
+                    self.env.invalidate_all()
+                    self.assertFalse(channel.sudo().chatbot_current_step_id)
+                    self.assertFalse(self._bot_bodies(channel))
+
+    def test_test_page_restarts_its_script(self):
+        """The default administrator tests the welcome script, then a
+        script outside LinkUp, on the test page of each, and restarts it:
+        the first step of the script follows the restart."""
+        other = self.env["chatbot.script"].create(
+            {
+                "title": "Essai",
+                "script_step_ids": [
+                    Command.create({"step_type": "text", "message": "Bonjour"})
+                ],
+            }
+        )
+        self.authenticate("admin", "admin")
+        for script in (self.welcome_script, other):
+            with self.subTest(script=script.title):
+                response = self.url_open(f"/chatbot/{script.id}/test")
+                self.assertEqual(response.status_code, 200)
+                channel = self.Channel.sudo().search(
+                    [
+                        ("channel_type", "=", "livechat"),
+                        ("livechat_channel_id", "=", False),
+                        (
+                            "livechat_operator_id",
+                            "=",
+                            script.operator_partner_id.id,
+                        ),
+                    ],
+                    order="id desc",
+                    limit=1,
+                )
+                params = {
+                    "channel_id": channel.id,
+                    "chatbot_script_id": script.id,
+                }
+                self.assertNotIn(
+                    "error", self._rpc("/chatbot/restart", params)
+                )
+                self.assertNotIn(
+                    "error", self._rpc("/chatbot/step/trigger", params)
+                )
+                self.env.invalidate_all()
+                self.assertEqual(
+                    channel.chatbot_current_step_id,
+                    script.script_step_ids.sorted("sequence")[:1],
+                )
+
+    def test_linkup_administrator_tests_a_script(self):
+        """Henri, a LinkUp administrator who is not a system administrator,
+        opens the test page of the welcome script, then restarts it: the
+        conversation of the test holds its first step."""
+        henri = mail_new_test_user(
+            self.env,
+            login="linkup_lc_test_admin",
+            name="Henri",
+            email="linkup_lc_test_admin@example.com",
+            groups=f"{MEMBER},mail_linkup_reflet.group_linkup_admin,"
+            "im_livechat.im_livechat_group_user",
+        )
+        self.assertFalse(henri.has_group("base.group_system"))
+        script = self.welcome_script
+        self.authenticate(henri.login, henri.login)
+        response = self.url_open(f"/chatbot/{script.id}/test")
+        self.assertEqual(response.status_code, 200)
+        channel = self.Channel.sudo().search(
+            [
+                ("channel_type", "=", "livechat"),
+                ("livechat_channel_id", "=", False),
+                ("channel_member_ids.partner_id", "=", henri.partner_id.id),
+            ],
+            order="id desc",
+            limit=1,
+        )
+        self.assertTrue(channel.chatbot_current_step_id)
+        params = {"channel_id": channel.id, "chatbot_script_id": script.id}
+        self.assertNotIn("error", self._rpc("/chatbot/restart", params))
+        self.assertNotIn("error", self._rpc("/chatbot/step/trigger", params))
+        self.env.invalidate_all()
+        self.assertEqual(
+            channel.chatbot_current_step_id,
+            script.script_step_ids.sorted("sequence")[:1],
+        )
+
+    def test_operator_scripts_kept_from_plain_members(self):
+        """A live chat conversation without a live chat channel that holds
+        Sam, led by the LinkUp bot, runs no script of the bot: Sam
+        neither restarts it nor runs its first step there."""
+        channel = self.Channel.sudo().create(
+            {
+                "name": "Essai",
+                "channel_type": "livechat",
+                "livechat_operator_id": self.bot.id,
+                "channel_member_ids": [
+                    Command.create({"partner_id": self.sam.partner_id.id}),
+                    Command.create({"partner_id": self.bot.id}),
+                ],
+            }
+        )
+        first = self.welcome_script.script_step_ids.sorted("sequence")[:1]
+        as_sam = channel.with_user(self.sam)
+        with self.assertLinkupCode("linkup.unavailable"):
+            as_sam._chatbot_restart(self.welcome_script)
+        with self.assertLinkupCode("linkup.unavailable"):
+            first._process_step(as_sam)
+        self.assertFalse(channel.chatbot_current_step_id)
+
+    def test_script_of_another_conversation_refused(self):
+        """A visitor of the welcome channel restarts their conversation
+        with the script of the guide, or runs a step of it: refused, the
+        welcome script restarts."""
+        channel, guest = self._welcome_session()
+        visitor = self._as_visitor(channel, guest)
+        first = self.guide_script.script_step_ids.sorted("sequence")[:1]
+        with self.assertLinkupCode("linkup.unavailable"):
+            visitor._chatbot_restart(self.guide_script)
+        with self.assertLinkupCode("linkup.unavailable"):
+            first._process_step(visitor)
+        visitor._chatbot_restart(self.welcome_script)
+        self.assertFalse(channel.chatbot_current_step_id)
+
+    def test_guide_answers_no_route(self):
+        """The guide of Sam, run by the server, answers neither route: its
+        step and the posts of its chatbot stay as they were."""
+        result = self.Reflet.with_user(self.sam).linkup_start_guide()
+        guide = self.Channel.sudo().browse(result["channel_id"])
+        step = guide.chatbot_current_step_id
+        bodies = self._bot_bodies(guide)
+        self.authenticate(self.sam.login, self.sam.login)
+        params = {
+            "channel_id": guide.id,
+            "chatbot_script_id": self.guide_script.id,
+        }
+        for route in ("/chatbot/restart", "/chatbot/step/trigger"):
+            with self.subTest(route=route):
+                response = self._rpc(route, params)
+                self.assertNotIn("error", response)
+                self.assertIsNone(response.get("result"))
+        self.env.invalidate_all()
+        self.assertEqual(guide.chatbot_current_step_id, step)
+        self.assertEqual(self._bot_bodies(guide), bodies)

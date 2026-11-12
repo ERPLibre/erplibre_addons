@@ -147,8 +147,11 @@ class DiscussChannel(models.Model):
         LinkUp only while its party holds it alone with the chatbot: once
         a member or a moderator joined, or in a conversation of distress,
         the script stays done, so that no step of it (a moderator, a member,
-        the guide) reaches a conversation that holds two people."""
+        the guide) reaches a conversation that holds two people. The
+        script must be one of the conversation
+        (``_linkup_check_chatbot``)."""
         for channel in self:
+            channel._linkup_check_chatbot(chatbot_script, restart=True)
             kind = channel._linkup_livechat_kind()
             if kind and (
                 kind == "distress" or channel._linkup_livechat_people() >= 2

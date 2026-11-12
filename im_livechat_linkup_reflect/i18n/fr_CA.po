@@ -584,6 +584,12 @@ msgid "Off"
 msgstr "Désactivé"
 
 #. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/discuss_channel_guide.py:0
+msgid "Only the server starts a guide or changes its step."
+msgstr "Seul le serveur démarre un guide ou change son étape."
+
+#. module: im_livechat_linkup_reflect
 #. odoo-javascript
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/livechat_service_patch.js:0
 msgid "Open LinkUp in Discuss"
