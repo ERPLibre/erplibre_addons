@@ -135,7 +135,8 @@ class TestRequirementUpgrade(TransactionCase):
     def test_an_upgrade_to_1_4_follows_the_renamed_contract_test(self):
         # Le contrat 1.4 renomme le test qui prouve SD-INV-R24 et
         # SD-CTL-R27 ; la disposition des touches fait mentir ce que
-        # SD-CTL-R27 et SD-CTL-R43 disent de la version et des fichiers.
+        # SD-CTL-R27 et SD-CTL-R43 disent de la version et des fichiers,
+        # et SD-CTL-R47 gagne la règle des actions plugin du catalogue.
         proofs = {
             "test_sd_inv_r24_1": INVENTORY,
             "test_sd_ctl_r27_1": CONTROL,
@@ -144,7 +145,7 @@ class TestRequirementUpgrade(TransactionCase):
             self.env.ref("%s.%s" % (MODULE, xmlid)).write(
                 {"reference": CONTRACT_1_3}
             )
-        requirements = ("req_sd_ctl_r27", "req_sd_ctl_r43")
+        requirements = ("req_sd_ctl_r27", "req_sd_ctl_r43", "req_sd_ctl_r47")
         for xmlid in requirements:
             self.env.ref("%s.%s" % (MODULE, xmlid)).write(
                 {"achievement": "An outdated way"}
