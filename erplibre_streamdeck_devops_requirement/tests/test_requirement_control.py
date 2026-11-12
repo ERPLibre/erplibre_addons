@@ -130,6 +130,71 @@ REVIEW_FOCUS = (
     KEY_LAYOUT + "test_an_employee_cannot_edit_a_locked_layout",
 )
 
+# Les requis dont le nom énonce une contrainte du modèle, et le test qui
+# la tient : il compte parmi leurs preuves.
+STATED_CONSTRAINTS = {
+    "SD-CTL-R58": KEY_LAYOUT
+    + "test_a_layout_has_exactly_one_parent_one_per_model",
+    "SD-CTL-R60": KEY_LAYOUT + "test_a_layout_names_each_key_once",
+}
+
+# Ce qu'un nom dit du fichier de contrat d'ERPLibre : une version, que
+# « or later » change en borne basse.
+CONTRACT_HELD = re.compile(
+    r"contract file of ERPLibre holds (\d+)\.(\d+)( or later)?"
+)
+CONTRACT_FILE = "script/gnome-extension/erplibre_home_contract"
+
+# Une définition de fonction d'un module de l'extension : fonction de
+# premier niveau, ou méthode de classe indentée de quatre espaces dont la
+# signature ne finit pas sur un point-virgule (ce qui écarte un appel).
+JS_DEFINITION = re.compile(
+    r"^(?:export )?(?:async )?function (\w+)\("
+    r"|^    (?:async )?(\w+)\([^;]*$",
+    re.M,
+)
+JS_KEYWORDS = {"if", "for", "while", "switch", "catch", "return", "super"}
+CATALOG_CHECK = "validateKeyLayouts"
+CATALOG_CHECK_FILES = ("lib/deck-config.js", "lib/inventory-service.js")
+
+
+def js_functions(source):
+    """{nom: corps} des fonctions de `source` ; le corps court jusqu'à la
+    définition suivante. Seuls comptent les noms qui portent une
+    majuscule ou un souligné : un nom tout en minuscules (`start`,
+    `status`) se confond avec un mot d'une phrase."""
+    found = [
+        (match.group(1) or match.group(2), match.start())
+        for match in JS_DEFINITION.finditer(source)
+        if (match.group(1) or match.group(2)) not in JS_KEYWORDS
+    ]
+    bounds = [start for _name, start in found[1:]] + [len(source)]
+    return {
+        name: source[start:end]
+        for (name, start), end in zip(found, bounds, strict=True)
+        if re.search(r"[A-Z_]", name)
+    }
+
+
+def js_callers(functions, callee):
+    """Les fonctions de `functions` qui appellent `callee`, directement
+    ou par une autre d'entre elles."""
+    chain = {callee}
+    grew = True
+    while grew:
+        grew = False
+        for name, body in functions.items():
+            if name in chain:
+                continue
+            if any(
+                re.search(r"(?<![\w$])%s\(" % re.escape(called), body)
+                for called in chain
+            ):
+                chain.add(name)
+                grew = True
+    return chain - {callee}
+
+
 FRENCH = {
     "cat_sd_ctl": "Pilotage",
     "SD-CTL-R11": (
@@ -255,6 +320,67 @@ class TestRequirementControl(TransactionCase):
         for reference in REVIEW_FOCUS:
             with self.subTest(reference=reference):
                 self.assertIn(reference, cited)
+
+    def test_the_constraints_a_name_states_are_proved(self):
+        for code, reference in STATED_CONSTRAINTS.items():
+            with self.subTest(code=code):
+                self.assertIn(
+                    reference,
+                    self._requirement(code).test_ids.mapped("reference"),
+                )
+
+    def test_a_name_holds_true_of_the_contract_file(self):
+        root = erplibre_root()
+        if not root or not (root / ".git").exists():
+            self.skipTest("this module is not inside an ERPLibre checkout")
+        text = committed(root, CONTRACT_FILE)
+        self.assertIsNotNone(text, "%s not committed" % CONTRACT_FILE)
+        major, minor = (int(part) for part in text.strip().split("."))
+        named = self.requirements.filtered(
+            lambda r: CONTRACT_HELD.search(r.name)
+        )
+        self.assertTrue(named)
+        for requirement in named:
+            with self.subTest(code=requirement.code):
+                held = CONTRACT_HELD.search(requirement.name)
+                version = (int(held.group(1)), int(held.group(2)))
+                if held.group(3):
+                    self.assertEqual(version[0], major)
+                    self.assertLessEqual(version[1], minor)
+                else:
+                    self.assertEqual(version, (major, minor))
+
+    def test_the_catalog_check_is_named_where_it_runs(self):
+        # SD-CTL-R69 nomme la fonction de l'extension qui lance la
+        # vérification par le catalogue, et aucune qui ne la lance pas.
+        root = erplibre_root()
+        extension = root and root / "script/gnome-extension/erplibre_home"
+        if not extension or not (extension / ".git").exists():
+            self.skipTest("no clone of the extension in this checkout")
+        functions = {}
+        for path in CATALOG_CHECK_FILES:
+            source = committed(extension, path)
+            self.assertIsNotNone(source, "%s not committed" % path)
+            functions.update(js_functions(source))
+        self.assertIn(CATALOG_CHECK, functions)
+        callers = js_callers(functions, CATALOG_CHECK)
+        direct = {
+            name
+            for name in callers
+            if re.search(r"(?<![\w$])%s\(" % CATALOG_CHECK, functions[name])
+        }
+        self.assertTrue(direct)
+        achievement = self._requirement("SD-CTL-R69").achievement
+        named = {
+            name
+            for name in functions
+            if re.search(r"(?<![\w$])%s(?!\w)" % re.escape(name), achievement)
+        }
+        self.assertIn(CATALOG_CHECK, named)
+        self.assertTrue(named & direct, sorted(direct))
+        self.assertFalse(
+            sorted(named - callers - {CATALOG_CHECK}), sorted(callers)
+        )
 
     def test_extension_proofs_name_its_committed_tests(self):
         root = erplibre_root()

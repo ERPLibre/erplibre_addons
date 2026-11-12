@@ -6222,7 +6222,7 @@ msgstr ""
 msgid ""
 "The wire moves to protocol 1.1 and the contract of the extension to 1.3, "
 "MINOR versions: Odoo still accepts a report in 1.0, and the contract file of"
-" ERPLibre holds 1.3"
+" ERPLibre holds 1.3 or later"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
