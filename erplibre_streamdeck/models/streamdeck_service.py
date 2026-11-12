@@ -646,6 +646,8 @@ class StreamdeckService(models.AbstractModel):
         state, decks, events, lost = _parse_report(payload)
         catalog = _parse_catalog(payload["state"]) if minor >= 2 else None
         config = self._parse_config(payload, minor) if minor >= 1 else None
+        if config and config["pilot"]:
+            config["catalog"] = catalog
         now = fields.Datetime.now()
         values = dict(
             state,
@@ -871,7 +873,8 @@ class StreamdeckService(models.AbstractModel):
         nothing of the pilot; `{"pilot": False}` from a destination that
         is not the pilot, whatever else it holds; for the pilot,
         `{pilot: True, revision_applied, current, result, choice, layouts,
-        current_layouts}`. `current` holds every key of KEYS, validated by
+        current_layouts}`, to which `_report` adds the `catalog` of the
+        report. `current` holds every key of KEYS, validated by
         the schema and normalised, None for a key absent or null; a key
         outside KEYS is ignored. `layouts` is True from protocol 1.2 on,
         which takes in the key layouts; `current_layouts` then holds the
@@ -934,10 +937,11 @@ class StreamdeckService(models.AbstractModel):
         drift asks for it with the same values.
 
         From protocol 1.2, the settings carry `key_layouts`, the layouts
-        of the connected deck models (`_config_settings`), and a layout
-        changed in the workstation's file is adopted or offered again as
-        a key is (`_config_layout_drift`); the first pilot asks nothing
-        of the layouts, which the extension alone writes.
+        of the connected deck models within the catalog of the report
+        (`_config_settings`), and a layout changed in the workstation's
+        file is adopted or offered again as a key is
+        (`_config_layout_drift`); the first pilot asks nothing of the
+        layouts, which the extension alone writes.
 
         A workstation that no layer configures is `unmanaged` and gets no
         `config`; its hash is cleared, so a later configuration gets a
@@ -955,7 +959,9 @@ class StreamdeckService(models.AbstractModel):
             schema._effective_layouts(workstation) if config["layouts"] else {}
         )
         current = config["current"]
-        if not self._config_settings(effective, layouts, current)[0]:
+        catalog = config.get("catalog")
+        wanted = self._config_settings(effective, layouts, current, catalog)[0]
+        if not wanted:
             self._config_release(workstation)
             return None
         ask, drift, adopt, adopt_layouts = [], [], {}, {}
@@ -977,10 +983,7 @@ class StreamdeckService(models.AbstractModel):
         ):
             adopt, drift = self._config_drift(workstation, effective, current)
             adopt_layouts, drift_layouts = self._config_layout_drift(
-                workstation,
-                self._config_settings(effective, layouts, current)[0],
-                layouts,
-                config["current_layouts"],
+                workstation, wanted, layouts, config["current_layouts"]
             )
             drift += ["%s:%s" % (LAYOUTS_KEY, pid) for pid in drift_layouts]
         if adopt or adopt_layouts:
@@ -988,7 +991,9 @@ class StreamdeckService(models.AbstractModel):
             effective = schema._effective(workstation)
             if config["layouts"]:
                 layouts = schema._effective_layouts(workstation)
-        settings, locked = self._config_settings(effective, layouts, current)
+        settings, locked = self._config_settings(
+            effective, layouts, current, catalog
+        )
         if not settings:
             self._config_release(workstation)
             return None
@@ -1025,10 +1030,11 @@ class StreamdeckService(models.AbstractModel):
             offered["ask"] = ask
         return offered
 
-    def _config_settings(self, effective, layouts, current):
+    def _config_settings(self, effective, layouts, current, catalog=None):
         """`(settings, locked)` that Odoo offers: those of `effective`,
         plus `key_layouts` when `layouts` (`_effective_layouts`) gives a
-        layout to send, locked when one of the sent layouts is. The
+        layout to send within `catalog`, the workstation's own catalog
+        (`_layout_settings`), locked when one of the sent layouts is. The
         plugins turned off are those `effective` sets, else those of the
         workstation's file (`current`), as the workstation checks the
         layouts against them."""
@@ -1038,7 +1044,7 @@ class StreamdeckService(models.AbstractModel):
         plugins_off = settings.get(
             "plugins_off", current.get("plugins_off") or []
         )
-        sent = schema._layout_settings(layouts, plugins_off)
+        sent = schema._layout_settings(layouts, plugins_off, catalog)
         if sent:
             settings[LAYOUTS_KEY] = sent
             if any(layouts[product]["locked"] for product in sent):

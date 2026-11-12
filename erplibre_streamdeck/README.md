@@ -346,8 +346,16 @@ refuses a layout naming a plugin turned off. Only the layouts of the connected d
 the workstation, in the setting `key_layouts` of the revision, which is
 locked when one of them is; the extension writes them to
 `~/.config/erplibre-home/keymap.json` when the employee applies the
-revision. A model that no layer lays out keeps the automatic layout of
-the deck program.
+revision, and keeps there the layouts of the models Odoo does not send.
+A model that no layer lays out keeps the automatic layout of the deck
+program.
+
+Each workstation gets the layouts within the catalog of its own report,
+since it refuses the whole revision for a key its deck program cannot
+lay out: a model that catalog does not describe gets no layout, a key
+past its number of keys is left out, an action it lacks goes as a black
+key, as the deck program would show it, and an icon it lacks is left
+out. A report without a catalog gets no layout; its settings still go.
 
 The catalog (*Configuration › Catalog*) is the union of what the
 workstations report: the actions, the icons and the geometry of each
@@ -448,7 +456,8 @@ accepted and its unknown keys ignored. Every reply carries `"protocol":
   SHA-256 of the canonical JSON of `settings` (keys sorted, no space),
   `locked` the locked settings, `ask` the free settings whose local value
   differs from Odoo's. In 1.2, `settings.key_layouts` maps the product
-  id of each connected deck that Odoo lays out to `{"keys": [{"key",
+  id of each connected deck that Odoo lays out, within the catalog of the
+  report, to `{"keys": [{"key",
   "action", "icon", "label"}]}`, by ascending key, `icon` and `label`
   only when set, at most 16 models; `locked` then lists `key_layouts`
   when one of these layouts is locked.
