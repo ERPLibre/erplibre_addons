@@ -453,6 +453,11 @@ msgid "Catalog"
 msgstr "Catalogue"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__catalog_action_ids
+msgid "Catalog actions"
+msgstr "Actions du catalogue"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__drift
 msgid "Changed locally"
 msgstr "Changée localement"
@@ -902,6 +907,11 @@ msgstr "Abonnés (Partenaires)"
 #: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__workstation_ids
+msgid "For an action, the workstations whose last catalog offered it."
+msgstr "Pour une action, les postes dont le dernier catalogue l'a offerte."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.fields,help:erplibre_streamdeck.field_mail_mail__streamdeck_activity_created
@@ -1440,6 +1450,11 @@ msgid "Odoo manages no setting of this workstation."
 msgstr "Odoo ne gère aucun réglage de ce poste."
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__workstation_ids
+msgid "Offered by"
+msgstr "Offert par"
+
+#. module: erplibre_streamdeck
 #: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_offered
 msgid "Offered configuration"
 msgstr "Configuration proposée"
@@ -1544,18 +1559,20 @@ msgid "Plugin %(id)s"
 msgstr "Plugin %(id)s"
 
 #. module: erplibre_streamdeck
-#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
-msgid ""
-"Plugins of the catalog that have a home key and that this layout does not "
-"name: they get no key on the home screen."
-msgstr ""
-"Les plugins du catalogue qui ont une touche d'accueil et que cette "
-"disposition ne nomme pas : ils n'ont pas de touche à l'écran d'accueil."
-
-#. module: erplibre_streamdeck
 #: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__plugins_off
 msgid "Plugins turned off"
 msgstr "Plugins coupés"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
+msgid ""
+"Plugins with a home key that the workstations offer, those of its own "
+"workstation for a workstation's layout, and that this layout does not name: "
+"they get no key on the home screen."
+msgstr ""
+"Les plugins à touche d'accueil qu'offrent les postes, ceux de son propre "
+"poste pour la disposition d'un poste, et que cette disposition ne nomme pas "
+": ils n'ont pas de touche à l'écran d'accueil."
 
 #. module: erplibre_streamdeck
 #. odoo-python
@@ -1943,6 +1960,11 @@ msgstr "Le gestionnaire Stream Deck qui reçoit les activités."
 #: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
 msgid "The action of a key is an action."
 msgstr "L'action d'une touche est une action."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__catalog_action_ids
+msgid "The actions the last catalog of this workstation offered."
+msgstr "Les actions qu'a offertes le dernier catalogue de ce poste."
 
 #. module: erplibre_streamdeck
 #: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_catalog_item_kind_value_unique

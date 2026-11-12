@@ -197,6 +197,15 @@ class StreamdeckWorkstation(models.Model):
         help="The key layouts of this workstation, over those of its"
         " profile and of its deck models.",
     )
+    catalog_action_ids = fields.Many2many(
+        "streamdeck.catalog.item",
+        "streamdeck_catalog_item_workstation_rel",
+        "workstation_id",
+        "item_id",
+        string="Catalog actions",
+        readonly=True,
+        help="The actions the last catalog of this workstation offered.",
+    )
     config_layouts_html = fields.Html(
         string="Key layouts of the connected decks",
         compute="_compute_config_layouts_html",
@@ -381,7 +390,7 @@ class StreamdeckWorkstation(models.Model):
                 parts.append(
                     title
                     + Markup('<p class="text-muted">%s</p>') % origin
-                    + layout._preview(layout._missing_plugins())
+                    + layout._preview(layout._missing_plugins(workstation))
                 )
             workstation.config_layouts_html = Markup().join(parts)
 

@@ -670,7 +670,9 @@ class StreamdeckService(models.AbstractModel):
                 workstation, "heard_again", now, received_at=now
             )
         if catalog:
-            self.env["streamdeck.catalog.item"]._take(catalog, now)
+            self.env["streamdeck.catalog.item"]._take(
+                catalog, now, workstation
+            )
         moved, replugged = self._apply_decks(workstation, decks, now)
         accepted = self._store_events(workstation, events, now)
         self.env["streamdeck.monitor"]._on_report(

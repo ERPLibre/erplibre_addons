@@ -121,8 +121,12 @@ sur une disposition entière : un employé lit les dispositions des couches
 qu'il lit, et sur ses propres postes crée, modifie et supprime les
 dispositions, et leurs touches, des modèles de deck qu'aucune couche ne
 verrouille, jamais *Verrouillé*, *Source* ni *Gardée dans le fichier du
-poste*. Tout le monde lit le catalogue ; seule la route de remontée y
-ajoute.
+poste*. Seule la route de remontée ajoute au catalogue. L'identifiant
+d'un plugin est le nom de son fichier, et le répertoire de plugins de
+l'utilisateur tient les fichiers de son choix : un employé lit les
+actions `plugin:<id>` qu'offrent ses propres postes, jamais celles
+qu'offrent seulement ceux d'un autre employé, et n'en nomme aucune autre
+dans une touche ; le reste du catalogue, tout le monde le lit.
 
 ## Surveillance
 
@@ -355,7 +359,9 @@ bord (`tiles`) ou une touche noire (`empty`) ; une touche sans action est
 laissée au programme du deck, qui y place ses fixtures et son tableau de
 bord. Un plugin a au plus une touche d'accueil par disposition, et un
 plugin que la disposition ne nomme pas n'en a aucune : la fiche avertit
-des *Plugins sans touche*.
+des *Plugins sans touche*, parmi les plugins qu'offre son propre poste
+pour la disposition d'un poste, sinon parmi ceux qu'un poste offre dans
+sa dernière remontée.
 
 Les dispositions d'un modèle se replient comme les réglages, profil <
 modèle de deck < poste, et *Verrouillé* tient la disposition entière :
@@ -386,7 +392,8 @@ reçoit aucune disposition ; ses réglages partent quand même.
 Le catalogue (*Configuration › Catalogue*) est l'union de ce que
 remontent les postes : les actions, les icônes et la géométrie de chaque
 modèle de deck. Un élément qu'aucun poste ne remonte plus reste, avec la
-date où il a été vu la dernière fois, à l'heure près. La géométrie d'un
+date où il a été vu la dernière fois, à l'heure près ; une action garde
+les postes dont la dernière remontée l'a offerte (*Offert par*). La géométrie d'un
 modèle est une constante de son matériel : un modèle de la table livrée
 avec le module prend celle de la table, et un modèle hors de la table
 garde la géométrie remontée la première. Aucune remontée ne la change :

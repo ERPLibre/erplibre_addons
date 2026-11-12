@@ -124,6 +124,8 @@
                 <field name="rows" optional="hide"/>
                 <field name="key_count" optional="hide"/>
                 <field name="last_seen"/>
+                <field name="workstation_ids" widget="many2many_tags"
+                       optional="show"/>
             </list>
         </field>
     </record>

@@ -120,8 +120,12 @@ The key layouts follow the same rules, the lock being on a whole layout:
 an employee reads the layouts of the layers they read, and on their own
 workstations creates, changes and deletes the layouts, and their keys, of
 the deck models that no layer locks, never *Locked*, *Source* nor *Kept
-in the workstation's file*. Everyone reads the catalog; only the report
-route adds to it.
+in the workstation's file*. Only the report route adds to the catalog.
+A plugin's id is the name of its file, and the user's own plugin
+directory holds files of their choosing: an employee reads the
+`plugin:<id>` actions their own workstations offer, never those only
+another employee's offer, and names no other in a key; the rest of the
+catalog is read by everyone.
 
 ## Monitoring
 
@@ -341,7 +345,9 @@ preview shows the grid. An action is the home key of a plugin
 (`empty`); a key without action is left to the deck program, which
 places its fixtures and its dashboard there. A plugin can have one home
 key per layout, and a plugin that the layout does not name gets none: the
-form warns of the *Plugins without a key*.
+form warns of the *Plugins without a key*, among the plugins its own
+workstation offers for a workstation's layout, else among those that a
+workstation offers in its last report.
 
 The layouts of a model fold as the settings do, profile < deck model <
 workstation, and *Locked* holds the whole layout: a locked layout stops
@@ -368,7 +374,8 @@ out. A report without a catalog gets no layout; its settings still go.
 The catalog (*Configuration › Catalog*) is the union of what the
 workstations report: the actions, the icons and the geometry of each
 deck model. An item that no workstation reports any more stays, with the
-date it was last seen, to the hour. The geometry of a model is a constant
+date it was last seen, to the hour; an action keeps the workstations
+whose last report offered it (*Offered by*). The geometry of a model is a constant
 of its hardware: a model of the table shipped with the module takes the
 table's, and a model outside it keeps the geometry first reported. No
 report changes it, so no workstation decides the keys Odoo lays out for
@@ -625,8 +632,12 @@ sur une disposition entière : un employé lit les dispositions des couches
 qu'il lit, et sur ses propres postes crée, modifie et supprime les
 dispositions, et leurs touches, des modèles de deck qu'aucune couche ne
 verrouille, jamais *Verrouillé*, *Source* ni *Gardée dans le fichier du
-poste*. Tout le monde lit le catalogue ; seule la route de remontée y
-ajoute.
+poste*. Seule la route de remontée ajoute au catalogue. L'identifiant
+d'un plugin est le nom de son fichier, et le répertoire de plugins de
+l'utilisateur tient les fichiers de son choix : un employé lit les
+actions `plugin:<id>` qu'offrent ses propres postes, jamais celles
+qu'offrent seulement ceux d'un autre employé, et n'en nomme aucune autre
+dans une touche ; le reste du catalogue, tout le monde le lit.
 
 ## Surveillance
 
@@ -859,7 +870,9 @@ bord (`tiles`) ou une touche noire (`empty`) ; une touche sans action est
 laissée au programme du deck, qui y place ses fixtures et son tableau de
 bord. Un plugin a au plus une touche d'accueil par disposition, et un
 plugin que la disposition ne nomme pas n'en a aucune : la fiche avertit
-des *Plugins sans touche*.
+des *Plugins sans touche*, parmi les plugins qu'offre son propre poste
+pour la disposition d'un poste, sinon parmi ceux qu'un poste offre dans
+sa dernière remontée.
 
 Les dispositions d'un modèle se replient comme les réglages, profil <
 modèle de deck < poste, et *Verrouillé* tient la disposition entière :
@@ -890,7 +903,8 @@ reçoit aucune disposition ; ses réglages partent quand même.
 Le catalogue (*Configuration › Catalogue*) est l'union de ce que
 remontent les postes : les actions, les icônes et la géométrie de chaque
 modèle de deck. Un élément qu'aucun poste ne remonte plus reste, avec la
-date où il a été vu la dernière fois, à l'heure près. La géométrie d'un
+date où il a été vu la dernière fois, à l'heure près ; une action garde
+les postes dont la dernière remontée l'a offerte (*Offert par*). La géométrie d'un
 modèle est une constante de son matériel : un modèle de la table livrée
 avec le module prend celle de la table, et un modèle hors de la table
 garde la géométrie remontée la première. Aucune remontée ne la change :
