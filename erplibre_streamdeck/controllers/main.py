@@ -1,6 +1,6 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-"""HTTP routes of the workstation protocol 1.1, under `/streamdeck/v1/`.
+"""HTTP routes of the workstation protocol 1.2, under `/streamdeck/v1/`.
 
 Each route takes a POST whose body is a JSON object and answers a JSON
 object with the status that `streamdeck.service` returns; a body that is

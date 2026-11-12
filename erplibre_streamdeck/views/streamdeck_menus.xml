@@ -65,6 +65,20 @@
               groups="group_streamdeck_manager"
               sequence="20"/>
 
+    <menuitem id="menu_streamdeck_config_layouts"
+              name="Key layouts"
+              parent="menu_streamdeck_configuration"
+              action="action_streamdeck_key_layouts"
+              groups="group_streamdeck_manager"
+              sequence="24"/>
+
+    <menuitem id="menu_streamdeck_config_catalog"
+              name="Catalog"
+              parent="menu_streamdeck_configuration"
+              action="action_streamdeck_catalog"
+              groups="group_streamdeck_manager"
+              sequence="26"/>
+
     <menuitem id="menu_streamdeck_config_policy"
               name="First pilot"
               parent="menu_streamdeck_configuration"

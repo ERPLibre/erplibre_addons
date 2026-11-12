@@ -24,6 +24,27 @@ USB_MODELS = {
     "0086": "Stream Deck Pedal",
 }
 
+# USB product id -> (columns, rows, keys) of the deck's keys, as the class
+# constants of the `streamdeck` library give them. A catalog that a
+# workstation reports takes precedence (`streamdeck.catalog.item`); this
+# table lays out a model before any workstation reported one.
+USB_GEOMETRY = {
+    "0060": (5, 3, 15),
+    "006d": (5, 3, 15),
+    "0080": (5, 3, 15),
+    "00a5": (5, 3, 15),
+    "00b9": (5, 3, 15),
+    "0063": (3, 2, 6),
+    "0090": (3, 2, 6),
+    "00b8": (3, 2, 6),
+    "009a": (4, 2, 8),
+    "006c": (8, 4, 32),
+    "008f": (8, 4, 32),
+    "00ba": (8, 4, 32),
+    "0084": (4, 2, 8),
+    "0086": (3, 1, 3),
+}
+
 
 def usb_model_name(product_id):
     """Model name of a USB product id; the id is matched without regard

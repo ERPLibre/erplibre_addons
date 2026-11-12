@@ -1,6 +1,6 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-"""Enrollment and report of workstations, protocol 1.1.
+"""Enrollment and report of workstations, protocol 1.2.
 
 Every public method takes the decoded JSON body and returns
 `(http_status, body)`, the body always carrying `protocol`; an error body
@@ -16,6 +16,9 @@ A report of protocol 1.1 or later may carry `config`, the managed
 configuration as the workstation holds it (`_parse_config`); the reply to
 the pilot of a workstation that a layer configures carries the revision
 Odoo offers (`_apply_config`). A report of protocol 1.0 gets no `config`.
+From protocol 1.2, the state may carry the catalog of the deck program
+(`_parse_catalog`), and the configuration holds the key layouts of the
+connected deck models (`streamdeck.key.layout`).
 
 Secrets: the workstation token is returned once by `enroll` and only its
 SHA-256 is stored; an API key or a password is checked and dropped. No
@@ -37,13 +40,14 @@ from odoo import api, fields, models
 from odoo.exceptions import AccessDenied, ValidationError
 from odoo.tools import mute_logger
 
-from .streamdeck_config import KEYS, PLUGIN_ID_RE
+from .streamdeck_config import KEYS, LAYOUTS_KEY, PLUGIN_ID_RE
 from .streamdeck_event import SERVER_KINDS
+from .streamdeck_key_layout import ACTION_RE, ICON_RE
 from .streamdeck_workstation import FIRST_CHOICES, SERVICE_STATES
 
 _logger = logging.getLogger(__name__)
 
-PROTOCOL = "1.1"
+PROTOCOL = "1.2"
 HEARTBEAT_S = 900
 PAIRING_TTL_MIN = 10
 FUTURE_TOLERANCE_MIN = 5
@@ -63,6 +67,12 @@ MAX_SECRET = 4096
 MAX_DECKS = 128
 MAX_EVENTS = 10000
 MAX_DECK_PLUGINS = 128
+# The catalog of the deck program: the extension drops one larger than
+# MAX_CATALOG_BYTES as compact JSON, and Odoo does the same; its size
+# bounds the number of items. Each number of a geometry is at most
+# MAX_GEOMETRY.
+MAX_CATALOG_BYTES = 32 * 1024
+MAX_GEOMETRY = 256
 # The largest value of an Integer field, a PostgreSQL `integer` column.
 MAX_COUNT = 2**31 - 1
 
@@ -79,6 +89,9 @@ REFUSAL_REASONS = frozenset(
     ["write_failed", "restart_failed", "unit_missing"]
     + ["invalid:%s" % key for key in KEYS]
 )
+# A workstation refuses the key layouts from protocol 1.2 on, the first
+# that sends them.
+LAYOUTS_REFUSAL = "invalid:%s" % LAYOUTS_KEY
 # The refusals that come after the revision is written to the file: the
 # file holds its values though the deck unit does not run them.
 WRITTEN_REASONS = ("restart_failed", "unit_missing")
@@ -94,6 +107,7 @@ ERRORS = (
 # Matched with `fullmatch`: a trailing newline is refused too.
 _PROTOCOL_RE = re.compile(r"([0-9]+)\.([0-9]+)")
 _FINGERPRINT_RE = re.compile(r"[0-9a-f]{64}")
+_HASH_RE = _FINGERPRINT_RE
 _PRODUCT_RE = re.compile(r"[0-9a-f]{4}")
 # A serial has no `:`, so `sn:<serial>` never equals a `nosn:` key.
 _SERIAL_RE = re.compile(r"[A-Za-z0-9._-]{1,64}")
@@ -295,9 +309,10 @@ def _parse_report(payload):
     return state, decks, events, lost
 
 
-def _parse_result(result):
+def _parse_result(result, minor=1):
     """The `result` of a pilot's `config`: None, or `{revision, status,
-    reason, at}` with a reason of REFUSAL_REASONS or None."""
+    reason, at}` with a reason of REFUSAL_REASONS, LAYOUTS_REFUSAL from
+    protocol 1.2 on, or None."""
     if result is None:
         return None
     if not isinstance(result, dict):
@@ -306,8 +321,11 @@ def _parse_result(result):
     if status not in CONFIG_STATUSES:
         raise _bad()
     reason = result.get("reason")
+    reasons = REFUSAL_REASONS
+    if minor >= 2:
+        reasons = reasons | {LAYOUTS_REFUSAL}
     if reason is not None and (
-        not isinstance(reason, str) or reason not in REFUSAL_REASONS
+        not isinstance(reason, str) or reason not in reasons
     ):
         raise _bad()
     return {
@@ -316,6 +334,84 @@ def _parse_result(result):
         "reason": reason,
         "at": _parse_at(result.get("at")),
     }
+
+
+def _int(value, low, high):
+    """`value`, an integer from `low` to `high`; raises a 400 for anything
+    else, a boolean included."""
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise _bad()
+    if not low <= value <= high:
+        raise _bad()
+    return value
+
+
+def _parse_catalog(state):
+    """The `deck_catalog` of a state of protocol 1.2, as
+    `streamdeck.catalog.item._take` takes it.
+
+    None when absent or null, when larger than MAX_CATALOG_BYTES as compact
+    JSON, or of a format other than 1. An action or an icon of another
+    form, a model whose key is not a USB product id, or one no key fits
+    (no key, or more keys than cells), is skipped: a newer deck program
+    may offer more. Raises a 400 for any other shape: a format that is
+    not an integer, an entry that is not a string, a geometry whose
+    numbers are not integers from 0 to MAX_GEOMETRY."""
+    catalog = state.get("deck_catalog")
+    if catalog is None:
+        return None
+    if not isinstance(catalog, dict):
+        raise _bad()
+    if not isinstance(catalog.get("format"), int) or isinstance(
+        catalog.get("format"), bool
+    ):
+        raise _bad()
+    text = json.dumps(catalog, separators=(",", ":"), ensure_ascii=False)
+    if len(text.encode("utf-8", "surrogatepass")) > MAX_CATALOG_BYTES:
+        return None
+    if catalog["format"] != 1:
+        return None
+    actions = _list(catalog, "actions", MAX_CATALOG_BYTES)
+    icons = _list(catalog, "icons", MAX_CATALOG_BYTES)
+    shapes = _dict(catalog, "models")
+    for entry in actions + icons:
+        if not isinstance(entry, str) or len(entry) > MAX_TEXT:
+            raise _bad()
+    models = {}
+    for product, shape in shapes.items():
+        if not isinstance(shape, dict):
+            raise _bad()
+        cols = _int(shape.get("cols"), 0, MAX_GEOMETRY)
+        rows = _int(shape.get("rows"), 0, MAX_GEOMETRY)
+        keys = _int(shape.get("keys"), 0, MAX_GEOMETRY)
+        if _PRODUCT_RE.fullmatch(product) and 0 < keys <= cols * rows:
+            models[product] = {"cols": cols, "rows": rows, "keys": keys}
+    return {
+        "actions": [
+            a for a in dict.fromkeys(actions) if ACTION_RE.fullmatch(a)
+        ],
+        "icons": [i for i in dict.fromkeys(icons) if ICON_RE.fullmatch(i)],
+        "models": models,
+    }
+
+
+def _parse_layout_hashes(value):
+    """`current.key_layouts` of a pilot, protocol 1.2: `{product id:
+    sha256 hex | None}`, the hash of each layout the workstation's
+    keymap.json holds; `{}` when absent or null. Raises a 400 for any
+    other shape, or more than MAX_DECKS models."""
+    if value is None:
+        return {}
+    if not isinstance(value, dict) or len(value) > MAX_DECKS:
+        raise _bad()
+    for product, digest in value.items():
+        if not _PRODUCT_RE.fullmatch(product):
+            raise _bad()
+        if digest is not None and not (
+            isinstance(digest, str) and _HASH_RE.fullmatch(digest)
+        ):
+            raise _bad()
+    return dict(value)
 
 
 def _hash_token(token):
@@ -548,7 +644,8 @@ class StreamdeckService(models.AbstractModel):
         minor = _check_protocol(payload)
         workstation = self._workstation_of(token)
         state, decks, events, lost = _parse_report(payload)
-        config = self._parse_config(payload) if minor >= 1 else None
+        catalog = _parse_catalog(payload["state"]) if minor >= 2 else None
+        config = self._parse_config(payload, minor) if minor >= 1 else None
         now = fields.Datetime.now()
         values = dict(
             state,
@@ -570,6 +667,8 @@ class StreamdeckService(models.AbstractModel):
             self._server_event(
                 workstation, "heard_again", now, received_at=now
             )
+        if catalog:
+            self.env["streamdeck.catalog.item"]._take(catalog, now)
         moved, replugged = self._apply_decks(workstation, decks, now)
         accepted = self._store_events(workstation, events, now)
         self.env["streamdeck.monitor"]._on_report(
@@ -767,14 +866,17 @@ class StreamdeckService(models.AbstractModel):
 
     # -- managed configuration -------------------------------------------
 
-    def _parse_config(self, payload):
+    def _parse_config(self, payload, minor=1):
         """The `config` of a report: None when absent or null, which says
         nothing of the pilot; `{"pilot": False}` from a destination that
         is not the pilot, whatever else it holds; for the pilot,
-        `{pilot: True, revision_applied, current, result, choice}`.
-        `current` holds every key of KEYS, validated by the schema and
-        normalised, None for a key absent or null; a key outside KEYS is
-        ignored. Raises a 400 for any other shape or value."""
+        `{pilot: True, revision_applied, current, result, choice, layouts,
+        current_layouts}`. `current` holds every key of KEYS, validated by
+        the schema and normalised, None for a key absent or null; a key
+        outside KEYS is ignored. `layouts` is True from protocol 1.2 on,
+        which takes in the key layouts; `current_layouts` then holds the
+        hashes of `current.key_layouts` (`_parse_layout_hashes`), `{}`
+        before. Raises a 400 for any other shape or value."""
         config = payload.get("config")
         if config is None:
             return None
@@ -799,14 +901,19 @@ class StreamdeckService(models.AbstractModel):
         choice = config.get("choice")
         if choice is not None and choice not in CONFIG_CHOICES:
             raise _bad()
+        layouts = minor >= 2
         return {
             "pilot": True,
             "revision_applied": _count(
                 config.get("revision_applied"), nullable=True
             ),
             "current": current,
-            "result": _parse_result(config.get("result")),
+            "result": _parse_result(config.get("result"), minor),
             "choice": choice,
+            "layouts": layouts,
+            "current_layouts": (
+                _parse_layout_hashes(local.get(LAYOUTS_KEY)) if layouts else {}
+            ),
         }
 
     def _apply_config(self, workstation, config, now):
@@ -826,6 +933,12 @@ class StreamdeckService(models.AbstractModel):
         revision when its hash differs from the offered one, or when a
         drift asks for it with the same values.
 
+        From protocol 1.2, the settings carry `key_layouts`, the layouts
+        of the connected deck models (`_config_settings`), and a layout
+        changed in the workstation's file is adopted or offered again as
+        a key is (`_config_layout_drift`); the first pilot asks nothing
+        of the layouts, which the extension alone writes.
+
         A workstation that no layer configures is `unmanaged` and gets no
         `config`; its hash is cleared, so a later configuration gets a
         new revision whatever its values.
@@ -838,11 +951,14 @@ class StreamdeckService(models.AbstractModel):
         schema = self.env["streamdeck.config.schema"]
         self._config_result(workstation, config["result"], now)
         effective = schema._effective(workstation)
-        if not effective["settings"]:
+        layouts = (
+            schema._effective_layouts(workstation) if config["layouts"] else {}
+        )
+        current = config["current"]
+        if not self._config_settings(effective, layouts, current)[0]:
             self._config_release(workstation)
             return None
-        current = config["current"]
-        ask, drift, adopt = [], [], {}
+        ask, drift, adopt, adopt_layouts = [], [], {}, {}
         if (
             not workstation.config_first_choice
             and not workstation.config_applied_revision
@@ -860,10 +976,22 @@ class StreamdeckService(models.AbstractModel):
             config["revision_applied"] == workstation.config_applied_revision
         ):
             adopt, drift = self._config_drift(workstation, effective, current)
-        if adopt:
-            self._config_adopt(workstation, adopt, now)
+            adopt_layouts, drift_layouts = self._config_layout_drift(
+                workstation,
+                self._config_settings(effective, layouts, current)[0],
+                layouts,
+                config["current_layouts"],
+            )
+            drift += ["%s:%s" % (LAYOUTS_KEY, pid) for pid in drift_layouts]
+        if adopt or adopt_layouts:
+            self._config_adopt(workstation, adopt, now, adopt_layouts)
             effective = schema._effective(workstation)
-        settings = effective["settings"]
+            if config["layouts"]:
+                layouts = schema._effective_layouts(workstation)
+        settings, locked = self._config_settings(effective, layouts, current)
+        if not settings:
+            self._config_release(workstation)
+            return None
         digest = schema._hash(settings)
         values = {"config_ask": ",".join(ask) or False}
         renewed = digest != workstation.config_hash or bool(drift)
@@ -891,11 +1019,31 @@ class StreamdeckService(models.AbstractModel):
             "revision": workstation.config_revision,
             "hash": digest,
             "settings": settings,
-            "locked": effective["locked"],
+            "locked": locked,
         }
         if ask:
             offered["ask"] = ask
         return offered
+
+    def _config_settings(self, effective, layouts, current):
+        """`(settings, locked)` that Odoo offers: those of `effective`,
+        plus `key_layouts` when `layouts` (`_effective_layouts`) gives a
+        layout to send, locked when one of the sent layouts is. The
+        plugins turned off are those `effective` sets, else those of the
+        workstation's file (`current`), as the workstation checks the
+        layouts against them."""
+        schema = self.env["streamdeck.config.schema"]
+        settings = dict(effective["settings"])
+        locked = list(effective["locked"])
+        plugins_off = settings.get(
+            "plugins_off", current.get("plugins_off") or []
+        )
+        sent = schema._layout_settings(layouts, plugins_off)
+        if sent:
+            settings[LAYOUTS_KEY] = sent
+            if any(layouts[product]["locked"] for product in sent):
+                locked.append(LAYOUTS_KEY)
+        return settings, locked
 
     def _config_release(self, workstation):
         """Make `workstation` `unmanaged`: no revision offered, pending
@@ -970,11 +1118,64 @@ class StreamdeckService(models.AbstractModel):
                 adopt[key] = local
         return adopt, drift
 
-    def _config_adopt(self, workstation, values, now):
+    def _config_layout_drift(self, workstation, settings, layouts, current):
+        """`(adopt, drift)` of the key layouts, as `_config_drift` for the
+        settings, on hashes: `current` maps a product id to the hash of the
+        layout the workstation's keymap.json holds, None when it holds
+        none; the baseline is the `key_layouts` of `config_written`, else
+        of `config_applied`.
+
+        `adopt` maps each product id whose free layout differs from the
+        baseline, and from Odoo's, to its hash in the file; `drift` lists
+        those whose locked layout, or missing one, differs, while the
+        applied revision is the offered one. A layout the baseline lacks
+        fails closed as a key does: offered again when locked or missing
+        from the file, never adopted. Only the layouts of `settings`, the
+        settings Odoo offers now, count: a layout Odoo does not send (kept
+        in the file, model of unknown keys) is skipped."""
+        schema = self.env["streamdeck.config.schema"]
+        sent = settings.get(LAYOUTS_KEY) or {}
+        if not sent:
+            return {}, []
+        written = json.loads(
+            workstation.config_written or workstation.config_applied or "{}"
+        )
+        baseline = written.get(LAYOUTS_KEY) or {}
+        offered = (
+            json.loads(workstation.config_offered or "{}").get(LAYOUTS_KEY)
+            or {}
+        )
+        settled = workstation.config_revision == (
+            workstation.config_applied_revision
+        )
+        adopt, drift = {}, []
+        for product, layout in sent.items():
+            local = current.get(product)
+            wanted = schema._layout_hash(layout)
+            locked = layouts[product]["locked"]
+            if product not in baseline:
+                if product not in offered or local == wanted:
+                    continue
+                if (locked or local is None) and settled:
+                    drift.append(product)
+                continue
+            if local == schema._layout_hash(baseline[product]):
+                continue
+            if locked or local is None:
+                if settled and local != wanted:
+                    drift.append(product)
+            elif local != wanted:
+                adopt[product] = local
+        return adopt, drift
+
+    def _config_adopt(self, workstation, values, now, layouts=None):
         """Write each `{key: value}` as the workstation's own line, not
-        locked, `source` "local", and record one `config_adopted` event.
-        The keys are free: no layer locks them, so the line is the value
-        of the effective configuration."""
+        locked, `source` "local"; mark the workstation's layout of each
+        `{product id: hash}` of `layouts` as kept in its file, `source`
+        "local"; record one `config_adopted` event naming them all. The
+        keys and the layouts are free: no layer locks them, so the line
+        is the value of the effective configuration, and Odoo stops
+        sending the layout."""
         Line = self.env["streamdeck.config.line"]
         lines = {line.key: line for line in workstation.config_line_ids}
         for key, value in values.items():
@@ -985,8 +1186,30 @@ class StreamdeckService(models.AbstractModel):
                 Line.create(
                     dict(line_values, key=key, workstation_id=workstation.id)
                 )
+        layouts = layouts or {}
+        Layout = self.env["streamdeck.key.layout"]
+        own = {item.usb_product_id: item for item in workstation.layout_ids}
+        for product, digest in layouts.items():
+            layout_values = {
+                "in_file": True,
+                "file_hash": digest,
+                "source": "local",
+            }
+            if product in own:
+                own[product].write(layout_values)
+            else:
+                Layout.create(
+                    dict(
+                        layout_values,
+                        usb_product_id=product,
+                        workstation_id=workstation.id,
+                    )
+                )
+        keys = list(values) + [
+            "%s:%s" % (LAYOUTS_KEY, product) for product in layouts
+        ]
         self._server_event(
-            workstation, "config_adopted", now, config_keys=", ".join(values)
+            workstation, "config_adopted", now, config_keys=", ".join(keys)
         )
 
     def _config_result(self, workstation, result, now):

@@ -207,6 +207,19 @@
                                     <field name="source" readonly="True"/>
                                 </list>
                             </field>
+                            <separator string="Key layouts of the connected decks"/>
+                            <field name="config_layouts_html" nolabel="1"
+                                   readonly="True"/>
+                            <separator string="Key layouts of this workstation"/>
+                            <field name="layout_ids" nolabel="1">
+                                <list>
+                                    <field name="usb_product_id"/>
+                                    <field name="name"/>
+                                    <field name="locked"/>
+                                    <field name="in_file"/>
+                                    <field name="source"/>
+                                </list>
+                            </field>
                             <group>
                                 <field name="deck_plugins" readonly="True"/>
                             </group>
