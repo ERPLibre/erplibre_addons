@@ -79,8 +79,19 @@ Reflection guide
   LinkUp conversation only while its party holds it alone with the
   chatbot: once a member or a moderator joined, or on the distress
   channel, it reads ``linkup.unavailable``.
-* A member opens the guide by ``linkup.reflet.linkup_start_guide``, a
-  conversation with the chatbot alone; a visitor by the welcome script.
+* A member opens the guide from the last step of the first-use tour of
+  Discuss, "Write my first reflection with the guide" (LU-F-125 RM5):
+  ``linkup.reflet.linkup_start_guide`` opens a conversation with the
+  chatbot alone (``linkup_member_guide``), which Discuss shows. A visitor
+  opens it by the welcome script.
+* Discuss has no chatbot of the widget: the server runs the guide of a
+  member there. Each post of the member answers the current step, a
+  choice carrying its answer (``selected_answer_id``) as in the widget;
+  the server processes it, then posts the next steps up to the next one
+  that waits for an answer. ``linkup_guide`` gives the web client the step
+  to answer: the answers of a choice show as buttons above the composer,
+  the composer names the text a step asks for, and an answer the server
+  refuses leaves no message and shows its reason.
 
 Distress
 ========
@@ -98,6 +109,13 @@ channel with an available moderator.
 * Without a moderator online, no conversation opens: the reporter reads
   the help resources (``linkup.help_resources``, or 9-8-8 and 9-1-1) and
   the delay of an urgent report, which waits in the queue.
+* "Need help now" creates at most ``linkup.livechat_help_now_per_hour``
+  urgent reports an hour (3), counted for the visitor (or the member) and
+  for the address of the request, each on its own. Beyond, the press
+  creates no report and brings no moderator: the resources still show at
+  once, and the chatbot and the status line say that the request is
+  already with the moderation team. A press in a conversation whose report
+  is still open creates none, so the limit never holds it back.
 * "Need help now" brings a moderator into a welcome conversation that
   its party holds alone with the chatbot only; in one a member already
   operates, the report waits and the resources are posted. Once a
@@ -170,6 +188,31 @@ operator included, and a second report pays nothing. An event still
 waiting after ``linkup.guest_event_expiry_days`` days (30) is deleted
 without points by a daily cron.
 
+Retention
+=========
+
+The periods of the members apply to the visitors (LU-NF-015, Q-31), with
+the parameters of ``mail_linkup_community``:
+
+* the draft of a visitor unchanged for ``linkup.retention_draft_days``
+  days (30) is deleted, and a reflection of the live chat rejected or
+  expired for ``linkup.retention_closed_reflet_months`` months (12) loses
+  its texts, by the retention of the members, which reaches them whatever
+  their parties;
+* an event of points held for a visitor leaves after
+  ``linkup.guest_event_expiry_days`` days (30, Q-43);
+* a conversation of the live chat channels of LinkUp without a message for
+  ``linkup.retention_inactive_pair_months`` months (24) is deleted, with
+  its messages and its reflections, by the daily cron "LinkUp: retention
+  of the live chat". A conversation a report points to (the conversation
+  of a distress, of a reported visitor, or one of its messages or
+  reflections) stays while the report is open, then for
+  ``linkup.retention_closed_report_months`` months (24) after its
+  decision, the evidence period of the moderation.
+
+The sessions of ``im_livechat`` outside LinkUp, and the ``mail.guest`` of
+a visitor, keep the retention of ``im_livechat`` and ``mail``.
+
 Widget of the visitors
 ======================
 
@@ -200,7 +243,8 @@ widget keeps the light theme (LU-NF-054): no ``*.dark.scss``.
   guide mode. It shows the resources at once (``/linkup/v1/livechat/help``),
   saves the conversation if needed, then ``/linkup/v1/livechat/help_now``
   creates the urgent report and brings a moderator, or leaves the report
-  in the queue; a status line says which.
+  in the queue; a status line says which, or that the request is already
+  with the moderation team beyond the limit.
 * The widget reads the categories through
   ``/linkup/v1/livechat/categories``: a visitor reads no model.
 * For a member logged in, the button of the widget opens Discuss.
@@ -241,6 +285,12 @@ Decided by the owner:
   one, the help resources show at once and the report waits, urgent.
 * Q-45: the widget is the one of ``website_livechat`` on the pages of the
   website; a logged-in member is sent to Discuss.
+* Q-31: the retention periods of the specification apply to the visitors
+  of the live chat (see Retention).
+* "Need help now" creates at most 3 urgent reports an hour
+  (``linkup.livechat_help_now_per_hour``).
+* LU-F-125 RM5: a member opens the guide from the first-use tour, and it
+  runs in Discuss.
 
 Applied by default, to confirm:
 
@@ -264,15 +314,16 @@ Applied by default, to confirm:
   into a conversation that holds a third person.
 * The reading of a reflection of the live chat is not recorded: nothing
   depends on it, its withdrawal not being offered.
-
-Not covered yet
-===============
-
-* The guide of a member opened from Discuss
-  (``linkup.reflet.linkup_start_guide``): the chatbot runs in the widget
-  only.
-* The retention of the conversations of the visitors follows
-  ``im_livechat``; their periods in LinkUp are to define (Q-31).
+* The limit of "Need help now" counts the visitor and the address apart:
+  visitors behind one address share its 3 reports an hour; a value below
+  1 takes 3.
+* The conversations of the live chat take the period of an inactive pair
+  (24 months), the guide of a member included, and are deleted rather
+  than emptied: no link of a pair points to them. The ``mail.guest`` of a
+  visitor stays to ``mail``.
+* The guide of a member is proposed by the last step of the first-use
+  tour, which "Replay the tour" of the help page brings back; each launch
+  opens a new conversation.
 
 License
 =======

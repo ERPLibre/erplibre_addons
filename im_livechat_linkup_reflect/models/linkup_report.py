@@ -1,5 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
+from datetime import timedelta
+
 from odoo import _, api, fields, models
 from odoo.addons.mail_linkup_community.models.res_users import (
     HELP_RESOURCES_PARAM,
@@ -14,6 +16,15 @@ from odoo.addons.mail_linkup_reflet.models.linkup_report import (
     OPEN_STATES,
     URGENT_REASONS,
 )
+
+# Urgent reports that "Need help now" creates within an hour, counted for
+# the party of the conversation (a visitor or a member) and for the address
+# of the request, each on its own (LU-NF-006). A value below 1 falls back
+# to the default.
+HELP_NOW_RATE_PARAM = "linkup.livechat_help_now_per_hour"
+DEFAULT_HELP_NOW_RATE = 3
+HELP_NOW_KIND = "livechat_help_now"
+HELP_NOW_WINDOW = timedelta(hours=1)
 
 
 class LinkupReport(models.Model):
@@ -210,11 +221,9 @@ class LinkupReport(models.Model):
         return report._linkup_distress_info()
 
     @api.model
-    def _linkup_livechat_distress(self, conversation, user, guest):
-        """The urgent report of distress of the party of a live chat
-        conversation, a visitor (``reporter_guest_id``) or a member: the
-        one still open for this conversation, or a new one."""
-        Report = self.sudo()
+    def _linkup_livechat_open_distress(self, conversation, user, guest):
+        """The report of distress of the party of a live chat conversation
+        still open for this conversation, or an empty recordset."""
         domain = [
             ("reason", "=", "distress"),
             ("livechat_conversation_id", "=", conversation.id),
@@ -224,10 +233,21 @@ class LinkupReport(models.Model):
             domain.append(("reporter_guest_id", "=", guest.id))
         else:
             domain.append(("reporter_id", "=", user.id))
-        report = Report.search(domain, limit=1)
+        return self.sudo().search(domain, limit=1)
+
+    @api.model
+    def _linkup_livechat_distress(self, conversation, user, guest):
+        """The urgent report of distress of the party of a live chat
+        conversation, a visitor (``reporter_guest_id``) or a member: the
+        one still open for this conversation, or a new one, which counts
+        towards the limit of "Need help now"."""
+        report = self._linkup_livechat_open_distress(conversation, user, guest)
         if report:
             return report
-        return Report.create(
+        Rate = self.env["linkup.rate.event"].sudo()
+        for key in self._linkup_help_now_keys(user, guest):
+            Rate._linkup_hit(HELP_NOW_KIND, key)
+        return self.sudo().create(
             {
                 "reporter_id": user.id,
                 "reporter_guest_id": guest.id,
@@ -235,6 +255,36 @@ class LinkupReport(models.Model):
                 "urgent": True,
                 "livechat_conversation_id": conversation.id,
             }
+        )
+
+    @api.model
+    def _linkup_help_now_keys(self, user, guest):
+        """What the limit of "Need help now" counts: the party, a visitor
+        by their ``mail.guest``, a member by their account, and the address
+        of the request."""
+        party = f"guest:{guest.id}" if guest else f"user:{user.id}"
+        address = self.env["res.users"]._linkup_request_address()
+        return (party, f"address:{address}")
+
+    @api.model
+    def _linkup_help_now_limited(self, conversation, user, guest):
+        """Whether "Need help now", pressed by the party of
+        ``conversation``, would create an urgent report beyond the limit of
+        ``linkup.livechat_help_now_per_hour`` (3) reports an hour, for the
+        party or for the address. A press that finds the report of the
+        party still open for this conversation creates none, so it is
+        never beyond the limit."""
+        if self._linkup_livechat_open_distress(conversation, user, guest):
+            return False
+        limit = self.env["linkup.reflet"]._linkup_param(
+            HELP_NOW_RATE_PARAM, DEFAULT_HELP_NOW_RATE
+        )
+        if limit < 1:
+            limit = DEFAULT_HELP_NOW_RATE
+        Rate = self.env["linkup.rate.event"].sudo()
+        return any(
+            Rate._linkup_exceeded(HELP_NOW_KIND, key, limit, HELP_NOW_WINDOW)
+            for key in self._linkup_help_now_keys(user, guest)
         )
 
     # ------------------------------------------------------------------

@@ -11,4 +11,19 @@
         <field name="interval_type">days</field>
         <field name="active" eval="True" />
     </record>
+
+    <!-- Daily retention of the conversations of the live chat of LinkUp
+         (LU-NF-015, Q-31): those without a message for the period of an
+         inactive pair, unless a report holds them. Each run catches up
+         what the previous ones left, after a restoration too. -->
+    <record id="ir_cron_linkup_livechat_retention" model="ir.cron">
+        <field name="name">LinkUp: retention of the live chat</field>
+        <field name="model_id" ref="mail_linkup_community.model_linkup_personal_data" />
+        <field name="state">code</field>
+        <field name="code">model._cron_linkup_livechat_retention()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True" />
+    </record>
 </odoo>

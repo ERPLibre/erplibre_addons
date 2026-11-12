@@ -18,6 +18,9 @@ import {LinkupHelpNow} from "@mail_linkup_community/core/common/linkup_help_now"
  * conflict of interest, or posts the resources and leaves the report
  * waiting in the queue. Once a moderator joined, the chatbot is done: its
  * last step is the one of "Need help now", and the composer is free.
+ * Beyond the limit of urgent reports an hour (`limited`), the server
+ * creates no report and brings nobody: the status says that the request is
+ * already with the moderation team.
  *
  * The state lives on the live chat service (`linkupHelp`), so that it
  * stays when the chat window of the conversation is replaced.
@@ -57,7 +60,9 @@ export async function linkupPressHelpNow(env, thread) {
             conversation.messages.add(message);
         }
         help.found = Boolean(result.operator_found);
-        if (help.found) {
+        if (result.limited) {
+            help.status = _t("Your request is already with the moderation team.");
+        } else if (help.found) {
             linkupEndChatbot(store, conversation, result.step_id, result.message_id);
             conversation.linkup_livechat_kind = "distress";
             help.status = _t("A person of the moderation joins you in this conversation.");

@@ -45,7 +45,10 @@ class ChatbotScriptStep(models.Model):
     conversation an available moderator in no conflict of interest with
     it, the conversation joining the distress channel without start rule;
     without one, it posts the help resources and tells that the request
-    waits in the queue.
+    waits in the queue. Beyond ``linkup.livechat_help_now_per_hour``
+    reports an hour (3), for the party or for the address, it posts the
+    resources and that the request is already with the moderation team,
+    without a new report or a moderator.
     """
 
     _inherit = "chatbot.script.step"
@@ -300,7 +303,9 @@ class ChatbotScriptStep(models.Model):
         or one of distress, which a restarted script would reach again, the
         report waits in the queue and the resources are posted. The row of
         the conversation is locked first, so two presses at once bring a
-        single moderator.
+        single moderator. Beyond the limit of "Need help now", no report is
+        created and no moderator is brought: the chatbot posts the
+        resources and that the request is already with the moderation team.
         """
         user, guest = self._linkup_party(discuss_channel)
         channel = discuss_channel.sudo()
@@ -312,6 +317,11 @@ class ChatbotScriptStep(models.Model):
         )
         channel.invalidate_recordset()
         Report = self.env["linkup.report"].sudo()
+        if Report._linkup_help_now_limited(channel, user, guest):
+            return channel._chatbot_post_message(
+                self.chatbot_script_id,
+                self._linkup_resources_body(limited=True),
+            )
         report = Report._linkup_livechat_distress(channel, user, guest)
         Livechat = self.env["im_livechat.channel"].sudo()
         operator = self.env["res.users"]
@@ -412,48 +422,78 @@ class ChatbotScriptStep(models.Model):
         ``linkup.reflet._linkup_livechat_party``; any other case reads
         ``linkup.unavailable``.
 
-        Return whether a moderator joined, the step and the message posted,
-        the help resources, the hours of the moderation and the delay of an
-        urgent report, with the Store data of the message.
+        Beyond ``linkup.livechat_help_now_per_hour`` urgent reports an hour
+        (3), for the party or for the address, the press creates no report
+        and brings no moderator: the resources still show, and the chatbot
+        says that the request is already with the moderation team
+        (``limited``).
+
+        Return whether a moderator joined, whether the limit held the press
+        back, the step and the message posted, the help resources, the
+        hours of the moderation and the delay of an urgent report, with the
+        Store data of the message.
         """
         Reflet = self.env["linkup.reflet"]
-        Report = self.env["linkup.report"]
+        Report = self.env["linkup.report"].sudo()
         channel, user, guest = Reflet._linkup_livechat_party(channel_id, guest)
         step = self._linkup_help_step()
         if not step:
             raise Reflet._linkup_livechat_unavailable()
         posted = self.env["mail.message"]
-        if channel._linkup_livechat_people() < 2:
+        limited = Report._linkup_help_now_limited(channel, user, guest)
+        if limited:
+            posted = channel._chatbot_post_message(
+                step.chatbot_script_id,
+                step._linkup_resources_body(limited=True),
+            )
+        elif channel._linkup_livechat_people() < 2:
             posted = step._linkup_forward_moderator(channel)
         else:
-            Report.sudo()._linkup_livechat_distress(channel, user, guest)
+            Report._linkup_livechat_distress(channel, user, guest)
         found = channel.livechat_channel_id.linkup_kind == "distress"
         if found:
             channel.chatbot_current_step_id = step
         return {
             "operator_found": found,
+            "limited": limited,
             "step_id": step.id,
             "message_id": posted.id,
             **Report._linkup_help_info(),
             "store": Store(posted, for_current_user=True).get_result(),
         }
 
-    def _linkup_resources_body(self):
+    def _linkup_resources_body(self, limited=False):
         """The help resources, and that the request waits in the queue of
-        the moderation, processed within the delay of an urgent report."""
+        the moderation, processed within the delay of an urgent report;
+        with ``limited``, that it is already with the moderation team, a
+        line that tells neither the limit nor the reports counted."""
         Report = self.env["linkup.report"]
-        lines = [
-            _(
-                "No person of the moderation is available right now. LinkUp"
-                " is not an emergency service: reach one of these resources."
-            )
-        ]
+        if limited:
+            lines = [
+                _(
+                    "LinkUp is not an emergency service: reach one of these"
+                    " resources."
+                )
+            ]
+        else:
+            lines = [
+                _(
+                    "No person of the moderation is available right now."
+                    " LinkUp is not an emergency service: reach one of these"
+                    " resources."
+                )
+            ]
         lines += Report._linkup_help_resources()
-        lines.append(
-            _(
-                "Your request waits in the queue of the moderation, which"
-                " processes it within %(hours)s hours.",
-                hours=Report._linkup_hours(True),
+        if limited:
+            lines.append(
+                _("Your request is already with the moderation team.")
             )
-        )
+        else:
+            lines.append(
+                _(
+                    "Your request waits in the queue of the moderation, which"
+                    " processes it within %(hours)s hours.",
+                    hours=Report._linkup_hours(True),
+                )
+            )
         return Markup("").join(Markup("<p>%s</p>") % line for line in lines)

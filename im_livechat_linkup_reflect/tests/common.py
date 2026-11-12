@@ -105,9 +105,13 @@ class LinkupLivechatMixin:
     def _chatbot(self, channel, body, answer=None, user=None, guest=None):
         """Answer the current step as the widget does: post the answer,
         with the choice made, then trigger the next step as
-        ``/chatbot/step/trigger``. Return the next step."""
+        ``/chatbot/step/trigger``. In the guide of a member, which the
+        server runs in Discuss, the post alone answers. Return the next
+        step."""
         context = {"selected_answer_id": answer.id} if answer else {}
         message = self._post(channel, body, user=user, guest=guest, **context)
+        if channel.sudo().linkup_member_guide:
+            return channel.sudo().chatbot_current_step_id
         if guest:
             channel = self._as_visitor(channel, guest)
         else:

@@ -43,6 +43,15 @@ msgid "A comment holds at most %(count)s characters."
 msgstr "Un commentaire compte au plus %(count)s caractères."
 
 #. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,help:im_livechat_linkup_reflect.field_discuss_channel__linkup_member_guide
+msgid ""
+"A conversation of the reflection guide of a member, whose script the server "
+"runs in Discuss."
+msgstr ""
+"Une conversation du guide du reflet d'un membre, dont le serveur déroule le"
+" script dans Discussion."
+
+#. module: im_livechat_linkup_reflect
 #: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_member
 msgid ""
 "A member joins you. Here too, the conversation starts with a reflection."
@@ -158,6 +167,18 @@ msgstr "Choisis un motif."
 
 #. module: im_livechat_linkup_reflect
 #. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.js:0
+msgid "Choose an answer."
+msgstr "Choisis une réponse."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.js:0
+msgid "Choose the category of what you were told."
+msgstr "Choisis la catégorie de ce qu'on t'a dit."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.xml:0
 msgid "Close the help"
 msgstr "Fermer l'aide"
@@ -234,6 +255,11 @@ msgid "Global rule"
 msgstr "Règle globale"
 
 #. module: im_livechat_linkup_reflect
+#: model:ir.model.fields,field_description:im_livechat_linkup_reflect.field_discuss_channel__linkup_member_guide
+msgid "Guide of a member"
+msgstr "Guide d'un membre"
+
+#. module: im_livechat_linkup_reflect
 #: model:chatbot.script.step,message:im_livechat_linkup_reflect.welcome_step_hello
 msgid ""
 "Hello! On LinkUp, a conversation starts with an exchange lived in person: "
@@ -284,6 +310,7 @@ msgstr "J'ai compris que : écris ce que tu en as compris."
 
 #. module: im_livechat_linkup_reflect
 #. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.js:0
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_patch.js:0
 msgid "I understood that…"
 msgstr "J'ai compris que…"
@@ -349,6 +376,13 @@ msgstr ""
 "le 9-1-1. Une personne de la modération lit cette conversation."
 
 #. module: im_livechat_linkup_reflect
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+msgid "LinkUp is not an emergency service: reach one of these resources."
+msgstr ""
+"LinkUp n'est pas un service d'urgence : joins l'une de ces ressources."
+
+#. module: im_livechat_linkup_reflect
 #. odoo-javascript
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
 msgid ""
@@ -362,6 +396,11 @@ msgstr ""
 #: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_audit_log
 msgid "LinkUp moderation audit log"
 msgstr "Journal d'audit de la modération LinkUp"
+
+#. module: im_livechat_linkup_reflect
+#: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_personal_data
+msgid "LinkUp personal data"
+msgstr "Données personnelles LinkUp"
 
 #. module: im_livechat_linkup_reflect
 #: model:ir.model,name:im_livechat_linkup_reflect.model_linkup_rate_event
@@ -425,6 +464,11 @@ msgid "LinkUp: forward to a moderator"
 msgstr "LinkUp : transfert à la modération"
 
 #. module: im_livechat_linkup_reflect
+#: model:ir.actions.server,name:im_livechat_linkup_reflect.ir_cron_linkup_livechat_retention_ir_actions_server
+msgid "LinkUp: retention of the live chat"
+msgstr "LinkUp : rétention du clavardage"
+
+#. module: im_livechat_linkup_reflect
 #: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__chatbot_script_step__step_type__linkup_reflet_review
 msgid "LinkUp: review of the reflection"
 msgstr "LinkUp : relecture du reflet"
@@ -465,6 +509,7 @@ msgstr "Module"
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/guide_patch.js:0
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.xml:0
 #: model:chatbot.script.answer,name:im_livechat_linkup_reflect.welcome_answer_help
+#: model:ir.model.fields.selection,name:im_livechat_linkup_reflect.selection__linkup_rate_event__kind__livechat_help_now
 msgid "Need help now"
 msgstr "Besoin d'aide maintenant"
 
@@ -768,6 +813,18 @@ msgid "Try a guided reflection"
 msgstr "Essayer un reflet guidé"
 
 #. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.js:0
+msgid "Type what the person told you."
+msgstr "Écris ce que la personne t'a dit."
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.js:0
+msgid "Type what you understood."
+msgstr "Écris ce que tu as compris."
+
+#. module: im_livechat_linkup_reflect
 #. odoo-python
 #: code:addons/im_livechat_linkup_reflect/models/linkup_reflet.py:0
 msgid "Unknown answer."
@@ -818,6 +875,12 @@ msgid "Write a reflection first."
 msgstr "Écris d'abord un reflet."
 
 #. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.xml:0
+msgid "Write my first reflection with the guide"
+msgstr "Écrire mon premier reflet avec le guide"
+
+#. module: im_livechat_linkup_reflect
 #: model:im_livechat.channel,input_placeholder:im_livechat_linkup_reflect.livechat_channel_welcome
 msgid "Write your answer…"
 msgstr "Écris ta réponse…"
@@ -842,9 +905,18 @@ msgstr "Tu m'as dit : écris ce que la personne t'a dit, dans ses mots."
 
 #. module: im_livechat_linkup_reflect
 #. odoo-javascript
+#: code:addons/im_livechat_linkup_reflect/static/src/core/member_guide.js:0
 #: code:addons/im_livechat_linkup_reflect/static/src/embed/chatbot_patch.js:0
 msgid "You told me…"
 msgstr "Tu m'as dit…"
+
+#. module: im_livechat_linkup_reflect
+#. odoo-javascript
+#. odoo-python
+#: code:addons/im_livechat_linkup_reflect/models/chatbot_script_step.py:0
+#: code:addons/im_livechat_linkup_reflect/static/src/embed/help_now.js:0
+msgid "Your request is already with the moderation team."
+msgstr "Ta demande est déjà entre les mains de l'équipe de modération."
 
 #. module: im_livechat_linkup_reflect
 #. odoo-python

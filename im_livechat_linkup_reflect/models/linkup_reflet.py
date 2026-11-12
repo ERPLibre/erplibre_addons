@@ -543,7 +543,9 @@ class LinkupReflet(models.Model):
 
         The conversation belongs to the welcome channel; the chatbot alone
         answers in it, so the start rule never refuses the answers of the
-        member. Return its id and its Store data.
+        member. It is marked ``linkup_member_guide``: the server runs its
+        script as the member answers in Discuss. Return its id and its
+        Store data.
         """
         self._linkup_check_member()
         user = self.env.user
@@ -581,6 +583,7 @@ class LinkupReflet(models.Model):
                     ].id,
                     "channel_type": "livechat",
                     "name": script.title,
+                    "linkup_member_guide": True,
                 }
             )
         )

@@ -1,7 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 """Web client of the live chat: the tours of a visitor in the widget of
-the website (T-53, T-55, T-54) and of a member who reports a distress in
-Discuss (T-54), and the Hoot tests of the module, those of Discuss and
+the website (T-53, T-55, T-54), of a member who reports a distress in
+Discuss (T-54) and of a member who follows the guide in Discuss (T-53),
+and the Hoot tests of the module, those of Discuss and
 those of the widget (§12.1)."""
 
 from odoo import Command, fields
@@ -135,6 +136,35 @@ class TestLinkupLivechatUi(HttpCase):
         self.assertNotIn(
             self.joanna.partner_id,
             conversation.sudo().channel_member_ids.partner_id,
+        )
+
+    def test_member_guide_in_discuss(self):
+        """LU-F-125 RM5: the last step of the first-use tour opens the
+        guide of a first reflection in Discuss, whose steps the server
+        runs there: the answers of Sam write his draft, and nothing is
+        sent."""
+        self.sam.linkup_tour_done = False
+        self.start_tour(
+            "/odoo/discuss", "linkup_member_guide_tour", login=self.sam.login
+        )
+        self.assertTrue(self.sam.linkup_tour_done)
+        draft = self.Reflet.sudo().search(
+            [("author_id", "=", self.sam.id), ("state", "=", "draft")]
+        )
+        self.assertEqual(draft.category_id.code, "emotions")
+        self.assertEqual(draft.you_said, "The chores and a job wear me out")
+        self.assertEqual(draft.understood, "you are exhausted")
+        channel = self.env["discuss.channel"].search(
+            [("linkup_member_guide", "=", True)]
+        )
+        self.assertEqual(
+            channel.chatbot_current_step_id,
+            self.env.ref(f"{MODULE}.guide_step_review"),
+        )
+        self.assertFalse(
+            self.Reflet.sudo().search(
+                [("author_id", "=", self.sam.id), ("state", "!=", "draft")]
+            )
         )
 
     def test_hoot_suite(self):

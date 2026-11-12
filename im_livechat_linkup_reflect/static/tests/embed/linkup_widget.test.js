@@ -217,6 +217,27 @@ test("without a moderator, the request waits and the resources stay", async () =
   });
 });
 
+test("beyond the limit, the request is already with the team", async () => {
+  await openWelcomeConversation();
+  onRpc("/linkup/v1/livechat/help_now", () => ({
+    operator_found: false,
+    limited: true,
+    step_id: false,
+    message_id: false,
+    resources: ["9-8-8: crisis line."],
+    moderation_hours: "",
+    urgent_hours: 4,
+    store: {},
+  }));
+  await click(".o-linkup-LivechatHelp-button");
+  await contains(".o-linkup-LivechatHelp-status[role='status']", {
+    text: "Your request is already with the moderation team.",
+  });
+  await contains(".o-linkup-HelpNow-resources li", {
+    text: "9-8-8: crisis line.",
+  });
+});
+
 test("the visitor confirms the reflection of the member through the live chat", async () => {
   const { store, thread, guestId } = await openWelcomeConversation();
   onRpc("/linkup/v1/livechat/reflet/confirm", async (request) => {
