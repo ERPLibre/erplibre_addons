@@ -21,7 +21,7 @@ from datetime import timedelta
 from markupsafe import Markup
 from psycopg2 import errors
 
-from odoo import _, api, fields, models
+from odoo import Command, _, api, fields, models
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tools import mute_logger
 
@@ -68,6 +68,12 @@ class StreamdeckCatalogItem(models.Model):
     The catalog is the union of what the workstations reported: an item
     that no report names any more stays, `last_seen` telling when a
     workstation last offered it. Only the report service adds items.
+
+    An action links the workstations whose last catalog offered it
+    (`workstation_ids`): the id of a plugin is the name of its file, and
+    a file of the user's own plugin directory names what that user keeps
+    there. An employee reads the `plugin:` actions of their own
+    workstations only (security/streamdeck_rules.xml).
     """
 
     _name = "streamdeck.catalog.item"
@@ -88,6 +94,16 @@ class StreamdeckCatalogItem(models.Model):
         readonly=True,
         help="When a workstation last reported this item; empty for an"
         " item the module ships.",
+    )
+    workstation_ids = fields.Many2many(
+        "streamdeck.workstation",
+        "streamdeck_catalog_item_workstation_rel",
+        "item_id",
+        "workstation_id",
+        string="Offered by",
+        readonly=True,
+        help="For an action, the workstations whose last catalog offered"
+        " it.",
     )
     cols = fields.Integer(string="Columns", readonly=True)
     rows = fields.Integer(readonly=True)
@@ -117,8 +133,10 @@ class StreamdeckCatalogItem(models.Model):
                 item.name = value
 
     @api.model
-    def _take(self, catalog, now):
-        """Add what `catalog` holds to the catalog and date it `now`.
+    def _take(self, catalog, now, workstation):
+        """Add what `catalog`, reported by `workstation`, holds to the
+        catalog and date it `now`; the actions of `catalog` become those
+        `workstation` offers (`workstation_ids`).
 
         `catalog` has the wire shape `{"actions": [...], "icons": [...],
         "models": {product id: {"cols", "rows", "keys"}}}`, its entries
@@ -128,7 +146,8 @@ class StreamdeckCatalogItem(models.Model):
         `catalog`, and keeps it: the keys of a model are a constant of its
         hardware, and a report never changes the keys Odoo lays out for
         every workstation. Two reports that add the same item at once
-        both succeed (`_insert`)."""
+        both succeed (`_insert`). The links are written on `workstation`,
+        a row its report writes anyway, and only when they change."""
         Item = self.sudo()
         now = fields.Datetime.to_datetime(now)
         wanted = {("action", value): {} for value in catalog["actions"]}
@@ -142,8 +161,22 @@ class StreamdeckCatalogItem(models.Model):
                 "rows": rows,
                 "key_count": keys,
             }
-        if not wanted:
-            return
+        if wanted:
+            self._add(wanted, now)
+        actions = Item.search(
+            [("kind", "=", "action"), ("value", "in", catalog["actions"])]
+        )
+        workstation = workstation.sudo()
+        if set(actions.ids) != set(workstation.catalog_action_ids.ids):
+            workstation.write(
+                {"catalog_action_ids": [Command.set(actions.ids)]}
+            )
+
+    def _add(self, wanted, now):
+        """Create the items of `wanted`, `{(kind, value): geometry}`, that
+        the catalog lacks, and date `now` those it holds whose date is
+        older than LAST_SEEN_STEP."""
+        Item = self.sudo()
         found = Item.search(
             [("value", "in", sorted({value for _k, value in wanted}))]
         )
@@ -282,7 +315,8 @@ class StreamdeckKeyLayout(models.Model):
     missing_plugins = fields.Char(
         string="Plugins without a key",
         compute="_compute_preview_html",
-        help="Plugins of the catalog that have a home key and that this"
+        help="Plugins with a home key that the workstations offer, those of"
+        " its own workstation for a workstation's layout, and that this"
         " layout does not name: they get no key on the home screen.",
     )
 
@@ -339,20 +373,30 @@ class StreamdeckKeyLayout(models.Model):
             layout.missing_plugins = ", ".join(missing) or False
             layout.preview_html = layout._preview(missing)
 
-    def _missing_plugins(self):
+    def _missing_plugins(self, workstation=None):
         """The ids of the plugins of the catalog, a home key each, that
         this layout does not name; none for a layout kept in the
-        workstation's file."""
+        workstation's file.
+
+        The plugins are those the catalog of `workstation` offers, else
+        of the layout's own workstation. A layout of a profile or of a
+        deck model layer counts those that some workstation offers and
+        the reader reads: all for a manager, those of their own
+        workstations for an employee. An item that no workstation offers
+        any more is no warning."""
         self.ensure_one()
         if self.in_file:
             return []
-        plugins = (
-            self.env["streamdeck.catalog.item"]
-            .sudo()
-            .search([("kind", "=", "action"), ("value", "=like", "plugin:%")])
-            .mapped("value")
-        )
-        named = set(self.key_ids.mapped("action_id.value"))
+        station = workstation or self.sudo().workstation_id
+        Item = self.env["streamdeck.catalog.item"]
+        domain = [("kind", "=", "action"), ("value", "=like", "plugin:%")]
+        if station:
+            Item = Item.sudo()
+            domain.append(("workstation_ids", "in", station.ids))
+        else:
+            domain.append(("workstation_ids", "!=", False))
+        plugins = Item.search(domain).mapped("value")
+        named = set(self.sudo().key_ids.mapped("action_id.value"))
         return [
             value[len("plugin:") :] for value in plugins if value not in named
         ]
@@ -380,7 +424,10 @@ class StreamdeckKeyLayout(models.Model):
                 " workstation reports its catalog."
             )
         cols, rows, count = geometry
-        keys = {key.key_index: key for key in self.key_ids}
+        # A key may name an action the reader does not read in the
+        # catalog: the manager set it, or a workstation stopped offering
+        # it. The layout shows it as it shows its key.
+        keys = {key.key_index: key for key in self.sudo().key_ids}
         lines = []
         for row in range(rows):
             cells = []
@@ -735,7 +782,7 @@ class StreamdeckKeyLayoutKey(models.Model):
 
     @api.constrains("action_id", "icon_id", "label", "layout_id")
     def _check_values(self):
-        for key in self:
+        for key in self.sudo():
             if key.action_id and key.action_id.kind != "action":
                 raise ValidationError(_("The action of a key is an action."))
             if key.icon_id and key.icon_id.kind != "icon":
@@ -763,12 +810,22 @@ class StreamdeckKeyLayoutKey(models.Model):
                     _("A plugin has one home key in a layout.")
                 )
 
-    def _check_layouts(self, layouts):
+    def _check_layouts(self, layouts, vals_list=()):
         """For an employee, raise AccessError unless they may change the
-        keys of `layouts`."""
+        keys of `layouts`, and read the catalog items `vals_list` sets:
+        the id of an action they do not read stays out of their keys."""
         if _is_employee(self.env):
             layouts.check_access("write")
             layouts._check_editable()
+            ids = {
+                vals[name]
+                for vals in vals_list
+                for name in ("action_id", "icon_id")
+                if vals.get(name)
+            }
+            self.env["streamdeck.catalog.item"].browse(ids).check_access(
+                "read"
+            )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -779,7 +836,7 @@ class StreamdeckKeyLayoutKey(models.Model):
                 if vals.get("layout_id")
             }
         )
-        self._check_layouts(layouts)
+        self._check_layouts(layouts, vals_list)
         keys = super().create(vals_list)
         keys.layout_id._touched()
         return keys
@@ -790,7 +847,7 @@ class StreamdeckKeyLayoutKey(models.Model):
             layouts |= layouts.browse(vals["layout_id"])
         if _is_employee(self.env):
             self.check_access("write")
-        self._check_layouts(layouts)
+        self._check_layouts(layouts, [vals])
         result = super().write(vals)
         layouts._touched()
         return result

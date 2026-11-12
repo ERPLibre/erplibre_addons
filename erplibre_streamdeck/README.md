@@ -115,8 +115,12 @@ The key layouts follow the same rules, the lock being on a whole layout:
 an employee reads the layouts of the layers they read, and on their own
 workstations creates, changes and deletes the layouts, and their keys, of
 the deck models that no layer locks, never *Locked*, *Source* nor *Kept
-in the workstation's file*. Everyone reads the catalog; only the report
-route adds to it.
+in the workstation's file*. Only the report route adds to the catalog.
+A plugin's id is the name of its file, and the user's own plugin
+directory holds files of their choosing: an employee reads the
+`plugin:<id>` actions their own workstations offer, never those only
+another employee's offer, and names no other in a key; the rest of the
+catalog is read by everyone.
 
 ## Monitoring
 
@@ -336,7 +340,9 @@ preview shows the grid. An action is the home key of a plugin
 (`empty`); a key without action is left to the deck program, which
 places its fixtures and its dashboard there. A plugin can have one home
 key per layout, and a plugin that the layout does not name gets none: the
-form warns of the *Plugins without a key*.
+form warns of the *Plugins without a key*, among the plugins its own
+workstation offers for a workstation's layout, else among those that a
+workstation offers in its last report.
 
 The layouts of a model fold as the settings do, profile < deck model <
 workstation, and *Locked* holds the whole layout: a locked layout stops
@@ -363,7 +369,8 @@ out. A report without a catalog gets no layout; its settings still go.
 The catalog (*Configuration › Catalog*) is the union of what the
 workstations report: the actions, the icons and the geometry of each
 deck model. An item that no workstation reports any more stays, with the
-date it was last seen, to the hour. The geometry of a model is a constant
+date it was last seen, to the hour; an action keeps the workstations
+whose last report offered it (*Offered by*). The geometry of a model is a constant
 of its hardware: a model of the table shipped with the module takes the
 table's, and a model outside it keeps the geometry first reported. No
 report changes it, so no workstation decides the keys Odoo lays out for
