@@ -205,7 +205,7 @@ class KeyLayoutCase(TransactionCase):
         self, token, workstation, config=None, protocol="1.2", catalog=None
     ):
         """`(status, body)` of a report of `workstation` carrying `config`
-        and the catalog."""
+        and `catalog`, CATALOG when None, none when False."""
         state = {
             "hostname": "host",
             "os": {"name": "Debian GNU/Linux", "version": "13"},
@@ -216,9 +216,10 @@ class KeyLayoutCase(TransactionCase):
             "deck_program": "tiler",
             "service_state": "active",
             "deck_plugins": ["timers", "sound"],
-            "deck_catalog": CATALOG if catalog is None else catalog,
             "decks": self._decks(workstation),
         }
+        if catalog is not False:
+            state["deck_catalog"] = CATALOG if catalog is None else catalog
         payload = {
             "protocol": protocol,
             "state": state,
@@ -633,6 +634,73 @@ class TestStreamdeckKeyLayout(KeyLayoutCase):
             "settings"
         ]["key_layouts"]["0084"]["keys"]
         self.assertEqual(keys[0]["action"], "plugin:timers")
+
+    def test_layouts_go_within_the_workstation_s_own_catalog(self):
+        # The workstation refuses the whole revision for a layout its own
+        # deck program cannot lay out: Odoo sends what that program
+        # offers, as the deck program itself would show the rest.
+        self.Key.create(
+            dict(
+                self._key_values(3, "plugin:sound", "sound", "Son"),
+                layout_id=self.layout.id,
+            )
+        )
+        workstation, token = self._workstation()
+
+        def keys(catalog):
+            settings = self._ok(
+                token, workstation, self._pilot(), catalog=catalog
+            )["config"]["settings"]
+            return settings.get("key_layouts", {}).get("0084", {}).get("keys")
+
+        older = dict(
+            CATALOG, actions=["plugin:sound", "tiles", "empty"], icons=["tile"]
+        )
+        self.assertEqual(
+            keys(older),
+            [
+                {"key": 0, "action": "empty"},
+                {"key": 1, "action": "tiles"},
+                {"key": 3, "action": "plugin:sound", "label": "Son"},
+            ],
+        )
+        # Without a black key either, the key is left out.
+        self.assertEqual(
+            [key["key"] for key in keys(dict(older, actions=["tiles"]))],
+            [1],
+        )
+        smaller = dict(
+            CATALOG, models={"0084": {"cols": 2, "rows": 1, "keys": 2}}
+        )
+        self.assertEqual([key["key"] for key in keys(smaller)], [0, 1])
+        # A model the workstation's catalog does not describe, or a report
+        # without catalog, gets no layout: the settings still go.
+        for catalog in (dict(CATALOG, models={}), False):
+            with self.subTest(catalog=catalog):
+                config = self._ok(
+                    token, workstation, self._pilot(), catalog=catalog
+                )["config"]
+                self.assertEqual(config["settings"], {"games": "on"})
+        # So does a model whose keys Odoo does not know.
+        self.env["streamdeck.device"].create(
+            {
+                "key": "sn:SN-NEW-1",
+                "serial": "SN-NEW-1",
+                "usb_product_id": "00ab",
+                "workstation_id": workstation.id,
+                "connected": True,
+            }
+        )
+        self._layout({"profile_id": self.profile.id}, product="00ab")
+        self.assertFalse(self.Item._geometry("00ab"))
+        self.assertEqual(
+            sorted(
+                self._ok(token, workstation, self._pilot())["config"][
+                    "settings"
+                ]["key_layouts"]
+            ),
+            ["0084"],
+        )
 
     def _applied(self, token, workstation):
         """Report then apply the offered revision; return it with the

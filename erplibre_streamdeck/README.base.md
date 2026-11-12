@@ -351,8 +351,16 @@ refuses a layout naming a plugin turned off. Only the layouts of the connected d
 the workstation, in the setting `key_layouts` of the revision, which is
 locked when one of them is; the extension writes them to
 `~/.config/erplibre-home/keymap.json` when the employee applies the
-revision. A model that no layer lays out keeps the automatic layout of
-the deck program.
+revision, and keeps there the layouts of the models Odoo does not send.
+A model that no layer lays out keeps the automatic layout of the deck
+program.
+
+Each workstation gets the layouts within the catalog of its own report,
+since it refuses the whole revision for a key its deck program cannot
+lay out: a model that catalog does not describe gets no layout, a key
+past its number of keys is left out, an action it lacks goes as a black
+key, as the deck program would show it, and an icon it lacks is left
+out. A report without a catalog gets no layout; its settings still go.
 
 The catalog (*Configuration › Catalog*) is the union of what the
 workstations report: the actions, the icons and the geometry of each
@@ -453,7 +461,8 @@ accepted and its unknown keys ignored. Every reply carries `"protocol":
   SHA-256 of the canonical JSON of `settings` (keys sorted, no space),
   `locked` the locked settings, `ask` the free settings whose local value
   differs from Odoo's. In 1.2, `settings.key_layouts` maps the product
-  id of each connected deck that Odoo lays out to `{"keys": [{"key",
+  id of each connected deck that Odoo lays out, within the catalog of the
+  report, to `{"keys": [{"key",
   "action", "icon", "label"}]}`, by ascending key, `icon` and `label`
   only when set, at most 16 models; `locked` then lists `key_layouts`
   when one of these layouts is locked.
@@ -852,8 +861,18 @@ un plugin coupé. Seules les
 dispositions des decks branchés vont au poste, dans le réglage
 `key_layouts` de la révision, verrouillé quand l'une d'elles l'est ;
 l'extension les écrit dans `~/.config/erplibre-home/keymap.json` quand
-l'employé applique la révision. Un modèle qu'aucune couche ne dispose
-garde la disposition automatique du programme du deck.
+l'employé applique la révision, et y garde les dispositions des modèles
+qu'Odoo n'envoie pas. Un modèle qu'aucune couche ne dispose garde la
+disposition automatique du programme du deck.
+
+Chaque poste reçoit les dispositions dans les limites du catalogue de sa
+propre remontée, puisqu'il refuse la révision entière pour une touche que
+son programme du deck ne sait pas disposer : un modèle que ce catalogue
+ne décrit pas ne reçoit aucune disposition, une touche au-delà de son
+nombre de touches est laissée de côté, une action qui lui manque part
+comme une touche noire, comme le programme du deck la montrerait, et une
+icône qui lui manque est laissée de côté. Une remontée sans catalogue ne
+reçoit aucune disposition ; ses réglages partent quand même.
 
 Le catalogue (*Configuration › Catalogue*) est l'union de ce que
 remontent les postes : les actions, les icônes et la géométrie de chaque
@@ -959,7 +978,8 @@ réponse d'erreur y ajoute `error`.
   espace), `locked` les réglages verrouillés, `ask` les réglages libres
   dont la valeur locale diffère de celle d'Odoo. En 1.2,
   `settings.key_layouts` associe l'identifiant produit de chaque deck
-  branché qu'Odoo dispose à `{"keys": [{"key", "action", "icon",
+  branché qu'Odoo dispose, dans les limites du catalogue de la remontée,
+  à `{"keys": [{"key", "action", "icon",
   "label"}]}`, par touche croissante, `icon` et `label` seulement quand
   ils sont fixés, au plus 16 modèles ; `locked` liste alors
   `key_layouts` quand une de ces dispositions est verrouillée.

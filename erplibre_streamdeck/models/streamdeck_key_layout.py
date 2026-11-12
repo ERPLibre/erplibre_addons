@@ -414,25 +414,41 @@ class StreamdeckKeyLayout(models.Model):
             ) % (_("Plugins without a key"), ", ".join(missing))
         return html
 
-    def _wire(self, plugins_off=()):
+    def _wire(self, plugins_off=(), catalog=None):
         """The layout as keymap.json format 1 holds it: `{"keys": [...]}`
         by ascending index, `icon` and `label` only when set. A key with
         no action is not named, and a key beyond the model's keys is left
         out. The home key of a plugin of `plugins_off` goes as a black
         key: the workstation refuses a layout that names a plugin turned
-        off, and the deck program leaves its key empty."""
+        off, and the deck program leaves its key empty.
+
+        `catalog`, the workstation's own (`_parse_catalog` of its report),
+        bounds the layout by what its deck program lays out, since the
+        workstation refuses the whole revision for any key outside it: its
+        number of keys of the model counts, an action it lacks goes as a
+        black key as the deck program would show it, an icon it lacks is
+        left out."""
         self.ensure_one()
         count = (self._geometry() or (0, 0, 0))[2]
+        actions = icons = None
+        if catalog is not None:
+            shape = catalog["models"].get(self.usb_product_id)
+            count = shape["keys"] if shape else 0
+            actions, icons = set(catalog["actions"]), set(catalog["icons"])
         off = {"plugin:%s" % plugin for plugin in plugins_off}
         keys = []
         for key in self.key_ids.sorted("key_index"):
             if not key.action_id or not 0 <= key.key_index < count:
                 continue
-            if key.action_id.value in off:
-                keys.append({"key": key.key_index, "action": "empty"})
+            action = key.action_id.value
+            if action in off or (
+                actions is not None and action not in actions
+            ):
+                if actions is None or "empty" in actions:
+                    keys.append({"key": key.key_index, "action": "empty"})
                 continue
-            entry = {"key": key.key_index, "action": key.action_id.value}
-            if key.icon_id:
+            entry = {"key": key.key_index, "action": action}
+            if key.icon_id and (icons is None or key.icon_id.value in icons):
                 entry["icon"] = key.icon_id.value
             if key.label:
                 entry["label"] = key.label
@@ -819,20 +835,25 @@ class StreamdeckConfigSchema(models.AbstractModel):
                     break
         return result
 
-    def _layout_settings(self, layouts, plugins_off=()):
+    def _layout_settings(self, layouts, plugins_off=(), catalog=None):
         """`{product id: layout}` that Odoo sends, from
-        `_effective_layouts`: neither a layout kept in the workstation's
-        file nor one of a model whose keys are unknown, at most
+        `_effective_layouts`, within `catalog`, the workstation's own
+        catalog (`_wire`): neither a layout kept in the workstation's file
+        nor one of a model that `catalog` does not describe, at most
         LAYOUT_MODELS_MAX models, the lowest product ids first; the home
-        keys of `plugins_off` go black (`_wire`)."""
+        keys of `plugins_off` go black. None without `catalog`: the
+        workstation refuses every layout when its deck program gives no
+        catalog, and with them the settings of the revision."""
         sent = {}
+        if catalog is None:
+            return sent
         for product, entry in layouts.items():
             layout = entry["layout"]
-            if layout.in_file or not layout._geometry():
+            if layout.in_file or product not in catalog["models"]:
                 continue
             if len(sent) == LAYOUT_MODELS_MAX:
                 break
-            sent[product] = layout._wire(plugins_off)
+            sent[product] = layout._wire(plugins_off, catalog)
         return sent
 
     def _layout_hash(self, layout):
