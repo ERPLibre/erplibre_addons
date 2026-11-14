@@ -118,7 +118,41 @@
                                     <span t-esc="contact.name" />
                                 </li>
                             </ul>
-                            <t t-call="mail_linkup_reflet.LinkupRefletForm" />
+                            <div
+                                t-if="state.folded"
+                                class="o-linkup-RefletView-folded d-flex flex-wrap align-items-center gap-2"
+                            >
+                                <div
+                                    class="o-linkup-RefletView-token d-flex align-items-center gap-2 border rounded-pill px-3 py-2 shadow-sm"
+                                    role="button"
+                                    tabindex="0"
+                                    data-linkup-guide="reflet-view-token"
+                                    t-att-aria-label="tokenLabel"
+                                    aria-describedby="o-linkup-RefletView-tokenHint"
+                                    t-att-data-code="category?.code"
+                                    t-on-dblclick="unfold"
+                                    t-on-keydown="onTokenKeydown"
+                                    t-ref="token"
+                                >
+                                    <LinkupCategoryIcon t-if="category" code="category.code" />
+                                    <span class="o-linkup-RefletView-tokenText text-truncate" t-esc="tokenText" />
+                                </div>
+                                <button
+                                    type="button"
+                                    class="o-linkup-RefletView-unfold btn btn-link btn-sm"
+                                    t-on-click="unfold"
+                                >
+                                    Unfold the card
+                                </button>
+                                <p
+                                    id="o-linkup-RefletView-tokenHint"
+                                    class="o-linkup-RefletView-tokenHint small mb-0 w-100"
+                                    t-esc="tokenHint"
+                                />
+                            </div>
+                            <div t-else="" class="o-linkup-RefletView-cardForm" t-on-dblclick="onCardDblclick">
+                                <t t-call="mail_linkup_reflet.LinkupRefletForm" />
+                            </div>
                         </t>
                     </div>
                     <section

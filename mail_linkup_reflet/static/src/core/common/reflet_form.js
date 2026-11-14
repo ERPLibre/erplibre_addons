@@ -49,6 +49,8 @@ export const LINKUP_DRAFT_SAVE_DELAY = 800;
  *   `needsRealWorld` and `formId`, unique in the page;
  * - `sendLabel` and `cancelLabel`, the texts of the two buttons of the
  *   form when they differ from "Send the reflection" and "Cancel";
+ * - `canFold`, whether the form offers "Fold the card", which calls
+ *   `fold()`;
  * - `saveDraftCall(vals)`, `sendCall(draftId, target)` and
  *   `discardCall(draftId)`, the calls to the server, when they differ from
  *   `action_save_draft`, `action_send` and `action_discard_draft`.
@@ -127,6 +129,11 @@ export class LinkupRefletFormBase extends Component {
     /** @returns {string} the text of the cancel button, empty for the default one */
     get cancelLabel() {
         return "";
+    }
+
+    /** @returns {boolean} whether the form offers "Fold the card" */
+    get canFold() {
+        return false;
     }
 
     get recipientName() {

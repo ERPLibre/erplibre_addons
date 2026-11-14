@@ -308,6 +308,20 @@ Sources in ``static/src/core/common``, loaded in ``web.assets_backend``.
   then takes the focus. Once sent, the focus reaches the link of the
   reflection, which opens the direct conversation in Discuss, as each
   contact does.
+* A complete card of the Reflet view, its category and its two texts
+  filled, folds into a token (LU-F-015): a double-click on the card outside
+  its fields, or "Fold the card" in the form; an incomplete card stays open
+  on the message of what is missing. The token shows the icon and the
+  beginning of the text, has an accessible name, and opens again with a
+  double-click, ``Enter``, ``Space`` or "Unfold the card". Dropped on a
+  contact, it sends the card through the same path as "Send to…"
+  (LU-F-016 RM1): the checks of ``action_send``, the sound
+  ``linkup-sent``, the focus on the link of the reflection; a refused
+  sending unfolds the card on its error. A card being sent neither folds
+  nor moves, and takes no other recipient. Dropped on "+ NewLink", it
+  opens NewLink, which keeps the card. Folding is never required to send.
+  A category or a token over a contact zooms its row and its avatar,
+  without animation under ``prefers-reduced-motion: reduce``.
 * ``linkup.reflet.linkup_reflet_view_info`` gives the contacts and the
   draft. The contacts are the LinkUp members of the scope: the members of
   the groups and channels of the member, the other party of an ``active``

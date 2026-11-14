@@ -3,7 +3,8 @@
 LU-F-012 to LU-F-017), of the strict start rule (T-08, LU-F-061), of the
 validation and the exact answer (T-18, LU-F-021 to LU-F-030), of a precision
 and its guess (LU-F-031 to LU-F-042), of the Reflet view (T-24, LU-F-010 to
-LU-F-016), of NewLink (T-29, LU-F-020), of the first-use tour (T-25,
+LU-F-016), of the folded card dropped on a contact (LU-F-015, LU-F-016 RM1),
+of NewLink (T-29, LU-F-020), of the first-use tour (T-25,
 LU-F-083), of a sending with the keyboard only (T-18, LU-NF-020), of the
 three options (P4, LU-F-040 to LU-F-044), of "You add to my happiness" (P5,
 LU-F-050, LU-F-051), of the languages (LU-NF-025), each one once more in the
@@ -123,6 +124,23 @@ class TestLinkupRefletUi(HttpCase):
         self.assertEqual(reflet.category_id.code, "emotions")
         self.assertEqual(reflet.understood, "tu es épuisée.")
         self.assertEqual(reflet.channel_id, self.chat)
+
+    def test_fold_drop_tour(self):
+        """Sam folds his complete card with a double-click and drops the
+        token on France: the reflection is sent to her direct conversation
+        (LU-F-015 CA1, LU-F-016 CA1)."""
+        self.start_tour("/odoo", "linkup_fold_drop_tour", login=self.sam.login)
+        reflet = self.env["linkup.reflet"].search(
+            [("author_id", "=", self.sam.id)]
+        )
+        self.assertEqual(len(reflet), 1)
+        self.assertEqual(reflet.state, "sent")
+        self.assertEqual(reflet.recipient_id, self.france)
+        self.assertEqual(reflet.category_id.code, "emotions")
+        self.assertEqual(reflet.understood, "tu es épuisée.")
+        self.assertTrue(reflet.real_world_declared)
+        self.assertEqual(reflet.channel_id, self.chat)
+        self.assertEqual(reflet.message_id.linkup_reflet_id, reflet)
 
     def test_newlink_tour(self):
         """Sam invites a person who is not a member from the Reflet view:

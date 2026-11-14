@@ -62,10 +62,19 @@ $o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") 
             border-color: $primary;
         }
 
-        // A category dragged over a contact zooms its row.
+        .o-linkup-RefletView-avatar {
+            transition: transform 0.15s ease-out;
+        }
+
+        // A category or a folded card dragged over a contact zooms its
+        // row, and its avatar more (LU-F-016 RM1).
         &.o-isDropTarget {
             border-color: $primary;
             transform: scale(1.05);
+
+            .o-linkup-RefletView-avatar {
+                transform: scale(1.3);
+            }
         }
 
         .o-linkup-RefletView-contactSelect {
@@ -75,9 +84,18 @@ $o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") 
     }
 
     .o-linkup-HelpBar-category,
-    .o-linkup-RefletView-happiness {
+    .o-linkup-RefletView-happiness,
+    .o-linkup-RefletView-token {
         cursor: grab;
         touch-action: none;
+    }
+
+    // The folded card: its icon and the beginning of its text (LU-F-015).
+    .o-linkup-RefletView-token {
+        max-width: 20rem;
+        min-width: 0;
+        background-color: $o-view-background-color;
+        user-select: none;
     }
 
     .o-linkup-RefletView-happiness {
@@ -147,7 +165,12 @@ $o-linkup-on-primary: map-get(map-get($o-btns-bs-override, "primary"), "color") 
         .o-linkup-RefletView-contact {
             transition: none;
 
-            &.o-isDropTarget {
+            .o-linkup-RefletView-avatar {
+                transition: none;
+            }
+
+            &.o-isDropTarget,
+            &.o-isDropTarget .o-linkup-RefletView-avatar {
                 transform: none;
             }
         }

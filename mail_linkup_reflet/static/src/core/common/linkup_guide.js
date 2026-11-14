@@ -58,8 +58,23 @@ function linkupGuideTexts() {
             title: _t("A contact"),
             text: _t("A person of your conversations or of your confirmed links."),
             behavior: _t(
-                "Outside the guide, choosing a person makes them the recipient of the card; dropping a category on a person does both."
+                "Outside the guide, choosing a person makes them the recipient of the card; dropping a category on a person does both; dropping the folded card on a person sends it."
             ),
+        },
+        "reflet-view-fold": {
+            title: _t("Fold the card"),
+            text: _t("Fold the complete card into a token, to drop it on a person."),
+            behavior: _t(
+                "Outside the guide, this button folds the card, as a double-click on it does. An incomplete card does not fold. Folding is never required: Send to… sends the card as it is."
+            ),
+        },
+        "reflet-view-token": {
+            title: _t("The folded card"),
+            text: _t("Your complete card, folded: its icon and the beginning of its text."),
+            behavior: _t(
+                "Outside the guide, drop it on a person to send it, or on + NewLink to invite someone. A double-click or Enter unfolds it."
+            ),
+            noShow: true,
         },
         "reflet-view-newlink": {
             title: _t("+ NewLink"),

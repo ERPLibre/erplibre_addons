@@ -1162,6 +1162,16 @@ msgid "Dragged onto a person"
 msgstr "Glissée sur une personne"
 
 #. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid ""
+"Drop the folded card on a person to send it, or on + NewLink to invite "
+"someone. A double-click or Enter unfolds it."
+msgstr ""
+"Dépose la carte pliée sur une personne pour la lui envoyer, ou sur + NewLink"
+" pour inviter quelqu'un. Un double-clic ou Entrée la déplie."
+
+#. module: mail_linkup_reflet
 #: model:ir.model.fields,field_description:mail_linkup_reflet.field_discuss_channel__linkup_effective_start_rule
 msgid "Effective start rule"
 msgstr "Règle de démarrage effective"
@@ -1355,6 +1365,25 @@ msgstr ""
 #: model:linkup.category,name:mail_linkup_reflet.linkup_category_focus
 msgid "Focused attention"
 msgstr "Attention focalisée"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+#: code:addons/mail_linkup_reflet/static/src/core/common/reflet_form.xml:0
+msgid "Fold the card"
+msgstr "Plier"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Fold the complete card into a token, to drop it on a person."
+msgstr "Plie la carte complète en jeton, pour la déposer sur une personne."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.js:0
+msgid "Folded card, %(title)s: %(text)s"
+msgstr "Carte pliée, %(title)s : %(text)s"
 
 #. module: mail_linkup_reflet
 #: model:linkup.category,starter_reflect:mail_linkup_reflet.linkup_category_team
@@ -2443,10 +2472,12 @@ msgstr "Autre"
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
 msgid ""
 "Outside the guide, choosing a person makes them the recipient of the card; "
-"dropping a category on a person does both."
+"dropping a category on a person does both; dropping the folded card on a "
+"person sends it."
 msgstr ""
 "Hors du guide, choisir une personne en fait la destinataire de la carte ; "
-"déposer une catégorie sur une personne fait les deux."
+"déposer une catégorie sur une personne fait les deux ; déposer la carte "
+"pliée sur une personne la lui envoie."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -2457,6 +2488,16 @@ msgid ""
 msgstr ""
 "Hors du guide, glisse ce champ sur une personne, ou appuie dessus pour la "
 "choisir dans la liste : les flèches déplacent, Entrée choisit, Échap ferme."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, drop it on a person to send it, or on + NewLink to invite"
+" someone. A double-click or Enter unfolds it."
+msgstr ""
+"Hors du guide, dépose-la sur une personne pour la lui envoyer, ou sur + "
+"NewLink pour inviter quelqu'un. Un double-clic ou Entrée la déplie."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -2499,6 +2540,18 @@ msgid ""
 msgstr ""
 "Hors du guide, ce bouton confirme le reflet : le lien devient actif et le "
 "texte libre s'ouvre. Touche →."
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid ""
+"Outside the guide, this button folds the card, as a double-click on it does."
+" An incomplete card does not fold. Folding is never required: Send to… sends"
+" the card as it is."
+msgstr ""
+"Hors du guide, ce bouton plie la carte, comme un double-clic sur elle. Une "
+"carte incomplète ne se plie pas. Plier n'est jamais obligatoire : Envoyer à…"
+" envoie la carte telle quelle."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
@@ -3427,6 +3480,12 @@ msgstr "Les cinq étapes montrées à ta première ouverture de Discussion."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "The folded card"
+msgstr "La carte pliée"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/core/common/linkup_tour.js:0
 msgid "The free text of the conversation."
 msgstr "Le texte libre de la conversation."
@@ -3803,6 +3862,12 @@ msgstr "Réessayer"
 #: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
 msgid "Unblock %(name)s"
 msgstr "Débloquer %(name)s"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/views/reflet_view/reflet_view.xml:0
+msgid "Unfold the card"
+msgstr "Déplier"
 
 #. module: mail_linkup_reflet
 #. odoo-python
@@ -4332,6 +4397,12 @@ msgstr "Ta précision"
 #: code:addons/mail_linkup_reflet/static/src/core/common/reflet_actions.js:0
 msgid "Your closing message"
 msgstr "Ton message de clôture"
+
+#. module: mail_linkup_reflet
+#. odoo-javascript
+#: code:addons/mail_linkup_reflet/static/src/core/common/linkup_guide.js:0
+msgid "Your complete card, folded: its icon and the beginning of its text."
+msgstr "Ta carte complète, pliée : son icône et le début de son texte."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript

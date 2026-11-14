@@ -97,6 +97,17 @@
                 >
                     Preview
                 </button>
+                <button
+                    t-if="canFold"
+                    type="button"
+                    class="o-linkup-RefletForm-fold btn btn-outline-secondary btn-sm"
+                    data-linkup-guide="reflet-view-fold"
+                    t-att-disabled="state.sending"
+                    t-on-click="fold"
+                    t-ref="fold"
+                >
+                    Fold the card
+                </button>
                 <button type="button" class="o-linkup-RefletForm-cancel btn btn-secondary btn-sm" t-on-click="cancel">
                     <t t-if="cancelLabel" t-esc="cancelLabel" />
                     <t t-else="">Cancel</t>

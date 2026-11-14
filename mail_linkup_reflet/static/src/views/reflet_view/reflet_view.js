@@ -32,6 +32,19 @@ import {LinkupRefletFormBase} from "@mail_linkup_reflet/core/common/reflet_form"
  * the link to the conversation it went to, so the keyboard never falls
  * back to the top of the page.
  *
+ * A complete card, its category and its two texts filled (LU-F-013 RM2),
+ * folds into a token (LU-F-015): a double-click on the card outside its
+ * fields, or "Fold the card". The token shows the icon and the beginning
+ * of the text; a double-click, `Enter`, `Space` or "Unfold the card"
+ * opens the card again.
+ * Dropped on a contact, the token sends the card to them (LU-F-016 RM1),
+ * through `pick` as "Send to…" does: the same checks, the same sound, the
+ * same focus afterwards. A refused sending unfolds the card on its error.
+ * Dropped on "+ NewLink", it opens NewLink with the card. Folding is never
+ * required: "Send to…" and the send button work on a card folded or not.
+ * A contact under a category or a token zooms its avatar, unless the
+ * system asks for reduced motion.
+ *
  * The avatar of the member shines while someone puts them in the light
  * (`linkup.highlight`), with the avatars of the first three senders, and
  * each of these contacts shines in the list. The "?" button of the Help
@@ -94,6 +107,8 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         this.newlinkStatusRef = useRef("newlinkStatus");
         this.happinessRef = useRef("happiness");
         this.happinessListRef = useRef("happinessList");
+        this.tokenRef = useRef("token");
+        this.foldRef = useRef("fold");
         this.guide = useState(useService("linkup.guide"));
         /** What the next rendering gives the focus to: `field`, `picker`, `sendTo` or `sent`. */
         this.focusTarget = null;
@@ -140,18 +155,22 @@ export class LinkupRefletView extends LinkupRefletFormBase {
                 }
             },
         });
+        // A category or a token over a contact or "+ NewLink" marks it as
+        // the drop target.
+        const onDragOver = ({x, y}) => {
+            this.state.hoverUserId = this.contactAt(x, y)?.user_id || null;
+            this.state.hoverNewlink = this.isOverNewlink(x, y);
+        };
+        const onDragEnd = () => {
+            this.state.hoverUserId = null;
+            this.state.hoverNewlink = false;
+        };
         useDraggable({
             ref: this.root,
             elements: ".o-linkup-HelpBar-category",
             cursor: "grabbing",
-            onDrag: ({x, y}) => {
-                this.state.hoverUserId = this.contactAt(x, y)?.user_id || null;
-                this.state.hoverNewlink = this.isOverNewlink(x, y);
-            },
-            onDragEnd: () => {
-                this.state.hoverUserId = null;
-                this.state.hoverNewlink = false;
-            },
+            onDrag: onDragOver,
+            onDragEnd,
             onDrop: ({element, x, y}) => {
                 const category = this.store.linkupCategories.find((record) => record.code === element.dataset.code);
                 if (!category) {
@@ -164,6 +183,26 @@ export class LinkupRefletView extends LinkupRefletFormBase {
                 const contact = this.contactAt(x, y);
                 if (contact) {
                     this.chooseCategoryAndContact(category, contact);
+                }
+            },
+        });
+        // A token whose card is being sent no longer moves: a second drop
+        // would change the recipient shown under a sending already made.
+        useDraggable({
+            ref: this.root,
+            elements: ".o-linkup-RefletView-token",
+            enable: () => !this.state.sending,
+            cursor: "grabbing",
+            onDrag: onDragOver,
+            onDragEnd,
+            onDrop: ({x, y}) => {
+                if (this.isOverNewlink(x, y)) {
+                    this.startNewlink();
+                    return;
+                }
+                const contact = this.contactAt(x, y);
+                if (contact) {
+                    this.pick(contact);
                 }
             },
         });
@@ -181,6 +220,8 @@ export class LinkupRefletView extends LinkupRefletFormBase {
             lastSent: null,
             focusRequest: 0,
             hoverNewlink: false,
+            /** Whether the card shows as its token (LU-F-015). */
+            folded: false,
             /** The NewLink in progress: `{step, email, name, invitation}`, or `null`. */
             newlink: null,
             newlinkInfo: {invitations: [], quota: null, expiry_days: 0},
@@ -239,6 +280,19 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         if (!this.recipient) {
             this.state.recipientUserId = null;
         }
+    }
+
+    /** A card read again from the server stays folded only while it is complete. */
+    restoreDraft(draft) {
+        super.restoreDraft(draft);
+        if (!this.state.formOpen || !this.isComplete) {
+            this.state.folded = false;
+        }
+    }
+
+    reset() {
+        super.reset();
+        this.state.folded = false;
     }
 
     /** @returns {Object|undefined} the chosen contact */
@@ -319,12 +373,19 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         return this.state.newlink ? _t("Back") : "";
     }
 
-    /** In NewLink, the form goes on to the preview, which sends. */
+    /**
+     * In NewLink, the form goes on to the preview, which sends. A refused
+     * sending unfolds the card, whose form shows the error, however the
+     * sending started: "Send to…", a dropped token or the send button.
+     */
     async send() {
         if (this.state.newlink?.step === "reflet") {
             return this.newlinkPreview();
         }
-        return super.send();
+        await super.send();
+        if (this.state.error) {
+            this.state.folded = false;
+        }
     }
 
     /** In NewLink, the cancel button of the form goes back to the address; the draft stays. */
@@ -428,6 +489,7 @@ export class LinkupRefletView extends LinkupRefletFormBase {
     onSelectCategory(category) {
         super.onSelectCategory(category);
         this.state.lastSent = null;
+        this.state.folded = false;
         if (!this.state.newlink || this.state.newlink.step === "reflet") {
             this.requestFocus("field");
         }
@@ -463,6 +525,93 @@ export class LinkupRefletView extends LinkupRefletFormBase {
             }
         }
         return null;
+    }
+
+    // ------------------------------------------------------------------
+    // The folded card (LU-F-015)
+    // ------------------------------------------------------------------
+
+    /** Whether the card holds its category and its two texts (LU-F-013 RM2). */
+    get isComplete() {
+        return Boolean(this.category && this.state.you_said.trim() && this.state.understood.trim());
+    }
+
+    /** The form offers "Fold the card" in the zone of the card, not in NewLink. */
+    get canFold() {
+        return !this.state.newlink;
+    }
+
+    /** The beginning of the text of the card, as its token shows it. */
+    get tokenText() {
+        const text = this.state.you_said.trim();
+        return text.length > 40 ? `${text.slice(0, 40).trimEnd()}…` : text;
+    }
+
+    get tokenHint() {
+        return _t(
+            "Drop the folded card on a person to send it, or on + NewLink to invite someone. A double-click or Enter unfolds it."
+        );
+    }
+
+    get tokenLabel() {
+        return _t("Folded card, %(title)s: %(text)s", {title: this.formTitle, text: this.tokenText});
+    }
+
+    /**
+     * Fold the card into its token, which takes the focus. An incomplete
+     * card stays open, with the message and the focus on what is missing,
+     * as a sending would show them. In guide mode, or while the card is
+     * being sent, nothing folds: the answer of the server may be an error
+     * the form must show.
+     */
+    fold() {
+        if (this.guide.active || this.state.sending) {
+            return;
+        }
+        const missing = this.isComplete ? null : super.validate();
+        if (missing) {
+            this.state.error = {
+                code: "linkup.validation",
+                field: missing.field,
+                message: linkupFieldMessage(missing.field),
+            };
+            missing.ref?.el?.focus();
+            return;
+        }
+        this.state.error = null;
+        this.state.folded = true;
+        this.requestFocus("token");
+    }
+
+    /** Open the folded card again, the focus on "Fold the card". */
+    unfold() {
+        if (this.guide.active) {
+            return;
+        }
+        this.state.folded = false;
+        this.requestFocus("fold");
+    }
+
+    /**
+     * A double-click on the card folds it, except on its fields, buttons
+     * and labels, where it keeps its native meaning (selecting a word).
+     *
+     * @param {MouseEvent} ev
+     */
+    onCardDblclick(ev) {
+        if (ev.target.closest("textarea, input, select, button, a, label")) {
+            return;
+        }
+        this.fold();
+    }
+
+    /** @param {KeyboardEvent} ev */
+    onTokenKeydown(ev) {
+        if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            ev.stopPropagation();
+            this.unfold();
+        }
     }
 
     // ------------------------------------------------------------------
@@ -771,6 +920,7 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         }
         this.state.newlink = {step: "contact", email: "", name: "", invitation: null};
         Object.assign(this.state, {
+            folded: false,
             recipientUserId: null,
             pickerOpen: false,
             lastSent: null,
@@ -895,7 +1045,7 @@ export class LinkupRefletView extends LinkupRefletFormBase {
         this.requestFocus("field");
     }
 
-    /** @param {"field"|"picker"|"sendTo"|"sent"|"newlinkEmail"|"newlinkStatus"|"happiness"|"happinessList"} target */
+    /** @param {"field"|"picker"|"sendTo"|"sent"|"newlinkEmail"|"newlinkStatus"|"happiness"|"happinessList"|"token"|"fold"} target */
     requestFocus(target) {
         this.focusTarget = target;
         this.state.focusRequest++;
@@ -918,6 +1068,10 @@ export class LinkupRefletView extends LinkupRefletFormBase {
             this.happinessRef.el?.focus();
         } else if (target === "happinessList") {
             this.happinessListRef.el?.focus();
+        } else if (target === "token") {
+            this.tokenRef.el?.focus();
+        } else if (target === "fold") {
+            this.foldRef.el?.focus();
         } else if (target === "field") {
             const declaration = this.state.error?.field === "real_world_declared" && this.realWorldRef.el;
             const field = [this.youSaidRef.el, this.understoodRef.el].find((el) => el && !el.value.trim());
@@ -938,14 +1092,17 @@ export class LinkupRefletView extends LinkupRefletFormBase {
     }
 
     /**
-     * Choose the recipient in the list, then send the card. The list goes
-     * away with the focus it held: the focus then moves to the link of the
-     * card sent, to the field to correct, such as the declaration of the
-     * exchange in person that the chosen contact requires, or back to
-     * "Send to…". In guide mode, nothing is chosen.
+     * Choose the recipient in the list, or by dropping the token on them,
+     * then send the card. The list goes away with the focus it held: the
+     * focus then moves to the link of the card sent, to the field to
+     * correct, such as the declaration of the exchange in person that the
+     * chosen contact requires, or back to "Send to…". A refused sending
+     * unfolds the card, whose form shows the error (`send`). In guide
+     * mode, or while a sending is in progress, nothing is chosen: the
+     * recipient shown stays the one the card goes to.
      */
     async pick(contact) {
-        if (this.guide.active) {
+        if (this.guide.active || this.state.sending) {
             return;
         }
         this.selectRecipient(contact);

@@ -13,11 +13,12 @@ import {
   queryAllTexts,
   queryFirst,
 } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
+import { animationFrame, Deferred } from "@odoo/hoot-mock";
 import {
   Command,
   contains as webContains,
   getService,
+  makeServerError,
   onRpc,
   patchWithCleanup,
   serverState,
@@ -110,6 +111,9 @@ test("a member without contacts gets the first-use message", async () => {
 
 test("dropping a category on a contact opens the form for that contact", async () => {
   const { users } = await setupContacts();
+  onRpc("linkup.reflet", "action_send", () => {
+    expect.step("action_send");
+  });
   await openRefletView();
   await webContains(
     ".o-linkup-RefletView .o-linkup-HelpBar-category[data-code='emotions']"
@@ -129,6 +133,269 @@ test("dropping a category on a contact opens the form for that contact", async (
   // France has no confirmed link yet: the exchange in person is asked.
   await contains(".o-linkup-RefletForm-realWorld");
   expect(".o-linkup-RefletForm-youSaid").toBeFocused();
+  // A category chooses; only the folded card sends at the drop.
+  await insertText(".o-linkup-RefletForm-youSaid", "the chores wear you out");
+  await insertText(".o-linkup-RefletForm-understood", "you are exhausted");
+  await webContains(
+    ".o-linkup-RefletView .o-linkup-HelpBar-category[data-code='needs']"
+  ).dragAndDrop(
+    `.o-linkup-RefletView-contact[data-user-id='${users.Jacques.userId}']`
+  );
+  await contains(".o-linkup-RefletView-recipient", { text: "To: Jacques" });
+  await contains(".o-linkup-RefletForm-title", {
+    text: "You told me about your needs",
+  });
+  await contains(".o-linkup-RefletForm-understood", {
+    value: "you are exhausted",
+  });
+  await contains(".o-linkup-RefletView-notice", { count: 0 });
+  expect.verifySteps([]);
+});
+
+/** Open the view on a complete Emotions card, not yet folded. */
+async function openCompleteCard() {
+  await openRefletView();
+  await click(".o-linkup-HelpBar-category[data-code='emotions']");
+  await insertText(".o-linkup-RefletForm-youSaid", "the chores wear you out");
+  await insertText(".o-linkup-RefletForm-understood", "you are exhausted");
+}
+
+/** Record the sounds played as steps. */
+function stepSounds() {
+  patchWithCleanup(getService("mail.sound_effects"), {
+    play(name) {
+      expect.step(`play ${name}`);
+    },
+  });
+}
+
+test("an incomplete card does not fold", async () => {
+  await setupContacts();
+  await openRefletView();
+  await click(".o-linkup-HelpBar-category[data-code='emotions']");
+  await insertText(".o-linkup-RefletForm-youSaid", "the chores wear you out");
+  await dblclick(".o-linkup-RefletForm-title");
+  await animationFrame();
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  await contains(".o-linkup-RefletForm-error[role='alert']", {
+    text: "Fill in “I understood that”.",
+  });
+  expect(".o-linkup-RefletForm-understood").toBeFocused();
+  await click(".o-linkup-RefletForm-fold");
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  await contains(".o-linkup-RefletForm");
+});
+
+test("a double-click folds the complete card into a token, and unfolds it", async () => {
+  await setupContacts();
+  await openCompleteCard();
+  await dblclick(".o-linkup-RefletForm-title");
+  await contains(".o-linkup-RefletView-token svg[data-code='emotions']");
+  await contains(".o-linkup-RefletForm", { count: 0 });
+  await contains(".o-linkup-RefletView-tokenText", {
+    text: "the chores wear you out",
+  });
+  expect(".o-linkup-RefletView-token").toHaveAttribute(
+    "aria-label",
+    "Folded card, You told me about your emotions: the chores wear you out"
+  );
+  expect(".o-linkup-RefletView-token").toHaveAttribute("role", "button");
+  await animationFrame();
+  expect(".o-linkup-RefletView-token").toBeFocused();
+  await dblclick(".o-linkup-RefletView-token");
+  await contains(".o-linkup-RefletForm");
+  await contains(".o-linkup-RefletForm-understood", {
+    value: "you are exhausted",
+  });
+  // A double-click inside a text keeps its native meaning.
+  await dblclick(".o-linkup-RefletForm-youSaid");
+  await animationFrame();
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  // The buttons do the same.
+  await click(".o-linkup-RefletForm-fold");
+  await contains(".o-linkup-RefletView-token");
+  await click(".o-linkup-RefletView-unfold");
+  await contains(".o-linkup-RefletForm");
+});
+
+test("the keyboard folds the card and unfolds the token", async () => {
+  await setupContacts();
+  await openCompleteCard();
+  queryFirst(".o-linkup-RefletForm-fold").focus();
+  await press("Enter");
+  await contains(".o-linkup-RefletView-token");
+  await animationFrame();
+  expect(".o-linkup-RefletView-token").toBeFocused();
+  expect(".o-linkup-RefletView-token").toHaveAttribute("tabindex", "0");
+  await press("Enter");
+  await contains(".o-linkup-RefletForm");
+  await animationFrame();
+  expect(".o-linkup-RefletForm-fold").toBeFocused();
+  await press("Enter");
+  await contains(".o-linkup-RefletView-token");
+  await animationFrame();
+  await press(" ");
+  await contains(".o-linkup-RefletForm");
+});
+
+test("the folded card dropped on a contact sends it, as Send to… does", async () => {
+  const { users } = await setupContacts();
+  onRpc("linkup.reflet", "action_send", ({ args }) => {
+    expect.step(`action_send ${args[1]}`);
+  });
+  await openCompleteCard();
+  stepSounds();
+  await click(".o-linkup-RefletForm-fold");
+  const jacques = `.o-linkup-RefletView-contact[data-user-id='${users.Jacques.userId}']`;
+  const { drop, moveTo } = await webContains(
+    ".o-linkup-RefletView-token"
+  ).drag();
+  await moveTo(jacques);
+  // The contact under the token zooms.
+  await contains(`${jacques}.o-isDropTarget`);
+  await drop();
+  await contains(".o-linkup-RefletView-notice", {
+    text: "Reflection sent to Jacques.",
+  });
+  expect.verifySteps([
+    `action_send ${users.Jacques.userId}`,
+    "play linkup-sent",
+  ]);
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  await contains(".o-linkup-RefletView-placeholder");
+  await contains(`${jacques}.o-isDropTarget`, { count: 0 });
+  await animationFrame();
+  expect(".o-linkup-RefletView-sentChat").toBeFocused();
+  await click(".o-linkup-RefletView-sentChat");
+  await contains(".o-mail-Discuss-threadName[title='Jacques']");
+  await contains(
+    ".o-mail-Message .o-linkup-RefletCard[data-state='sent'][data-role='author']"
+  );
+});
+
+test("a folded card refused at the drop unfolds on what is missing", async () => {
+  const { users } = await setupContacts();
+  onRpc("linkup.reflet", "action_send", () => {
+    expect.step("action_send");
+  });
+  await openCompleteCard();
+  await click(".o-linkup-RefletForm-fold");
+  // France has no confirmed link: the exchange in person is required.
+  await webContains(".o-linkup-RefletView-token").dragAndDrop(
+    `.o-linkup-RefletView-contact[data-user-id='${users.France.userId}']`
+  );
+  await contains(".o-linkup-RefletForm-error[role='alert']", {
+    text: "Confirm that this exchange took place in person.",
+  });
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  await contains(".o-linkup-RefletView-recipient", { text: "To: France" });
+  await animationFrame();
+  expect(".o-linkup-RefletForm-realWorld input[type='checkbox']").toBeFocused();
+  expect.verifySteps([]);
+});
+
+test("a folded card the server refuses at the drop unfolds on its error", async () => {
+  const { users } = await setupContacts();
+  onRpc("linkup.reflet", "action_send", () => {
+    expect.step("action_send");
+    throw makeServerError({
+      message: "Rate limited",
+      context: { linkup_code: "linkup.rate_limited" },
+    });
+  });
+  await openCompleteCard();
+  stepSounds();
+  await click(".o-linkup-RefletForm-fold");
+  await webContains(".o-linkup-RefletView-token").dragAndDrop(
+    `.o-linkup-RefletView-contact[data-user-id='${users.Jacques.userId}']`
+  );
+  await contains(
+    ".o-linkup-RefletForm-error[role='alert'][data-code='linkup.rate_limited']",
+    { text: "Too many attempts for now, try again later." }
+  );
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  await contains(".o-linkup-RefletView-recipient", { text: "To: Jacques" });
+  await contains(".o-linkup-RefletForm-understood", {
+    value: "you are exhausted",
+  });
+  expect.verifySteps(["action_send"]);
+});
+
+test("a card being sent neither folds nor changes its recipient", async () => {
+  const { users } = await setupContacts();
+  const answer = new Deferred();
+  onRpc("linkup.reflet", "action_send", async ({ args }) => {
+    expect.step(`action_send ${args[1]}`);
+    await answer;
+    throw makeServerError({
+      message: "Rate limited",
+      context: { linkup_code: "linkup.rate_limited" },
+    });
+  });
+  await openCompleteCard();
+  await click(".o-linkup-RefletForm-fold");
+  const jacques = `.o-linkup-RefletView-contact[data-user-id='${users.Jacques.userId}']`;
+  const france = `.o-linkup-RefletView-contact[data-user-id='${users.France.userId}']`;
+  await webContains(".o-linkup-RefletView-token").dragAndDrop(jacques);
+  await expect.waitForSteps([`action_send ${users.Jacques.userId}`]);
+  // A second drop during the sending chooses nobody.
+  await webContains(".o-linkup-RefletView-token").dragAndDrop(france);
+  await animationFrame();
+  await contains(".o-linkup-RefletView-recipient", { text: "To: Jacques" });
+  // Unfolded during the sending, the card does not fold again.
+  await dblclick(".o-linkup-RefletView-token");
+  await contains(".o-linkup-RefletForm");
+  expect(".o-linkup-RefletForm-fold").toHaveAttribute("disabled");
+  await dblclick(".o-linkup-RefletForm-title");
+  await animationFrame();
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  answer.resolve();
+  // The refusal shows in the open form, under the recipient it concerns.
+  await contains(
+    ".o-linkup-RefletForm-error[role='alert'][data-code='linkup.rate_limited']"
+  );
+  await contains(".o-linkup-RefletView-token", { count: 0 });
+  await contains(".o-linkup-RefletView-recipient", { text: "To: Jacques" });
+  expect.verifySteps([]);
+});
+
+test("the folded card dropped on + NewLink opens NewLink with the card", async () => {
+  await setupContacts();
+  onRpc("linkup.reflet", "action_send", () => {
+    expect.step("action_send");
+  });
+  await openCompleteCard();
+  await click(".o-linkup-RefletForm-fold");
+  await webContains(".o-linkup-RefletView-token").dragAndDrop(
+    ".o-linkup-RefletView-newlink"
+  );
+  await contains(".o-linkup-Newlink[data-step='contact']");
+  await animationFrame();
+  expect(".o-linkup-Newlink-email").toBeFocused();
+  await insertText(".o-linkup-Newlink-email", "someone@example.com");
+  await click(".o-linkup-Newlink-next");
+  await contains(".o-linkup-Newlink .o-linkup-RefletForm-title", {
+    text: "You told me about your emotions",
+  });
+  await contains(".o-linkup-Newlink .o-linkup-RefletForm-understood", {
+    value: "you are exhausted",
+  });
+  await contains(".o-linkup-Newlink .o-linkup-RefletForm-fold", { count: 0 });
+  expect.verifySteps([]);
+});
+
+test("the guide explains Fold and the token instead of acting", async () => {
+  await setupContacts();
+  await openCompleteCard();
+  await click(".o-linkup-RefletForm-fold");
+  await contains(".o-linkup-RefletView-token");
+  await click(".o-linkup-RefletView .o-linkup-GuideButton");
+  await click(".o-linkup-RefletView-token");
+  await contains(".o-linkup-GuideSheet-title", { text: "The folded card" });
+  await dblclick(".o-linkup-RefletView-token");
+  await contains(".o-linkup-RefletView-token");
+  await press("Escape");
+  await contains(".o-linkup-GuideSheet", { count: 0 });
 });
 
 test("the keyboard chooses a category, then a contact in Send to… which sends", async () => {
