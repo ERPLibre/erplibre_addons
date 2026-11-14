@@ -13,11 +13,14 @@ import {
   queryAllTexts,
   queryFirst,
 } from "@odoo/hoot-dom";
+import { ConnectionLostError } from "@web/core/network/rpc";
+import { ORM } from "@web/core/orm_service";
 import {
   Command,
   getService,
   makeServerError,
   onRpc,
+  patchWithCleanup,
   serverState,
 } from "@web/../tests/web_test_helpers";
 
@@ -403,6 +406,72 @@ test("a hidden theme found is revealed as found", async () => {
       text: "Theme found: Goals, Emotions",
     }
   );
+});
+
+/**
+ * A pending precision of France holding `goals`, the reward sounds of the
+ * current user on, and every sound played recorded as a step.
+ */
+async function setupGuessWithSounds() {
+  const setup = await setupReflet({ fromFrance: true });
+  const { category, pyEnv, refletId } = setup;
+  pyEnv["linkup.reflet"].write([refletId], {
+    kind: "precision",
+    category_id: false,
+    guess_state: "pending",
+    hidden_category_ids: [category("goals")],
+    body_text: "A clarification.",
+  });
+  pyEnv["res.users.settings"].create({
+    user_id: serverState.userId,
+    linkup_reward_sounds_enabled: true,
+  });
+  await start();
+  patchWithCleanup(getService("mail.sound_effects"), {
+    play(name) {
+      expect.step(`play ${name}`);
+    },
+  });
+  await openDiscuss(setup.channelId);
+  return setup;
+}
+
+test("a hidden theme found rings “Ting”", async () => {
+  await setupGuessWithSounds();
+  await click(".o-linkup-CategoryPicker-option[data-code='goals']");
+  await click(".o-linkup-RefletActions-guess");
+  await contains(`${CARD}[data-guess-state='found']`);
+  await expect.waitForSteps(["play linkup-ting"]);
+});
+
+test("a guess found after “Try again” rings “Ting” too", async () => {
+  let fail = true;
+  patchWithCleanup(ORM.prototype, {
+    call(model, method) {
+      if (method === "action_guess" && fail) {
+        fail = false;
+        return Promise.reject(new ConnectionLostError("/web/dataset"));
+      }
+      return super.call(...arguments);
+    },
+  });
+  await setupGuessWithSounds();
+  await click(".o-linkup-CategoryPicker-option[data-code='goals']");
+  await click(".o-linkup-RefletActions-guess");
+  await contains(".o-linkup-ErrorAlert-retry", { text: "Try again" });
+  expect.verifySteps([]);
+  await click(".o-linkup-ErrorAlert-retry");
+  await contains(`${CARD}[data-guess-state='found']`);
+  await expect.waitForSteps(["play linkup-ting"]);
+});
+
+test("a hidden theme missed plays no sound", async () => {
+  await setupGuessWithSounds();
+  await click(".o-linkup-CategoryPicker-option[data-code='needs']");
+  await click(".o-linkup-RefletActions-guess");
+  await contains(`${CARD}[data-guess-state='missed']`);
+  await animationFrame();
+  expect.verifySteps([]);
 });
 
 test("the three options show only to the member whose turn it is", async () => {

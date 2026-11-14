@@ -2975,12 +2975,12 @@ msgstr ""
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
-msgid "Sound of a confirmed reflection"
+msgid "Reward sounds: confirmed reflection, points, theme found"
 msgstr ""
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_reward_sounds_enabled
-msgid "Sound of a confirmed reflection."
+msgid "Sounds of a confirmed reflection, of the points won and of a hidden theme found."
 msgstr ""
 
 #. module: mail_linkup_reflet

@@ -9,6 +9,7 @@ import {LinkupGuideButton} from "./linkup_guide";
 import {LinkupCategoryIcon} from "./linkup_category_icon";
 import {LinkupErrorAlert} from "./linkup_error_alert";
 import {linkupClientError, linkupErrorInfo, linkupFieldMessage, linkupMediaDenied} from "./linkup_errors";
+import {linkupPlaySound} from "./linkup_signals";
 
 /**
  * Insert a starter at the beginning of a text.
@@ -339,6 +340,10 @@ export class LinkupRefletActions extends Component {
     /**
      * Call an action of the reflection, then read the conversation again.
      *
+     * A guess that finds the theme rings "Ting" for the member who
+     * guessed, under the reward sounds setting, whether it comes from
+     * `guess` or from "Try again"; the "+100" brings its own reward sound.
+     *
      * @param {string} method
      * @param {any[]} args after the id of the reflection
      * @returns {Promise<boolean>} whether the action succeeded
@@ -353,9 +358,12 @@ export class LinkupRefletActions extends Component {
         const thread = this.props.thread;
         let done = false;
         try {
-            await this.orm.silent.call("linkup.reflet", method, [[this.reflet.id], ...args]);
+            const result = await this.orm.silent.call("linkup.reflet", method, [[this.reflet.id], ...args]);
             done = true;
             this.closeForm();
+            if (method === "action_guess" && result === "found") {
+                linkupPlaySound(this.env.services, "linkup-ting");
+            }
         } catch (error) {
             const info = linkupErrorInfo(error);
             if (!info) {

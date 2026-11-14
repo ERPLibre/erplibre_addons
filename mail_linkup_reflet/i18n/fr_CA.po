@@ -3128,13 +3128,13 @@ msgstr ""
 #. module: mail_linkup_reflet
 #. odoo-javascript
 #: code:addons/mail_linkup_reflet/static/src/views/help/linkup_help.js:0
-msgid "Sound of a confirmed reflection"
-msgstr "Son d'un reflet confirmé"
+msgid "Reward sounds: confirmed reflection, points, theme found"
+msgstr "Sons de récompense : reflet confirmé, points, thème trouvé"
 
 #. module: mail_linkup_reflet
 #: model:ir.model.fields,help:mail_linkup_reflet.field_res_users_settings__linkup_reward_sounds_enabled
-msgid "Sound of a confirmed reflection."
-msgstr "Son d'un reflet confirmé."
+msgid "Sounds of a confirmed reflection, of the points won and of a hidden theme found."
+msgstr "Sons d'un reflet confirmé, des points gagnés et d'un thème caché trouvé."
 
 #. module: mail_linkup_reflet
 #. odoo-javascript

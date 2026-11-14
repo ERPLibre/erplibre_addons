@@ -23,7 +23,8 @@ class ResUsersSettings(models.Model):
     linkup_reward_sounds_enabled = fields.Boolean(
         string="LinkUp reward sounds",
         default=False,
-        help="Sound of a confirmed reflection.",
+        help="Sounds of a confirmed reflection, of the points won and of a"
+        " hidden theme found.",
     )
     linkup_notify_reflet_received = fields.Boolean(
         string="Notify a received reflection", default=True

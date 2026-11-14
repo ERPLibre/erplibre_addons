@@ -617,7 +617,10 @@ Sounds and notifications
   of the module; the script rebuilds the same files.
 * ``res.users.settings`` holds the choices of each member:
   ``linkup_sound_enabled`` (sent and received, on by default),
-  ``linkup_reward_sounds_enabled`` (off by default) and one switch per
+  ``linkup_reward_sounds_enabled`` (off by default: ``linkup-success`` of
+  a confirmed reflection, ``linkup-yeah`` of the points, ``linkup-ting``
+  of a received highlight, of an invitation used and of a hidden theme
+  found by the member who guessed it) and one switch per
   notification (``linkup_notify_reflet_received``,
   ``linkup_notify_confirmed``, ``linkup_notify_highlight``). The help page
   writes them. A sound always comes with a visible change.

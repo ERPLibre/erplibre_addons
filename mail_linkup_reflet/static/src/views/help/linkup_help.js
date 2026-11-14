@@ -14,7 +14,7 @@ import {linkupErrorInfo} from "@mail_linkup_reflet/core/common/linkup_errors";
 function linkupSettingLabels() {
     return [
         ["linkup_sound_enabled", _t("Sounds of a reflection sent and received")],
-        ["linkup_reward_sounds_enabled", _t("Sound of a confirmed reflection")],
+        ["linkup_reward_sounds_enabled", _t("Reward sounds: confirmed reflection, points, theme found")],
         ["linkup_notify_reflet_received", _t("Notify a received reflection")],
         ["linkup_notify_confirmed", _t("Notify a confirmed reflection")],
         ["linkup_notify_highlight", _t("Notify when someone adds to my happiness")],
