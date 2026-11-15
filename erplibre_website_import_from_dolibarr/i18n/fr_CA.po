@@ -1,0 +1,1395 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * erplibre_website_import_from_dolibarr
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-30 13:52+0000\n"
+"PO-Revision-Date: 2026-09-30 13:52+0000\n"
+"Last-Translator: \n"
+"Language: fr_CA\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "%(file)s: %(text)s"
+msgstr "%(file)s : %(text)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "%(kind)s %(ref)s is not in this import (%(reason)s): kept unchanged"
+msgstr "%(kind)s %(ref)s n'est pas dans cet import (%(reason)s) : gardé tel quel"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "%(kind)s %(ref)s was deleted in Odoo and has been recreated"
+msgstr "%(kind)s %(ref)s avait été supprimé dans Odoo et a été recréé"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "%(kind)s %(ref)s was edited in Odoo: the edit is kept; the option \"Overwrite local edits\" would replace it"
+msgstr "%(kind)s %(ref)s a été modifié dans Odoo : la modification est gardée ; l'option « Écraser les modifications locales » la remplacerait"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "%(kind)s %(ref)s was edited in Odoo: the edit was overwritten"
+msgstr "%(kind)s %(ref)s a été modifié dans Odoo : la modification a été écrasée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+".\n"
+"                    The key identifies the imported records: another key imports a second copy."
+msgstr ""
+".\n"
+"                    La clé identifie les enregistrements importés : une autre clé importe une seconde copie."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+"<span class=\"s_website_form_label_content\">Email</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+msgstr ""
+"<span class=\"s_website_form_label_content\">Courriel</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+"<span class=\"s_website_form_label_content\">Message</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+msgstr ""
+"<span class=\"s_website_form_label_content\">Message</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+"<span class=\"s_website_form_label_content\">Name</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+msgstr ""
+"<span class=\"s_website_form_label_content\">Nom</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+"<span class=\"s_website_form_label_content\">Subject</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+msgstr ""
+"<span class=\"s_website_form_label_content\">Sujet</span>\n"
+"                                <span class=\"s_website_form_mark\">*</span>"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+"A kept script runs on the website origin, which is also the\n"
+"                                origin of the Odoo backend, with the session of whoever opens\n"
+"                                the page."
+msgstr ""
+"Un script gardé s'exécute sur l'origine du site web, qui est aussi\n"
+"                                l'origine de l'interface d'administration d'Odoo, avec la session de\n"
+"                                quiconque ouvre la page."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Action Needed"
+msgstr "Action requise"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Analyse"
+msgstr "Analyser"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Analyse Only"
+msgstr "Analyser seulement"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Analysis"
+msgstr "Analyse"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Analysis finished: %(pages)s pages; %(waiting)s pages in another language await a choice."
+msgstr "Analyse terminée : %(pages)s pages ; %(waiting)s pages dans une autre langue attendent un choix."
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Another import of %(key)s into this website is running."
+msgstr "Un autre import de %(key)s vers ce site est en cours."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Author alias %(alias)s of %(ref)s ignored"
+msgstr "Alias d'auteur %(alias)s de %(ref)s ignoré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Blog"
+msgstr "Blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Blog Name"
+msgstr "Nom du blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Blog Post"
+msgstr "Billet de blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Blog post"
+msgstr "Billet de blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Blog style view"
+msgstr "Vue de style blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "CSS selector %(selector)s rescoped to %(scoped)s"
+msgstr "Sélecteur CSS %(selector)s restreint en %(scoped)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Choose a Dolibarr export zip."
+msgstr "Choisissez un zip d'export Dolibarr."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Code"
+msgstr "Code"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Contact form of %(ref)s replaced by the Odoo contact form"
+msgstr "Formulaire de contact de %(ref)s remplacé par le formulaire de contact d'Odoo"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Container"
+msgstr "Conteneur"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Container %(container)s inserted into %(ref)s"
+msgstr "Conteneur %(container)s inséré dans %(ref)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Container %(ref)s detected as the %(role)s"
+msgstr "Conteneur %(ref)s reconnu comme %(role)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Container %(ref)s of type %(type)s is not included by any page"
+msgstr "Le conteneur %(ref)s de type %(type)s n'est inclus par aucune page"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Container %(ref)s of type %(type)s skipped"
+msgstr "Conteneur %(ref)s de type %(type)s écarté"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Content Hash"
+msgstr "Empreinte du contenu"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Created"
+msgstr "Créé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Date End"
+msgstr "Date de fin"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Date Start"
+msgstr "Date de début"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Detail"
+msgstr "Détail"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr Import Cover Url"
+msgstr "URL de couverture de l'import Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr Version"
+msgstr "Version de Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr import"
+msgstr "Import Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr import reports"
+msgstr "Rapports d'import Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr website import"
+msgstr "Import de site Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr website import analysis row"
+msgstr "Ligne d'analyse d'import de site Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr website import identity"
+msgstr "Identité d'import de site Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Dolibarr website import report line"
+msgstr "Ligne de rapport d'import de site Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Done"
+msgstr "Terminé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Error"
+msgstr "Erreur"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Error Count"
+msgstr "Nombre d'erreurs"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Errors"
+msgstr "Erreurs"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Export zip"
+msgstr "Zip d'export"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "External CSS reference removed from %(ref)s: %(url)s"
+msgstr "Référence CSS externe retirée de %(ref)s : %(url)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Failed"
+msgstr "Échoué"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Findings"
+msgstr "Constats"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Followers (Partners)"
+msgstr "Abonnés (partenaires)"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Footer container %(ref)s not imported: the Odoo footer applies"
+msgstr "Conteneur de pied de page %(ref)s non importé : le pied de page d'Odoo s'applique"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Foreign Imported"
+msgstr "Pages d'une autre langue importées"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Foreign Proposed"
+msgstr "Pages d'une autre langue proposées"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Foreign Skipped"
+msgstr "Pages d'une autre langue écartées"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Form element posting to the Odoo form controller removed from %(ref)s: %(what)s"
+msgstr "Élément de formulaire visant le contrôleur de formulaires d'Odoo retiré de %(ref)s : %(what)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Give the source key of the site; the zip file name does not carry one."
+msgstr "Indiquez la clé source du site ; le nom du fichier zip n'en porte pas."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Head element dropped from %(ref)s: %(what)s"
+msgstr "Élément du head retiré de %(ref)s : %(what)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Head view"
+msgstr "Vue de l'en-tête"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "ID"
+msgstr "ID"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Import"
+msgstr "Importer"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Import Done"
+msgstr "Import terminé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Import Menu"
+msgstr "Importer le menu"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Import a website from Dolibarr"
+msgstr "Importer un site depuis Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Import failed: %(error)s"
+msgstr "Import échoué : %(error)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Import finished: %(pages)s pages, %(posts)s posts, %(media)s media, %(warnings)s warnings, %(errors)s errors."
+msgstr "Import terminé : %(pages)s pages, %(posts)s billets, %(media)s médias, %(warnings)s avertissements, %(errors)s erreurs."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Import from Dolibarr"
+msgstr "Import depuis Dolibarr"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Imported Before"
+msgstr "Déjà importé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Include"
+msgstr "Importer"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Include Page Refs"
+msgstr "Références de pages à inclure"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Include Unlinked Langs"
+msgstr "Inclure les langues sans lien"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Information"
+msgstr "Information"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Inline script of %(ref)s uses jQuery, which Odoo loads lazily"
+msgstr "Le script en ligne de %(ref)s utilise jQuery, qu'Odoo charge à la demande"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Invalid source key %s."
+msgstr "Clé source %s invalide."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Is Follower"
+msgstr "Est abonné"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Keep Scripts"
+msgstr "Garder les scripts"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Keep scripts can only change while the import waits for review."
+msgstr "Garder les scripts ne se change que pendant que l'import attend sa revue."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Kind"
+msgstr "Genre"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Lang"
+msgstr "Langue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Langs Source"
+msgstr "Source des langues"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Language %s is not active."
+msgstr "La langue %s n'est pas active."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Language of the report lines."
+msgstr "Langue des lignes du rapport."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Last Action"
+msgstr "Dernière action"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Last Import"
+msgstr "Dernier import"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Line"
+msgstr "Ligne"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Link %(url)s in %(ref)s does not match any imported page"
+msgstr "Le lien %(url)s de %(ref)s ne correspond à aucune page importée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Local edit kept"
+msgstr "Modification locale gardée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Main Lang"
+msgstr "Langue principale"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Map"
+msgstr "Table"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Max Media"
+msgstr "Médias au plus"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Media"
+msgstr "Médias"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(relpath)s refused: invalid name"
+msgstr "Média %(relpath)s refusé : nom invalide"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(relpath)s skipped: another file has the same name"
+msgstr "Média %(relpath)s écarté : un autre fichier porte le même nom"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(relpath)s skipped: file type not allowed"
+msgstr "Média %(relpath)s écarté : type de fichier non admis"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(relpath)s skipped: larger than the %(limit)s per-file limit"
+msgstr "Média %(relpath)s écarté : plus gros que la limite de %(limit)s par fichier"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(url)s referenced by %(ref)s not found"
+msgstr "Média %(url)s référencé par %(ref)s introuvable"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(url)s unreadable in the zip: %(error)s"
+msgstr "Média %(url)s illisible dans le zip : %(error)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media %(wanted)s of %(ref)s matched by name to %(found)s"
+msgstr "Média %(wanted)s de %(ref)s associé par son nom à %(found)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Media Count"
+msgstr "Nombre de médias"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Media import stopped: %(limit)s reached"
+msgstr "Import des médias arrêté : %(limit)s atteint"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Menu entry"
+msgstr "Entrée de menu"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Menu entry %(label)s moved up: Odoo menus have two levels"
+msgstr "Entrée de menu %(label)s remontée : les menus d'Odoo ont deux niveaux"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Menu entry %(label)s skipped: %(url)s is already in the menu as %(existing)s"
+msgstr "Entrée de menu %(label)s sautée : %(url)s est déjà au menu sous %(existing)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Menu import stopped after %(limit)s entries"
+msgstr "Import du menu arrêté après %(limit)s entrées"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Message"
+msgstr "Message"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Message Delivery error"
+msgstr "Erreur de livraison du message"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Messages"
+msgstr "Messages"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Name"
+msgstr "Nom"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "No PHP"
+msgstr "Sans PHP"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "No bundled %(domain)s.lang for %(lang)s: texts come from %(used)s"
+msgstr "Aucun %(domain)s.lang embarqué pour %(lang)s : les textes viennent de %(used)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "No free URL for page %(ref)s after %(count)s candidates."
+msgstr "Aucune URL libre pour la page %(ref)s après %(count)s candidates."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages demandant une action"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec erreur de livraison"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "One analysis row per page."
+msgstr "Une ligne d'analyse par page."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "One page reference per line."
+msgstr "Une référence de page par ligne."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "One record per source item."
+msgstr "Un enregistrement par élément de la source."
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Only a draft import can be started."
+msgstr "Seul un import brouillon peut être démarré."
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Only an analysed import can be imported."
+msgstr "Seul un import analysé peut être importé."
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Only pages in another language can be chosen, and only while the import waits for review."
+msgstr "Seules les pages dans une autre langue se choisissent, et seulement pendant que l'import attend sa revue."
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "Only system administrators can import websites."
+msgstr "Seuls les administrateurs système peuvent importer des sites."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Open"
+msgstr "Ouvrir"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Open blog"
+msgstr "Ouvrir le blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Open website"
+msgstr "Ouvrir le site"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Options"
+msgstr "Options"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Other Langs"
+msgstr "Autres langues"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Other language, no link"
+msgstr "Autre langue, sans lien"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Overwrite Local Edits"
+msgstr "Écraser les modifications locales"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "PHP and languages"
+msgstr "PHP et langues"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "PHP closing block in %(ref)s at line %(line)s has no opening block: removed alone"
+msgstr "Bloc PHP fermant sans ouvrant dans %(ref)s à la ligne %(line)s : retiré seul"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "PHP control structure opened in %(ref)s at line %(line)s is never closed: only its opening block was removed"
+msgstr "Structure de contrôle PHP ouverte dans %(ref)s à la ligne %(line)s et jamais fermée : seul son bloc ouvrant a été retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "PHP removed from %(ref)s at line %(line)s (%(context)s): %(code)s; %(bytes)s HTML bytes removed"
+msgstr "PHP retiré de %(ref)s à la ligne %(line)s (%(context)s) : %(code)s ; %(bytes)s octets HTML retirés"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Page"
+msgstr "Page"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page %(ref)s (%(lang)s, %(url)s) skipped: not chosen"
+msgstr "Page %(ref)s (%(lang)s, %(url)s) écartée : non choisie"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page %(ref)s (%(lang)s, %(url)s) skipped: translation of %(translates)s"
+msgstr "Page %(ref)s (%(lang)s, %(url)s) écartée : traduction de %(translates)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page %(ref)s imported although its language is %(lang)s"
+msgstr "Page %(ref)s importée bien que sa langue soit %(lang)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page %(ref)s keeps placeholders as text: %(placeholders)s"
+msgstr "La page %(ref)s garde des jetons en texte : %(placeholders)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page %(ref)s placed at %(url)s: %(wanted)s is already used"
+msgstr "Page %(ref)s placée à %(url)s : %(wanted)s est déjà pris"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page %(ref)s skipped: %(reason)s"
+msgstr "Page %(ref)s écartée : %(reason)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Page Count"
+msgstr "Nombre de pages"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Page Ref"
+msgstr "Référence de page"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page choice %(ref)s ignored: not a page in another language without a translation link"
+msgstr "Choix de page %(ref)s ignoré : ce n'est pas une page dans une autre langue sans lien de traduction"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Page reference %(original)s changed to %(ref)s"
+msgstr "Référence de page %(original)s changée en %(ref)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Pages"
+msgstr "Pages"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid ""
+"Pages linked by a translation are never proposed, and a\n"
+"                                container is never listed for its language. Tick Import to\n"
+"                                bring a page in another language without a translation link."
+msgstr ""
+"Les pages liées par une traduction ne sont jamais proposées, et un\n"
+"                                conteneur n'est jamais listé pour sa langue. Cochez Importer pour\n"
+"                                amener une page dans une autre langue sans lien de traduction."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Phase"
+msgstr "Phase"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Php Plan"
+msgstr "Traitement du PHP"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Php Removed Bytes"
+msgstr "Octets de PHP retirés"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Php Removed Count"
+msgstr "Nombre de blocs PHP retirés"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Php Translated Count"
+msgstr "Nombre de blocs PHP traduits"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Php Unknown Blocks"
+msgstr "Blocs PHP inconnus"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Post Count"
+msgstr "Nombre de billets"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Posts"
+msgstr "Billets"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Previous Key"
+msgstr "Clé précédente"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Records"
+msgstr "Enregistrements"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Recreated"
+msgstr "Recréé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Redirect"
+msgstr "Redirection"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Redirect Count"
+msgstr "Nombre de redirections"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Redirect from %(url)s not created: a redirect the import does not own exists"
+msgstr "Redirection depuis %(url)s non créée : une redirection qui n'appartient pas à l'import existe"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Redirects"
+msgstr "Redirections"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Ref"
+msgstr "Référence"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Reimport"
+msgstr "Réimporter"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Replace the changes made in Odoo since the last import."
+msgstr "Remplacer les modifications faites dans Odoo depuis le dernier import."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Res"
+msgstr "Ressource"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Res Model"
+msgstr "Modèle de la ressource"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Resume"
+msgstr "Reprendre"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Review"
+msgstr "Revue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Review Before Import"
+msgstr "Revoir avant l'import"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Running"
+msgstr "En cours"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "SVG %(relpath)s cleaned: %(removed)s"
+msgstr "SVG %(relpath)s nettoyé : %(removed)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Script Count"
+msgstr "Nombre de scripts"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Script Detail"
+msgstr "Détail du script"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Script kept in %(ref)s: %(what)s"
+msgstr "Script gardé dans %(ref)s : %(what)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Script removed from %(ref)s: %(what)s"
+msgstr "Script retiré de %(ref)s : %(what)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Scripts"
+msgstr "Scripts"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Scripts Kept Count"
+msgstr "Nombre de scripts gardés"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Search form of %(ref)s sent to the Odoo website search"
+msgstr "Formulaire de recherche de %(ref)s dirigé vers la recherche du site Odoo"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Send"
+msgstr "Envoyer"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Set Homepage"
+msgstr "Définir la page d'accueil"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Severity"
+msgstr "Gravité"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Site CSS"
+msgstr "CSS du site"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Site JavaScript"
+msgstr "JavaScript du site"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Site Script Detail"
+msgstr "Détail des scripts du site"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Site Scripts"
+msgstr "Scripts du site"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Skip Page Refs"
+msgstr "Références de pages à écarter"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Skipped"
+msgstr "Écarté"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Social network %(network)s has no Odoo website field"
+msgstr "Le réseau social %(network)s n'a pas de champ de site Odoo"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Source"
+msgstr "Source"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Source Key"
+msgstr "Clé source"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Source Url"
+msgstr "URL source"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Source error: %(error)s"
+msgstr "Erreur de source : %(error)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Source made by Dolibarr %(source)s, bundled language files from Dolibarr %(bundled)s"
+msgstr "Source produite par Dolibarr %(source)s, fichiers de langue embarqués de Dolibarr %(bundled)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Source main language %(source)s differs from the website default language %(website)s"
+msgstr "La langue principale de la source, %(source)s, diffère de la langue par défaut du site, %(website)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Source main language missing: %(lang)s used"
+msgstr "Langue principale absente de la source : %(lang)s utilisée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Start over"
+msgstr "Recommencer"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "State"
+msgstr "État"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Status"
+msgstr "Statut"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Style Blog Posts"
+msgstr "Styler les billets de blogue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Summary"
+msgstr "Sommaire"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Target Url"
+msgstr "URL cible"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Text %(key)s of %(ref)s resolved approximately as %(value)s"
+msgstr "Texte %(key)s de %(ref)s résolu approximativement en %(value)s"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "The file name carries no source key; give --source-key."
+msgstr "Le nom du fichier ne porte aucune clé source ; donnez --source-key."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "The last import into this website used the source key"
+msgstr "Le dernier import dans ce site a utilisé la clé source"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "The source key %(key)s is not valid: use letters, digits, dot, dash and underscore."
+msgstr "La clé source %(key)s n'est pas valide : lettres, chiffres, point, tiret et soulignement seulement."
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "The state of an import changes by its actions."
+msgstr "L'état d'un import change par ses actions."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Title"
+msgstr "Titre"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "To review"
+msgstr "À revoir"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Translated"
+msgstr "Traduit"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Translates Ref"
+msgstr "Référence traduite"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Translation"
+msgstr "Traduction"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "URL %(url)s is already used by another attachment: media served at %(fallback)s"
+msgstr "L'URL %(url)s est déjà prise par une autre pièce jointe : média servi à %(fallback)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Unchanged"
+msgstr "Inchangé"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Unsafe markup removed from %(ref)s: %(what)s"
+msgstr "Balisage dangereux retiré de %(ref)s : %(what)s"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Updated"
+msgstr "Mis à jour"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Url"
+msgstr "URL"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Warning"
+msgstr "Avertissement"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Warning Count"
+msgstr "Nombre d'avertissements"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Warnings"
+msgstr "Avertissements"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Website"
+msgstr "Site web"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+#, python-format
+msgid "Website %s not found."
+msgstr "Site %s introuvable."
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Website communication history"
+msgstr "Historique des communications du site web"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Will be removed"
+msgstr "Sera retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Write options"
+msgstr "Options d'écriture"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Written Hash"
+msgstr "Empreinte écrite"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Zip File"
+msgstr "Fichier zip"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Zip Filename"
+msgstr "Nom du fichier zip"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "Zip Sha256"
+msgstr "SHA-256 du zip"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "absent from source"
+msgstr "absente de la source"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "author_alias_ignored"
+msgstr "Alias d'auteur ignoré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "choice_ignored"
+msgstr "Choix ignoré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "container_inlined"
+msgstr "Conteneur inséré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "credits"
+msgstr "Crédits"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "css_external_removed"
+msgstr "CSS externe retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "css_rescoped"
+msgstr "CSS restreint"
+
+#. module: erplibre_website_import_from_dolibarr
+#. odoo-python
+msgid "dropped by choice"
+msgstr "écartée par choix"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "footer_not_imported"
+msgstr "Pied de page non importé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "foreign_lang_page"
+msgstr "Page d'une autre langue importée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "foreign_lang_skipped"
+msgstr "Page d'une autre langue écartée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "form_removed"
+msgstr "Formulaire retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "form_replaced"
+msgstr "Formulaire remplacé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "head_asset_dropped"
+msgstr "Ressource du head retirée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "inline_script_needs_jquery"
+msgstr "Script en ligne requérant jQuery"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "langs_fallback"
+msgstr "Langues de repli"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "langs_version_mismatch"
+msgstr "Version des langues différente"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "language_mismatch"
+msgstr "Langue différente"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "layout_detected"
+msgstr "Mise en page reconnue"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "literal_placeholder"
+msgstr "Jeton en texte"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "local_edit_kept"
+msgstr "Modification locale gardée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "local_edit_overwritten"
+msgstr "Modification locale écrasée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "main_lang_defaulted"
+msgstr "Langue principale par défaut"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_capped"
+msgstr "Médias plafonnés"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_duplicate"
+msgstr "Média en double"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_matched_by_name"
+msgstr "Média associé par son nom"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_name_refused"
+msgstr "Nom de média refusé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_skipped_type"
+msgstr "Type de média écarté"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_too_large"
+msgstr "Média trop gros"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_unreadable"
+msgstr "Média illisible"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "media_url_conflict"
+msgstr "Conflit d'URL de média"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "menu_capped"
+msgstr "Menu plafonné"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "menu_flattened"
+msgstr "Menu aplati"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "menu_skipped_existing_url"
+msgstr "Entrée de menu sautée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "missing_media"
+msgstr "Média manquant"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "page_error"
+msgstr "Erreur de page"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "php_approximated"
+msgstr "PHP approximé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "php_removed"
+msgstr "PHP retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "php_unbalanced"
+msgstr "PHP non fermé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "php_unpaired"
+msgstr "PHP fermant seul"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "recreated"
+msgstr "Recréé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "ref_slugified"
+msgstr "Référence changée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "rewrite_conflict"
+msgstr "Conflit de redirection"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "run_error"
+msgstr "Erreur d'exécution"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "script_kept"
+msgstr "Script gardé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "script_removed"
+msgstr "Script retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "search_rewired"
+msgstr "Recherche redirigée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "skipped_container_type"
+msgstr "Type de conteneur écarté"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "skipped_translation"
+msgstr "Traduction écartée"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "social_unsupported"
+msgstr "Réseau social non pris en charge"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "source_error"
+msgstr "Erreur de source"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "stale_record"
+msgstr "Enregistrement périmé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "svg_sanitised"
+msgstr "SVG nettoyé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "unresolved_link"
+msgstr "Lien non résolu"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "unsafe_markup_removed"
+msgstr "Balisage dangereux retiré"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "unused_container"
+msgstr "Conteneur inutilisé"
+
+#. module: erplibre_website_import_from_dolibarr
+msgid "url_conflict"
+msgstr "Conflit d'URL"
+

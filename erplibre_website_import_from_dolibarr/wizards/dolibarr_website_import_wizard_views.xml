@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre (https://technolibre.ca)
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="dolibarr_website_import_wizard_form" model="ir.ui.view">
+        <field name="name">dolibarr.website.import.wizard.form</field>
+        <field name="model">dolibarr.website.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import from Dolibarr">
+                <div class="alert alert-warning" role="alert" invisible="not previous_key">
+                    The last import into this website used the source key
+                    <field name="previous_key" class="oe_inline" readonly="1" />
+                    .
+                    The key identifies the imported records: another key imports a second copy.
+                </div>
+                <group>
+                    <group string="Source">
+                        <field name="website_id" />
+                        <field name="zip_file" filename="zip_filename" />
+                        <field name="zip_filename" invisible="1" />
+                        <field name="source_key" required="1" />
+                        <field name="blog_name" />
+                    </group>
+                    <group string="Options">
+                        <field name="import_menu" />
+                        <field name="set_homepage" />
+                        <field name="style_blog_posts" />
+                        <field name="overwrite_local_edits" />
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_analyse" type="object" string="Analyse" class="btn-primary" />
+                    <button string="Cancel" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="dolibarr_website_import_wizard_action" model="ir.actions.act_window">
+        <field name="name">Import from Dolibarr</field>
+        <field name="res_model">dolibarr.website.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

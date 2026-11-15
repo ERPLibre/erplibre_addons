@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 TechnoLibre (https://technolibre.ca)
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Fixed templates called by the generated page views. They hold no
+         source text and read only the values their caller sets. -->
+    <template id="blog_post_list" name="Dolibarr import: blog post list">
+        <!-- limit=0 means "no limit" in a search: the count is at least 1. -->
+        <t
+            t-set="dolibarr_posts"
+            t-value="request.env['blog.post'].search([('blog_id', '=', blog_id), ('website_published', '=', True)], order='post_date desc', limit=max(blog_limit or 1, 1))"
+        />
+        <ul class="list-unstyled dolibarr-blog-list">
+            <li t-foreach="dolibarr_posts" t-as="post">
+                <a t-att-href="post.website_url" t-out="post.name" />
+                <small>
+                    <span t-field="post.post_date" t-options="{'widget': 'date'}" />
+                </small>
+            </li>
+        </ul>
+    </template>
+
+    <template id="social_links" name="Dolibarr import: social links">
+        <ul class="list-inline dolibarr-social">
+            <t
+                t-foreach="['social_facebook', 'social_twitter', 'social_linkedin', 'social_youtube', 'social_instagram', 'social_github', 'social_tiktok']"
+                t-as="field"
+            >
+                <li t-if="website[field]" class="list-inline-item">
+                    <a t-att-href="website[field]" target="_blank" rel="noopener">
+                        <t t-out="website._fields[field].string" />
+                    </a>
+                </li>
+            </t>
+        </ul>
+    </template>
+
+    <!-- The form of website.contactus: it posts to /website/form/ for the
+         mail.mail model, with the fixed fields below. The email_to input is
+         empty: Odoo signs the company address for it and the page sets the
+         same address through a data-for span, so the form can reach no other
+         recipient. -->
+    <template id="contact_form" name="Dolibarr import: contact form">
+        <section class="s_website_form pt16 pb16" data-vcss="001" data-snippet="s_website_form">
+            <div class="container">
+                <form
+                    t-att-id="form_id"
+                    action="/website/form/"
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="o_mark_required"
+                    data-mark="*"
+                    data-model_name="mail.mail"
+                    data-success-mode="redirect"
+                    data-success-page="/contactus-thank-you"
+                    data-pre-fill="true"
+                >
+                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                        <div
+                            class="mb-3 col-lg-6 s_website_form_field s_website_form_custom s_website_form_required"
+                            data-type="char"
+                            data-name="Field"
+                        >
+                            <label class="s_website_form_label" t-att-for="form_id + '_name'">
+                                <span class="s_website_form_label_content">Name</span>
+                                <span class="s_website_form_mark">*</span>
+                            </label>
+                            <input
+                                t-att-id="form_id + '_name'"
+                                type="text"
+                                class="form-control s_website_form_input"
+                                name="name"
+                                required=""
+                                data-fill-with="name"
+                            />
+                        </div>
+                        <div
+                            class="mb-3 col-lg-6 s_website_form_field s_website_form_required s_website_form_model_required"
+                            data-type="email"
+                            data-name="Field"
+                        >
+                            <label class="s_website_form_label" t-att-for="form_id + '_email'">
+                                <span class="s_website_form_label_content">Email</span>
+                                <span class="s_website_form_mark">*</span>
+                            </label>
+                            <input
+                                t-att-id="form_id + '_email'"
+                                type="email"
+                                class="form-control s_website_form_input"
+                                name="email_from"
+                                required=""
+                                data-fill-with="email"
+                            />
+                        </div>
+                        <div
+                            class="mb-3 col-12 s_website_form_field s_website_form_required s_website_form_model_required"
+                            data-type="char"
+                            data-name="Field"
+                        >
+                            <label class="s_website_form_label" t-att-for="form_id + '_subject'">
+                                <span class="s_website_form_label_content">Subject</span>
+                                <span class="s_website_form_mark">*</span>
+                            </label>
+                            <input
+                                t-att-id="form_id + '_subject'"
+                                type="text"
+                                class="form-control s_website_form_input"
+                                name="subject"
+                                required=""
+                            />
+                        </div>
+                        <div
+                            class="mb-3 col-12 s_website_form_field s_website_form_custom s_website_form_required"
+                            data-type="text"
+                            data-name="Field"
+                        >
+                            <label class="s_website_form_label" t-att-for="form_id + '_message'">
+                                <span class="s_website_form_label_content">Message</span>
+                                <span class="s_website_form_mark">*</span>
+                            </label>
+                            <textarea
+                                t-att-id="form_id + '_message'"
+                                class="form-control s_website_form_input"
+                                name="description"
+                                required=""
+                                rows="6"
+                            />
+                        </div>
+                        <div class="mb-3 col-12 s_website_form_field s_website_form_dnone">
+                            <input type="hidden" class="form-control s_website_form_input" name="email_to" value="" />
+                        </div>
+                        <div
+                            class="mb-0 py-2 col-12 s_website_form_submit s_website_form_no_submit_label text-end"
+                            data-name="Submit Button"
+                        >
+                            <a href="#" role="button" class="btn btn-primary s_website_form_send">Send</a>
+                            <span id="s_website_form_result" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </template>
+</odoo>
