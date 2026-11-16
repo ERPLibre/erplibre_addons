@@ -62,6 +62,9 @@
                                     <field name="comment" />
                                     <field name="is_absent" />
                                     <field name="date" />
+                                    <field name="notified" optional="show" />
+                                    <field name="notification_read" optional="show" />
+                                    <field name="notification_count" optional="show" />
                                     <field name="name" optional="hide" />
                                     <field name="partner_id" optional="hide" />
                                     <field name="winner_participant_id" optional="hide" />

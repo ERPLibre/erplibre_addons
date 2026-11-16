@@ -46,6 +46,29 @@ class EventRaffleDraw(models.Model):
         tracking=True,
     )
     prize_received_date = fields.Datetime(string="Prize Received Date")
+    notification_ids = fields.One2many(
+        "event.raffle.draw.notification",
+        "draw_id",
+        string="Notifications Sent",
+    )
+    notification_count = fields.Integer(
+        string="Notifications",
+        compute="_compute_notification_count",
+        store=True,
+        help="Number of notifications sent to the winner from this draw.",
+    )
+    notified = fields.Boolean(
+        string="Notified",
+        compute="_compute_notification_count",
+        store=True,
+        help="At least one notification was sent to the winner.",
+    )
+    notification_read = fields.Boolean(
+        string="Read",
+        compute="_compute_notification_read",
+        help="The winner has seen the latest chat notification in Discuss. "
+        "An email notification never counts as read.",
+    )
 
     @api.onchange("prize_received_date")
     def _onchange_prize_received_date(self):
@@ -66,6 +89,24 @@ class EventRaffleDraw(models.Model):
         if vals.get("prize_received_date"):
             vals["prize_received"] = True
         return super().write(vals)
+
+    @api.depends("notification_ids")
+    def _compute_notification_count(self):
+        for rec in self:
+            rec.notification_count = len(rec.notification_ids)
+            rec.notified = bool(rec.notification_ids)
+
+    @api.depends("notification_ids.is_read")
+    def _compute_notification_read(self):
+        # The latest chat notification decides, taken by id since the
+        # one2many cache keeps creation order rather than the model order.
+        # An email sent after it does not hide a read chat message.
+        for rec in self:
+            chats = rec.notification_ids.filtered(
+                lambda n: n.channel == "chat"
+            )
+            latest = chats.sorted("id")[-1:]
+            rec.notification_read = bool(latest.is_read)
 
     @api.depends("sequence", "winner_name")
     def _compute_name(self):
@@ -91,3 +132,16 @@ class EventRaffleDraw(models.Model):
                 rec.winner_participant_id.present = True
             rec.message_post(body=_("Winner marked present."))
         return True
+
+    def action_open_notify_wizard(self):
+        """Open the wizard that sends a notification to this winner."""
+        self.ensure_one()
+        self.check_access("write")
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Notify the Winner"),
+            "res_model": "event.raffle.draw.notify.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {"default_draw_id": self.id},
+        }

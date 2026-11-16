@@ -85,6 +85,25 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
    **« Quitter le plein écran »** revient à la vue précédente).
 5. Enchaîner avec **« Prochain tirage »**. Marquer un gagnant **absent** depuis le tir
    (une note/activité peut être ajoutée dans le chatter).
+6. **Notifier le gagnant** : dans l'onglet **Tirs**, ouvrir la ligne du tir puis
+   cliquer **« Notifier »**. L'assistant choisit l'expéditeur (**OdooBot** par
+   défaut, ou **Moi**, l'utilisateur courant ; jamais un autre utilisateur) et
+   propose un message modifiable, par défaut *« Vous avez reçu un prix, venez le
+   réclamer! »*. L'envoi dépend du gagnant :
+   - son contact a un **compte utilisateur** actif (interne ou portail) : un
+     **clavardage privé** dans *Discussion*, la conversation directe entre
+     l'expéditeur et le gagnant, créée au besoin ;
+   - sinon, s'il a un **courriel** (celui du contact, ou celui saisi sur le tir) :
+     le même message par **courriel** ;
+   - sinon : l'assistant explique pourquoi et n'offre pas de bouton *Envoyer*.
+
+   Un gagnant **absent** peut être notifié : c'est l'usage principal. Chaque
+   envoi est consigné sur le tir (section *Notifications* du formulaire) et
+   laisse une note dans le chatter. Les listes des tirs et des gagnants
+   affichent, après *Date*, les colonnes **Notifié**, **Lu** (le gagnant a vu
+   la dernière notification par clavardage ; jamais coché pour un courriel)
+   et **Notifications** (le nombre d'envois). Peut notifier qui peut modifier
+   les tirs (groupe *Événements / Utilisateur*).
 
 ## Animations de Tux
 
@@ -140,6 +159,13 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 - Tux est modélisé procéduralement (primitives three.js) pour ressembler à la
   mascotte ; aucun fichier 3D externe n'est requis.
+
+## Changes
+
+- **18.0.1.3.0** : bouton **Notifier** sur le tir. Notification du gagnant
+  par clavardage privé (OdooBot ou l'utilisateur courant) ou, à défaut de
+  compte utilisateur, par courriel ; suivi par tir (colonnes *Notifié*, *Lu*
+  et compteur *Notifications*).
 
 ## Bug Tracker
 
