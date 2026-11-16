@@ -9,7 +9,10 @@ class EventRaffleDrawNotification(models.Model):
     A record is written by the notify wizard for each send and is never
     edited afterwards: it keeps who sent what, how, and the message it
     produced, so that the draw can count its notifications and tell whether
-    the winner read the last chat message.
+    the winner read the last chat message. The access rights grant no create
+    and no write: the wizard creates the record with sudo once it has
+    checked the draw and derived the sender, so no record names a sender, a
+    draw or a message that no send produced. A manager can delete one.
     """
 
     _name = "event.raffle.draw.notification"

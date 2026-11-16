@@ -11,7 +11,9 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
     """Send one notification to the winner of a draw.
 
     The winner is reached by a private chat in Discuss when its contact has
-    an active user account, internal or portal, and by email otherwise. The
+    an active internal user, and by email otherwise. A portal user has no
+    Discuss app and a chat member is only notified by web push, so a chat
+    sent to a portal user never reaches it: portal users go by email. The
     sender is a choice between OdooBot and the current user, never another
     user: the selection is the only input, and the author is derived from it.
     """
@@ -58,8 +60,8 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
                 wiz.delivery = "chat"
                 wiz.recipient = partner.display_name
                 wiz.delivery_info = _(
-                    "The winner has a user account: the message is sent "
-                    "as a private chat in Discuss."
+                    "The winner has an internal user account: the message "
+                    "is sent as a private chat in Discuss."
                 )
             elif email:
                 wiz.delivery = "email"
@@ -67,26 +69,32 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
                     f"{partner.name} <{email}>" if partner else email
                 )
                 wiz.delivery_info = _(
-                    "The winner has no user account: the message is sent "
-                    "by email."
+                    "The winner has no internal user account (a portal "
+                    "account does not see Discuss): the message is sent by "
+                    "email."
                 )
             else:
                 wiz.delivery = "none"
                 wiz.recipient = partner.display_name or draw.winner_name
                 wiz.delivery_info = _(
-                    "The winner has neither a user account nor an email "
-                    "address, so no notification can be sent. Add an email "
-                    "to the draw or to the winner contact first."
+                    "The winner has neither an internal user account nor an "
+                    "email address, so no notification can be sent. Add an "
+                    "email to the draw or to the winner contact first."
                 )
 
     def _winner_user(self):
-        """The active user of the winner contact, internal or portal."""
+        """The active internal user of the winner contact, if any.
+
+        Share users (portal, public) are left out: they cannot open Discuss.
+        """
         self.ensure_one()
         partner = self.draw_id.partner_id
         if not partner:
             return self.env["res.users"]
         # sudo: an event user does not read the portal users.
-        return partner.sudo().user_ids.filtered("active")[:1]
+        return partner.sudo().user_ids.filtered(
+            lambda u: u.active and not u.share
+        )[:1]
 
     def _winner_email(self):
         """The contact email, else the email typed on the draw."""
@@ -210,6 +218,9 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
             mail = self._send_email(author, body_html)
             vals.update(mail_id=mail.id, message_id=mail.mail_message_id.id)
             note = _("Notification sent by email by %s.") % author.name
-        self.env["event.raffle.draw.notification"].create(vals)
+        # sudo: users only read notifications, so that a record cannot be
+        # written with a sender, a draw or a message that no send produced.
+        # This method is the only writer, after the checks above.
+        self.env["event.raffle.draw.notification"].sudo().create(vals)
         draw.message_post(body=note)
         return {"type": "ir.actions.act_window_close"}

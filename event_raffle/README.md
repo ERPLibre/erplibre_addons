@@ -90,11 +90,13 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
    défaut, ou **Moi**, l'utilisateur courant ; jamais un autre utilisateur) et
    propose un message modifiable, par défaut *« Vous avez reçu un prix, venez le
    réclamer! »*. L'envoi dépend du gagnant :
-   - son contact a un **compte utilisateur** actif (interne ou portail) : un
-     **clavardage privé** dans *Discussion*, la conversation directe entre
-     l'expéditeur et le gagnant, créée au besoin ;
+   - son contact a un **compte utilisateur interne** actif : un **clavardage
+     privé** dans *Discussion*, la conversation directe entre l'expéditeur et
+     le gagnant, créée au besoin ;
    - sinon, s'il a un **courriel** (celui du contact, ou celui saisi sur le tir) :
-     le même message par **courriel** ;
+     le même message par **courriel**. Un utilisateur **portail** passe par
+     ici : il n'a pas accès à *Discussion* et un clavardage ne lui parviendrait
+     pas ;
    - sinon : l'assistant explique pourquoi et n'offre pas de bouton *Envoyer*.
 
    Un gagnant **absent** peut être notifié : c'est l'usage principal. Chaque
@@ -103,7 +105,9 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
    affichent, après *Date*, les colonnes **Notifié**, **Lu** (le gagnant a vu
    la dernière notification par clavardage ; jamais coché pour un courriel)
    et **Notifications** (le nombre d'envois). Peut notifier qui peut modifier
-   les tirs (groupe *Événements / Utilisateur*).
+   les tirs (groupe *Événements / Utilisateur*). Les notifications ne se
+   créent ni ne se modifient à la main : seul l'assistant les écrit, après
+   ses vérifications ; un gestionnaire peut en supprimer une.
 
 ## Animations de Tux
 
@@ -163,9 +167,10 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 ## Changes
 
 - **18.0.1.3.0** : bouton **Notifier** sur le tir. Notification du gagnant
-  par clavardage privé (OdooBot ou l'utilisateur courant) ou, à défaut de
-  compte utilisateur, par courriel ; suivi par tir (colonnes *Notifié*, *Lu*
-  et compteur *Notifications*).
+  par clavardage privé (OdooBot ou l'utilisateur courant) quand il a un
+  compte interne, sinon par courriel (y compris un utilisateur portail) ;
+  suivi par tir (colonnes *Notifié*, *Lu* et compteur *Notifications*),
+  écrit par l'assistant seul.
 
 ## Bug Tracker
 
