@@ -8,6 +8,12 @@
         "Requirements of the ERPLibre Stream Deck, with the repository "
         "tests that prove them."
     ),
+    "description": (
+        "Loads the requirements of the ERPLibre Stream Deck into the "
+        "registry of ERPLibre DevOps Requirement: inventory, monitoring and "
+        "control, each with the repository tests that prove it, in English "
+        "and French."
+    ),
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",
     "license": "AGPL-3",
