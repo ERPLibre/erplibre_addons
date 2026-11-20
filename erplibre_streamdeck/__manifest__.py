@@ -5,6 +5,15 @@
     "version": "18.0.1.4.0",
     "category": "Productivity",
     "summary": "Inventory of the employees' workstations and Stream Decks.",
+    "description": (
+        "Inventory and monitoring of the employees' workstations and Elgato "
+        "Stream Decks, fed by the ERPLibre Home GNOME extension. A "
+        "workstation enrolls with a pairing code, an API key or a login, "
+        "then reports its decks, its deck service and their events. "
+        "Managers see the whole fleet, get an activity when a deck service "
+        "fails or a workstation goes silent, and pilot the deck settings "
+        "and home-screen key layouts through profiles."
+    ),
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",
     "license": "AGPL-3",
