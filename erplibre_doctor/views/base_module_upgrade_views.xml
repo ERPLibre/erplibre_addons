@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- The confirmation of the doctor's installs. Without a view named,
+         base.module.upgrade opens with base.view_base_module_upgrade, the
+         lowest priority, which speaks of uninstalling; the high priority
+         keeps this view from becoming that default. -->
+    <record id="base_module_upgrade_view_form_doctor" model="ir.ui.view">
+        <field name="name">base.module.upgrade.form.erplibre.doctor</field>
+        <field name="model">base.module.upgrade</field>
+        <field name="priority" eval="99" />
+        <field name="arch" type="xml">
+            <form string="Install the suggested modules">
+                <p>The modules below are about to be installed, with their dependencies.</p>
+                <p>
+                    Confirm applies every module change scheduled in this database: a module marked to remove
+                    or to upgrade elsewhere is in the list too, with its state. Cancel takes back every mark.
+                </p>
+                <separator string="Scheduled changes" />
+                <field name="module_info" />
+                <footer>
+                    <button
+                        name="action_erplibre_doctor_confirm"
+                        string="Confirm"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="q"
+                    />
+                    <button
+                        name="upgrade_module_cancel"
+                        string="Cancel"
+                        type="object"
+                        class="btn-secondary"
+                        data-hotkey="x"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

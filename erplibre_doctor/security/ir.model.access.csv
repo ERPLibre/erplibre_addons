@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_erplibre_doctor_report_system,erplibre.doctor.report system,model_erplibre_doctor_report,base.group_system,1,1,1,1
+access_erplibre_doctor_report_line_system,erplibre.doctor.report.line system,model_erplibre_doctor_report_line,base.group_system,1,1,1,1

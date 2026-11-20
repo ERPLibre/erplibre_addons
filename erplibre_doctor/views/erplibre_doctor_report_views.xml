@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_doctor_report_view_list" model="ir.ui.view">
+        <field name="name">erplibre.doctor.report.list</field>
+        <field name="model">erplibre.doctor.report</field>
+        <field name="arch" type="xml">
+            <!-- a report comes from an analysis only: no create, no edit -->
+            <list create="0" edit="0">
+                <header>
+                    <button
+                        name="action_new_analysis"
+                        type="object"
+                        string="New analysis"
+                        class="btn-primary"
+                        display="always"
+                    />
+                </header>
+                <field name="name" />
+                <field name="date" />
+                <field name="user_id" optional="show" />
+                <field name="image" optional="hide" />
+                <field name="problem_count" />
+                <field
+                    name="state"
+                    widget="badge"
+                    decoration-success="state == 'done'"
+                    decoration-danger="state == 'error'"
+                />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_doctor_report_view_form" model="ir.ui.view">
+        <field name="name">erplibre.doctor.report.form</field>
+        <field name="model">erplibre.doctor.report</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <button
+                        name="action_install_missing"
+                        type="object"
+                        string="Install the missing modules"
+                        class="btn-primary"
+                        icon="fa-download"
+                        invisible="not installable_count"
+                    />
+                    <button name="action_new_analysis" type="object" string="New analysis" icon="fa-stethoscope" />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="state != 'error'">
+                        <field name="error" />
+                    </div>
+                    <div class="alert alert-info" role="status" invisible="not installable_count">
+                        <field name="installable_count" class="oe_inline" />
+                        suggested modules can be installed. A confirmation lists them, with their dependencies,
+                        before installing anything.
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" />
+                            <field name="user_id" />
+                        </group>
+                        <group>
+                            <field name="image" />
+                            <field name="problem_count" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Findings" name="findings">
+                            <field name="line_ids">
+                                <list
+                                    decoration-warning="problem and module_state != 'installed'"
+                                    decoration-muted="not problem"
+                                >
+                                    <field name="sequence" column_invisible="1" />
+                                    <field name="check" optional="hide" />
+                                    <field name="name" />
+                                    <field name="shortdesc" />
+                                    <field name="state_found" widget="badge" />
+                                    <field name="module_state" widget="badge" optional="show" />
+                                    <field name="problem" column_invisible="1" />
+                                    <field name="module_id" column_invisible="1" />
+                                    <field name="can_install" column_invisible="1" />
+                                    <button
+                                        name="action_install"
+                                        type="object"
+                                        string="Install"
+                                        icon="fa-download"
+                                        invisible="not can_install"
+                                    />
+                                    <button
+                                        name="action_open_module"
+                                        type="object"
+                                        string="Module"
+                                        icon="fa-external-link"
+                                        invisible="not module_id"
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_doctor_report_view_search" model="ir.ui.view">
+        <field name="name">erplibre.doctor.report.search</field>
+        <field name="model">erplibre.doctor.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="user_id" />
+                <filter name="with_problems" string="With problems" domain="[('problem_count', '>', 0)]" />
+                <filter name="incomplete" string="Incomplete" domain="[('state', '=', 'error')]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_doctor_report_action" model="ir.actions.act_window">
+        <field name="name">Doctor reports</field>
+        <field name="res_model">erplibre.doctor.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No analysis yet</p>
+            <p>
+                The doctor compares this database with what the ERPLibre checkout suggests, starting with the
+                modules of its base image. Start an analysis with « New analysis » or from Settings › ERPLibre.
+            </p>
+        </field>
+    </record>
+</odoo>

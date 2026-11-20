@@ -1,0 +1,444 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_doctor
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-20 16:45+0000\n"
+"PO-Revision-Date: 2026-11-20 16:45+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report.py:0
+msgid "%(file)s cannot be read as a JSON object."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid "<span class=\"o_form_label me-2\">Last report</span>"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid "All reports"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid "Analysis"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__can_install
+msgid "Can install"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.base_module_upgrade_view_form_doctor
+msgid "Cancel"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__check
+msgid "Check"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid ""
+"Compares this database with what the ERPLibre checkout suggests: the modules"
+" of its base image that are not installed, with an offer to install them."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model,name:erplibre_doctor.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.base_module_upgrade_view_form_doctor
+msgid "Confirm"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.base_module_upgrade_view_form_doctor
+msgid ""
+"Confirm applies every module change scheduled in this database: a module marked to remove\n"
+"                    or to upgrade elsewhere is in the list too, with its state. Cancel takes back every mark."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__create_uid
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__create_date
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__module_state
+msgid "Current state"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__date
+msgid "Date"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__shortdesc
+msgid "Description"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__display_name
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid "Doctor"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.actions.act_window,name:erplibre_doctor.erplibre_doctor_report_action
+msgid "Doctor reports"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_res_config_settings__erplibre_doctor_summary
+msgid "Doctor summary"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report__state__done
+msgid "Done"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model,name:erplibre_doctor.model_erplibre_doctor_report_line
+msgid "ERPLibre doctor finding"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model,name:erplibre_doctor.model_erplibre_doctor_report
+msgid "ERPLibre doctor report"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__error
+msgid "Errors"
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/res_config_settings.py:0
+msgid "Every suggested module is installed."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__line_ids
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_form
+msgid "Findings"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__id
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__id
+msgid "ID"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__image
+msgid "Image"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report__state__error
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_search
+msgid "Incomplete"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,help:erplibre_doctor.field_erplibre_doctor_report__state
+msgid ""
+"Incomplete: at least one check could not run, its reason is in Errors; the "
+"findings of the other checks are kept."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_form
+msgid "Install"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_form
+msgid "Install the missing modules"
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report_line.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.base_module_upgrade_view_form_doctor
+msgid "Install the suggested modules"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__installed
+msgid "Installed"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__write_uid
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__write_date
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_res_config_settings__erplibre_doctor_report_id
+msgid "Last doctor report"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid "Last report"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__name
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_form
+msgid "Module"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__module_id
+msgid "Module in the database"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__name
+msgid "Name"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_list
+msgid "New analysis"
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report.py:0
+msgid ""
+"No ERPLibre checkout found above the running Odoo: set the system parameter "
+"%(param)s to its directory."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.actions.act_window,help:erplibre_doctor.erplibre_doctor_report_action
+msgid "No analysis yet"
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/res_config_settings.py:0
+msgid "No analysis yet."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__uninstalled
+msgid "Not Installed"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__absent
+msgid "Not found"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__problem
+msgid "Problem"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__problem_count
+msgid "Problems"
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/res_config_settings.py:0
+msgid "Problems found by the last analysis: %(count)s."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__report_id
+msgid "Report"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__user_id
+msgid "Run by"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.base_module_upgrade_view_form_doctor
+msgid "Scheduled changes"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.res_config_settings_view_form
+msgid "Start an analysis"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__state
+msgid "State"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report_line__state_found
+msgid "State at analysis"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__check__suggested_module
+msgid "Suggested module"
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report.py:0
+msgid ""
+"The ERPLibre checkout has no %(file)s: no suggested module to compare with."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,help:erplibre_doctor.field_erplibre_doctor_report_line__problem
+msgid "The analysis found the module not installed in this database."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,help:erplibre_doctor.field_erplibre_doctor_report__image
+msgid ""
+"The database image of the ERPLibre checkout whose modules are suggested, "
+"from conf/module_list_image_db_odoo.json."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.actions.act_window,help:erplibre_doctor.erplibre_doctor_report_action
+msgid ""
+"The doctor compares this database with what the ERPLibre checkout suggests, starting with the\n"
+"                modules of its base image. Start an analysis with « New analysis » or from Settings › ERPLibre."
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report.py:0
+msgid "The image %(image)s is its own base in %(file)s."
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report.py:0
+msgid "The image %(image)s is not described in %(file)s."
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/res_config_settings.py:0
+msgid "The last analysis is incomplete."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.base_module_upgrade_view_form_doctor
+msgid "The modules below are about to be installed, with their dependencies."
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report_line.py:0
+msgid "This module cannot be installed from here."
+msgstr ""
+
+#. module: erplibre_doctor
+#. odoo-python
+#: code:addons/erplibre_doctor/models/erplibre_doctor_report.py:0
+msgid "This report has no module left that can be installed."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__to_install
+msgid "To be installed"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__to_remove
+msgid "To be removed"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__to_upgrade
+msgid "To be upgraded"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields,field_description:erplibre_doctor.field_erplibre_doctor_report__installable_count
+msgid "To install"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model.fields.selection,name:erplibre_doctor.selection__erplibre_doctor_report_line__state_found__uninstallable
+msgid "Uninstallable"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.model,name:erplibre_doctor.model_base_module_upgrade
+msgid "Upgrade Module"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_search
+msgid "With problems"
+msgstr ""
+
+#. module: erplibre_doctor
+#: model_terms:ir.ui.view,arch_db:erplibre_doctor.erplibre_doctor_report_view_form
+msgid ""
+"suggested modules can be installed. A confirmation lists them, with their dependencies,\n"
+"                        before installing anything."
+msgstr ""
+
+#. module: erplibre_doctor
+#: model:ir.ui.menu,name:erplibre_doctor.erplibre_doctor_dev_menu
+msgid "🩺 Doctor"
+msgstr ""
