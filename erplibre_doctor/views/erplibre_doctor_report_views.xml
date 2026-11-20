@@ -15,6 +15,7 @@
                         string="New analysis"
                         class="btn-primary"
                         display="always"
+                        groups="base.group_system"
                     />
                 </header>
                 <field name="name" />
@@ -45,15 +46,27 @@
                         class="btn-primary"
                         icon="fa-download"
                         invisible="not installable_count"
+                        groups="base.group_system"
                     />
-                    <button name="action_new_analysis" type="object" string="New analysis" icon="fa-stethoscope" />
+                    <button
+                        name="action_new_analysis"
+                        type="object"
+                        string="New analysis"
+                        icon="fa-stethoscope"
+                        groups="base.group_system"
+                    />
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
                     <div class="alert alert-warning" role="alert" invisible="state != 'error'">
                         <field name="error" />
                     </div>
-                    <div class="alert alert-info" role="status" invisible="not installable_count">
+                    <div
+                        class="alert alert-info"
+                        role="status"
+                        invisible="not installable_count"
+                        groups="base.group_system"
+                    >
                         <field name="installable_count" class="oe_inline" />
                         suggested modules can be installed. A confirmation lists them, with their dependencies,
                         before installing anything.
@@ -95,6 +108,7 @@
                                         string="Install"
                                         icon="fa-download"
                                         invisible="not can_install"
+                                        groups="base.group_system"
                                     />
                                     <button
                                         name="action_open_module"
@@ -102,12 +116,14 @@
                                         string="Module"
                                         icon="fa-external-link"
                                         invisible="not module_id"
+                                        groups="base.group_system"
                                     />
                                 </list>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
+                <chatter />
             </form>
         </field>
     </record>

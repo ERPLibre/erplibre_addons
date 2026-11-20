@@ -1,6 +1,7 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from datetime import date
 from unittest.mock import patch
 
 from odoo.addons.erplibre_info import runner
@@ -32,6 +33,37 @@ class TestReport(DoctorCase):
         self.assertFalse(lines[MODULE_ABSENT].can_install)
         self.assertEqual(report.problem_count, 2)
         self.assertEqual(report.installable_count, 1)
+
+    def test_name_counts_from_one_each_day(self):
+        first, second = date(2000, 1, 1), date(2000, 1, 2)
+        self.assertEqual(
+            self.Report._next_name(first), "DOCTOR/2000/01/01/0001"
+        )
+        self.assertEqual(
+            self.Report._next_name(first), "DOCTOR/2000/01/01/0002"
+        )
+        self.assertEqual(
+            self.Report._next_name(second), "DOCTOR/2000/01/02/0001"
+        )
+        self.assertEqual(
+            self.Report._next_name(first), "DOCTOR/2000/01/01/0003"
+        )
+        ranges = self.env["ir.sequence.date_range"].search(
+            [
+                (
+                    "sequence_id",
+                    "=",
+                    self.env.ref(
+                        "erplibre_doctor.seq_erplibre_doctor_report"
+                    ).id,
+                ),
+                ("date_from", "in", [first, second]),
+            ]
+        )
+        self.assertEqual(
+            sorted((r.date_from, r.date_to) for r in ranges),
+            [(first, first), (second, second)],
+        )
 
     def test_a_new_analysis_keeps_the_previous_report(self):
         first = self.new_report()
@@ -110,6 +142,8 @@ class TestReport(DoctorCase):
         self.assertIn(self.image, report.error)
 
     def test_rights(self):
+        """Every internal user reads the reports, only the Settings group
+        runs an analysis."""
         user = self.env["res.users"].create(
             {
                 "name": "Doctor user",
@@ -117,6 +151,8 @@ class TestReport(DoctorCase):
                 "groups_id": [(6, 0, [self.env.ref("base.group_user").id])],
             }
         )
-        self.assertFalse(
-            self.Report.with_user(user).has_access("read"),
-        )
+        Report = self.Report.with_user(user)
+        self.assertTrue(Report.has_access("read"))
+        self.assertFalse(Report.has_access("create"))
+        report = self.new_report()
+        self.assertTrue(report.with_user(user).line_ids.mapped("name"))

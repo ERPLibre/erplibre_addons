@@ -12,10 +12,12 @@
     "depends": [
         "erplibre_info",
         "erplibre_info_developer_menu",
+        "mail",
     ],
     "data": [
         "security/ir.model.access.csv",
         "data/ir_sequence.xml",
+        "data/ir_cron.xml",
         "views/erplibre_doctor_report_views.xml",
         "views/base_module_upgrade_views.xml",
         "views/res_config_settings_views.xml",

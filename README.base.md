@@ -56,7 +56,7 @@ packages the modules need are listed in `requirements.txt`.
 | `erplibre_info_git` | Read-only snapshots of the ERPLibre code: HEAD of each repository of the manifest and its gap to the manifest, each installed module with its installed and on-disk version, which shows pending upgrades. |
 | `erplibre_info_git_fetch` | For developers: server actions that write into the git clones of the checkout — fetch and rebase forks, pull the deployed code, return to a snapshot — each with a dry run, then a doubly confirmed apply, never pushing. Installs only on a server started with `--dev`. |
 | `erplibre_info_developer_menu` | Glue module: adds the code snapshots, the code runs and the ERPLibre settings to the Dev menu of `developer_menu`. Installed automatically with both modules. |
-| `erplibre_doctor` | Analyses the database against what the ERPLibre checkout suggests and keeps each analysis as a report: lists the modules of the base image of `conf/module_list_image_db_odoo.json` that are not installed and offers to install them through Odoo's confirmation. Started from Settings › ERPLibre, reports in the Dev menu. |
+| `erplibre_doctor` | Analyses the database against what the ERPLibre checkout suggests and keeps each analysis as a report: lists the modules of the base image of `conf/module_list_image_db_odoo.json` that are not installed and offers to install them through Odoo's confirmation. Runs every day and notifies the chosen users of a problem; started from Settings › ERPLibre, reports in the Dev menu. |
 
 ### Telephony and SMS
 
@@ -162,7 +162,7 @@ besoin sont listés dans `requirements.txt`.
 | `erplibre_info_git` | Instantanés en lecture seule du code ERPLibre : HEAD de chaque dépôt du manifeste et son écart au manifeste, chaque module installé avec sa version installée et sur disque, ce qui révèle les mises à jour en attente. |
 | `erplibre_info_git_fetch` | Pour les développeurs : actions serveur qui écrivent dans les clones git du checkout — fetch et rebase des forks, pull du code déployé, retour à un instantané — chacune avec un essai à blanc puis une application doublement confirmée, sans jamais pousser. S'installe seulement sur un serveur lancé avec `--dev`. |
 | `erplibre_info_developer_menu` | Module de liaison : ajoute les instantanés de code, les exécutions et les paramètres ERPLibre au menu Dev de `developer_menu`. Installé automatiquement avec les deux modules. |
-| `erplibre_doctor` | Analyse la base par rapport à ce que suggère le checkout ERPLibre et garde chaque analyse dans un rapport : liste les modules de l'image de base de `conf/module_list_image_db_odoo.json` qui ne sont pas installés et propose de les installer par la confirmation d'Odoo. Lancé depuis Paramètres › ERPLibre, rapports dans le menu Dev. |
+| `erplibre_doctor` | Analyse la base par rapport à ce que suggère le checkout ERPLibre et garde chaque analyse dans un rapport : liste les modules de l'image de base de `conf/module_list_image_db_odoo.json` qui ne sont pas installés et propose de les installer par la confirmation d'Odoo. Tourne chaque jour et notifie les utilisateurs choisis d'un problème ; lancé depuis Paramètres › ERPLibre, rapports dans le menu Dev. |
 
 ### Téléphonie et SMS
 

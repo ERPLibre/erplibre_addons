@@ -16,5 +16,14 @@ confirmation closed otherwise leaves the marks, and the report still
 offers to finish the install.
 
 A report is a snapshot: it never runs again, a new analysis makes a new
-report. Each line still shows the current state of its module, so that a
-module installed since no longer offers to install it.
+report, named « DOCTOR/<year>/<month>/<day>/<n> » with `n` counting
+from 1 each day. Each line still shows the current state of its module,
+so that a module installed since no longer offers to install it.
+
+The scheduled action *ERPLibre: doctor* runs an analysis every day. When
+it finds a problem, or cannot complete, it posts a message on its report
+to the internal users chosen in the settings: each receives it in the
+Odoo inbox or by e-mail, as their notification preference says. The
+message lists the modules in problem; the recipients who are not
+administrators can read the reports, the analyses and the installs stay
+with *Administration / Settings*.

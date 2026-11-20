@@ -53,6 +53,20 @@
                             />
                         </div>
                     </setting>
+                    <setting
+                        id="erplibre_doctor_daily"
+                        help="Runs an analysis every day; the users listed receive a message when it finds a problem or is incomplete."
+                    >
+                        <field name="erplibre_doctor_daily" />
+                        <div class="mt8">
+                            <span class="o_form_label me-2">Notify</span>
+                            <field
+                                name="erplibre_doctor_notify_user_ids"
+                                widget="many2many_tags"
+                                options="{'no_create': True}"
+                            />
+                        </div>
+                    </setting>
                 </block>
             </xpath>
         </field>
