@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <record id="seq_erplibre_doctor_report" model="ir.sequence">
+        <field name="name">ERPLibre doctor report</field>
+        <field name="code">erplibre.doctor.report</field>
+        <!-- the range_ keys give the date of the range, one range a day:
+             the date of the counter, not the time of the call -->
+        <field name="prefix">DOCTOR/%(range_year)s/%(range_month)s/%(range_day)s/</field>
+        <field name="use_date_range" eval="True" />
+        <field name="padding">4</field>
+        <field name="company_id" eval="False" />
+    </record>
+</odoo>

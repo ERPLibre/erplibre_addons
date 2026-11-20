@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- The Doctor block is a setting for every member of the Settings
+         group, developer mode or not: the ERPLibre page takes that group,
+         as erplibre_info_git also gives it; only the server actions setting
+         keeps base.group_no_one. -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.erplibre.doctor</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="erplibre_info.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='erplibre_info']" position="attributes">
+                <attribute name="groups">base.group_system</attribute>
+            </xpath>
+            <xpath expr="//block[@name='erplibre_code_environment']" position="before">
+                <block title="Doctor" name="erplibre_doctor">
+                    <setting
+                        id="erplibre_doctor_analysis"
+                        string="Analysis"
+                        help="Compares this database with what the ERPLibre checkout suggests: the modules of its base image that are not installed, with an offer to install them."
+                    >
+                        <div class="mt8">
+                            <field name="erplibre_doctor_summary" class="fw-bold" />
+                        </div>
+                        <div class="mt8" invisible="not erplibre_doctor_report_id">
+                            <span class="o_form_label me-2">Last report</span>
+                            <field name="erplibre_doctor_report_id" class="oe_inline" readonly="1" />
+                        </div>
+                        <div class="mt8">
+                            <button
+                                name="action_erplibre_doctor_start"
+                                type="object"
+                                string="Start an analysis"
+                                class="btn-primary"
+                                icon="fa-stethoscope"
+                            />
+                            <button
+                                name="action_erplibre_doctor_open_report"
+                                type="object"
+                                string="Last report"
+                                class="btn-link"
+                                icon="fa-arrow-right"
+                                invisible="not erplibre_doctor_report_id"
+                            />
+                            <button
+                                name="action_erplibre_doctor_open_reports"
+                                type="object"
+                                string="All reports"
+                                class="btn-link"
+                                icon="fa-list"
+                            />
+                        </div>
+                    </setting>
+                    <setting
+                        id="erplibre_doctor_daily"
+                        help="Runs an analysis every day; the users listed receive a message when it finds a problem or is incomplete."
+                    >
+                        <field name="erplibre_doctor_daily" />
+                        <div class="mt8">
+                            <span class="o_form_label me-2">Notify</span>
+                            <field
+                                name="erplibre_doctor_notify_user_ids"
+                                widget="many2many_tags"
+                                options="{'no_create': True}"
+                            />
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

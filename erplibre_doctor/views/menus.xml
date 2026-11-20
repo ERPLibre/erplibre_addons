@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <menuitem
+        id="erplibre_doctor_dev_menu"
+        name="🩺 Doctor"
+        parent="erplibre_info_developer_menu.erplibre_dev_menu_erplibre"
+        action="erplibre_doctor_report_action"
+        groups="base.group_system"
+        sequence="40"
+    />
+</odoo>
