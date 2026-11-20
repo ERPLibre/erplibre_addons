@@ -1,0 +1,281 @@
+<section class="oe_container">
+<h1>ERPLibre — software requirements (MoSCoW)</h1>
+<p>Tracks what a project <strong>commits to deliver</strong>: one requirement per line,
+classified by domain and by phase, with its MoSCoW level and the state of its
+delivery. Each requirement takes its place in the DevSecOps loop, carries its
+threats and the list of the tests that prove it, with their last result.</p>
+<p>The module ships <strong>no requirement</strong>. It ships the model, the screens and the
+vocabulary; the requirements come from a project module, as data.</p>
+<h2>The model</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>devops.requirement</code></td>
+<td>A requirement: code, title, domain, phase, MoSCoW level, priority, effort, owner, DevSecOps stage, acceptance criteria, dependencies.</td>
+</tr>
+<tr>
+<td><code>devops.requirement.threat</code></td>
+<td>A threat on a requirement, classified by STRIDE, with its mitigation and its residual risk.</td>
+</tr>
+<tr>
+<td><code>devops.requirement.test</code></td>
+<td>A test that proves a requirement, and its last known result.</td>
+</tr>
+<tr>
+<td><code>devops.requirement.category</code></td>
+<td>A functional domain. <strong>Data</strong>, not code.</td>
+</tr>
+<tr>
+<td><code>devops.requirement.phase</code></td>
+<td>A phase or a milestone. <strong>Data</strong>, not code.</td>
+</tr>
+<tr>
+<td><code>devops.requirement.classifier</code></td>
+<td>Abstract mixin: <code>code</code>, <code>name</code>, <code>sequence</code>, and the uniqueness of the code.</td>
+</tr>
+</tbody>
+</table>
+<h3>Why the domain is a model and the MoSCoW level a Selection</h3>
+<p>The rule fits in one sentence: <strong>a Selection when the vocabulary is
+universal, a model when it belongs to the project.</strong></p>
+<p>MoSCoW has four values, the same everywhere, defined outside any project: it
+is a Selection, and a project that wanted a fifth would no longer be dealing
+with MoSCoW. Functional domains, on the other hand, only resemble each other
+from one project to the next by accident — freezing them in code would force
+every project to patch the shared module to name its own.</p>
+<h3>The code carries counts</h3>
+<p><code>code</code> is not a label: data files reference it, and the domains of the counted
+figures of a presentation page compare against it. <strong>Renaming it silently
+breaks every count that relies on it</strong> — the figure drops to zero without an
+error, and the list its button opens arrives empty.</p>
+<p>This is also the reason for the rights below.</p>
+<p>The requirement's <code>code</code> is unique for the same reason: a test runner finds
+the requirement by its code. It stays optional — several requirements without
+a code coexist.</p>
+<h2>DevSecOps planning</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>devsecops_stage</code></td>
+<td>Stage of the loop: plan, code, build, test, release, deploy, operate, monitor. Clickable status bar, kanban columns. The <code>code</code> value is labelled "Develop", so as not to share its translation with the <code>code</code> field.</td>
+</tr>
+<tr>
+<td><code>requirement_type</code></td>
+<td>Functional, non-functional, security, compliance, operational.</td>
+</tr>
+<tr>
+<td><code>acceptance_criteria</code></td>
+<td>Acceptance criteria, one Given / When / Then scenario per criterion.</td>
+</tr>
+<tr>
+<td><code>security_relevant</code>, <code>data_classification</code></td>
+<td>Whether the requirement touches security, and the most sensitive class of data it handles.</td>
+</tr>
+<tr>
+<td><code>depends_on_ids</code> / <code>dependent_ids</code></td>
+<td>What must be delivered before, what waits for this one. A cycle is refused, even through several hops.</td>
+</tr>
+</tbody>
+</table>
+<p>The DevSecOps stage <strong>does not replace</strong> the three booleans: the stage tells
+where the work stands, <code>accepted</code> / <code>approved</code> / <code>done</code> what the client has
+observed.</p>
+<h2>Tests and their result</h2>
+<p>A test line is declared in data, by the project. Its <code>kind</code> tells what its
+<code>reference</code> designates:</p>
+<table>
+<thead>
+<tr>
+<th><code>kind</code></th>
+<th><code>reference</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tour</code></td>
+<td>the name of the guided tour</td>
+</tr>
+<tr>
+<td><code>python</code></td>
+<td>the dotted path of the test method</td>
+</tr>
+<tr>
+<td><code>selenium</code></td>
+<td>the path of the script, relative to the repository</td>
+</tr>
+<tr>
+<td><code>manual</code></td>
+<td>free text</td>
+</tr>
+<tr>
+<td><code>repo_unittest</code></td>
+<td>a unit test of a repository: <code>&lt;repository&gt;:&lt;path&gt;::&lt;Class&gt;::&lt;method&gt;</code></td>
+</tr>
+<tr>
+<td><code>node_test</code></td>
+<td>a <code>node --test</code> test of a repository: <code>&lt;repository&gt;:&lt;path&gt;::&lt;test name&gt;</code></td>
+</tr>
+<tr>
+<td><code>long_test</code></td>
+<td>a long test of a repository, same form</td>
+</tr>
+</tbody>
+</table>
+<p><code>test_state</code>, stored on the requirement, sums up its lines by the worst
+result: no test → <code>none</code>; a failure or an error → <code>failed</code>; otherwise a test
+never run → <code>not_run</code>; otherwise a passed test → <code>passed</code>. Tests all skipped
+have proven nothing: <code>not_run</code>. <code>tour_name</code> returns the reference of the first
+<code>tour</code> line in sequence order, <code>""</code> if there is none.</p>
+<p>An external runner writes the result through XML-RPC or JSON-RPC:</p>
+<pre><code class="language-python">models.execute_kw(
+    db, uid, password,
+    &quot;devops.requirement.test&quot;, &quot;record_result&quot;,
+    [&quot;INV-01&quot;, &quot;selenium&quot;, &quot;script/selenium/inventory_stock.py&quot;, &quot;passed&quot;],
+    {&quot;log&quot;: output, &quot;duration&quot;: 12.4},
+)
+</code></pre>
+<p><code>record_result</code> <strong>creates nothing</strong>: an unknown requirement or line returns
+<code>False</code> and leaves a warning in the log. A result outside <code>not_run</code>, <code>passed</code>,
+<code>failed</code>, <code>error</code>, <code>skipped</code> is refused. The log is truncated to 20,000
+characters, the end kept — it is the end that carries the failing assertion.
+Only the <code>last_*</code> fields are written.</p>
+<h3>Verdict by reference</h3>
+<p>A repository test runner — ERPLibre's unit tests, the <code>node --test</code> suite of
+an extension, the long tests — knows its test and none of the requirements it
+proves: the link lives in the database only. It writes through
+<code>record_result_by_reference</code>, with the <code>kind</code> and the <code>reference</code> alone:</p>
+<pre><code class="language-python">models.execute_kw(
+    db, uid, password,
+    &quot;devops.requirement.test&quot;, &quot;record_result_by_reference&quot;,
+    [&quot;repo_unittest&quot;, &quot;erplibre:test/test_inventory.py::TestStock::test_count&quot;,
+     &quot;passed&quot;],
+    {&quot;log&quot;: output, &quot;duration&quot;: 0.8},
+)
+</code></pre>
+<p>The verdict goes to <strong>every</strong> line that carries this <code>kind</code> and this
+<code>reference</code>, whatever their requirement: one test that proves several
+requirements updates them all in one call. The method returns the number of
+lines updated; <code>0</code>, with a warning in the log, when the <code>kind</code> or the
+<code>reference</code> is empty or when no line declares them. It creates nothing, and
+shares with <code>record_result</code> its rights, the validation of the result and the
+truncation of the log.</p>
+<p>A repository reference reads <code>&lt;repository&gt;:&lt;path&gt;::&lt;test id&gt;</code>: the
+repository by its name, the path of the test file relative to it, then
+<code>Class::method</code> for a unit test or the test name for a Node test.</p>
+<h2>Rights</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Internal user</th>
+<th>Test runner</th>
+<th>Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>devops.requirement</code></td>
+<td>read, write</td>
+<td>read</td>
+<td>all</td>
+</tr>
+<tr>
+<td><code>devops.requirement.category</code></td>
+<td>read</td>
+<td>read</td>
+<td>all</td>
+</tr>
+<tr>
+<td><code>devops.requirement.phase</code></td>
+<td>read</td>
+<td>read</td>
+<td>all</td>
+</tr>
+<tr>
+<td><code>devops.requirement.threat</code></td>
+<td>read</td>
+<td>—</td>
+<td>all</td>
+</tr>
+<tr>
+<td><code>devops.requirement.test</code></td>
+<td>read</td>
+<td>read, result through <code>record_result</code> and <code>record_result_by_reference</code></td>
+<td>all</td>
+</tr>
+</tbody>
+</table>
+<p>The vocabulary is read-only for the user: its <code>code</code> carries counts, and a
+typo there costs more than a badly filled field on a requirement.</p>
+<p>The <strong>Requirement test runner</strong> group is meant for the technical account of a
+runner, whose credentials live on an integration machine. It does <strong>not</strong>
+inherit the internal user: on its own, it reads what the runner matches and
+writes nothing directly. <code>record_result</code> refuses any caller that is neither in
+this group nor an administrator, then writes, as sudo, the result fields only:
+the runner can neither declare a line, nor change its reference, nor touch the
+requirement. The table holds for a dedicated account only: an internal user
+who also receives the group keeps their write access to the requirements.</p>
+<p><code>test_state</code> and <code>test_count</code> follow the results of the tests: <code>create</code> and
+<code>write</code> refuse them to any caller (AccessError), administrator included. Only
+the superuser overrides it.</p>
+<p>Threats and tests are declared through the configuration or in data: the
+internal user sees them in the requirement form without being able to modify
+them.</p>
+<h2>Laying down your data</h2>
+<p>A project module declares the dependency, then its records:</p>
+<pre><code class="language-xml">&lt;record id=&quot;categorie_inventaire&quot; model=&quot;devops.requirement.category&quot;&gt;
+    &lt;field name=&quot;code&quot;&gt;inventaire&lt;/field&gt;
+    &lt;field name=&quot;name&quot;&gt;Inventaire et réception&lt;/field&gt;
+    &lt;field name=&quot;sequence&quot;&gt;50&lt;/field&gt;
+&lt;/record&gt;
+
+&lt;record id=&quot;req_inv_01&quot; model=&quot;devops.requirement&quot;&gt;
+    &lt;field name=&quot;code&quot;&gt;INV-01&lt;/field&gt;
+    &lt;field name=&quot;name&quot;&gt;Stock physique par entrepôt&lt;/field&gt;
+    &lt;field name=&quot;category_id&quot; ref=&quot;categorie_inventaire&quot;/&gt;
+    &lt;field name=&quot;phase_id&quot; ref=&quot;phase1&quot;/&gt;
+    &lt;field name=&quot;moscow&quot;&gt;must&lt;/field&gt;
+    &lt;field name=&quot;priority&quot;&gt;high&lt;/field&gt;
+    &lt;field name=&quot;size&quot;&gt;m&lt;/field&gt;
+    &lt;field name=&quot;devsecops_stage&quot;&gt;code&lt;/field&gt;
+    &lt;field name=&quot;requirement_type&quot;&gt;functional&lt;/field&gt;
+&lt;/record&gt;
+
+&lt;record id=&quot;req_inv_01_test_stock&quot; model=&quot;devops.requirement.test&quot;&gt;
+    &lt;field name=&quot;requirement_id&quot; ref=&quot;req_inv_01&quot;/&gt;
+    &lt;field name=&quot;name&quot;&gt;Stock per warehouse&lt;/field&gt;
+    &lt;field name=&quot;kind&quot;&gt;selenium&lt;/field&gt;
+    &lt;field name=&quot;reference&quot;&gt;script/selenium/inventory_stock.py&lt;/field&gt;
+&lt;/record&gt;
+
+&lt;record id=&quot;req_inv_01_threat_tampering&quot; model=&quot;devops.requirement.threat&quot;&gt;
+    &lt;field name=&quot;requirement_id&quot; ref=&quot;req_inv_01&quot;/&gt;
+    &lt;field name=&quot;stride&quot;&gt;tampering&lt;/field&gt;
+    &lt;field name=&quot;description&quot;&gt;A user edits a stock count without trace.&lt;/field&gt;
+    &lt;field name=&quot;mitigation&quot;&gt;Stock moves are the only way to change a quantity.&lt;/field&gt;
+    &lt;field name=&quot;residual_risk&quot;&gt;low&lt;/field&gt;
+&lt;/record&gt;
+</code></pre>
+<h2>The screens</h2>
+<p>List grouped by domain, kanban by DevSecOps stage, form, search with
+groupings, graph by domain and pivot view. The form carries the stage status
+bar and the Description, Acceptance, Security, Tests and Dependencies tabs.
+The search filters the security requirements, those with a failing test and
+those without any test. The root menu is <code>Requirements</code>; its configuration
+holds the domains and the phases.</p>
+<h2>See also</h2>
+<p><code>erplibre_devops_guide</code> renders a presentation page described in data, and
+can count requirements in its figures.</p>
+</section>
