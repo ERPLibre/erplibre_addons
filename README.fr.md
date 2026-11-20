@@ -50,6 +50,7 @@ besoin sont listés dans `requirements.txt`.
 | `erplibre_info_git` | Instantanés en lecture seule du code ERPLibre : HEAD de chaque dépôt du manifeste et son écart au manifeste, chaque module installé avec sa version installée et sur disque, ce qui révèle les mises à jour en attente. |
 | `erplibre_info_git_fetch` | Pour les développeurs : actions serveur qui écrivent dans les clones git du checkout — fetch et rebase des forks, pull du code déployé, retour à un instantané — chacune avec un essai à blanc puis une application doublement confirmée, sans jamais pousser. S'installe seulement sur un serveur lancé avec `--dev`. |
 | `erplibre_info_developer_menu` | Module de liaison : ajoute les instantanés de code, les exécutions et les paramètres ERPLibre au menu Dev de `developer_menu`. Installé automatiquement avec les deux modules. |
+| `erplibre_doctor` | Analyse la base par rapport à ce que suggère le checkout ERPLibre et garde chaque analyse dans un rapport : liste les modules de l'image de base de `conf/module_list_image_db_odoo.json` qui ne sont pas installés et propose de les installer par la confirmation d'Odoo. Tourne chaque jour et notifie les utilisateurs choisis d'un problème ; lancé depuis Paramètres › ERPLibre, rapports dans le menu Dev. |
 
 ### Téléphonie et SMS
 

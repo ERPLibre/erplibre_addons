@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <!-- Active at install; Settings › ERPLibre › Doctor turns it off. -->
+    <record id="ir_cron_erplibre_doctor" model="ir.cron">
+        <field name="name">ERPLibre: doctor</field>
+        <field name="model_id" ref="model_erplibre_doctor_report" />
+        <field name="state">code</field>
+        <field name="code">model._cron_run_analysis()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True" />
+    </record>
+</odoo>
