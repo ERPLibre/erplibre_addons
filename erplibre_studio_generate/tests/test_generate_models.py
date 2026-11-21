@@ -505,6 +505,36 @@ class TestGenerateModels(StudioCase):
         self.assertTrue(fields["x_notes"].get("translate"))
         self.assertNotIn("index", fields["x_notes"])
 
+    def test_model_options(self):
+        """The options of a model reach its class: its default order, and
+        the fields ``x_active`` and ``x_sequence`` with their default; the
+        default list holds the handle of the manual order."""
+        self.project._studio_update_model(
+            self.item,
+            {"order": "x_name desc", "archivable": True, "manual_order": True},
+        )
+        self.project.action_apply()
+        self.generate()
+        attributes, fields = self.class_of(self.read("models", f"{ITEM}.py"))
+        self.assertEqual(attributes["_order"], "x_name desc")
+        self.assertLessEqual({"default": True}.items(), fields["x_active"].items())
+        self.assertLessEqual({"default": 10}.items(), fields["x_sequence"].items())
+        self.assertEqual(sorted(fields), ["x_active", "x_name", "x_sequence", "x_tag"])
+        # The model without option keeps the order of Odoo, « id ».
+        attributes, _fields = self.class_of(self.read("models", f"{TAG}.py"))
+        self.assertNotIn("_order", attributes)
+        root = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        listing = root.xpath(
+            f"//record[@id='view_{ITEM}_list']/field[@name='arch']/list"
+        )[0]
+        self.assertEqual(listing[0].attrib, {"name": "x_sequence", "widget": "handle"})
+        search = root.xpath(
+            f"//record[@id='view_{ITEM}_search']/field[@name='arch']/search"
+        )[0]
+        self.assertTrue(search.xpath("filter[@name='inactive']"))
+
     # ── checks ─────────────────────────────────────────────────────────
 
     def test_rights_alone_generate(self):

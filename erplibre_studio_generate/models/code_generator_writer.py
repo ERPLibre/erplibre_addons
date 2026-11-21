@@ -8,6 +8,7 @@ actions and every view of the model. Under the context key
 ``erplibre_studio_project_id`` it exports what the project made only:
 
 - a model the project creates gets its Python class (``x_name``, the
+  fields of its options with their default, its default order, the
   fields of the project, the mail mixins of its chatter) and its
   constraints, reports and data like any model of a module;
 - a model the project extends, which belongs to another module, gets the
@@ -54,6 +55,10 @@ RULE_PERMS = ("perm_read", "perm_create", "perm_write", "perm_unlink")
 
 # Class attributes the writer copies from the extended model.
 _COPIED_ATTRIBUTE = re.compile(r"^\s+_(order|rec_name) = .*$\n?", re.M)
+# The order the writer gives a class, from ir.model.
+_ORDER_ATTRIBUTE = re.compile(r"^[ \t]+_order = .*$\n?", re.M)
+# The description of a class, which the order of a new model follows.
+_DESCRIPTION_ATTRIBUTE = re.compile(r"^([ \t]+)_description = .*\n", re.M)
 # The import line of the writer; a studio model only declares fields.
 _WRITER_IMPORT = re.compile(r"^from odoo import .*$", re.M)
 
@@ -62,10 +67,11 @@ class PayloadField:
     """An ``ir.model.fields`` record read with the definition of the
     project: label, tooltip, read-only flag, selection, comodel, currency
     field, the options its type takes (translatable, indexed, maximum size
-    of FIELD_OPTIONS), and the relation of a relational field (the inverse
+    of FIELD_OPTIONS), the relation of a relational field (the inverse
     of a one2many, the table and columns of a many2many, what a many2one
-    does when its record is deleted). Every other attribute is the
-    record's."""
+    does when its record is deleted), and the default of a field of an
+    option of a model (a text, as ir.model.fields holds it). Every other
+    attribute is the record's."""
 
     def __init__(self, record, definition):
         self._record = record
@@ -85,6 +91,8 @@ class PayloadField:
         if definition.get("currency_field"):
             self._values["currency_field"] = definition["currency_field"]
         ttype = definition.get("ttype")
+        if definition.get("default"):
+            self._values["default"] = definition["default"]
         if ttype in FIELD_OPTIONS["translate"]:
             self._values["translate"] = bool(definition.get("translate"))
         if ttype in FIELD_OPTIONS["index"]:
@@ -230,28 +238,44 @@ class CodeGeneratorWriter(models.Model):
         names = set(project._studio_field_definitions(model.model))
         if not self._studio_extends(model):
             names.add("x_name")
+            names |= set(self._studio_option_fields(project, model.model))
         return (
             model.field_id.filtered(lambda f: f.name in names)
             .sorted(key=lambda r: r.code_generator_sequence)
             .with_context(lang=None)
         )
 
+    @staticmethod
+    def _studio_option_fields(project, model):
+        """{name: definition} of the fields of the options of the model line
+        of ``project`` that creates ``model``; empty for another model."""
+        line = project.new_model_ids.filtered(lambda m: m.model == model)
+        return line._studio_option_fields() if line else {}
+
     def _generate_field_from_model(
         self, f2export, model_name, lst_field_inherit, dct_field_attr_diff
     ):
         project = self._studio_project()
         if project:
-            definitions = project._studio_field_definitions(f2export.model)
+            definitions = {
+                name: definition
+                for name, (definition, _change) in project._studio_field_definitions(
+                    f2export.model
+                ).items()
+            }
+            definitions.update(self._studio_option_fields(project, f2export.model))
             if f2export.name in definitions:
-                f2export = PayloadField(f2export, definitions[f2export.name][0])
+                f2export = PayloadField(f2export, definitions[f2export.name])
         return super()._generate_field_from_model(
             f2export, model_name, lst_field_inherit, dct_field_attr_diff
         )
 
     def _set_model_py_file(self, module, model, model_model):
         """Under a studio project, an extended model loses the attributes
-        the writer copies from the model (``_order``, ``_rec_name``); the
-        import line keeps what the class uses."""
+        the writer copies from the model (``_order``, ``_rec_name``); a new
+        model takes the default order of its line, read from the line: the
+        ir.model of a model the installed module owns keeps its former order
+        until the upgrade. The import line keeps what the class uses."""
         path = super()._set_model_py_file(module, model, model_model)
         if self._studio_project() and path:
             cg_data = code_generator_data.get_code_generator_data(self.env)
@@ -260,6 +284,8 @@ class CodeGeneratorWriter(models.Model):
                 content = fh.read()
             if self._studio_extends(model):
                 content = _COPIED_ATTRIBUTE.sub("", content)
+            else:
+                content = self._studio_order_attribute(model, content)
             if "api." not in content and "_(" not in content:
                 content = _WRITER_IMPORT.sub(
                     "from odoo import fields, models", content, count=1
@@ -267,6 +293,24 @@ class CodeGeneratorWriter(models.Model):
             with open(full, "w", encoding="utf-8") as fh:
                 fh.write(content)
         return path
+
+    def _studio_order_attribute(self, model, content):
+        """``content``, the source of the class of the new model ``model``,
+        with the ``_order`` of its model line, after ``_description``; none
+        when the line has no order (Odoo then sorts by « id »). An order
+        holds field names, spaces, commas and directions only
+        (``_studio_clean_order``): it goes between double quotes as it
+        is."""
+        project = self._studio_project()
+        line = project.new_model_ids.filtered(lambda m: m.model == model.model)
+        content = _ORDER_ATTRIBUTE.sub("", content)
+        if not line.order:
+            return content
+        return _DESCRIPTION_ATTRIBUTE.sub(
+            lambda m: f'{m.group(0)}{m.group(1)}_order = "{line.order}"\n',
+            content,
+            count=1,
+        )
 
     def set_xml_views_file(self, module):
         """The views file of the project, and the icon of each of its apps,
