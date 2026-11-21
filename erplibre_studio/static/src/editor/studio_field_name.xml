@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The technical name of a new field not created yet: the input, the
+         rule of the database, the status of the value, the checks. -->
+    <t t-name="erplibre_studio.FieldName">
+        <div class="o_erplibre_studio_field_name mb-1">
+            <label class="form-label d-flex align-items-center gap-2 mb-1 w-100" t-att-for="inputId">
+                Technical name
+                <span
+                    class="badge text-bg-light border ms-auto o_erplibre_studio_name_tag"
+                    t-att-data-auto="props.field.name_auto === false ? 'false' : 'true'"
+                    t-esc="tag"
+                />
+            </label>
+            <input
+                t-att-id="inputId"
+                class="form-control form-control-sm font-monospace o_erplibre_studio_prop_name"
+                t-att-class="{'is-invalid': invalid}"
+                autocomplete="off"
+                spellcheck="false"
+                t-att-value="state.value"
+                t-att-aria-invalid="invalid ? 'true' : 'false'"
+                t-att-aria-describedby="inputId + '_status'"
+                t-att-disabled="props.busy"
+                t-on-input="onInput"
+                t-on-change="onChange"
+            />
+            <div
+                t-if="rule"
+                class="d-flex align-items-center gap-1 small text-muted mt-1 o_erplibre_studio_name_rule"
+                t-att-data-mode="rule.mode"
+                t-att-title="rule.detail or ''"
+            >
+                <i
+                    class="fa fa-fw"
+                    t-att-class="rule.mode === 'development' ? 'fa-code' : 'fa-lock'"
+                    aria-hidden="true"
+                />
+                <span t-esc="rule.text" />
+            </div>
+            <div
+                t-att-id="inputId + '_status'"
+                class="d-flex align-items-start gap-2 rounded small px-2 py-1 mt-1 o_erplibre_studio_name_status"
+                t-att-class="statusClass"
+                role="status"
+                aria-live="polite"
+            >
+                <t t-if="state.checking or !current">
+                    <i class="fa fa-spinner fa-spin mt-1" aria-hidden="true" />
+                    <span>Checking…</span>
+                </t>
+                <t t-else="">
+                    <i
+                        class="fa mt-1"
+                        t-att-class="invalid ? 'fa-exclamation-circle' : 'fa-check-circle'"
+                        aria-hidden="true"
+                    />
+                    <span class="d-flex flex-column">
+                        <span class="fw-bold o_erplibre_studio_name_message" t-esc="current.message" />
+                        <span t-if="current.detail" class="o_erplibre_studio_name_detail" t-esc="current.detail" />
+                    </span>
+                </t>
+            </div>
+            <button
+                t-if="suggestion"
+                type="button"
+                class="btn btn-sm btn-outline-primary mt-1 o_erplibre_studio_name_use"
+                t-att-disabled="props.busy"
+                t-on-click="useProposed"
+                t-esc="useLabel(suggestion)"
+            />
+            <ul
+                t-if="current and current.checks and current.checks.length"
+                class="list-unstyled small mb-0 mt-1 o_erplibre_studio_name_checks"
+                aria-label="Checks"
+            >
+                <li
+                    t-foreach="current.checks"
+                    t-as="item"
+                    t-key="item.key"
+                    class="d-flex align-items-center gap-1"
+                    t-att-class="item.ok ? 'o_erplibre_studio_name_check_ok' : 'o_erplibre_studio_name_check_bad text-danger-emphasis'"
+                    t-att-data-check="item.key"
+                >
+                    <span
+                        class="o_erplibre_studio_name_check_glyph fw-bold text-center"
+                        aria-hidden="true"
+                        t-esc="item.ok ? '✓' : '!'"
+                    />
+                    <span class="o_erplibre_studio_name_check_text" t-esc="item.text" />
+                </li>
+            </ul>
+            <button
+                t-if="props.field.name_auto === false and current and current.proposed"
+                type="button"
+                class="btn btn-sm btn-link p-0 mt-1 fw-bold o_erplibre_studio_name_back"
+                t-att-disabled="props.busy"
+                t-on-click="backToProposed"
+                t-esc="backLabel(current.proposed)"
+            />
+            <span class="d-block fw-normal text-muted small mt-1 o_erplibre_studio_name_help">
+                Proposed from the label while it is not edited. Frozen at Apply: it becomes a column of the table.
+            </span>
+        </div>
+    </t>
+</templates>

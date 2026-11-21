@@ -468,7 +468,16 @@
                         t-att-disabled="props.busy"
                     />
                 </label>
-                <label class="form-label mb-1 w-100">
+                <StudioFieldName
+                    t-if="nameEditable(field)"
+                    editor="editor"
+                    model="data.model"
+                    name="block.name"
+                    field="field"
+                    rule="data.field_name_rule or null"
+                    busy="!!props.busy"
+                />
+                <label t-else="" class="form-label mb-1 w-100">
                     Technical name
                     <span class="input-group input-group-sm mt-1">
                         <input

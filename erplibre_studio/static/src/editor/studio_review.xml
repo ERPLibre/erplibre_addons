@@ -73,6 +73,17 @@
                                 <t t-esc="appliedText" />
                             </button>
                         </div>
+                        <div
+                            t-if="nameBlockers.length"
+                            class="alert alert-danger d-flex align-items-start gap-2 mx-3 mt-2 mb-0 o_erplibre_studio_review_names"
+                            role="alert"
+                        >
+                            <i class="fa fa-exclamation-circle mt-1" aria-hidden="true" />
+                            <span>
+                                <span class="fw-bold d-block" t-esc="nameBlockersText" />
+                                Fix each name marked below in the inspector of its field, then Apply.
+                            </span>
+                        </div>
                         <p t-if="!groups.length" class="text-muted p-3 mb-0 o_erplibre_studio_review_empty">
                             No change to show.
                         </p>
@@ -126,6 +137,16 @@
                                             <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
                                             <t t-esc="item.error" />
                                         </span>
+                                        <t t-foreach="nameProblems(item)" t-as="problem" t-key="problem_index">
+                                            <span class="d-block small text-danger-emphasis o_erplibre_studio_review_name_problem">
+                                                <span class="badge text-bg-danger me-1 o_erplibre_studio_review_name_badge">
+                                                    Technical name to fix
+                                                </span>
+                                                <code class="text-danger-emphasis" t-esc="problem.name" />
+                                                ·
+                                                <t t-esc="problem.message" />
+                                            </span>
+                                        </t>
                                     </span>
                                     <button
                                         type="button"

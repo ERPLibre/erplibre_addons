@@ -203,6 +203,9 @@ export class StudioEditor extends Component {
             modelPreview: null,
             // Why the server refused the last call of the panel « apps ».
             panelError: null,
+            // The keys of the technical name inputs whose unsaved value
+            // does not apply (StudioFieldName): each one blocks Apply.
+            localNameBlockers: new Set(),
         });
         this.previewCount = 0;
         // The menus of the top bar, closed by their items once chosen.
@@ -1325,8 +1328,104 @@ export class StudioEditor extends Component {
         if (!block || this.state.busy) {
             return;
         }
+        const before = new Set(Object.keys(this.data.fields || {}));
         const data = await this.operate({type: "update_field", field_name: block.name, field: values});
-        this.reselect(data, block);
+        // A new label renames a field whose name follows it.
+        const name = data && this.renamedField(before, data, block.name);
+        this.reselect(data, name ? {...block, name} : block);
+    }
+
+    /**
+     * The name the field ``old`` has in ``data``, ``before`` being the
+     * names of the fields before the operation: ``old`` when it is still
+     * there, else the one new field of the project that took its place, or
+     * null.
+     */
+    renamedField(before, data, old) {
+        const fields = data.fields || {};
+        if (old in fields) {
+            return old;
+        }
+        const added = Object.keys(fields).filter((name) => !before.has(name) && fields[name].project);
+        return added.length === 1 ? added[0] : null;
+    }
+
+    // ── technical names of the new fields ───────────────────────────────
+
+    /**
+     * What the technical name ``name`` of a new field of ``model`` gives
+     * (``check_field_name``): {name, proposed, status, message, detail,
+     * checks, rule}. ``current``: the name of the field renamed, ``label``
+     * its label. A read: the editor stays usable meanwhile; an error
+     * answers the status « invalid » with its message.
+     */
+    async checkFieldName(model, name, current, label) {
+        const refused = (message) => ({name, proposed: false, status: "invalid", message, detail: "", checks: []});
+        if (!this.project) {
+            return refused(_t("Choose or create a studio project first."));
+        }
+        try {
+            return await this.orm.call(MODEL, "check_field_name", [this.project.id, model, name], {
+                field_name: current || false,
+                label: label || false,
+            });
+        } catch (error) {
+            return refused(this.errorMessage(error));
+        }
+    }
+
+    /**
+     * Rename the new field ``old`` of the model on screen to ``name``, or,
+     * with ``auto``, to the name its label proposes, which it then follows;
+     * select its block under the new name. Answer that name, or null when
+     * the server refused.
+     */
+    async renameField(old, name, {auto = false} = {}) {
+        if (this.state.busy) {
+            return null;
+        }
+        const before = new Set(Object.keys(this.data.fields || {}));
+        const data = await this.operate({
+            type: "rename_field",
+            field_name: old,
+            new_name: name || null,
+            auto: Boolean(auto),
+        });
+        if (!data) {
+            return null;
+        }
+        const renamed = (name && name in (data.fields || {}) ? name : null) || this.renamedField(before, data, old);
+        const block = renamed && this.fieldBlock(data.blocks, renamed);
+        this.state.selected = block ? block.path : null;
+        return renamed;
+    }
+
+    /** Count, or stop counting, the input ``key`` among the names that block Apply. */
+    setLocalNameBlocker(key, blocked) {
+        const blockers = this.state.localNameBlockers;
+        if (blocked && !blockers.has(key)) {
+            blockers.add(key);
+        } else if (!blocked && blockers.has(key)) {
+            blockers.delete(key);
+        }
+    }
+
+    /**
+     * How many technical names block Apply: those of the draft the server
+     * counts, and the unsaved values of the inputs that do not apply.
+     */
+    get nameBlockerCount() {
+        const counts = (this.project && this.project.counts) || {};
+        return (counts.name_blockers || 0) + this.state.localNameBlockers.size;
+    }
+
+    get nameBlockerText() {
+        return _t("%(count)s technical name(s) block Apply", {count: this.nameBlockerCount});
+    }
+
+    /** The title of Apply in the top bar: what blocks it, else what it does. */
+    get applyBarTitle() {
+        return this.nameBlockerCount ? this.nameBlockerText : _t("Review the draft, then write it to the database");
     }
 
     async removeSelected() {

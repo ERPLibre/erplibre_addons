@@ -4,6 +4,7 @@
 
 import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
+import {StudioFieldName} from "./studio_field_name";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
 import {
     DEFAULT_TIMELINE_MODE,
@@ -39,8 +40,9 @@ const RELATION_TYPES = ["many2one", "one2many", "many2many"];
 /**
  * The inspector of the view space, in two tabs. « Properties »: the
  * selected block, else the view itself. A field shows its definition
- * (label, technical name read-only, and for a field of the project its
- * tooltip, read-only, values and comodel) apart from what this view sets
+ * (label, technical name, editable for a new field not created yet
+ * (StudioFieldName), and for a field of the project its tooltip,
+ * read-only, values and comodel) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
  * writes); a container shows what it holds. « Changes »: the changes of
  * the draft in this view, each one revealing its block on the canvas. It
@@ -49,6 +51,7 @@ const RELATION_TYPES = ["many2one", "one2many", "many2many"];
  */
 export class StudioInspector extends Component {
     static template = "erplibre_studio.Inspector";
+    static components = {StudioFieldName};
     static props = {
         editor: Object,
         // The payload of the editor (get_editor_data).
@@ -314,15 +317,23 @@ export class StudioInspector extends Component {
         return _t("Changed by the draft: %(kinds)s.", {kinds: kinds.map((k) => changeKindLabel(k)).join(", ")});
     }
 
+    /**
+     * Whether the technical name of ``field`` is edited here: a new field
+     * of the project not created yet, in a view that renames fields.
+     */
+    nameEditable(field) {
+        return Boolean(field.project && field.pending && this.allows("rename_field"));
+    }
+
     /** Why the technical name of ``field`` cannot change here. */
     nameHelp(field) {
         if (!field.project) {
             return _t("Field of an installed module: its name does not change here.");
         }
         if (field.pending) {
-            return _t("Proposed from the label when the field was added; it is created under this name at Apply.");
+            return _t("Its technical name changes in a form, list or kanban view, until Apply.");
         }
-        return _t("Field created by the project: its name is in the database.");
+        return _t("Frozen at Apply: its name is a column of the table in the database.");
     }
 
     // ── the changes of the view ─────────────────────────────────────────

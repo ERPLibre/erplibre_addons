@@ -91,6 +91,13 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
+msgid "%(count)s technical name(s) block Apply"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "%(groups)s group(s) · %(models)s model(s)"
 msgstr ""
@@ -1136,6 +1143,24 @@ msgid "Available"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.js:0
+msgid "Back to the proposed name (%(name)s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+msgid "Checking…"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+msgid "Checks"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Each new field of the project needs its own name."
@@ -1148,9 +1173,28 @@ msgid "Fields created outside the code carry x_ on a production database."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
+msgid "Fix each name marked below in the inspector of its field, then Apply."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Frozen at Apply: its name is a column of the table in the database."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Invalid format: lower case letters, digits and _ only"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid ""
+"Its technical name changes in a form, list or kanban view, until Apply."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1187,6 +1231,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Production · x_ required"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+msgid ""
+"Proposed from the label while it is not edited. Frozen at Apply: it becomes "
+"a column of the table."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2174,12 +2226,6 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__field_name
 msgid "Field Name"
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
-msgid "Field created by the project: its name is in the database."
 msgstr ""
 
 #. module: erplibre_studio
@@ -3949,14 +3995,6 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
-msgid ""
-"Proposed from the label when the field was added; it is created under this "
-"name at Apply."
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Quarter"
 msgstr ""
@@ -4318,7 +4356,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Review the draft, then write it to the database"
 msgstr ""
 
@@ -4698,12 +4736,19 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__module_name
 msgid "Technical name"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
+msgid "Technical name to fix"
 msgstr ""
 
 #. module: erplibre_studio
@@ -6030,6 +6075,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.js:0
+msgid "Use %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Valid domain · %(count)s record(s)"
 msgstr ""
@@ -6324,6 +6375,12 @@ msgid "applied"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.js:0
+msgid "auto"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "change of the project %(project)s"
@@ -6383,6 +6440,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_field_name.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "edited"

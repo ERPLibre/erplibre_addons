@@ -273,8 +273,8 @@
                         <div class="btn-group o_erplibre_studio_apply_group">
                             <button
                                 class="btn btn-sm btn-primary o_erplibre_studio_apply_bar"
-                                t-att-disabled="state.busy or project.state !== 'draft' or !project.item_count"
-                                title="Review the draft, then write it to the database"
+                                t-att-disabled="state.busy or project.state !== 'draft' or !project.item_count or nameBlockerCount"
+                                t-att-title="applyBarTitle"
                                 t-on-click="applyFromBar"
                             >
                                 Apply
@@ -566,6 +566,11 @@
                         />
                         <t t-esc="statusText" />
                     </span>
+                    <span
+                        t-if="nameBlockerCount"
+                        class="fw-bold text-danger-emphasis o_erplibre_studio_name_blockers"
+                        t-esc="nameBlockerText"
+                    />
                     <span t-if="previewLabel" class="o_erplibre_studio_status_preview" t-esc="previewLabel" />
                     <span class="ms-auto o_erplibre_studio_status_applied" t-esc="appliedText" />
                 </t>

@@ -380,6 +380,31 @@ describe("erplibre_studio review", () => {
         expect(".o_erplibre_studio").toHaveAttribute("data-space", "view");
     });
 
+    test("technical names that block Apply", async () => {
+        respond.get_review = () =>
+            review({
+                name_blockers: [
+                    {
+                        change_id: 1,
+                        model: "res.partner",
+                        name: "x_level",
+                        message: "The field x_level already exists in another project (Sample)",
+                    },
+                ],
+            });
+        await openReview();
+        expect(".o_erplibre_studio_review_names").toHaveText(/^1 technical name\(s\) block Apply/);
+        expect(".o_erplibre_studio_review_name_badge").toHaveCount(1);
+        expect(
+            ".o_erplibre_studio_review_item[data-key='change:1'] .o_erplibre_studio_review_name_badge"
+        ).toHaveText("Technical name to fix");
+        expect(".o_erplibre_studio_review_item[data-key='change:1'] .o_erplibre_studio_review_name_problem").toHaveText(
+            /x_level · The field x_level already exists in another project/
+        );
+        expect(".o_erplibre_studio_apply").not.toBeEnabled();
+        expect(".o_erplibre_studio_apply").toHaveAttribute("title", "1 technical name(s) block Apply");
+    });
+
     test("what leaves without data needs no « I understand »", async () => {
         respond.get_review = () =>
             review({

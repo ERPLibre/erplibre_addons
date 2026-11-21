@@ -206,6 +206,29 @@
         color: $primary;
     }
 
+    // The technical name of a new field: the input framed by its status,
+    // each check behind one glyph of fixed width.
+    .o_erplibre_studio_name_status {
+        line-height: 1.4;
+    }
+
+    .o_erplibre_studio_name_ok {
+        border: 1px solid rgba($success, 0.35);
+    }
+
+    .o_erplibre_studio_name_bad {
+        border: 1px solid rgba($danger, 0.35);
+    }
+
+    .o_erplibre_studio_name_check_glyph {
+        flex: none;
+        width: 1rem;
+    }
+
+    .o_erplibre_studio_name_check_ok .o_erplibre_studio_name_check_glyph {
+        color: $success;
+    }
+
     // The models space: its list of models, the page of one, its inspector.
     .o_erplibre_studio_models_list {
         width: 248px;

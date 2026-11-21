@@ -204,6 +204,22 @@ export class StudioReview extends Component {
         await this.editor.showReviewItem(item.target);
     }
 
+    // ── technical names ─────────────────────────────────────────────────
+
+    /** The new fields whose technical name stops Apply: [{change_id, model, name, message}]. */
+    get nameBlockers() {
+        return (this.review && this.review.name_blockers) || [];
+    }
+
+    get nameBlockersText() {
+        return _t("%(count)s technical name(s) block Apply", {count: this.nameBlockers.length});
+    }
+
+    /** The technical names of the change ``item`` that stop Apply, or []. */
+    nameProblems(item) {
+        return item.type === "change" ? this.nameBlockers.filter((blocker) => blocker.change_id === item.id) : [];
+    }
+
     // ── summary ─────────────────────────────────────────────────────────
 
     get intro() {
@@ -281,6 +297,9 @@ export class StudioReview extends Component {
         }
         if (project.state !== "draft" || !project.item_count) {
             return _t("Nothing to apply.");
+        }
+        if (this.nameBlockers.length) {
+            return this.nameBlockersText;
         }
         if (this.review.blocked) {
             return _t("Fix what Apply refuses first.");

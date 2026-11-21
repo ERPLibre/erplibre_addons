@@ -11,7 +11,7 @@ const UNLINK =
 
 // From the contact list: a new project, a new model in a new app with the
 // icon of base, its page in the models space, Apply and open its form, a
-// text field dropped into it, the right to delete taken from the internal
+// text field dropped into it and given its technical name, the right to delete taken from the internal
 // users, a record rule of the internal users checked and saved, then
 // Apply. Back on the contacts, the new app is in the home menu without a
 // reload of the page.
@@ -47,6 +47,24 @@ registry.category("web_tour.tours").add("erplibre_studio_models", {
         {trigger: ".o_erplibre_studio_state[data-state=applied]"},
         {trigger: ".o_erplibre_studio_field[data-name=x_name]"},
         {trigger: ".o_erplibre_studio_new_field[data-type=char]", run: `drag_and_drop ${LEFT}`},
+        // The new field is selected: the server checks its technical name
+        // live; a name without x_ blocks Apply, a valid one renames it.
+        {trigger: ".o_erplibre_studio_name_status:contains(Available)"},
+        {trigger: ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name", run: "edit tour_code"},
+        {trigger: ".o_erplibre_studio_name_status:contains(Prefix x_ required)"},
+        {trigger: ".o_erplibre_studio_name_blockers"},
+        {trigger: ".o_erplibre_studio_apply_bar:disabled"},
+        {
+            trigger: ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name",
+            // Typing alone fires no « change »: the browser fires it on
+            // Enter or when the input loses the focus.
+            async run(helpers) {
+                await helpers.edit("x_tour_code");
+                helpers.anchor.dispatchEvent(new Event("change", {bubbles: true}));
+            },
+        },
+        {trigger: ".o_erplibre_studio_properties[data-name=x_tour_code] .o_erplibre_studio_name_tag:contains(edited)"},
+        {trigger: "body:not(:has(.o_erplibre_studio_name_blockers))"},
         {trigger: ".o_erplibre_studio_inspector_tab[data-tab=changes]", run: "click"},
         {trigger: ".o_erplibre_studio_changes li[data-type=add_field]"},
         {trigger: ".o_erplibre_studio_rail_item[data-space=security]:enabled", run: "click"},

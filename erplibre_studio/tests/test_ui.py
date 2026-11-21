@@ -196,9 +196,9 @@ class TestStudioModelsUi(HttpCase):
 
     def test_models_tour(self):
         """A new model made from the editor: a new app with an icon, Apply
-        and open, a field dropped into its form, an access right changed,
-        a rule checked and saved, Apply. Every record lives under the
-        external ids of the module."""
+        and open, a field dropped into its form and renamed, an access
+        right changed, a rule checked and saved, Apply. Every record lives
+        under the external ids of the module."""
         self.env["res.lang"]._activate_lang("en_US")
         self.env.ref("base.user_admin").lang = "en_US"
         self.start_tour(
@@ -227,6 +227,8 @@ class TestStudioModelsUi(HttpCase):
         self.assertEqual(menu.parent_id, app)
         self.assertEqual(menu.action, project.created_action_ids)
         self.assertEqual(project.created_action_ids.res_model, "x_tour_item")
+        new_fields = project.field_ids.filtered(lambda f: f.model == "x_tour_item")
+        self.assertEqual(new_fields.mapped("name"), ["x_tour_code"])
         access = project.created_access_ids
         self.assertEqual(access.group_id, self.env.ref("base.group_user"))
         self.assertEqual(
