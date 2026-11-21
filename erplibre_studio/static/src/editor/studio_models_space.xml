@@ -380,6 +380,22 @@
                         class="form-text mt-0 o_erplibre_studio_model_option_locked"
                         t-esc="lockedTitle"
                     />
+                    <div
+                        t-if="option.key === 'per_company' and entry.line.per_company"
+                        class="form-text mt-0 d-flex flex-wrap align-items-baseline gap-2 o_erplibre_studio_model_company_rule"
+                    >
+                        <span t-esc="companyRuleText(entry)" />
+                        <button
+                            t-if="companyRule(entry)"
+                            type="button"
+                            class="btn btn-sm btn-link p-0 o_erplibre_studio_model_company_rule_open"
+                            t-att-disabled="props.busy"
+                            t-on-click="() => this.openCompanyRule(entry)"
+                        >
+                            <i class="fa fa-shield me-1" aria-hidden="true" />
+                            Open in Security
+                        </button>
+                    </div>
                 </div>
             </fieldset>
         </t>

@@ -908,8 +908,10 @@ class ErplibreStudioProject(models.Model):
         """The domain of ``text`` evaluated as ir.rule evaluates it (``user``,
         ``company_ids``, ``time``...). On a model of the registry, its terms
         are checked against the fields of the model; on a model not created
-        yet, only their shape. Raise UserError, naming the rule ``name``,
-        when it does not apply."""
+        yet, or whose model line has an option whose field Apply has not
+        created yet (``_studio_pending_option_fields``), only their shape.
+        Raise UserError, naming the rule ``name``, when it does not
+        apply."""
         try:
             if len(text or "") > RULE_DOMAIN_SIZE:
                 raise ValueError(
@@ -918,7 +920,7 @@ class ErplibreStudioProject(models.Model):
             domain = safe_eval(text or "[]", self.env["ir.rule"]._eval_context())
             if not isinstance(domain, (list, tuple)):
                 raise ValueError(self.env._("a domain is a list"))
-            if model in self.env:
+            if model in self.env and not self._studio_pending_option_fields(model):
                 with self.env.cr.savepoint():
                     expression.expression(list(domain), self.env[model].sudo())
             else:
@@ -932,6 +934,17 @@ class ErplibreStudioProject(models.Model):
                 )
             ) from exc
         return list(domain)
+
+    def _studio_pending_option_fields(self, model):
+        """The names of the fields of the options of the model line of
+        ``model`` that its model in the registry does not have yet: Apply
+        creates them. Empty for another model, or on no single project."""
+        if len(self) != 1 or model not in self.env:
+            return set()
+        line = self.new_model_ids.filtered(lambda m: m.model == model)
+        if not line:
+            return set()
+        return set(line._studio_option_fields()) - set(self.env[model]._fields)
 
     # ── state ───────────────────────────────────────────────────────────
 
@@ -3248,6 +3261,7 @@ class ErplibreStudioProject(models.Model):
             Group = restore.env["erplibre.studio.group"]
             for item in snapshot["groups"]:
                 Group._studio_restore_implied(project, item)
+            project._studio_restore_company_rules(snapshot["models"])
             Change = project.env["erplibre.studio.change"]
             View = self.env["ir.ui.view"].sudo()
             for index, item in enumerate(snapshot["changes"]):
@@ -3306,6 +3320,21 @@ class ErplibreStudioProject(models.Model):
                 "next": {"type": "ir.actions.client", "tag": "soft_reload"},
             },
         }
+
+    def _studio_restore_company_rules(self, items):
+        """Link each model line restored from ``items`` (the models of a
+        snapshot) to the rule line of its option « Per company », named by
+        its external id: the rules are restored after the models."""
+        self.ensure_one()
+        for item in items:
+            if not item.get("company_rule"):
+                continue
+            line = self.new_model_ids.filtered(lambda m, i=item: m.model == i["model"])
+            rule = self.rule_line_ids.filtered(
+                lambda r, i=item: r.xml_name == i["company_rule"]
+            )
+            if line and rule:
+                line._server_writing().write({"company_rule_id": rule[:1].id})
 
     def _studio_restore(self, Line, vals, item):
         """Create the line of ``vals`` (from ``item``, an entry of the
@@ -3502,12 +3531,14 @@ class ErplibreStudioProject(models.Model):
         return line
 
     def _studio_write_options(self, line, values):
-        """Write the options of ``values`` {order, archivable, manual_order}
-        on the model line ``line``. An option turned on needs its field
-        free on the applied model. « Manual order » turned on sorts by
-        ``x_sequence`` a model without order; turned off, it clears an
-        order that names ``x_sequence``. The order is checked last, against
-        the fields the options give (``_studio_clean_order``)."""
+        """Write the options of ``values`` {order, archivable, manual_order,
+        per_company} on the model line ``line``. An option turned on needs
+        its field free on the applied model. « Manual order » turned on
+        sorts by ``x_sequence`` a model without order; turned off, it clears
+        an order that names ``x_sequence``. « Per company » turned on adds
+        its rule line (``_studio_company_rule``); turned off, it removes
+        that line when the project still has it. The order is checked last,
+        against the fields the options give (``_studio_clean_order``)."""
         line = line.with_context(**{NO_TOUCH_KEY: True})
         vals = {}
         for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items():
@@ -3532,9 +3563,33 @@ class ErplibreStudioProject(models.Model):
                     order = ""
             except studio_arch.ArchError:
                 pass
+        company_rule = line.company_rule_id
         line.write(vals)
+        if vals.get("per_company"):
+            self._studio_company_rule(line)
+        elif vals.get("per_company") is False:
+            company_rule.unlink()
         if "order" in values or order != (line.order or ""):
             line.write({"order": self._studio_clean_order(line, order) or False})
+
+    def _studio_company_rule(self, line):
+        """Create the rule line of the option « Per company » of the model
+        line ``line`` and keep it on the line: global, every operation,
+        the records of the companies of the user and those of no company
+        (``COMPANY_RULE_DOMAIN``). The line is an ordinary rule of the
+        project from then on: the Security space edits or removes it."""
+        label = (line.name or "").strip() or line.model
+        rule = self._studio_save_rule(
+            {
+                "name": self.env._("%(model)s: multi-company", model=label),
+                "model": line.model,
+                "domain": studio_arch.COMPANY_RULE_DOMAIN,
+                "global_rule": True,
+                **{perm: True for perm in PERMS},
+            }
+        )
+        line._server_writing().write({"company_rule_id": rule.id})
+        return rule
 
     def _studio_clean_order(self, line, text):
         """The order ``text`` of the model line ``line``, normalised:
@@ -3793,6 +3848,7 @@ class ErplibreStudioProject(models.Model):
             line.chatter,
             archivable=line.archivable,
             manual_order=line.manual_order,
+            per_company=line.per_company,
         )
 
     # ── views the project adds ──────────────────────────────────────────
@@ -4545,10 +4601,11 @@ class ErplibreStudioProject(models.Model):
         """Give each custom model of the model lines the fields of its
         options and its default order, after the new fields: the order may
         name one of them, and ir.model checks it against the stored fields.
-        A field of an option is created with its default (ir.default, which
-        leaves with the field), on a model the installed module defines as
-        well, as a new field of the project is: the next generation writes
-        it into the module; ``x_active`` created on a
+        A field of an option is created with its constant default
+        (ir.default, which leaves with the field; ``x_company_id`` takes its
+        company from the window action instead), on a model the installed
+        module defines as well, as a new field of the project is: the next
+        generation writes it into the module; ``x_active`` created on a
         model that has records marks them active, as a new column is empty
         and an empty ``x_active`` reads as archived. The fields of the
         options are not counted among the fields of the project: they leave
@@ -4564,22 +4621,21 @@ class ErplibreStudioProject(models.Model):
             if not record:
                 continue
             defaults = line._studio_option_defaults()
-            for name, definition in line._studio_option_fields().items():
+            for name, field_vals in line._studio_option_field_vals().items():
                 if Fields._get(line.model, name):
                     continue
                 Fields.create(
-                    {
-                        "name": name,
-                        "model": line.model,
-                        "model_id": record.id,
-                        "ttype": definition["ttype"],
-                        "field_description": definition["field_description"],
-                        "state": "manual",
-                    }
+                    dict(
+                        field_vals,
+                        model=line.model,
+                        model_id=record.id,
+                        state="manual",
+                    )
                 )
                 log.append(f"field {line.model}.{name}: created")
-                Default.set(line.model, name, defaults[name])
-                if definition["ttype"] == "boolean":
+                if name in defaults:
+                    Default.set(line.model, name, defaults[name])
+                if field_vals["ttype"] == "boolean":
                     Model = self.env[line.model].sudo().with_context(active_test=False)
                     Model.search([(name, "=", False)]).write({name: True})
             order = line.order or "id"
@@ -4667,7 +4723,8 @@ class ErplibreStudioProject(models.Model):
         return kept
 
     def _apply_actions(self, log):
-        """Create or update the window action of each model line."""
+        """Create or update the window action of each model line, with the
+        context of its options (``_studio_action_context``)."""
         kept = self.env["ir.actions.act_window"].sudo()
         for line in self.new_model_ids:
             names = line._studio_xml_names()
@@ -4680,6 +4737,7 @@ class ErplibreStudioProject(models.Model):
                     "res_model": line.model,
                     "view_mode": "list,form",
                     "search_view_id": search.id,
+                    "context": line._studio_action_context() or "{}",
                 },
                 log,
             )

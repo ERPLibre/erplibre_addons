@@ -355,11 +355,24 @@ MODEL_VIEW_TYPES = ("form", "list", "search")
 # The options of a model the studio creates: {option: (field name, type,
 # label)}. Each one adds one field to the model, which Odoo gives a meaning
 # by its name: ``x_active`` archives the records, ``x_sequence`` orders them
-# by hand (the handle of the list).
+# by hand (the handle of the list); ``x_company_id`` gives each record a
+# company, which a multi-company record rule reads.
 MODEL_OPTIONS = {
     "archivable": ("x_active", "boolean", "Active"),
     "manual_order": ("x_sequence", "integer", "Sequence"),
+    "per_company": ("x_company_id", "many2one", "Company"),
 }
+# {field name: (comodel, on_delete)} of the many2one fields of the options.
+MODEL_OPTION_RELATIONS = {"x_company_id": ("res.company", "set null")}
+# The domain of the global rule the option « per_company » creates: the
+# records of the companies the user works in, and the records of no
+# company, which every company shares.
+COMPANY_RULE_DOMAIN = (
+    "['|', ('x_company_id', '=', False), ('x_company_id', 'in', company_ids)]"
+)
+# The context of the window action of a model whose option « per_company »
+# is on: a record created from it takes the current company of the user.
+COMPANY_ACTION_CONTEXT = "{'default_x_company_id': allowed_company_ids[0]}"
 # The order of the records of a model whose option « manual_order » is on.
 MANUAL_ORDER = "x_sequence asc, id asc"
 
@@ -1374,7 +1387,12 @@ def valid_model_name(name):
 
 
 def default_model_arch(
-    view_type, label, chatter=False, archivable=False, manual_order=False
+    view_type,
+    label,
+    chatter=False,
+    archivable=False,
+    manual_order=False,
+    per_company=False,
 ):
     """The arch text of the default ``view_type`` view (``MODEL_VIEW_TYPES``)
     of a model the studio creates, labelled ``label``. The form has a title
@@ -1382,7 +1400,9 @@ def default_model_arch(
     chatter when ``chatter``. ``archivable`` (``x_active``) adds the
     « Archived » ribbon and the field to the form and the « Archived »
     filter to the search view; ``manual_order`` puts the handle of
-    ``x_sequence`` first in the list. The arch depends on these values
+    ``x_sequence`` first in the list; ``per_company`` adds ``x_company_id``
+    at the end of the right column of the form and after ``x_name`` in the
+    list, for the multi-company users only. The arch depends on these values
     only: the changes of the editor on the view stay in an inherited view,
     so that writing the arch again never moves the nodes they locate. The
     options add nodes whose tag or name keeps the paths of the other
@@ -1407,7 +1427,13 @@ def default_model_arch(
         etree.SubElement(heading, "field", {"name": "x_name", "placeholder": label})
         main = etree.SubElement(sheet, "group", {"name": "studio_main"})
         etree.SubElement(main, "group", {"name": "studio_left"})
-        etree.SubElement(main, "group", {"name": "studio_right"})
+        right = etree.SubElement(main, "group", {"name": "studio_right"})
+        if per_company:
+            etree.SubElement(
+                right,
+                "field",
+                {"name": "x_company_id", "groups": "base.group_multi_company"},
+            )
         if archivable:
             etree.SubElement(sheet, "field", {"name": "x_active", "invisible": "1"})
         if chatter:
@@ -1416,6 +1442,16 @@ def default_model_arch(
         if view_type == "list" and manual_order:
             etree.SubElement(root, "field", {"name": "x_sequence", "widget": "handle"})
         etree.SubElement(root, "field", {"name": "x_name"})
+        if view_type == "list" and per_company:
+            etree.SubElement(
+                root,
+                "field",
+                {
+                    "name": "x_company_id",
+                    "groups": "base.group_multi_company",
+                    "optional": "show",
+                },
+            )
         if view_type == "search" and archivable:
             etree.SubElement(
                 root,

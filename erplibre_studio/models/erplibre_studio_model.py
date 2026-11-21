@@ -140,6 +140,19 @@ class ErplibreStudioModel(models.Model):
         help="The records are ordered by hand, with the handle of the list "
         "(the field x_sequence). Once applied, the option cannot be removed.",
     )
+    per_company = fields.Boolean(
+        string="Per company",
+        help="Each record belongs to a company (the field x_company_id), and a "
+        "global record rule shows a user the records of their companies and "
+        "those of no company. Once applied, the option cannot be removed.",
+    )
+    company_rule_id = fields.Many2one(
+        "erplibre.studio.rule",
+        string="Multi-company rule",
+        ondelete="set null",
+        help="The rule line the option « Per company » created; empty once "
+        "the rule is removed from the project.",
+    )
     applied = fields.Boolean(compute="_compute_applied")
     ir_model_id = fields.Many2one(
         "ir.model", compute="_compute_applied", string="Model in the database"
@@ -152,6 +165,10 @@ class ErplibreStudioModel(models.Model):
             "Another studio project creates this model.",
         ),
     ]
+
+    @api.model
+    def _server_fields(self):
+        return super()._server_fields() | {"company_rule_id"}
 
     # ── external ids ────────────────────────────────────────────────────
 
@@ -207,33 +224,74 @@ class ErplibreStudioModel(models.Model):
                 # before the options stays equal to its draft.
                 **({"order": line.order} if line.order else {}),
                 **{key: True for key in studio_arch.MODEL_OPTIONS if line[key]},
+                **(
+                    {"company_rule": line.company_rule_id.xml_name}
+                    if line.company_rule_id
+                    else {}
+                ),
             }
             for line in self.sorted(lambda m: (m.sequence, m.model))
         ]
 
     def _studio_option_fields(self):
         """{field name: definition} of the fields the options that are on
-        add to the model: {ttype, field_description, default}, the default
-        as ir.model.fields writes it (a text)."""
+        add to the model: {ttype, field_description} and either
+        ``default``, a constant as ir.model.fields writes it (a text) that
+        Apply stores as an ir.default, or, for a many2one, ``relation``,
+        ``on_delete`` and ``default_lambda``, the default of the generated
+        class: a company depends on the user, no ir.default holds it."""
         self.ensure_one()
         defaults = {"boolean": "True", "integer": "10"}
-        return {
-            name: {
-                "ttype": ttype,
-                "field_description": label,
-                "default": defaults[ttype],
-            }
-            for key, (name, ttype, label) in studio_arch.MODEL_OPTIONS.items()
-            if self[key]
-        }
+        lambdas = {"x_company_id": "lambda self: self.env.company"}
+        options = {}
+        for key, (name, ttype, label) in studio_arch.MODEL_OPTIONS.items():
+            if not self[key]:
+                continue
+            definition = {"ttype": ttype, "field_description": label}
+            if name in studio_arch.MODEL_OPTION_RELATIONS:
+                relation, on_delete = studio_arch.MODEL_OPTION_RELATIONS[name]
+                definition.update(
+                    relation=relation,
+                    on_delete=on_delete,
+                    default_lambda=lambdas[name],
+                )
+            else:
+                definition["default"] = defaults[ttype]
+            options[name] = definition
+        return options
 
     def _studio_option_defaults(self):
         """{field name: default value} of the fields of the options that are
-        on, as Python values (ir.default, default_get)."""
+        on and have a constant default, as Python values (ir.default,
+        default_get)."""
         return {
             name: ast.literal_eval(definition["default"])
             for name, definition in self._studio_option_fields().items()
+            if "default" in definition
         }
+
+    def _studio_option_field_vals(self):
+        """{field name: ir.model.fields values} of the fields of the options
+        that are on: label and type, and the comodel and the « on delete »
+        of a many2one."""
+        vals = {}
+        for name, definition in self._studio_option_fields().items():
+            vals[name] = {
+                "name": name,
+                "field_description": definition["field_description"],
+                "ttype": definition["ttype"],
+            }
+            if definition.get("relation"):
+                vals[name]["relation"] = definition["relation"]
+                vals[name]["on_delete"] = definition["on_delete"]
+        return vals
+
+    def _studio_action_context(self):
+        """The context text of the window action of the model, or False:
+        with « Per company », a record created from the action takes the
+        current company of the user."""
+        self.ensure_one()
+        return studio_arch.COMPANY_ACTION_CONTEXT if self.per_company else False
 
     def _studio_options_applied(self):
         """{option: whether the applied model has its field}: an option on
@@ -298,7 +356,7 @@ class ErplibreStudioModel(models.Model):
                     self.env._("A chatter needs the module mail (Discuss).")
                 )
 
-    @api.constrains("archivable", "manual_order")
+    @api.constrains(*studio_arch.MODEL_OPTIONS)
     def _check_studio_options(self):
         """An option whose field the applied model has cannot be turned
         off, as with the chatter: the field and its values would stay. The

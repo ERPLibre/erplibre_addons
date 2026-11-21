@@ -732,6 +732,107 @@ describe("erplibre_studio models", () => {
         );
     });
 
+    test("the models space: per company and its rule", async () => {
+        const companyRule = {
+            id: 9,
+            name: "Loan item: multi-company",
+            model: MODEL,
+            domain: "['|', ('x_company_id', '=', False), ('x_company_id', 'in', company_ids)]",
+            groups: [],
+            global_rule: true,
+            ...ALL_PERMS,
+        };
+        const project = (line = {}, rules = []) => ({
+            apps: [LOANS_APP],
+            models: [
+                modelLine({
+                    order: "",
+                    archivable: false,
+                    manual_order: false,
+                    per_company: false,
+                    company_rule: false,
+                    options_applied: {archivable: false, manual_order: false, per_company: false},
+                    sort_fields: [["x_name", "Name"]],
+                    ...line,
+                }),
+            ],
+            access: [],
+            rules,
+            item_count: 2 + rules.length,
+            touched_models: [],
+        });
+        answer = payload(project());
+        respond.get_editor_data = (args) =>
+            payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
+        await openEditor();
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_options").toHaveText(/Per company\s*x_company_id/);
+        expect(".o_erplibre_studio_model_per_company").toBeEnabled();
+        expect(".o_erplibre_studio_model_company_rule").toHaveCount(0);
+
+        // On: the server adds the rule line, which the note names.
+        respond.update_model = () =>
+            payload({
+                ...project({per_company: true, company_rule: [9, companyRule.name]}, [companyRule]),
+                revision: 1,
+            });
+        await contains(".o_erplibre_studio_model_per_company").click();
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {per_company: true}]);
+        expect(".o_erplibre_studio_model_per_company").toBeChecked();
+        expect(".o_erplibre_studio_model_company_rule").toHaveText(
+            /Rule « Loan item: multi-company »: a user sees the records of their companies and those of no company\.\s*Open in Security/
+        );
+
+        // « Open in Security » shows the rule in the rules tab.
+        await contains(".o_erplibre_studio_model_company_rule_open").click();
+        expect.verifySteps(["get_studio_choices 3", "get_access_existing x_loan_item"]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "security");
+        expect(".o_erplibre_studio_rule_form").toHaveCount(1);
+        expect(".o_erplibre_studio_rule_domain").toHaveValue(companyRule.domain);
+
+        // The rule removed in Security: the records are shared.
+        respond.remove_rule = () => payload({...project({per_company: true, company_rule: false}), revision: 2});
+        await contains(".o_erplibre_studio_remove_rule").click();
+        expect(lastCall("remove_rule").args.slice(0, 2)).toEqual([3, 9]);
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_company_rule").toHaveText(
+            "No rule: records are shared between companies."
+        );
+        expect(".o_erplibre_studio_model_company_rule_open").toHaveCount(0);
+    });
+
+    test("the models space: per company applied is locked", async () => {
+        answer = payload({
+            apps: [LOANS_APP],
+            models: [
+                modelLine({
+                    applied: true,
+                    views: APPLIED_VIEWS,
+                    order: "",
+                    archivable: false,
+                    manual_order: false,
+                    per_company: true,
+                    company_rule: false,
+                    options_applied: {archivable: false, manual_order: false, per_company: true},
+                    sort_fields: [["x_name", "Name"]],
+                }),
+            ],
+            item_count: 1,
+            touched_models: [],
+        });
+        respond.get_editor_data = (args) =>
+            payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
+        await openEditor();
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_per_company").toBeChecked();
+        expect(".o_erplibre_studio_model_per_company").not.toBeEnabled();
+        expect(".o_erplibre_studio_model_option_locked").toHaveCount(1);
+        expect(".o_erplibre_studio_model_archivable").toBeEnabled();
+    });
+
     test("the access grid: a toggle and a new row send set_access", async () => {
         const row = {id: 1, model: MODEL, group: [1, "Role / User"], ...ALL_PERMS};
         answer = payload({models: [modelLine({applied: true, views: APPLIED_VIEWS})], access: [row], item_count: 2});

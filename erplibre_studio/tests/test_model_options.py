@@ -3,8 +3,10 @@
 
 from lxml import etree
 from odoo.exceptions import UserError
-from odoo.tests import tagged
+from odoo.tests import new_test_user, tagged
 
+from ..arch import COMPANY_ACTION_CONTEXT, COMPANY_RULE_DOMAIN
+from ..models.erplibre_studio_project import PERMS
 from .common import StudioCase
 
 MODULE = "studio_test_options"
@@ -15,7 +17,8 @@ LEFT = "//group[@name='studio_left']"
 @tagged("post_install", "-at_install")
 class TestModelOptions(StudioCase):
     """The options of a model of the project: its default order, archivable
-    (``x_active``) and manual order (``x_sequence``)."""
+    (``x_active``), manual order (``x_sequence``) and per company
+    (``x_company_id`` and its multi-company rule)."""
 
     def setUp(self):
         super().setUp()
@@ -143,7 +146,7 @@ class TestModelOptions(StudioCase):
         self.assertNotIn("x_active", self.project.field_ids.mapped("name"))
         self.assertEqual(
             self.Editor._model_payload(self.line)["options_applied"],
-            {"archivable": True, "manual_order": True},
+            {"archivable": True, "manual_order": True, "per_company": False},
         )
         self.assertEqual(self.project.state, "applied")
         # Applying again changes nothing; the order changes after Apply.
@@ -240,3 +243,144 @@ class TestModelOptions(StudioCase):
         self.project.change_ids.unlink()
         with self.assertRaisesRegex(UserError, "x_code"):
             self.project.action_apply()
+
+    # ── per company ─────────────────────────────────────────────────────
+
+    def company_rule(self):
+        return self.project.rule_line_ids.filtered(
+            lambda r: r.domain_force == COMPANY_RULE_DOMAIN
+        )
+
+    def test_per_company_rule_line(self):
+        self.update(per_company=True)
+        rule = self.line.company_rule_id
+        self.assertTrue(rule)
+        self.assertEqual(rule, self.company_rule())
+        self.assertEqual(
+            (rule.model, rule.domain_force, rule.global_rule, rule.name),
+            (MODEL, COMPANY_RULE_DOMAIN, True, "Studio test item: multi-company"),
+        )
+        self.assertTrue(all(rule[perm] for perm in PERMS))
+        self.assertFalse(rule.group_ids or rule.group_line_ids)
+        payload = self.Editor._model_payload(self.line)
+        self.assertTrue(payload["per_company"])
+        self.assertEqual(payload["company_rule"], [rule.id, rule.name])
+        # The field is simulated before Apply, and its name is taken.
+        fields_info = self.project._studio_simulated_fields(self.line)
+        self.assertEqual(fields_info["x_company_id"]["relation"], "res.company")
+        self.assertIn("x_company_id", self.project._taken_field_names(MODEL))
+        form = etree.fromstring(self.project._studio_default_arch(self.line, "form"))
+        self.assertEqual(
+            form.xpath("//group[@name='studio_right']/field/@name"), ["x_company_id"]
+        )
+        # Off before Apply: the rule line goes with it.
+        self.update(per_company=False)
+        self.assertFalse(rule.exists())
+        self.assertFalse(self.line.company_rule_id)
+        self.assertFalse(self.Editor._model_payload(self.line)["company_rule"])
+        # A rule removed from the project leaves the option on, without rule.
+        self.update(per_company=True)
+        self.project._studio_remove_rule(self.line.company_rule_id)
+        self.assertTrue(self.line.per_company)
+        self.assertFalse(self.line.company_rule_id)
+        # Discard restores the option and its rule line, linked again.
+        self.update(per_company=False)
+        self.update(per_company=True)
+        self.project.action_apply()
+        xml_name = self.line.company_rule_id.xml_name
+        self.assertIn('"company_rule"', self.project.applied_snapshot)
+        self.project._studio_remove_rule(self.line.company_rule_id)
+        self.update(name="Studio test thing")
+        self.assertEqual(self.project.state, "draft")
+        self.project.action_discard()
+        line = self.project.new_model_ids
+        self.assertTrue(line.per_company)
+        self.assertEqual(line.company_rule_id, self.company_rule())
+        self.assertEqual(line.company_rule_id.xml_name, xml_name)
+        self.assertEqual(self.project.state, "applied")
+
+    def test_per_company_apply(self):
+        self.update(per_company=True)
+        self.project.action_apply()
+        Model = self.env[MODEL]
+        field = Model._fields["x_company_id"]
+        self.assertEqual((field.type, field.comodel_name), ("many2one", "res.company"))
+        self.assertEqual(field.ondelete, "set null")
+        action = self.env.ref(f"{MODULE}.{self.line._studio_xml_names()['action']}")
+        self.assertEqual(action.context, COMPANY_ACTION_CONTEXT)
+        ir_rule = self.env.ref(f"{MODULE}.{self.line.company_rule_id.xml_name}")
+        self.assertFalse(ir_rule.groups)
+        self.assertEqual(ir_rule.domain_force, COMPANY_RULE_DOMAIN)
+        listing = etree.fromstring(self.line._studio_views()["list"].arch)
+        self.assertEqual(
+            listing.xpath("field[@name='x_company_id']")[0].attrib,
+            {
+                "name": "x_company_id",
+                "groups": "base.group_multi_company",
+                "optional": "show",
+            },
+        )
+        # A user of company A sees the records of A and those of no
+        # company, not those of B.
+        company_a = self.env.company
+        company_b = self.env["res.company"].create({"name": "Studio test company B"})
+        records = Model.create(
+            [
+                {"x_name": "Of A", "x_company_id": company_a.id},
+                {"x_name": "Of B", "x_company_id": company_b.id},
+                {"x_name": "Shared"},
+            ]
+        )
+        # The default access row of the project lets internal users read.
+        user_a = new_test_user(
+            self.env,
+            login="erplibre_studio_r4b_a",
+            groups="base.group_user",
+            company_id=company_a.id,
+            company_ids=[(6, 0, company_a.ids)],
+        )
+        user_b = new_test_user(
+            self.env,
+            login="erplibre_studio_r4b_b",
+            groups="base.group_user",
+            company_id=company_b.id,
+            company_ids=[(6, 0, company_b.ids)],
+        )
+        seen_a = Model.with_user(user_a).search([("id", "in", records.ids)])
+        self.assertEqual(seen_a.mapped("x_name"), ["Of A", "Shared"])
+        seen_b = Model.with_user(user_b).search([("id", "in", records.ids)])
+        self.assertEqual(seen_b.mapped("x_name"), ["Of B", "Shared"])
+
+    def test_per_company_after_apply(self):
+        """Turned on after Apply: the rule line is accepted before the
+        field exists, and existing records, without company, stay shared."""
+        self.project.action_apply()
+        record = self.env[MODEL].create({"x_name": "Before"})
+        self.update(per_company=True)
+        rule = self.line.company_rule_id
+        self.assertTrue(rule)
+        check = self.Editor.check_rule_domain(
+            self.project.id, MODEL, COMPANY_RULE_DOMAIN
+        )
+        self.assertEqual(check, {"ok": True, "count": False})
+        self.project.action_apply()
+        self.assertFalse(self.env[MODEL].browse(record.id).x_company_id)
+        self.assertTrue(self.env.ref(f"{MODULE}.{rule.xml_name}"))
+        check = self.Editor.check_rule_domain(
+            self.project.id, MODEL, COMPANY_RULE_DOMAIN
+        )
+        self.assertEqual(check, {"ok": True, "count": 1})
+
+    def test_per_company_frozen_after_apply(self):
+        self.update(per_company=True)
+        self.project.action_apply()
+        rule = self.line.company_rule_id
+        with self.assertRaises(UserError):
+            with self.env.cr.savepoint():
+                self.update(per_company=False)
+        self.line.invalidate_recordset()
+        self.assertTrue(self.line.per_company)
+        self.assertTrue(rule.exists())
+        self.assertTrue(
+            self.Editor._model_payload(self.line)["options_applied"]["per_company"]
+        )

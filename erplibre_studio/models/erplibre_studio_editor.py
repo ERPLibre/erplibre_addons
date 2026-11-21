@@ -908,7 +908,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         views hold changes recorded before Apply. ``options_applied``:
         {option: whether the applied model has its field}, which locks it;
         ``sort_fields``: [[name, label]] of the fields its default order
-        can name (``_studio_sortable_fields``), by label."""
+        can name (``_studio_sortable_fields``), by label; ``company_rule``:
+        [id, name] of the rule line of « Per company », or False."""
         views = line._studio_views() if line.applied else {}
         parent = line.menu_parent_id
         changes = line.project_id.change_ids.filtered(lambda c: c.model_line_id == line)
@@ -921,6 +922,12 @@ class ErplibreStudioEditor(models.AbstractModel):
             "order": line.order or "",
             "archivable": line.archivable,
             "manual_order": line.manual_order,
+            "per_company": line.per_company,
+            "company_rule": (
+                [line.company_rule_id.id, line.company_rule_id.name]
+                if line.company_rule_id
+                else False
+            ),
             "options_applied": line._studio_options_applied(),
             "sort_fields": sorted(
                 ([name, label] for name, label in sortable.items()),
@@ -1293,7 +1300,8 @@ class ErplibreStudioEditor(models.AbstractModel):
     def check_rule_domain(self, project_id, model, domain):
         """{ok, count} when ``domain`` applies to ``model`` as a record
         rule, ``count`` the records it matches (False for a model not
-        created yet); else {ok: False, error}."""
+        created yet, or one whose option fields Apply has not created yet);
+        else {ok: False, error}."""
         self._check_studio_access()
         # A read: the project is not opened, its editor and its revision
         # stay as they are.
@@ -1307,7 +1315,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         except UserError as exc:
             return {"ok": False, "error": str(exc.args[0])}
         count = False
-        if model in self.env:
+        if model in self.env and not project._studio_pending_option_fields(model):
             count = self.env[model].sudo().search_count(terms)
         return {"ok": True, "count": count}
 

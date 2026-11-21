@@ -128,7 +128,10 @@ class ErplibreStudioProject(models.Model):
         }
         for name, definition in line._studio_option_fields().items():
             fields_info[name] = _field_info(
-                name, definition["ttype"], definition["field_description"]
+                name,
+                definition["ttype"],
+                definition["field_description"],
+                relation=definition.get("relation") or False,
             )
         for name, (definition, _change) in self._studio_field_definitions(
             line.model
@@ -431,16 +434,8 @@ class ErplibreStudioProject(models.Model):
                     )
                 ],
             }
-            for name, definition in line._studio_option_fields().items():
-                vals["field_id"].append(
-                    Command.create(
-                        {
-                            "name": name,
-                            "field_description": definition["field_description"],
-                            "ttype": definition["ttype"],
-                        }
-                    )
-                )
+            for field_vals in line._studio_option_field_vals().values():
+                vals["field_id"].append(Command.create(field_vals))
             if line.chatter and mail:
                 vals.update(is_mail_thread=True, is_mail_activity=True)
             IrModel.create(vals)

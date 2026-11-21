@@ -7654,3 +7654,58 @@ msgstr "[('active', '=', True)]"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "restricted"
 msgstr "restreint"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(model)s: multi-company"
+msgstr "%(model)s : multisociété"
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__per_company
+msgid ""
+"Each record belongs to a company (the field x_company_id), and a global "
+"record rule shows a user the records of their companies and those of no "
+"company. Once applied, the option cannot be removed."
+msgstr ""
+"Chaque enregistrement appartient à une société (le champ x_company_id), et "
+"une règle d'enregistrement globale montre à un utilisateur les "
+"enregistrements de ses sociétés et ceux sans société. Une fois appliquée, "
+"l'option ne peut plus être retirée."
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__company_rule_id
+msgid "Multi-company rule"
+msgstr "Règle multisociété"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "No rule: records are shared between companies."
+msgstr "Aucune règle : les enregistrements sont partagés entre les sociétés."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__per_company
+msgid "Per company"
+msgstr "Par société"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid ""
+"Rule « %(name)s »: a user sees the records of their companies and those of "
+"no company."
+msgstr ""
+"Règle « %(name)s » : un utilisateur voit les enregistrements de ses "
+"sociétés et ceux sans société."
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__company_rule_id
+msgid ""
+"The rule line the option « Per company » created; empty once the rule is "
+"removed from the project."
+msgstr ""
+"La ligne de règle créée par l'option « Par société »; vide une fois la "
+"règle retirée du projet."

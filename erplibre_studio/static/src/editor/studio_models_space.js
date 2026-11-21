@@ -401,7 +401,37 @@ export class StudioModelsSpace extends Component {
         return [
             {key: "archivable", label: _t("Archivable"), field: "x_active"},
             {key: "manual_order", label: _t("Manual order"), field: "x_sequence"},
+            {key: "per_company", label: _t("Per company"), field: "x_company_id"},
         ];
+    }
+
+    /**
+     * The rule line of « Per company » of the model line of ``entry``, as
+     * the security payload holds it, or null once removed from the project.
+     */
+    companyRule(entry) {
+        const ref = entry.line.company_rule;
+        return (ref && this.rules(entry).find((rule) => rule.id === ref[0])) || null;
+    }
+
+    companyRuleText(entry) {
+        const rule = this.companyRule(entry);
+        if (!rule) {
+            return _t("No rule: records are shared between companies.");
+        }
+        return _t("Rule « %(name)s »: a user sees the records of their companies and those of no company.", {
+            name: rule.name,
+        });
+    }
+
+    /** Show the rule of « Per company » of ``entry`` in the rules tab of the security space. */
+    async openCompanyRule(entry) {
+        const rule = this.companyRule(entry);
+        this.editor.state.security.model = entry.model;
+        await this.editor.openSecurity("rules");
+        if (rule && this.editor.state.space === "security") {
+            this.editor.editRule(rule);
+        }
     }
 
     /** Whether the option ``key`` of the model line of ``entry`` is applied: its field exists, it stays. */
