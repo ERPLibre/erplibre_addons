@@ -20,7 +20,8 @@ project**, applied to the database, and can become a module.
   views once *web_timeline* is installed. **Customize this view**, in the
   debug menu or the *Developer panel*, opens the editor on the view of the
   page. Fields move by drag and drop; the palette adds existing fields and
-  new ``x_`` fields, the side panel edits their properties.
+  new ``x_`` fields, the side panel edits their properties. **Add a view**
+  gives a model a view of a type it lacks.
 * **New models**: ``x_`` models with their views, action, menu and access
   rights, in an app of the project or under an existing menu, with a
   chatter when *mail* is installed; one2many and many2many relations.
@@ -28,8 +29,8 @@ project**, applied to the database, and can become a module.
   other modules give, record rules checked against their model.
 * **Draft, Preview, Apply**: each change is a draft; **Preview** shows the
   view with the draft, a model not created yet is simulated in the
-  browser; **Apply** writes the draft to the database, where every user
-  sees it; **Discard** goes back to the last Apply; **Revert** removes
+  browser; **Apply** reviews the draft, item by item, then writes it to
+  the database, where every user sees it; **Discard** goes back to the last Apply; **Revert** removes
   what the project created, the records of its models included. Revert,
   and an Apply that removes records, values or group members, first list
   what leaves the database and ask for confirmation.

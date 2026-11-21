@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_developer.FieldsTab">
+        <section class="o_erplibre_dev_fields d-flex flex-column gap-2">
+            <!-- A div, not a label: the clear button stays out of the name of
+                 the input, which its aria-label gives. -->
+            <div class="o_erplibre_dev_field_search d-flex align-items-center gap-2 mb-0 px-2 rounded-2 border">
+                <i class="fa fa-search text-muted" aria-hidden="true" />
+                <input
+                    type="search"
+                    class="form-control form-control-sm border-0 shadow-none px-0 o_erplibre_dev_filter"
+                    aria-label="Filter by field, label or module"
+                    placeholder="Filter by field, label or module"
+                    t-model="data.filter"
+                />
+                <button
+                    t-if="data.filter"
+                    type="button"
+                    class="btn btn-sm o_erplibre_dev_icon_btn o_erplibre_dev_filter_clear"
+                    aria-label="Clear the filter"
+                    title="Clear the filter"
+                    t-on-click="clearFilter"
+                >
+                    <i class="fa fa-times" aria-hidden="true" />
+                </button>
+            </div>
+            <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter the fields">
+                <button
+                    t-foreach="filterChips"
+                    t-as="chip"
+                    t-key="chip.id"
+                    type="button"
+                    class="btn btn-sm rounded-pill o_erplibre_dev_module_chip o_erplibre_dev_field_filter"
+                    t-att-class="{'o_erplibre_dev_chip_on': fieldFilter === chip.id}"
+                    t-att-data-filter="chip.id"
+                    t-att-aria-pressed="fieldFilter === chip.id ? 'true' : 'false'"
+                    t-on-click="() => this.setFieldFilter(chip.id)"
+                >
+                    <t t-esc="chip.label" />
+                    <span class="o_erplibre_dev_filter_count" t-esc="chip.count" />
+                </button>
+            </div>
+
+            <!-- The card of the selected field, above the list -->
+            <t t-set="field" t-value="card" />
+            <section
+                t-if="field"
+                class="card o_erplibre_dev_field_card"
+                t-att-data-field="field.name"
+                aria-labelledby="o_erplibre_dev_field_card_title"
+                t-ref="card"
+            >
+                <div class="card-body p-2 small">
+                    <div class="d-flex flex-wrap align-items-center gap-2" aria-live="polite">
+                        <h3
+                            id="o_erplibre_dev_field_card_title"
+                            class="o_erplibre_dev_field_label mb-0"
+                            t-esc="field.string or field.name"
+                        />
+                        <code class="o_erplibre_dev_chip fw-semibold" t-esc="field.name" />
+                        <span class="o_erplibre_dev_type" t-esc="field.type" />
+                        <code t-if="field.relation" class="o_erplibre_dev_relation" t-esc="'→ ' + field.relation" />
+                        <span
+                            t-foreach="flags(field)"
+                            t-as="flag"
+                            t-key="flag"
+                            class="o_erplibre_dev_flag"
+                            t-esc="flag"
+                        />
+                    </div>
+                    <div t-if="field.related" class="mt-1 text-muted">
+                        related
+                        <code t-esc="field.related" />
+                    </div>
+                    <div t-if="field.inherited_model" class="mt-1 text-muted">
+                        delegated by
+                        <code t-esc="field.inherited_model" />
+                    </div>
+                    <t t-set="closed" t-value="closedPage(field)" />
+                    <div
+                        t-if="closed"
+                        class="d-flex flex-wrap align-items-center gap-2 mt-2 text-muted o_erplibre_dev_page_note"
+                    >
+                        <span t-esc="pageNote(closed)" />
+                        <button type="button" class="btn btn-sm btn-secondary o_erplibre_dev_open_page" t-on-click="() => this.openPage(field)">
+                            Open the tab
+                        </button>
+                    </div>
+
+                    <div class="d-flex align-items-baseline gap-2 mt-3 mb-2">
+                        <h4 class="o_erplibre_dev_section_title o_erplibre_dev_caps mb-0">Origin chain</h4>
+                        <span class="text-muted o_erplibre_dev_chain_note" t-esc="chainNote(field)" />
+                    </div>
+                    <div
+                        t-if="field.manual and !field.defined_in"
+                        class="d-flex align-items-start gap-2 p-2 rounded-2 o_erplibre_dev_custom_field"
+                    >
+                        <i class="fa fa-database mt-1" aria-hidden="true" />
+                        <div class="min-w-0">
+                            <div class="fw-semibold">Custom field, defined in the database</div>
+                            <div class="text-muted">An ir.model.fields record in the manual state: no source file.</div>
+                        </div>
+                    </div>
+                    <t t-set="steps" t-value="chain(field)" />
+                    <ol t-if="steps.length" class="list-unstyled mb-0 o_erplibre_dev_chain">
+                        <li
+                            t-foreach="steps"
+                            t-as="step"
+                            t-key="step_index"
+                            class="d-flex gap-2 o_erplibre_dev_step"
+                            t-att-class="{'o_erplibre_dev_dimmed': dimmed([step.module])}"
+                            t-att-data-kind="step.kind"
+                        >
+                            <div class="o_erplibre_dev_step_mark d-flex flex-column align-items-center" aria-hidden="true">
+                                <span class="o_erplibre_dev_step_n" t-esc="step_index + 1" />
+                                <span t-if="!step_last" class="o_erplibre_dev_step_line flex-grow-1" />
+                            </div>
+                            <div class="flex-grow-1 min-w-0 pb-2 d-flex flex-column gap-1">
+                                <div class="d-flex flex-wrap align-items-center gap-1">
+                                    <span
+                                        class="badge o_erplibre_dev_kind"
+                                        t-att-data-kind="step.kind"
+                                        t-esc="kindLabel(step.kind)"
+                                    />
+                                    <t t-if="step.module" t-call="erplibre_developer.ModuleChip">
+                                        <t t-set="module" t-value="step.module" />
+                                    </t>
+                                    <span t-else="" class="o_erplibre_dev_module_tag o_tag rounded-pill">Odoo core</span>
+                                    <code class="fw-semibold text-break o_erplibre_dev_step_code" t-esc="stepCode(field, step)" />
+                                </div>
+                                <div>
+                                    <SourceLocation
+                                        file="step.file"
+                                        fileRel="step.file_rel"
+                                        line="step.line"
+                                        ide="info.ide_available"
+                                    />
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                    <p t-elif="!field.manual" class="text-muted mb-0">No class of the model declares this field.</p>
+
+                    <t t-set="views" t-value="fieldViews(field)" />
+                    <div
+                        t-if="views.length"
+                        class="d-flex flex-wrap align-items-center gap-1 mt-2 pt-2 border-top o_erplibre_dev_field_views"
+                    >
+                        <span class="fw-semibold me-1">In the views</span>
+                        <button
+                            t-foreach="views"
+                            t-as="row"
+                            t-key="row.view.id"
+                            type="button"
+                            class="btn btn-sm d-inline-flex flex-wrap align-items-center gap-1 o_erplibre_dev_field_view"
+                            t-att-class="{'o_erplibre_dev_dimmed': dimmed([row.view.module])}"
+                            t-att-data-view-id="row.view.id"
+                            t-att-title="row.view.xml_id or row.view.name"
+                            t-on-click="() => this.showView(field, row.view)"
+                        >
+                            <span class="o_erplibre_dev_view_n" t-esc="row.n" />
+                            <t t-call="erplibre_developer.ModuleChip">
+                                <t t-set="module" t-value="row.view.module" />
+                            </t>
+                            <t t-foreach="viewEffects(row.view, row.n, field.name)" t-as="effect" t-key="effect_index">
+                                <span
+                                    t-if="effect.position"
+                                    class="badge o_erplibre_dev_position"
+                                    t-att-data-position="effect.position"
+                                    t-esc="effect.position"
+                                />
+                                <span t-if="effect.note" t-esc="effect.note" />
+                            </t>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- The fields -->
+            <div class="o_erplibre_dev_field_list">
+                <div class="o_erplibre_dev_field_grid o_erplibre_dev_field_head border-bottom" aria-hidden="true">
+                    <span>Field</span>
+                    <span>Type</span>
+                    <span>Modules</span>
+                    <span class="text-end">Overr.</span>
+                </div>
+                <ul class="list-unstyled mb-0 mt-1 d-flex flex-column gap-1" t-on-mouseleave="unhighlight">
+                    <li t-foreach="filteredFields" t-as="row" t-key="row.name">
+                        <button
+                            type="button"
+                            class="o_erplibre_dev_field_grid o_erplibre_dev_field_row"
+                            t-att-class="{'o_erplibre_dev_selected': field and field.name === row.name, 'o_erplibre_dev_dimmed': dimmed(fieldModules(row))}"
+                            t-att-data-field="row.name"
+                            t-att-aria-pressed="field and field.name === row.name ? 'true' : 'false'"
+                            t-att-title="rowTitle(row)"
+                            t-on-mouseenter="() => this.highlightField(row)"
+                            t-on-focus="() => this.highlightField(row)"
+                            t-on-click="() => this.selectField(row)"
+                        >
+                            <span class="d-flex align-items-baseline gap-2 min-w-0">
+                                <code class="o_erplibre_dev_field_name text-truncate" t-esc="row.name" />
+                                <span class="o_erplibre_dev_field_string text-truncate" t-esc="row.string" />
+                            </span>
+                            <span><span class="o_erplibre_dev_type" t-esc="row.type" /></span>
+                            <span class="d-inline-flex align-items-center o_erplibre_dev_field_dots">
+                                <span
+                                    t-foreach="fieldModules(row)"
+                                    t-as="module"
+                                    t-key="module"
+                                    t-attf-class="o_erplibre_dev_dot o_tag o_tag_color_{{ moduleColor(module) }}"
+                                    t-att-title="module"
+                                />
+                                <span class="visually-hidden o_erplibre_dev_defined_in" t-esc="definedInText(row)" />
+                                <span class="visually-hidden o_erplibre_dev_overridden_by" t-esc="overriddenByText(row)" />
+                                <span class="visually-hidden o_erplibre_dev_modules_text" t-esc="modulesText(row)" />
+                            </span>
+                            <span class="text-end">
+                                <span t-if="row.overrides.length" class="o_erplibre_dev_over_count">
+                                    <t t-esc="'+' + row.overrides.length" />
+                                    <span class="visually-hidden">overrides</span>
+                                </span>
+                            </span>
+                        </button>
+                    </li>
+                </ul>
+                <p t-if="!filteredFields.length" class="text-muted text-center my-3 o_erplibre_dev_no_field">
+                    <t t-if="fields.length">No field matches this filter.</t>
+                    <t t-else="">This view shows no field.</t>
+                </p>
+            </div>
+        </section>
+    </t>
+</templates>

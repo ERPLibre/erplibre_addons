@@ -284,11 +284,12 @@ class TestProjectGenerate(StudioCase):
         for name in ("version", "destination", "generation_log"):
             self.assertTrue(arch.xpath(f"//field[@name='{name}']"), name)
 
-    def test_editor_payload_shows_the_version(self):
+    def test_editor_payload_has_no_version(self):
+        """The editor shows no project version: the payload leaves it out."""
         data = self.Editor.with_context(lang="en_US").get_editor_data(
             "res.partner", False, "list", self.project.id
         )
-        self.assertEqual(data["project"]["version"], "18.0.1.0.0")
+        self.assertNotIn("version", data["project"])
         self.assertEqual(
             dict(self.Project._fields["state"].selection)["generated"], "Generated"
         )

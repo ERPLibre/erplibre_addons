@@ -42,8 +42,8 @@ class TestStudioUi(HttpCase):
 
     def test_views_tour(self):
         """A kanban and a search view customized end to end: drop, widget,
-        new filter, both previews, Apply. The applied views show the
-        changes to every user, without the draft context."""
+        new filter, both previews, a pivot view added, Apply. The applied
+        views show the changes to every user, without the draft context."""
         self.env["res.lang"]._activate_lang("en_US")
         self.env.ref("base.user_admin").lang = "en_US"
         self.start_tour(
@@ -63,6 +63,14 @@ class TestStudioUi(HttpCase):
         self.assertEqual(
             sorted(project.studio_view_ids.mapped("type")), ["kanban", "search"]
         )
+        # The pivot view the tour adds is the one of the contacts now.
+        added = project.view_line_ids
+        self.assertEqual(added.view_type, "pivot")
+        self.assertTrue(added.applied)
+        self.assertEqual(
+            self.env["ir.ui.view"].default_view("res.partner", "pivot"),
+            added.view_id.id,
+        )
         kanban = self.arch_of("base.res_partner_kanban_view")
         phone = kanban.xpath("//t[@t-name='card']//field[@name='phone']")
         self.assertEqual(phone[0].get("widget"), "phone")
@@ -71,9 +79,10 @@ class TestStudioUi(HttpCase):
         tax = search.xpath("//filter[@string='Tour has a tax ID']")
         self.assertEqual(tax[0].get("domain"), "[('vat', '!=', False)]")
 
-    def test_timeline_item_field_tour(self):
-        """A field the project drops into a timeline item renders in the
-        browser once applied: the item shows its value, no JS error."""
+    def timeline_setup(self):
+        """A timeline view of the contacts, a contact of a company to show
+        in it, and an action that opens the view: (view, action). Skips the
+        test without web_timeline."""
         Project = self.env["erplibre.studio.project"]
         if "timeline" not in Project._view_types():
             self.skipTest("web_timeline is not installed")
@@ -97,7 +106,24 @@ class TestStudioUi(HttpCase):
                 "user_id": self.env.ref("base.user_admin").id,
             }
         )
-        project = Project.create(
+        action = self.env["ir.actions.act_window"].create(
+            {
+                "name": "Studio timeline",
+                "res_model": "res.partner",
+                "view_mode": "timeline",
+                "view_id": view.id,
+                "domain": [("name", "like", "Studio timeline")],
+            }
+        )
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        return view, action
+
+    def test_timeline_item_field_tour(self):
+        """A field the project drops into a timeline item renders in the
+        browser once applied: the item shows its value, no JS error."""
+        view, action = self.timeline_setup()
+        project = self.env["erplibre.studio.project"].create(
             {"name": "Tour timeline", "module_name": "studio_tour_timeline"}
         )
         item = "//t[@t-name='timeline-item']/div[1]"
@@ -115,23 +141,39 @@ class TestStudioUi(HttpCase):
         Run = type(self.env["erplibre.code.run"])
         with patch.object(Run, "_is_debug_mode", lambda run: True):
             project.action_apply()
-        action = self.env["ir.actions.act_window"].create(
-            {
-                "name": "Studio timeline",
-                "res_model": "res.partner",
-                "view_mode": "timeline",
-                "view_id": view.id,
-                "domain": [("name", "like", "Studio timeline")],
-            }
-        )
-        self.env["res.lang"]._activate_lang("en_US")
-        self.env.ref("base.user_admin").lang = "en_US"
         self.start_tour(
             f"/odoo/action-{action.id}",
             "erplibre_studio_timeline",
             login="admin",
             timeout=180,
         )
+
+    def test_timeline_editor_tour(self):
+        """The lanes of a timeline in the editor: a scale, a field dropped
+        on the end date, a color rule; the timeline of the canvas and the
+        preview render the draft."""
+        view, action = self.timeline_setup()
+        self.start_tour(
+            f"/odoo/action-{action.id}?debug=1",
+            "erplibre_studio_timeline_editor",
+            login="admin",
+            timeout=240,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_timeline_editor")]
+        )
+        self.assertEqual(
+            sorted(
+                change._payload()["attribute"]
+                for change in project.change_ids
+                if change.change_type == "set_attribute"
+            ),
+            ["colors", "mode"],
+        )
+        arch, _errors = project._draft_arch(view)
+        self.assertEqual(arch.get("mode"), "week")
+        self.assertEqual(arch.get("date_stop"), "write_date")
+        self.assertEqual(arch.get("colors"), "#ec7063:is_company == True")
 
     def test_hoot(self):
         """The hoot unit tests of the editor (web.assets_unit_tests)."""

@@ -58,8 +58,12 @@ export function reportItemText(section, item) {
             return item.group ? `${item.name} (${item.group})` : item.name;
         case "rules":
             return `${item.name} (${item.model})`;
-        case "views":
-            return `${item.name} (${item.kind === "default" ? _t("default") : _t("inherited")})`;
+        case "views": {
+            // The extractor of the .pot skips a _t() written inside a
+            // template literal: the label is computed apart.
+            const kind = item.kind === "default" ? _t("default") : _t("inherited");
+            return `${item.name} (${kind})`;
+        }
         case "tables":
             return item;
         default:

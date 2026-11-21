@@ -26,9 +26,11 @@ opens.
 * **Code & repository**: the path, versions and git repository of each
   module involved, the state of that repository from the last snapshot of
   *ERPLibre info - Git* or read on demand, and its recent commits.
-* **Dev actions**: upgrade a module, which marks it and restarts the
-  Odoo server so the upgrade runs at the next start with the code on
-  disk, and reload the assets.
+* **Dev actions**: the prerequisites of the server actions, the modules
+  of the page with those to upgrade checked, the upgrade of the checked
+  modules (the confirmation of *ERPLibre info* marks them and restarts
+  the Odoo server, so the upgrade runs at the next start with the code on
+  disk), the reload of the assets and the recent runs.
 
 Hovering a view or a field highlights it in the page; **Inspect** selects
 the field clicked in the page.

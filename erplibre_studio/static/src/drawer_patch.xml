@@ -2,24 +2,25 @@
 <!-- © 2026 TechnoLibre (http://www.technolibre.ca)
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <templates xml:space="preserve">
-    <t t-inherit="erplibre_developer.DeveloperDrawer" t-inherit-mode="extension">
-        <xpath expr="//button[hasclass('o_erplibre_dev_inspect')]" position="before">
+    <t t-inherit="erplibre_developer.ViewsTab" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_erplibre_dev_view_actions')]" position="inside">
             <button
                 t-if="canCustomize"
-                class="btn btn-sm btn-secondary o_erplibre_studio_customize"
-                title="Customize this view"
+                class="btn btn-sm btn-primary o_erplibre_studio_customize"
                 t-on-click="customizeView"
             >
-                <i class="fa fa-paint-brush" />
+                <i class="fa fa-paint-brush me-1" aria-hidden="true" />
+                Customize this view
             </button>
             <button
                 t-if="canCustomizeSearch"
                 class="btn btn-sm btn-secondary o_erplibre_studio_customize_search"
-                title="Customize the search view"
                 t-on-click="customizeSearchView"
             >
-                <i class="fa fa-search" />
+                <i class="fa fa-search me-1" aria-hidden="true" />
+                Customize the search view
             </button>
+            <span t-if="canCustomize" class="w-100 text-muted">Opens the ERPLibre studio on this view.</span>
         </xpath>
     </t>
 </templates>

@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The attributes « set_attribute » writes on « block ». -->
+    <t t-name="erplibre_studio.Inspector.Settable">
+        <t t-foreach="settableOf(block)" t-as="entry" t-key="entry.attribute">
+            <t t-call="erplibre_studio.Inspector.SettableEntry" />
+        </t>
+    </t>
+
+    <!-- One attribute « entry » of settableOf(block): a select of its
+         values, the scales of a timeline, the color rules, an order. -->
+    <t t-name="erplibre_studio.Inspector.SettableEntry">
+        <div class="o_erplibre_studio_settable mb-2" t-att-data-attribute="entry.attribute">
+            <t t-if="entry.kind === 'colors'">
+                <div class="d-flex align-items-baseline gap-2 mb-1">
+                    <span class="form-label mb-0" t-esc="entry.label" />
+                    <span class="text-muted small">the first true rule wins</span>
+                </div>
+                <ol class="list-unstyled d-flex flex-column gap-1 mb-2 o_erplibre_studio_colors">
+                    <li
+                        t-foreach="layout.colors or []"
+                        t-as="rule"
+                        t-key="rule_index"
+                        class="d-flex align-items-center gap-2 border rounded px-2 py-1 o_erplibre_studio_color_chip"
+                        t-att-data-index="rule_index"
+                    >
+                        <span
+                            class="o_erplibre_studio_swatch d-inline-block rounded flex-none"
+                            t-att-style="'background-color: ' + rule.color"
+                            aria-hidden="true"
+                        />
+                        <code class="flex-grow-1 text-break" t-esc="rule.expression" />
+                        <button
+                            t-if="colorsWritable"
+                            type="button"
+                            class="btn btn-link btn-sm p-0 text-body o_erplibre_studio_color_remove"
+                            t-att-aria-label="removeRuleLabel(rule)"
+                            t-att-title="removeRuleLabel(rule)"
+                            t-att-disabled="props.busy"
+                            t-on-click="() => this.deleteColorRule(rule_index)"
+                        >
+                            <i class="fa fa-times" aria-hidden="true" />
+                        </button>
+                    </li>
+                    <li t-if="!(layout.colors or []).length" class="text-muted">
+                        No rule: every item takes the default color.
+                    </li>
+                </ol>
+                <div t-if="props.colors" class="o_erplibre_studio_colors_form border rounded p-2">
+                    <div t-if="!colorsWritable" class="text-muted mb-1">Saving replaces the rules above.</div>
+                    <div
+                        t-foreach="props.colors"
+                        t-as="rule"
+                        t-key="rule_index"
+                        class="d-flex flex-wrap gap-1 mb-1 o_erplibre_studio_color_rule"
+                    >
+                        <input
+                            type="color"
+                            class="form-control form-control-sm form-control-color"
+                            aria-label="Color"
+                            t-model="rule.color"
+                        />
+                        <select
+                            class="form-select form-select-sm w-auto o_erplibre_studio_color_field"
+                            aria-label="Field"
+                            t-model="rule.field"
+                        >
+                            <option value="">Field…</option>
+                            <option
+                                t-foreach="colorFields"
+                                t-as="item"
+                                t-key="item[0]"
+                                t-att-value="item[0]"
+                                t-esc="item[1]"
+                            />
+                        </select>
+                        <select
+                            class="form-select form-select-sm w-auto o_erplibre_studio_color_operator"
+                            aria-label="Operator"
+                            t-model="rule.operator"
+                        >
+                            <option
+                                t-foreach="layout.color_operators or []"
+                                t-as="op"
+                                t-key="op"
+                                t-att-value="op"
+                                t-esc="op"
+                            />
+                        </select>
+                        <input
+                            class="form-control form-control-sm w-auto o_erplibre_studio_color_value"
+                            placeholder="Value"
+                            aria-label="Value"
+                            t-model="rule.value"
+                        />
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-link text-danger p-0"
+                            title="Remove this rule"
+                            aria-label="Remove this rule"
+                            t-on-click="() => this.removeColorRule(rule_index)"
+                        >
+                            <i class="fa fa-times" aria-hidden="true" />
+                        </button>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-sm btn-link p-0" t-on-click="addColorRule">
+                            <i class="fa fa-plus" aria-hidden="true" />
+                            Rule
+                        </button>
+                        <button type="button" class="btn btn-sm btn-secondary ms-auto" t-on-click="cancelColors">Cancel</button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary o_erplibre_studio_save_colors"
+                            t-att-disabled="props.busy"
+                            t-on-click="() => this.saveColors(props.colors)"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+                <div t-else="" class="d-flex flex-wrap gap-1">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-secondary o_erplibre_studio_edit_colors"
+                        t-att-disabled="props.busy"
+                        t-on-click="() => this.editColors()"
+                    >
+                        <t t-if="(layout.colors or []).length">Edit the rules</t>
+                        <t t-else="">Add a rule</t>
+                    </button>
+                    <button
+                        t-if="(layout.colors or []).length"
+                        type="button"
+                        class="btn btn-sm btn-outline-danger o_erplibre_studio_clear_colors"
+                        t-att-disabled="props.busy"
+                        t-on-click="() => this.saveColors([])"
+                    >
+                        Remove all
+                    </button>
+                </div>
+            </t>
+            <t t-elif="entry.kind === 'timeline_mode'">
+                <span class="form-label d-block mb-1" t-att-id="'o_erplibre_studio_attr_' + entry.attribute" t-esc="entry.label" />
+                <div
+                    class="btn-group btn-group-sm w-100 o_erplibre_studio_modes"
+                    role="group"
+                    t-att-aria-labelledby="'o_erplibre_studio_attr_' + entry.attribute"
+                >
+                    <button
+                        t-foreach="modesOf(entry, block)"
+                        t-as="item"
+                        t-key="item.value"
+                        type="button"
+                        class="btn o_erplibre_studio_mode"
+                        t-att-class="item.pressed ? 'btn-primary' : 'btn-outline-secondary'"
+                        t-att-data-value="item.value"
+                        t-att-aria-pressed="item.pressed ? 'true' : 'false'"
+                        t-att-disabled="props.busy"
+                        t-on-click="() => this.setMode(block, entry, item)"
+                        t-esc="item.label"
+                    />
+                </div>
+                <span t-if="!entry.value" class="d-block text-muted mt-1">Not set in the view: web_timeline opens on Fit.</span>
+            </t>
+            <label t-elif="entry.kind === 'order'" class="form-label mb-0 w-100">
+                <t t-esc="entry.label" />
+                <input
+                    class="form-control form-control-sm o_erplibre_studio_attribute"
+                    placeholder="name asc, id desc"
+                    t-att-value="entry.value"
+                    t-att-disabled="props.busy"
+                    t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value)"
+                />
+            </label>
+            <label t-else="" class="form-label mb-0 w-100">
+                <t t-esc="entry.label" />
+                <select
+                    class="form-select form-select-sm o_erplibre_studio_attribute"
+                    t-att-disabled="props.busy"
+                    t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value)"
+                >
+                    <option t-if="!entry.required" value="" t-att-selected="!entry.value">Default</option>
+                    <option
+                        t-foreach="choicesOf(entry, block)"
+                        t-as="item"
+                        t-key="item[0]"
+                        t-att-value="item[0]"
+                        t-att-selected="item[0] === entry.value"
+                        t-esc="item[1]"
+                    />
+                </select>
+            </label>
+        </div>
+    </t>
+
+    <!-- The properties of a timeline: the lane chosen on the canvas, the
+         other attributes of <timeline>, then the attributes the draft
+         gives it. -->
+    <t t-name="erplibre_studio.Inspector.Timeline">
+        <t t-set="lane" t-value="laneInfo" />
+        <div
+            class="o_erplibre_studio_properties o_erplibre_studio_view_properties small d-flex flex-column gap-3"
+            t-att-data-tag="block.tag"
+            t-att-data-lane="lane ? lane.key : false"
+        >
+            <div class="d-flex align-items-center gap-2 o_erplibre_studio_inspector_head">
+                <span
+                    class="o_erplibre_studio_glyph o_erplibre_studio_glyph_large o_erplibre_studio_glyph_container"
+                    aria-hidden="true"
+                    t-esc="lane ? lane.glyph : 'TL'"
+                />
+                <div class="o_erplibre_studio_inspector_name">
+                    <div class="fw-bold fs-6 text-truncate o_erplibre_studio_inspector_title" t-esc="lane ? lane.label : timelineLabel" />
+                    <div class="text-muted o_erplibre_studio_inspector_kind" t-esc="lane ? lane.kind : viewPropertiesLabel" />
+                </div>
+            </div>
+            <fieldset t-if="lane" class="o_erplibre_studio_fieldset o_erplibre_studio_lane_props">
+                <legend class="o_erplibre_studio_section_title">Lane</legend>
+                <t t-foreach="lane.entries" t-as="entry" t-key="entry.attribute">
+                    <t t-call="erplibre_studio.Inspector.SettableEntry" />
+                </t>
+                <div t-if="lane.key === 'template'" class="mb-2 o_erplibre_studio_lane_fields">
+                    <span class="fw-bold">Fields shown</span>
+                    ·
+                    <t t-if="lane.fields.length" t-esc="lane.fields.join(', ')" />
+                    <span t-else="" class="text-muted">none: the items show their name</span>
+                </div>
+                <p class="text-muted mb-0" t-esc="lane.help" />
+            </fieldset>
+            <fieldset t-if="otherEntries(lane).length" class="o_erplibre_studio_fieldset">
+                <legend class="o_erplibre_studio_section_title">Options of the timeline</legend>
+                <t t-foreach="otherEntries(lane)" t-as="entry" t-key="entry.attribute">
+                    <t t-call="erplibre_studio.Inspector.SettableEntry" />
+                </t>
+            </fieldset>
+            <div>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link px-0 d-flex align-items-center gap-1 o_erplibre_studio_generated_toggle"
+                    t-att-aria-expanded="local.generated ? 'true' : 'false'"
+                    aria-controls="o_erplibre_studio_generated"
+                    t-on-click="() => this.local.generated = !this.local.generated"
+                >
+                    Advanced: the attributes of the view
+                    <i class="fa" t-att-class="local.generated ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
+                </button>
+                <pre
+                    t-if="local.generated"
+                    id="o_erplibre_studio_generated"
+                    class="border rounded p-2 mb-0 small bg-200 text-body o_erplibre_studio_generated"
+                    t-esc="generatedTag(block)"
+                />
+            </div>
+        </div>
+    </t>
+
+    <!-- The preview on screen (props.preview), in place of the properties:
+         its mode, the approval of the real mode, how it renders. -->
+    <t t-name="erplibre_studio.Inspector.Preview">
+        <t t-set="preview" t-value="props.preview" />
+        <div
+            class="o_erplibre_studio_preview_info small d-flex flex-column gap-3"
+            t-att-data-kind="preview.kind"
+            t-att-data-mode="preview.mode"
+        >
+            <div class="d-flex align-items-center gap-2 o_erplibre_studio_inspector_head">
+                <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_large o_erplibre_studio_glyph_container" aria-hidden="true">
+                    <i class="fa fa-eye" />
+                </span>
+                <div class="o_erplibre_studio_inspector_name">
+                    <div class="fw-bold fs-6 o_erplibre_studio_inspector_title">Preview</div>
+                    <div class="text-muted o_erplibre_studio_inspector_kind" t-esc="previewModeLabel(preview)" />
+                </div>
+            </div>
+            <t t-if="preview.kind === 'model'">
+                <fieldset class="o_erplibre_studio_fieldset o_erplibre_studio_approval" t-att-data-approved="preview.approved ? '1' : '0'">
+                    <legend class="o_erplibre_studio_section_title">Approval</legend>
+                    <dl t-if="preview.approved" class="o_erplibre_studio_dl mb-0">
+                        <dt>By</dt>
+                        <dd t-esc="preview.approvedBy" />
+                        <dt>When</dt>
+                        <dd t-esc="preview.approvedDate" />
+                        <dt>Scope</dt>
+                        <dd>The models not created yet, as the draft has them now</dd>
+                    </dl>
+                    <p t-elif="preview.stale" class="mb-0 text-warning-emphasis">
+                        The draft changed since its approval: approve it again for a real preview.
+                    </p>
+                    <p t-else="" class="mb-0">
+                        Not approved yet. The real mode creates the draft in the database for a moment: a Settings administrator approves it first, in developer mode.
+                    </p>
+                </fieldset>
+                <fieldset class="o_erplibre_studio_fieldset o_erplibre_studio_approval_rules">
+                    <legend class="o_erplibre_studio_section_title">Withdraws the approval</legend>
+                    <ul class="ps-3 mb-2">
+                        <li>Adding, removing or renaming a model not created yet, or changing its chatter</li>
+                        <li>Adding or changing a new field of such a model</li>
+                        <li>Any change of the views of such a model</li>
+                    </ul>
+                    <div class="fw-bold">Keeps it</div>
+                    <ul class="ps-3 mb-0">
+                        <li>Access rights, record rules, apps and groups</li>
+                        <li>The changes of the models of the database</li>
+                    </ul>
+                </fieldset>
+            </t>
+            <fieldset class="o_erplibre_studio_fieldset o_erplibre_studio_render">
+                <legend class="o_erplibre_studio_section_title">Rendering</legend>
+                <dl class="o_erplibre_studio_dl mb-0">
+                    <t t-foreach="renderFacts(preview)" t-as="fact" t-key="fact_index">
+                        <dt t-esc="fact[0]" />
+                        <dd t-esc="fact[1]" />
+                    </t>
+                </dl>
+            </fieldset>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary align-self-start o_erplibre_studio_preview_leave"
+                t-att-disabled="props.busy"
+                t-on-click="leavePreview"
+            >
+                <i class="fa fa-sign-out me-1" aria-hidden="true" />
+                Leave the preview
+            </button>
+        </div>
+    </t>
+
+    <!-- The inspector: its tabs, then the panel of the tab shown. -->
+    <t t-name="erplibre_studio.Inspector">
+        <div class="o_erplibre_studio_inspector d-flex flex-column h-100">
+            <div role="tablist" class="nav nav-tabs flex-nowrap px-2 pt-2 o_erplibre_studio_inspector_tabs" aria-label="Inspector">
+                <button
+                    type="button"
+                    role="tab"
+                    id="o_erplibre_studio_inspector_tab_properties"
+                    class="nav-link o_erplibre_studio_inspector_tab"
+                    t-att-class="{'active fw-bold': tab === 'properties'}"
+                    data-tab="properties"
+                    aria-controls="o_erplibre_studio_inspector_panel"
+                    t-att-aria-selected="tab === 'properties' ? 'true' : 'false'"
+                    t-on-click="() => this.setTab('properties')"
+                >
+                    Properties
+                </button>
+                <button
+                    type="button"
+                    role="tab"
+                    id="o_erplibre_studio_inspector_tab_changes"
+                    class="nav-link o_erplibre_studio_inspector_tab"
+                    t-att-class="{'active fw-bold': tab === 'changes'}"
+                    data-tab="changes"
+                    aria-controls="o_erplibre_studio_inspector_panel"
+                    t-att-aria-selected="tab === 'changes' ? 'true' : 'false'"
+                    t-on-click="() => this.setTab('changes')"
+                >
+                    Changes
+                    <span
+                        t-if="changes.length"
+                        class="badge rounded-pill text-bg-primary ms-1 o_erplibre_studio_changes_count"
+                        t-esc="changes.length"
+                    />
+                </button>
+            </div>
+            <div
+                role="tabpanel"
+                id="o_erplibre_studio_inspector_panel"
+                class="flex-grow-1 overflow-auto p-3"
+                t-att-aria-labelledby="'o_erplibre_studio_inspector_tab_' + tab"
+                t-att-data-tab="tab"
+            >
+                <t t-if="tab === 'changes'" t-call="erplibre_studio.Inspector.Changes" />
+                <t t-elif="props.preview" t-call="erplibre_studio.Inspector.Preview" />
+                <t t-else="" t-call="erplibre_studio.Inspector.Properties" />
+            </div>
+        </div>
+    </t>
+
+    <!-- The properties of the selected block, else of the view. -->
+    <t t-name="erplibre_studio.Inspector.Properties">
+        <t t-set="block" t-value="propertiesBlock" />
+        <div t-if="!selectedBlock and !laneInfo" class="small text-muted o_erplibre_studio_help mb-3">
+            Drag a field to move it, or drag a field from the left into the view. Click a field to edit its properties.
+        </div>
+        <t t-if="block and isRoot(block) and viewType === 'timeline'" t-call="erplibre_studio.Inspector.Timeline" />
+        <div
+            t-elif="block and isRoot(block)"
+            class="o_erplibre_studio_properties o_erplibre_studio_view_properties small"
+            t-att-data-tag="block.tag"
+        >
+            <fieldset class="o_erplibre_studio_fieldset">
+                <legend class="o_erplibre_studio_section_title">View properties</legend>
+                <t t-call="erplibre_studio.Inspector.Settable" />
+            </fieldset>
+        </div>
+        <div
+            t-elif="block"
+            class="o_erplibre_studio_properties small d-flex flex-column gap-3"
+            t-att-data-name="block.name"
+            t-att-data-kind="block.kind"
+        >
+            <t t-set="field" t-value="selectedField or {}" />
+            <t t-set="view" t-value="viewProps(block, field)" />
+            <div class="d-flex align-items-center gap-2 o_erplibre_studio_inspector_head">
+                <span
+                    class="o_erplibre_studio_glyph o_erplibre_studio_glyph_large o_erplibre_studio_glyph_container"
+                    aria-hidden="true"
+                    t-esc="glyph(block)"
+                />
+                <div class="o_erplibre_studio_inspector_name">
+                    <div class="fw-bold fs-6 text-truncate o_erplibre_studio_inspector_title" t-esc="heading(block)" />
+                    <div class="text-muted o_erplibre_studio_inspector_kind" t-esc="kindOf(block)" />
+                </div>
+            </div>
+            <div
+                t-if="changedNote(block)"
+                class="d-flex gap-2 align-items-start border rounded p-2 o_erplibre_studio_inspector_changed"
+            >
+                <span class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_changed mt-1" aria-hidden="true" />
+                <span class="flex-grow-1">
+                    <t t-esc="changedNote(block)" />
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm p-0 d-block fw-bold o_erplibre_studio_show_changes"
+                        t-on-click="() => this.setTab('changes')"
+                    >
+                        See the changes of this view
+                    </button>
+                </span>
+            </div>
+            <div
+                t-if="block.kind === 'field' and block.in_template === false"
+                class="text-muted o_erplibre_studio_loaded_note"
+            >
+                The view loads this field for its templates: it cannot move nor be hidden here.
+            </div>
+            <div t-if="block.kind === 'filter'">
+                <span class="text-muted">Domain</span>
+                <code class="d-block text-break" t-esc="block.domain" />
+            </div>
+            <div t-if="block.kind === 'group_by'">
+                <span class="text-muted">Group by</span>
+                <code class="d-block" t-esc="block.group_by" />
+            </div>
+
+            <fieldset t-if="block.kind === 'field'" class="o_erplibre_studio_fieldset o_erplibre_studio_field_props">
+                <legend class="o_erplibre_studio_section_title">Field</legend>
+                <t t-if="view.definition">
+                    <label class="form-label mb-1 w-100">
+                        Label
+                        <input
+                            class="form-control form-control-sm mt-1 o_erplibre_studio_prop_label"
+                            t-att-value="field.definition.field_description"
+                            t-on-change="(ev) => this.updateField({field_description: ev.target.value})"
+                            t-att-disabled="props.busy"
+                        />
+                    </label>
+                </t>
+                <label t-elif="view.relabel" class="form-label mb-1 w-100">
+                    Label
+                    <input
+                        class="form-control form-control-sm mt-1 o_erplibre_studio_prop_label"
+                        t-att-value="attr('string')"
+                        t-att-placeholder="field.string"
+                        t-on-change="(ev) => this.setAttribute('relabel', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    />
+                </label>
+                <label class="form-label mb-1 w-100">
+                    Technical name
+                    <span class="input-group input-group-sm mt-1">
+                        <input
+                            class="form-control font-monospace o_erplibre_studio_prop_name"
+                            readonly="readonly"
+                            t-att-value="block.name"
+                        />
+                        <span class="input-group-text">
+                            <i class="fa fa-lock me-1" aria-hidden="true" />
+                            locked
+                        </span>
+                    </span>
+                    <span class="d-block fw-normal text-muted mt-1 o_erplibre_studio_name_help" t-esc="nameHelp(field)" />
+                </label>
+                <t t-if="view.definition">
+                    <label class="form-label mb-1 w-100">
+                        Tooltip
+                        <input
+                            class="form-control form-control-sm mt-1 o_erplibre_studio_prop_help"
+                            t-att-value="field.definition.help"
+                            t-on-change="(ev) => this.updateField({help: ev.target.value})"
+                            t-att-disabled="props.busy"
+                        />
+                    </label>
+                    <label class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2 mb-1">
+                        <input
+                            type="checkbox"
+                            class="form-check-input m-0 o_erplibre_studio_prop_readonly"
+                            t-att-checked="field.definition.readonly"
+                            t-on-change="(ev) => this.updateField({readonly: ev.target.checked})"
+                            t-att-disabled="props.busy"
+                        />
+                        Read-only everywhere
+                    </label>
+                    <label t-if="field.type === 'selection'" class="form-label mb-1 w-100">
+                        Values
+                        <textarea
+                            class="form-control form-control-sm font-monospace mt-1 o_erplibre_studio_prop_selection"
+                            rows="4"
+                            t-att-value="selectionText(field)"
+                            t-on-change="(ev) => this.updateSelection(ev.target.value)"
+                            t-att-disabled="props.busy"
+                        />
+                        <span class="d-block fw-normal text-muted mt-1">One « value:Label » line per value.</span>
+                    </label>
+                    <label t-if="field.type === 'many2one'" class="form-label mb-1 w-100">
+                        Comodel
+                        <input
+                            class="form-control form-control-sm mt-1 o_erplibre_studio_prop_relation"
+                            list="o_erplibre_studio_comodels"
+                            t-att-value="field.definition.relation"
+                            t-att-disabled="props.busy or !field.pending"
+                            t-on-focus="loadComodels"
+                            t-on-change="(ev) => this.updateField({relation: ev.target.value})"
+                        />
+                        <datalist id="o_erplibre_studio_comodels">
+                            <option
+                                t-foreach="props.comodels or []"
+                                t-as="item"
+                                t-key="item[0]"
+                                t-att-value="item[0]"
+                            >
+                                <t t-esc="item[1]" />
+                            </option>
+                        </datalist>
+                    </label>
+                </t>
+            </fieldset>
+
+            <fieldset t-if="isContainer(block)" class="o_erplibre_studio_fieldset o_erplibre_studio_container_props">
+                <legend class="o_erplibre_studio_section_title">Container</legend>
+                <div class="o_erplibre_studio_contents">
+                    <span class="fw-bold">Contents</span>
+                    ·
+                    <t t-if="contents(block).length" t-esc="contents(block).join(', ')" />
+                    <span t-else="" class="text-muted">empty</span>
+                </div>
+            </fieldset>
+
+            <fieldset t-if="view.any" class="o_erplibre_studio_fieldset o_erplibre_studio_in_view">
+                <legend class="o_erplibre_studio_section_title">In this view</legend>
+                <label t-if="view.relabel and block.kind !== 'field'" class="form-label mb-1 w-100">
+                    Label
+                    <input
+                        class="form-control form-control-sm mt-1 o_erplibre_studio_prop_label"
+                        t-att-value="attr('string')"
+                        t-att-placeholder="field.string"
+                        t-on-change="(ev) => this.setAttribute('relabel', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    />
+                </label>
+                <label t-if="view.help" class="form-label mb-1 w-100">
+                    Tooltip
+                    <input
+                        class="form-control form-control-sm mt-1 o_erplibre_studio_prop_help"
+                        t-att-value="attr('help')"
+                        t-att-placeholder="field.help"
+                        t-on-change="(ev) => this.setAttribute('help', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    />
+                </label>
+                <div t-if="view.required or view.readonly or view.hidden" class="o_erplibre_studio_checks mb-2">
+                    <label t-if="view.required" class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2">
+                        <input
+                            type="checkbox"
+                            class="form-check-input m-0 o_erplibre_studio_prop_required"
+                            t-att-checked="isTrue(attr('required'))"
+                            t-on-change="(ev) => this.setAttribute('required', ev.target.checked)"
+                            t-att-disabled="props.busy"
+                        />
+                        Required
+                    </label>
+                    <label t-if="view.readonly" class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2">
+                        <input
+                            type="checkbox"
+                            class="form-check-input m-0 o_erplibre_studio_prop_readonly"
+                            t-att-checked="isTrue(attr('readonly'))"
+                            t-on-change="(ev) => this.setAttribute('readonly', ev.target.checked)"
+                            t-att-disabled="props.busy"
+                        />
+                        Read-only
+                    </label>
+                    <label t-if="view.hidden" class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2">
+                        <input
+                            type="checkbox"
+                            class="form-check-input m-0 o_erplibre_studio_prop_hidden"
+                            t-att-checked="isTrue(attr(hideAttribute))"
+                            t-on-change="(ev) => this.setAttribute('hide', ev.target.checked)"
+                            t-att-disabled="props.busy"
+                        />
+                        Hidden
+                    </label>
+                </div>
+                <label t-if="view.optional" class="form-label mb-1 w-100">
+                    Optional column
+                    <select
+                        class="form-select form-select-sm mt-1 o_erplibre_studio_prop_optional"
+                        t-on-change="(ev) => this.setAttribute('optional', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    >
+                        <option value="" t-att-selected="!attr('optional')">Always shown</option>
+                        <option value="show" t-att-selected="attr('optional') === 'show'">Optional, shown</option>
+                        <option value="hide" t-att-selected="attr('optional') === 'hide'">Optional, hidden</option>
+                    </select>
+                </label>
+                <t t-call="erplibre_studio.Inspector.Settable" />
+            </fieldset>
+
+            <button
+                t-if="canRemove(block)"
+                type="button"
+                class="btn btn-sm btn-outline-danger align-self-start o_erplibre_studio_remove"
+                t-att-disabled="props.busy"
+                t-on-click="removeSelected"
+            >
+                <i class="fa fa-trash" aria-hidden="true" />
+                Remove from the view
+            </button>
+        </div>
+    </t>
+
+    <!-- The changes of the draft in the view on screen. -->
+    <t t-name="erplibre_studio.Inspector.Changes">
+        <div t-if="!changes.length" class="small text-muted mb-3 o_erplibre_studio_no_change">No change.</div>
+        <ol t-else="" class="list-unstyled d-flex flex-column gap-2 mb-3 small o_erplibre_studio_changes">
+            <li
+                t-foreach="changes"
+                t-as="change"
+                t-key="change.id"
+                t-att-data-type="change.type"
+                t-att-data-kind="change.kind"
+                t-att-data-path="change.path or ''"
+                t-att-class="{'o_erplibre_studio_change_failed': change.error}"
+            >
+                <button
+                    t-if="change.path"
+                    type="button"
+                    class="o_erplibre_studio_change_item o_erplibre_studio_change_pick btn w-100 text-start d-flex gap-2 align-items-start border rounded p-2"
+                    t-att-class="{'o_erplibre_studio_change_selected': change.path === props.selected}"
+                    t-att-disabled="props.busy"
+                    t-on-click="() => this.pickChange(change)"
+                >
+                    <t t-call="erplibre_studio.Inspector.Change" />
+                </button>
+                <div
+                    t-else=""
+                    class="o_erplibre_studio_change_item d-flex gap-2 align-items-start border rounded p-2"
+                >
+                    <t t-call="erplibre_studio.Inspector.Change" />
+                </div>
+            </li>
+        </ol>
+        <p class="small text-muted mb-1">
+            Click a change to find its element. The review of the whole project is in the Review space.
+        </p>
+        <button
+            type="button"
+            class="btn btn-sm btn-link p-0 o_erplibre_studio_open_review"
+            t-att-disabled="!props.hasProject or props.busy"
+            t-on-click="openReview"
+        >
+            Open the review
+            <i class="fa fa-arrow-right ms-1" aria-hidden="true" />
+        </button>
+    </t>
+
+    <!-- One change of the list: its number, kind, summary and error. -->
+    <t t-name="erplibre_studio.Inspector.Change">
+        <span
+            class="badge rounded-pill o_erplibre_studio_change_number"
+            t-att-class="change.error ? 'text-bg-danger' : 'o_erplibre_studio_change_number_ok'"
+            t-esc="change_index + 1"
+        />
+        <span class="d-flex flex-column flex-grow-1">
+            <span class="text-muted o_erplibre_studio_change_kind" t-esc="changeKind(change)" />
+            <span class="o_erplibre_studio_change_summary" t-esc="change.summary" />
+            <span t-if="change.error" class="text-danger o_erplibre_studio_change_error">
+                <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
+                <t t-esc="change.error" />
+            </span>
+            <span t-elif="!change.path" class="text-muted fst-italic o_erplibre_studio_change_unplaced">
+                Not on the canvas: the change removes its element.
+            </span>
+        </span>
+    </t>
+</templates>

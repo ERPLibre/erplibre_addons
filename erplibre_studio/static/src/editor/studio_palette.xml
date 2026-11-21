@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The palette: a search box, then a section per kind of item; the
+         heading of a section carries « data-tab » (new, existing, other). -->
+    <t t-name="erplibre_studio.Palette">
+        <div class="o_erplibre_studio_palette_body d-flex flex-column gap-3 h-100">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">
+                    <i class="fa fa-search" aria-hidden="true" />
+                </span>
+                <input
+                    type="text"
+                    class="form-control o_erplibre_studio_palette_filter"
+                    placeholder="Search a field or a type"
+                    aria-label="Search the palette"
+                    t-model="palette.filter"
+                />
+            </div>
+            <section t-if="allows('add_field')" class="o_erplibre_studio_palette_section">
+                <h2 class="o_erplibre_studio_section_title mb-2" data-tab="new">New fields</h2>
+                <div class="o_erplibre_studio_type_grid">
+                    <div
+                        t-foreach="shownTypes"
+                        t-as="item"
+                        t-key="item.ttype"
+                        class="o_erplibre_studio_palette_item o_erplibre_studio_new_field d-flex align-items-center gap-2 border rounded px-2 py-1"
+                        t-att-data-type="item.ttype"
+                        t-att-title="item.label"
+                        role="button"
+                        tabindex="0"
+                        t-att-aria-label="itemLabel(item.label)"
+                        draggable="true"
+                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'new', ttype: item.ttype})"
+                        t-on-dragend="() => this.endDrag()"
+                        t-on-click="() => this.add({kind: 'new', ttype: item.ttype})"
+                        t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'new', ttype: item.ttype})"
+                    >
+                        <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_container" aria-hidden="true" t-esc="item.glyph" />
+                        <span class="text-truncate" t-esc="item.label" />
+                    </div>
+                </div>
+                <div t-if="query and !shownTypes.length" class="small text-muted">No field type matches.</div>
+                <button
+                    t-if="foldsTypes"
+                    class="btn btn-sm btn-link px-0 o_erplibre_studio_more_types"
+                    t-att-aria-expanded="palette.more ? 'true' : 'false'"
+                    t-on-click="toggleMore"
+                >
+                    <t t-if="palette.more">Show fewer types</t>
+                    <t t-else="" t-esc="moreTypesLabel" />
+                </button>
+            </section>
+            <section class="o_erplibre_studio_palette_section">
+                <button
+                    class="btn btn-sm w-100 d-flex align-items-center justify-content-between px-0 o_erplibre_studio_section_toggle"
+                    data-tab="existing"
+                    t-att-aria-expanded="existingOpen ? 'true' : 'false'"
+                    t-on-click="toggleExisting"
+                >
+                    <span class="o_erplibre_studio_section_title" t-esc="existingLabel" />
+                    <i class="fa" t-att-class="existingOpen ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
+                </button>
+                <t t-if="existingOpen">
+                    <div t-if="offersInterval" class="mb-2 small">
+                        <label class="form-label mb-0" for="o_erplibre_studio_interval">Interval of a date grouping</label>
+                        <select
+                            id="o_erplibre_studio_interval"
+                            class="form-select form-select-sm o_erplibre_studio_interval"
+                            t-model="palette.interval"
+                        >
+                            <option t-foreach="intervals" t-as="item" t-key="item[0]" t-att-value="item[0]" t-esc="item[1]" />
+                        </select>
+                    </div>
+                    <div
+                        t-foreach="existingFields"
+                        t-as="item"
+                        t-key="item.name"
+                        class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field d-flex flex-wrap align-items-center gap-1 rounded px-2 py-1 mb-1"
+                        t-att-data-name="item.name"
+                        t-att-title="item.type"
+                        role="button"
+                        tabindex="0"
+                        t-att-aria-label="itemLabel(item.string + ' (' + item.name + ')')"
+                        draggable="true"
+                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes})"
+                        t-on-dragend="() => this.endDrag()"
+                        t-on-click="() => this.add({kind: 'existing', name: item.name, axes: item.axes})"
+                        t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'existing', name: item.name, axes: item.axes})"
+                    >
+                        <span class="text-truncate flex-grow-1" t-esc="item.string" />
+                        <code class="small text-muted text-truncate" t-esc="item.name" />
+                        <span
+                            t-foreach="item.axes or []"
+                            t-as="axis"
+                            t-key="axis"
+                            class="badge text-bg-light o_erplibre_studio_axis_badge"
+                            t-esc="axisLabel(axis)"
+                        />
+                    </div>
+                    <div t-if="query and !existingFields.length" class="small text-muted">No field matches.</div>
+                    <div class="small text-muted mt-1">The fields already in the view are left out.</div>
+                </t>
+            </section>
+            <section t-if="allows('add_widget') or allows('add_separator')" class="o_erplibre_studio_palette_section">
+                <h2 class="o_erplibre_studio_section_title mb-2" data-tab="other">Other</h2>
+                <t t-if="allows('add_widget')">
+                    <label class="small text-muted mb-1" for="o_erplibre_studio_ribbon_title">Ribbon on the card</label>
+                    <input
+                        id="o_erplibre_studio_ribbon_title"
+                        class="form-control form-control-sm mb-1 o_erplibre_studio_ribbon_title"
+                        placeholder="Ribbon text"
+                        t-model="palette.ribbon.title"
+                    />
+                    <select
+                        class="form-select form-select-sm mb-1 o_erplibre_studio_ribbon_color"
+                        aria-label="Ribbon color"
+                        t-model="palette.ribbon.bg_color"
+                    >
+                        <option t-foreach="ribbonColors" t-as="color" t-key="color" t-att-value="color" t-esc="color" />
+                    </select>
+                    <div
+                        class="o_erplibre_studio_palette_item o_erplibre_studio_widget border rounded px-2 py-1 mb-1"
+                        data-widget="web_ribbon"
+                        role="button"
+                        tabindex="0"
+                        draggable="true"
+                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'widget', widget: 'web_ribbon'})"
+                        t-on-dragend="() => this.endDrag()"
+                        t-on-click="() => this.add({kind: 'widget', widget: 'web_ribbon'})"
+                        t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'widget', widget: 'web_ribbon'})"
+                    >
+                        <i class="fa fa-bookmark text-muted" aria-hidden="true" />
+                        Ribbon
+                    </div>
+                </t>
+                <div
+                    t-if="allows('add_separator')"
+                    class="o_erplibre_studio_palette_item o_erplibre_studio_separator border rounded px-2 py-1 mb-1"
+                    role="button"
+                    tabindex="0"
+                    draggable="true"
+                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'separator'})"
+                    t-on-dragend="() => this.endDrag()"
+                    t-on-click="() => this.add({kind: 'separator'})"
+                    t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'separator'})"
+                >
+                    <i class="fa fa-minus text-muted" aria-hidden="true" />
+                    Separator
+                </div>
+            </section>
+            <p t-if="viewType === 'timeline'" class="small text-muted border-top pt-2 mt-auto mb-0">
+                Drag a date field onto Start date or End date, a many2one or a many2many onto Group by.
+            </p>
+            <p t-else="" class="small text-muted border-top pt-2 mt-auto mb-0">
+                Drag an item onto a drop zone of the canvas, or press Enter on it: it goes after the selected element, else at the end of the view.
+            </p>
+        </div>
+    </t>
+</templates>

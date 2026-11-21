@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_developer.SourceLocation">
+        <span class="o_erplibre_dev_location d-inline-flex align-items-center gap-1" t-if="props.file">
+            <code class="text-break" t-esc="text" t-att-title="props.file" />
+            <!-- One button whose label follows the copy: the focus stays on it. -->
+            <button
+                class="btn btn-sm o_erplibre_dev_icon_btn o_erplibre_dev_copy"
+                t-att-class="{'o_erplibre_dev_copied': copyState.copied}"
+                t-att-aria-label="copyLabel"
+                t-att-title="copyLabel"
+                t-on-click.stop="copy"
+            >
+                <i t-attf-class="fa {{ copyState.copied ? 'fa-check' : 'fa-clipboard' }}" aria-hidden="true" />
+            </button>
+            <button
+                t-if="props.ide"
+                class="btn btn-sm o_erplibre_dev_icon_btn o_erplibre_dev_ide"
+                aria-label="Open in IDE"
+                title="Open in IDE"
+                t-on-click.stop="openInIde"
+            >
+                <i class="fa fa-external-link" aria-hidden="true" />
+            </button>
+        </span>
+        <span t-else="" class="text-muted">no file</span>
+        <div t-if="props.file and copyState.manual" class="input-group input-group-sm mt-1 o_erplibre_dev_manual_copy">
+            <input
+                class="form-control"
+                readonly="1"
+                aria-label="Path to copy"
+                t-ref="manual"
+                t-att-value="fullText"
+                t-on-click.stop="(ev) => ev.target.select()"
+            />
+            <button class="btn btn-secondary" aria-label="Close" title="Close" t-on-click.stop="closeManual">
+                <i class="fa fa-times" aria-hidden="true" />
+            </button>
+        </div>
+    </t>
+
+    <t t-name="erplibre_developer.Commits">
+        <div t-if="props.commits" class="mt-1 o_erplibre_dev_commits" t-att-id="props.id">
+            <div t-if="props.commits.loading" class="text-muted">
+                <i class="fa fa-spinner fa-spin" aria-hidden="true" />
+                Loading…
+            </div>
+            <t t-else="">
+                <div t-if="props.commits.clone_rel" class="text-muted text-break mb-1 o_erplibre_dev_commits_repo">
+                    <i class="fa fa-folder-o me-1" aria-hidden="true" />
+                    <t t-esc="props.commits.clone_rel" />
+                </div>
+                <div t-if="props.commits.error" class="text-warning-emphasis text-break" t-esc="props.commits.error" />
+                <div t-elif="!props.commits.commits.length" class="text-muted">No recent commit touches this module.</div>
+                <ul t-else="" class="list-unstyled mb-0 d-flex flex-column gap-1">
+                    <li t-foreach="props.commits.commits" t-as="commit" t-key="commit.sha">
+                        <div class="text-break">
+                            <code class="fw-semibold" t-esc="shortSha(commit.sha)" t-att-title="commit.sha" />
+                            <t t-esc="' ' + commit.subject" />
+                        </div>
+                        <div class="text-muted">
+                            <t t-esc="commit.author" />
+                            ·
+                            <span t-att-title="commitDate(commit.date)" t-esc="commitWhen(commit.date)" />
+                        </div>
+                    </li>
+                </ul>
+            </t>
+        </div>
+    </t>
+</templates>

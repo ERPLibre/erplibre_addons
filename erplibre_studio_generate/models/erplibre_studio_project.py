@@ -389,7 +389,8 @@ class ErplibreStudioProject(models.Model):
         (read from the branding of the combined arch), of the models
         extended (by a field or by the inverse of a one2many), of the
         fields added or named by the changes (a filter domain, a group-by,
-        a timeline date) and of the comodels; mail for a chatter; those of
+        a timeline date) and of the comodels; those of the models and the
+        view types of the views the project adds; mail for a chatter; those of
         the parent menus, of the groups, of the groups the groups of the
         project imply, of the existing models of the access rights and
         record rules, and of the fields their domains name. The icons of
@@ -436,6 +437,10 @@ class ErplibreStudioProject(models.Model):
             relation = definition.get("relation")
             if relation:
                 names.add(self._module_of("ir.model", IrModel._get_id(relation)))
+        for added in self.view_line_ids:
+            # The model of a view the project adds, and its view type.
+            names.add(self._module_of("ir.model", IrModel._get_id(added.model)))
+            names.add(self._view_type_module(added.view_type))
         names |= self._model_line_dependencies()
         names.discard(False)
         names.discard(self.module_name)
@@ -604,6 +609,15 @@ class ErplibreStudioProject(models.Model):
                 f"- {view.type} view `{view.xml_id or view.name}`: "
                 + self.env._("%(count)s change(s)", count=count)
             )
+        for added in self.view_line_ids:
+            lines.append(
+                f"- `{added.model}`: "
+                + self.env._(
+                    "new %(type)s view `%(view)s`",
+                    type=added.view_type,
+                    view=added._studio_xml_name(),
+                )
+            )
         for app in self.app_ids:
             lines.append(
                 "- "
@@ -729,10 +743,10 @@ class ErplibreStudioProject(models.Model):
         # again as Apply checks them.
         self._studio_check_apply_groups()
         self._studio_check_apply_rules()
-        pending = self.change_ids.filtered("model_line_id")
-        if pending:
-            # Apply binds them to the views it creates: an applied project
-            # has none.
+        pending = self.change_ids.filtered(lambda c: c.model_line_id or c.view_line_id)
+        if pending or self.view_line_ids.filtered(lambda v: not v.applied):
+            # Apply creates these views and binds the changes to them: an
+            # applied project has none.
             raise UserError(
                 self.env._(
                     "Apply the draft first: %(count)s change(s) are on the views "

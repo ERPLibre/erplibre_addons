@@ -78,6 +78,7 @@ class TestEditorModels(StudioCase):
                     "perm_write": True,
                     "perm_create": True,
                     "perm_unlink": True,
+                    "applied": False,
                 }
             ],
         )

@@ -16,7 +16,7 @@ from odoo.tools.misc import file_path
 from odoo.tools.safe_eval import safe_eval
 
 from .. import arch as studio_arch
-from .studio_pending import is_pending_view, pending_view
+from .studio_pending import added_view, is_added_view, is_pending_view, pending_view
 
 _logger = logging.getLogger(__name__)
 
@@ -164,6 +164,7 @@ GUARDED_FIELDS = frozenset(
         "rule_line_ids",
         "app_ids",
         "group_line_ids",
+        "view_line_ids",
     }
 )
 # The values of a project without an approval of its real preview.
@@ -366,6 +367,14 @@ class ErplibreStudioProject(models.Model):
     rule_line_ids = fields.One2many(
         "erplibre.studio.rule", "project_id", string="Record rules", copy=False
     )
+    view_line_ids = fields.One2many(
+        "erplibre.studio.view",
+        "project_id",
+        string="Views added",
+        copy=False,
+        help="The views the project adds to existing models that have none "
+        "of their type.",
+    )
     item_count = fields.Integer(compute="_compute_item_count")
     created_model_ids = fields.Many2many(
         "ir.model",
@@ -472,6 +481,7 @@ class ErplibreStudioProject(models.Model):
         "rule_line_ids",
         "app_ids",
         "group_line_ids",
+        "view_line_ids",
     )
     def _compute_item_count(self):
         for project in self:
@@ -482,6 +492,7 @@ class ErplibreStudioProject(models.Model):
                 + len(project.rule_line_ids)
                 + len(project.app_ids)
                 + len(project.group_line_ids)
+                + len(project.view_line_ids)
             )
 
     @api.depends("approved_snapshot", "draft_revision")
@@ -889,7 +900,9 @@ class ErplibreStudioProject(models.Model):
     def _current_snapshot(self):
         """The JSON of the draft, to compare it with the one applied. A
         project with changes of views only keeps the form of a list of its
-        changes, the one of the projects recorded before the models."""
+        changes, the one of the projects recorded before the models; the
+        key « views » shows only with a view line, so that the snapshot of
+        a project without one keeps the form it had before them."""
         self.ensure_one()
         changes = self.change_ids._snapshot()
         lines = (
@@ -898,25 +911,26 @@ class ErplibreStudioProject(models.Model):
             or self.rule_line_ids
             or self.app_ids
             or self.group_line_ids
+            or self.view_line_ids
         )
         if not lines:
             return json.dumps(changes, sort_keys=True)
-        return json.dumps(
-            {
-                "changes": changes,
-                "models": self.new_model_ids._snapshot(),
-                "access": self.access_line_ids._snapshot(),
-                "rules": self.rule_line_ids._snapshot(),
-                "apps": self.app_ids._snapshot(),
-                "groups": self.group_line_ids._snapshot(),
-            },
-            sort_keys=True,
-        )
+        value = {
+            "changes": changes,
+            "models": self.new_model_ids._snapshot(),
+            "access": self.access_line_ids._snapshot(),
+            "rules": self.rule_line_ids._snapshot(),
+            "apps": self.app_ids._snapshot(),
+            "groups": self.group_line_ids._snapshot(),
+        }
+        if self.view_line_ids:
+            value["views"] = self.view_line_ids._snapshot()
+        return json.dumps(value, sort_keys=True)
 
     @api.model
     def _studio_load_snapshot(self, text):
-        """The dict {changes, models, access, rules, apps, groups} of the
-        snapshot ``text``, whichever form ``_current_snapshot`` gave it. A
+        """The dict {changes, models, access, rules, apps, groups, views} of
+        the snapshot ``text``, whichever form ``_current_snapshot`` gave it. A
         snapshot with a single « app » {name, icon, sequence} gives the app
         « menu_app », where its models « in the app » go; its rules without
         a group on a model it creates are global."""
@@ -925,7 +939,15 @@ class ErplibreStudioProject(models.Model):
             value = {"changes": value}
         snapshot = {
             key: value.get(key) or []
-            for key in ("changes", "models", "access", "rules", "apps", "groups")
+            for key in (
+                "changes",
+                "models",
+                "access",
+                "rules",
+                "apps",
+                "groups",
+                "views",
+            )
         }
         app = value.get("app") or {}
         if "apps" not in value and (app.get("name") or "").strip():
@@ -979,44 +1001,55 @@ class ErplibreStudioProject(models.Model):
     # ── draft ───────────────────────────────────────────────────────────
 
     def _view_changes(self, view):
-        """The changes of ``view``, a view or a pending view (see
-        ``StudioPendingView``), in the order they apply."""
+        """The changes of ``view``, a view, a pending view (see
+        ``StudioPendingView``) or a view a view line adds (see
+        ``StudioAddedView``), in the order they apply."""
         self.ensure_one()
         if is_pending_view(view):
             changes = self.change_ids.filtered(
                 lambda c: c.model_line_id == view.line and c.view_type == view.type
             )
+        elif is_added_view(view):
+            changes = self.change_ids.filtered(lambda c: c.view_line_id == view.line)
         else:
             changes = self.change_ids.filtered(lambda c: c.view_id == view)
         return changes.sorted(lambda c: (c.sequence, c.id))
 
     def _change_view(self, change):
-        """The view ``change`` is on: its view, or the pending view of its
-        model line."""
+        """The view ``change`` is on: its view, the pending view of its
+        model line, or the view its view line adds."""
         if change.view_id:
             return change.view_id
+        if change.view_line_id:
+            return added_view(change.view_line_id)
         return pending_view(change.model_line_id, change.view_type)
 
     def _base_arch(self, view, branding=False):
         """The combined arch of ``view`` without the views of the project;
-        of a pending view, the default arch of its model line."""
+        of a pending view, the default arch of its model line; of a view a
+        view line adds, the arch the line recorded."""
         self.ensure_one()
         if is_pending_view(view):
             return etree.fromstring(self._studio_default_arch(view.line, view.type))
+        if is_added_view(view):
+            return etree.fromstring(view.line.arch)
         context = {EXCLUDE_KEY: ViewExclusion(self.studio_view_ids.ids)}
         if branding:
             context["inherit_branding"] = True
         View = self.env["ir.ui.view"].sudo().with_context(**context)
         return View.browse(view.id)._get_combined_arch()
 
-    def _draft_arch(self, view):
+    def _draft_arch(self, view, track=False):
         """(arch, errors): the base arch of ``view`` with the changes of the
         project applied; ``errors`` maps a change id to why it does not
-        apply."""
+        apply. ``track``: the nodes the changes touch carry
+        ``arch.CHANGE_MARK``, for the editor only."""
         self.ensure_one()
-        return self._draft_arch_without(view, self.env["erplibre.studio.change"])
+        return self._draft_arch_without(
+            view, self.env["erplibre.studio.change"], track=track
+        )
 
-    def _draft_arch_without(self, view, skipped):
+    def _draft_arch_without(self, view, skipped, track=False):
         """``_draft_arch`` of ``view`` with the changes ``skipped`` left
         out. On a pending view, a change that shows a field the model will
         not have (the inverse of a one2many that left the draft) does not
@@ -1040,6 +1073,7 @@ class ErplibreStudioProject(models.Model):
             [c._as_dict() for c in changes if c.id not in errors],
             view.type,
             self._arch_message,
+            track=track,
         )
         return arch, {**arch_errors, **errors}
 
@@ -1352,6 +1386,8 @@ class ErplibreStudioProject(models.Model):
         target = {"view_id": view.id}
         if is_pending_view(view):
             target = {"view_id": False, "model_line_id": view.line.id}
+        elif is_added_view(view):
+            target = {"view_id": False, "view_line_id": view.line.id}
         return Change.create(
             {
                 "project_id": self.id,
@@ -2236,6 +2272,7 @@ class ErplibreStudioProject(models.Model):
             project.change_ids.unlink()
             project.rule_line_ids.unlink()
             project.access_line_ids.unlink()
+            project.view_line_ids.unlink()
             project.new_model_ids.unlink()
             project.group_line_ids.unlink()
             project.app_ids.unlink()
@@ -2246,6 +2283,7 @@ class ErplibreStudioProject(models.Model):
                 ("models", "erplibre.studio.model"),
                 ("access", "erplibre.studio.access"),
                 ("rules", "erplibre.studio.rule"),
+                ("views", "erplibre.studio.view"),
             ):
                 Line = restore.env[model]
                 for item in snapshot[kind]:
@@ -2276,6 +2314,14 @@ class ErplibreStudioProject(models.Model):
                     )
                     if line and not line.applied:
                         Change.create(dict(vals, view_id=False, model_line_id=line.id))
+                        continue
+                elif item.get("view_line"):
+                    added = project.view_line_ids.filtered(
+                        lambda v, i=item: v.model == i["model"]
+                        and v.view_type == i["view_type"]
+                    )
+                    if added and not added.applied:
+                        Change.create(dict(vals, view_id=False, view_line_id=added.id))
                         continue
                 elif item["model"] in self.env and (
                     View.browse(item["view_id"] or 0).exists()
@@ -2333,6 +2379,10 @@ class ErplibreStudioProject(models.Model):
             and model not in self._studio_new_models()
         ):
             gone.append(self.env._("its model"))
+        if Line._name == "erplibre.studio.view":
+            label = f"{model}.{vals.get('view_type')}"
+            if model not in self.env:
+                gone.append(self.env._("its model"))
         if not gone:
             try:
                 with self.env.cr.savepoint():
@@ -2348,6 +2398,7 @@ class ErplibreStudioProject(models.Model):
             "erplibre.studio.model": self.env._("the model"),
             "erplibre.studio.access": self.env._("the access row on"),
             "erplibre.studio.rule": self.env._("the rule"),
+            "erplibre.studio.view": self.env._("the view"),
         }[Line._name]
         return [
             self.env._(
@@ -2692,6 +2743,159 @@ class ErplibreStudioProject(models.Model):
             view_type, (line.name or "").strip(), line.chatter
         )
 
+    # ── views the project adds ──────────────────────────────────────────
+
+    def _studio_view_line(self, model, view_type):
+        """The view line of the project that adds the ``view_type`` view of
+        ``model``, or an empty recordset."""
+        lines = self.view_line_ids if len(self) == 1 else self.view_line_ids.browse()
+        return lines.filtered(
+            lambda line: line.model == model and line.view_type == view_type
+        )[:1]
+
+    def _studio_added_view(self, model, view_type):
+        """The view the project adds as ``view_type`` view of ``model``,
+        while Apply has not created it (``StudioAddedView``), else None."""
+        line = self._studio_view_line(model, view_type)
+        if line and not line.applied:
+            return added_view(line)
+        return None
+
+    def _studio_view_line_of(self, view):
+        """The view line behind ``view``: the line of a ``StudioAddedView``,
+        or the line whose Apply created the view; else an empty
+        recordset."""
+        if is_added_view(view):
+            return view.line
+        if not view or is_pending_view(view):
+            return self.view_line_ids.browse()
+        return self.view_line_ids.filtered(lambda line: line.view_id == view)[:1]
+
+    @api.model
+    def _studio_view_fields(self, model):
+        """(name field, date field, group field) of the default arch of a
+        view added to ``model``: the field a record shows by, the first of
+        ``create_date`` or a stored date, and the first of ``create_uid`` or
+        a stored many2one; None where the model has none."""
+        Model = self.env[model]
+        name = Model._rec_name_fallback()
+        stored = [
+            (fname, field)
+            for fname, field in Model._fields.items()
+            if field.store and fname != "id"
+        ]
+        date = next(
+            (
+                fname
+                for fname in ["create_date"]
+                + [n for n, f in stored if f.type in studio_arch.DATE_TYPES]
+                if fname in Model._fields
+                and Model._fields[fname].type in studio_arch.DATE_TYPES
+            ),
+            None,
+        )
+        group = next(
+            (
+                fname
+                for fname in ["create_uid"]
+                + [n for n, f in stored if f.type == "many2one"]
+                if fname in Model._fields and Model._fields[fname].type == "many2one"
+            ),
+            None,
+        )
+        return name, date, group
+
+    def _studio_add_view(self, model, view_type):
+        """Add to the draft the ``view_type`` view of the existing ``model``,
+        which has none of that type: a view line with its default arch
+        (``arch.default_view_arch``). Return the line; UserError when the
+        view cannot be added."""
+        self.ensure_one()
+        self = self._editing()
+        Editor = self.env["erplibre.studio.editor"]
+        label = Editor._view_type_labels().get(view_type, view_type)
+        if view_type not in self._view_types():
+            if view_type == "timeline":
+                raise UserError(Editor._view_reason("needs_module", label, model))
+            raise UserError(
+                self.env._("The studio does not edit %(type)s views.", type=label)
+            )
+        if model not in self.env:
+            if self._studio_pending_line(model):
+                raise UserError(Editor._view_reason("apply_first", label, model))
+            raise UserError(self.env._("Unknown model %(model)s.", model=model))
+        Model = self.env[model]
+        if Model._abstract or Model._transient:
+            raise UserError(
+                self.env._(
+                    "%(model)s stores no records: the studio adds no view to it.",
+                    model=model,
+                )
+            )
+        View = self.env["ir.ui.view"].sudo()
+        if View.default_view(model, view_type):
+            raise UserError(
+                self.env._(
+                    "%(model)s already has a %(type)s view.", model=model, type=label
+                )
+            )
+        other = (
+            self.env["erplibre.studio.view"]
+            .sudo()
+            .search([("model", "=", model), ("view_type", "=", view_type)], limit=1)
+        )
+        if other:
+            raise UserError(
+                self.env._(
+                    "The project %(project)s already adds a %(type)s view to "
+                    "%(model)s.",
+                    project=other.project_id.name,
+                    type=label,
+                    model=model,
+                )
+            )
+        name, date, group = self._studio_view_fields(model)
+        if view_type == "timeline" and not (date and group):
+            raise UserError(
+                self.env._(
+                    "A timeline needs a date field and a many2one on %(model)s.",
+                    model=model,
+                )
+            )
+        # The source label of the model: the arch goes as is into a module.
+        description = Model._description or model
+        arch = studio_arch.default_view_arch(view_type, description, name, date, group)
+        sequence = max(self.view_line_ids.mapped("sequence") or [0]) + 10
+        line = (
+            self.env["erplibre.studio.view"]
+            ._server_writing()
+            .with_context(**{NO_TOUCH_KEY: True})
+            .create(
+                {
+                    "project_id": self.id,
+                    "model": model,
+                    "view_type": view_type,
+                    "arch": arch,
+                    "sequence": sequence,
+                }
+            )
+        )
+        self._touch()
+        return line
+
+    def _studio_added_line(self, line_id):
+        line = self.view_line_ids.filtered(lambda v: v.id == int(line_id or 0))
+        if not line:
+            raise UserError(self.env._("This view is not in the project."))
+        return line
+
+    def _studio_remove_view(self, line):
+        """Take the view ``line`` adds out of the draft, with its changes;
+        once applied, the next Apply removes the view from the database."""
+        self.ensure_one()
+        line.with_context(**{NO_TOUCH_KEY: True}).unlink()
+        self._touch()
+
     # ── apply / revert ──────────────────────────────────────────────────
 
     def _studio_xmlname(self, view):
@@ -2974,105 +3178,174 @@ class ErplibreStudioProject(models.Model):
     def _studio_check_apply(self):
         """The checks of the lines again, before Apply writes anything: the
         parent menus, groups and models the lines name leave the database
-        with the module that defines them."""
+        with the module that defines them. Raise UserError on the first
+        line that does not apply; each check of a line is its own method,
+        which the review runs line by line."""
         self.ensure_one()
         mail = self._studio_mail_available()
         for line in self.new_model_ids:
-            self._studio_check_menu(line)
-            if line.chatter and not mail:
-                raise UserError(
-                    self.env._("A chatter needs the module mail (Discuss).")
-                )
-            if line.model in self.env and not line.applied:
-                raise UserError(
-                    self.env._("The model %(name)s already exists.", name=line.model)
-                )
-            if line.model not in self.access_line_ids.mapped("model"):
-                # Without one, the model is the superuser's only, and the
-                # generated module has no access file.
-                raise UserError(
-                    self.env._(
-                        "The model %(name)s needs at least one access right.",
-                        name=line.model,
-                    )
-                )
+            self._studio_check_apply_model(line, mail)
         for line in self.access_line_ids:
-            self._studio_check_rights_model(line.model)
-            if line.group_line_id:
-                if line.group_line_id.project_id != self:
-                    raise UserError(
-                        self.env._(
-                            "The access row on %(model)s names a group of "
-                            "another project.",
-                            model=line.model,
-                        )
-                    )
-            else:
-                self._studio_check_group(line.group_id)
-            self._studio_check_access_line(line)
-            if line.xml_name != line._studio_xml_name():
-                raise UserError(
-                    self.env._(
-                        "The access row on %(model)s has the external id "
-                        "%(name)s instead of %(expected)s.",
-                        model=line.model,
-                        name=line.xml_name,
-                        expected=line._studio_xml_name(),
-                    )
-                )
+            self._studio_check_apply_access(line)
         self._studio_check_apply_rules()
         self._studio_check_apply_groups()
         for change in self.change_ids:
-            if not change.view_id and change.model_line_id.project_id != self:
-                raise UserError(
-                    self.env._(
-                        "The change « %(change)s » is on no view of the project.",
-                        change=change.summary,
-                    )
-                )
+            self._studio_check_apply_change(change)
+        for line in self.view_line_ids:
+            self._studio_check_apply_view(line)
         self._studio_check_relations()
         names = self._studio_new_models()
         self._studio_check_model_removal(
             self.created_model_ids.exists().filtered(lambda m: m.model not in names)
         )
 
+    def _studio_check_apply_model(self, line, mail):
+        """Raise UserError when the model line ``line`` does not apply: its
+        menu, its chatter without mail (``mail``: whether mail is
+        installed), a model of that name already in the database, no access
+        row on it."""
+        self.ensure_one()
+        self._studio_check_menu(line)
+        if line.chatter and not mail:
+            raise UserError(self.env._("A chatter needs the module mail (Discuss)."))
+        if line.model in self.env and not line.applied:
+            raise UserError(
+                self.env._("The model %(name)s already exists.", name=line.model)
+            )
+        if line.model not in self.access_line_ids.mapped("model"):
+            # Without one, the model is the superuser's only, and the
+            # generated module has no access file.
+            raise UserError(
+                self.env._(
+                    "The model %(name)s needs at least one access right.",
+                    name=line.model,
+                )
+            )
+
+    def _studio_check_apply_access(self, line):
+        """Raise UserError when the access row ``line`` does not apply: its
+        model, its group, the rights of a share group, its external id."""
+        self.ensure_one()
+        self._studio_check_rights_model(line.model)
+        if line.group_line_id:
+            if line.group_line_id.project_id != self:
+                raise UserError(
+                    self.env._(
+                        "The access row on %(model)s names a group of "
+                        "another project.",
+                        model=line.model,
+                    )
+                )
+        else:
+            self._studio_check_group(line.group_id)
+        self._studio_check_access_line(line)
+        if line.xml_name != line._studio_xml_name():
+            raise UserError(
+                self.env._(
+                    "The access row on %(model)s has the external id "
+                    "%(name)s instead of %(expected)s.",
+                    model=line.model,
+                    name=line.xml_name,
+                    expected=line._studio_xml_name(),
+                )
+            )
+
+    def _studio_check_apply_change(self, change):
+        """Raise UserError when ``change`` is on no view of the project: a
+        change of a model line of another project."""
+        self.ensure_one()
+        line = change.model_line_id or change.view_line_id
+        if not change.view_id and line.project_id != self:
+            raise UserError(
+                self.env._(
+                    "The change « %(change)s » is on no view of the project.",
+                    change=change.summary,
+                )
+            )
+
+    def _studio_check_apply_view(self, line):
+        """Raise UserError when the view line ``line`` does not apply: its
+        model left the database, the studio no longer edits its type, or
+        another view of its type is now the default of the model. A model
+        line of the project creates its model again before Apply creates the
+        added views: a view added to it is not refused while the model is
+        out of the database (after Revert or an uninstall)."""
+        self.ensure_one()
+        label = (
+            self.env["erplibre.studio.editor"]
+            ._view_type_labels()
+            .get(line.view_type, line.view_type)
+        )
+        if line.model not in self.env and line.model not in self._studio_new_models():
+            raise UserError(
+                self.env._(
+                    "The model %(model)s of the %(type)s view the project adds "
+                    "left the database.",
+                    model=line.model,
+                    type=label,
+                )
+            )
+        if line.view_type not in self._view_types():
+            raise UserError(
+                self.env._("The studio does not edit %(type)s views.", type=label)
+            )
+        View = self.env["ir.ui.view"].sudo()
+        default = View.browse(View.default_view(line.model, line.view_type))
+        if default and default != line.view_id:
+            raise UserError(
+                self.env._(
+                    "%(model)s has a %(type)s view now (%(view)s): remove the "
+                    "one the project adds.",
+                    model=line.model,
+                    type=label,
+                    view=default.xml_id or default.name,
+                )
+            )
+
     def _studio_check_apply_rules(self):
-        """The checks of the rule lines before Apply: the groups they name,
-        a group or « Global », and their domain on an existing model."""
+        """The checks of the rule lines before Apply
+        (``_studio_check_apply_rule``)."""
         self.ensure_one()
         for rule in self.rule_line_ids:
-            self._studio_check_rights_model(rule.model)
-            for group in rule.group_ids:
-                self._studio_check_group(group)
-            rule._check_studio_xml_name()
-            missing = rule._studio_missing_group_refs()
-            if missing:
-                raise UserError(
-                    self.env._(
-                        "The rule %(name)s lost the groups %(groups)s: choose its "
-                        "groups again.",
-                        name=rule.name,
-                        groups=", ".join(missing),
-                    )
+            self._studio_check_apply_rule(rule)
+
+    def _studio_check_apply_rule(self, rule):
+        """Raise UserError when the rule line ``rule`` does not apply: the
+        groups it names, a group or « Global », and its domain on an
+        existing model."""
+        self.ensure_one()
+        self._studio_check_rights_model(rule.model)
+        for group in rule.group_ids:
+            self._studio_check_group(group)
+        rule._check_studio_xml_name()
+        missing = rule._studio_missing_group_refs()
+        if missing:
+            raise UserError(
+                self.env._(
+                    "The rule %(name)s lost the groups %(groups)s: choose its "
+                    "groups again.",
+                    name=rule.name,
+                    groups=", ".join(missing),
                 )
-            self._studio_check_global_rule(rule)
-            if not (rule.group_ids or rule.group_line_ids or rule.global_rule):
-                raise UserError(
-                    self.env._(
-                        "The rule %(name)s has no group: check « Global » to "
-                        "apply it to every user, or choose its groups.",
-                        name=rule.name,
-                    )
+            )
+        self._studio_check_global_rule(rule)
+        if not (rule.group_ids or rule.group_line_ids or rule.global_rule):
+            raise UserError(
+                self.env._(
+                    "The rule %(name)s has no group: check « Global » to "
+                    "apply it to every user, or choose its groups.",
+                    name=rule.name,
                 )
-            if rule.group_line_ids - self.group_line_ids:
-                raise UserError(
-                    self.env._(
-                        "The rule %(name)s names a group of another project.",
-                        name=rule.name,
-                    )
+            )
+        if rule.group_line_ids - self.group_line_ids:
+            raise UserError(
+                self.env._(
+                    "The rule %(name)s names a group of another project.",
+                    name=rule.name,
                 )
-            if rule.model in self.env:
-                self._studio_check_rule(rule)
+            )
+        if rule.model in self.env:
+            self._studio_check_rule(rule)
 
     def _studio_check_apply_groups(self):
         """The checks of the apps and the groups before Apply."""
@@ -3080,17 +3353,23 @@ class ErplibreStudioProject(models.Model):
         for app in self.app_ids:
             app._check_studio_app()
         for group in self.group_line_ids:
-            group._check_studio_group()
-            missing = group._studio_missing_implied_refs()
-            if missing:
-                raise UserError(
-                    self.env._(
-                        "The group %(name)s lost the implied groups %(groups)s: "
-                        "choose them again.",
-                        name=group.name,
-                        groups=", ".join(missing),
-                    )
+            self._studio_check_apply_group(group)
+
+    def _studio_check_apply_group(self, group):
+        """Raise UserError when the group line ``group`` does not apply: its
+        constraints, an implied group it lost."""
+        self.ensure_one()
+        group._check_studio_group()
+        missing = group._studio_missing_implied_refs()
+        if missing:
+            raise UserError(
+                self.env._(
+                    "The group %(name)s lost the implied groups %(groups)s: "
+                    "choose them again.",
+                    name=group.name,
+                    groups=", ".join(missing),
                 )
+            )
 
     def _apply_models(self, log):
         """Create or update the custom models of the model lines, with their
@@ -3189,6 +3468,28 @@ class ErplibreStudioProject(models.Model):
                     waiting.append(vals["name"])
                 kept |= view
         return kept, waiting
+
+    def _apply_added_views(self, log):
+        """Create the views the view lines add, primary, with the arch each
+        line recorded: the only view of its type on its model, its default
+        one. Return the views kept."""
+        kept = self.env["ir.ui.view"].sudo()
+        for line in self.view_line_ids:
+            view, _differs = self._studio_save(
+                "ir.ui.view",
+                line._studio_xml_name(),
+                {
+                    "name": line._studio_view_name(),
+                    "model": line.model,
+                    "type": line.view_type,
+                    "mode": "primary",
+                    "priority": MODEL_VIEW_PRIORITY,
+                    "arch": line.arch,
+                },
+                log,
+            )
+            kept |= view
+        return kept
 
     def _apply_actions(self, log):
         """Create or update the window action of each model line."""
@@ -3408,8 +3709,9 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_bind_pending_changes(self):
         """Bind the changes recorded on the default views of the new models,
-        before Apply created them, to these views, now created: their node
-        paths were recorded on the default arch."""
+        and on the views the view lines add, before Apply created them, to
+        these views, now created: their node paths were recorded on the
+        arch Apply gave them."""
         self.ensure_one()
         for change in self.change_ids.filtered("model_line_id"):
             view = change.model_line_id._studio_views().get(change.view_type)
@@ -3417,6 +3719,31 @@ class ErplibreStudioProject(models.Model):
                 change.with_context(**{NO_TOUCH_KEY: True}).sudo().write(
                     {"view_id": view.id, "model_line_id": False}
                 )
+        self.view_line_ids.invalidate_recordset(["applied", "view_id"])
+        for change in self.change_ids.filtered("view_line_id"):
+            view = change.view_line_id.view_id
+            if view:
+                change.with_context(**{NO_TOUCH_KEY: True}).sudo().write(
+                    {"view_id": view.id, "view_line_id": False}
+                )
+
+    def _studio_unbind_added_changes(self, views):
+        """Bind the changes on ``views``, views of view lines about to leave
+        the database, back to their lines: the lines stay in the draft, and
+        the paths of the changes hold on the arch the lines recorded.
+        Return the changes bound back."""
+        self.ensure_one()
+        back = self.env["erplibre.studio.change"]
+        for line in self.view_line_ids:
+            record = line.view_id
+            if not record or record not in views:
+                continue
+            changes = self.change_ids.filtered(lambda c, r=record: c.view_id == r)
+            changes.with_context(**{NO_TOUCH_KEY: True}).sudo().write(
+                {"view_id": False, "view_line_id": line.id}
+            )
+            back |= changes
+        return back
 
     def _apply_access(self, log):
         """Create or update the ir.model.access of each access row, on an
@@ -4027,6 +4354,7 @@ class ErplibreStudioProject(models.Model):
                 continue
             value = value.exists()
             if kind == "primary_views":
+                self._studio_unbind_added_changes(value)
                 changes = self.change_ids.filtered(lambda c: c.view_id in value)
                 removed_changes = len(changes)
                 changes.with_context(**{NO_TOUCH_KEY: True}).unlink()
@@ -4079,6 +4407,7 @@ class ErplibreStudioProject(models.Model):
             kept["primary_views"], waiting_views = project._apply_model_views(
                 log, owned
             )
+            kept["primary_views"] |= project._apply_added_views(log)
             project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
             project._studio_bind_pending_changes()
             kept["views"] = project._apply_views(log)
@@ -4110,6 +4439,7 @@ class ErplibreStudioProject(models.Model):
             )
             project._internal().write(vals)
             project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
+            project.view_line_ids.invalidate_recordset(["applied", "view_id"])
             project._touch()
             _logger.info("Studio project %s applied: %s", project.module_name, log)
         if not waiting:
@@ -4167,6 +4497,7 @@ class ErplibreStudioProject(models.Model):
             )
             project._internal().write(vals)
             project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
+            project.view_line_ids.invalidate_recordset(["applied", "view_id"])
             project._touch()
             _logger.info("Studio project %s reverted: %s", project.module_name, log)
         if not removed:
@@ -4210,17 +4541,23 @@ class ErplibreStudioProject(models.Model):
         for project in self:
             project._internal().write(project._studio_uninstall_reset_vals())
             project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
+            project.view_line_ids.invalidate_recordset(["applied", "view_id"])
             project._touch()
 
     def action_open_editor(self):
         """The editor on the first view the project changes, else on the
-        form of its first model."""
+        form of its first model, else on the first view it adds."""
         self.ensure_one()
         view = self.change_ids.filtered("view_id")[:1].view_id
         if not view:
             applied = self.new_model_ids.filtered("applied")[:1]
             view = applied and applied._studio_views().get("form")
         Editor = self.env["erplibre.studio.editor"]
+        added = self.view_line_ids[:1]
+        if not view and not self.new_model_ids and added:
+            return Editor.action_customize(
+                added.model, added.view_id.id, added.view_type, project_id=self.id
+            )
         if not view:
             line = self.new_model_ids[:1]
             if not line:

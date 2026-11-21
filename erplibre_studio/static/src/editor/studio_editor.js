@@ -4,379 +4,112 @@
 
 import {Component, onWillStart, useState} from "@odoo/owl";
 import {ConfirmationDialog} from "@web/core/confirmation_dialog/confirmation_dialog";
-import {serializeDateTime} from "@web/core/l10n/dates";
+import {Dropdown} from "@web/core/dropdown/dropdown";
+import {useDropdownState} from "@web/core/dropdown/dropdown_hooks";
+import {deserializeDateTime, formatDateTime} from "@web/core/l10n/dates";
 import {_t} from "@web/core/l10n/translation";
+import {browser} from "@web/core/browser/browser";
+import {useHotkey} from "@web/core/hotkeys/hotkey_hook";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 import {View} from "@web/views/view";
+import {StudioCanvas} from "./studio_canvas";
 import {StudioConfirmDialog} from "./studio_confirm";
-import {StudioAppsPanel, groupValue, parseGroupValue} from "./studio_groups";
-import {PERMS, StudioModelDialog, accessGrid, accessGroup, accessRows, permLabel} from "./studio_models";
+import {parseGroupValue} from "./studio_groups";
+import {PERMS, StudioModelDialog, accessGroup, accessRows} from "./studio_models";
+import {StudioSecuritySpace, pickModel, securityModels} from "./studio_security";
+import {INSPECTOR_TABS, StudioInspector} from "./studio_inspector";
+import {StudioOutline, outlineLabel} from "./studio_outline";
+import {StudioPalette} from "./studio_palette";
+import {StudioModelsSpace} from "./studio_models_space";
 import {StudioModelPreview} from "./studio_preview";
+import {StudioReview} from "./studio_review";
+import {laneOfZone, timelineLane, writableColorRules} from "./studio_timeline";
 import {StudioRelationDialog, X2MANY_TYPES, fieldTypeFits} from "./studio_relations";
+import {
+    DATE_TYPES,
+    DRAGGING_CLASS,
+    MODEL,
+    RIBBON_COLORS,
+    allBlocks,
+    blockTrail,
+    canSelectBlock,
+    conditionValue,
+    fieldTypeLabel,
+    findBlock,
+    namedKeys,
+    pivotAxes,
+    searchEndHook,
+} from "./studio_utils";
 
-const {DateTime} = luxon;
+// The helpers live in studio_utils.js; this module re-exports them, where
+// the tests and the other modules import them from.
+export {
+    DRAGGING_CLASS,
+    allBlocks,
+    attributeLabel,
+    blockTrail,
+    conditionValue,
+    fieldTypeLabel,
+    fieldWidgets,
+    findBlock,
+    isTrue,
+    namedKeys,
+    pivotAxes,
+    pivotLanes,
+    searchColumns,
+    selectionToText,
+    textToSelection,
+    valueLabel,
+} from "./studio_utils";
+export {StudioBlock} from "./studio_canvas";
+export {outlineRows} from "./studio_outline";
+export {INSPECTOR_TABS} from "./studio_inspector";
 
-const MODEL = "erplibre.studio.editor";
-export const DRAGGING_CLASS = "o_erplibre_studio_dragging";
-
-const TRUE_VALUES = ["1", "True", "true"];
-// The view types whose fields show from a QWeb template.
-const TEMPLATED_TYPES = ["kanban", "timeline"];
-const DATE_TYPES = ["date", "datetime"];
-const NUMBER_TYPES = ["integer", "float", "monetary"];
-// The ribbon colors offered for a new ribbon: bootstrap classes.
-const RIBBON_COLORS = [
-    "text-bg-success",
-    "text-bg-danger",
-    "text-bg-warning",
-    "text-bg-info",
-    "text-bg-primary",
-    "text-bg-secondary",
-];
-
-/** The label of a new field type. */
-export function fieldTypeLabel(ttype) {
-    return (
-        {
-            char: _t("Text"),
-            integer: _t("Integer"),
-            float: _t("Decimal"),
-            boolean: _t("Checkbox"),
-            date: _t("Date"),
-            datetime: _t("Date and time"),
-            selection: _t("Selection"),
-            many2one: _t("Many2one"),
-            text: _t("Multiline text"),
-            html: _t("HTML"),
-            monetary: _t("Monetary"),
-            one2many: _t("One2many"),
-            many2many: _t("Many2many"),
-        }[ttype] || ttype
-    );
-}
-
-/** The label of a settable view attribute (``settable`` of the payload). */
-export function attributeLabel(attribute) {
-    return (
-        {
-            default_group_by: _t("Default grouping"),
-            default_order: _t("Default order"),
-            quick_create: _t("Quick create"),
-            group_create: _t("Add columns"),
-            group_delete: _t("Delete columns"),
-            group_edit: _t("Edit columns"),
-            records_draggable: _t("Drag the records"),
-            archivable: _t("Archive the records of a column"),
-            widget: _t("Widget"),
-            disable_linking: _t("No link to the records"),
-            display_quantity: _t("Show the count"),
-            type: _t("Axis"),
-            interval: _t("Interval"),
-            date_start: _t("Start date"),
-            date_stop: _t("End date"),
-            date_delay: _t("Duration"),
-            colors: _t("Colors"),
-            mode: _t("Default scale"),
-            stack: _t("Stack the items"),
-            event_open_popup: _t("Open the records in a dialog"),
-        }[attribute] || attribute
-    );
-}
-
-/** The label of a fixed value of an attribute, by the kind of the attribute. */
-export function valueLabel(kind, value) {
-    const labels = {
-        bool: {True: _t("Yes"), False: _t("No")},
-        axis: {row: _t("Row"), col: _t("Column"), measure: _t("Measure")},
-        interval: {day: _t("Day"), week: _t("Week"), month: _t("Month"), quarter: _t("Quarter"), year: _t("Year")},
-        timeline_mode: {day: _t("Day"), week: _t("Week"), month: _t("Month"), fit: _t("Fit")},
-    }[kind];
-    return (labels && labels[value]) || null;
-}
-
-/** Whether a node attribute holds a constant true expression. */
-export function isTrue(value) {
-    return TRUE_VALUES.includes(value);
-}
-
-/** The first block of the tree ``root`` that ``predicate`` accepts, or null. */
-export function findBlock(root, predicate) {
-    if (!root) {
-        return null;
-    }
-    if (predicate(root)) {
-        return root;
-    }
-    for (const child of root.children || []) {
-        const found = findBlock(child, predicate);
-        if (found) {
-            return found;
-        }
-    }
-    return null;
-}
-
-/** Every block of the tree ``root``, depth first. */
-export function allBlocks(root) {
-    const blocks = [];
-    const visit = (block) => {
-        blocks.push(block);
-        for (const child of block.children || []) {
-            visit(child);
-        }
-    };
-    if (root) {
-        visit(root);
-    }
-    return blocks;
-}
-
-/** The « kind:name » keys of the named blocks of ``root``. */
-export function namedKeys(root) {
-    return new Set(
-        allBlocks(root)
-            .filter((b) => b.name)
-            .map((b) => `${b.kind}:${b.name}`)
-    );
-}
-
-/**
- * The blocks of a search view by column: {fields, filters, group_bys}, in
- * the order of the arch. A separator goes with the filters or the
- * group-bys it separates.
- */
-export function searchColumns(root) {
-    const columns = {fields: [], filters: [], group_bys: []};
-    const visit = (block) => {
-        let column = "filters";
-        for (const child of block.children || []) {
-            if (child.kind === "field") {
-                columns.fields.push(child);
-            } else if (child.kind === "filter" || child.kind === "group_by") {
-                column = child.kind === "filter" ? "filters" : "group_bys";
-                columns[column].push(child);
-            } else if (child.kind === "separator") {
-                columns[column].push(child);
-            } else if (child.children) {
-                visit(child);
-            }
-        }
-    };
-    visit(root || {});
-    return columns;
-}
-
-/** The field blocks of a pivot view by axis: {row, col, measure, others}. */
-export function pivotLanes(data) {
-    const layout = data.layout || {};
-    const axes = layout.axes || {};
-    const byPath = (path) => findBlock(data.blocks, (b) => b.path === path);
-    const lane = (paths) => (paths || []).map(byPath).filter(Boolean);
-    return {row: lane(axes.row), col: lane(axes.col), measure: lane(axes.measure), others: lane(layout.others)};
-}
-
-/** The axes a field described by ``info`` (``fields_get``) can go on. */
-export function pivotAxes(info) {
-    const axes = info && info.groupable ? ["row", "col"] : [];
-    if (info && NUMBER_TYPES.includes(info.type) && info.aggregator) {
-        axes.push("measure");
-    }
-    return axes;
-}
-
-/**
- * [[name, label]] of the field widgets of the registry that show a field of
- * ``ttype``; a widget proper to one view type (« list.many2one ») is left
- * out.
- */
-export function fieldWidgets(ttype) {
-    return registry
-        .category("fields")
-        .getEntries()
-        .filter(([name, widget]) => !name.includes(".") && (widget.supportedTypes || []).includes(ttype))
-        .map(([name, widget]) => [name, widget.displayName ? `${widget.displayName} (${name})` : name])
-        .sort((a, b) => a[1].localeCompare(b[1]));
-}
-
-/** « value:Label » lines <-> [[value, label]]. */
-export function selectionToText(selection) {
-    return (selection || []).map(([value, label]) => `${value}:${label}`).join("\n");
-}
-
-export function textToSelection(text) {
-    return (text || "")
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => {
-            const index = line.indexOf(":");
-            return index < 0 ? [line, line] : [line.slice(0, index).trim(), line.slice(index + 1).trim()];
-        });
-}
-
-/**
- * The value an input of a filter condition holds, as the server reads it.
- * A datetime input gives the local time « YYYY-MM-DDTHH:MM »; a domain
- * compares a datetime in UTC, « YYYY-MM-DD HH:MM:SS ».
- */
-export function conditionValue(type, value) {
-    if (type === "datetime" && value) {
-        const local = DateTime.fromISO(value);
-        return local.isValid ? serializeDateTime(local) : value;
-    }
-    return value;
-}
-
-/**
- * One node of the edited arch: a container with its children and the drop
- * hooks between them, a field, or another element.
- */
-export class StudioBlock extends Component {
-    static template = "erplibre_studio.Block";
-    static props = {block: Object, editor: Object, viewType: String};
-
-    get block() {
-        return this.props.block;
-    }
-
-    get editor() {
-        return this.props.editor;
-    }
-
-    get field() {
-        return (this.editor.data.fields || {})[this.block.name] || {};
-    }
-
-    get isSelected() {
-        return this.editor.state.selected === this.block.path;
-    }
-
-    get templated() {
-        return TEMPLATED_TYPES.includes(this.props.viewType);
-    }
-
-    /**
-     * Whether the block can be dragged: what the server lets move, and in
-     * a form or a list only the fields.
-     */
-    get canDrag() {
-        if (this.block.movable === false) {
-            return false;
-        }
-        if (["field", "widget", "filter", "group_by", "separator"].includes(this.block.kind)) {
-            return true;
-        }
-        return this.templated;
-    }
-
-    /** A block the properties describe: a field, or any node of a view other than a form or a list. */
-    get canSelect() {
-        if (this.block.kind === "field") {
-            return true;
-        }
-        return !["form", "list"].includes(this.props.viewType) && this.block.kind !== "template";
-    }
-
-    /** A group of groups lays its groups out side by side, as Odoo does. */
-    get isRow() {
-        const children = this.block.children || [];
-        return this.block.tag === "group" && children.length > 0 && children.every((child) => child.tag === "group");
-    }
-
-    get showHooks() {
-        return Boolean(this.block.drop) && !this.isRow;
-    }
-
-    /**
-     * Whether a hook goes before ``child``: never inside a t-if chain,
-     * whose nodes must stay next to each other.
-     */
-    hookBefore(child) {
-        return this.showHooks && !["elif", "else"].includes(child.chain);
-    }
-
-    get pages() {
-        return (this.block.children || []).filter((child) => child.tag === "page");
-    }
-
-    get activePage() {
-        const index = this.editor.state.pages[this.block.path] || 0;
-        return this.pages[index] || this.pages[0];
-    }
-
-    get flags() {
-        const attrs = this.block.attrs || {};
-        const flags = [];
-        if (isTrue(attrs.invisible) || isTrue(attrs.column_invisible)) {
-            flags.push({key: "hidden", label: _t("hidden")});
-        } else if (attrs.invisible && this.templated) {
-            flags.push({key: "condition", label: _t("hidden when %(condition)s", {condition: attrs.invisible})});
-        }
-        if (isTrue(attrs.required) || this.field.required) {
-            flags.push({key: "required", label: _t("required")});
-        }
-        if (isTrue(attrs.readonly) || this.field.readonly) {
-            flags.push({key: "readonly", label: _t("read-only")});
-        }
-        if (attrs.optional) {
-            flags.push({key: "optional", label: attrs.optional === "hide" ? _t("optional, hidden") : _t("optional")});
-        }
-        if (attrs.widget && this.props.viewType !== "form") {
-            flags.push({key: "widget", label: attrs.widget});
-        }
-        if (this.block.interval) {
-            flags.push({key: "interval", label: valueLabel("interval", this.block.interval) || this.block.interval});
-        }
-        if (this.field.pending) {
-            flags.push({key: "pending", label: _t("new")});
-        }
-        return flags;
-    }
-
-    /**
-     * The sub-list an x2many field shows in a form: {comodel, label}, or
-     * null. The editor does not descend into it: it is part of the field.
-     */
-    get subList() {
-        if (this.props.viewType !== "form" || this.block.kind !== "field") {
-            return null;
-        }
-        const field = this.field;
-        if (!X2MANY_TYPES.includes(field.type) || !field.relation) {
-            return null;
-        }
-        return {comodel: field.relation, label: this.editor.modelLabel(field.relation)};
-    }
-
-    startDrag(ev) {
-        ev.stopPropagation();
-        this.editor.startDrag(ev, {kind: "node", path: this.block.path, name: this.block.name});
-    }
-
-    select() {
-        if (this.canSelect) {
-            this.editor.select(this.block.path);
-        }
-    }
-
-    selectPage(index) {
-        this.editor.state.pages[this.block.path] = index;
-    }
-}
-StudioBlock.components = {StudioBlock};
+// The spaces of the rail, in its order: the view on screen, the models of
+// the project, its security (access rights, rules, apps and groups), the
+// review of its changes.
+export const SPACES = ["view", "models", "security", "review"];
+// The tabs of the security space, each one a panel of the editor.
+export const SECURITY_TABS = ["access", "rules", "apps"];
+// The tabs of the left panel of the view space: the palette, the plan.
+export const LEFT_TABS = ["palette", "plan"];
+// The ``reason_code`` of the view types the menu of views lists « to add »:
+// a type the model has no view of, which the project can add; a timeline
+// once web_timeline is installed; a type a model not created yet gets
+// once applied.
+export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first"];
 
 /**
  * The studio editor: a client action on one view of a model. The server
  * holds the draft; every drop or property change is one operation, and the
- * editor renders the payload it answers. The canvas depends on the view
- * type: the arch tree of a form, the columns of a list, the template of a
- * kanban card or a timeline item, the columns of a search view, the axes
- * of a pivot.
+ * editor renders the payload it answers. The editor holds the state and
+ * the calls to the server; its parts render from the props it gives them
+ * and change the draft through its methods: the palette (StudioPalette),
+ * the canvas of the view type (StudioCanvas), the properties of the
+ * selection (StudioInspector). The panels of the project (access rights,
+ * rules, apps, preview of a model) render in its context.
+ *
+ * Its shell: a top bar (where the view is, the views of its model, the
+ * project, Undo, Preview, Apply and its menu), a rail of spaces
+ * (``state.space``) that decides what the centre shows, and a status bar.
+ * Apply of the top bar opens the review space (StudioReview), whose last
+ * button applies the draft.
  */
 export class StudioEditor extends Component {
     static template = "erplibre_studio.Editor";
-    static components = {StudioBlock, View, StudioModelPreview, StudioAppsPanel};
+    static components = {
+        StudioCanvas,
+        StudioPalette,
+        StudioOutline,
+        StudioInspector,
+        View,
+        StudioModelPreview,
+        StudioSecuritySpace,
+        StudioModelsSpace,
+        StudioReview,
+        Dropdown,
+    };
     static props = ["*"];
 
     setup() {
@@ -395,6 +128,12 @@ export class StudioEditor extends Component {
         // The view the editor was opened on: where the canvas goes back to
         // when the model on screen leaves the project.
         this.launch = {resModel: params.res_model, viewId: params.view_id || false, viewType: params.view_type || "form"};
+        // Ctrl+Z (Cmd+Z on macOS) removes the last change of the view on
+        // screen, as the undo button does; the hotkey service leaves it to
+        // the browser inside a text field.
+        useHotkey("control+z", () => this.projectAction("action_undo"), {
+            isAvailable: () => this.canUndo,
+        });
         this.state = useState({
             loading: true,
             busy: false,
@@ -404,19 +143,52 @@ export class StudioEditor extends Component {
             selected: null,
             dragging: null,
             hook: null,
-            tab: "new",
-            filter: "",
             preview: false,
             pages: {},
             newProject: {name: "", module_name: ""},
             comodels: null,
-            // The interval of a date field dropped as a grouping.
-            interval: "month",
+            // The tab of the left panel of the view space (LEFT_TABS).
+            leftTab: "palette",
+            // The tab of the inspector of the view space (INSPECTOR_TABS).
+            inspectorTab: "properties",
+            // The state of the palette, kept while a panel hides it: its
+            // search, whether the existing fields show (null: as the view
+            // decides), whether every type shows, the interval of a date
+            // field dropped as a grouping, the ribbon a drop adds.
+            palette: {
+                filter: "",
+                existing: null,
+                more: false,
+                interval: "month",
+                ribbon: {title: "", bg_color: RIBBON_COLORS[0]},
+            },
+            // The state of the plan: its text filter, « Modified » only,
+            // the paths of the folded containers.
+            outline: {filter: "", changedOnly: false, collapsed: {}},
             template: null,
-            ribbon: {title: "", bg_color: RIBBON_COLORS[0]},
             filterForm: null,
             colors: null,
-            // The canvas shows the view (null), the access grid or the rules.
+            // The lane of a timeline the inspector shows (TIMELINE_LANES),
+            // null for none.
+            timelineLane: null,
+            // The space the rail shows (SPACES): the centre of the editor.
+            space: "view",
+            // The id of the model line whose form the editor opens once the
+            // review applies the draft (« Apply and open »), else false.
+            openAfterApply: false,
+            // The tab the security space opens on: the last one shown.
+            securityTab: "access",
+            // What the security space shows: the model chosen in its list
+            // (null: the model on screen, else the first one), the access
+            // row its inspector shows (« project:<id> » or « existing:<id> »).
+            security: {model: null, row: null},
+            // What the models space shows: the model chosen in its list
+            // (null: the model on screen, else the first one), whether its
+            // inspector unfolds the advanced section.
+            modelsSpace: {model: null, advanced: false},
+            // What the centre shows instead of the canvas: the preview of a
+            // model in the view space, a tab of SECURITY_TABS in the
+            // security space; null for none.
             panel: null,
             // What the dialogs and the panels offer (get_studio_choices).
             choices: null,
@@ -433,8 +205,12 @@ export class StudioEditor extends Component {
             panelError: null,
         });
         this.previewCount = 0;
-        this.ribbonColors = RIBBON_COLORS;
-        this.perms = PERMS;
+        // The menus of the top bar, closed by their items once chosen.
+        this.menus = {
+            project: useDropdownState(),
+            apply: useDropdownState(),
+            views: useDropdownState(),
+        };
         onWillStart(() => this.load());
     }
 
@@ -442,7 +218,7 @@ export class StudioEditor extends Component {
         return this.state.data;
     }
 
-    /** The editor itself, for the blocks it renders. */
+    /** The editor itself, for the parts it renders. */
     get editor() {
         return this;
     }
@@ -468,13 +244,16 @@ export class StudioEditor extends Component {
         return project && project.id === this.state.projectId ? project : null;
     }
 
+    /** Whether the undo button, and Ctrl+Z, can remove a change of the view on screen. */
+    get canUndo() {
+        return Boolean(
+            this.project && !this.state.busy && this.state.space === "view" && (this.data.changes || []).length
+        );
+    }
+
     /** The panel the canvas shows instead of the view, while a project is selected. */
     get panel() {
         return this.project ? this.state.panel : null;
-    }
-
-    allows(operation) {
-        return (this.data.operations || []).includes(operation);
     }
 
     fieldInfo(name) {
@@ -547,11 +326,19 @@ export class StudioEditor extends Component {
         return [this.params.resModel, this.params.viewId, this.params.viewType];
     }
 
-    /** Back to a canvas without selection, form or preview. */
+    /** Back to the canvas of the view space, without selection, form or preview. */
     resetCanvas() {
         this.state.panel = null;
+        this.state.space = "view";
         this.state.modelPreview = null;
-        Object.assign(this.state, {selected: null, filterForm: null, colors: null, template: null, preview: false});
+        Object.assign(this.state, {
+            selected: null,
+            filterForm: null,
+            colors: null,
+            template: null,
+            preview: false,
+            timelineLane: null,
+        });
     }
 
     /**
@@ -584,16 +371,191 @@ export class StudioEditor extends Component {
 
     /**
      * Edit the default view of another type of the same model, in the same
-     * project.
+     * project; the view space shows it.
      */
-    async switchViewType(ev) {
-        const viewType = ev.target.value;
-        if (this.state.busy || viewType === this.params.viewType) {
+    async switchViewType(viewType) {
+        this.menus.views.close();
+        if (this.state.busy) {
             return;
         }
-        if (!(await this.openView(this.params.resModel, false, viewType))) {
-            ev.target.value = this.params.viewType;
+        if (viewType === this.params.viewType) {
+            this.openSpace("view");
+            return;
         }
+        // The preview stays on: it shows the view chosen.
+        const preview = this.previewOn;
+        if ((await this.openView(this.params.resModel, false, viewType)) && preview) {
+            await this.togglePreview();
+        }
+    }
+
+    /**
+     * The view types of the model on screen the editor opens, as the tabs
+     * of the top bar show them: [{type, label, changes, pending, added,
+     * xml_id}]. From ``view_list`` of the payload, else from its
+     * ``view_types``. ``added``: a view the project adds, ``pending``
+     * until Apply creates it.
+     */
+    get viewTabs() {
+        const list = this.data.view_list;
+        if (list) {
+            return list
+                .filter((entry) => entry.editable)
+                .map((entry) => ({
+                    type: entry.type,
+                    label: entry.label,
+                    changes: entry.changes || 0,
+                    pending: entry.pending,
+                    added: Boolean(entry.added),
+                    xml_id: entry.xml_id || false,
+                }));
+        }
+        return (this.data.view_types || []).map((type) => ({
+            type,
+            label: this.viewTypeLabel(type),
+            changes: 0,
+            pending: false,
+            added: false,
+            xml_id: false,
+        }));
+    }
+
+    /** The label of the views of the model on screen. */
+    get viewTabsLabel() {
+        return _t("Views of %(model)s", {model: this.data.model_name || this.data.model || ""});
+    }
+
+    /** The title of the count of changes of a view tab. */
+    changesTitle(count) {
+        return _t("%(count)s change(s) of the project in this view", {count});
+    }
+
+    /**
+     * The view types the editor does not open on the model on screen, with
+     * why not: the entries of ``view_list`` that are not editable.
+     */
+    get unavailableViews() {
+        return (this.data.view_list || []).filter((entry) => !entry.editable);
+    }
+
+    /**
+     * The view types of the « To add » section of the menu of views: those
+     * the project can add (``no_view``), and those it could once a module
+     * is installed or the model applied, with why not.
+     */
+    get addableViews() {
+        return this.unavailableViews.filter((entry) => ADDABLE_REASONS.includes(entry.reason_code));
+    }
+
+    /** The view types the studio does not edit, with why not. */
+    get unsupportedViews() {
+        return this.unavailableViews.filter((entry) => !ADDABLE_REASONS.includes(entry.reason_code));
+    }
+
+    /** What a view of ``viewType`` shows, for the menu of views. */
+    viewTypeDescription(viewType) {
+        return (
+            {
+                form: _t("One record on a page: its fields in groups and tabs."),
+                list: _t("The records as rows, one column per field."),
+                kanban: _t("The records as cards, in columns by grouping."),
+                search: _t("The filters, groupings and fields of the search."),
+                pivot: _t("Cross analysis: rows, columns and measures."),
+                timeline: _t("A chronological band, provided by web_timeline (OCA)."),
+            }[viewType] || ""
+        );
+    }
+
+    /**
+     * Add the ``viewType`` view of the model on screen to the project, then
+     * edit it: until Apply creates it, it exists in the draft only.
+     */
+    async addView(viewType) {
+        this.menus.views.close();
+        if (this.state.busy || !this.project) {
+            return false;
+        }
+        const data = await this.viewCall("add_view", [this.project.id, this.params.resModel, viewType], {
+            revision: this.project.revision,
+        });
+        return Boolean(data);
+    }
+
+    /**
+     * Call ``method``, whose answer is the payload of another view, and
+     * edit that view; on {view_gone}, leave for the home menu. Answer the
+     * payload, or null on an error.
+     */
+    async viewCall(method, args, kwargs) {
+        this.state.busy = true;
+        let data;
+        try {
+            data = await this.orm.call(MODEL, method, args, kwargs);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return null;
+        } finally {
+            this.state.busy = false;
+        }
+        if (data.view_gone) {
+            await this.action.doAction("home");
+            return null;
+        }
+        Object.assign(this.params, {resModel: data.model, viewType: data.view_type, viewId: data.view.id});
+        this.resetCanvas();
+        this.state.data = data;
+        this.state.projectId = (data.project && data.project.id) || false;
+        this.state.error = null;
+        return data;
+    }
+
+    /**
+     * The view the project adds that is on screen, as the payload gives
+     * it ({line_id, applied, name, xml_id}), or false.
+     */
+    get addedView() {
+        return (this.data.view && this.data.view.added) || false;
+    }
+
+    /** What the banner of a view the project adds says. */
+    get addedViewNotice() {
+        const view = this.viewTypeLabel(this.viewType);
+        if (this.addedView.applied) {
+            return _t("%(view)s view created by the project. Revert removes it with the rest of the draft.", {
+                view,
+            });
+        }
+        return _t("%(view)s view added to the project, with the default settings: Apply creates it.", {view});
+    }
+
+    /**
+     * Take the view on screen, which the project adds, out of the draft
+     * with its changes, once confirmed. Before Apply created it, the
+     * editor goes back to another view of the model.
+     */
+    removeAddedView() {
+        const added = this.addedView;
+        if (this.state.busy || !this.project || !added) {
+            return;
+        }
+        const body = added.applied
+            ? _t(
+                  "The %(view)s view leaves the draft with its changes; the next Apply removes it from the database.",
+                  {view: this.viewTypeLabel(this.viewType)}
+              )
+            : _t("The %(view)s view leaves the draft with its changes.", {view: this.viewTypeLabel(this.viewType)});
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Remove this view from the draft"),
+            body,
+            confirmLabel: _t("Remove"),
+            confirm: async () => {
+                await this.viewCall("remove_view", [this.project.id, added.line_id, ...this.viewArgs()], {
+                    revision: this.project.revision,
+                    fallback: this.launchArgs,
+                });
+            },
+            cancel: () => {},
+        });
     }
 
     /**
@@ -629,9 +591,11 @@ export class StudioEditor extends Component {
     /**
      * Run ``action`` on the project and show the payload it answers.
      * ``digest``: the digest of the removal report the user confirmed, for
-     * Apply and Revert.
+     * Apply and Revert. ``space``: the space the editor shows once the
+     * action ran, set with its payload so that the space it leaves does
+     * not render that payload.
      */
-    async projectAction(action, {digest} = {}) {
+    async projectAction(action, {digest, space} = {}) {
         if (this.state.busy || !this.project) {
             return null;
         }
@@ -673,6 +637,10 @@ export class StudioEditor extends Component {
                 this.resetCanvas();
             }
         }
+        if (space) {
+            this.closePanel();
+            Object.assign(this.state, {space, selected: null, preview: false});
+        }
         this.state.data = data;
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
@@ -684,50 +652,6 @@ export class StudioEditor extends Component {
         }
         await this.refreshModelPreview();
         return data;
-    }
-
-    /**
-     * Apply the project. When Apply would remove records, values or group
-     * members, its removal report shows first and Apply runs once the user
-     * confirmed it, with its digest. A project never applied removes
-     * nothing. Answer the payload, or null.
-     */
-    async applyProject() {
-        if (this.state.busy || !this.project) {
-            return null;
-        }
-        let answer = null;
-        if (this.project.applied) {
-            answer = await this.readReport("get_apply_report");
-            if (!answer) {
-                return null;
-            }
-        }
-        if (!answer || !answer.confirm) {
-            return this.projectAction("action_apply", {digest: answer && answer.digest});
-        }
-        return new Promise((resolve) => {
-            this.dialog.add(
-                StudioConfirmDialog,
-                {
-                    title: _t("Apply the project"),
-                    intro: _t("Apply removes from the database what the draft no longer has, with its data:"),
-                    report: answer.report,
-                    digest: answer.digest,
-                    refused: false,
-                    confirmLabel: _t("Apply"),
-                    confirm: async (digest) => {
-                        const data = await this.projectAction("action_apply", {digest});
-                        if (data) {
-                            resolve(data);
-                        }
-                        return Boolean(data);
-                    },
-                    reload: () => this.readReport("get_apply_report"),
-                },
-                {onClose: () => resolve(null)}
-            );
-        });
     }
 
     /**
@@ -774,23 +698,65 @@ export class StudioEditor extends Component {
         return Boolean(this.project && (this.project.applied || this.project.state !== "draft"));
     }
 
-    async selectProject(ev) {
+    /**
+     * Show the project ``value``: the id of a project, « new » for the form
+     * of a new project, or « » for none. The view space shows the view
+     * without the panels of the former project.
+     */
+    async selectProject(value) {
+        this.menus.project.close();
         if (this.state.busy) {
             return;
         }
-        const value = ev.target.value;
+        value = String(value || "");
         this.state.selected = null;
         this.closePanel();
+        this.state.space = "view";
         const projectId = parseInt(value) || false;
         if (projectId) {
-            await this.call("get_editor_data", [...this.viewArgs(), projectId]);
+            await this.showInProject(projectId);
             return;
         }
         // No project, or one to create: the view without any draft.
-        await this.call("get_editor_data", [...this.viewArgs(), false], {pick_project: false});
-        if (value === "new") {
+        const data = await this.showInProject(false, {pick_project: false});
+        if (data && value === "new") {
             this.state.projectId = "new";
         }
+    }
+
+    /**
+     * The views ``showInProject`` tries in another project, in order: the
+     * view on screen; when it is a view the project on screen adds and
+     * Apply has not created, which exists in that draft only, the view the
+     * editor was opened on, then the form of the model.
+     */
+    get projectSwitchViews() {
+        const added = this.addedView;
+        if (!added || added.applied) {
+            return [this.viewArgs()];
+        }
+        const launch = this.launchArgs;
+        const views = launch[0] && launch.join() !== this.viewArgs().join() ? [launch] : [];
+        return [...views, [this.params.resModel, false, "form"]];
+    }
+
+    /**
+     * Show in the project ``projectId`` (false: none) the first view of
+     * ``projectSwitchViews`` its payload answers; ``kwargs`` go to
+     * get_editor_data. Answer the payload, or null: the error of the last
+     * view tried is notified, the editor stays as it was.
+     */
+    async showInProject(projectId, kwargs = {}) {
+        const views = this.projectSwitchViews;
+        for (const [index, view] of views.entries()) {
+            const last = index === views.length - 1;
+            const data = await this.call("get_editor_data", [...view, projectId], kwargs, last ? null : () => {});
+            if (data) {
+                Object.assign(this.params, {resModel: data.model, viewType: data.view_type, viewId: data.view.id});
+                return data;
+            }
+        }
+        return null;
     }
 
     async createProject() {
@@ -798,7 +764,7 @@ export class StudioEditor extends Component {
         try {
             const projectId = await this.orm.call(MODEL, "create_project", [name, module_name]);
             this.state.newProject = {name: "", module_name: ""};
-            await this.call("get_editor_data", [...this.viewArgs(), projectId]);
+            await this.showInProject(projectId);
         } catch (error) {
             this.notification.add(this.errorMessage(error), {type: "danger"});
         }
@@ -842,6 +808,10 @@ export class StudioEditor extends Component {
     accepts(item, zone) {
         if (!item) {
             return false;
+        }
+        const lane = laneOfZone(zone);
+        if (lane) {
+            return item.kind === "existing" && Boolean(this.laneAttribute(lane, item.name));
         }
         const viewType = this.viewType;
         if (item.kind === "widget") {
@@ -908,7 +878,7 @@ export class StudioEditor extends Component {
             };
         }
         if (item.kind === "widget") {
-            return {type: "add_widget", target, position, widget: item.widget, attrs: {...this.state.ribbon}};
+            return {type: "add_widget", target, position, widget: item.widget, attrs: {...this.state.palette.ribbon}};
         }
         if (item.kind === "separator") {
             return {type: "add_separator", target, position};
@@ -917,7 +887,7 @@ export class StudioEditor extends Component {
         if (viewType === "search" && zone === "group_bys") {
             const operation = {type: "add_group_by", target, position, field_name: item.name};
             if (isDate) {
-                operation.interval = this.state.interval;
+                operation.interval = this.state.palette.interval;
             }
             return operation;
         }
@@ -925,7 +895,7 @@ export class StudioEditor extends Component {
         if (viewType === "pivot") {
             operation.axis = zone;
             if (isDate && zone !== "measure") {
-                operation.interval = this.state.interval;
+                operation.interval = this.state.palette.interval;
             }
         }
         return operation;
@@ -936,6 +906,15 @@ export class StudioEditor extends Component {
         const item = this.state.dragging;
         this.endDrag();
         if (!item || this.state.busy || !this.accepts(item, zone)) {
+            return;
+        }
+        const lane = laneOfZone(zone);
+        if (lane) {
+            // A field dropped on a lane of a timeline becomes its attribute.
+            const attribute = this.laneAttribute(lane, item.name);
+            if (await this.operate({type: "set_attribute", target, attribute, value: item.name})) {
+                Object.assign(this.state, {timelineLane: lane, selected: null, inspectorTab: "properties"});
+            }
             return;
         }
         if (item.kind === "existing" && this.viewType === "search" && zone === "filters") {
@@ -952,6 +931,52 @@ export class StudioEditor extends Component {
         if (operation) {
             await this.operateAndSelect(operation, item);
         }
+    }
+
+    /**
+     * Add the palette ``item`` without a drag (a click, Enter or Space on
+     * it). With a block selected, it goes right after it: the hook before
+     * its next sibling, else the hook at the end of its container; else,
+     * or when that hook does not take the item, on the last hook of the
+     * canvas that takes it. The drop on that hook then runs as a drop of a
+     * drag does.
+     */
+    async addFromPalette(item) {
+        if (this.state.busy) {
+            return;
+        }
+        if (!this.project) {
+            this.notification.add(_t("Choose or create a studio project first."), {type: "warning"});
+            return;
+        }
+        const canvas = document.querySelector(".o_erplibre_studio_canvas");
+        const hooks = [...((canvas && canvas.querySelectorAll(".o_erplibre_studio_hook")) || [])]
+            .map((el) => {
+                const {target, position, zone} = el.dataset;
+                return {target, position, zone: zone || undefined};
+            })
+            .filter((hook) => this.accepts(item, hook.zone));
+        const wanted = [];
+        const trail = this.state.selected ? blockTrail(this.root, this.state.selected) : [];
+        if (trail.length > 1) {
+            const parent = trail[trail.length - 2];
+            const siblings = parent.children || [];
+            const next = siblings[siblings.indexOf(trail[trail.length - 1]) + 1];
+            if (next) {
+                wanted.push({target: next.path, position: "before"});
+            }
+            wanted.push({target: parent.path, position: "inside"});
+        }
+        const hook =
+            wanted
+                .map((w) => hooks.find((h) => h.target === w.target && h.position === w.position))
+                .find(Boolean) || hooks[hooks.length - 1];
+        if (!hook) {
+            this.notification.add(_t("No place of this view takes this item."), {type: "warning"});
+            return;
+        }
+        this.state.dragging = item;
+        await this.dropOnHook({preventDefault: () => {}}, hook.target, hook.position, hook.zone);
     }
 
     /**
@@ -990,77 +1015,6 @@ export class StudioEditor extends Component {
         );
     }
 
-    // ── canvas of each view type ────────────────────────────────────────
-
-    /** The templates of a kanban view, card first: [{name, block}]. */
-    get templates() {
-        const templates = this.layout.templates || {};
-        const names = Object.keys(templates).sort((a, b) =>
-            a === "card" ? -1 : b === "card" ? 1 : a.localeCompare(b)
-        );
-        return names
-            .map((name) => ({name, block: findBlock(this.root, (b) => b.path === templates[name])}))
-            .filter((item) => item.block);
-    }
-
-    get activeTemplate() {
-        const templates = this.templates;
-        return templates.find((t) => t.name === this.state.template) || templates[0] || null;
-    }
-
-    selectTemplate(name) {
-        this.state.template = name;
-    }
-
-    /** The fields a QWeb view declares outside its templates. */
-    get loadedBlocks() {
-        return ((this.root && this.root.children) || []).filter((b) => b.kind === "field");
-    }
-
-    get timelineTemplate() {
-        const path = this.layout.template;
-        return path ? findBlock(this.root, (b) => b.path === path) : null;
-    }
-
-    get searchColumns() {
-        return searchColumns(this.root);
-    }
-
-    /** The hook after the last block of ``blocks``, else inside ``fallback``. */
-    endHook(blocks, fallback) {
-        const last = blocks[blocks.length - 1];
-        return last ? {target: last.path, position: "after"} : {target: fallback, position: "inside"};
-    }
-
-    searchEndHook(column) {
-        let fallback = this.root.path;
-        if (column === "group_bys") {
-            const group = findBlock(this.root, (b) => b.kind === "container" && b.tag === "group");
-            fallback = group ? group.path : fallback;
-        }
-        return this.endHook(this.searchColumns[column], fallback);
-    }
-
-    get pivotLanes() {
-        return pivotLanes(this.data);
-    }
-
-    get searchColumnList() {
-        return [
-            {key: "fields", label: _t("Search fields")},
-            {key: "filters", label: _t("Filters")},
-            {key: "group_bys", label: _t("Group by")},
-        ];
-    }
-
-    get pivotLaneList() {
-        return [
-            {key: "row", label: _t("Rows")},
-            {key: "col", label: _t("Columns")},
-            {key: "measure", label: _t("Measures")},
-        ];
-    }
-
     // ── the filter form of a search view ────────────────────────────────
 
     operatorsOf(name) {
@@ -1080,7 +1034,7 @@ export class StudioEditor extends Component {
             return;
         }
         if (!target) {
-            ({target, position} = this.searchEndHook("filters"));
+            ({target, position} = searchEndHook(this.root, "filters"));
         }
         const label = name ? this.fieldInfo(name).string || name : "";
         this.state.selected = null;
@@ -1100,34 +1054,6 @@ export class StudioEditor extends Component {
      */
     formIsCurrent(form, project) {
         return Boolean(!form || (project && project.id === form.projectId && project.revision === form.revision));
-    }
-
-    closeFilterForm() {
-        this.state.filterForm = null;
-    }
-
-    addCondition() {
-        this.state.filterForm.conditions.push(this.newCondition());
-    }
-
-    removeCondition(index) {
-        this.state.filterForm.conditions.splice(index, 1);
-    }
-
-    setConditionField(condition, name) {
-        Object.assign(condition, this.newCondition(name));
-    }
-
-    /** How the value of ``condition`` is typed in: none, a list, a date… */
-    valueInput(condition) {
-        if (["set", "not set"].includes(condition.operator)) {
-            return "none";
-        }
-        const type = this.fieldInfo(condition.field).type;
-        if (["boolean", "selection", "date", "datetime"].includes(type)) {
-            return type;
-        }
-        return NUMBER_TYPES.includes(type) ? "number" : "text";
     }
 
     async createFilter() {
@@ -1159,27 +1085,6 @@ export class StudioEditor extends Component {
         if (data) {
             this.state.filterForm = null;
         }
-    }
-
-    // ── palette ─────────────────────────────────────────────────────────
-
-    /** The tab the palette shows: one that the view type offers. */
-    get paletteTab() {
-        const tabs = ["existing"];
-        if (this.allows("add_field")) {
-            tabs.unshift("new");
-        }
-        if (this.allows("add_widget") || this.allows("add_separator")) {
-            tabs.push("other");
-        }
-        return tabs.includes(this.state.tab) ? this.state.tab : tabs[0];
-    }
-
-    /** The new field types the palette offers: an x2many only where it shows. */
-    get fieldTypes() {
-        return (this.data.field_types || [])
-            .filter((ttype) => fieldTypeFits(ttype, this.viewType))
-            .map((ttype) => ({ttype, label: fieldTypeLabel(ttype)}));
     }
 
     // ── relation fields ─────────────────────────────────────────────────
@@ -1214,38 +1119,7 @@ export class StudioEditor extends Component {
         });
     }
 
-    get existingFields() {
-        const filter = this.state.filter.trim().toLowerCase();
-        return (this.data.palette || []).filter(
-            (f) => !filter || f.name.toLowerCase().includes(filter) || (f.string || "").toLowerCase().includes(filter)
-        );
-    }
-
-    /** Whether the palette offers the interval of a date grouping. */
-    get offersInterval() {
-        return ["search", "pivot"].includes(this.viewType);
-    }
-
-    get intervals() {
-        return ((this.data.choices || {}).interval || []).map(([value, label]) => [
-            value,
-            valueLabel("interval", value) || label,
-        ]);
-    }
-
-    attributeLabel(attribute) {
-        return attributeLabel(attribute);
-    }
-
-    axisLabel(axis) {
-        return valueLabel("axis", axis) || axis;
-    }
-
     // ── selection and properties ────────────────────────────────────────
-
-    setTab(tab) {
-        this.state.tab = tab;
-    }
 
     onCanvasClick() {
         if (!this.state.preview) {
@@ -1253,89 +1127,179 @@ export class StudioEditor extends Component {
         }
     }
 
+    /**
+     * Select the block at ``path``, or unselect it when it is the
+     * selection; the inspector shows the properties of a new selection.
+     */
     select(path) {
         this.state.selected = this.state.selected === path ? null : path;
         this.state.colors = null;
+        if (this.state.selected) {
+            this.state.inspectorTab = "properties";
+            this.state.timelineLane = null;
+        }
+    }
+
+    /**
+     * Select the block at ``path`` and bring it on screen: the notebook
+     * pages and the kanban template that hold it show, the containers of
+     * the plan above it unfold, the canvas scrolls to it, the inspector
+     * shows its properties. A QWeb template shows without being selected
+     * (``canSelectBlock``).
+     */
+    reveal(path) {
+        const trail = blockTrail(this.root, path);
+        if (!trail.length) {
+            return;
+        }
+        if (canSelectBlock(trail[trail.length - 1])) {
+            this.state.selected = path;
+            this.state.colors = null;
+            this.state.inspectorTab = "properties";
+            this.state.timelineLane = null;
+        }
+        trail.forEach((block, index) => {
+            const child = trail[index + 1];
+            if (child && block.tag === "notebook") {
+                const pages = (block.children || []).filter((b) => b.tag === "page");
+                const page = pages.indexOf(child);
+                if (page >= 0) {
+                    this.state.pages[block.path] = page;
+                }
+            }
+            if (child) {
+                delete this.state.outline.collapsed[block.path];
+            }
+        });
+        const templates = this.layout.templates || {};
+        const template = Object.keys(templates).find((name) => trail.some((b) => b.path === templates[name]));
+        if (template) {
+            this.state.template = template;
+        }
+        this.scrollToBlock(path);
+    }
+
+    /** Scroll the canvas to the block at ``path`` once it renders. */
+    scrollToBlock(path) {
+        browser.requestAnimationFrame(() => {
+            const canvas = document.querySelector(".o_erplibre_studio_canvas");
+            const node = canvas && canvas.querySelector(`[data-path="${CSS.escape(path)}"]`);
+            if (node && node.scrollIntoView) {
+                node.scrollIntoView({block: "nearest"});
+            }
+        });
+    }
+
+    /**
+     * The trail of the selection above the canvas: [{path, label}], from
+     * the first block under the view down to the selected one.
+     */
+    get selectionTrail() {
+        return blockTrail(this.root, this.state.selected)
+            .slice(1)
+            .map((block) => ({path: block.path, label: outlineLabel(block)}));
+    }
+
+    /** How many blocks of the view on screen a draft change touches. */
+    get changedBlockCount() {
+        return allBlocks(this.root).filter((b) => b.changed).length;
+    }
+
+    /**
+     * Reveal the block of ``change`` (a change of the payload): its
+     * ``path`` is false when the canvas shows no block for it (a removed
+     * node, a change in error).
+     */
+    revealChange(change) {
+        if (change && change.path) {
+            this.reveal(change.path);
+        }
+    }
+
+    /** Show the tab ``tab`` of the inspector (INSPECTOR_TABS). */
+    setInspectorTab(tab) {
+        if (INSPECTOR_TABS.includes(tab)) {
+            this.state.inspectorTab = tab;
+        }
+    }
+
+    /** Show the tab ``tab`` of the left panel (LEFT_TABS). */
+    setLeftTab(tab) {
+        if (LEFT_TABS.includes(tab)) {
+            this.state.leftTab = tab;
+        }
+    }
+
+    // ── the lanes and the colors of a timeline ──────────────────────────
+
+    /** Show the lane ``key`` of a timeline (TIMELINE_LANES) in the inspector. */
+    selectLane(key) {
+        if (timelineLane(key)) {
+            Object.assign(this.state, {timelineLane: key, selected: null, colors: null, inspectorTab: "properties"});
+        }
+    }
+
+    /**
+     * The attribute of the lane ``key`` the field ``name`` fits, by the
+     * values the server offers for its kind (``choices``); null for none.
+     */
+    laneAttribute(key, name) {
+        const lane = timelineLane(key);
+        const settable = (this.data.settable || {})[this.root && this.root.tag] || {};
+        const choices = this.data.choices || {};
+        const fits = (attribute) =>
+            (choices[settable[attribute]] || []).some(([value]) => value === name);
+        return ((lane && lane.attributes) || []).find(fits) || null;
+    }
+
+    newColorRule() {
+        return {color: "#ec7063", field: "", operator: (this.layout.color_operators || ["=="])[0], value: ""};
+    }
+
+    /**
+     * Edit the color rules of the timeline: those of the view when the
+     * editor writes them again (writableColorRules), then a new one when
+     * ``add`` or when there is none. Saving replaces every rule.
+     */
+    editColors(add = false) {
+        const rules = (writableColorRules(this.layout.colors || []) || []).map((rule) => ({
+            ...rule,
+            value: String(rule.value),
+        }));
+        if (add || !rules.length) {
+            rules.push(this.newColorRule());
+        }
+        this.state.colors = rules;
+    }
+
+    /** Show the colors lane with a new rule to write. */
+    addColorRule() {
+        if (!this.project || this.state.busy) {
+            return;
+        }
+        this.selectLane("colors");
+        this.editColors(true);
+    }
+
+    /** Write the color rules of the timeline without the one at ``index``. */
+    async deleteColorRule(index) {
+        const rules = writableColorRules(this.layout.colors || []);
+        if (!rules || !rules[index]) {
+            return;
+        }
+        rules.splice(index, 1);
+        if (await this.setNodeAttribute(this.root, "colors", rules.length ? rules : "")) {
+            this.state.colors = null;
+        }
     }
 
     get selectedBlock() {
         return this.state.selected && findBlock(this.data.blocks, (b) => b.path === this.state.selected);
     }
 
-    get selectedField() {
-        const block = this.selectedBlock;
-        return (block && block.kind === "field" && (this.data.fields || {})[block.name]) || null;
-    }
-
     /** Whether ``block`` is the root of the view. */
     isRoot(block) {
         return Boolean(block && this.root && block.path === this.root.path);
-    }
-
-    /**
-     * The block the properties describe: the selected one, else the view
-     * itself when it has attributes to set.
-     */
-    get propertiesBlock() {
-        const block = this.selectedBlock;
-        if (block) {
-            return block;
-        }
-        return this.settableOf(this.root).length ? this.root : null;
-    }
-
-    /** Whether ``block`` can leave the view (a native node is hidden). */
-    canRemove(block) {
-        if (!block || this.isRoot(block) || block.kind === "template") {
-            return false;
-        }
-        return !TEMPLATED_TYPES.includes(this.viewType) || block.in_template !== false;
-    }
-
-    /**
-     * The attributes « set_attribute » writes on ``block``: [{attribute,
-     * kind, label, value, required}]. A view element nested in its own view
-     * (a <kanban> of a one2many) has none.
-     */
-    settableOf(block) {
-        if (!block || (block.tag === this.viewType && !this.isRoot(block))) {
-            return [];
-        }
-        const attrs = (this.data.settable || {})[block.tag] || {};
-        const required = (this.data.required_attributes || {})[block.tag] || [];
-        const field = block.kind === "field" ? this.fieldInfo(block.name) : {};
-        return Object.entries(attrs)
-            .filter(([attribute]) => attribute !== "interval" || DATE_TYPES.includes(field.type))
-            .map(([attribute, kind]) => ({
-                attribute,
-                kind,
-                label: attributeLabel(attribute),
-                value: (block.attrs || {})[attribute] || "",
-                required: required.includes(attribute),
-            }));
-    }
-
-    /** [[value, label]] of an attribute of ``kind`` on ``block``. */
-    choicesOf(entry, block) {
-        let choices;
-        if (entry.kind === "widget") {
-            choices = fieldWidgets(this.fieldInfo(block.name).type);
-        } else if (entry.kind === "bool") {
-            choices = [
-                ["True", valueLabel("bool", "True")],
-                ["False", valueLabel("bool", "False")],
-            ];
-        } else {
-            choices = ((this.data.choices || {})[entry.kind] || []).map(([value, label]) => [
-                value,
-                valueLabel(entry.kind, value) || label,
-            ]);
-        }
-        if (entry.value && !choices.some(([value]) => value === entry.value)) {
-            // A value of the arch the editor does not offer stays shown.
-            choices = [[entry.value, entry.value], ...choices];
-        }
-        return choices;
     }
 
     async setNodeAttribute(block, attribute, value) {
@@ -1345,20 +1309,6 @@ export class StudioEditor extends Component {
         const data = await this.operate({type: "set_attribute", target: block.path, attribute, value});
         this.reselect(data, block);
         return data;
-    }
-
-    attr(name) {
-        const block = this.selectedBlock;
-        return (block && block.attrs && block.attrs[name]) || "";
-    }
-
-    get hideAttribute() {
-        return this.data.hide_mode || (this.viewType === "list" ? "column_invisible" : "invisible");
-    }
-
-    /** Whether « hide » sets an attribute (it removes the node in a search or a pivot). */
-    get hidesByAttribute() {
-        return this.allows("hide") && this.hideAttribute !== "remove";
     }
 
     async setAttribute(type, value) {
@@ -1399,67 +1349,10 @@ export class StudioEditor extends Component {
         this.state.selected = found && !this.isRoot(found) ? found.path : null;
     }
 
-    isTrue(value) {
-        return isTrue(value);
-    }
-
-    async updateSelection(text) {
-        if (this.state.busy) {
-            return;
-        }
-        await this.updateField({selection: textToSelection(text)});
-    }
-
-    selectionText(field) {
-        return selectionToText((field.definition && field.definition.selection) || field.selection);
-    }
-
     /** The models a many2one can point to, the pending models of the project too. */
     async loadComodels() {
         const projectId = this.project ? this.project.id : false;
         this.state.comodels = await this.orm.call(MODEL, "get_comodels", [projectId]);
-    }
-
-    // ── colors of a timeline ────────────────────────────────────────────
-
-    /**
-     * [[name, label]] of the stored fields a color rule can compare: those
-     * of the types the server lists (``color_types``).
-     */
-    get colorFields() {
-        const types = this.layout.color_types || [];
-        return Object.entries(this.data.fields || {})
-            .filter(([name, info]) => info.store && !info.pending && types.includes(info.type) && name !== "id")
-            .map(([name, info]) => [name, info.string || name])
-            .sort((a, b) => a[1].localeCompare(b[1]));
-    }
-
-    editColors() {
-        this.state.colors = [this.newColorRule()];
-    }
-
-    newColorRule() {
-        return {color: "#ec7063", field: "", operator: (this.layout.color_operators || ["=="])[0], value: ""};
-    }
-
-    cancelColors() {
-        this.state.colors = null;
-    }
-
-    addColorRule() {
-        this.state.colors.push(this.newColorRule());
-    }
-
-    removeColorRule(index) {
-        this.state.colors.splice(index, 1);
-    }
-
-    /** Write the rules being edited; none removes the colors. */
-    async saveColors(rules) {
-        const value = (rules || []).filter((rule) => rule.field);
-        if (await this.setNodeAttribute(this.root, "colors", value.length ? value : "")) {
-            this.state.colors = null;
-        }
     }
 
     // ── models of the project ───────────────────────────────────────────
@@ -1499,12 +1392,21 @@ export class StudioEditor extends Component {
         return (this.project && this.project.models) || [];
     }
 
-    get projectRules() {
-        return (this.project && this.project.rules) || [];
-    }
-
+    /** The label of ``viewType``: the one of ``view_list``, else of the editor. */
     viewTypeLabel(viewType) {
-        return {form: _t("Form"), list: _t("List"), search: _t("Search")}[viewType] || viewType;
+        const entry = (this.data.view_list || []).find((e) => e.type === viewType);
+        if (entry) {
+            return entry.label;
+        }
+        const labels = {
+            form: _t("Form"),
+            list: _t("List"),
+            search: _t("Search"),
+            kanban: _t("Kanban"),
+            pivot: _t("Pivot"),
+            timeline: _t("Timeline"),
+        };
+        return labels[viewType] || viewType;
     }
 
     /** The label of ``model``: a model of the project, else of the database. */
@@ -1540,26 +1442,41 @@ export class StudioEditor extends Component {
         });
     }
 
+    /** Add a model to the project; the models space then shows it. */
     async createModel(values) {
-        return Boolean(await this.projectCall("create_model", [values]));
-    }
-
-    async updateModel(line, values) {
-        return Boolean(await this.projectCall("update_model", [line.id, values]));
-    }
-
-    /** The apps of the project, as the payload lists them. */
-    get projectApps() {
-        return (this.project && this.project.apps) || [];
-    }
-
-    /** Where the menu of the model line ``line`` goes: its app, or its parent menu. */
-    menuPlace(line) {
-        if (line.menu_mode === "menu") {
-            return line.menu_parent ? line.menu_parent[1] : _t("Under a menu");
+        const data = await this.projectCall("create_model", [values]);
+        if (data) {
+            this.state.modelsSpace.model = (data.created_model && data.created_model.model) || values.model || null;
         }
-        const app = this.projectApps.find((a) => a.id === line.app_id);
-        return app ? _t("App %(name)s", {name: app.name}) : _t("No app");
+        return Boolean(data);
+    }
+
+    /**
+     * Write ``values`` (any of name, model, chatter, menu) on the model
+     * line ``line``; the models space follows a new technical name.
+     */
+    async updateModel(line, values) {
+        const data = await this.projectCall("update_model", [line.id, values]);
+        if (data && values.model && this.state.modelsSpace.model === line.model) {
+            this.state.modelsSpace.model = values.model;
+        }
+        return Boolean(data);
+    }
+
+    /** Show the model ``model`` in the models space. */
+    selectModelEntry(model) {
+        this.state.modelsSpace.model = model;
+    }
+
+    /** Show the rights of the model ``model`` in the security space. */
+    async openSecurityModel(model) {
+        this.state.security.model = model;
+        this.state.security.row = null;
+        if (this.state.space === "security" && this.state.panel === "access") {
+            await this.loadAccessExisting([model]);
+            return;
+        }
+        await this.openSecurity("access");
     }
 
     get pendingViewTitle() {
@@ -1608,30 +1525,91 @@ export class StudioEditor extends Component {
         return this.openView(line.model, viewId, viewType);
     }
 
-    /** Apply the project, then edit the form of the model line ``line``. */
+    /**
+     * « Apply and open » of a model not created yet: the review of the
+     * draft, whose Apply then edits the form of the model line ``line``.
+     */
     async applyAndOpen(line) {
-        const data = await this.applyProject();
-        const applied = data && data.project && (data.project.models || []).find((m) => m.id === line.id);
-        if (applied && applied.applied) {
-            await this.openModel(applied, "form");
+        await this.openSpace("review");
+        if (this.state.space === "review") {
+            this.state.openAfterApply = line.id;
         }
     }
 
-    // ── access rights and record rules ──────────────────────────────────
+    // ── the spaces of the rail ──────────────────────────────────────────
 
-    /** Show the access grid or the rules on the canvas; again, the view. */
-    async togglePanel(panel) {
+    /**
+     * The entries of the rail: [{id, label, icon, count, disabled}]. Every
+     * space but the view needs a project. ``count``: the models of the
+     * project, its access rows, rules and groups, the total of its items.
+     */
+    get spaces() {
+        const project = this.project;
+        const counts = (project && project.counts) || {};
+        const size = (key) => (counts[key] !== undefined ? counts[key] : ((project && project[key]) || []).length);
+        return [
+            {id: "view", label: _t("View"), icon: "fa-columns", count: 0, disabled: false},
+            {id: "models", label: _t("Models"), icon: "fa-database", count: project ? size("models") : 0},
+            {
+                id: "security",
+                label: _t("Security"),
+                icon: "fa-shield",
+                count: project ? size("access") + size("rules") + size("groups") : 0,
+            },
+            {id: "review", label: _t("Review"), icon: "fa-list-alt", count: project ? this.changeCount : 0},
+        ].map((space) => ({...space, disabled: space.id !== "view" && !project}));
+    }
+
+    get chooseProjectTitle() {
+        return _t("Choose or create a studio project first.");
+    }
+
+    /**
+     * The key of the review space: it reads the review again for each
+     * revision and state of the project.
+     */
+    get reviewKey() {
+        const project = this.project;
+        return project ? `${project.id}:${project.revision}:${project.state}` : "none";
+    }
+
+    /** Show the space ``space`` of the rail; the security space opens on its last tab. */
+    async openSpace(space) {
         if (this.state.busy) {
             return;
         }
-        if (this.state.panel === panel) {
-            this.closePanel();
+        if (space !== "review") {
+            this.state.openAfterApply = false;
+        }
+        if (space === "security") {
+            await this.openSecurity(this.state.securityTab);
+            return;
+        }
+        if (space !== "view" && !this.project) {
+            return;
+        }
+        if (space === this.state.space && this.state.panel !== "preview") {
+            return;
+        }
+        this.closePanel();
+        Object.assign(this.state, {space, selected: null, preview: false});
+    }
+
+    /** Show the tab ``panel`` (SECURITY_TABS) of the security space. */
+    async openSecurity(panel) {
+        if (this.state.busy) {
+            return;
+        }
+        if (this.state.space === "security" && this.state.panel === panel) {
             return;
         }
         if (!this.project || !(await this.loadChoices())) {
             return;
         }
+        const entering = this.state.space !== "security";
         Object.assign(this.state, {
+            space: "security",
+            securityTab: panel,
             selected: null,
             preview: false,
             panel,
@@ -1641,13 +1619,47 @@ export class StudioEditor extends Component {
             modelPreview: null,
             panelError: null,
         });
-        this.state.accessExisting = {};
-        if (panel === "access") {
-            await this.loadAccessExisting(this.accessGrid.map((entry) => entry.model));
+        if (entering) {
+            // The rows of the other modules are read again at each entry.
+            this.state.accessExisting = {};
+            this.state.security.row = null;
+        }
+        if (entering || panel === "access") {
+            await this.loadAccessExisting([this.securityModel].filter(Boolean));
         }
     }
 
+    /** The models of the security space (securityModels). */
+    get securityModels() {
+        return securityModels(this.project, (model) => this.modelLabel(model));
+    }
+
+    /** The model the security space shows (pickModel), or null. */
+    get securityModel() {
+        return pickModel(this.securityModels, this.state.security.model, this.params.resModel);
+    }
+
+    /** Show the model ``model`` in the security space, with the rows of the other modules on it. */
+    async selectSecurityModel(model) {
+        if (model === this.securityModel && this.state.security.model) {
+            return;
+        }
+        this.state.security.model = model;
+        this.state.security.row = null;
+        if (this.state.ruleForm && this.state.ruleForm.model !== model) {
+            this.closeRuleForm();
+        }
+        await this.loadAccessExisting([model]);
+    }
+
+    /**
+     * Close the panel the centre shows; a security space without a panel
+     * goes back to the view.
+     */
     closePanel() {
+        if (this.state.space === "security") {
+            this.state.space = "view";
+        }
         Object.assign(this.state, {
             panel: null,
             ruleForm: null,
@@ -1658,59 +1670,10 @@ export class StudioEditor extends Component {
         });
     }
 
+    // ── access rights and record rules ──────────────────────────────────
+
     get choiceModels() {
         return (this.state.choices && this.state.choices.models) || [];
-    }
-
-    get choiceGroups() {
-        return (this.state.choices && this.state.choices.groups) || [];
-    }
-
-    groupName(groupId) {
-        const group = this.choiceGroups.find((g) => g.id === groupId);
-        return group ? group.name : String(groupId);
-    }
-
-    /** The value of ``group`` (of the choices) in a group select. */
-    groupValue(group) {
-        return groupValue(group);
-    }
-
-    /** [value, name] of the group of the access row ``row`` of the payload. */
-    accessGroup(row) {
-        return accessGroup(row);
-    }
-
-    get projectGroupSuffix() {
-        return _t("project");
-    }
-
-    /** The name of the group of the project ``lineId``, from the payload. */
-    groupLineName(lineId) {
-        const line = ((this.project && this.project.groups) || []).find((g) => g.id === lineId);
-        if (line) {
-            const app = this.projectApps.find((a) => a.id === line.app_id);
-            return app ? `${app.name} / ${line.name}` : line.name;
-        }
-        const choice = this.choiceGroups.find((g) => g.project && g.line_id === lineId);
-        return choice ? choice.name : String(lineId);
-    }
-
-    missingGroupText(xmlid) {
-        return _t("This group no longer exists: %(group)s", {group: xmlid});
-    }
-
-    /** Whether Apply refuses the rule ``rule`` of the payload: no group, not global. */
-    ruleNeedsGroup(rule) {
-        return !rule.global_rule && !rule.groups.length && !(rule.group_lines || []).length;
-    }
-
-    permLabel(perm) {
-        return permLabel(perm);
-    }
-
-    get accessGrid() {
-        return this.project ? accessGrid(this.project) : [];
     }
 
     /** The row being added; ``group_id`` holds the value of the group select. */
@@ -1778,13 +1741,15 @@ export class StudioEditor extends Component {
         }
         if (await this.setAccess([...accessRows(this.project.access), row])) {
             this.state.accessAdd = this.newAccessRow();
+            // The grid shows the model of the new row.
+            this.state.security.model = row.model;
             await this.loadAccessExisting([row.model]);
         }
     }
 
     /** The form of the rule ``rule`` of the payload, or of a new rule. */
     editRule(rule = null) {
-        const models = this.projectModels.map((m) => m.model);
+        const models = [this.securityModel, ...this.projectModels.map((m) => m.model)].filter(Boolean);
         this.state.ruleForm = rule
             ? {
                   id: rule.id,
@@ -1820,21 +1785,6 @@ export class StudioEditor extends Component {
         this.state.ruleError = null;
     }
 
-    /**
-     * The groups of the rule form: [{value, name, project}], the existing
-     * groups then those of the project.
-     */
-    get ruleFormGroups() {
-        const form = this.state.ruleForm;
-        if (!form) {
-            return [];
-        }
-        return [
-            ...form.group_ids.map((id) => ({value: String(id), name: this.groupName(id), project: false})),
-            ...form.group_line_ids.map((id) => ({value: `line:${id}`, name: this.groupLineName(id), project: true})),
-        ];
-    }
-
     addRuleGroup(ev) {
         const group = parseGroupValue(ev.target.value);
         ev.target.value = "";
@@ -1844,10 +1794,6 @@ export class StudioEditor extends Component {
         } else if (group && group.group_line_id && !form.group_line_ids.includes(group.group_line_id)) {
             form.group_line_ids.push(group.group_line_id);
         }
-    }
-
-    removeGroupLabel(name) {
-        return _t("Remove the group %(group)s", {group: name});
     }
 
     removeRuleGroup(value) {
@@ -1865,17 +1811,6 @@ export class StudioEditor extends Component {
             form.group_ids = [];
             form.group_line_ids = [];
         }
-    }
-
-    get domainPlaceholder() {
-        return "[('create_uid', '=', user.id)]";
-    }
-
-    /** The answer of the last check, while the form holds the domain it checked. */
-    get ruleCheck() {
-        const check = this.state.ruleCheck;
-        const form = this.state.ruleForm;
-        return check && form && check.model === form.model && check.domain === form.domain ? check : null;
     }
 
     ruleCheckText(check) {
@@ -1920,7 +1855,38 @@ export class StudioEditor extends Component {
         });
         if (data) {
             this.closeRuleForm();
+            // The cards show the rules of the model of the saved rule.
+            this.state.security.model = values.model;
         }
+    }
+
+    /**
+     * Save the rule ``rule`` of the payload with ``changes`` (perm_*,
+     * domain): one change of the draft. Saving records its groups again,
+     * so a group that left the database is no longer named. An open form
+     * of the rule shows it as saved.
+     */
+    async saveRuleValues(rule, changes = {}) {
+        const values = {
+            id: rule.id,
+            name: rule.name,
+            model: rule.model,
+            domain: rule.domain,
+            group_ids: rule.groups.map((g) => g[0]),
+            group_line_ids: (rule.group_lines || []).map((g) => g[0]),
+            global_rule: Boolean(rule.global_rule),
+            ...Object.fromEntries(PERMS.map((perm) => [perm, Boolean(rule[perm])])),
+            ...changes,
+        };
+        const data = await this.projectCall("save_rule", [values]);
+        const form = this.state.ruleForm;
+        if (data && form && form.id === rule.id) {
+            const saved = (data.project.rules || []).find((r) => r.id === rule.id);
+            if (saved) {
+                this.editRule(saved);
+            }
+        }
+        return data;
     }
 
     async removeRule(rule) {
@@ -1957,6 +1923,7 @@ export class StudioEditor extends Component {
             this.state.busy = false;
         }
         Object.assign(this.state, {
+            space: "view",
             selected: null,
             preview: false,
             panel: "preview",
@@ -2019,6 +1986,14 @@ export class StudioEditor extends Component {
      * for a model not created yet, its model preview.
      */
     async togglePreview() {
+        if (this.state.busy) {
+            return;
+        }
+        if (this.state.space !== "view") {
+            // The preview shows the view: back to its space, preview on.
+            this.closePanel();
+            Object.assign(this.state, {space: "view", selected: null, preview: false});
+        }
         if (this.data.view && this.data.view.pending) {
             if (this.state.panel === "preview") {
                 this.closePanel();
@@ -2053,6 +2028,11 @@ export class StudioEditor extends Component {
             props.preventEdit = true;
         } else if (this.params.viewType === "search") {
             Object.assign(props, {type: "list", viewId: false, searchViewId: this.params.viewId, display: {}});
+        } else if (this.params.viewType === "timeline") {
+            // web_timeline reads the fields of its attributes (start, end,
+            // grouping) from the fields get_views answers; the search view
+            // brings every field of the model.
+            props.searchViewId = false;
         }
         return props;
     }
@@ -2067,6 +2047,186 @@ export class StudioEditor extends Component {
 
     get previewKey() {
         return `${this.params.viewType}:${this.project ? this.project.preview_value : "none"}`;
+    }
+
+    /** Whether the centre shows a preview: of the view, or of a model not created yet. */
+    get previewOn() {
+        return this.state.space === "view" && (this.state.preview || this.state.panel === "preview");
+    }
+
+    /** The label of the preview on screen, for the status bar; false for none. */
+    get previewLabel() {
+        if (this.state.space !== "view") {
+            return false;
+        }
+        if (this.state.panel === "preview" && this.state.modelPreview) {
+            return this.state.modelPreview.mode === "real"
+                ? _t("Preview: real, rolled back")
+                : _t("Preview: simulation, nothing is written");
+        }
+        return this.state.preview ? _t("Preview: the view with the draft") : false;
+    }
+
+    /**
+     * What the inspector shows of the preview on screen, null for none:
+     * {kind, mode, model, approved, approvedBy, approvedDate, stale}.
+     * « model »: the preview of a model not created yet, in « simulation »
+     * or « real » mode, the latter once approved; « view »: the view of
+     * the database rendered with the draft.
+     */
+    get previewInfo() {
+        if (!this.previewOn || !this.project) {
+            return null;
+        }
+        const preview = this.state.modelPreview;
+        if (this.state.panel !== "preview" || !preview) {
+            return {kind: "view", mode: "view"};
+        }
+        const project = this.project;
+        return {
+            kind: "model",
+            mode: preview.data.mode || preview.mode,
+            model: (this.previewLine || {}).model || "",
+            approved: Boolean(project.approved),
+            approvedBy: project.approved_by ? project.approved_by[1] : "",
+            approvedDate: project.approved_date ? formatDateTime(deserializeDateTime(project.approved_date)) : "",
+            stale: Boolean(!project.approved && project.approved_by),
+        };
+    }
+
+    /** Back to the canvas from the preview on screen. */
+    async leavePreview() {
+        if (this.state.panel === "preview") {
+            this.closePanel();
+        } else {
+            this.state.preview = false;
+        }
+    }
+
+    /** The state of the project in the status bar. */
+    get statusText() {
+        const project = this.project;
+        if (project.state !== "draft") {
+            return _t("%(state)s · the database has the draft", {state: project.state_label});
+        }
+        if (!project.applied) {
+            return _t("%(state)s · %(count)s change(s) not applied", {
+                state: project.state_label,
+                count: this.changeCount,
+            });
+        }
+        return _t("%(state)s · changed since the last Apply", {state: project.state_label});
+    }
+
+    /** How many items the draft of the project holds: what Apply writes. */
+    get changeCount() {
+        const project = this.project;
+        if (!project) {
+            return 0;
+        }
+        const counts = project.counts || {};
+        return counts.total !== undefined ? counts.total : project.item_count || 0;
+    }
+
+    /** The date of the last Apply of the project, in the format of the user; false for none. */
+    get appliedDateLabel() {
+        const value = this.project && this.project.applied_date;
+        return value ? formatDateTime(deserializeDateTime(value)) : false;
+    }
+
+    /** When the project was last applied, for the status bar. */
+    get appliedText() {
+        const date = this.appliedDateLabel;
+        return date ? _t("Last Apply: %(date)s", {date}) : _t("Never applied");
+    }
+
+    /** Apply, from the top bar: the review of the draft, whose last button applies it. */
+    async applyFromBar() {
+        this.menus.apply.close();
+        await this.openSpace("review");
+    }
+
+    /**
+     * Apply the draft the review shows, with ``digest``, the digest of the
+     * removal report on screen; once applied, back to the view space, on
+     * the form of the model ``openAfterApply`` names when Apply created
+     * it. Answer the payload, or null.
+     */
+    async applyReviewed(digest) {
+        const lineId = this.state.openAfterApply;
+        const data = await this.projectAction("action_apply", {digest, space: "view"});
+        if (!data) {
+            return null;
+        }
+        this.state.openAfterApply = false;
+        const line = lineId && ((data.project && data.project.models) || []).find((m) => m.id === lineId);
+        if (line && line.applied) {
+            await this.openModel(line, "form");
+        }
+        return data;
+    }
+
+    /**
+     * Show the item of the review whose ``target`` is given: the block of a
+     * change in the view space (its view opened first), a model in the
+     * models space, an access row, a rule, an app or a group in its tab of
+     * the security space.
+     */
+    async showReviewItem(target) {
+        if (!target || this.state.busy) {
+            return;
+        }
+        if (target.space === "view") {
+            const params = this.params;
+            const same =
+                params.resModel === target.model &&
+                params.viewType === target.view_type &&
+                (!target.view_id || target.view_id === params.viewId);
+            if (!same && !(await this.openView(target.model, target.view_id || false, target.view_type))) {
+                return;
+            }
+            await this.openSpace("view");
+            if (target.path) {
+                this.reveal(target.path);
+            }
+        } else if (target.space === "models") {
+            this.selectModelEntry(target.model);
+            await this.openSpace("models");
+        } else if (target.space === "security") {
+            if (target.model) {
+                this.state.security.model = target.model;
+                this.state.security.row = null;
+            }
+            await this.openSecurity(target.tab || "access");
+        }
+    }
+
+    /** Discard the draft, once confirmed: back to the last Apply. */
+    discardDraft() {
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Discard the draft"),
+            body: _t(
+                "Go back to the last Apply? The changes of the draft made since are lost; " +
+                    "without an Apply, the draft is emptied."
+            ),
+            confirmLabel: _t("Discard"),
+            confirm: async () => {
+                await this.projectAction("action_discard");
+            },
+            cancel: () => {},
+        });
+    }
+
+    /** Run ``action`` of the menu of Apply (discard, revert, open the project). */
+    async runApplyMenu(action) {
+        this.menus.apply.close();
+        if (action === "discard") {
+            await this.projectAction("action_discard");
+        } else if (action === "revert") {
+            await this.revertProject();
+        } else if (action === "project") {
+            await this.openProject();
+        }
     }
 
     async openProject() {

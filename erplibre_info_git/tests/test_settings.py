@@ -233,15 +233,15 @@ class TestSettings(ErplibreInfoGitCase):
         self.assertFalse(settings.erplibre_last_failed_run_id)
 
     def test_runs_log_in_the_requester_language(self):
-        self.env["res.lang"]._activate_lang("fr_FR")
+        self.env["res.lang"]._activate_lang("fr_CA")
         self.env["ir.module.module"]._load_module_terms(
-            ["erplibre_info", "erplibre_info_git"], ["fr_FR"]
+            ["erplibre_info", "erplibre_info_git"], ["fr_CA"]
         )
         user = new_test_user(
             self.env,
             login="erplibre_info_fr",
             groups="base.group_system",
-            lang="fr_FR",
+            lang="fr_CA",
         )
         self.Snapshot._capture("manual")
         run = self.Run.with_user(user).create(
@@ -253,7 +253,7 @@ class TestSettings(ErplibreInfoGitCase):
         self.assertIn("Le code n'a pas changé", run.log)
         self.assertIn(
             "Instantané",
-            run.with_context(lang="fr_FR").name,
+            run.with_context(lang="fr_CA").name,
         )
         self.assertIn("Snapshot", run.with_context(lang="en_US").name)
         # A name is plain text: its time is the stored UTC one, and says so.

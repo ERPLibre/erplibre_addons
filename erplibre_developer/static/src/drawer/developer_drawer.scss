@@ -1,10 +1,21 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-$o-erplibre-dev-width: 460px;
-// The CSS min(): libsass would evaluate a bare min() as its own function
-// and fail on the mixed units.
-$o-erplibre-dev-space: unquote("min(#{$o-erplibre-dev-width}, 100vw)");
+// The highlight in the page: teal, apart from the brand colour of the
+// buttons. White text on it passes 4.5:1.
+$o-erplibre-dev-teal: $o-enterprise-action-color;
+$o-erplibre-dev-banner-height: 2.5rem;
+
+// The width of the drawer, narrow or wide (body.o_erplibre_dev_wide). The
+// page keeps the rest. The CSS min(): libsass would evaluate a bare min()
+// as its own function and fail on the mixed units.
+body {
+    --o-erplibre-dev-width: #{unquote("min(480px, 100vw)")};
+}
+
+body.o_erplibre_dev_wide {
+    --o-erplibre-dev-width: #{unquote("min(720px, 100vw)")};
+}
 
 .o_erplibre_dev_drawer {
     position: fixed;
@@ -12,7 +23,7 @@ $o-erplibre-dev-space: unquote("min(#{$o-erplibre-dev-width}, 100vw)");
     top: $o-navbar-height;
     right: 0;
     bottom: 0;
-    width: $o-erplibre-dev-space;
+    width: var(--o-erplibre-dev-width);
     // Below the overlays: the dialogs (the -u confirmation among them), the
     // dropdowns and the notifications show above the drawer.
     z-index: $zindex-modal-backdrop - 10;
@@ -30,24 +41,1071 @@ $o-erplibre-dev-space: unquote("min(#{$o-erplibre-dev-width}, 100vw)");
         margin-left: 0.25rem;
     }
 
-    .o_erplibre_dev_field_row,
-    .o_erplibre_dev_view_row {
+    // ── header ──────────────────────────────────────────────────────────
+
+    .o_erplibre_dev_header_icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background-color: rgba($primary, 0.12);
+        color: $primary;
+    }
+
+    .o_erplibre_dev_title {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .o_erplibre_dev_chip {
+        margin-left: 0;
+        padding: 0 0.3rem;
+        border-radius: 4px;
+        background-color: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
+        font-size: 0.75rem;
+    }
+
+    .o_erplibre_dev_icon_btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background-color: transparent;
+        color: var(--bs-body-color);
+
+        &:hover:not(:disabled) {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        &[aria-pressed="true"] {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+    }
+
+    // The copy and Open in IDE buttons of a source location: bordered
+    // 32px targets beside the path, which wraps before they shrink.
+    .o_erplibre_dev_location .o_erplibre_dev_icon_btn {
+        flex-shrink: 0;
+        border-color: var(--bs-border-color);
+    }
+
+    .o_erplibre_dev_offview {
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    // ── module filter ───────────────────────────────────────────────────
+
+    .o_erplibre_dev_modules_label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--bs-secondary-color);
+    }
+
+    .o_erplibre_dev_module_chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        min-height: 32px;
+        margin-left: 0;
+        padding: 0 0.625rem;
+        border: 1px solid var(--bs-border-color);
+        background-color: transparent;
+        color: var(--bs-body-color);
+        font-size: 0.75rem;
+        white-space: nowrap;
+
+        &.o_erplibre_dev_chip_on {
+            border-color: currentColor;
+            font-weight: 600;
+        }
+
+        &.o_erplibre_dev_module_all.o_erplibre_dev_chip_on {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+    }
+
+    // A dot in the module's tag colour: the text colour of the tag, which
+    // is the strong one in both themes.
+    .o_erplibre_dev_dot.o_tag {
+        display: inline-block;
+        flex: none;
+        width: 0.625rem;
+        height: 0.625rem;
+        margin: 0;
+        padding: 0;
+        border-radius: 50%;
+        background-color: var(--color) !important;
+    }
+
+    // ── tabs ────────────────────────────────────────────────────────────
+
+    .o_erplibre_dev_tabs {
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .o_erplibre_dev_tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        border: 0;
+        color: var(--bs-body-color);
+
+        &.active {
+            background-color: var(--bs-body-bg);
+            font-weight: 600;
+            box-shadow: $box-shadow-sm;
+        }
+    }
+
+    .o_erplibre_dev_tab_count {
+        padding: 0 0.4rem;
+        border-radius: 1rem;
+        // Upper case: libsass leaves RGBA() with a CSS variable to the browser.
+        background-color: RGBA(var(--bs-body-color-rgb), 0.1);
+        font-size: 0.7rem;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .o_erplibre_dev_tab.active .o_erplibre_dev_tab_count {
+        background-color: rgba($primary, 0.12);
+    }
+
+    // ── Views tab ───────────────────────────────────────────────────────
+
+    .o_erplibre_dev_section_title {
+        font-size: 0.8125rem;
+        font-weight: 600;
+    }
+
+    // A module as a chip in its tag colour (.o_tag_color_N sets both).
+    .o_erplibre_dev_module_tag {
+        display: inline-flex;
+        align-items: center;
+        flex: none;
+        gap: 0.3rem;
+        margin-left: 0;
+        padding: 0 0.45rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        line-height: 1.125rem;
+        white-space: nowrap;
+    }
+
+    .o_erplibre_dev_facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+        gap: 0.25rem 0.75rem;
+
+        dt {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--bs-secondary-color);
+        }
+
+        dd {
+            margin: 0;
+        }
+    }
+
+    .o_erplibre_dev_view_actions:empty {
+        display: none;
+    }
+
+    .o_erplibre_dev_segmented {
+        background-color: var(--bs-tertiary-bg);
+
+        .btn {
+            min-height: 32px;
+            border: 0;
+            color: var(--bs-body-color);
+            font-size: 0.75rem;
+
+            &.active {
+                background-color: var(--bs-body-bg);
+                font-weight: 600;
+                box-shadow: $box-shadow-sm;
+            }
+        }
+    }
+
+    .o_erplibre_dev_field_chip {
+        min-height: 32px;
+        padding: 0 0.625rem;
+        border: 1px solid var(--bs-border-color);
+        color: var(--bs-body-color);
+        font-family: $font-family-monospace;
+        font-size: 0.75rem;
+
+        &.o_erplibre_dev_chip_on {
+            border-color: $o-erplibre-dev-teal;
+            background-color: rgba($o-erplibre-dev-teal, 0.12);
+            font-weight: 600;
+        }
+    }
+
+    // The numbered rail of the applied views: a number per view, joined
+    // by a line.
+    .o_erplibre_dev_rail {
+        .o_erplibre_dev_view_row {
+            gap: 0.5rem;
+            cursor: default;
+        }
+
+        .o_erplibre_dev_rail_mark {
+            flex: none;
+            width: 1.375rem;
+        }
+
+        .o_erplibre_dev_rail_line {
+            width: 2px;
+            min-height: 0.5rem;
+            background-color: var(--bs-border-color);
+        }
+
+        .o_erplibre_dev_rail_n {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: none;
+            width: 1.375rem;
+            height: 1.375rem;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 50%;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-secondary-color);
+            font-size: 0.6875rem;
+            font-weight: 700;
+        }
+
+        .o_erplibre_dev_view_current .o_erplibre_dev_rail_n {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+
+        .o_erplibre_dev_view_card {
+            min-width: 0;
+            margin: 0.1875rem 0;
+            border-radius: 8px;
+        }
+
+        .o_erplibre_dev_view_open .o_erplibre_dev_view_card {
+            box-shadow: 0 0 0 1px var(--bs-border-color);
+        }
+
+        .o_erplibre_dev_view_row:hover,
+        .o_erplibre_dev_view_row:focus-within {
+            .o_erplibre_dev_view_card {
+                background-color: rgba($o-erplibre-dev-teal, 0.08);
+                box-shadow: 0 0 0 1px rgba($o-erplibre-dev-teal, 0.5);
+            }
+
+            .o_erplibre_dev_rail_n {
+                border-color: $o-erplibre-dev-teal;
+                background-color: $o-erplibre-dev-teal;
+                color: #ffffff;
+            }
+        }
+
+        .o_erplibre_dev_view_head {
+            gap: 0.125rem;
+            min-height: 32px;
+            padding: 0.375rem 0.5rem;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--bs-body-color);
+        }
+
+        .o_erplibre_dev_view_xml_id {
+            min-width: 0;
+            font-family: $font-family-monospace;
+            font-size: 0.75rem;
+        }
+
+        .o_erplibre_dev_spec_count {
+            flex: none;
+            color: var(--bs-secondary-color);
+            font-size: 0.6875rem;
+        }
+
+        .o_erplibre_dev_shown {
+            flex: none;
+            background-color: rgba($primary, 0.12);
+            color: var(--bs-body-color);
+        }
+
+        .o_erplibre_dev_view_body {
+            padding: 0 0.625rem 0.625rem 1.75rem;
+        }
+    }
+
+    .o_erplibre_dev_chevron {
+        flex: none;
+        width: 0.75rem;
+        color: var(--bs-secondary-color);
+        transition: transform 0.15s;
+    }
+
+    [aria-expanded="true"] > .o_erplibre_dev_chevron,
+    [aria-expanded="true"] > span > .o_erplibre_dev_chevron {
+        transform: rotate(90deg);
+    }
+
+    // The position of a spec, one colour each (subtle in both themes).
+    .o_erplibre_dev_position {
+        flex: none;
+        min-width: 4.5rem;
+        margin-top: 1px;
+        font-family: $font-family-monospace;
+        font-weight: 600;
+        background-color: var(--bs-secondary-bg-subtle);
+        color: var(--bs-secondary-text-emphasis);
+
+        @each $position, $color in (inside: info, after: success, before: primary, replace: danger, attributes: warning) {
+            &[data-position="#{$position}"] {
+                background-color: var(--bs-#{$color}-bg-subtle);
+                color: var(--bs-#{$color}-text-emphasis);
+            }
+        }
+    }
+
+    // An arch, line by line: the arch of a view, the combined arch.
+    .o_erplibre_dev_code_block {
+        max-height: 50vh;
+        overflow: auto;
+        padding: 0.375rem 0;
+        border-radius: 6px;
+        background-color: var(--bs-tertiary-bg);
+        font-family: $font-family-monospace;
+        font-size: 0.75rem;
+        line-height: 1.125rem;
+
+        .o_erplibre_dev_line_code {
+            padding: 0 0.5rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .o_erplibre_dev_tok_tag {
+            color: var(--bs-info-text-emphasis);
+        }
+
+        .o_erplibre_dev_tok_attr {
+            color: var(--bs-warning-text-emphasis);
+        }
+
+        .o_erplibre_dev_tok_value {
+            color: var(--bs-success-text-emphasis);
+        }
+
+        .o_erplibre_dev_tok_punct,
+        .o_erplibre_dev_tok_comment {
+            color: var(--bs-secondary-color);
+        }
+    }
+
+    .o_erplibre_dev_combined {
+        .o_erplibre_dev_line_code {
+            padding-left: 0.375rem;
+        }
+
+        .o_erplibre_dev_lineno {
+            flex: none;
+            width: 2.5rem;
+            padding-right: 0.375rem;
+            color: var(--bs-secondary-color);
+            text-align: right;
+            user-select: none;
+        }
+
+        .o_erplibre_dev_match {
+            background-color: var(--bs-warning-bg-subtle);
+        }
+    }
+
+    // The bars of the « Node origins » gutter: wide for the module that
+    // brought the node, thin for the module that changed its attributes.
+    .o_erplibre_dev_bar {
+        flex: none;
+        align-self: stretch;
+        width: 4px;
+        margin: 0 1px 0 0;
+        padding: 0;
+        border-radius: 0;
+
+        &.o_erplibre_dev_bar_attr {
+            width: 2px;
+            margin-right: 0.25rem;
+        }
+
+        &.o_tag {
+            background-color: var(--color) !important;
+        }
+    }
+
+    .o_erplibre_dev_swatch.o_tag {
+        display: inline-block;
+        width: 4px;
+        height: 0.75rem;
+        margin: 0;
+        padding: 0;
+        border-radius: 1px;
+        background-color: var(--color) !important;
+    }
+
+    .o_erplibre_dev_arch_search {
+        min-width: 10rem;
+
+        .fa-search {
+            top: 50%;
+            left: 0.5rem;
+            transform: translateY(-50%);
+        }
+
+        input {
+            padding-left: 1.75rem;
+        }
+    }
+
+    .o_erplibre_dev_origin_switch {
+        min-height: 32px;
+        border: 0;
+        color: var(--bs-body-color);
+
+        .o_erplibre_dev_switch_track {
+            position: relative;
+            display: inline-block;
+            width: 1.875rem;
+            height: 1.125rem;
+            border-radius: 1rem;
+            background-color: var(--bs-secondary-bg);
+            transition: background-color 0.15s;
+        }
+
+        .o_erplibre_dev_switch_knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 0.875rem;
+            height: 0.875rem;
+            border-radius: 50%;
+            background-color: var(--bs-body-bg);
+            box-shadow: $box-shadow-sm;
+            transition: left 0.15s;
+        }
+
+        &[aria-checked="true"] {
+            .o_erplibre_dev_switch_track {
+                background-color: $o-erplibre-dev-teal;
+            }
+
+            .o_erplibre_dev_switch_knob {
+                left: calc(100% - 0.875rem - 2px);
+            }
+        }
+    }
+
+    // ── Fields tab ──────────────────────────────────────────────────────
+
+    .o_erplibre_dev_field_search {
+        min-height: 36px;
+        background-color: var(--bs-body-bg);
+
+        &:focus-within {
+            outline: 2px solid $primary;
+            outline-offset: 1px;
+        }
+
+        input {
+            min-height: 32px;
+            background-color: transparent;
+        }
+    }
+
+    .o_erplibre_dev_field_filter {
+        &.o_erplibre_dev_chip_on {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+
+        .o_erplibre_dev_filter_count {
+            padding: 0 0.375rem;
+            border-radius: 1rem;
+            background-color: RGBA(var(--bs-body-color-rgb), 0.08);
+            font-size: 0.6875rem;
+            font-weight: 700;
+        }
+
+        &.o_erplibre_dev_chip_on .o_erplibre_dev_filter_count {
+            background-color: rgba(color-contrast($primary), 0.22);
+        }
+    }
+
+    // The type of a field, as a small monospace label.
+    .o_erplibre_dev_type {
+        display: inline-block;
+        margin-left: 0;
+        padding: 0 0.3rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 4px;
+        background-color: var(--bs-tertiary-bg);
+        font-family: $font-family-monospace;
+        font-size: 0.6875rem;
+        line-height: 1.125rem;
+        white-space: nowrap;
+    }
+
+    // The card sits above the list, in the flow of the body: the body of
+    // the drawer is the only scroll of the tab, the card and the list
+    // scroll together.
+    .o_erplibre_dev_field_card {
+        border-radius: 10px;
+        background-color: var(--bs-body-bg);
+        box-shadow: $box-shadow-sm;
+
+        .o_erplibre_dev_field_label {
+            font-size: 0.9375rem;
+            font-weight: 600;
+        }
+
+        .o_erplibre_dev_relation {
+            margin-left: 0;
+            font-size: 0.6875rem;
+        }
+
+        .o_erplibre_dev_flag {
+            margin-left: 0;
+            padding: 0 0.375rem;
+            border-radius: 4px;
+            background-color: rgba($o-erplibre-dev-teal, 0.15);
+            color: var(--bs-body-color);
+            font-family: $font-family-monospace;
+            font-size: 0.6875rem;
+            line-height: 1.125rem;
+        }
+    }
+
+    .o_erplibre_dev_caps {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--bs-secondary-color);
+    }
+
+    .o_erplibre_dev_custom_field {
+        border: 1px dashed var(--bs-border-color);
+    }
+
+    // The origin chain: a numbered step per class, joined by a line.
+    .o_erplibre_dev_chain {
+        .o_erplibre_dev_step_mark {
+            flex: none;
+            width: 1.25rem;
+        }
+
+        .o_erplibre_dev_step_n {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--bs-border-color);
+            border-radius: 50%;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-secondary-color);
+            font-size: 0.625rem;
+            font-weight: 700;
+        }
+
+        .o_erplibre_dev_step_line {
+            width: 2px;
+            min-height: 0.75rem;
+            background-color: var(--bs-border-color);
+        }
+    }
+
+    // The kind of a step, one colour each (subtle in both themes).
+    .o_erplibre_dev_kind {
+        flex: none;
+        background-color: var(--bs-secondary-bg-subtle);
+        color: var(--bs-secondary-text-emphasis);
+
+        @each $kind, $color in (compute: info, inverse: success, search: warning, onchange: primary, constrains: danger) {
+            &[data-kind="#{$kind}"] {
+                background-color: var(--bs-#{$color}-bg-subtle);
+                color: var(--bs-#{$color}-text-emphasis);
+            }
+        }
+    }
+
+    .o_erplibre_dev_field_view {
+        min-height: 32px;
+        padding: 0.125rem 0.375rem;
+        border: 1px solid transparent;
+        color: var(--bs-body-color);
+        font-size: 0.75rem;
+
+        &:hover,
+        &:focus-visible {
+            border-color: var(--bs-border-color);
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        .o_erplibre_dev_view_n {
+            color: var(--bs-secondary-color);
+            font-weight: 700;
+        }
+    }
+
+    // The list of the fields: name and label, type, module dots, overrides.
+    .o_erplibre_dev_field_grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 5.25rem 3.5rem 2.25rem;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .o_erplibre_dev_field_head {
+        padding: 0 0.5rem 0.25rem;
+        color: var(--bs-secondary-color);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .o_erplibre_dev_field_row {
+        width: 100%;
+        min-height: 40px;
+        padding: 0.5rem;
+        border: 0;
+        border-radius: 6px;
+        background-color: transparent;
+        color: var(--bs-body-color);
+        font-size: 0.8125rem;
+        text-align: left;
         cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        &.o_erplibre_dev_selected {
+            background-color: rgba($primary, 0.1);
+            box-shadow: inset 0 0 0 1px rgba($primary, 0.4);
+        }
+
+        .o_erplibre_dev_field_name {
+            flex: 0 1 auto;
+            margin-left: 0;
+            color: var(--bs-body-color);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .o_erplibre_dev_field_string {
+            flex: 0 1000 auto;
+            margin-left: 0;
+            color: var(--bs-secondary-color);
+            font-size: 0.75rem;
+        }
+
+        // Overlapping dots, each ringed with the background.
+        .o_erplibre_dev_field_dots .o_erplibre_dev_dot.o_tag {
+            box-shadow: 0 0 0 2px var(--bs-body-bg);
+
+            & + .o_erplibre_dev_dot {
+                margin-left: -2px;
+            }
+        }
+
+        .o_erplibre_dev_over_count {
+            margin-left: 0;
+            padding: 0 0.375rem;
+            border: 1px solid rgba($primary, 0.4);
+            border-radius: 1rem;
+            color: var(--bs-body-color);
+            font-size: 0.6875rem;
+            font-weight: 700;
+        }
+    }
+
+    // ── Code tab ────────────────────────────────────────────────────────
+
+    // The summary tiles: a count over a label, pressed when they filter.
+    .o_erplibre_dev_code_tile {
+        display: flex;
+        flex: 1 1 6.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        min-height: 56px;
+        padding: 0.5rem 0.625rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 10px;
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        text-align: left;
+
+        .o_erplibre_dev_tile_n {
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .o_erplibre_dev_tile_label {
+            font-size: 0.75rem;
+        }
+
+        &[data-tile="dirty"] {
+            border-color: var(--bs-warning-border-subtle);
+            background-color: var(--bs-warning-bg-subtle);
+            color: var(--bs-warning-text-emphasis);
+        }
+
+        &[data-tile="upgrade"] {
+            border-color: var(--bs-primary-border-subtle);
+            background-color: var(--bs-primary-bg-subtle);
+            color: var(--bs-primary-text-emphasis);
+        }
+
+        &.o_erplibre_dev_chip_on {
+            border-color: $primary;
+            box-shadow: inset 0 0 0 1px $primary;
+        }
+
+        &:is([data-tile="dirty"], [data-tile="upgrade"]).o_erplibre_dev_chip_on {
+            border-color: currentColor;
+            box-shadow: inset 0 0 0 1px currentColor;
+        }
+    }
+
+    .o_erplibre_dev_code_filtered {
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .o_erplibre_dev_repo {
+        .o_erplibre_dev_repo_path {
+            color: var(--bs-body-color);
+        }
+
+        .o_erplibre_dev_repo_state {
+            font-size: 0.6875rem;
+        }
+    }
+
+    .o_erplibre_dev_repo_none {
+        border-style: dashed;
+    }
+
+    .o_erplibre_dev_dirty {
+        border: 1px solid var(--bs-warning-border-subtle);
+        background-color: var(--bs-warning-bg-subtle);
+        color: var(--bs-warning-text-emphasis);
+
+        code {
+            color: inherit;
+        }
+
+        .o_erplibre_dev_dirty_status {
+            display: inline-block;
+            min-width: 1.5rem;
+            font-weight: 700;
+        }
+    }
+
+    .o_erplibre_dev_code_row {
+        padding: 0.3125rem 0.375rem;
+
+        &:hover,
+        &:focus-within {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        &.o_erplibre_dev_selected {
+            background-color: rgba($primary, 0.1);
+        }
+
+        .o_erplibre_dev_code_module {
+            color: var(--bs-body-color);
+            text-decoration: none;
+        }
+
+        .o_erplibre_dev_versions code,
+        > span > code {
+            font-size: 0.75rem;
+        }
+
+        .o_erplibre_dev_pending {
+            font-size: 0.6875rem;
+        }
+    }
+
+    .o_erplibre_dev_commit_list {
+        .o_erplibre_dev_commit {
+            padding: 0.5rem 0;
+            border-top: 1px solid var(--bs-border-color-translucent);
+        }
+    }
+
+    // ── Actions tab ─────────────────────────────────────────────────────
+
+    .o_erplibre_dev_prereq {
+        border: 1px solid var(--bs-border-color);
+        background-color: var(--bs-body-bg);
+
+        &.o_erplibre_dev_prereq_missing {
+            border-color: var(--bs-danger-border-subtle);
+        }
+
+        .o_erplibre_dev_prereq_badge {
+            font-size: 0.6875rem;
+        }
+    }
+
+    // The line to add to odoo.conf, with its copy button on the right.
+    .o_erplibre_dev_option {
+        border: 1px solid var(--bs-border-color);
+        background-color: var(--bs-tertiary-bg);
+
+        .o_erplibre_dev_option_text {
+            min-width: 0;
+            overflow-x: auto;
+            color: var(--bs-body-color);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .o_erplibre_dev_option_copy {
+            min-height: 36px;
+            padding: 0 0.75rem;
+            border: 0;
+            border-left: 1px solid var(--bs-border-color);
+            border-radius: 0;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-primary-text-emphasis);
+            font-weight: 600;
+        }
+    }
+
+    .o_erplibre_dev_action_section {
+        border: 1px solid var(--bs-border-color);
+    }
+
+    .o_erplibre_dev_action_empty {
+        border-top: 1px solid var(--bs-border-color-translucent);
+    }
+
+    .o_erplibre_dev_action_row {
+        border-top: 1px solid var(--bs-border-color-translucent);
+
+        .o_erplibre_dev_action_head {
+            min-height: 36px;
+            padding: 0.5rem 0.75rem;
+        }
+
+        &.o_erplibre_dev_checked {
+            background-color: rgba($primary, 0.06);
+        }
+
+        &:hover,
+        &:focus-within {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        label {
+            cursor: pointer;
+
+            &.o_erplibre_dev_locked {
+                cursor: not-allowed;
+            }
+        }
+
+        .o_erplibre_dev_disk_version {
+            color: var(--bs-primary-text-emphasis);
+        }
+
+        .o_erplibre_dev_history.active {
+            background-color: rgba($primary, 0.1);
+            color: var(--bs-primary-text-emphasis);
+        }
+
+        .o_erplibre_dev_commits {
+            margin: 0 0.75rem 0.625rem 2.375rem !important;
+            padding: 0.5rem 0.625rem;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            background-color: var(--bs-tertiary-bg);
+        }
+    }
+
+    .o_erplibre_dev_action_bar {
+        border: 1px solid var(--bs-border-color);
+        background-color: var(--bs-tertiary-bg);
+
+        .o_erplibre_dev_upgrade,
+        .o_erplibre_dev_reload_assets {
+            min-height: 44px;
+            font-weight: 600;
+        }
+    }
+
+    .o_erplibre_dev_runs .o_erplibre_dev_run {
+        min-height: 24px;
+    }
+
+    // ── items of other modules, density ─────────────────────────────────
+
+    .o_erplibre_dev_dimmed {
+        opacity: 0.45;
+        transition: opacity 0.15s;
+    }
+
+    &.o_erplibre_dev_compact {
+        .o_erplibre_dev_body {
+            padding: 0.5rem 0.75rem !important;
+        }
+
+        .o_erplibre_dev_rail .o_erplibre_dev_view_head {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .o_erplibre_dev_field_row {
+            min-height: 32px;
+            padding: 0.1875rem 0.5rem;
+        }
+
+        .o_erplibre_dev_action_row .o_erplibre_dev_action_head {
+            min-height: 32px;
+            padding: 0.25rem 0.625rem;
+        }
+
+        .o_erplibre_dev_action_bar {
+            .o_erplibre_dev_upgrade,
+            .o_erplibre_dev_reload_assets {
+                min-height: 36px;
+            }
+        }
+
+        .o_erplibre_dev_code_row {
+            padding: 1px 0.375rem;
+        }
+
+        .o_erplibre_dev_code_tile {
+            min-height: 44px;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .o_erplibre_dev_commit_list .o_erplibre_dev_commit {
+            padding: 0.25rem 0;
+        }
+    }
+
+    // ── status bar ──────────────────────────────────────────────────────
+
+    .o_erplibre_dev_density {
+        background-color: var(--bs-tertiary-bg);
+
+        .btn {
+            min-height: 28px;
+            padding: 0 0.625rem;
+            border: 0;
+            color: var(--bs-body-color);
+            font-size: 0.75rem;
+
+            &.active {
+                background-color: var(--bs-body-bg);
+                font-weight: 600;
+                box-shadow: $box-shadow-sm;
+            }
+        }
     }
 }
 
 // The page keeps its whole width usable: the drawer takes its own space.
 body.o_erplibre_dev_open .o_action_manager {
-    margin-right: $o-erplibre-dev-space;
+    margin-right: var(--o-erplibre-dev-width);
 }
 
 .o_erplibre_dev_highlight {
-    outline: 2px solid $primary !important;
-    outline-offset: 1px;
-    background-color: rgba($primary, 0.12) !important;
+    outline: 2px solid $o-erplibre-dev-teal !important;
+    outline-offset: 2px;
+    border-radius: 4px;
+    background-color: rgba($o-erplibre-dev-teal, 0.1) !important;
+}
+
+// The labels of the highlighted elements; ``placeTags`` of the service
+// sets each one's place from its element.
+.o_erplibre_dev_tags {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: $zindex-modal + 6;
+    pointer-events: none;
+
+    .o_erplibre_dev_tag {
+        position: fixed;
+        max-width: 22rem;
+        padding: 1px 6px;
+        border-radius: 4px;
+        background-color: $o-erplibre-dev-teal;
+        color: #ffffff;
+        font-size: 11px;
+        line-height: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+// The inspect banner, above the page beside the drawer.
+.o_erplibre_dev_inspect_banner {
+    position: fixed;
+    top: $o-navbar-height;
+    left: 0;
+    right: var(--o-erplibre-dev-width);
+    min-height: $o-erplibre-dev-banner-height;
+    z-index: $zindex-modal + 5;
+    background-color: $o-erplibre-dev-teal;
+    color: #ffffff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+
+    .o_erplibre_dev_inspect_quit {
+        min-height: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        background-color: transparent;
+        color: #ffffff;
+        font-weight: 600;
+    }
 }
 
 body.o_erplibre_dev_inspecting {
+    .o_action_manager {
+        padding-top: $o-erplibre-dev-banner-height;
+    }
+
     .o_action_manager,
     .modal {
         cursor: crosshair;
@@ -56,5 +1114,37 @@ body.o_erplibre_dev_inspecting {
     // While inspecting, the drawer stays above a dialog it inspects.
     .o_erplibre_dev_drawer {
         z-index: $zindex-modal + 5;
+    }
+}
+
+// On a phone the drawer drops under the page: a sheet over the lower part
+// of the screen, the page keeping its whole width above it. A side drawer
+// of min(480px, 100vw) would leave the page no width at all, and the
+// inspect banner, which ends where the drawer starts, none either.
+@include media-breakpoint-down(md) {
+    body {
+        --o-erplibre-dev-sheet: 55vh;
+    }
+
+    .o_erplibre_dev_drawer {
+        top: auto;
+        left: 0;
+        width: 100%;
+        height: var(--o-erplibre-dev-sheet);
+        border-top: $border-width solid var(--bs-border-color);
+
+        // The sheet takes the whole width: narrow or wide means nothing.
+        .o_erplibre_dev_width {
+            display: none;
+        }
+    }
+
+    body.o_erplibre_dev_open .o_action_manager {
+        margin-right: 0;
+        margin-bottom: var(--o-erplibre-dev-sheet);
+    }
+
+    .o_erplibre_dev_inspect_banner {
+        right: 0;
     }
 }

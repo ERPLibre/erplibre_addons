@@ -87,10 +87,10 @@ class TestCheckoutProblem(ErplibreInfoCase):
         self.assertIn(runner.PARAM_ROOT, settings.erplibre_checkout_problem)
 
     def test_message_in_french(self):
-        self.env["res.lang"]._activate_lang("fr_FR")
-        self.env["ir.module.module"]._load_module_terms(["erplibre_info"], ["fr_FR"])
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(["erplibre_info"], ["fr_CA"])
         self._set_root(self.old)
-        problem = runner.checkout_problem(self.env(context={"lang": "fr_FR"}))
+        problem = runner.checkout_problem(self.env(context={"lang": "fr_CA"}))
         self.assertIn(
             "Il manque la fonctionnalité dans ERPLibre, êtes-vous sur la "
             "bonne version?",
@@ -125,11 +125,11 @@ class TestPermissionWarning(ErplibreInfoCase):
         self.assertNotIn("chmod", text)
 
     def test_in_french(self):
-        self.env["res.lang"]._activate_lang("fr_FR")
-        self.env["ir.module.module"]._load_module_terms(["erplibre_info"], ["fr_FR"])
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env["ir.module.module"]._load_module_terms(["erplibre_info"], ["fr_CA"])
         advice = dict(PERMISSIONS, container="c0ffee")
         text = runner.permission_warning(
-            self.env(context={"lang": "fr_FR"}), {"permissions": advice}
+            self.env(context={"lang": "fr_CA"}), {"permissions": advice}
         )
         self.assertIn("Il manque des permissions", text)
         self.assertIn("Depuis l'hôte Docker", text)

@@ -7,20 +7,31 @@ from the source files on disk: no ORM write, no subprocess. A
 ``SourceCache`` keeps the files read during one call.
 """
 
+import ast
 import collections
 import inspect
+import logging
 import os
 import re
+from xml.sax.saxutils import escape
 
 from lxml import etree
 from odoo.models import is_definition_class
 from odoo.tools.misc import file_path
+
+_logger = logging.getLogger(__name__)
 
 # Field attributes that tie a field to a method or another field: an
 # override that sets one of them changes the behaviour, not only a label.
 BEHAVIOUR_ATTRS = ("compute", "inverse", "search", "related", "default")
 # Field method attributes followed along the class hierarchy.
 METHOD_ATTRS = ("compute", "inverse", "search")
+# Nodes listed in the content summary of one inheritance spec.
+SPEC_CONTENT_MAX = 3
+# The lines a field declaration may span, and the characters of its
+# source the payload keeps.
+DECLARATION_MAX_LINES = 40
+DECLARATION_MAX_CHARS = 300
 
 
 class SourceCache:
@@ -101,6 +112,38 @@ class SourceCache:
         return path, start
 
 
+def declaration_source(lines, number):
+    """The ``fields.…(…)`` call assigned on line ``number`` (1-based) of
+    ``lines``, on one line as ``ast.unparse`` writes it, or False.
+
+    The statement is read from its first line until it parses, over at
+    most ``DECLARATION_MAX_LINES`` lines; a line that holds no assignment
+    of a ``fields.`` call, as the class line ``field_line`` falls back on,
+    gives False. A source past ``DECLARATION_MAX_CHARS`` ends with « … ».
+    """
+    if not number or number > len(lines):
+        return False
+    first = lines[number - 1].lstrip()
+    if not re.match(r"^\w+\s*(:[^=]*)?=\s*fields\.", first):
+        return False
+    last = min(number + DECLARATION_MAX_LINES - 1, len(lines))
+    for end in range(number, last + 1):
+        text = "\n".join([first, *lines[number:end]])
+        try:
+            tree = ast.parse(text)
+        except SyntaxError:
+            continue
+        statement = tree.body[0] if tree.body else None
+        value = getattr(statement, "value", None)
+        if not isinstance(value, ast.Call):
+            return False
+        source = ast.unparse(value)
+        if len(source) > DECLARATION_MAX_CHARS:
+            source = source[: DECLARATION_MAX_CHARS - 1] + "…"
+        return source
+    return False
+
+
 def definition_classes(model):
     """The definition classes behind ``model``, base first: one per Python
     class that defines or extends the model, its mixins included."""
@@ -171,7 +214,8 @@ def field_origins(model, name, cache, onchanges=None, constrains=None):
     """Where the field ``name`` of ``model`` comes from.
 
     Return a dict: ``definitions`` lists each class that declares the
-    field, base first, with the attributes it passes; ``defined_in`` is
+    field, base first, with the attributes it passes (``attrs``) and its
+    declaration (``source``, ``declaration_source``); ``defined_in`` is
     the first one; ``overrides`` lists, after the first declaration,
     every later declaration and every class that defines one of its
     methods (compute, inverse, search), its onchange methods and its
@@ -194,7 +238,10 @@ def field_origins(model, name, cache, onchanges=None, constrains=None):
             continue
         path, line = cache.field_line(cls, name)
         args = sorted(k for k in (declared._args__ or {}) if not k.startswith("_"))
-        definitions.append(_origin(cls, path, line, kind="field", attrs=args))
+        source = declaration_source(cache.lines(path), line) if path else False
+        definitions.append(
+            _origin(cls, path, line, kind="field", attrs=args, source=source)
+        )
     overrides = [
         dict(entry, behaviour=any(a in BEHAVIOUR_ATTRS for a in entry["attrs"]))
         for entry in definitions[1:]
@@ -232,6 +279,7 @@ def field_origins(model, name, cache, onchanges=None, constrains=None):
         "store": bool(field.store),
         "readonly": bool(field.readonly),
         "required": bool(field.required),
+        "company_dependent": bool(getattr(field, "company_dependent", False)),
         "compute": (
             compute if isinstance(compute, str) else getattr(compute, "__name__", False)
         )
@@ -293,10 +341,24 @@ def _locator(node):
     return f"//{node.tag}{attrs}"
 
 
+def _node_summary(node):
+    return {
+        "tag": node.tag,
+        "name": node.get("name") or False,
+        "string": node.get("string") or False,
+    }
+
+
 def view_specs(arch):
-    """The inheritance specs of an extension arch: a list of
-    {expr, position, attributes}, and the field names the view adds or
-    targets. A ``<data>`` root holds the specs; any other root is one."""
+    """The inheritance specs of an extension arch, and the field names the
+    view adds or targets. A ``<data>`` root holds the specs; any other
+    root is one.
+
+    Each spec is {expr, position, attributes, content, content_more}:
+    ``attributes`` names the attributes a ``position="attributes"`` spec
+    sets; ``content`` summarises the first ``SPEC_CONTENT_MAX`` element
+    nodes the spec brings, each as {tag, name, string}, and
+    ``content_more`` counts the element nodes left out of it."""
     root = _parse(arch)
     if root is None:
         return [], []
@@ -315,11 +377,18 @@ def view_specs(arch):
         attributes = [
             a.get("name") for a in node if getattr(a, "tag", None) == "attribute"
         ]
+        brought = [
+            child
+            for child in node
+            if isinstance(child.tag, str) and child.tag != "attribute"
+        ]
         specs.append(
             {
                 "expr": _locator(node),
                 "position": position,
                 "attributes": [a for a in attributes if a],
+                "content": [_node_summary(c) for c in brought[:SPEC_CONTENT_MAX]],
+                "content_more": max(0, len(brought) - SPEC_CONTENT_MAX),
             }
         )
         if node.tag == "field":
@@ -369,7 +438,9 @@ def arch_fields(arch_tree):
     """The ``<field>`` nodes of the arch that belong to its own model, in
     document order, without the nodes of the sub-views of a relational
     field. Each one is {name, invisible, readonly, required, widget,
-    groups}, first occurrence kept."""
+    groups, page}, first occurrence kept; ``page`` is the nearest
+    ``<page>`` ancestor of the node as {name, string}, or False outside a
+    notebook page."""
     result = []
     seen = set()
     for node in arch_tree.iter("field"):
@@ -378,10 +449,16 @@ def arch_fields(arch_tree):
             continue
         parent = node.getparent()
         nested = False
+        page = False
         while parent is not None:
             if parent.tag == "field":
                 nested = True
                 break
+            if parent.tag == "page" and not page:
+                page = {
+                    "name": parent.get("name") or False,
+                    "string": parent.get("string") or False,
+                }
             parent = parent.getparent()
         if nested:
             continue
@@ -394,6 +471,184 @@ def arch_fields(arch_tree):
                 "required": node.get("required") or False,
                 "widget": node.get("widget") or False,
                 "groups": node.get("groups") or False,
+                "page": page,
             }
         )
     return result
+
+
+def arch_field_names(arch):
+    """The names of every ``<field>`` node of ``arch`` (a string), those of
+    the sub-views of a relational field aside; an empty set when the arch
+    does not parse."""
+    root = _parse(arch)
+    if root is None:
+        return set()
+    return {node["name"] for node in arch_fields(root)}
+
+
+# ── combined arch with node origins ────────────────────────────────────
+
+# Attributes set on the nodes while the arch is combined again: the view
+# that brought the node, the views that changed its attributes, and the
+# number of the node during one application, to compare its attributes
+# before and after.
+ORIGIN_ATTR = "data-erplibre-dev-view"
+CHANGED_ATTR = "data-erplibre-dev-attrs"
+MARK_ATTR = "data-erplibre-dev-mark"
+STAMPS = (ORIGIN_ATTR, CHANGED_ATTR, MARK_ATTR)
+
+
+def _stamp(node, key):
+    """Stamp ``node`` and every element under it with the view ``key``."""
+    for item in node.iter(etree.Element):
+        item.set(ORIGIN_ATTR, key)
+
+
+def _stamp_specs(arch, key):
+    """Stamp with the view ``key`` the nodes the specs of the extension
+    ``arch`` bring, the specs themselves aside. The specs are read as
+    ``apply_inheritance_specs`` reads them: the root, or the children of
+    a ``<data>`` root, recursively. The ``<attribute>`` children of a
+    ``position="attributes"`` spec and the ``position="move"`` children,
+    which point at an existing node, keep no stamp."""
+    specs = [arch]
+    while specs:
+        spec = specs.pop(0)
+        if not isinstance(spec.tag, str):
+            continue
+        if spec.tag == "data":
+            specs += list(spec)
+            continue
+        if spec.get("position") == "attributes":
+            continue
+        for child in spec:
+            if isinstance(child.tag, str) and child.get("position") != "move":
+                _stamp(child, key)
+
+
+def _own_attrib(node):
+    """The attributes of ``node``, the stamps aside, in document order."""
+    return [(k, v) for k, v in node.attrib.items() if k not in STAMPS]
+
+
+def _tag_text(node, text=None, opening=False):
+    """``<tag attrs/>``, ``<tag attrs>text</tag>`` or, with ``opening``,
+    ``<tag attrs>``, escaped by lxml, the stamps aside."""
+    shallow = etree.Element(node.tag, dict(_own_attrib(node)))
+    if text:
+        shallow.text = text
+    out = etree.tostring(shallow, encoding="unicode")
+    return out[:-2] + ">" if opening else out
+
+
+def _text_lines(text):
+    return [escape(part.strip()) for part in (text or "").splitlines() if part.strip()]
+
+
+def _arch_lines(root, modules):
+    """The lines of the stamped arch ``root``, one per opening, closing or
+    empty tag, comment and line of text, each {depth, text, origin,
+    view_id, attr_origin, attr_view_ids}. ``modules`` maps a view id to
+    its module (False without external id). A line of text takes the
+    origin of the element that holds it; a comment has none."""
+    lines = []
+
+    def add(depth, text, node):
+        view = node.get(ORIGIN_ATTR) if node is not None else None
+        changed = (node.get(CHANGED_ATTR) or "").split() if node is not None else []
+        attr_origin = []
+        for key in changed:
+            module = modules.get(int(key))
+            if module and module not in attr_origin:
+                attr_origin.append(module)
+        lines.append(
+            {
+                "depth": depth,
+                "text": text,
+                "origin": modules.get(int(view), False) if view else False,
+                "view_id": int(view) if view else False,
+                "attr_origin": attr_origin,
+                "attr_view_ids": [int(key) for key in changed],
+            }
+        )
+
+    def walk(node, depth, holder):
+        if node.tag is etree.Comment:
+            add(depth, f"<!--{node.text or ''}-->", None)
+        elif isinstance(node.tag, str):
+            children = list(node)
+            text = (node.text or "").strip()
+            if not children and "\n" not in text:
+                add(depth, _tag_text(node, text), node)
+            else:
+                add(depth, _tag_text(node, opening=True), node)
+                for part in _text_lines(node.text):
+                    add(depth + 1, part, node)
+                for child in children:
+                    walk(child, depth + 1, node)
+                add(depth, f"</{etree.QName(node).localname}>", node)
+        if holder is not None:
+            for part in _text_lines(node.tail):
+                add(depth, part, holder)
+
+    walk(root, 0, None)
+    return lines
+
+
+def combined_lines(applied, modules, expected):
+    """The combined arch of the views ``applied`` (``applied_views``
+    order, the root first) as lines that name, for each node, the module
+    of the view that brought it and the modules of the views that changed
+    its attributes (``_arch_lines``).
+
+    The arch is combined again the way ``ir.ui.view._combine`` does it,
+    through the ``apply_inheritance_specs`` of each view, with the nodes
+    of each view stamped beforehand; the attributes of the combined nodes
+    are compared before and after each view. The result, stamps removed,
+    must equal ``expected`` (the combined arch of the ORM): any other
+    result, or any error, gives False, and the caller keeps the plain
+    combined arch."""
+    if not applied:
+        return False
+    try:
+        root = applied[0].with_context(inherit_branding=False)
+        combined = etree.fromstring(root.arch)
+        _stamp(combined, str(root.id))
+        for view in applied[1:]:
+            view = view.with_context(inherit_branding=False)
+            key = str(view.id)
+            arch = etree.fromstring(view.arch or "<data/>")
+            _stamp_specs(arch, key)
+            before = {}
+            for number, node in enumerate(combined.iter(etree.Element)):
+                node.set(MARK_ATTR, str(number))
+                before[str(number)] = _own_attrib(node)
+            combined = view.apply_inheritance_specs(combined, arch)
+            for node in combined.iter(etree.Element):
+                mark = node.get(MARK_ATTR)
+                if mark is None:
+                    continue
+                del node.attrib[MARK_ATTR]
+                if mark in before and before[mark] != _own_attrib(node):
+                    changed = (node.get(CHANGED_ATTR) or "").split()
+                    if key not in changed:
+                        node.set(CHANGED_ATTR, " ".join([*changed, key]))
+        lines = _arch_lines(combined, modules)
+        for node in combined.iter(etree.Element):
+            for name in STAMPS:
+                node.attrib.pop(name, None)
+        if etree.tostring(combined) != etree.tostring(expected):
+            _logger.warning(
+                "Combined arch of view %s rebuilt differently: no node origin.",
+                root.id,
+            )
+            return False
+        return lines
+    except Exception:
+        _logger.warning(
+            "Node origins of the combined arch of view %s failed.",
+            applied[0].id,
+            exc_info=True,
+        )
+        return False

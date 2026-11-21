@@ -16,6 +16,8 @@ from .. import code, introspection
 VIEW_TYPES = ("form", "list", "kanban", "search", "pivot", "graph", "calendar")
 VIEW_TYPES += ("activity", "gantt", "timeline", "map", "cohort", "hierarchy")
 COMMIT_LIMIT = 20
+RUN_LIMIT = 5
+RUN_LIMIT_MAX = 50
 
 
 class ErplibreDeveloper(models.AbstractModel):
@@ -149,11 +151,17 @@ class ErplibreDeveloper(models.AbstractModel):
         ``view_id`` False takes the default view of ``model`` for
         ``view_type``. Return a dict: ``view`` (the view shown), ``views``
         (every view combined into it, in application order),
-        ``combined_arch``, ``fields`` (the fields of ``model`` the arch
-        shows, with the modules that define and override them),
-        ``modules`` (every module named), ``action`` and the flags of the
-        developer actions. No git call, no script: the code tab loads
-        with ``get_code_info``.
+        ``combined_arch``, ``combined_lines`` (the same arch line by line
+        with the module of each node, ``introspection.combined_lines``;
+        False when it cannot be built), ``fields`` (the fields of
+        ``model`` the arch shows, with the modules that define and
+        override them, and in ``view_ids`` the views that show, add or
+        target them),
+        ``modules`` (every installed module named), ``module_versions``
+        (``_module_versions``), ``action``, the flags of the developer
+        actions with ``server_actions_checks``, and ``snapshot_date``, the
+        date of the last erplibre_info_git snapshot. No git call, no
+        script: the code tab loads with ``get_code_info``.
         """
         self._check_panel_access()
         if model not in self.env:
@@ -165,12 +173,26 @@ class ErplibreDeveloper(models.AbstractModel):
         root = runner.erplibre_root(self.env)
         view = self._resolve_view(model, view_id, view_type)
         views = []
+        touching = {}
+        lines = False
         if view:
             arch_tree = view._get_combined_arch()
-            views = [
-                self._view_entry(v, cache, root, view)
-                for v in introspection.applied_views(view)
-            ]
+            chain = introspection.applied_views(view)
+            for applied in chain:
+                entry = self._view_entry(applied, cache, root, view)
+                views.append(entry)
+                # The root of the chain shows its fields with its own arch;
+                # an extension names those its specs add or target.
+                names = (
+                    entry["fields"]
+                    if applied.inherit_id
+                    else introspection.arch_field_names(applied.arch)
+                )
+                for name in names:
+                    touching.setdefault(name, []).append(applied.id)
+            lines = introspection.combined_lines(
+                chain, {entry["id"]: entry["module"] for entry in views}, arch_tree
+            )
         else:
             # A model without a view of this type: Odoo builds a default one.
             arch_tree, _view = Model._get_view(False, view_type)
@@ -185,6 +207,7 @@ class ErplibreDeveloper(models.AbstractModel):
                 Model, node["name"], cache, onchanges, constrains
             )
             info["node"] = node
+            info["view_ids"] = touching.get(node["name"], [])
             for entry in [*info["definitions"], *info["overrides"]]:
                 entry.update(self._location(entry["file"], entry["line"], root))
             fields_info.append(info)
@@ -204,6 +227,8 @@ class ErplibreDeveloper(models.AbstractModel):
         )
         current = next((v for v in views if v["is_current"]), None)
         allowed = self.env["erplibre.code.run"]._server_actions_allowed()
+        modules = sorted(m for m in modules if m in installed)
+        snapshot = self.env["erplibre.code.snapshot"].search([], limit=1)
         return {
             "model": model,
             "model_name": self.env["ir.model"]._get(model).name,
@@ -211,12 +236,58 @@ class ErplibreDeveloper(models.AbstractModel):
             "view": current,
             "views": views,
             "combined_arch": combined,
+            "combined_lines": lines,
             "fields": fields_info,
-            "modules": sorted(m for m in modules if m in installed),
+            "modules": modules,
+            "module_versions": self._module_versions(modules),
             "action": self._action_info(action_id),
             "server_actions_allowed": allowed,
+            "server_actions_checks": self._server_actions_checks(),
+            "snapshot_date": snapshot.date if snapshot else False,
             # Opening the IDE is a server action: offered only when allowed.
             "ide_available": allowed and self._ide_available(),
+        }
+
+    @api.model
+    def _module_versions(self, names):
+        """{name: {installed, code, pending}} of the modules ``names``: the
+        version recorded in the database, the version of the manifest on
+        disk as Odoo stores it, and whether they differ, the rule of the
+        erplibre_info_git snapshots for an upgrade pending (-u). Read from
+        the database and the manifests only."""
+        records = {
+            m.name: m
+            for m in self.env["ir.module.module"]
+            .sudo()
+            .search([("name", "in", list(names))])
+        }
+        result = {}
+        for name in names:
+            record = records.get(name)
+            installed = (record.latest_version if record else False) or False
+            manifest = get_manifest(name) or {}
+            code_version = safe_version(manifest.get("version")) or False
+            result[name] = {
+                "installed": installed,
+                "code": code_version,
+                "pending": bool(
+                    installed and code_version and installed != code_version
+                ),
+            }
+        return result
+
+    @api.model
+    def _server_actions_checks(self):
+        """The three conditions of the erplibre_info server actions, each
+        as a bool, and ``problem``: the message of the first one that
+        fails (the odoo.conf flag names the configuration file the server
+        read), or False."""
+        Run = self.env["erplibre.code.run"]
+        return {
+            "flag": Run._flag_enabled(),
+            "group": self.env.user.has_group("base.group_system"),
+            "debug": Run._is_debug_mode(),
+            "problem": Run._server_actions_problem(),
         }
 
     @api.model
@@ -249,11 +320,24 @@ class ErplibreDeveloper(models.AbstractModel):
     @api.model
     def _repo_vals(self, line, labels=None):
         """The repository part of the code payload, from a snapshot line of
-        erplibre_info or a ``repo_state.py`` entry (a dict)."""
+        erplibre_info or a ``repo_state.py`` entry (a dict). ``target`` is
+        the commit the manifest branch resolves to; ``ahead`` and
+        ``behind`` count the commits of HEAD not in it and the reverse,
+        False when the target is unknown; ``alignment`` is the state of
+        HEAD against it, before a modified tree turns ``state`` into
+        ``sale``."""
         if labels is None:
             labels = self._repo_state_labels()
         get = line.get if isinstance(line, dict) else line.__getitem__
         state = get("state") or False
+        alignment = get("alignment") or False
+        target = get("target") or False
+
+        def gap(key):
+            # A clone without target has no gap: a snapshot line stores 0.
+            value = get(key)
+            return value if target and value is not None else False
+
         return {
             "path": get("path") or False,
             "state": state,
@@ -263,6 +347,11 @@ class ErplibreDeveloper(models.AbstractModel):
             "dirty": bool(get("dirty")),
             "revision": get("revision") or False,
             "manifest_branch": get("manifest_branch") or False,
+            "target": target,
+            "ahead": gap("ahead"),
+            "behind": gap("behind"),
+            "alignment": alignment,
+            "alignment_label": labels.get(alignment, alignment) if alignment else False,
             "error": get("error") or False,
         }
 
@@ -380,28 +469,197 @@ class ErplibreDeveloper(models.AbstractModel):
             result["error"] = str(exc)
         return result
 
+    @api.model
+    def _repo_clone(self, repo, root):
+        """The absolute path of the git clone ``repo``, a path relative to
+        the checkout ``root`` or an absolute path. Raise unless it is the
+        top of a clone that lies in the checkout, or the clone of a module
+        of the addons path: the panel reads no other directory."""
+        if not repo or not isinstance(repo, str):
+            raise UserError(self.env._("No repository given."))
+        root = os.path.realpath(root) if root else None
+        if os.path.isabs(repo):
+            real = os.path.realpath(repo)
+        elif root:
+            real = os.path.realpath(os.path.join(root, repo))
+        else:
+            real = False
+        allowed = bool(real) and os.path.lexists(os.path.join(real, ".git"))
+        if allowed and not (root and (real + os.sep).startswith(root + os.sep)):
+            allowed = any(
+                code.repository_of(os.path.realpath(path), root) == real
+                for path in self._module_paths()
+            )
+        if not allowed:
+            raise UserError(
+                self.env._(
+                    "%(repo)s is not a git repository of this server.", repo=repo
+                )
+            )
+        return real
+
+    @api.model
+    def _module_paths(self):
+        """The directories of the installed modules."""
+        names = (
+            self.env["ir.module.module"]
+            .sudo()
+            .search([("state", "=", "installed")])
+            .mapped("name")
+        )
+        paths = (get_module_path(n, display_warning=False) for n in names)
+        return [p for p in paths if p]
+
+    @api.model
+    def _snapshot_target(self, rel):
+        """The manifest target of the repository ``rel`` in the last
+        erplibre_info_git snapshot, or False."""
+        snapshot = self.env["erplibre.code.snapshot"].search([], limit=1)
+        line = snapshot.repo_ids.filtered(lambda r: r.path == rel)[:1]
+        return line.target or False
+
+    @api.model
+    def get_repo_details(self, repo, target=False, limit=COMMIT_LIMIT):
+        """What a repository holds beyond its state: its uncommitted
+        changes and its recent commits.
+
+        ``repo`` is the path of the clone relative to the checkout (the
+        ``clone_rel`` of ``get_code_info``). ``target`` is the commit the
+        manifest branch resolves to (``repo.target``); without it, the one
+        of the last snapshot. Return {repo, dirty_count, dirty_files,
+        commits, target, error}: ``dirty_files`` lists at most
+        ``code.MAX_DIRTY_FILES`` of the ``dirty_count`` changed paths;
+        ``commits`` holds the last ``limit`` commits of the clone, each
+        with ``ahead`` True when the target does not contain it, False
+        when it does, None when the target is unknown. A git failure is
+        reported in ``error``, with what could be read."""
+        self._check_panel_access()
+        root = runner.erplibre_root(self.env)
+        clone = self._repo_clone(repo, root)
+        rel = code.relative_to(clone, root) if root else clone
+        if not code.is_sha(target):
+            target = self._snapshot_target(rel)
+        result = {
+            "repo": rel,
+            "dirty_count": 0,
+            "dirty_files": [],
+            "commits": [],
+            "target": target or False,
+            "error": False,
+        }
+        errors = []
+        try:
+            result["dirty_count"], result["dirty_files"] = code.git_status(
+                self.env, clone
+            )
+        except code.GitLogError as exc:
+            errors.append(str(exc))
+        try:
+            commits = code.git_log(self.env, clone, ".", limit)
+        except code.GitLogError as exc:
+            errors.append(str(exc))
+            commits = []
+        ahead = None
+        if commits and target:
+            try:
+                ahead = code.git_ahead(self.env, clone, target, len(commits))
+            except code.GitLogError as exc:
+                errors.append(str(exc))
+        for commit in commits:
+            commit["ahead"] = None if ahead is None else commit["sha"] in ahead
+        result["commits"] = commits
+        result["error"] = "\n".join(errors) or False
+        return result
+
+    # ── recent runs ─────────────────────────────────────────────────────
+
+    @api.model
+    def _run_modules(self, run, known):
+        """The module names a run log lists after a colon, kept when they
+        name a module of ``known``: erplibre_info writes the modules marked
+        to upgrade in the log of a restart, as text."""
+        names = []
+        for line in (run.log or "").splitlines()[1:]:
+            if ": " not in line:
+                continue
+            for name in line.rsplit(": ", 1)[1].split(","):
+                name = name.strip()
+                if name in known and name not in names:
+                    names.append(name)
+        return names
+
+    @api.model
+    def get_recent_runs(self, limit=RUN_LIMIT):
+        """The last ``limit`` runs of erplibre_info (``erplibre.code.run``),
+        most recent first: {id, run_type, type_label, state, state_label,
+        user, date, date_start, date_end, modules}. The state is the one the
+        run recorded: a restart is done when it is requested, the upgrade
+        it asks for runs at the next start and is not followed here."""
+        self._check_panel_access()
+        limit = max(1, min(int(limit or RUN_LIMIT), RUN_LIMIT_MAX))
+        Run = self.env["erplibre.code.run"]
+        runs = Run.search([], limit=limit, order="id desc")
+        types = dict(Run._fields["run_type"]._description_selection(self.env))
+        states = dict(Run._fields["state"]._description_selection(self.env))
+        known = (
+            set(self.env["ir.module.module"].sudo().search([]).mapped("name"))
+            if runs
+            else set()
+        )
+        return [
+            {
+                "id": run.id,
+                "run_type": run.run_type,
+                "type_label": types.get(run.run_type, run.run_type),
+                "state": run.state,
+                "state_label": states.get(run.state, run.state),
+                "user": run.user_id.name or False,
+                "date": run.create_date or False,
+                "date_start": run.date_start or False,
+                "date_end": run.date_end or False,
+                "modules": self._run_modules(run, known),
+            }
+            for run in runs
+        ]
+
     # ── developer actions ───────────────────────────────────────────────
 
     @api.model
-    def action_upgrade_module(self, module):
-        """Open the erplibre_info confirmation that marks ``module`` to
+    def action_upgrade_modules(self, modules):
+        """Open the erplibre_info confirmation (checkbox and database name
+        typed again) that marks the modules named in ``modules`` to
         upgrade and restarts the server: the upgrade then runs at the next
         start, with the code on disk (see
-        ``erplibre.code.run._request_restart``)."""
+        ``erplibre.code.run._request_restart``). Every name must be an
+        installed module."""
         self._check_panel_access()
         self._check_server_actions()
-        record = (
+        if isinstance(modules, str):
+            modules = [modules]
+        names = list(dict.fromkeys(n for n in modules or [] if n))
+        if not names:
+            raise UserError(self.env._("No module to upgrade."))
+        records = (
             self.env["ir.module.module"]
             .sudo()
-            .search([("name", "=", module), ("state", "=", "installed")], limit=1)
+            .search([("name", "in", names), ("state", "=", "installed")])
         )
-        if not record:
+        found = set(records.mapped("name"))
+        missing = [n for n in names if n not in found]
+        if missing:
             raise UserError(
-                self.env._("Module %(module)s is not installed.", module=module)
+                self.env._(
+                    "Module %(module)s is not installed.", module=", ".join(missing)
+                )
             )
         return self.env["erplibre.code.confirm.wizard"]._action_open(
-            "restart_upgrade", modules=record
+            "restart_upgrade", modules=records
         )
+
+    @api.model
+    def action_upgrade_module(self, module):
+        """``action_upgrade_modules`` for the one module ``module``."""
+        return self.action_upgrade_modules([module])
 
     @api.model
     def action_reload_assets(self):

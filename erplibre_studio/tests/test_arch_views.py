@@ -266,8 +266,34 @@ class TestArchViews(BaseCase):
         self.assertEqual(
             studio_arch.colors_rules(text),
             [
-                {"color": "#ec7063", "expression": "is_company == True"},
-                {"color": "green", "expression": "name != 'x'"},
+                {
+                    "color": "#ec7063",
+                    "expression": "is_company == True",
+                    "field": "is_company",
+                    "operator": "==",
+                    "value": True,
+                },
+                {
+                    "color": "green",
+                    "expression": "name != 'x'",
+                    "field": "name",
+                    "operator": "!=",
+                    "value": "x",
+                },
+            ],
+        )
+        # An expression colors_text does not write stays text only.
+        self.assertEqual(
+            studio_arch.colors_rules("red:state in ('a', 'b');blue:x >= 2"),
+            [
+                {"color": "red", "expression": "state in ('a', 'b')"},
+                {
+                    "color": "blue",
+                    "expression": "x >= 2",
+                    "field": "x",
+                    "operator": ">=",
+                    "value": 2,
+                },
             ],
         )
         for bad in (

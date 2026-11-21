@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The tokens of one arch line, coloured by kind: ``tokens``. -->
+    <t t-name="erplibre_developer.ArchTokens">
+        <t t-foreach="tokens" t-as="token" t-key="token_index">
+            <span t-if="token.kind !== 'text'" t-attf-class="o_erplibre_dev_tok_{{ token.kind }}" t-esc="token.text" />
+            <t t-else="" t-esc="token.text" />
+        </t>
+    </t>
+
+    <!-- A module as a chip in its tag colour: ``module``. -->
+    <t t-name="erplibre_developer.ModuleChip">
+        <span
+            t-attf-class="o_erplibre_dev_module_tag o_tag o_tag_color_{{ moduleColor(module) }} rounded-pill {{ chipClass or '' }}"
+        >
+            <span t-attf-class="o_erplibre_dev_dot o_tag o_tag_color_{{ moduleColor(module) }}" aria-hidden="true" />
+            <t t-esc="module or '—'" />
+        </span>
+    </t>
+
+    <t t-name="erplibre_developer.ViewsTab">
+        <section class="o_erplibre_dev_views">
+            <!-- The view shown -->
+            <section
+                class="card mb-3 o_erplibre_dev_current_view"
+                t-att-class="{'o_erplibre_dev_dimmed': dimmed([info.view and info.view.module])}"
+                aria-labelledby="o_erplibre_dev_current_title"
+            >
+                <div class="card-body p-2 small d-flex flex-column gap-2">
+                    <h3 id="o_erplibre_dev_current_title" class="o_erplibre_dev_section_title mb-0">Current view</h3>
+                    <t t-if="info.view">
+                        <div class="d-flex align-items-center gap-2 min-w-0">
+                            <code
+                                class="text-truncate o_erplibre_dev_current_xml_id"
+                                t-att-title="info.view.xml_id or info.view.name"
+                                t-esc="info.view.xml_id or info.view.name"
+                            />
+                            <t t-call="erplibre_developer.ModuleChip">
+                                <t t-set="module" t-value="info.view.module" />
+                            </t>
+                        </div>
+                        <dl class="o_erplibre_dev_facts mb-0">
+                            <div>
+                                <dt>ID</dt>
+                                <dd t-esc="info.view.id" />
+                            </div>
+                            <div>
+                                <dt>Type</dt>
+                                <dd t-esc="info.view.type" />
+                            </div>
+                            <div>
+                                <dt>Priority</dt>
+                                <dd t-esc="info.view.priority" />
+                            </div>
+                            <div>
+                                <dt>Mode</dt>
+                                <dd t-esc="modeLabel(info.view.mode)" />
+                            </div>
+                            <div>
+                                <dt>Model</dt>
+                                <dd>
+                                    <code t-esc="info.view.model" />
+                                </dd>
+                            </div>
+                        </dl>
+                        <div class="o_erplibre_dev_current_file">
+                            <SourceLocation
+                                file="info.view.file"
+                                fileRel="info.view.file_rel"
+                                line="info.view.line"
+                                ide="info.ide_available"
+                            />
+                        </div>
+                    </t>
+                    <p t-else="" class="text-muted mb-0 o_erplibre_dev_no_view">
+                        Odoo builds this view itself: no view record holds it.
+                    </p>
+                    <div t-if="info.action" class="d-flex flex-wrap align-items-center gap-1 o_erplibre_dev_action">
+                        <span class="text-muted">Action</span>
+                        <code t-esc="info.action.xml_id or info.action.id" />
+                        <span t-esc="info.action.name" />
+                        <t t-if="info.action.module" t-call="erplibre_developer.ModuleChip">
+                            <t t-set="module" t-value="info.action.module" />
+                        </t>
+                    </div>
+                    <!-- Extended by other modules (erplibre_studio). -->
+                    <div class="d-flex flex-wrap align-items-center gap-2 o_erplibre_dev_view_actions" />
+                </div>
+            </section>
+
+            <!-- The views applied, in order -->
+            <section class="mb-3 o_erplibre_dev_applied" aria-labelledby="o_erplibre_dev_applied_title">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <h3 id="o_erplibre_dev_applied_title" class="o_erplibre_dev_section_title mb-0">
+                        Views applied, in order
+                    </h3>
+                    <span class="small text-muted flex-grow-1 o_erplibre_dev_views_count" t-esc="countLabel" />
+                    <button
+                        t-if="rows.length"
+                        class="btn btn-link btn-sm p-0 o_erplibre_dev_toggle_all"
+                        t-on-click="toggleAll"
+                    >
+                        <t t-if="allExpanded">Collapse all</t>
+                        <t t-else="">Expand all</t>
+                    </button>
+                </div>
+                <div class="o_erplibre_dev_segmented d-flex p-1 mb-2 rounded-2" role="group" aria-label="Filter the views">
+                    <button
+                        class="btn btn-sm flex-grow-1 o_erplibre_dev_views_all"
+                        t-att-class="{'active': !byField}"
+                        t-att-aria-pressed="byField ? 'false' : 'true'"
+                        t-on-click="() => this.setByField(false)"
+                    >
+                        All
+                    </button>
+                    <button
+                        class="btn btn-sm flex-grow-1 o_erplibre_dev_views_by_field"
+                        t-att-class="{'active': byField}"
+                        t-att-aria-pressed="byField ? 'true' : 'false'"
+                        t-on-click="() => this.setByField(true)"
+                    >
+                        Touching this field
+                    </button>
+                </div>
+                <div t-if="byField" class="d-flex flex-wrap align-items-center gap-1 mb-2 small o_erplibre_dev_field_picker">
+                    <t t-if="fieldChoices.length">
+                        <span class="text-muted me-1">Selected field</span>
+                        <button
+                            t-foreach="fieldChoices"
+                            t-as="name"
+                            t-key="name"
+                            class="btn btn-sm rounded-pill o_erplibre_dev_field_chip"
+                            t-att-class="{'o_erplibre_dev_chip_on': name === currentField}"
+                            t-att-data-field="name"
+                            t-att-aria-pressed="name === currentField ? 'true' : 'false'"
+                            t-on-click="() => this.pickField(name)"
+                            t-esc="name"
+                        />
+                        <span class="w-100 text-muted">In Inspect mode, clicking a field of the page selects it here.</span>
+                    </t>
+                    <span t-else="" class="text-muted">No view names a field.</span>
+                </div>
+                <p t-if="moduleNote" class="small text-muted mb-2 o_erplibre_dev_module_note" t-esc="moduleNote" />
+                <ol class="list-unstyled mb-0 o_erplibre_dev_rail" aria-label="Views applied">
+                    <li
+                        t-foreach="rows"
+                        t-as="row"
+                        t-key="row.view.id"
+                        class="d-flex o_erplibre_dev_view_row"
+                        t-att-class="{'o_erplibre_dev_view_open': isExpanded(row.view), 'o_erplibre_dev_view_current': row.view.is_current, 'o_erplibre_dev_dimmed': dimmed([row.view.module])}"
+                        t-att-data-view-id="row.view.id"
+                        t-on-mouseenter="() => this.highlightView(row.view)"
+                        t-on-mouseleave="unhighlight"
+                    >
+                        <t t-set="view" t-value="row.view" />
+                        <span class="o_erplibre_dev_rail_mark d-flex flex-column align-items-center" aria-hidden="true">
+                            <span class="o_erplibre_dev_rail_line" t-att-class="{'invisible': row_first}" />
+                            <span class="o_erplibre_dev_rail_n" t-esc="row.n" />
+                            <span class="o_erplibre_dev_rail_line flex-grow-1" t-att-class="{'invisible': row_last}" />
+                        </span>
+                        <div class="o_erplibre_dev_view_card flex-grow-1">
+                            <button
+                                class="o_erplibre_dev_view_head d-flex flex-column w-100 text-start"
+                                t-att-aria-expanded="isExpanded(view) ? 'true' : 'false'"
+                                t-att-aria-controls="'o_erplibre_dev_view_body_' + view.id"
+                                t-on-click="() => this.toggleView(view)"
+                                t-on-focus="() => this.highlightView(view)"
+                                t-on-blur="unhighlight"
+                            >
+                                <span class="d-flex align-items-center gap-1 w-100 min-w-0">
+                                    <i class="fa fa-chevron-right o_erplibre_dev_chevron" aria-hidden="true" />
+                                    <t t-call="erplibre_developer.ModuleChip">
+                                        <t t-set="module" t-value="view.module" />
+                                        <t t-set="chipClass" t-value="'o_erplibre_dev_module'" />
+                                    </t>
+                                    <span
+                                        class="text-truncate flex-grow-1 o_erplibre_dev_view_xml_id"
+                                        t-att-title="view.xml_id or view.name"
+                                        t-esc="view.xml_id or view.name"
+                                    />
+                                    <span t-if="view.is_current" class="badge rounded-pill o_erplibre_dev_shown">shown</span>
+                                    <span class="o_erplibre_dev_spec_count" t-esc="specCount(view)" />
+                                </span>
+                                <span class="small text-muted o_erplibre_dev_view_meta" t-esc="viewMeta(view)" />
+                            </button>
+                            <div
+                                t-if="isExpanded(view)"
+                                t-att-id="'o_erplibre_dev_view_body_' + view.id"
+                                class="o_erplibre_dev_view_body d-flex flex-column gap-2 small"
+                            >
+                                <div t-if="view.inherit_name">
+                                    <span class="text-muted">inherits</span>
+                                    <code t-esc="view.inherit_name" />
+                                </div>
+                                <div t-if="view.groups.length">
+                                    <span class="text-muted">visible to</span>
+                                    <code t-esc="view.groups.join(', ')" />
+                                </div>
+                                <ul t-if="view.specs.length" class="list-unstyled mb-0 o_erplibre_dev_specs" aria-label="XPath specs">
+                                    <li t-foreach="view.specs" t-as="spec" t-key="spec_index" class="d-flex align-items-start gap-2">
+                                        <span
+                                            class="badge o_erplibre_dev_position"
+                                            t-att-data-position="spec.position"
+                                            t-esc="spec.position"
+                                        />
+                                        <span class="min-w-0">
+                                            <code class="text-break" t-esc="spec.expr" />
+                                            <t t-set="note" t-value="specNote(spec)" />
+                                            <span t-if="note" class="d-block text-muted o_erplibre_dev_spec_note" t-esc="note" />
+                                        </span>
+                                    </li>
+                                </ul>
+                                <p t-elif="view.mode === 'primary'" class="text-muted mb-0">
+                                    Primary view: no xpath, it lays the base arch the other views change.
+                                </p>
+                                <SourceLocation
+                                    file="view.file"
+                                    fileRel="view.file_rel"
+                                    line="view.line"
+                                    ide="info.ide_available"
+                                />
+                                <div>
+                                    <button
+                                        class="btn btn-link btn-sm p-0 o_erplibre_dev_arch_toggle"
+                                        t-att-aria-expanded="isArchShown(view) ? 'true' : 'false'"
+                                        t-att-aria-controls="'o_erplibre_dev_view_arch_' + view.id"
+                                        t-on-click="() => this.toggleArch(view)"
+                                    >
+                                        <i class="fa fa-code me-1" aria-hidden="true" />
+                                        <t t-if="isArchShown(view)">Hide its arch</t>
+                                        <t t-else="">Show its arch</t>
+                                    </button>
+                                </div>
+                                <div
+                                    t-if="isArchShown(view)"
+                                    t-att-id="'o_erplibre_dev_view_arch_' + view.id"
+                                    class="o_erplibre_dev_code_block o_erplibre_dev_arch"
+                                    role="region"
+                                    tabindex="0"
+                                    t-att-aria-label="archLabel(view)"
+                                >
+                                    <div t-foreach="viewArch(view)" t-as="line" t-key="line.n" class="o_erplibre_dev_line">
+                                        <span class="o_erplibre_dev_line_code">
+                                            <t t-call="erplibre_developer.ArchTokens">
+                                                <t t-set="tokens" t-value="line.tokens" />
+                                            </t>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+
+            <!-- The combined arch -->
+            <section class="o_erplibre_dev_combined_section" aria-labelledby="o_erplibre_dev_combined_title">
+                <h3 id="o_erplibre_dev_combined_title" class="o_erplibre_dev_section_title mb-2">
+                    <button
+                        class="btn btn-link p-0 text-start text-reset text-decoration-none d-flex align-items-baseline gap-1 flex-wrap o_erplibre_dev_toggle_combined"
+                        t-att-aria-expanded="data.showCombined ? 'true' : 'false'"
+                        aria-controls="o_erplibre_dev_combined_body"
+                        t-on-click="toggleCombined"
+                    >
+                        <i class="fa fa-chevron-right o_erplibre_dev_chevron" aria-hidden="true" />
+                        <span>Combined arch</span>
+                        <span class="small text-muted fw-normal" t-esc="combinedSubtitle" />
+                    </button>
+                </h3>
+                <div t-if="data.showCombined" id="o_erplibre_dev_combined_body">
+                    <t t-set="combinedArch" t-value="combined" />
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <label class="o_erplibre_dev_arch_search position-relative flex-grow-1 mb-0">
+                            <span class="visually-hidden">Search the arch</span>
+                            <i class="fa fa-search position-absolute text-muted" aria-hidden="true" />
+                            <input
+                                type="search"
+                                class="form-control form-control-sm o_erplibre_dev_arch_query"
+                                placeholder="Search the arch"
+                                t-model="data.archQuery"
+                            />
+                        </label>
+                        <button
+                            t-if="combinedArch.hasOrigins"
+                            class="btn btn-sm d-inline-flex align-items-center gap-2 o_erplibre_dev_origin_switch"
+                            role="switch"
+                            t-att-aria-checked="data.showOrigins ? 'true' : 'false'"
+                            t-on-click="toggleOrigins"
+                        >
+                            <span class="o_erplibre_dev_switch_track" aria-hidden="true">
+                                <span class="o_erplibre_dev_switch_knob" />
+                            </span>
+                            Node origins
+                        </button>
+                    </div>
+                    <div
+                        t-if="combinedArch.hasOrigins and data.showOrigins"
+                        class="d-flex flex-wrap align-items-center gap-2 mb-2 small o_erplibre_dev_legend"
+                    >
+                        <span
+                            t-foreach="combinedArch.legend"
+                            t-as="module"
+                            t-key="module"
+                            class="d-inline-flex align-items-center gap-1"
+                            t-att-data-module="module"
+                        >
+                            <span t-attf-class="o_erplibre_dev_swatch o_tag o_tag_color_{{ moduleColor(module) }}" aria-hidden="true" />
+                            <t t-esc="module" />
+                        </span>
+                        <span class="w-100 text-muted">
+                            Wide bar: the module that added the node · thin bar: the module that changed its attributes.
+                        </span>
+                    </div>
+                    <p
+                        class="small text-muted mb-1 o_erplibre_dev_arch_count"
+                        aria-live="polite"
+                        t-esc="combinedCountLabel(combinedArch)"
+                    />
+                    <div
+                        class="o_erplibre_dev_code_block o_erplibre_dev_combined"
+                        t-att-class="{'o_erplibre_dev_origins': combinedArch.hasOrigins and data.showOrigins}"
+                        role="region"
+                        tabindex="0"
+                        aria-label="Combined arch"
+                    >
+                        <div
+                            t-foreach="combinedArch.lines"
+                            t-as="line"
+                            t-key="line.n"
+                            class="d-flex o_erplibre_dev_line"
+                            t-att-class="{'o_erplibre_dev_match': combinedArch.matches.has(line.n), 'o_erplibre_dev_dimmed': lineDimmed(line)}"
+                            t-att-data-origin="line.origin"
+                            t-att-data-attr-origin="line.attrOrigin.length ? line.attrOrigin.join(' ') : false"
+                            t-att-title="line.title or false"
+                        >
+                            <t t-if="combinedArch.hasOrigins and data.showOrigins">
+                                <span
+                                    class="o_erplibre_dev_bar o_erplibre_dev_bar_origin"
+                                    t-att-class="line.origin ? 'o_tag o_tag_color_' + moduleColor(line.origin) : ''"
+                                />
+                                <span
+                                    class="o_erplibre_dev_bar o_erplibre_dev_bar_attr"
+                                    t-att-class="line.attrOrigin.length ? 'o_tag o_tag_color_' + moduleColor(line.attrOrigin[line.attrOrigin.length - 1]) : ''"
+                                />
+                            </t>
+                            <span class="o_erplibre_dev_lineno" aria-hidden="true" t-esc="line.n" />
+                            <span class="o_erplibre_dev_line_code">
+                                <t t-call="erplibre_developer.ArchTokens">
+                                    <t t-set="tokens" t-value="line.tokens" />
+                                </t>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </t>
+</templates>

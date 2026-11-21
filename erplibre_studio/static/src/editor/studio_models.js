@@ -12,8 +12,6 @@ export const MODEL_NAME_SIZE = 50;
 export const PERMS = ["perm_read", "perm_write", "perm_create", "perm_unlink"];
 // The icon of an app without one of its own (DEFAULT_APP_ICON of the server).
 export const DEFAULT_APP_ICON = "erplibre_studio,static/description/icon.png";
-// The value of the app select of the model dialog that makes a new app.
-export const NEW_APP = "new";
 
 /** The label of a right of the grid. */
 export function permLabel(perm) {
@@ -101,11 +99,30 @@ export function accessGroup(row) {
     return row.group ? [String(row.group[0]), row.group[1]] : ["", ""];
 }
 
+// Where the dialog puts the menu of a model: in an app of the project, in
+// a new app made with the model, under an existing menu.
+export const MENU_PLACES = ["project", "new_app", "menu"];
+
+/**
+ * The place of MENU_PLACES of the model line ``line`` among the apps
+ * ``apps`` of the project: « menu » under a menu, « project » in one of
+ * the apps, else « new_app »; a new model goes in the first app of the
+ * project, else in a new app.
+ */
+export function menuPlace(line, apps) {
+    if (line && line.menu_mode === "menu") {
+        return "menu";
+    }
+    const appId = line ? line.app_id : apps[0] && apps[0].id;
+    return appId && apps.some((app) => app.id === appId) ? "project" : "new_app";
+}
+
 /**
  * The dialog of a model of the project: a new one, or the model line
  * ``line``. Its menu goes in an app of the project, a new app made with
- * the model, or under an existing menu. ``save(values)`` sends it and
- * answers whether the server took it.
+ * the model, or under an existing menu (MENU_PLACES); the dialog shows
+ * the path of the menu it makes. ``save(values)`` sends it and answers
+ * whether the server took it.
  */
 export class StudioModelDialog extends Component {
     static template = "erplibre_studio.ModelDialog";
@@ -122,13 +139,15 @@ export class StudioModelDialog extends Component {
     setup() {
         const line = this.props.line;
         const apps = this.apps;
-        const appId = (line && line.app_id) || (apps[0] && apps[0].id) || NEW_APP;
+        const place = menuPlace(line, apps);
+        const appId = place === "project" ? (line ? line.app_id : apps[0].id) : (apps[0] && apps[0].id) || false;
+        this.places = MENU_PLACES;
         this.state = useState({
             name: line ? line.name : "",
             model: line ? line.model : "",
             modelEdited: Boolean(line),
             chatter: line ? line.chatter : false,
-            mode: line ? line.menu_mode : "app",
+            place,
             appId,
             appName: "",
             appNameEdited: Boolean(line),
@@ -163,7 +182,7 @@ export class StudioModelDialog extends Component {
 
     /** Whether the model goes in a new app, made with it. */
     get isNewApp() {
-        return this.state.mode === "app" && this.state.appId === NEW_APP;
+        return this.state.place === "new_app";
     }
 
     /** The technical name cannot change once Apply created the model. */
@@ -190,10 +209,61 @@ export class StudioModelDialog extends Component {
         if (state.saving || !state.name.trim() || !state.model.trim()) {
             return false;
         }
-        if (state.mode === "menu") {
+        if (state.place === "menu") {
             return Boolean(state.parentId);
         }
+        if (state.place === "project") {
+            return Boolean(state.appId);
+        }
         return !this.appNameMissing;
+    }
+
+    /** The label and the help of the place ``place`` of MENU_PLACES. */
+    placeInfo(place) {
+        if (place === "project") {
+            return {
+                label: _t("In an app of the project"),
+                help: this.apps.length
+                    ? _t("Added to the menu of an app this project makes.")
+                    : _t("The project has no app yet."),
+            };
+        }
+        if (place === "new_app") {
+            return {
+                label: _t("In a new app"),
+                help: _t("One more app on the home screen, with its name and its icon."),
+            };
+        }
+        return {
+            label: _t("Under an existing menu"),
+            help: _t("In the menu of an installed app, for example Contacts."),
+        };
+    }
+
+    /** The id of the radio button of the place ``place``, which the tests and tours name. */
+    placeId(place) {
+        const ids = {project: "o_erplibre_studio_menu_app", new_app: "o_erplibre_studio_menu_new_app"};
+        return ids[place] || "o_erplibre_studio_menu_under";
+    }
+
+    /**
+     * The path of the menu the model gets, as the home menu shows it:
+     * the app or the parent menu, then the label of the menu.
+     */
+    get menuPreview() {
+        const state = this.state;
+        const leaf = state.menuName.trim() || state.name.trim() || _t("New model");
+        let root;
+        if (state.place === "menu") {
+            const parent = (this.choices.menus || []).find((menu) => menu.id === state.parentId);
+            root = parent ? parent.name.split("/").map((part) => part.trim()).join(" › ") : _t("Choose a parent menu");
+        } else if (state.place === "project") {
+            const app = this.apps.find((a) => a.id === state.appId);
+            root = app ? app.name : _t("Choose an app");
+        } else {
+            root = state.appName.trim() || _t("New app");
+        }
+        return `${root} › ${leaf}`;
     }
 
     /** The technical name and the name of a new app follow the label until edited. */
@@ -212,20 +282,26 @@ export class StudioModelDialog extends Component {
         this.state.modelEdited = true;
     }
 
+    /** The technical name of a new model follows the label again. */
+    followLabel() {
+        this.state.modelEdited = false;
+        this.setName(this.state.name);
+    }
+
     setAppName(value) {
         this.state.appName = value;
         this.state.appNameEdited = true;
     }
 
-    setMode(mode) {
-        this.state.mode = mode;
+    setPlace(place) {
+        this.state.place = place;
+        if (place === "new_app" && !this.state.appNameEdited) {
+            this.state.appName = this.state.name;
+        }
     }
 
     setApp(value) {
-        this.state.appId = value === NEW_APP ? NEW_APP : parseInt(value) || NEW_APP;
-        if (this.state.appId === NEW_APP && !this.state.appNameEdited) {
-            this.state.appName = this.state.name;
-        }
+        this.state.appId = parseInt(value) || false;
     }
 
     /** Whether the icon ``value`` is the one of the new app; none is the studio one. */
@@ -244,8 +320,8 @@ export class StudioModelDialog extends Component {
     /** The values of ``create_model`` / ``update_model``. */
     get values() {
         const state = this.state;
-        const menu = {mode: state.mode, name: state.menuName.trim()};
-        if (state.mode === "menu") {
+        const menu = {mode: state.place === "menu" ? "menu" : "app", name: state.menuName.trim()};
+        if (state.place === "menu") {
             menu.parent_id = state.parentId;
         } else if (this.isNewApp) {
             menu.new_app = {name: state.appName.trim(), icon: state.appIcon || false};

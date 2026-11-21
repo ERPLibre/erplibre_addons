@@ -347,6 +347,33 @@ class TestTimelineStudio(StudioCase):
         )
         arch = self.draft(self.project, self.timeline)
         self.assertEqual(arch.get("colors"), "red:ref == 'A-1';#00ff00:color > 3")
+        # The payload gives each rule back as the editor writes it: removing
+        # one rule writes the others unchanged.
+        data = self.Editor.get_editor_data(
+            "res.partner", self.timeline.id, "timeline", self.project.id
+        )
+        rules = data["layout"]["colors"]
+        self.assertEqual(
+            [(r["field"], r["operator"], r["value"]) for r in rules],
+            [("ref", "==", "A-1"), ("color", ">", 3)],
+        )
+        self.assertEqual(
+            [(c["type"], c["attribute"]) for c in data["changes"]],
+            [("set_attribute", "colors")],
+        )
+        self.op(
+            self.project,
+            self.timeline,
+            type="set_attribute",
+            target="/timeline",
+            attribute="colors",
+            value=[
+                {key: rule[key] for key in ("color", "field", "operator", "value")}
+                for rule in rules[1:]
+            ],
+        )
+        arch = self.draft(self.project, self.timeline)
+        self.assertEqual(arch.get("colors"), "#00ff00:color > 3")
 
     def test_refused_operations(self):
         refused = [

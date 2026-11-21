@@ -32,6 +32,9 @@ class TestGuards(DeveloperCase):
             lambda: dev.get_module_commits("base"),
             lambda: dev.action_reload_assets(),
             lambda: dev.action_upgrade_module("base"),
+            lambda: dev.action_upgrade_modules(["base", "web"]),
+            lambda: dev.get_repo_details("odoo"),
+            lambda: dev.get_recent_runs(),
             lambda: dev.action_open_in_ide(__file__, 1),
         ]
 
@@ -112,6 +115,38 @@ class TestGuards(DeveloperCase):
     def test_upgrade_unknown_module(self):
         with self.server_actions(), self.assertRaises(UserError):
             self.Dev.action_upgrade_module("no_such_module_erplibre")
+
+    def test_upgrade_several_modules_in_one_confirmation(self):
+        modules = self.env["ir.module.module"].search(
+            [("name", "in", ("erplibre_developer", "web"))]
+        )
+        with self.server_actions(), patch("odoo.service.server.restart") as restart:
+            action = self.Dev.action_upgrade_modules(
+                ["erplibre_developer", "web", "web"]
+            )
+            wizard = self.env["erplibre.code.confirm.wizard"].browse(action["res_id"])
+            self.assertEqual(wizard.action, "restart_upgrade")
+            self.assertEqual(wizard.module_ids, modules)
+            self.env.cr.postcommit.run()
+            restart.assert_not_called()
+            # The confirmation of erplibre_info still asks for the name.
+            wizard.write({"understood": True, "typed_database_name": "x"})
+            with self.assertRaises(UserError):
+                wizard.action_confirm()
+        self.assertEqual(set(modules.mapped("state")), {"installed"})
+
+    def test_upgrade_several_modules_refused(self):
+        """Every name must be an installed module, and the odoo.conf flag
+        is required: nothing opens otherwise."""
+        Wizard = self.env["erplibre.code.confirm.wizard"]
+        count = Wizard.search_count([])
+        with self.server_actions():
+            for names in ([], ["web", "no_such_module_erplibre"], [False]):
+                with self.subTest(names=names), self.assertRaises(UserError):
+                    self.Dev.action_upgrade_modules(names)
+        with self.server_actions(flag=False), self.assertRaises(UserError):
+            self.Dev.action_upgrade_modules(["web"])
+        self.assertEqual(Wizard.search_count([]), count)
 
     def test_reload_assets(self):
         Attachment = type(self.env["ir.attachment"])

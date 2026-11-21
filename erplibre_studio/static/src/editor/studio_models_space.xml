@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The models space: the models of the project on the left, the page of
+         the chosen one in the centre, its inspector on the right. -->
+    <t t-name="erplibre_studio.ModelsSpace">
+        <div
+            class="o_erplibre_studio_space o_erplibre_studio_models_space d-flex flex-grow-1 overflow-hidden"
+            t-att-class="{'o_erplibre_studio_busy': props.busy}"
+        >
+            <aside
+                class="o_erplibre_studio_models_list border-end d-flex flex-column p-2 overflow-auto"
+                aria-labelledby="o_erplibre_studio_models_title"
+            >
+                <h2 id="o_erplibre_studio_models_title" class="o_erplibre_studio_section_title px-1 mt-1 mb-2">
+                    Models of the project
+                </h2>
+                <p t-if="!hasNewModel" class="small text-muted px-1 mb-2 o_erplibre_studio_no_model">No new model.</p>
+                <ul class="list-unstyled d-flex flex-column gap-1 mb-2">
+                    <li t-foreach="entries" t-as="entry" t-key="entry.model">
+                        <button
+                            type="button"
+                            class="btn btn-sm w-100 text-start d-flex flex-column align-items-start gap-1 border o_erplibre_studio_models_item"
+                            t-att-class="{'o_erplibre_studio_models_item_current': current and entry.model === current.model}"
+                            t-att-data-model="entry.model"
+                            t-att-data-kind="entry.kind"
+                            t-att-aria-current="current and entry.model === current.model ? 'true' : 'false'"
+                            t-on-click="() => this.select(entry)"
+                        >
+                            <span class="d-flex align-items-center gap-1 fw-bold mw-100">
+                                <span class="text-truncate" t-esc="entry.name" />
+                                <span
+                                    class="badge rounded-pill o_erplibre_studio_model_kind"
+                                    t-att-class="'o_erplibre_studio_model_kind_' + entry.kind"
+                                    t-esc="badge(entry)"
+                                />
+                            </span>
+                            <code class="small text-truncate mw-100" t-esc="entry.model" />
+                            <span class="small text-muted" t-esc="status(entry)" />
+                        </button>
+                    </li>
+                </ul>
+                <button
+                    class="btn btn-sm btn-outline-primary o_erplibre_studio_new_model"
+                    title="A new model of the project, with its views, its menu and its access rights"
+                    t-att-disabled="props.busy"
+                    t-on-click="() => this.editor.openModelDialog()"
+                >
+                    <i class="fa fa-plus me-1" aria-hidden="true" />
+                    New model
+                </button>
+                <p class="small text-muted px-1 mt-2 mb-0">
+                    A pending model changes freely. Once applied, its technical name is fixed.
+                </p>
+            </aside>
+            <t t-set="entry" t-value="current" />
+            <main
+                t-if="entry"
+                class="flex-grow-1 overflow-auto p-3 o_erplibre_studio_model"
+                t-att-class="{'o_erplibre_studio_model_current': entry.model === props.screenModel}"
+                t-att-data-model="entry.model"
+                t-att-data-kind="entry.kind"
+                aria-label="Chosen model"
+            >
+                <t t-call="erplibre_studio.ModelsSpace.Page" />
+            </main>
+            <main t-else="" class="flex-grow-1 overflow-auto p-3" aria-label="Chosen model">
+                <p class="text-muted o_erplibre_studio_models_empty">
+                    No model yet: « New model » adds one to the draft of the project.
+                </p>
+            </main>
+            <aside
+                t-if="entry"
+                class="o_erplibre_studio_sidebar border-start overflow-auto p-3 o_erplibre_studio_model_inspector"
+                aria-label="Inspector"
+            >
+                <t t-call="erplibre_studio.ModelsSpace.Inspector" />
+            </aside>
+        </div>
+    </t>
+
+    <!-- The page of the model ``entry``: identity, fields, access. -->
+    <t t-name="erplibre_studio.ModelsSpace.Page">
+        <nav class="small text-muted mb-1" aria-label="Path of the model">
+            <span>Models</span>
+            <i class="fa fa-angle-right mx-1" aria-hidden="true" />
+            <span class="text-body" t-esc="entry.name" />
+        </nav>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <h1 class="h4 mb-0" t-esc="entry.name" />
+            <span
+                t-if="entry.line"
+                class="badge rounded-pill o_erplibre_studio_model_state"
+                t-att-class="'o_erplibre_studio_model_kind_' + entry.kind"
+                t-att-data-applied="entry.line.applied ? '1' : '0'"
+                t-esc="status(entry)"
+            />
+            <span
+                t-else=""
+                class="badge rounded-pill o_erplibre_studio_model_kind_existing"
+                t-esc="status(entry)"
+            />
+            <t t-if="entry.kind === 'pending'">
+                <button
+                    class="btn btn-sm btn-outline-secondary ms-auto o_erplibre_studio_model_preview_open"
+                    title="Preview the model before Apply creates it: nothing is saved"
+                    t-att-disabled="props.busy"
+                    t-on-click="() => this.editor.openModelPreview(entry.line, 'form')"
+                >
+                    <i class="fa fa-eye me-1" aria-hidden="true" />
+                    Preview
+                </button>
+                <button
+                    class="btn btn-sm btn-primary o_erplibre_studio_apply_open"
+                    title="Review the draft and apply it, then edit the form of the model"
+                    t-att-disabled="props.busy or project.state !== 'draft'"
+                    t-on-click="() => this.editor.applyAndOpen(entry.line)"
+                >
+                    Apply and open
+                </button>
+            </t>
+        </div>
+        <section class="card mb-3 o_erplibre_studio_model_identity" aria-label="Identity of the model">
+            <div class="card-body d-flex flex-column gap-3">
+                <div>
+                    <label class="form-label fw-bold small mb-1" for="o_erplibre_studio_model_detail_label">Label</label>
+                    <input
+                        id="o_erplibre_studio_model_detail_label"
+                        class="form-control form-control-sm o_erplibre_studio_model_detail_label"
+                        t-att-value="entry.name"
+                        t-att-readonly="!entry.line"
+                        t-on-change="(ev) => this.rename(entry, ev)"
+                    />
+                </div>
+                <div>
+                    <label class="form-label fw-bold small mb-1" for="o_erplibre_studio_model_detail_name">
+                        Technical name
+                    </label>
+                    <div class="input-group input-group-sm">
+                        <span t-if="hasPrefix(entry)" class="input-group-text font-monospace" t-esc="'x_'" />
+                        <input
+                            id="o_erplibre_studio_model_detail_name"
+                            class="form-control font-monospace o_erplibre_studio_model_detail_name"
+                            aria-describedby="o_erplibre_studio_model_detail_name_note"
+                            t-att-value="techRest(entry)"
+                            t-att-readonly="entry.kind !== 'pending'"
+                            t-on-change="(ev) => this.renameModel(entry, ev)"
+                        />
+                        <span
+                            t-if="entry.kind !== 'pending'"
+                            class="input-group-text gap-1 o_erplibre_studio_model_locked"
+                        >
+                            <i class="fa fa-lock" aria-hidden="true" />
+                            locked
+                        </span>
+                    </div>
+                    <div id="o_erplibre_studio_model_detail_name_note" class="form-text" t-esc="nameNote(entry)" />
+                </div>
+                <div>
+                    <div class="fw-bold small mb-1">Menu</div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <t t-if="entry.line">
+                            <span class="o_erplibre_studio_model_menu_place">
+                                <i class="fa fa-th-large me-1 text-muted" aria-hidden="true" />
+                                <t t-esc="menuPath(entry)" />
+                            </span>
+                            <button
+                                class="btn btn-sm btn-link p-0 o_erplibre_studio_edit_model"
+                                title="Edit the model: its label, its chatter and where its menu goes"
+                                t-att-disabled="props.busy"
+                                t-on-click="() => this.editor.openModelDialog(entry.line)"
+                            >
+                                Change
+                            </button>
+                        </t>
+                        <span t-else="" class="text-muted">The menus of its modules.</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check form-switch mb-0">
+                        <input
+                            id="o_erplibre_studio_model_detail_chatter"
+                            type="checkbox"
+                            role="switch"
+                            class="form-check-input o_erplibre_studio_model_chatter_switch"
+                            aria-describedby="o_erplibre_studio_model_detail_chatter_note"
+                            t-att-checked="chatterOn(entry)"
+                            t-att-disabled="chatterLocked(entry) or props.busy"
+                            t-on-change="(ev) => this.toggleChatter(entry, ev)"
+                        />
+                        <label class="form-check-label fw-bold small" for="o_erplibre_studio_model_detail_chatter">
+                            Chatter: messages, followers and activities
+                        </label>
+                    </div>
+                    <div
+                        id="o_erplibre_studio_model_detail_chatter_note"
+                        class="form-text mt-0"
+                        t-esc="chatterNote(entry)"
+                    />
+                </div>
+                <div>
+                    <div class="fw-bold small mb-1">Views of the model</div>
+                    <div class="d-flex flex-wrap align-items-center gap-1 o_erplibre_studio_model_views">
+                        <button
+                            t-foreach="views(entry)"
+                            t-as="view"
+                            t-key="view.type"
+                            class="btn btn-sm btn-outline-secondary o_erplibre_studio_open_model"
+                            t-att-class="{'o_erplibre_studio_open_pending': view.pending}"
+                            t-att-data-view-type="view.type"
+                            t-att-title="view.pending ? editor.pendingViewTitle : ''"
+                            t-att-disabled="props.busy or view.disabled"
+                            t-on-click="view.open"
+                        >
+                            <t t-esc="view.label" />
+                            <i
+                                t-if="view.changes"
+                                class="fa fa-circle ms-1 small o_erplibre_studio_pending_changes"
+                                title="Changes wait for Apply"
+                            />
+                            <i class="fa fa-external-link ms-1 small" aria-hidden="true" />
+                        </button>
+                        <span t-if="!views(entry).length" class="text-muted small">
+                            The studio edits none of its views.
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        A view opens in the View space. Other types: « Add a view », once a view is open.
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="card mb-3 o_erplibre_studio_model_fields" aria-labelledby="o_erplibre_studio_model_fields_title">
+            <div class="card-header d-flex flex-wrap align-items-center gap-2">
+                <h2 id="o_erplibre_studio_model_fields_title" class="h6 mb-0">
+                    Fields ·
+                    <t t-esc="fields(entry).length" />
+                </h2>
+                <span class="small text-muted" t-esc="fieldsNote(entry)" />
+                <button
+                    class="btn btn-sm btn-link ms-auto p-0 o_erplibre_studio_model_add_field"
+                    title="Open the form of the model: the palette adds its fields"
+                    t-att-disabled="props.busy or !canAddField(entry)"
+                    t-on-click="() => this.addField(entry)"
+                >
+                    <i class="fa fa-plus me-1" aria-hidden="true" />
+                    Add a field
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Label</th>
+                            <th scope="col">Technical name</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            t-foreach="fields(entry)"
+                            t-as="field"
+                            t-key="field.name"
+                            class="o_erplibre_studio_model_field"
+                            t-att-data-name="field.name"
+                        >
+                            <th scope="row" class="fw-normal">
+                                <span
+                                    class="o_erplibre_studio_glyph me-1"
+                                    aria-hidden="true"
+                                    t-esc="field.glyph"
+                                />
+                                <t t-esc="field.label" />
+                            </th>
+                            <td><code t-esc="field.name" /></td>
+                            <td t-esc="field.type" />
+                            <td>
+                                <span
+                                    class="badge o_erplibre_studio_model_field_state"
+                                    t-att-class="field.applied ? 'text-bg-success' : 'o_erplibre_studio_change_tag_new'"
+                                    t-att-data-applied="field.applied ? '1' : '0'"
+                                >
+                                    <t t-if="field.applied">Created</t>
+                                    <t t-else="">New</t>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr t-if="!fields(entry).length">
+                            <td colspan="4" class="text-muted small">The project adds no field to this model.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="card o_erplibre_studio_model_access" aria-labelledby="o_erplibre_studio_model_access_title">
+            <div class="card-header d-flex flex-wrap align-items-center gap-2">
+                <h2 id="o_erplibre_studio_model_access_title" class="h6 mb-0">Access</h2>
+                <span class="small text-muted">Summary: the rights and the rules are set in Security.</span>
+                <button
+                    class="btn btn-sm btn-link ms-auto p-0 o_erplibre_studio_model_security"
+                    t-att-disabled="props.busy"
+                    t-on-click="() => this.openSecurity(entry)"
+                >
+                    <i class="fa fa-shield me-1" aria-hidden="true" />
+                    Open in Security
+                </button>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li
+                    t-foreach="access(entry)"
+                    t-as="row"
+                    t-key="row.id"
+                    class="list-group-item d-flex flex-wrap justify-content-between gap-2 small o_erplibre_studio_model_access_row"
+                >
+                    <span class="fw-bold" t-esc="row.group" />
+                    <span class="text-muted" t-esc="row.perms" />
+                </li>
+                <li t-if="!access(entry).length" class="list-group-item small text-muted">
+                    The project adds no access right on this model.
+                </li>
+                <li class="list-group-item small o_erplibre_studio_model_rules" t-esc="rulesText(entry)" />
+            </ul>
+        </section>
+    </t>
+
+    <!-- The inspector of the model ``entry``: what the draft holds on it,
+         its table, and its removal. -->
+    <t t-name="erplibre_studio.ModelsSpace.Inspector">
+        <div class="d-flex align-items-center gap-2 mb-3 o_erplibre_studio_inspector_head">
+            <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_large" aria-hidden="true">
+                <i class="fa fa-database" />
+            </span>
+            <div class="o_erplibre_studio_inspector_name">
+                <div class="fw-bold text-truncate" t-esc="entry.name" />
+                <div class="small text-muted o_erplibre_studio_model_kind_text" t-esc="kindText(entry)" />
+            </div>
+        </div>
+        <fieldset class="o_erplibre_studio_fieldset mb-3">
+            <legend class="o_erplibre_studio_section_title">In the draft</legend>
+            <dl class="row small mb-0 o_erplibre_studio_model_counts">
+                <t t-foreach="draftCounts(entry)" t-as="item" t-key="item.key">
+                    <dt class="col-8 fw-normal" t-esc="item.label" />
+                    <dd class="col-4 mb-1 fw-bold text-end" t-att-data-count="item.key" t-esc="item.count" />
+                </t>
+            </dl>
+        </fieldset>
+        <button
+            type="button"
+            class="btn btn-sm btn-link text-body p-0 d-flex align-items-center gap-1 mb-2 o_erplibre_studio_model_advanced_toggle"
+            aria-controls="o_erplibre_studio_model_advanced"
+            t-att-aria-expanded="space.advanced ? 'true' : 'false'"
+            t-on-click="toggleAdvanced"
+        >
+            <i class="fa" t-att-class="space.advanced ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
+            Advanced: table, displayed name
+        </button>
+        <dl
+            t-if="space.advanced"
+            id="o_erplibre_studio_model_advanced"
+            class="row small mb-3 o_erplibre_studio_model_advanced"
+        >
+            <dt class="col-5 fw-normal text-muted">Table</dt>
+            <dd class="col-7 mb-1"><code t-esc="table(entry)" /></dd>
+            <t t-if="entry.line">
+                <dt class="col-5 fw-normal text-muted">Displayed name</dt>
+                <dd class="col-7 mb-1"><code t-esc="'x_name'" /></dd>
+            </t>
+        </dl>
+        <button
+            t-if="entry.line"
+            class="btn btn-sm btn-outline-danger w-100 o_erplibre_studio_remove_model"
+            title="Remove the model from the project"
+            t-att-disabled="props.busy"
+            t-on-click="() => this.remove(entry)"
+        >
+            <i class="fa fa-trash me-1" aria-hidden="true" />
+            <t t-esc="removeText(entry)" />
+        </button>
+    </t>
+</templates>

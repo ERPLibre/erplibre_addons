@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The plan of the view: a filter, « All | Modified », the tree of
+         its blocks. -->
+    <t t-name="erplibre_studio.Outline">
+        <t t-set="shown" t-value="result" />
+        <div class="o_erplibre_studio_outline d-flex flex-column gap-2 h-100">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">
+                    <i class="fa fa-search" aria-hidden="true" />
+                </span>
+                <input
+                    type="text"
+                    class="form-control o_erplibre_studio_outline_filter"
+                    placeholder="Filter: label or technical name"
+                    aria-label="Filter the plan"
+                    t-model="outline.filter"
+                />
+                <button
+                    t-if="outline.filter"
+                    class="btn btn-outline-secondary o_erplibre_studio_outline_clear"
+                    title="Clear the filter"
+                    aria-label="Clear the filter"
+                    t-on-click="clearFilter"
+                >
+                    <i class="fa fa-times" aria-hidden="true" />
+                </button>
+            </div>
+            <div class="d-flex align-items-center gap-1">
+                <div role="group" class="d-flex gap-1" aria-label="Show">
+                    <button
+                        class="btn btn-sm rounded-pill py-0 o_erplibre_studio_outline_all"
+                        t-att-class="outline.changedOnly ? 'btn-outline-secondary' : 'btn-primary'"
+                        t-att-aria-pressed="outline.changedOnly ? 'false' : 'true'"
+                        t-on-click="() => this.showChanged(false)"
+                    >
+                        All
+                    </button>
+                    <button
+                        class="btn btn-sm rounded-pill py-0 o_erplibre_studio_outline_changed"
+                        t-att-class="outline.changedOnly ? 'btn-primary' : 'btn-outline-secondary'"
+                        t-att-aria-pressed="outline.changedOnly ? 'true' : 'false'"
+                        t-on-click="() => this.showChanged(true)"
+                    >
+                        Modified ·
+                        <t t-esc="changedCount" />
+                    </button>
+                </div>
+                <span class="ms-auto small text-muted o_erplibre_studio_outline_count" t-esc="countLabel(shown)" />
+            </div>
+            <t t-set="active" t-value="activePath(shown.rows)" />
+            <ul role="tree" class="list-unstyled mb-0 o_erplibre_studio_outline_tree" t-att-aria-label="treeLabel">
+                <li
+                    t-foreach="shown.rows"
+                    t-as="row"
+                    t-key="row.block.path"
+                    role="treeitem"
+                    class="o_erplibre_studio_outline_row d-flex align-items-center rounded"
+                    t-att-class="{
+                        'o_erplibre_studio_outline_selected': row.block.path === props.selected,
+                        'o_erplibre_studio_outline_context': row.context,
+                    }"
+                    t-att-style="'padding-left: ' + (row.depth * 0.75) + 'rem'"
+                    t-att-aria-level="row.depth + 1"
+                    t-att-aria-selected="row.block.path === props.selected ? 'true' : 'false'"
+                    t-att-aria-expanded="isContainer(row.block) ? (row.open ? 'true' : 'false') : undefined"
+                    t-att-data-path="row.block.path"
+                    t-att-data-kind="row.block.kind"
+                    t-att-data-name="row.block.name"
+                    t-att-tabindex="row.block.path === active ? '0' : '-1'"
+                    t-on-keydown="(ev) => this.onTreeKey(ev, row, shown.rows)"
+                    t-on-focus="() => this.state.focus = row.block.path"
+                >
+                    <button
+                        t-if="isContainer(row.block)"
+                        class="btn btn-sm btn-link text-body p-0 o_erplibre_studio_outline_toggle"
+                        tabindex="-1"
+                        t-att-aria-label="toggleLabel(row)"
+                        t-att-title="toggleLabel(row)"
+                        t-att-aria-expanded="row.open ? 'true' : 'false'"
+                        t-att-disabled="filtering"
+                        t-on-click="() => this.toggle(row)"
+                    >
+                        <i class="fa fa-fw" t-att-class="row.open ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
+                    </button>
+                    <span t-else="" class="o_erplibre_studio_outline_spacer" aria-hidden="true" />
+                    <button
+                        class="btn btn-sm d-flex align-items-center gap-1 flex-grow-1 min-w-0 text-start px-1 o_erplibre_studio_outline_pick"
+                        tabindex="-1"
+                        t-att-class="{'fw-bold': isContainer(row.block) and !row.context}"
+                        t-att-draggable="canDrag(row.block) ? 'true' : 'false'"
+                        t-att-title="row.block.name or ''"
+                        t-on-click="() => this.pick(row.block)"
+                        t-on-dragstart="(ev) => this.startDrag(ev, row.block)"
+                        t-on-dragend="() => this.endDrag()"
+                    >
+                        <span
+                            class="o_erplibre_studio_glyph"
+                            t-att-class="{'o_erplibre_studio_glyph_container': isContainer(row.block)}"
+                            aria-hidden="true"
+                            t-esc="glyph(row.block)"
+                        />
+                        <span class="text-truncate flex-grow-1 o_erplibre_studio_outline_label" t-esc="label(row.block)" />
+                        <span
+                            t-if="isContainer(row.block) and count(row.block)"
+                            class="small text-muted fw-normal"
+                            t-esc="count(row.block)"
+                        />
+                        <t t-if="row.block.changed">
+                            <span
+                                class="small fw-bold text-info-emphasis o_erplibre_studio_outline_tag"
+                                t-esc="changeLabel(row.block)"
+                            />
+                            <span
+                                class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_changed"
+                                aria-hidden="true"
+                            />
+                        </t>
+                        <span
+                            t-if="row.block.changed_inside and !row.open"
+                            role="img"
+                            class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_inside"
+                            t-att-aria-label="holdsLabel()"
+                            t-att-title="holdsLabel()"
+                        />
+                    </button>
+                </li>
+            </ul>
+            <p t-if="!shown.rows.length" class="small text-muted mb-0 o_erplibre_studio_outline_empty" t-esc="emptyLabel" />
+            <p class="small text-muted border-top pt-2 mt-auto mb-0">
+                A click selects the element on the canvas. Drag a row to move it; a filled dot marks a change of the
+                draft.
+            </p>
+        </div>
+    </t>
+</templates>

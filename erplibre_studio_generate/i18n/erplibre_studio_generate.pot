@@ -106,11 +106,6 @@ msgid "Destination"
 msgstr ""
 
 #. module: erplibre_studio_generate
-#: model:ir.model,name:erplibre_studio_generate.model_erplibre_studio_editor
-msgid "ERPLibre studio editor"
-msgstr ""
-
-#. module: erplibre_studio_generate
 #: model:ir.model,name:erplibre_studio_generate.model_erplibre_studio_project
 msgid "ERPLibre studio project"
 msgstr ""
@@ -363,4 +358,10 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid "with a chatter"
+msgstr ""
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "new %(type)s view `%(view)s`"
 msgstr ""

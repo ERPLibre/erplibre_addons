@@ -25,7 +25,8 @@ registry.category("web_tour.tours").add("erplibre_studio_j4", {
         {trigger: ".o_erplibre_studio_new_module", run: "edit studio_tour_j4"},
         {trigger: ".o_erplibre_studio_create_project", run: "click"},
         {trigger: ".o_erplibre_studio_state[data-state=draft]"},
-        // Two apps.
+        // Two apps, in the security space.
+        {trigger: ".o_erplibre_studio_rail_item[data-space=security]:enabled", run: "click"},
         {trigger: ".o_erplibre_studio_apps_toggle", run: "click"},
         {trigger: ".o_erplibre_studio_new_app", run: "click"},
         {trigger: ".o_erplibre_studio_app_form_name", run: "edit Tour shop"},
@@ -37,7 +38,8 @@ registry.category("web_tour.tours").add("erplibre_studio_j4", {
         {trigger: ".o_erplibre_studio_app_form_name", run: "edit Tour stock"},
         {trigger: ".o_erplibre_studio_save_app:enabled", run: "click"},
         {trigger: ".o_erplibre_studio_app_card[data-app=menu_app_tour_stock]"},
-        // A model in each app.
+        // A model in each app, in the models space.
+        {trigger: ".o_erplibre_studio_rail_item[data-space=models]:enabled", run: "click"},
         {trigger: ".o_erplibre_studio_new_model", run: "click"},
         {trigger: ".o_erplibre_studio_model_dialog .o_erplibre_studio_model_label", run: "edit Tour order"},
         {trigger: ".o_erplibre_studio_model_app", run: "selectByLabel Tour shop"},
@@ -48,10 +50,14 @@ registry.category("web_tour.tours").add("erplibre_studio_j4", {
         {trigger: ".o_erplibre_studio_model_app", run: "selectByLabel Tour stock"},
         {trigger: ".o_erplibre_studio_model_save:enabled", run: "click"},
         {trigger: "body:not(:has(.o_erplibre_studio_model_dialog)) .o_erplibre_studio_model[data-model=x_tour_line]"},
-        // The form of the order before Apply: a one2many to the line.
+        // The form of the order before Apply: a one2many to the line. The
+        // page shows the model created last: the order is picked first.
+        {trigger: ".o_erplibre_studio_models_item[data-model=x_tour_order]", run: "click"},
         {trigger: `${ORDER} .o_erplibre_studio_open_model[data-view-type=form]`, run: "click"},
-        {trigger: `.o_erplibre_studio[data-view-type=form] ${ORDER}.o_erplibre_studio_model_current`},
+        {trigger: ".o_erplibre_studio[data-view-type=form][data-space=view] .o_erplibre_studio_title:contains(Tour order)"},
         {trigger: ".o_erplibre_studio_field[data-name=x_name]"},
+        // The relations come after the common types of the palette.
+        {trigger: ".o_erplibre_studio_more_types", run: "click"},
         {trigger: ".o_erplibre_studio_new_field[data-type=one2many]", run: `drag_and_drop ${LEFT}`},
         {trigger: ".o_erplibre_studio_relation_dialog .o_erplibre_studio_relation_comodel", run: "select x_tour_line"},
         {trigger: "#o_erplibre_studio_inverse_create:checked"},
@@ -67,6 +73,7 @@ registry.category("web_tour.tours").add("erplibre_studio_j4", {
         {trigger: ".o_erplibre_studio_preview_close", run: "click"},
         {trigger: ".o_erplibre_studio_sublist[data-comodel=x_tour_line]"},
         // Two groups of the first app: the admin implies the user.
+        {trigger: ".o_erplibre_studio_rail_item[data-space=security]:enabled", run: "click"},
         {trigger: ".o_erplibre_studio_apps_toggle", run: "click"},
         {trigger: `${SHOP} .o_erplibre_studio_new_group`, run: "click"},
         {trigger: ".o_erplibre_studio_group_form_name", run: "edit Tour user"},
@@ -74,8 +81,8 @@ registry.category("web_tour.tours").add("erplibre_studio_j4", {
         {trigger: ".o_erplibre_studio_group[data-group=group_tour_shop_tour_user]"},
         {trigger: `${SHOP} .o_erplibre_studio_new_group`, run: "click"},
         {trigger: ".o_erplibre_studio_group_form_name", run: "edit Tour admin"},
-        {trigger: ".o_erplibre_studio_add_implied_line", run: "selectByLabel Tour user"},
-        {trigger: ".o_erplibre_studio_implied_line:contains(Tour user)"},
+        {trigger: ".o_erplibre_studio_implied_line:contains(Tour user) input", run: "check"},
+        {trigger: ".o_erplibre_studio_implied_line:contains(Tour user) input:checked"},
         {trigger: ".o_erplibre_studio_save_group:enabled", run: "click"},
         {
             trigger:
@@ -90,10 +97,15 @@ registry.category("web_tour.tours").add("erplibre_studio_j4", {
         {trigger: "body:not(:has(.o_erplibre_studio_rule_add_group))"},
         {trigger: ".o_erplibre_studio_save_rule:enabled", run: "click"},
         {trigger: ".o_erplibre_studio_rule:contains(Tour all orders) .o_erplibre_studio_rule_global"},
-        // Apply: nothing to remove, no confirmation.
+        // Apply of the top bar opens the review; nothing leaves the
+        // database, so its Apply needs no « I understand ».
+        {trigger: ".o_erplibre_studio_apply_bar:enabled", run: "click"},
+        {trigger: ".o_erplibre_studio_review_group[data-kind=model] .o_erplibre_studio_review_item[data-type=model]"},
+        {trigger: "body:not(:has(.o_erplibre_studio_review_removal))"},
         {trigger: ".o_erplibre_studio_apply:enabled", run: "click"},
         {trigger: ".o_erplibre_studio_state[data-state=applied]"},
         // Revert lists the two models, then Cancel.
+        {trigger: ".o_erplibre_studio_apply_menu", run: "click"},
         {trigger: ".o_erplibre_studio_revert:enabled", run: "click"},
         {
             trigger:
