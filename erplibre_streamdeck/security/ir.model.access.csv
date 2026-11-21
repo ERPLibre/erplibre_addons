@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_streamdeck_workstation_user,streamdeck.workstation user,model_streamdeck_workstation,group_streamdeck_user,1,1,0,0
+access_streamdeck_device_user,streamdeck.device user,model_streamdeck_device,group_streamdeck_user,1,0,0,0
+access_streamdeck_event_user,streamdeck.event user,model_streamdeck_event,group_streamdeck_user,1,0,0,0
+access_streamdeck_device_holding_none,streamdeck.device.holding nobody,model_streamdeck_device_holding,,0,0,0,0
+access_streamdeck_pairing_code_none,streamdeck.pairing.code nobody,model_streamdeck_pairing_code,,0,0,0,0
+access_streamdeck_pairing_wizard_user,streamdeck.pairing.wizard user,model_streamdeck_pairing_wizard,group_streamdeck_user,1,1,1,0
+access_streamdeck_config_profile_user,streamdeck.config.profile user,model_streamdeck_config_profile,group_streamdeck_user,1,0,0,0
+access_streamdeck_config_profile_manager,streamdeck.config.profile manager,model_streamdeck_config_profile,group_streamdeck_manager,1,1,1,1
+access_streamdeck_config_model_user,streamdeck.config.model user,model_streamdeck_config_model,group_streamdeck_user,1,0,0,0
+access_streamdeck_config_model_manager,streamdeck.config.model manager,model_streamdeck_config_model,group_streamdeck_manager,1,1,1,1
+access_streamdeck_config_line_user,streamdeck.config.line user,model_streamdeck_config_line,group_streamdeck_user,1,1,1,1
+access_streamdeck_config_policy_manager,streamdeck.config.policy manager,model_streamdeck_config_policy,group_streamdeck_manager,1,1,1,0
+access_streamdeck_catalog_item_user,streamdeck.catalog.item user,model_streamdeck_catalog_item,group_streamdeck_user,1,0,0,0
+access_streamdeck_catalog_item_manager,streamdeck.catalog.item manager,model_streamdeck_catalog_item,group_streamdeck_manager,1,0,0,1
+access_streamdeck_key_layout_user,streamdeck.key.layout user,model_streamdeck_key_layout,group_streamdeck_user,1,1,1,1
+access_streamdeck_key_layout_key_user,streamdeck.key.layout.key user,model_streamdeck_key_layout_key,group_streamdeck_user,1,1,1,1

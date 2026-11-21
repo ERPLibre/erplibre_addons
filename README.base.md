@@ -38,6 +38,13 @@ packages the modules need are listed in `requirements.txt`.
 | `erplibre_devops_requirement` | Tracks the software requirements of an implementation project: MoSCoW level, functional domain, phase, DevSecOps stage, STRIDE threats, acceptance criteria, dependencies and the tests that prove each requirement. Ships no requirement: a project module supplies them as data. |
 | `erplibre_devops_guide` | Renders the presentation page of an implementation project from records: hero with figures, sections of cards, roadmap and counts on any model, with buttons to a URL, an action or a guided tour. Ships the engine only: a project module describes its pages in data. |
 
+### Stream Deck
+
+| Module | Description |
+|---|---|
+| `erplibre_streamdeck` | Inventory of the employees' Stream Decks: each workstation running the GNOME extension ERPLibre Home enrolls (pairing code, API key or password) and reports its decks, its deck service and their events through JSON routes authenticated by a workstation token. Every employee reads their own workstations and the decks they have held; the manager reads the whole fleet. |
+| `erplibre_streamdeck_devops_requirement` | The requirements of the ERPLibre Stream Deck (deck programs, GNOME extension ERPLibre Home, installation, games, mobile plugin, Odoo inventory) as `erplibre_devops_requirement` data, in English and Canadian French, each with the repository tests that prove it; a test runner pushes its verdict by test reference. |
+
 ### External data synchronisation
 
 | Module | Description |
@@ -143,6 +150,13 @@ besoin sont listés dans `requirements.txt`.
 |---|---|
 | `erplibre_devops_requirement` | Suit les requis logiciels d'un projet d'implantation : niveau MoSCoW, domaine fonctionnel, phase, étape DevSecOps, menaces STRIDE, critères d'acceptation, dépendances et tests qui prouvent chaque requis. Ne livre aucun requis : un module de projet les fournit en données. |
 | `erplibre_devops_guide` | Rend la page de présentation d'un projet d'implantation à partir d'enregistrements : bandeau avec chiffres, sections de cartes, feuille de route et décomptes sur n'importe quel modèle, avec boutons vers une URL, une action ou une visite guidée. Ne livre que le moteur : un module de projet décrit ses pages en données. |
+
+### Stream Deck
+
+| Module | Description |
+|---|---|
+| `erplibre_streamdeck` | Inventaire des Stream Deck des employés : chaque poste qui fait tourner l'extension GNOME ERPLibre Home s'inscrit (code d'appairage, clé d'API ou mot de passe) et remonte ses decks, son service deck et leurs événements par des routes JSON authentifiées par un jeton de poste. Chaque employé lit ses postes et les decks qu'il a tenus ; le gestionnaire lit tout le parc. |
+| `erplibre_streamdeck_devops_requirement` | Les requis du Stream Deck d'ERPLibre (programmes du deck, extension GNOME ERPLibre Home, installation, jeux, plugin mobile, inventaire Odoo) en données d'`erplibre_devops_requirement`, en anglais et en français canadien, chacun avec les tests de dépôt qui le prouvent ; un lanceur de tests pousse son verdict par la référence du test. |
 
 ### Synchronisation de données externes
 

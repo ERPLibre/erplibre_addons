@@ -1,0 +1,2437 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_streamdeck
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-10 13:34+0000\n"
+"PO-Revision-Date: 2026-11-10 13:34+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Odoo\n"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+msgid "(none)"
+msgstr "(aucun)"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__key_index
+msgid "0 is the top left key; the keys are numbered row by row."
+msgstr ""
+"0 est la touche en haut à gauche ; les touches sont numérotées rangée par "
+"rangée."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "<span class=\"me-2\">After</span>"
+msgstr "<span class=\"me-2\">Après</span>"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "<span class=\"ms-2\">hours</span>"
+msgstr "<span class=\"ms-2\">heures</span>"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "<span class=\"ms-2\">minutes</span>"
+msgstr "<span class=\"ms-2\">minutes</span>"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "A USB product id is four hexadecimal digits."
+msgstr "Un identifiant produit USB a quatre chiffres hexadécimaux."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
+msgid ""
+"A deck appears here once one of your enrolled workstations\n"
+"                reports it."
+msgstr ""
+"Un deck apparaît ici dès qu'un de vos postes inscrits\n"
+"                le signale."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A deck is reported by another workstation. A person closes the activity; a "
+"new move adds a note to it."
+msgstr ""
+"Un deck est remonté par un autre poste. Une personne ferme l'activité ; un "
+"nouveau déplacement y ajoute une note."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid "A deck is unplugged for long after %(floor)s hour at least."
+msgstr "Un deck est débranché longtemps après %(floor)s heure au moins."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_device_key_unique
+msgid "A deck key is unique."
+msgstr "La clé d'un deck est unique."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_model_usb_product_id_unique
+msgid "A deck model has one settings layer."
+msgstr "Un modèle de deck a une seule couche de réglages."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_model_product_unique
+msgid "A deck model layer has one layout."
+msgstr "Une couche de modèle de deck a une seule disposition."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_line_model_key_unique
+msgid "A deck model sets each setting once."
+msgstr "Un modèle de deck fixe chaque réglage une seule fois."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A deck stays unplugged beyond this delay. The activity closes when the deck "
+"is plugged again."
+msgstr ""
+"Un deck reste débranché au-delà de ce délai. L'activité se ferme quand le "
+"deck est rebranché."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "A key label holds at most 16 characters and no control character."
+msgstr ""
+"Le libellé d'une touche compte au plus 16 caractères, sans caractère de "
+"contrôle."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_key_layouts
+msgid ""
+"A key layout belongs to a profile, a deck model or a\n"
+"                workstation: open one of them to add its layouts."
+msgstr ""
+"Une disposition des touches appartient à un profil, à un modèle de deck ou à un\n"
+"                poste : ouvrez l'un d'eux pour lui ajouter des dispositions."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"A key layout belongs to exactly one profile, deck model or workstation."
+msgstr ""
+"Une disposition des touches appartient à exactement un profil, un modèle de "
+"deck ou un poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_key_layout_index_unique
+msgid "A layout names each key once."
+msgstr "Une disposition nomme chaque touche une seule fois."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_pairing_code_code_unique
+msgid "A pairing code is unique."
+msgstr "Un code d'appairage est unique."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "A plugin has one home key in a layout."
+msgstr "Un plugin a une seule touche d'accueil dans une disposition."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_config_profiles
+msgid ""
+"A profile is a reusable set of deck settings. Assign it to\n"
+"                workstations, or mark it selectable so that employees pick\n"
+"                it for their own workstations."
+msgstr ""
+"Un profil est un ensemble réutilisable de réglages du deck. Assignez-le à\n"
+"                des postes, ou marquez-le « au choix » pour que les employés\n"
+"                le choisissent pour leurs propres postes."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_profile_product_unique
+msgid "A profile lays out each deck model once."
+msgstr "Un profil dispose chaque modèle de deck une seule fois."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_line_profile_key_unique
+msgid "A profile sets each setting once."
+msgstr "Un profil fixe chaque réglage une seule fois."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+msgid "A setting belongs to exactly one profile, deck model or workstation."
+msgstr "Un réglage appartient à un seul profil, modèle de deck ou poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_device_holding_device_user_unique
+msgid "A user has one first holding per deck."
+msgstr "Un utilisateur a une seule première détention par deck."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_line__value
+msgid ""
+"A word for the deck program and the games, plugin ids separated by commas, a"
+" number of seconds; stored as JSON."
+msgstr ""
+"Un mot pour le programme du deck et les jeux, des identifiants de plugins "
+"séparés par des virgules, un nombre de secondes ; gardé en JSON."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A workstation goes silent. The activity closes at the next report of the "
+"workstation."
+msgstr ""
+"Un poste devient muet. L'activité se ferme à la remontée suivante du poste."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid ""
+"A workstation is silent after %(floor)s minutes at least: one missed "
+"heartbeat is not silence."
+msgstr ""
+"Un poste devient muet après %(floor)s minutes au moins : un battement manqué"
+" n'est pas un silence."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_key_layout_workstation_product_unique
+msgid "A workstation lays out each deck model once."
+msgstr "Un poste dispose chaque modèle de deck une seule fois."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_config_line_workstation_key_unique
+msgid "A workstation overrides each setting once."
+msgstr "Un poste surcharge chaque réglage une seule fois."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_silent_after_min
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"A workstation that has not reported for this delay is silent. The "
+"workstation reports every 15 minutes."
+msgstr ""
+"Un poste qui n'a rien remonté pendant ce délai est muet. Le poste remonte "
+"toutes les 15 minutes."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__absent
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__absent
+msgid "Absent"
+msgstr "Absent"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__action_id
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_catalog_item__kind__action
+msgid "Action"
+msgstr "Action"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_needaction
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+msgid "Actions"
+msgstr "Actions"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__active
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__active
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__active
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_recipient
+msgid "Activities for"
+msgstr "Activités pour"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_mail_activity
+msgid "Activity"
+msgstr "Activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_exception_decoration
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_state
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_state
+msgid "Activity State"
+msgstr "Statut de l'activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_type_icon
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône de type d'activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_manager_id
+msgid "Activity manager"
+msgstr "Gestionnaire des activités"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_pairing_wizard
+msgid "Add a Stream Deck workstation"
+msgstr "Ajouter un poste Stream Deck"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/wizard/streamdeck_pairing_wizard.py:0
+#: model:ir.actions.server,name:erplibre_streamdeck.action_streamdeck_pairing_wizard
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_pairing_wizard_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_list
+msgid "Add a workstation"
+msgstr "Ajouter un poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_workstation_user_fingerprint_unique
+msgid "An employee has one workstation per fingerprint."
+msgstr "Un employé a un seul poste par empreinte."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "An employee lays out the keys of a workstation."
+msgstr "Un employé dispose les touches d'un poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_profile__selectable
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_profile_selectable
+msgid "An employee may pick this profile for their own workstations."
+msgstr "Un employé peut choisir ce profil pour ses propres postes."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid ""
+"An employee picks a selectable configuration profile, in place of no profile"
+" or of a selectable one."
+msgstr ""
+"Un employé choisit un profil de configuration « au choix », à la place "
+"d'aucun profil ou d'un profil « au choix »."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+msgid "An employee sets the settings of a workstation."
+msgstr "Un employé règle les réglages d'un poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__visible_to_me
+msgid ""
+"An event of a deck you hold or held, dated from the first moment one of your"
+" workstations held it."
+msgstr ""
+"Un événement d'un deck que vous détenez ou avez détenu, daté à partir du "
+"premier moment où un de vos postes l'a détenu."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_event_uuid_unique
+msgid "An event uuid is unique."
+msgstr "L'UUID d'un événement est unique."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__applied
+msgid "Applied"
+msgstr "Appliquée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_applied
+msgid "Applied configuration"
+msgstr "Configuration appliquée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_applied_revision
+msgid "Applied revision"
+msgstr "Révision appliquée"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__value
+msgid ""
+"As keymap.json writes it: plugin:<id>, tiles or empty for an action, the "
+"icon name, or the USB product id of a deck model."
+msgstr ""
+"Tel que keymap.json l'écrit : plugin:<id>, tiles ou empty pour une action, "
+"le nom de l'icône, ou l'identifiant produit USB d'un modèle de deck."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__ask
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__ask
+msgid "Ask the employee"
+msgstr "Demander à l'employé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__label
+msgid "At most 16 characters; replaces the text of the plugin's home key."
+msgstr ""
+"Au plus 16 caractères ; remplace le texte de la touche d'accueil du plugin."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid ""
+"At the first report of a piloted workstation, the free settings whose local "
+"value differs from Odoo's."
+msgstr ""
+"À la première remontée d'un poste piloté, les réglages libres dont la valeur"
+" locale diffère de celle d'Odoo."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_first_pilot_policy
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_policy__first_pilot_policy
+msgid ""
+"At the first report of a piloted workstation, the free settings whose local "
+"value differs from Odoo's: the employee chooses, or this choice applies. "
+"Locked settings are always offered for the employee's confirmation."
+msgstr ""
+"À la première remontée d'un poste piloté, les réglages libres dont la valeur"
+" locale diffère de celle d'Odoo : l'employé choisit, ou ce choix s'applique."
+" Les réglages verrouillés sont toujours proposés à la confirmation de "
+"l'employé."
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_ir_attachment
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_attachment_count
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Black key"
+msgstr "Touche noire"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_catalog
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_catalog
+msgid "Catalog"
+msgstr "Catalogue"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__catalog_action_ids
+msgid "Catalog actions"
+msgstr "Actions du catalogue"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__drift
+msgid "Changed locally"
+msgstr "Changée localement"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__moved
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Changed workstation"
+msgstr "Changé de poste"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_workstations
+msgid ""
+"Click Add a workstation to get a pairing code, then enroll\n"
+"                this database from the preferences of the ERPLibre Home\n"
+"                extension on the workstation."
+msgstr ""
+"Cliquez sur Ajouter un poste pour obtenir un code d'appairage,\n"
+"                puis inscrivez cette base depuis les préférences de\n"
+"                l'extension ERPLibre Home sur le poste."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_pairing_wizard_form
+msgid "Close"
+msgstr "Fermer"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_mail__streamdeck_activity_created
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_message__streamdeck_activity_created
+msgid "Closed activity created on"
+msgstr "Création de l'activité fermée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__code
+msgid "Code"
+msgstr "Code"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__cols
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__cols
+msgid "Columns"
+msgstr "Colonnes"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_state
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_configuration
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_applied
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Configuration applied"
+msgstr "Configuration appliquée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_written
+msgid "Configuration in the file"
+msgstr "Configuration dans le fichier"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_line_ids
+msgid "Configuration overrides"
+msgstr "Surcharges de configuration"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Configuration pending"
+msgstr "Configuration en attente"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_pending_since
+msgid "Configuration pending since"
+msgstr "Configuration en attente depuis"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_profile_id
+msgid "Configuration profile"
+msgstr "Profil de configuration"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_refused
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Configuration refused"
+msgstr "Configuration refusée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_revision
+msgid "Configuration revision"
+msgstr "Révision de la configuration"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__connected
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
+msgid "Connected"
+msgstr "Branché"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__connected_since
+msgid "Connected since"
+msgstr "Branché depuis"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__contract_version
+msgid "Contract version"
+msgstr "Version du contrat"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_config_profiles
+msgid "Create a configuration profile"
+msgstr "Créez un profil de configuration"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid "Create the keys"
+msgstr "Créer les touches"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_config_models
+msgid "Create the settings of a deck model"
+msgstr "Créez les réglages d'un modèle de deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__create_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__create_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__workstation_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
+msgid "Current workstation"
+msgstr "Poste actuel"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__device_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__device_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Deck"
+msgstr "Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_moved
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_moved
+msgid "Deck changed workstation"
+msgstr "Deck changé de poste"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__model_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__name
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_catalog_item__kind__model
+msgid "Deck model"
+msgstr "Modèle de deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__model_id
+msgid "Deck model layer"
+msgstr "Couche du modèle de deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_config_models
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_models
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+msgid "Deck models"
+msgstr "Modèles de deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
+msgid "Deck plugins"
+msgstr "Plugins du deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__deck_program
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__deck_program
+msgid "Deck program"
+msgstr "Programme du deck"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Deck serial number"
+msgstr "Numéro de série du deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__service_state
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__service_state
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Deck service"
+msgstr "Service du deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_service_failed
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_service_failed
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Deck service failed"
+msgstr "Service du deck en échec"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__service_state_since
+msgid "Deck service state since"
+msgstr "État du service du deck depuis"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_unplugged
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_unplugged
+msgid "Deck unplugged for long"
+msgstr "Deck débranché longtemps"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_fleet_decks
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__device_ids
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet_decks
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Decks"
+msgstr "Decks"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid ""
+"Decks of several models are connected to this\n"
+"                                workstation: the settings of their models\n"
+"                                apply by ascending USB product id, the highest\n"
+"                                one winning."
+msgstr ""
+"Des decks de plusieurs modèles sont branchés à ce\n"
+"                                poste : les réglages de leurs modèles\n"
+"                                s'appliquent par identifiant produit USB croissant,\n"
+"                                le plus grand l'emportant."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_several_models
+msgid ""
+"Decks of several models that have a settings layer are connected: their "
+"layers apply by ascending USB product id."
+msgstr ""
+"Des decks de plusieurs modèles qui ont une couche de réglages sont branchés "
+": leurs couches s'appliquent par identifiant produit USB croissant."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__device_ids
+msgid "Decks whose last report came from this workstation."
+msgstr "Les decks dont la dernière remontée vient de ce poste."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
+msgid "Disconnected"
+msgstr "Débranché"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__display_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__erplibre_branch
+msgid "ERPLibre branch"
+msgstr "Branche ERPLibre"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__erplibre_commit
+msgid "ERPLibre commit"
+msgstr "Commit ERPLibre"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_effective_html
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Effective configuration"
+msgstr "Configuration effective"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__user_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__employee_name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__user_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__user_id
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__employee
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__source__employee
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_key_layout__source__employee
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Employee"
+msgstr "Employé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__both
+msgid "Employee and manager"
+msgstr "Employé et gestionnaire"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__token_active
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Enrolled"
+msgstr "Inscrit"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__label
+msgid "Event"
+msgstr "Événement"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_fleet_events
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__event_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__event_ids
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet_events
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Events"
+msgstr "Événements"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__lost_events_total
+msgid ""
+"Events the workstation dropped unsent because its offline queue was full or "
+"too old: the largest running total it reported, so a report sent again "
+"changes nothing."
+msgstr ""
+"Les événements que le poste a abandonnés sans les envoyer, sa file hors "
+"ligne étant pleine ou trop ancienne : le plus grand total cumulé qu'il a "
+"remonté, si bien qu'une remontée renvoyée ne change rien."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__expires_at
+msgid "Expires at"
+msgstr "Expire le"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_too_old
+msgid "Extension too old to pilot"
+msgstr "Extension trop ancienne pour le pilotage"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__extension_version
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Extension version"
+msgstr "Version de l'extension"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__failed
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__failed
+msgid "Failed"
+msgstr "En échec"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__fingerprint
+msgid "Fingerprint"
+msgstr "Empreinte"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__firmware
+msgid "Firmware"
+msgstr "Firmware"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_config_policy
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_first_pilot_policy
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__first_pilot_policy
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_policy
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid "First pilot"
+msgstr "Premier pilotage"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_first_choice
+msgid "First pilot choice"
+msgstr "Choix du premier pilotage"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_policy
+msgid "First pilot policy"
+msgstr "Politique du premier pilotage"
+
+#. module: erplibre_streamdeck
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet
+msgid "Fleet"
+msgstr "Parc"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_follower_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_partner_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_type_icon
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__workstation_ids
+msgid "For an action, the workstations whose last catalog offered it."
+msgstr "Pour une action, les postes dont le dernier catalogue l'a offerte."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_mail_mail__streamdeck_activity_created
+#: model:ir.model.fields,help:erplibre_streamdeck.field_mail_message__streamdeck_activity_created
+msgid ""
+"For the message that closes an activity of a deck, the creation of that "
+"activity, which bounds who reads it."
+msgstr ""
+"Pour le message qui ferme une activité d'un deck, la création de cette "
+"activité, qui borne qui le lit."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_model__usb_product_id
+msgid "Four hexadecimal digits, as the deck reports them."
+msgstr "Quatre chiffres hexadécimaux, tels que le deck les remonte."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__usb_product_id
+msgid "Four hexadecimal digits: the deck model this layout is for."
+msgstr ""
+"Quatre chiffres hexadécimaux : le modèle de deck de cette disposition."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_ir_attachment__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_activity__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_mail__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_mail_message__streamdeck_visible_to_me
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_thread_visibility__streamdeck_visible_to_me
+msgid "From my deck holding"
+msgstr "Depuis ma détention du deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__visible_to_me
+msgid "From my holding"
+msgstr "Depuis ma détention"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__gnome_shell
+msgid "GNOME Shell version"
+msgstr "Version de GNOME Shell"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__games
+msgid "Games"
+msgstr "Jeux"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_revision
+msgid "Grows each time the effective configuration changes."
+msgstr "Augmente à chaque changement de la configuration effective."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__fingerprint
+msgid ""
+"HMAC-SHA256 of the machine identifier, keyed by the Linux user, the URL of "
+"this Odoo and this database: the raw identifier never leaves the "
+"workstation, and two Odoo destinations cannot match the same workstation."
+msgstr ""
+"HMAC-SHA256 de l'identifiant de la machine, avec pour clé l'utilisateur "
+"Linux, l'URL de cet Odoo et cette base : l'identifiant brut ne quitte jamais"
+" le poste, et deux destinations Odoo ne peuvent pas recouper le même poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__has_message
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__file_hash
+msgid "Hash in the workstation's file"
+msgstr "Empreinte dans le fichier du poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__held_by_me
+msgid "Held by me"
+msgstr "Détenu par moi"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__since
+msgid "Held since"
+msgstr "Détenu depuis"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__name
+msgid "Host name given at enrollment; the employee may rename it."
+msgstr "Nom d'hôte donné à l'inscription ; l'employé peut le renommer."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__id
+msgid "ID"
+msgstr "ID"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_exception_icon
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__icon_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_icon
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_catalog_item__kind__icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_exception_icon
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+msgid "Icons"
+msgstr "Icônes"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_needaction
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_has_error
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__service_state__inactive
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__service_state__inactive
+msgid "Inactive"
+msgstr "Arrêté"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+msgid "Invalid value for the Stream Deck setting %(key)s."
+msgstr "Valeur invalide pour le réglage Stream Deck %(key)s."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_is_follower
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_written
+msgid ""
+"JSON of the settings of the last revision written to the workstation's file:"
+" the applied one, or a later one refused after its write. A local change is "
+"measured against them."
+msgstr ""
+"JSON des réglages de la dernière révision écrite dans le fichier du poste : "
+"l'appliquée, ou une plus récente refusée après son écriture. Un changement "
+"local se mesure par rapport à eux."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_offered
+msgid "JSON of the settings of the offered revision."
+msgstr "JSON des réglages de la révision proposée."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_applied
+msgid "JSON of the settings the workstation last applied."
+msgstr "JSON des réglages que le poste a appliqués en dernier."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__keep_local
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__keep_local
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_first_choice__keep_local
+msgid "Keep local values"
+msgstr "Garder les valeurs locales"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__in_file
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
+msgid "Kept in the workstation's file"
+msgstr "Gardée dans le fichier du poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__key
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__key_index
+msgid "Key"
+msgstr "Clé"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Key %(index)s is not a key of the deck model %(model)s."
+msgstr "La touche %(index)s n'est pas une touche du modèle de deck %(model)s."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__layout_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid "Key layout"
+msgstr "Disposition des touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_key_layouts
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__layout_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__layout_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__layout_ids
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_layouts
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_model_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
+msgid "Key layouts"
+msgstr "Dispositions des touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_layouts_html
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Key layouts of the connected decks"
+msgstr "Dispositions des touches des decks branchés"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Key layouts of this workstation"
+msgstr "Dispositions des touches de ce poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__key_count
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__key_ids
+msgid "Keys"
+msgstr "Touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__kind
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__kind
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_catalog_item_search
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Kind"
+msgstr "Sorte"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__label
+msgid "Label"
+msgstr "Libellé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__write_uid
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__write_uid
+msgid "Last Updated by"
+msgstr "Dernière modification par"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_policy__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device_holding__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout_key__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__write_date
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__write_date
+msgid "Last Updated on"
+msgstr "Dernière modification le"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__last_report
+msgid "Last report"
+msgstr "Dernière remontée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__last_seen
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__last_seen
+msgid "Last seen"
+msgstr "Vu pour la dernière fois"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_key_layouts
+msgid "Lay out the home keys of a deck model"
+msgstr "Disposez les touches d'accueil d'un modèle de deck"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid "Layer"
+msgstr "Couche"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_adopted
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Local setting adopted"
+msgstr "Réglage local adopté"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid "Lock"
+msgstr "Verrou"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__locked
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__locked
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
+msgid "Locked"
+msgstr "Verrouillé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_line__locked
+msgid "Locked by the manager: no later layer and no employee changes it."
+msgstr ""
+"Verrouillé par le gestionnaire : aucune couche suivante ni aucun employé ne "
+"le change."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__locked
+msgid ""
+"Locked by the manager: no later layer and no employee changes the layout of "
+"this deck model."
+msgstr ""
+"Verrouillée par le gestionnaire : aucune couche suivante ni aucun employé ne"
+" change la disposition de ce modèle de deck."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid ""
+"Locked settings are always offered to the employee, who confirms them as any"
+" new configuration."
+msgstr ""
+"Les réglages verrouillés sont toujours proposés à l'employé, qui les "
+"confirme comme toute nouvelle configuration."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__lost_events_total
+msgid "Lost events"
+msgstr "Événements perdus"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_activity_recipient__manager
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__source__manager
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_key_layout__source__manager
+#: model:res.groups,name:erplibre_streamdeck.group_streamdeck_manager
+msgid "Manager"
+msgstr "Gestionnaire"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_mail_message
+msgid "Message"
+msgstr "Message"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_has_error
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__model_name
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_device_search
+msgid "Model"
+msgstr "Modèle"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "Monitoring"
+msgstr "Surveillance"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__my_activity_date_deadline
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Échéance de mon activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_my_decks
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_my_decks
+msgid "My decks"
+msgstr "Mes decks"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_my_workstations
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_my_workstations
+msgid "My workstations"
+msgstr "Mes postes"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__name
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid ""
+"Name the manager who receives the Stream Deck activities, or send them to "
+"the employee only."
+msgstr ""
+"Nommez le gestionnaire qui reçoit les activités Stream Deck, ou envoyez-les "
+"à l'employé seulement."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_date_deadline
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Échéance de la prochaine activité"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_summary
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_type_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activités à venir"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid "No deck is connected to this workstation."
+msgstr "Aucun deck n'est branché à ce poste."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_decks
+msgid "No deck reported yet"
+msgstr "Aucun deck remonté pour l'instant"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid ""
+"No layer lays out this deck model, and Odoo sends it no layout: the deck "
+"keeps the layout last applied to its keymap.json, if any, else places its "
+"keys itself."
+msgstr ""
+"Aucune couche ne dispose ce modèle de deck, et Odoo ne lui envoie aucune "
+"disposition : le deck garde la dernière disposition appliquée à son "
+"keymap.json, s'il y en a une, sinon il place lui-même ses touches."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_catalog
+msgid "No workstation reported its catalog yet"
+msgstr "Aucun poste n'a encore remonté son catalogue"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_my_workstations
+msgid "No workstation reports to this database yet"
+msgstr "Aucun poste ne remonte encore vers cette base"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Not enrolled"
+msgstr "Non inscrit"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_needaction_counter
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__message_has_error_counter
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__key_count
+msgid "Number of keys"
+msgstr "Nombre de touches"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_needaction_counter
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__message_has_error_counter
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"Odoo does not hold the keys of this layout, kept in the workstation's file: "
+"create its keys before locking it."
+msgstr ""
+"Odoo ne tient pas les touches de cette disposition, gardée dans le fichier "
+"du poste : créez ses touches avant de la verrouiller."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid "Odoo manages no setting of this workstation."
+msgstr "Odoo ne gère aucun réglage de ce poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__workstation_ids
+msgid "Offered by"
+msgstr "Offert par"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_offered
+msgid "Offered configuration"
+msgstr "Configuration proposée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_hash
+msgid "Offered configuration hash"
+msgstr "Empreinte de la configuration proposée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_revision
+msgid "Offered revision"
+msgstr "Révision proposée"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_pairing_wizard_form
+msgid ""
+"On the workstation, open the preferences of the ERPLibre\n"
+"                    Home extension, page Odoo inventory, and enroll this\n"
+"                    database with the method Pairing code. The code works\n"
+"                    once, until the time below."
+msgstr ""
+"Sur le poste, ouvrez les préférences de l'extension ERPLibre\n"
+"                    Home, page Inventaire Odoo, et inscrivez cette base par\n"
+"                    la méthode Code d'appairage. Le code sert une seule\n"
+"                    fois, jusqu'à l'heure ci-dessous."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__held_by_me
+msgid "One of your workstations holds this deck or held it."
+msgstr "Un de vos postes détient ce deck ou l'a détenu."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Only a Stream Deck manager sets locks, profiles and deck models."
+msgstr ""
+"Seul un gestionnaire Stream Deck pose les verrous, les profils et les "
+"modèles de deck."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/wizard/streamdeck_config_policy.py:0
+msgid "Only a Stream Deck manager sets the first-pilot policy."
+msgstr ""
+"Seul un gestionnaire du Stream Deck règle la politique du premier pilotage."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "Only the Stream Deck monitoring opens activities of this type."
+msgstr "Seule la surveillance Stream Deck ouvre des activités de ce type."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activities_enabled
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"Open an Odoo activity for each problem the monitoring detects, and close it "
+"when the problem is solved. Without it, the monitoring only writes the "
+"history."
+msgstr ""
+"Ouvrir une activité Odoo pour chaque problème que la surveillance détecte, "
+"et la fermer quand le problème est réglé. Sans cela, la surveillance n'écrit"
+" que l'historique."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__os_name
+msgid "Operating system"
+msgstr "Système d'exploitation"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__os_version
+msgid "Operating system version"
+msgstr "Version du système d'exploitation"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Overrides of this workstation"
+msgstr "Surcharges de ce poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__code
+msgid "Pairing code"
+msgstr "Code d'appairage"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__pending
+msgid "Pending"
+msgstr "En attente"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__plugged
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Plugged"
+msgstr "Branché"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "Plugin %(id)s"
+msgstr "Plugin %(id)s"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__plugins_off
+msgid "Plugins turned off"
+msgstr "Plugins coupés"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
+msgid ""
+"Plugins with a home key that the workstations offer, those of its own "
+"workstation for a workstation's layout, and that this layout does not name: "
+"they get no key on the home screen."
+msgstr ""
+"Les plugins à touche d'accueil qu'offrent les postes, ceux de son propre "
+"poste pour la disposition d'un poste, et que cette disposition ne nomme pas "
+": ils n'ont pas de touche à l'écran d'accueil."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__missing_plugins
+msgid "Plugins without a key"
+msgstr "Plugins sans touche"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__preview_html
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid "Preview"
+msgstr "Aperçu"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__previous_workstation_id
+msgid "Previous workstation"
+msgstr "Poste précédent"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__previous_workstation_name
+msgid "Previous workstation name"
+msgstr "Nom du poste précédent"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "Problems that open an activity"
+msgstr "Problèmes qui ouvrent une activité"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__profile_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__profile_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Profile"
+msgstr "Profil"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_profile_selectable
+msgid "Profile selectable"
+msgstr "Profil au choix"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_config_profiles
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_config_profiles
+msgid "Profiles"
+msgstr "Profils"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__received_at
+msgid "Received"
+msgstr "Reçu"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_reason
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_reason
+msgid "Refusal reason"
+msgstr "Raison du refus"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__refused
+msgid "Refused"
+msgstr "Refusée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__icon_id
+msgid "Replaces the icon of the plugin's home key."
+msgstr "Remplace l'icône de la touche d'accueil du plugin."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Reports"
+msgstr "Remontées"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "Resolved at %s: %s"
+msgstr "Résolu à %s : %s"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__activity_user_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Revoke the token"
+msgstr "Révoquer le jeton"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__rows
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__rows
+msgid "Rows"
+msgstr "Rangées"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__token_hash
+msgid ""
+"SHA-256 of the workstation token; the token itself is kept only by the "
+"workstation."
+msgstr ""
+"SHA-256 du jeton du poste ; le jeton lui-même n'est gardé que par le poste."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_policy_form
+msgid "Save"
+msgstr "Enregistrer"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__selectable
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_search
+msgid "Selectable"
+msgstr "Au choix"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__serial
+msgid "Serial number"
+msgstr "Numéro de série"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Service absent"
+msgstr "Service absent"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__service_changed
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Service changed"
+msgstr "Service changé"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Service failed"
+msgstr "Service en échec"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_service_failed_after_min
+msgid "Service failed for (minutes)"
+msgstr "Service en échec depuis (minutes)"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Service started"
+msgstr "Service démarré"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_event.py:0
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Service stopped"
+msgstr "Service arrêté"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__key__session_refresh_sec
+msgid "Session refresh (seconds)"
+msgstr "Rafraîchissement de session (secondes)"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_first_choice
+msgid ""
+"Set once, at the first pilot of the workstation, by the employee's answer or"
+" by the organisation's policy."
+msgstr ""
+"Fixé une seule fois, au premier pilotage du poste, par la réponse de "
+"l'employé ou par la politique de l'organisation."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__silent_since
+msgid ""
+"Set when the workstation has not reported for the silent delay, dated the "
+"end of that delay; its next report clears it."
+msgstr ""
+"Posé quand le poste n'a rien remonté pendant le délai de silence, daté de la"
+" fin de ce délai ; sa remontée suivante l'efface."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__key
+msgid "Setting"
+msgstr "Réglage"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__config_drift
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Setting changed locally"
+msgstr "Réglage changé localement"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_settings
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__line_ids
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__line_ids
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_settings
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_model_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
+msgid "Settings"
+msgstr "Paramètres"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_ask
+msgid "Settings asked"
+msgstr "Réglages demandés"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__config_keys
+msgid "Settings involved"
+msgstr "Réglages concernés"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__config_several_models
+msgid "Several deck models"
+msgstr "Plusieurs modèles de deck"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
+msgid "Silent"
+msgstr "Muets"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_silent_after_min
+msgid "Silent after (minutes)"
+msgstr "Muet après (minutes)"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__silent_since
+msgid "Silent since"
+msgstr "Muet depuis"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__source
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__source
+msgid "Source"
+msgstr "Source"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "State"
+msgstr "État"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_state
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Statut basé sur les activités\n"
+"En retard : la date d'échéance est déjà dépassée\n"
+"Aujourd'hui : la date d'activité est aujourd'hui\n"
+"Planifiée : activités futures"
+
+#. module: erplibre_streamdeck
+#: model:ir.module.category,name:erplibre_streamdeck.module_category_streamdeck
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_root
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid "Stream Deck"
+msgstr "Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_catalog_item
+msgid "Stream Deck catalog item"
+msgstr "Élément du catalogue Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_model
+msgid "Stream Deck configuration of a deck model"
+msgstr "Configuration Stream Deck d'un modèle de deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_profile
+msgid "Stream Deck configuration profile"
+msgstr "Profil de configuration Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_schema
+msgid "Stream Deck configuration schema"
+msgstr "Schéma de configuration Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_config_line
+msgid "Stream Deck configuration setting"
+msgstr "Réglage de configuration Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_activities_enabled
+msgid "Stream Deck detection activities"
+msgstr "Activités de détection Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_device
+msgid "Stream Deck device"
+msgstr "Deck Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_device_holding
+msgid "Stream Deck device holding"
+msgstr "Détention d'un Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_event
+msgid "Stream Deck event"
+msgstr "Événement Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_key_layout
+msgid "Stream Deck key layout"
+msgstr "Disposition des touches Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_key_layout_key
+msgid "Stream Deck key of a layout"
+msgstr "Touche Stream Deck d'une disposition"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_monitor
+msgid "Stream Deck monitoring"
+msgstr "Surveillance Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_pairing_code
+msgid "Stream Deck pairing code"
+msgstr "Code d'appairage Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_thread_visibility
+msgid "Stream Deck thread visibility"
+msgstr "Visibilité du fil Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_workstation
+msgid "Stream Deck workstation"
+msgstr "Poste Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_streamdeck_service
+msgid "Stream Deck workstation service"
+msgstr "Service des postes Stream Deck"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.server,name:erplibre_streamdeck.ir_cron_streamdeck_watch_ir_actions_server
+msgid "Stream Deck: watch workstations and decks"
+msgstr "Stream Deck : surveiller les postes et les decks"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__res_config_settings__streamdeck_first_pilot_policy__take_odoo
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_policy__first_pilot_policy__take_odoo
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_first_choice__take_odoo
+msgid "Take Odoo's values"
+msgstr "Prendre les valeurs d'Odoo"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "The Stream Deck manager locked the key layout of this deck model."
+msgstr ""
+"Le gestionnaire Stream Deck a verrouillé la disposition des touches de ce "
+"modèle de deck."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_config.py:0
+msgid ""
+"The Stream Deck manager locked the setting %(key)s of this workstation."
+msgstr ""
+"Le gestionnaire Stream Deck a verrouillé le réglage %(key)s de ce poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_manager_id
+msgid "The Stream Deck manager who receives the activities."
+msgstr "Le gestionnaire Stream Deck qui reçoit les activités."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "The action of a key is an action."
+msgstr "L'action d'une touche est une action."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__catalog_action_ids
+msgid "The actions the last catalog of this workstation offered."
+msgstr "Les actions qu'a offertes le dernier catalogue de ce poste."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.constraint,message:erplibre_streamdeck.constraint_streamdeck_catalog_item_kind_value_unique
+msgid "The catalog holds each item once."
+msgstr "Le catalogue contient chaque élément une seule fois."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_too_old
+msgid ""
+"The contract version the workstation reports is older than the first one "
+"that takes in the managed configuration."
+msgstr ""
+"La version de contrat que remonte le poste est plus ancienne que la première"
+" qui reçoit la configuration gérée."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "The deck has been unplugged for at least %(hours)s hours."
+msgstr "Le deck est débranché depuis au moins %(hours)s heures."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "The deck moved from workstation %(previous)s to %(current)s."
+msgstr "Le deck est passé du poste %(previous)s au poste %(current)s."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid ""
+"The deck service has been in the failed state for at least %(minutes)s "
+"minutes."
+msgstr "Le service du deck est en échec depuis au moins %(minutes)s minutes."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+msgid ""
+"The deck service of a workstation stays failed beyond this delay. The "
+"activity closes when the service leaves the failed state."
+msgstr ""
+"Le service du deck d'un poste reste en échec au-delà de ce délai. L'activité"
+" se ferme quand le service quitte l'échec."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_service_failed_after_min
+msgid ""
+"The deck service restarts by itself after a failure: a failure shorter than "
+"this delay opens no activity."
+msgstr ""
+"Le service du deck se relance seul après un échec : un échec plus court que "
+"ce délai n'ouvre aucune activité."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/res_config_settings.py:0
+msgid "The delay of a failed deck service is %(floor)s minutes at least."
+msgstr ""
+"Le délai d'un service du deck en échec est de %(floor)s minutes au moins."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_res_config_settings__streamdeck_activity_recipient
+msgid ""
+"The employee is the one of the workstation, or of the workstation that holds"
+" the deck. Both give one activity to each."
+msgstr ""
+"L'employé est celui du poste, ou du poste qui tient le deck. Les deux "
+"donnent une activité à chacun."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid ""
+"The extension of this workstation is too old\n"
+"                                for Odoo to pilot its deck: piloting starts\n"
+"                                with contract 1.3 of the extension."
+msgstr ""
+"L'extension de ce poste est trop ancienne\n"
+"                                pour qu'Odoo pilote son deck : le pilotage commence\n"
+"                                avec le contrat 1.3 de l'extension."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_ask
+msgid ""
+"The free settings, separated by commas, whose local value the employee is "
+"asked to keep or replace by Odoo's: the first pilot waits for their choice."
+msgstr ""
+"Les réglages libres, séparés par des virgules, dont l'employé est appelé à "
+"garder la valeur locale ou à la remplacer par celle d'Odoo : le premier "
+"pilotage attend son choix."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout_key__action_id
+msgid ""
+"The home key of a plugin, a key of the dashboard, or a black key; empty, the"
+" deck program uses the key as it sees fit."
+msgstr ""
+"La touche d'accueil d'un plugin, une touche du tableau de bord ou une touche"
+" noire ; vide, le programme du deck se sert de la touche à sa guise."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid "The icon of a key is an icon."
+msgstr "L'icône d'une touche est une icône."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__deck_plugins
+msgid ""
+"The ids of the deck plugins found on the workstation's disk, separated by "
+"commas, as its last report of protocol 1.1 or later listed them."
+msgstr ""
+"Les identifiants des plugins du deck trouvés sur le disque du poste, séparés"
+" par des virgules, tels que sa dernière remontée en protocole 1.1 ou plus "
+"récent les a listés."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__layout_ids
+msgid ""
+"The key layouts of this workstation, over those of its profile and of its "
+"deck models."
+msgstr ""
+"Les dispositions des touches de ce poste, par-dessus celles de son profil et"
+" de ses modèles de deck."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The keys of the deck model %(model)s are unknown until a workstation reports"
+" its catalog."
+msgstr ""
+"Les touches du modèle de deck %(model)s sont inconnues tant qu'un poste n'a "
+"pas remonté son catalogue."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The keys of this deck model are unknown until a workstation reports its "
+"catalog."
+msgstr ""
+"Les touches de ce modèle de deck sont inconnues tant qu'un poste n'a pas "
+"remonté son catalogue."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The layout of a deck model layer is for the USB product id of that model."
+msgstr ""
+"La disposition d'une couche de modèle de deck est pour l'identifiant produit"
+" USB de ce modèle."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__config_keys
+msgid "The managed settings the event is about."
+msgstr "Les réglages gérés dont parle l'événement."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__config_profile_id
+msgid ""
+"The manager assigns any profile; the employee picks a selectable one, unless"
+" the manager assigned one that is not."
+msgstr ""
+"Le gestionnaire assigne n'importe quel profil ; l'employé en choisit un « au"
+" choix », sauf si le gestionnaire en a assigné un qui ne l'est pas."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_config_models
+msgid ""
+"The settings of a deck model apply to every workstation to\n"
+"                which a deck of that USB product id is connected, over its\n"
+"                profile."
+msgstr ""
+"Les réglages d'un modèle de deck s'appliquent à tout poste auquel\n"
+"                un deck de cet identifiant produit USB est branché, par-dessus\n"
+"                son profil."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "The workstation has sent no report for %(minutes)s minutes."
+msgstr "Le poste n'a envoyé aucune remontée depuis %(minutes)s minutes."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__token_active
+msgid "The workstation holds a token that this database accepts."
+msgstr "Le poste détient un jeton que cette base accepte."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid ""
+"The workstation will stop reporting until it is enrolled again. Revoke its "
+"token?"
+msgstr ""
+"Le poste cessera ses remontées jusqu'à sa prochaine inscription. Révoquer "
+"son jeton ?"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__in_file
+msgid ""
+"The workstation's keymap.json holds a layout edited by hand, which Odoo "
+"adopted: Odoo sends no layout for this deck model. Create or change a key to"
+" send this one again."
+msgstr ""
+"Le keymap.json du poste contient une disposition modifiée à la main, qu'Odoo"
+" a adoptée : Odoo n'envoie aucune disposition pour ce modèle de deck. Créez "
+"ou changez une touche pour renvoyer celle-ci."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_form
+msgid ""
+"The workstation's keymap.json holds this layout,\n"
+"                        edited on the workstation: Odoo sends no layout for\n"
+"                        this deck model. Create or change a key to send this\n"
+"                        one again."
+msgstr ""
+"Le keymap.json du poste contient cette disposition,\n"
+"                        modifiée sur le poste : Odoo n'envoie aucune disposition pour\n"
+"                        ce modèle de deck. Créez ou changez une touche pour renvoyer\n"
+"                        celle-ci."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_key_layout.py:0
+msgid ""
+"The workstation's keymap.json holds this layout, edited on the workstation: "
+"Odoo sends no layout for this deck model."
+msgstr ""
+"Le keymap.json du poste contient cette disposition, modifiée sur le poste : "
+"Odoo n'envoie aucune disposition pour ce modèle de deck."
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.actions.act_window,help:erplibre_streamdeck.action_streamdeck_catalog
+msgid ""
+"The workstations report the actions, icons and deck models\n"
+"                that their deck program offers; the key layouts choose from\n"
+"                them."
+msgstr ""
+"Les postes remontent les actions, les icônes et les modèles de deck\n"
+"                qu'offre leur programme du deck ; les dispositions des touches y\n"
+"                choisissent."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+msgid ""
+"These workstation fields come from the workstation's reports and cannot be "
+"changed by hand: %(fields)s"
+msgstr ""
+"Ces champs du poste viennent de ses remontées et ne se modifient pas à la "
+"main : %(fields)s"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__at
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Time"
+msgstr "Heure"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__token_created
+msgid "Token created"
+msgstr "Jeton créé le"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__token_hash
+msgid "Token hash"
+msgstr "Empreinte du jeton"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_workstation__token_last_used
+msgid "Token last used"
+msgstr "Jeton utilisé pour la dernière fois"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_device__activity_exception_decoration
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_model__usb_product_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_device__usb_product_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__usb_product_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_key_layout_search
+msgid "USB product id"
+msgstr "Identifiant produit USB"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__uuid
+msgid "UUID"
+msgstr "UUID"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_workstation__config_state__unmanaged
+msgid "Unmanaged"
+msgstr "Non gérée"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__unplugged
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Unplugged"
+msgstr "Débranché"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_unplugged_after_h
+msgid "Unplugged for long after (hours)"
+msgstr "Débranché longtemps après (heures)"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_code__used
+msgid "Used"
+msgstr "Utilisé"
+
+#. module: erplibre_streamdeck
+#: model:ir.model,name:erplibre_streamdeck.model_res_users
+#: model:res.groups,name:erplibre_streamdeck.group_streamdeck_user
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_pairing_wizard__expires_at
+msgid "Valid until"
+msgstr "Valable jusqu'au"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_catalog_item__value
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__value
+msgid "Value"
+msgstr "Valeur"
+
+#. module: erplibre_streamdeck
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid ""
+"Waiting for the employee's choice: keep the\n"
+"                                local values of these settings or take\n"
+"                                Odoo's."
+msgstr ""
+"En attente du choix de l'employé : garder les\n"
+"                                valeurs locales de ces réglages ou prendre\n"
+"                                celles d'Odoo."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_catalog_item__last_seen
+msgid ""
+"When a workstation last reported this item; empty for an item the module "
+"ships."
+msgstr ""
+"Quand un poste a remonté cet élément pour la dernière fois ; vide pour un "
+"élément que livre le module."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_workstation__service_state_since
+msgid ""
+"When this database first received the current state of the deck service."
+msgstr ""
+"Moment où cette base a reçu pour la première fois l'état actuel du service "
+"du deck."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_key_layout__source
+msgid ""
+"Who set the layout: the manager, the employee, or the workstation's own "
+"file, adopted by Odoo."
+msgstr ""
+"Qui a fixé la disposition : le gestionnaire, l'employé, ou le fichier du "
+"poste, adopté par Odoo."
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_config_line__source
+msgid ""
+"Who set the value: the manager, the employee, or the workstation's own file,"
+" adopted by Odoo."
+msgstr ""
+"Qui a fixé la valeur : le gestionnaire, l'employé, ou le fichier du poste "
+"lui-même, adopté par Odoo."
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_workstation.py:0
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_line__workstation_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__workstation_id
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_key_layout__workstation_id
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_form
+msgid "Workstation"
+msgstr "Poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_config_line__source__local
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_key_layout__source__local
+msgid "Workstation file"
+msgstr "Fichier du poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__heard_again
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Workstation heard again"
+msgstr "Poste revenu"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__workstation_name
+msgid "Workstation name"
+msgstr "Nom du poste"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_res_config_settings__streamdeck_alert_silent
+#: model:ir.model.fields.selection,name:erplibre_streamdeck.selection__streamdeck_event__kind__silent
+#: model:mail.activity.type,name:erplibre_streamdeck.activity_type_streamdeck_silent
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_event_search
+msgid "Workstation silent"
+msgstr "Poste muet"
+
+#. module: erplibre_streamdeck
+#: model:ir.actions.act_window,name:erplibre_streamdeck.action_streamdeck_fleet_workstations
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_config_profile__workstation_ids
+#: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet_workstations
+#: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
+msgid "Workstations"
+msgstr "Postes"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the assigned user is archived"
+msgstr "l'utilisateur assigné est archivé"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck is plugged in again"
+msgstr "le deck est rebranché"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck service is absent"
+msgstr "le service du deck est absent"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck service is active"
+msgstr "le service du deck est actif"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the deck service is stopped"
+msgstr "le service du deck est arrêté"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the workstation is archived"
+msgstr "le poste est archivé"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the workstation is unenrolled"
+msgstr "le poste est désinscrit"
+
+#. module: erplibre_streamdeck
+#. odoo-python
+#: code:addons/erplibre_streamdeck/models/streamdeck_monitor.py:0
+msgid "the workstation reported again"
+msgstr "le poste est revenu"

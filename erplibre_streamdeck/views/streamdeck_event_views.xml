@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Le poste et l'employé d'un événement s'affichent par leur copie
+         sur l'événement : un employé lit l'historique d'un deck prêté sans
+         lire le poste où il se trouve. Le poste qu'un déplacement a quitté
+         s'affiche de même, par sa copie. -->
+    <record id="view_streamdeck_event_list" model="ir.ui.view">
+        <field name="name">streamdeck.event.list</field>
+        <field name="model">streamdeck.event</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false">
+                <field name="at"/>
+                <field name="label"/>
+                <field name="kind" optional="hide"/>
+                <field name="device_id"/>
+                <field name="workstation_name"/>
+                <field name="employee_name"/>
+                <field name="previous_workstation_name" optional="show"/>
+                <field name="service_state" optional="hide"/>
+                <field name="config_revision" optional="hide"/>
+                <field name="config_keys" optional="hide"/>
+                <field name="received_at" optional="hide"/>
+                <field name="uuid" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_streamdeck_event_form" model="ir.ui.view">
+        <field name="name">streamdeck.event.form</field>
+        <field name="model">streamdeck.event</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="label"/>
+                            <field name="kind" readonly="True"/>
+                            <field name="at" readonly="True"/>
+                            <field name="received_at" readonly="True"/>
+                            <field name="service_state" readonly="True"
+                                   invisible="kind != 'service_changed'"/>
+                            <field name="config_revision" readonly="True"
+                                   invisible="kind not in ('config_applied', 'config_refused')"/>
+                            <field name="config_reason" readonly="True"
+                                   invisible="kind != 'config_refused'"/>
+                            <field name="config_keys" readonly="True"
+                                   invisible="kind not in ('config_adopted', 'config_drift')"/>
+                        </group>
+                        <group>
+                            <field name="device_id" readonly="True"/>
+                            <field name="workstation_name" readonly="True"/>
+                            <field name="employee_name" readonly="True"/>
+                            <field name="previous_workstation_name"
+                                   readonly="True"
+                                   invisible="kind != 'moved'"/>
+                            <field name="uuid" readonly="True"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Le libellé (`label`) n'est pas stocké : chaque filtre le retrouve
+         par `kind`, et par `service_state` pour un `service_changed`. Les
+         filtres forment un seul groupe, donc se cumulent par « ou ». -->
+    <record id="view_streamdeck_event_search" model="ir.ui.view">
+        <field name="name">streamdeck.event.search</field>
+        <field name="model">streamdeck.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="device_id"/>
+                <field name="workstation_name"/>
+                <field name="employee_name"/>
+                <field name="previous_workstation_name"/>
+                <filter name="plugged" string="Plugged"
+                        domain="[('kind', '=', 'plugged')]"/>
+                <filter name="unplugged" string="Unplugged"
+                        domain="[('kind', '=', 'unplugged')]"/>
+                <filter name="service_changed" string="Service changed"
+                        domain="[('kind', '=', 'service_changed')]"/>
+                <filter name="moved" string="Changed workstation"
+                        domain="[('kind', '=', 'moved')]"/>
+                <filter name="silent" string="Workstation silent"
+                        domain="[('kind', '=', 'silent')]"/>
+                <filter name="heard_again" string="Workstation heard again"
+                        domain="[('kind', '=', 'heard_again')]"/>
+                <filter name="config_applied" string="Configuration applied"
+                        domain="[('kind', '=', 'config_applied')]"/>
+                <filter name="config_refused" string="Configuration refused"
+                        domain="[('kind', '=', 'config_refused')]"/>
+                <filter name="config_adopted" string="Local setting adopted"
+                        domain="[('kind', '=', 'config_adopted')]"/>
+                <filter name="config_drift" string="Setting changed locally"
+                        domain="[('kind', '=', 'config_drift')]"/>
+                <filter name="service_started" string="Service started"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'active')]"/>
+                <filter name="service_failed" string="Service failed"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'failed')]"/>
+                <filter name="service_stopped" string="Service stopped"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'inactive')]"/>
+                <filter name="service_absent" string="Service absent"
+                        domain="[('kind', '=', 'service_changed'), ('service_state', '=', 'absent')]"/>
+                <separator/>
+                <filter name="filter_at" string="Time" date="at"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_kind" string="Kind"
+                            context="{'group_by': 'kind'}"/>
+                    <filter name="group_device" string="Deck"
+                            context="{'group_by': 'device_id'}"/>
+                    <filter name="group_employee" string="Employee"
+                            context="{'group_by': 'employee_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_streamdeck_fleet_events" model="ir.actions.act_window">
+        <field name="name">Events</field>
+        <field name="res_model">streamdeck.event</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

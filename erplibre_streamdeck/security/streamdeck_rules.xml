@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <!-- Les règles d'un même modèle s'additionnent d'un groupe à l'autre :
+         le gestionnaire, qui implique l'utilisateur, reçoit la règle
+         ouverte en plus de la règle bornée. Les droits du fichier
+         ir.model.access.csv bornent les opérations ; ces règles bornent
+         les enregistrements. -->
+
+    <!-- L'employé lit et renomme ses propres postes, et seulement eux. -->
+    <record id="rule_streamdeck_workstation_user" model="ir.rule">
+        <field name="name">Stream Deck workstation: own workstations</field>
+        <field name="model_id" ref="model_streamdeck_workstation"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <!-- L'employé lit le deck que tient un de ses postes et celui qu'un
+         de ses postes a détenu (held_by_me : une détention, posée à la
+         création du deck chez lui ou au déplacement vers son poste). Un
+         événement ne l'ouvre pas : un poste qui envoie le numéro de série
+         d'un deck tenu ailleurs lit son événement, le nom du deck compris
+         (un many2one s'affiche en sudo), jamais la fiche du deck. -->
+    <record id="rule_streamdeck_device_user" model="ir.rule">
+        <field name="name">Stream Deck device: decks of own workstations</field>
+        <field name="model_id" ref="model_streamdeck_device"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('held_by_me', '=', True),
+        ]</field>
+    </record>
+
+    <!-- L'employé lit les événements de ses postes, et ceux d'un deck qu'il
+         détient ou a détenu datés à partir de sa première détention
+         (visible_to_me), y compris ceux survenus au poste d'un autre : le
+         nom de ce poste et de son employé sont copiés sur l'événement, la
+         fiche du poste reste fermée. Rien d'avant son arrivée ne s'ouvre
+         au nouveau détenteur, ni à un poste qui déclare le numéro de série
+         d'un autre deck. -->
+    <record id="rule_streamdeck_event_user" model="ir.rule">
+        <field name="name">Stream Deck event: own workstations and held decks</field>
+        <field name="model_id" ref="model_streamdeck_event"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('visible_to_me', '=', True),
+        ]</field>
+    </record>
+
+    <!-- Le fil d'un deck suit la borne de son historique : messages,
+         activités et fichiers joints d'un deck datés d'avant la première
+         détention de l'utilisateur ne se lisent pas
+         (streamdeck_visible_to_me, qui laisse passer tout ce qui ne porte
+         pas sur un deck, et tout pour le gestionnaire). Règles globales, en lecture seule : une règle
+         de groupe s'additionnerait à celles d'autres modules qui ouvrent
+         tout le fil à leurs groupes. -->
+    <record id="rule_mail_message_streamdeck_device" model="ir.rule">
+        <field name="name">Mail message: deck thread from the first holding</field>
+        <field name="model_id" ref="mail.model_mail_message"/>
+        <field name="domain_force">[('streamdeck_visible_to_me', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_mail_activity_streamdeck_device" model="ir.rule">
+        <field name="name">Mail activity: deck thread from the first holding</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="domain_force">[('streamdeck_visible_to_me', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_ir_attachment_streamdeck_device" model="ir.rule">
+        <field name="name">Attachment: deck thread from the first holding</field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="domain_force">[('streamdeck_visible_to_me', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Le gestionnaire lit tout le parc et écrit les postes : les droits
+         du fichier CSV ne lui donnent ni création ni suppression. -->
+    <record id="rule_streamdeck_workstation_manager" model="ir.rule">
+        <field name="name">Stream Deck workstation: whole fleet</field>
+        <field name="model_id" ref="model_streamdeck_workstation"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_device_manager" model="ir.rule">
+        <field name="name">Stream Deck device: whole fleet</field>
+        <field name="model_id" ref="model_streamdeck_device"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_event_manager" model="ir.rule">
+        <field name="name">Stream Deck event: whole fleet</field>
+        <field name="model_id" ref="model_streamdeck_event"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- La configuration voulue : l'employé lit les profils « au choix »
+         et ceux de ses postes ; les couches modèle de deck n'ont pas de
+         règle, elles ne portent rien de personnel. -->
+    <record id="rule_streamdeck_config_profile_user" model="ir.rule">
+        <field name="name">Stream Deck config profile: selectable and own</field>
+        <field name="model_id" ref="model_streamdeck_config_profile"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|',
+            ('selectable', '=', True),
+            ('workstation_ids.user_id', '=', user.id),
+        ]</field>
+    </record>
+
+    <!-- Une ligne se lit avec sa couche : celle d'un poste de l'employé,
+         d'un modèle de deck, ou d'un profil qu'il lit. -->
+    <record id="rule_streamdeck_config_line_user_read" model="ir.rule">
+        <field name="name">Stream Deck config line: readable layers</field>
+        <field name="model_id" ref="model_streamdeck_config_line"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('model_id', '!=', False),
+            ('profile_id.selectable', '=', True),
+            ('profile_id.workstation_ids.user_id', '=', user.id),
+        ]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- L'employé écrit les lignes de ses postes seulement ; les clés
+         verrouillées, `locked` et `source` sont gardés par le modèle
+         (streamdeck.config.line). -->
+    <record id="rule_streamdeck_config_line_user_write" model="ir.rule">
+        <field name="name">Stream Deck config line: own workstations</field>
+        <field name="model_id" ref="model_streamdeck_config_line"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[('workstation_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_streamdeck_config_profile_manager" model="ir.rule">
+        <field name="name">Stream Deck config profile: all</field>
+        <field name="model_id" ref="model_streamdeck_config_profile"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_config_line_manager" model="ir.rule">
+        <field name="name">Stream Deck config line: all</field>
+        <field name="model_id" ref="model_streamdeck_config_line"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Une disposition des touches se lit avec sa couche, comme une
+         ligne de configuration ; ses touches suivent la disposition.
+         L'employé écrit celles de ses postes seulement ; les dispositions
+         verrouillées, `locked`, `source` et l'état gardé par le service
+         sont gardés par le modèle (streamdeck.key.layout). -->
+    <record id="rule_streamdeck_key_layout_user_read" model="ir.rule">
+        <field name="name">Stream Deck key layout: readable layers</field>
+        <field name="model_id" ref="model_streamdeck_key_layout"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('workstation_id.user_id', '=', user.id),
+            ('model_id', '!=', False),
+            ('profile_id.selectable', '=', True),
+            ('profile_id.workstation_ids.user_id', '=', user.id),
+        ]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_streamdeck_key_layout_user_write" model="ir.rule">
+        <field name="name">Stream Deck key layout: own workstations</field>
+        <field name="model_id" ref="model_streamdeck_key_layout"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[('workstation_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_streamdeck_key_layout_key_user_read" model="ir.rule">
+        <field name="name">Stream Deck key layout key: readable layouts</field>
+        <field name="model_id" ref="model_streamdeck_key_layout_key"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('layout_id.workstation_id.user_id', '=', user.id),
+            ('layout_id.model_id', '!=', False),
+            ('layout_id.profile_id.selectable', '=', True),
+            ('layout_id.profile_id.workstation_ids.user_id', '=', user.id),
+        ]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_streamdeck_key_layout_key_user_write" model="ir.rule">
+        <field name="name">Stream Deck key layout key: own workstations</field>
+        <field name="model_id" ref="model_streamdeck_key_layout_key"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[('layout_id.workstation_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_streamdeck_key_layout_manager" model="ir.rule">
+        <field name="name">Stream Deck key layout: all</field>
+        <field name="model_id" ref="model_streamdeck_key_layout"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_streamdeck_key_layout_key_manager" model="ir.rule">
+        <field name="name">Stream Deck key layout key: all</field>
+        <field name="model_id" ref="model_streamdeck_key_layout_key"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- L'identifiant d'un plugin est le nom de son fichier, et un
+         fichier du répertoire de plugins de l'utilisateur nomme ce que
+         celui-ci y garde : l'employé lit les actions `plugin:` que ses
+         propres postes offrent, et le reste du catalogue, que le
+         programme du deck tire de son propre code. -->
+    <record id="rule_streamdeck_catalog_item_user" model="ir.rule">
+        <field name="name">Stream Deck catalog item: plugins of own workstations</field>
+        <field name="model_id" ref="model_streamdeck_catalog_item"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_user'))]"/>
+        <field name="domain_force">[
+            '|', '|',
+            ('kind', '!=', 'action'),
+            ('value', 'in', ['tiles', 'empty']),
+            ('workstation_ids.user_id', '=', user.id),
+        ]</field>
+    </record>
+
+    <record id="rule_streamdeck_catalog_item_manager" model="ir.rule">
+        <field name="name">Stream Deck catalog item: all</field>
+        <field name="model_id" ref="model_streamdeck_catalog_item"/>
+        <field name="groups" eval="[Command.link(ref('group_streamdeck_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- L'assistant d'appairage porte un code valide : une règle globale
+         le réserve à l'utilisateur qui l'a créé, gestionnaire compris. -->
+    <record id="rule_streamdeck_pairing_wizard_own" model="ir.rule">
+        <field name="name">Stream Deck pairing wizard: own wizards</field>
+        <field name="model_id" ref="model_streamdeck_pairing_wizard"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+    </record>
+
+</odoo>

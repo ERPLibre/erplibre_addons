@@ -32,6 +32,13 @@ packages the modules need are listed in `requirements.txt`.
 | `erplibre_devops_requirement` | Tracks the software requirements of an implementation project: MoSCoW level, functional domain, phase, DevSecOps stage, STRIDE threats, acceptance criteria, dependencies and the tests that prove each requirement. Ships no requirement: a project module supplies them as data. |
 | `erplibre_devops_guide` | Renders the presentation page of an implementation project from records: hero with figures, sections of cards, roadmap and counts on any model, with buttons to a URL, an action or a guided tour. Ships the engine only: a project module describes its pages in data. |
 
+### Stream Deck
+
+| Module | Description |
+|---|---|
+| `erplibre_streamdeck` | Inventory of the employees' Stream Decks: each workstation running the GNOME extension ERPLibre Home enrolls (pairing code, API key or password) and reports its decks, its deck service and their events through JSON routes authenticated by a workstation token. Every employee reads their own workstations and the decks they have held; the manager reads the whole fleet. |
+| `erplibre_streamdeck_devops_requirement` | The requirements of the ERPLibre Stream Deck (deck programs, GNOME extension ERPLibre Home, installation, games, mobile plugin, Odoo inventory) as `erplibre_devops_requirement` data, in English and Canadian French, each with the repository tests that prove it; a test runner pushes its verdict by test reference. |
+
 ### External data synchronisation
 
 | Module | Description |
