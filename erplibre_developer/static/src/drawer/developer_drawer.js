@@ -2,94 +2,39 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, onWillUnmount, useEffect, useRef, useState} from "@odoo/owl";
-import {browser} from "@web/core/browser/browser";
-import {deserializeDateTime, formatDateTime} from "@web/core/l10n/dates";
+import {Component, onWillUnmount, useEffect, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {useService} from "@web/core/utils/hooks";
+import {session} from "@web/session";
+import {MODEL, formatServerDateTime, moduleColor} from "./common";
+import {ActionsTab} from "./tabs/actions_tab";
+import {CodeTab} from "./tabs/code_tab";
+import {FieldsTab} from "./tabs/fields_tab";
+import {ViewsTab} from "./tabs/views_tab";
 
-const MODEL = "erplibre.developer";
-const {DateTime} = luxon;
+export {formatIsoDateTime, formatServerDateTime, SourceLocation} from "./common";
 
-/** A server datetime (UTC, « YYYY-MM-DD HH:MM:SS ») in the user's timezone. */
-export function formatServerDateTime(value) {
-    return value ? formatDateTime(deserializeDateTime(value)) : "";
-}
+// The order of the tabs, for the arrow keys of the tab list.
+const TAB_IDS = ["views", "fields", "code", "actions"];
 
-/** An ISO 8601 date with its offset (``git log %aI``) in the user's timezone. */
-export function formatIsoDateTime(value) {
-    const date = value ? DateTime.fromISO(value) : null;
-    return date && date.isValid ? formatDateTime(date.setZone("default")) : value || "";
-}
-
-/** A file and a line: copied to the clipboard, or opened in the IDE. */
-export class SourceLocation extends Component {
-    static template = "erplibre_developer.SourceLocation";
-    static props = {
-        file: {type: [String, Boolean], optional: true},
-        fileRel: {type: [String, Boolean], optional: true},
-        line: {type: Number, optional: true},
-        ide: {type: Boolean, optional: true},
-    };
-
-    setup() {
-        this.orm = useService("orm");
-        this.notification = useService("notification");
-        // Without a clipboard (no secure context), the path shows in a
-        // selected field of the drawer, to copy by hand.
-        this.copyState = useState({manual: false});
-        this.manualRef = useRef("manual");
-        useEffect(
-            (el) => {
-                if (el) {
-                    el.focus();
-                    el.select();
-                }
-            },
-            () => [this.manualRef.el]
-        );
-    }
-
-    get text() {
-        const line = this.props.line ? `:${this.props.line}` : "";
-        return `${this.props.fileRel || this.props.file}${line}`;
-    }
-
-    get fullText() {
-        const line = this.props.line ? `:${this.props.line}` : "";
-        return `${this.props.file}${line}`;
-    }
-
-    async copy() {
-        try {
-            await browser.navigator.clipboard.writeText(this.fullText);
-            this.copyState.manual = false;
-            this.notification.add(_t("Path copied."), {type: "info"});
-        } catch {
-            this.copyState.manual = true;
-            this.notification.add(this.fullText, {title: _t("Copy this path"), type: "warning"});
-        }
-    }
-
-    closeManual() {
-        this.copyState.manual = false;
-    }
-
-    async openInIde() {
-        await this.orm.call(MODEL, "action_open_in_ide", [this.props.file, this.props.line || 0]);
-    }
-}
-
+/**
+ * The drawer: its header, the module filter, the tabs, the status bar and
+ * the loading of what the tabs show. It owns the RPC calls and the
+ * ``data`` state that the tabs (``tabs/``) receive through their props, so
+ * a switch of tab keeps the filter, the open rows and the loaded code. The
+ * preferences (follow, width, density) and the module filter live in the
+ * service's state, which the tabs read too.
+ */
 export class DeveloperDrawer extends Component {
     static template = "erplibre_developer.DeveloperDrawer";
-    static components = {SourceLocation};
+    static components = {ViewsTab, FieldsTab, CodeTab, ActionsTab};
     static props = {};
 
     setup() {
         this.dev = useService("erplibre_developer");
         this.orm = useService("orm");
+        // The studio patch of the header opens its editor through it.
         this.action = useService("action");
-        this.notification = useService("notification");
         this.state = useState(this.dev.state);
         this.data = useState({
             loading: false,
@@ -98,17 +43,51 @@ export class DeveloperDrawer extends Component {
             code: null,
             codeLoading: false,
             codeError: null,
+            // Where the Code tab reads the repositories: « snapshot » (the
+            // last erplibre_info_git snapshot) or « clones » (repo_state.py
+            // now); ``codeReadAt`` is when the clones were read (ISO 8601).
+            codeSource: "snapshot",
+            codeReadAt: null,
+            // The summary tile of the Code tab that filters its list: all,
+            // repos, dirty or upgrade.
+            codeTile: "all",
+            // The live details of each repository, by its path
+            // (``get_repo_details``), and the repositories whose recent
+            // commits are open.
+            repoDetails: {},
+            repoCommitsOpen: {},
+            // The module the Code tab sends to the Actions tab to upgrade.
+            upgradeRequest: null,
+            // The modules checked in the Actions tab ({module: bool}), null
+            // until a box changes: the modules to upgrade count as checked.
+            upgradeChecked: null,
+            // The recent commits of each module, and the modules whose
+            // commits are open (Actions tab).
             commits: {},
+            commitsOpen: {},
+            // The last runs of erplibre_info (``get_recent_runs``), read
+            // when the Actions tab shows.
+            runs: null,
+            runsLoading: false,
+            runsError: null,
             showCombined: false,
             expanded: {},
             filter: "",
+            // The kind of fields the Fields tab lists: all, overridden,
+            // custom or relational.
+            fieldFilter: "all",
+            // The search in the combined arch and its « Node origins »
+            // switch (Views tab).
+            archQuery: "",
+            showOrigins: true,
         });
-        this.fieldsRef = useRef("fields");
         this.loadedVersion = null;
         // Request counters: the answer of a call that a newer one replaced
         // (new target, refresh) is dropped.
         this.loadSeq = 0;
         this.codeSeq = 0;
+        this.detailsSeq = 0;
+        this.runsSeq = 0;
         useEffect(
             (open, version) => {
                 if (open && version !== this.loadedVersion) {
@@ -126,16 +105,12 @@ export class DeveloperDrawer extends Component {
             () => [this.state.tab, this.data.info]
         );
         useEffect(
-            (selected, tab) => {
-                if (!selected || tab !== "fields" || !this.fieldsRef.el) {
-                    return;
-                }
-                const row = this.fieldsRef.el.querySelector(`[data-field="${CSS.escape(selected)}"]`);
-                if (row && row.scrollIntoView) {
-                    row.scrollIntoView({block: "center"});
+            (tab, info) => {
+                if (tab === "actions" && info && !this.data.runs && !this.data.runsLoading) {
+                    this.loadRuns();
                 }
             },
-            () => [this.state.selectedField, this.state.tab, this.data.info]
+            () => [this.state.tab, this.data.info]
         );
         onWillUnmount(() => this.dev.clearHighlight());
     }
@@ -146,6 +121,8 @@ export class DeveloperDrawer extends Component {
         const seq = ++this.loadSeq;
         // A code call still running belongs to the former target.
         this.codeSeq++;
+        this.detailsSeq++;
+        this.runsSeq++;
         const target = this.state.target;
         this.loadedVersion = this.state.version;
         Object.assign(this.data, {
@@ -153,7 +130,17 @@ export class DeveloperDrawer extends Component {
             code: null,
             codeLoading: false,
             codeError: null,
+            codeSource: "snapshot",
+            codeReadAt: null,
+            repoDetails: {},
+            repoCommitsOpen: {},
+            upgradeRequest: null,
+            upgradeChecked: null,
             commits: {},
+            commitsOpen: {},
+            runs: null,
+            runsLoading: false,
+            runsError: null,
             error: null,
         });
         if (!target) {
@@ -180,6 +167,11 @@ export class DeveloperDrawer extends Component {
         Object.assign(this.data, {info, error, loading: false});
     }
 
+    /**
+     * Load ``data.code``: from the last snapshot, or with ``refresh`` from
+     * the clones. A read of the clones also drops the repository details,
+     * which the Code tab then reads again.
+     */
     async loadCode(refresh = false) {
         if (!this.data.info) {
             return;
@@ -188,6 +180,11 @@ export class DeveloperDrawer extends Component {
         const modules = this.data.info.modules;
         this.data.codeLoading = true;
         this.data.codeError = null;
+        this.data.codeSource = refresh ? "clones" : "snapshot";
+        if (refresh) {
+            this.detailsSeq++;
+            this.data.repoDetails = {};
+        }
         let code = null;
         let error = null;
         try {
@@ -202,7 +199,56 @@ export class DeveloperDrawer extends Component {
             code: code || this.data.code,
             codeError: error || (code && code.error) || null,
             codeLoading: false,
+            codeReadAt: refresh && code ? luxon.DateTime.now().toISO() : this.data.codeReadAt,
         });
+    }
+
+    /**
+     * Read the uncommitted files and the recent commits of the repository
+     * ``repo`` (a ``clone_rel``) into ``data.repoDetails[repo]``, the
+     * commits marked against ``target``. An answer that a new target or a
+     * read of the clones made out of date is dropped.
+     */
+    async loadRepoDetails(repo, target = false) {
+        const seq = this.detailsSeq;
+        const details = this.data.repoDetails;
+        details[repo] = {loading: true, dirty_count: 0, dirty_files: [], commits: [], error: false};
+        let result;
+        try {
+            result = await this.orm.call(MODEL, "get_repo_details", [repo], {target: target || false});
+        } catch (err) {
+            result = {
+                dirty_count: 0,
+                dirty_files: [],
+                commits: [],
+                error: (err.data && err.data.message) || err.message || String(err),
+            };
+        }
+        if (seq !== this.detailsSeq) {
+            return;
+        }
+        details[repo] = {loading: false, ...result};
+    }
+
+    /**
+     * Load ``data.runs``, the last runs of erplibre_info. An answer that a
+     * new target made out of date is dropped.
+     */
+    async loadRuns() {
+        const seq = ++this.runsSeq;
+        this.data.runsLoading = true;
+        this.data.runsError = null;
+        let runs = null;
+        let error = null;
+        try {
+            runs = await this.orm.call(MODEL, "get_recent_runs", []);
+        } catch (err) {
+            error = (err.data && err.data.message) || err.message || String(err);
+        }
+        if (seq !== this.runsSeq) {
+            return;
+        }
+        Object.assign(this.data, {runs: runs || [], runsError: error, runsLoading: false});
     }
 
     async loadCommits(module) {
@@ -219,94 +265,57 @@ export class DeveloperDrawer extends Component {
         }
     }
 
-    // ── view helpers ────────────────────────────────────────────────────
+    // ── header and tabs ─────────────────────────────────────────────────
 
     get info() {
         return this.data.info;
     }
 
+    /**
+     * The tabs with their count, from ``get_view_info`` alone: the views
+     * applied, the fields, the modules named (the Code tab loads its own
+     * data only when it shows).
+     */
     get tabs() {
+        const info = this.info;
+        const count = (list) => (info && list ? list.length : false);
         return [
-            {id: "views", label: _t("Views & inheritance")},
-            {id: "fields", label: _t("Fields & modules")},
-            {id: "code", label: _t("Code & repository")},
-            {id: "actions", label: _t("Dev actions")},
+            {id: "views", label: _t("Views"), title: _t("Views & inheritance"), count: count(info && info.views)},
+            {id: "fields", label: _t("Fields"), title: _t("Fields & modules"), count: count(info && info.fields)},
+            {id: "code", label: _t("Code"), title: _t("Code & repository"), count: count(info && info.modules)},
+            {id: "actions", label: _t("Actions"), title: _t("Dev actions"), count: false},
         ];
-    }
-
-    get filteredFields() {
-        const fields = (this.info && this.info.fields) || [];
-        const filter = this.data.filter.trim().toLowerCase();
-        if (!filter) {
-            return fields;
-        }
-        return fields.filter(
-            (f) =>
-                f.name.toLowerCase().includes(filter) ||
-                (f.string || "").toLowerCase().includes(filter) ||
-                (f.defined_in && (f.defined_in.module || "").includes(filter)) ||
-                f.override_modules.some((m) => m.includes(filter))
-        );
-    }
-
-    get codeModules() {
-        return (this.data.code && this.data.code.modules) || [];
-    }
-
-    get snapshotDate() {
-        return formatServerDateTime(this.data.code && this.data.code.snapshot_date);
-    }
-
-    commitDate(value) {
-        return formatIsoDateTime(value);
-    }
-
-    moduleLabel(entry) {
-        return entry.module || _t("Odoo core");
-    }
-
-    kindLabel(kind) {
-        return (
-            {
-                field: _t("field"),
-                compute: _t("compute"),
-                inverse: _t("inverse"),
-                search: _t("search"),
-                onchange: _t("onchange"),
-                constrains: _t("constraint"),
-            }[kind] || kind
-        );
-    }
-
-    shortSha(sha) {
-        return (sha || "").slice(0, 12);
-    }
-
-    toggle(key) {
-        this.data.expanded[key] = !this.data.expanded[key];
-    }
-
-    toggleCombined() {
-        this.data.showCombined = !this.data.showCombined;
     }
 
     selectTab(tab) {
         this.state.tab = tab;
     }
 
-    // ── page highlight ──────────────────────────────────────────────────
-
-    highlight(names) {
-        this.dev.highlight(names);
+    /** Arrow keys, Home and End move between the tabs, as in a tab list. */
+    onTabKeydown(ev) {
+        const index = TAB_IDS.indexOf(this.state.tab);
+        const next = {
+            ArrowRight: (index + 1) % TAB_IDS.length,
+            ArrowLeft: (index + TAB_IDS.length - 1) % TAB_IDS.length,
+            Home: 0,
+            End: TAB_IDS.length - 1,
+        }[ev.key];
+        if (next === undefined) {
+            return;
+        }
+        ev.preventDefault();
+        this.selectTab(TAB_IDS[next]);
+        const list = ev.target.closest("[role=tablist]");
+        const button = list && list.querySelector(`[data-tab="${TAB_IDS[next]}"]`);
+        if (button) {
+            button.focus();
+        }
     }
 
-    unhighlight() {
-        this.dev.clearHighlight();
-    }
-
-    selectField(name) {
-        this.state.selectedField = this.state.selectedField === name ? null : name;
-        this.dev.highlight(this.state.selectedField ? [name] : []);
+    /** The page shows another view than the one the drawer describes. */
+    get offView() {
+        // Read through the reactive state, so the template follows it.
+        return Boolean(this.state.target) && this.state.targetJsId !== this.state.pageJsId;
     }
 
     toggleInspect() {
@@ -317,26 +326,49 @@ export class DeveloperDrawer extends Component {
         }
     }
 
+    toggleFollow() {
+        this.dev.setFollow(!this.state.follow);
+    }
+
+    followAgain() {
+        this.dev.setFollow(true);
+    }
+
+    toggleWide() {
+        this.dev.setWide(!this.state.wide);
+    }
+
+    setDensity(density) {
+        this.dev.setDensity(density);
+    }
+
+    // ── module filter ───────────────────────────────────────────────────
+
+    /** The modules of the page, each with its tag colour. */
+    get moduleChips() {
+        return ((this.info && this.info.modules) || []).map((name) => ({name, color: moduleColor(name)}));
+    }
+
+    /** Picks ``module``; picking it again, or « All » (null), clears it. */
+    pickModule(module) {
+        this.dev.setModuleFilter(module && module !== this.state.moduleFilter ? module : null);
+    }
+
+    // ── status bar ──────────────────────────────────────────────────────
+
+    get serverVersion() {
+        return session.server_version || "";
+    }
+
+    get snapshotDate() {
+        return formatServerDateTime(this.info && this.info.snapshot_date);
+    }
+
     close() {
         this.dev.close();
     }
 
     refresh() {
         this.load();
-    }
-
-    // ── developer actions ───────────────────────────────────────────────
-
-    async upgrade(module) {
-        // The confirmation is a dialog: inspection would catch its clicks.
-        this.dev.stopInspect();
-        const action = await this.orm.call(MODEL, "action_upgrade_module", [module]);
-        await this.action.doAction(action);
-    }
-
-    async reloadAssets() {
-        await this.orm.call(MODEL, "action_reload_assets", []);
-        this.notification.add(_t("Asset bundles deleted: the page reloads."), {type: "info"});
-        browser.location.reload();
     }
 }

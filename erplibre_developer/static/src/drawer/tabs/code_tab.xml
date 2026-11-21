@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_developer.CodeTab">
+        <section class="o_erplibre_dev_code">
+            <!-- Summary: each tile hides what it leaves out. -->
+            <div class="o_erplibre_dev_code_tiles d-flex flex-wrap gap-2 mb-2" role="group" aria-label="Code summary, click to filter">
+                <button
+                    t-foreach="tiles"
+                    t-as="tile"
+                    t-key="tile.id"
+                    class="btn o_erplibre_dev_code_tile"
+                    t-att-class="{'o_erplibre_dev_chip_on': data.codeTile === tile.id}"
+                    t-att-data-tile="tile.id"
+                    t-att-aria-pressed="data.codeTile === tile.id ? 'true' : 'false'"
+                    t-on-click="() => this.pickTile(tile.id)"
+                >
+                    <span class="o_erplibre_dev_tile_n" t-esc="tile.n" />
+                    <span class="o_erplibre_dev_tile_label" t-esc="tile.label" />
+                </button>
+            </div>
+
+            <!-- Where the repositories are read from. -->
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <span class="flex-grow-1 small text-muted o_erplibre_dev_code_source_text">
+                    <i class="fa fa-clock-o me-1" aria-hidden="true" />
+                    <t t-if="fromClones and data.codeReadAt">
+                        Read from the clones at
+                        <span t-esc="readAt" />
+                    </t>
+                    <t t-elif="data.code and data.code.snapshot_date">
+                        Read from the snapshot of
+                        <span class="o_erplibre_dev_snapshot_date" t-esc="snapshotDate" />
+                    </t>
+                    <t t-else="">No ERPLibre snapshot</t>
+                </span>
+                <div class="o_erplibre_dev_segmented d-flex p-1 rounded-2" role="group" aria-label="Read from">
+                    <button
+                        class="btn btn-sm o_erplibre_dev_code_snapshot"
+                        t-att-class="{'active': !fromClones}"
+                        t-att-aria-pressed="fromClones ? 'false' : 'true'"
+                        t-on-click="readSnapshot"
+                    >
+                        Snapshot
+                    </button>
+                    <button
+                        class="btn btn-sm o_erplibre_dev_code_refresh"
+                        t-att-class="{'active': fromClones}"
+                        t-att-aria-pressed="fromClones ? 'true' : 'false'"
+                        title="Read the clones"
+                        t-on-click="readClones"
+                    >
+                        Clones
+                    </button>
+                </div>
+            </div>
+            <div t-if="data.codeLoading" class="text-muted small mb-2 o_erplibre_dev_code_loading" role="status">
+                <i class="fa fa-spinner fa-spin me-1" aria-hidden="true" />
+                <t t-if="fromClones">
+                    Reading the clones with
+                    <code t-esc="'repo_state.py'" />
+                    …
+                </t>
+                <t t-else="">Loading…</t>
+            </div>
+            <div t-if="data.codeError" class="alert alert-warning small" t-esc="data.codeError" />
+
+            <div
+                t-if="data.codeTile !== 'all'"
+                class="d-flex align-items-center gap-2 mb-2 px-2 py-1 rounded-2 small o_erplibre_dev_code_filtered"
+            >
+                <span class="flex-grow-1" t-esc="filterNote" />
+                <button class="btn btn-link btn-sm p-0 o_erplibre_dev_show_all" t-on-click="showAll">Show all</button>
+            </div>
+
+            <!-- The repositories, problems first; the modules in none last.
+                 A dimmed repository dims its rows once: they take no class of
+                 their own, the opacities would multiply. -->
+            <t t-set="shown" t-value="shownGroups" />
+            <section
+                t-foreach="shown"
+                t-as="group"
+                t-key="group.key"
+                class="card mb-2 o_erplibre_dev_repo"
+                t-att-class="{'o_erplibre_dev_dimmed': groupDimmed(group), 'o_erplibre_dev_repo_none': !group.key}"
+                t-att-data-repo="group.key"
+                t-att-aria-label="repoLabel(group)"
+            >
+                <div class="card-body p-2">
+                    <t t-if="group.key">
+                        <div class="d-flex flex-wrap align-items-center gap-1">
+                            <i class="fa fa-folder-o text-muted" aria-hidden="true" />
+                            <code class="text-break fw-semibold o_erplibre_dev_repo_path" t-esc="group.path" t-att-title="group.clone or group.path" />
+                            <button
+                                class="o_erplibre_dev_icon_btn o_erplibre_dev_repo_copy"
+                                t-att-aria-label="copyLabel(group)"
+                                title="Copy the path"
+                                t-on-click="() => this.copyPath(group)"
+                            >
+                                <i t-attf-class="fa {{ ui.copied === group.key ? 'fa-check' : 'fa-clipboard' }}" aria-hidden="true" />
+                            </button>
+                            <span t-if="ui.copied === group.key" class="small text-success-emphasis" role="status">Copied</span>
+                            <span
+                                t-if="group.repo and group.repo.state"
+                                t-attf-class="badge rounded-pill ms-auto bg-{{ stateColor(group.repo) }}-subtle text-{{ stateColor(group.repo) }}-emphasis o_erplibre_dev_repo_state"
+                                t-att-data-state="group.repo.state"
+                                t-esc="group.repo.state_label or group.repo.state"
+                            />
+                            <span t-elif="!group.repo" class="badge rounded-pill ms-auto text-bg-light o_erplibre_dev_repo_state">
+                                state unknown
+                            </span>
+                        </div>
+                        <div t-if="group.repo" class="d-flex flex-wrap align-items-center gap-2 mt-1 small text-muted o_erplibre_dev_repo_facts">
+                            <span t-if="group.repo.branch">
+                                <i class="fa fa-code-fork me-1" aria-hidden="true" />
+                                branch
+                                <code t-esc="group.repo.branch" />
+                            </span>
+                            <span t-if="group.repo.head">
+                                HEAD
+                                <code t-esc="shortSha(group.repo.head)" t-att-title="group.repo.head" />
+                            </span>
+                            <span t-if="group.repo.manifest_branch">
+                                manifest
+                                <code t-esc="group.repo.manifest_branch" />
+                            </span>
+                            <span
+                                t-if="group.repo.ahead"
+                                class="badge rounded-pill bg-info-subtle text-info-emphasis o_erplibre_dev_ahead"
+                                t-esc="aheadLabel(group.repo)"
+                            />
+                            <span
+                                t-if="group.repo.behind"
+                                class="badge rounded-pill bg-warning-subtle text-warning-emphasis o_erplibre_dev_behind"
+                                t-esc="behindLabel(group.repo)"
+                            />
+                            <span t-if="alignmentLabel(group.repo)" class="o_erplibre_dev_alignment">
+                                HEAD:
+                                <t t-esc="alignmentLabel(group.repo)" />
+                            </span>
+                            <span class="o_erplibre_dev_repo_source">
+                                <i class="fa fa-clock-o me-1" aria-hidden="true" />
+                                <t t-esc="sourceLabel(group)" />
+                            </span>
+                        </div>
+                        <div t-if="group.repo and group.repo.error" class="small text-warning-emphasis mt-1" t-esc="group.repo.error" />
+
+                        <!-- Uncommitted changes, read live. -->
+                        <t t-set="details" t-value="repoDetails(group)" />
+                        <div
+                            t-if="group.dirty"
+                            class="d-flex gap-2 mt-2 p-2 rounded-2 small o_erplibre_dev_dirty"
+                        >
+                            <i class="fa fa-exclamation-triangle mt-1" aria-hidden="true" />
+                            <div class="flex-grow-1 min-w-0">
+                                <t t-if="!details or details.loading">
+                                    <span class="fw-semibold">Uncommitted changes</span>
+                                    <i class="fa fa-spinner fa-spin ms-1" aria-hidden="true" />
+                                </t>
+                                <t t-elif="details.dirty_count">
+                                    <span class="fw-semibold o_erplibre_dev_dirty_count" t-esc="dirtyLabel(details)" />
+                                    <ul class="list-unstyled mb-0 mt-1 o_erplibre_dev_dirty_files">
+                                        <li t-foreach="details.dirty_files" t-as="file" t-key="file_index" class="text-break">
+                                            <!-- One line: the space between the two is kept. -->
+                                            <code class="o_erplibre_dev_dirty_status" t-esc="file.status.trim()" /> <code t-esc="file.path" />
+                                        </li>
+                                    </ul>
+                                    <div
+                                        t-if="details.dirty_count > details.dirty_files.length"
+                                        class="o_erplibre_dev_dirty_more"
+                                        t-esc="moreLabel(details)"
+                                    />
+                                </t>
+                                <span t-elif="details.error" class="fw-semibold">Uncommitted changes</span>
+                                <span t-else="">The clone has no uncommitted file now.</span>
+                                <div
+                                    t-if="details and !details.loading and details.error"
+                                    class="text-break o_erplibre_dev_details_error"
+                                    t-esc="details.error"
+                                />
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="fa fa-folder-o text-muted" aria-hidden="true" />
+                            <span class="fw-semibold">No repository</span>
+                        </div>
+                        <div class="small text-muted">These modules are not in a git clone.</div>
+                    </t>
+
+                    <!-- The modules, unless the tile keeps the repositories only. -->
+                    <div t-if="data.codeTile !== 'repos'" class="mt-2">
+                        <div class="o_erplibre_dev_caps" t-esc="modulesHeading(group)" />
+                        <ul class="list-unstyled mb-0 o_erplibre_dev_code_modules">
+                            <li
+                                t-foreach="group.shown"
+                                t-as="module"
+                                t-key="module.name"
+                                class="d-flex flex-wrap align-items-center gap-1 rounded-2 o_erplibre_dev_code_row"
+                                t-att-class="{
+                                    'o_erplibre_dev_dimmed': !groupDimmed(group) and dimmed([module.name]),
+                                    'o_erplibre_dev_selected': devState.moduleFilter === module.name,
+                                }"
+                                t-att-data-module="module.name"
+                                t-on-mouseenter="() => this.highlightModule(module)"
+                                t-on-mouseleave="unhighlight"
+                            >
+                                <button
+                                    class="btn btn-link p-0 d-inline-flex align-items-center gap-1 o_erplibre_dev_code_module"
+                                    t-att-aria-pressed="devState.moduleFilter === module.name ? 'true' : 'false'"
+                                    t-att-title="pickTitle(module)"
+                                    t-on-click="() => this.pickModule(module)"
+                                    t-on-focus="() => this.highlightModule(module)"
+                                    t-on-blur="unhighlight"
+                                >
+                                    <span t-attf-class="o_erplibre_dev_dot o_tag o_tag_color_{{ moduleColor(module.name) }}" aria-hidden="true" />
+                                    <span class="fw-semibold" t-esc="module.name" />
+                                </button>
+                                <code
+                                    t-if="modulePath(group, module)"
+                                    class="text-muted text-break o_erplibre_dev_module_path"
+                                    t-esc="modulePath(group, module)"
+                                    t-att-title="module.path_rel or module.path"
+                                />
+                                <span class="ms-auto d-inline-flex flex-wrap align-items-center gap-1">
+                                    <t t-if="upgradePending(module)">
+                                        <span class="d-inline-flex align-items-center gap-1 o_erplibre_dev_versions">
+                                            <code title="Installed version" t-esc="module.installed_version" />
+                                            <i class="fa fa-long-arrow-right" role="img" aria-label="then on disk" title="then on disk" />
+                                            <code title="Version on disk" class="o_erplibre_dev_disk_version" t-esc="module.code_version" />
+                                        </span>
+                                        <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis o_erplibre_dev_pending">
+                                            upgrade pending
+                                        </span>
+                                        <button class="btn btn-link btn-sm p-0 o_erplibre_dev_upgrade_link" t-on-click="() => this.openUpgrade(module)">
+                                            Upgrade…
+                                        </button>
+                                    </t>
+                                    <code t-elif="module.installed_version" title="Installed version" t-esc="module.installed_version" />
+                                    <span t-else="" class="text-muted small">not installed</span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Recent commits of the repository, read live. -->
+                    <div t-if="group.key" class="mt-2 o_erplibre_dev_repo_commits">
+                        <t t-set="open" t-value="commitsOpen(group)" />
+                        <button
+                            class="btn btn-link btn-sm p-0 d-inline-flex align-items-center gap-1 text-body o_erplibre_dev_repo_commits_toggle"
+                            t-att-aria-expanded="open ? 'true' : 'false'"
+                            t-att-aria-controls="'o_erplibre_dev_repo_commits_' + group.index"
+                            t-on-click="() => this.toggleCommits(group)"
+                        >
+                            <i class="fa fa-angle-right o_erplibre_dev_chevron" aria-hidden="true" />
+                            Recent commits
+                            <span
+                                t-if="details and !details.loading"
+                                class="o_erplibre_dev_tab_count"
+                                t-esc="details.commits.length"
+                            />
+                        </button>
+                        <div t-if="open" t-att-id="'o_erplibre_dev_repo_commits_' + group.index" class="small">
+                            <div t-if="!details or details.loading" class="text-muted">
+                                <i class="fa fa-spinner fa-spin" aria-hidden="true" />
+                                Loading…
+                            </div>
+                            <t t-else="">
+                                <div t-if="details.error" class="text-warning-emphasis text-break" t-esc="details.error" />
+                                <div t-if="!details.commits.length and !details.error" class="text-muted">No commit.</div>
+                                <ol t-if="details.commits.length" class="list-unstyled mb-0 o_erplibre_dev_commit_list">
+                                    <li
+                                        t-foreach="details.commits"
+                                        t-as="commit"
+                                        t-key="commit.sha"
+                                        class="d-flex align-items-start gap-2 o_erplibre_dev_commit"
+                                    >
+                                        <code t-esc="shortSha(commit.sha)" t-att-title="commit.sha" />
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="text-break" t-esc="commit.subject" />
+                                            <div class="text-muted">
+                                                <t t-esc="commit.author" />
+                                                ·
+                                                <span class="o_erplibre_dev_commit_when" t-att-title="commitDate(commit)" t-esc="commitWhen(commit)" />
+                                            </div>
+                                        </div>
+                                        <span
+                                            t-if="commit.ahead"
+                                            class="badge rounded-pill bg-info-subtle text-info-emphasis o_erplibre_dev_commit_ahead"
+                                            title="Not in the manifest's target"
+                                        >
+                                            ahead
+                                        </span>
+                                    </li>
+                                </ol>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div
+                t-if="data.code and !data.codeLoading and !shown.length"
+                class="text-center text-muted small p-3 o_erplibre_dev_code_empty"
+            >
+                <t t-if="data.codeTile !== 'all'">
+                    No module matches this filter.
+                    <button class="btn btn-link btn-sm p-0 o_erplibre_dev_show_all" t-on-click="showAll">Show all</button>
+                </t>
+                <t t-else="">No module.</t>
+            </div>
+        </section>
+    </t>
+</templates>

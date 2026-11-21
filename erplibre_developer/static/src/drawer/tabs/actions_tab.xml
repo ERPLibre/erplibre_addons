@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <t t-name="erplibre_developer.ActionsTab">
+        <section class="o_erplibre_dev_actions small d-flex flex-column gap-3" t-ref="root">
+            <!-- Prerequisites: an icon and a word for each, never the colour alone. -->
+            <section
+                class="o_erplibre_dev_prereq rounded-3 p-2"
+                t-att-class="{'o_erplibre_dev_prereq_missing': missingCount}"
+                aria-labelledby="o_erplibre_dev_prereq_title"
+            >
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <h3 id="o_erplibre_dev_prereq_title" class="o_erplibre_dev_section_title mb-0">Prerequisites</h3>
+                    <span
+                        class="badge rounded-pill o_erplibre_dev_prereq_badge"
+                        t-att-class="missingCount ? 'bg-danger-subtle text-danger-emphasis' : 'bg-success-subtle text-success-emphasis'"
+                        t-esc="prerequisitesBadge"
+                    />
+                </div>
+                <ul class="list-unstyled mb-0 d-flex flex-column gap-1">
+                    <li
+                        t-foreach="prerequisites"
+                        t-as="item"
+                        t-key="item.id"
+                        class="d-flex align-items-start gap-2 o_erplibre_dev_prereq_item"
+                        t-att-data-check="item.id"
+                        t-att-data-ok="item.ok ? '1' : '0'"
+                    >
+                        <i
+                            t-if="item.ok"
+                            class="fa fa-check-circle fa-fw mt-1 text-success"
+                            role="img"
+                            aria-label="Met"
+                            title="Met"
+                        />
+                        <i t-else="" class="fa fa-times-circle fa-fw mt-1 text-danger" role="img" aria-label="Missing" title="Missing" />
+                        <span class="flex-grow-1 min-w-0">
+                            <t t-esc="item.label" />
+                            <code t-if="item.code" class="ms-1 text-break" t-esc="item.code" />
+                        </span>
+                        <span
+                            class="flex-shrink-0 fw-semibold o_erplibre_dev_prereq_state"
+                            t-att-class="item.ok ? 'text-success-emphasis' : 'text-danger-emphasis'"
+                            t-esc="item.state"
+                        />
+                    </li>
+                </ul>
+                <div t-if="!allowed" class="mt-2 o_erplibre_dev_actions_disabled">
+                    <t t-if="!checks.flag">
+                        <p class="mb-1">Add these lines to the Odoo configuration file, then restart the server yourself: this panel cannot do it while the option is off.</p>
+                        <div class="d-flex align-items-stretch rounded-2 overflow-hidden o_erplibre_dev_option">
+                            <pre class="flex-grow-1 mb-0 px-2 py-2 o_erplibre_dev_option_text"><code t-esc="optionText" /></pre>
+                            <button
+                                class="btn btn-sm d-inline-flex align-items-center gap-1 flex-shrink-0 o_erplibre_dev_option_copy"
+                                title="Copy the configuration line"
+                                t-on-click="copyOption"
+                            >
+                                <i t-attf-class="fa {{ ui.copied ? 'fa-check' : 'fa-clipboard' }}" aria-hidden="true" />
+                                <span aria-live="polite">
+                                    <t t-if="ui.copied">Copied</t>
+                                    <t t-else="">Copy</t>
+                                </span>
+                            </button>
+                        </div>
+                    </t>
+                    <p t-if="checks.problem" class="mb-0 mt-1 text-muted text-break o_erplibre_dev_prereq_problem" t-esc="checks.problem" />
+                </div>
+            </section>
+            <p t-if="!allowed" class="d-flex align-items-start gap-2 mb-0 text-muted o_erplibre_dev_lock_note">
+                <i class="fa fa-lock mt-1" aria-hidden="true" />
+                <span>The upgrade is unavailable: it restarts the server, which the missing prerequisite forbids. The list stays readable.</span>
+            </p>
+
+            <!-- The modules of the page: to upgrade first, then the others. -->
+            <section
+                t-foreach="sections"
+                t-as="section"
+                t-key="section.id"
+                class="o_erplibre_dev_action_section rounded-3 overflow-hidden"
+                t-att-data-section="section.id"
+                t-att-aria-labelledby="'o_erplibre_dev_actions_' + section.id"
+            >
+                <div class="d-flex flex-wrap align-items-baseline gap-2 px-2 pt-2 pb-1">
+                    <h3 t-att-id="'o_erplibre_dev_actions_' + section.id" class="o_erplibre_dev_section_title mb-0">
+                        <t t-if="section.id === 'upgrade'">To upgrade</t>
+                        <t t-else="">Other modules of the page</t>
+                    </h3>
+                    <span class="text-muted">
+                        <t t-if="section.id === 'upgrade'">newer version on disk than in the database</t>
+                        <t t-else="">installed version, up to date with the disk</t>
+                    </span>
+                </div>
+                <p t-if="!section.modules.length" class="mb-0 px-2 py-2 text-muted o_erplibre_dev_action_empty">
+                    <t t-if="section.id === 'upgrade'">No module of the page waits for an upgrade.</t>
+                    <t t-else="">No other module on this page.</t>
+                </p>
+                <ul class="list-unstyled mb-0">
+                    <li
+                        t-foreach="section.modules"
+                        t-as="module"
+                        t-key="module"
+                        class="o_erplibre_dev_action_row"
+                        t-att-class="{
+                            'o_erplibre_dev_dimmed': dimmed([module]),
+                            'o_erplibre_dev_checked': isChecked(module),
+                        }"
+                        t-att-data-module="module"
+                        t-on-mouseenter="() => this.highlightModule(module)"
+                        t-on-mouseleave="unhighlight"
+                    >
+                        <t t-set="moduleVersions" t-value="versions(module)" />
+                        <t t-set="open" t-value="commitsOpen(module)" />
+                        <div class="d-flex align-items-center gap-2 o_erplibre_dev_action_head">
+                            <input
+                                type="checkbox"
+                                class="form-check-input flex-shrink-0 m-0 o_erplibre_dev_upgrade_check"
+                                t-att-id="'o_erplibre_dev_up_' + module"
+                                t-att-checked="isChecked(module)"
+                                t-att-disabled="!allowed"
+                                t-att-title="checkTitle(module)"
+                                t-on-change="(ev) => this.toggleChecked(module, ev)"
+                                t-on-focus="() => this.highlightModule(module)"
+                                t-on-blur="unhighlight"
+                            />
+                            <label
+                                t-att-for="'o_erplibre_dev_up_' + module"
+                                class="flex-grow-1 min-w-0 d-flex flex-wrap align-items-center gap-1 mb-0"
+                                t-att-class="{'o_erplibre_dev_locked': !allowed}"
+                                t-att-title="checkTitle(module)"
+                            >
+                                <span t-attf-class="o_erplibre_dev_dot o_tag o_tag_color_{{ moduleColor(module) }}" aria-hidden="true" />
+                                <span class="fw-semibold" t-esc="module" />
+                                <span
+                                    t-if="moduleVersions and moduleVersions.pending"
+                                    class="d-inline-flex align-items-center gap-1 text-muted o_erplibre_dev_versions"
+                                >
+                                    <t t-esc="moduleVersions.installed" />
+                                    <i class="fa fa-long-arrow-right" role="img" aria-label="then on disk" title="then on disk" />
+                                    <span class="fw-semibold o_erplibre_dev_disk_version" t-esc="moduleVersions.code" />
+                                </span>
+                                <span
+                                    t-elif="moduleVersions and moduleVersions.installed"
+                                    class="text-muted o_erplibre_dev_versions"
+                                    t-esc="moduleVersions.installed"
+                                />
+                            </label>
+                            <button
+                                class="btn btn-sm o_erplibre_dev_icon_btn flex-shrink-0 o_erplibre_dev_history"
+                                t-att-class="{'active': open}"
+                                aria-label="Recent commits"
+                                title="Recent commits"
+                                t-att-aria-expanded="open ? 'true' : 'false'"
+                                t-att-aria-controls="'o_erplibre_dev_commits_' + module"
+                                t-on-click="() => this.toggleCommits(module)"
+                            >
+                                <i class="fa fa-history" aria-hidden="true" />
+                            </button>
+                        </div>
+                        <Commits
+                            t-if="open"
+                            commits="data.commits[module]"
+                            id="'o_erplibre_dev_commits_' + module"
+                        />
+                    </li>
+                </ul>
+            </section>
+
+            <!-- The action bar. -->
+            <div class="o_erplibre_dev_action_bar d-flex flex-column gap-2 p-2 rounded-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        class="btn btn-primary d-inline-flex align-items-center gap-2 o_erplibre_dev_upgrade"
+                        t-att-disabled="upgradeDisabled"
+                        t-att-title="upgradeTitle"
+                        aria-describedby="o_erplibre_dev_bar_note"
+                        t-on-click="upgrade"
+                    >
+                        <i class="fa fa-arrow-up" aria-hidden="true" />
+                        <t t-esc="upgradeLabel" />
+                    </button>
+                    <button
+                        class="btn btn-secondary d-inline-flex align-items-center gap-2 o_erplibre_dev_reload_assets"
+                        title="Deletes the asset bundles: the next page load rebuilds them from the files on disk, without restarting the server."
+                        t-on-click="reloadAssets"
+                    >
+                        <i class="fa fa-paint-brush" aria-hidden="true" />
+                        Reload the assets
+                    </button>
+                </div>
+                <p t-if="dimmedCheckedNote" class="mb-0 text-muted o_erplibre_dev_dimmed_checked" t-esc="dimmedCheckedNote" />
+                <p
+                    t-if="ui.assetsDone"
+                    class="d-flex flex-wrap align-items-center gap-1 mb-0 text-success-emphasis o_erplibre_dev_assets_done"
+                    role="status"
+                >
+                    <i class="fa fa-check" aria-hidden="true" />
+                    Asset bundles deleted: reload the page to rebuild them.
+                    <button class="btn btn-link btn-sm p-0 o_erplibre_dev_reload_page" t-on-click="reloadPage">
+                        Reload the page
+                    </button>
+                </p>
+                <p id="o_erplibre_dev_bar_note" class="d-flex align-items-start gap-2 mb-0 text-muted o_erplibre_dev_bar_note">
+                    <i class="fa fa-server mt-1" aria-hidden="true" />
+                    <span t-esc="barNote" />
+                </p>
+            </div>
+
+            <!-- The last runs of erplibre_info, as they were recorded. -->
+            <section class="o_erplibre_dev_runs px-1" aria-labelledby="o_erplibre_dev_runs_title">
+                <h3 id="o_erplibre_dev_runs_title" class="o_erplibre_dev_section_title text-muted mb-1">Recent runs</h3>
+                <div t-if="data.runsLoading" class="text-muted">
+                    <i class="fa fa-spinner fa-spin" aria-hidden="true" />
+                    Loading…
+                </div>
+                <div t-elif="data.runsError" class="text-warning-emphasis text-break o_erplibre_dev_runs_error" t-esc="data.runsError" />
+                <div t-elif="data.runs and !data.runs.length" class="text-muted o_erplibre_dev_runs_empty">No run recorded.</div>
+                <ul t-elif="data.runs" class="list-unstyled mb-0 d-flex flex-column gap-1">
+                    <li
+                        t-foreach="data.runs"
+                        t-as="run"
+                        t-key="run.id"
+                        class="d-flex align-items-start gap-2 o_erplibre_dev_run"
+                        t-att-data-state="run.state"
+                    >
+                        <i t-attf-class="fa fa-fw mt-1 {{ runIcon(run) }}" role="img" t-att-aria-label="run.state_label" t-att-title="run.state_label" />
+                        <span class="flex-grow-1 min-w-0">
+                            <t t-esc="run.type_label" />
+                            <t t-foreach="run.modules" t-as="name" t-key="name">
+                                <code class="ms-1 o_erplibre_dev_run_module" t-esc="name" />
+                            </t>
+                            ·
+                            <span class="o_erplibre_dev_run_state" t-esc="run.state_label" />
+                            ·
+                            <time t-att-datetime="runIso(run)" t-att-title="runDate(run)" t-esc="runWhen(run)" />
+                            <t t-if="run.user">
+                                ·
+                                <t t-esc="run.user" />
+                            </t>
+                        </span>
+                    </li>
+                </ul>
+                <p class="mb-0 mt-1 text-muted o_erplibre_dev_runs_hint">The state is the one recorded at the request: the upgrade itself runs at the next start of the server.</p>
+            </section>
+        </section>
+    </t>
+</templates>
