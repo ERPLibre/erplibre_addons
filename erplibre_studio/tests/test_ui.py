@@ -6,7 +6,7 @@ from unittest.mock import patch
 from lxml import etree
 from odoo.tests import HttpCase, tagged
 
-from .common import TIMELINE_ARCH
+from .common import TIMELINE_ARCH, production_rule_patch
 
 
 def _hoot_error(message):
@@ -201,12 +201,14 @@ class TestStudioModelsUi(HttpCase):
         under the external ids of the module."""
         self.env["res.lang"]._activate_lang("en_US")
         self.env.ref("base.user_admin").lang = "en_US"
-        self.start_tour(
-            "/odoo/action-base.action_partner_form?debug=1&view_type=list",
-            "erplibre_studio_models",
-            login="admin",
-            timeout=240,
-        )
+        # The tour checks the refusal of a name without x_.
+        with production_rule_patch(self.env):
+            self.start_tour(
+                "/odoo/action-base.action_partner_form?debug=1&view_type=list",
+                "erplibre_studio_models",
+                login="admin",
+                timeout=240,
+            )
         project = self.env["erplibre.studio.project"].search(
             [("module_name", "=", "studio_tour_models")]
         )

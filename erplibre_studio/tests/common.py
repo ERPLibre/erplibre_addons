@@ -1,12 +1,14 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from unittest.mock import patch
+
 from lxml import etree
 from odoo.addons.erplibre_developer.tests.common import DeveloperMixin
 from odoo.tests import new_test_user
 from odoo.tests.common import TransactionCase
 
-from ..models.erplibre_studio_project import PREVIEW_KEY
+from ..models.erplibre_studio_project import PREVIEW_KEY, ErplibreStudioProject
 
 PIVOT_ARCH = """
 <pivot string="Partners">
@@ -29,8 +31,23 @@ TIMELINE_ARCH = """
 """
 
 
+def production_rule_patch(env):
+    """A patch of the registry class of the projects: the rule of the
+    technical names of ERPLibre studio itself, x_ required. The class is
+    shared by the requests of an HTTP test: a tour sees the same rule."""
+    return patch.object(
+        type(env["erplibre.studio.project"]),
+        "_studio_field_name_rule",
+        ErplibreStudioProject._studio_field_name_rule,
+    )
+
+
 class StudioMixin(DeveloperMixin):
-    """A studio project on the contact views, and its draft."""
+    """A studio project on the contact views, and its draft. The rule of
+    the technical names is the one of ERPLibre studio, x_ required
+    (``production_rule``), unless ``production_rule_pinned`` is False."""
+
+    production_rule_pinned = True
 
     def setUp(self):
         super().setUp()
@@ -38,6 +55,10 @@ class StudioMixin(DeveloperMixin):
         # state once the test is rolled back.
         self.addCleanup(self.registry.reset_changes)
         self.Project = self.env["erplibre.studio.project"]
+        if self.production_rule_pinned:
+            patcher = self.production_rule()
+            patcher.start()
+            self.addCleanup(patcher.stop)
         self.Editor = self.env["erplibre.studio.editor"]
         self.form = self.env.ref("base.view_partner_form")
         self.list = self.env.ref("base.view_partner_tree")
@@ -46,6 +67,12 @@ class StudioMixin(DeveloperMixin):
         return self.Project.create(
             {"name": "Studio test", "module_name": module_name, **vals}
         )
+
+    def production_rule(self):
+        """A patch that gives the rule of ERPLibre studio itself, x_
+        required, whatever rule a module installed beside it reads from
+        the database (a development database allows names without x_)."""
+        return production_rule_patch(self.env)
 
     def op(self, project, view, **operation):
         return project._apply_operation(view, operation)
