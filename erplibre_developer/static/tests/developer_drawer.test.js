@@ -171,6 +171,8 @@ const DIRTY_REPO = "odoo18.0/addons/sample_addons";
 const DIRTY_TARGET = "19be4d0ccccccccc";
 const CLEAN_REPO = "odoo18.0/odoo";
 const CLEAN_TARGET = "a41c9e2aaaaaaaaa";
+// The repository the panel of the code sample comes from.
+const PANEL_REPO = "odoo18.0/addons/example_panel_addons";
 
 function repoVals(path, vals) {
     return {
@@ -209,7 +211,7 @@ function repoModule(name, repoPath, repo, vals = {}) {
 /**
  * A get_code_info answer: base and other_module in a sound repository,
  * example (upgrade pending) in a modified one listed after them, orphan in
- * no repository.
+ * no repository; the panel comes from a repository of none of them.
  */
 function codeSample() {
     const clean = repoVals(CLEAN_REPO, {});
@@ -231,6 +233,7 @@ function codeSample() {
             repoModule("example", DIRTY_REPO, dirty, {code_version: "18.0.1.1.0"}),
             {...codeModule("orphan"), path: "/elsewhere/orphan", path_rel: "elsewhere/orphan"},
         ],
+        panel: repoModule("erplibre_developer", PANEL_REPO, repoVals(PANEL_REPO, {})),
         snapshot_date: false,
         error: false,
     };
@@ -1369,6 +1372,63 @@ describe("erplibre_developer drawer", () => {
         expect(".o_erplibre_dev_code_empty").toHaveText(/No module matches this filter\./);
         await contains(".o_erplibre_dev_code_empty .o_erplibre_dev_show_all").click();
         expect(".o_erplibre_dev_code_row").toHaveCount(1);
+    });
+
+    test("the code tab names the repository of the panel", async () => {
+        codeAnswers = [() => codeSample()];
+        repoAnswers = {[DIRTY_REPO]: () => repoDetailsSample()};
+        await openDrawer();
+        await contains(".o_erplibre_dev_tabs [data-tab=code]").click();
+        await animationFrame();
+        expect.verifySteps(["get_code_info base,example", `get_repo_details ${DIRTY_REPO} ${DIRTY_TARGET}`]);
+        await animationFrame();
+        const note = ".o_erplibre_dev_panel_repo";
+        expect(note).toHaveCount(1);
+        expect(`${note} .o_erplibre_dev_panel_repo_path`).toHaveText(PANEL_REPO);
+        expect(`${note} .o_erplibre_dev_panel_repo_state`).toHaveText("Matches the manifest");
+        expect(`${note} .o_erplibre_dev_panel_repo_state`).toHaveClass("bg-success-subtle");
+        expect(note).toHaveText(/no module of this page\.$/);
+        // The note follows the repositories: it stays with « repositories »
+        // and leaves with the other tiles.
+        await contains(".o_erplibre_dev_code_tile[data-tile=repos]").click();
+        expect(note).toHaveCount(1);
+        for (const tile of ["dirty", "upgrade"]) {
+            await contains(`.o_erplibre_dev_code_tile[data-tile=${tile}]`).click();
+            expect(note).toHaveCount(0);
+        }
+        await contains(".o_erplibre_dev_code_tile[data-tile=upgrade]").click();
+        expect(note).toHaveCount(1);
+        // A module filter hides it.
+        await contains(".o_erplibre_dev_code_row[data-module=example] .o_erplibre_dev_code_module").click();
+        expect(note).toHaveCount(0);
+        await contains(".o_erplibre_dev_code_row[data-module=example] .o_erplibre_dev_code_module").click();
+        expect(note).toHaveCount(1);
+        // A panel in a repository of the page is listed above.
+        codeAnswers = [
+            () => {
+                const sample = codeSample();
+                sample.panel = repoModule("erplibre_developer", CLEAN_REPO, sample.modules[0].repo);
+                return sample;
+            },
+        ];
+        await contains(".o_erplibre_dev_code_refresh").click();
+        await animationFrame();
+        expect.verifySteps(["get_code_info base,example", `get_repo_details ${DIRTY_REPO} ${DIRTY_TARGET}`]);
+        expect(`${note} .o_erplibre_dev_panel_repo_path`).toHaveText(CLEAN_REPO);
+        expect(note).toHaveText(/listed above\.$/);
+        // An answer without the panel shows no note.
+        codeAnswers = [
+            () => {
+                const sample = codeSample();
+                delete sample.panel;
+                return sample;
+            },
+        ];
+        await contains(".o_erplibre_dev_code_snapshot").click();
+        await animationFrame();
+        expect.verifySteps(["get_code_info base,example"]);
+        expect(".o_erplibre_dev_repo").toHaveCount(3);
+        expect(note).toHaveCount(0);
     });
 
     test("the code tab reads the snapshot or the clones", async () => {

@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from odoo import Command
 from odoo.addons.erplibre_info import runner
-from odoo.addons.erplibre_info.tests.common import REPO, SERIES
+from odoo.addons.erplibre_info.tests.common import REPO, REPO_OTHER, SERIES
 from odoo.addons.erplibre_info_git.tests.common import ErplibreInfoGitCase
 from odoo.exceptions import UserError
 from odoo.tests import tagged
@@ -145,6 +145,68 @@ class TestCodeInfo(DeveloperMixin, ErplibreInfoGitCase):
         self.assertFalse(entry["repo"])
         self.assertTrue(entry["path"].endswith("erplibre_developer"))
         self.assertEqual(entry["code_version"], entry["installed_version"])
+
+    def _state_reads(self, since):
+        """The ``repo_state.py`` argument lists recorded after ``since``
+        calls of the fake scripts."""
+        return [
+            args
+            for script, args in self.fake.scripts()[since:]
+            if script == "repo_state.py"
+        ]
+
+    def test_panel_repository(self):
+        """The module of the panel comes with the answer, out of the
+        modules of the page, and its clone joins the one script call."""
+        calls = len(self.fake.calls)
+        with self._fake_module():
+            res = self.Dev.get_code_info(["erplibre_info"])
+        self.assertEqual(len(res["modules"]), 1)
+        panel = res["panel"]
+        self.assertEqual(panel["name"], "erplibre_developer")
+        self.assertEqual(panel["clone_rel"], REPO)
+        self.assertEqual(panel["repo_source"], "repo_state")
+        self.assertEqual(panel["repo"]["state"], "conforme")
+        self.assertEqual(self._state_reads(calls), [["snapshot", "--repo", REPO]])
+        self.Snapshot._capture("manual", force=True)
+        for refresh in (False, True):
+            with self.subTest(refresh=refresh):
+                calls = len(self.fake.calls)
+                with self._fake_module():
+                    res = self.Dev.get_code_info(["erplibre_info"], refresh=refresh)
+                self.assertTrue(res["panel"]["repo"]["state"])
+                self.assertEqual(len(self._state_reads(calls)), 1)
+
+    def test_panel_in_another_clone(self):
+        """A panel in another clone than the modules of the page is read
+        in the same call, one ``--repo`` per clone."""
+        clones = {}
+        for name, rel in (("erplibre_info", REPO), ("erplibre_developer", REPO_OTHER)):
+            clone = os.path.join(self.root, rel)
+            os.makedirs(os.path.join(clone, ".git"), exist_ok=True)
+            clones[name] = os.path.join(clone, name)
+            os.makedirs(clones[name], exist_ok=True)
+        calls = len(self.fake.calls)
+        with patch(
+            f"{MODEL_MODULE}.get_module_path",
+            lambda name, display_warning=False: clones.get(name, False),
+        ):
+            res = self.Dev.get_code_info(["erplibre_info"])
+        self.assertEqual(res["panel"]["clone_rel"], REPO_OTHER)
+        self.assertEqual(res["panel"]["repo"]["path"], REPO_OTHER)
+        self.assertEqual(res["modules"][0]["repo"]["path"], REPO)
+        args = ["snapshot"]
+        for rel in sorted((REPO, REPO_OTHER)):
+            args += ["--repo", rel]
+        self.assertEqual(self._state_reads(calls), [args])
+
+    def test_panel_listed_on_the_page(self):
+        """When the page shows the module of the panel, ``panel`` is its
+        entry and the list keeps one entry per module."""
+        with self._fake_module():
+            res = self.Dev.get_code_info(["erplibre_info", "erplibre_developer"])
+        self.assertEqual(len(res["modules"]), 2)
+        self.assertIs(res["panel"], res["modules"][1])
 
 
 @tagged("post_install", "-at_install")

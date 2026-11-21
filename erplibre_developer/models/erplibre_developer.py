@@ -18,6 +18,9 @@ VIEW_TYPES += ("activity", "gantt", "timeline", "map", "cohort", "hierarchy")
 COMMIT_LIMIT = 20
 RUN_LIMIT = 5
 RUN_LIMIT_MAX = 50
+# The module whose files the drawer runs from: the Code tab names its
+# repository even when no module of the page lives there.
+PANEL_MODULE = "erplibre_developer"
 
 
 class ErplibreDeveloper(models.AbstractModel):
@@ -364,17 +367,21 @@ class ErplibreDeveloper(models.AbstractModel):
         that no snapshot links, or every module with ``refresh``, is read
         with one ``repo_state.py snapshot --repo …`` call for all of their
         repositories. Without a checkout, the snapshot stays the only
-        source, ``refresh`` or not, and ``error`` says why. Return
-        {modules: [...], snapshot_date, error}.
+        source, ``refresh`` or not, and ``error`` says why. ``panel`` is
+        the entry of PANEL_MODULE, read the same way and in the same call:
+        the very entry of ``modules`` when the page shows it, kept out of
+        that list otherwise. Return {modules: [...], panel, snapshot_date,
+        error}.
         """
         self._check_panel_access()
         root = runner.erplibre_root(self.env)
         labels = self._repo_state_labels()
+        names = set(modules or []) | {PANEL_MODULE}
         records = {
             m.name: m
             for m in self.env["ir.module.module"]
             .sudo()
-            .search([("name", "in", list(modules or []))])
+            .search([("name", "in", list(names))])
         }
         snapshot = self.env["erplibre.code.snapshot"].search([], limit=1)
         lines = {
@@ -384,41 +391,61 @@ class ErplibreDeveloper(models.AbstractModel):
         }
         result = []
         to_read = {}
+        panel = False
         for name in modules or []:
-            record = records.get(name)
-            path = get_module_path(name, display_warning=False) or False
-            path = os.path.realpath(path) if path else False
-            clone = code.repository_of(path, root) if path else None
-            manifest = get_manifest(name) if path else {}
-            entry = {
-                "name": name,
-                "state": record.state if record else False,
-                "installed_version": (record.latest_version if record else False)
-                or False,
-                "code_version": safe_version(manifest.get("version")) or False,
-                "path": path,
-                "path_rel": code.relative_to(path, root) if path else False,
-                "clone": clone or False,
-                "clone_rel": code.relative_to(clone, root) if clone else False,
-                "module_rel": os.path.relpath(path, clone) if clone else False,
-                "repo": False,
-                "repo_source": False,
-            }
-            line = lines.get(name)
-            if line and (not refresh or not root):
-                entry["repo"] = self._repo_vals(line, labels)
-                entry["repo_source"] = "snapshot"
-            elif clone and root and entry["clone_rel"] != clone:
-                to_read.setdefault(entry["clone_rel"], []).append(entry)
+            entry = self._code_entry(
+                name, records, lines, root, labels, refresh, to_read
+            )
+            if name == PANEL_MODULE and not panel:
+                panel = entry
             result.append(entry)
+        if not panel:
+            panel = self._code_entry(
+                PANEL_MODULE, records, lines, root, labels, refresh, to_read
+            )
         error = False if root else runner.checkout_problem(self.env)
         if to_read:
             error = self._read_repos(to_read, labels)
         return {
             "modules": result,
+            "panel": panel,
             "snapshot_date": snapshot.date if snapshot else False,
             "error": error,
         }
+
+    @api.model
+    def _code_entry(self, name, records, lines, root, labels, refresh, to_read):
+        """The code payload of the module ``name``: path, versions and the
+        repository read from its snapshot line (``lines``), or, when it
+        must be read on disk, the entry is added to ``to_read`` under the
+        path of its clone relative to the checkout, for one later
+        ``_read_repos`` call. ``records`` maps the names to their
+        ir.module.module record."""
+        record = records.get(name)
+        path = get_module_path(name, display_warning=False) or False
+        path = os.path.realpath(path) if path else False
+        clone = code.repository_of(path, root) if path else None
+        manifest = get_manifest(name) if path else {}
+        entry = {
+            "name": name,
+            "state": record.state if record else False,
+            "installed_version": (record.latest_version if record else False) or False,
+            "code_version": safe_version(manifest.get("version")) or False,
+            "path": path,
+            "path_rel": code.relative_to(path, root) if path else False,
+            "clone": clone or False,
+            "clone_rel": code.relative_to(clone, root) if clone else False,
+            "module_rel": os.path.relpath(path, clone) if clone else False,
+            "repo": False,
+            "repo_source": False,
+        }
+        line = lines.get(name)
+        if line and (not refresh or not root):
+            entry["repo"] = self._repo_vals(line, labels)
+            entry["repo_source"] = "snapshot"
+        elif clone and root and entry["clone_rel"] != clone:
+            to_read.setdefault(entry["clone_rel"], []).append(entry)
+        return entry
 
     @api.model
     def _read_repos(self, to_read, labels=None):

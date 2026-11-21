@@ -54,6 +54,11 @@ function upgradePending(module) {
  *
  * The summary tiles (``data.codeTile``) hide what they leave out, with a
  * « Show all »; the module filter only dims, as in the other tabs.
+ *
+ * Below the repositories, a note names the repository the panel itself
+ * comes from (``data.code.panel``), with its state, and whether a module
+ * of the page shares it; it shows with every module and every repository,
+ * not with another tile nor under a module filter.
  */
 export class CodeTab extends Component {
     static template = "erplibre_developer.CodeTab";
@@ -266,6 +271,28 @@ export class CodeTab extends Component {
         } catch {
             this.notification.add(text, {title: _t("Copy this path"), type: "warning"});
         }
+    }
+
+    // ── the repository of the panel ─────────────────────────────────────
+
+    /** The code entry of the module the panel runs from, null before it is known. */
+    get panel() {
+        return (this.data.code && this.data.code.panel) || null;
+    }
+
+    get showPanelRepo() {
+        const panel = this.panel;
+        return (
+            Boolean(panel && panel.clone_rel) &&
+            !this.devState.moduleFilter &&
+            ["all", "repos"].includes(this.data.codeTile)
+        );
+    }
+
+    /** Whether a repository of the list above is the one of the panel. */
+    get panelListed() {
+        const panel = this.panel;
+        return Boolean(panel) && this.groups.some((group) => group.key && group.key === panel.clone_rel);
     }
 
     // ── details: uncommitted files, commits ─────────────────────────────

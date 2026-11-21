@@ -1037,6 +1037,12 @@ msgstr ""
 
 #. module: erplibre_developer
 #. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/tabs/code_tab.xml:0
+msgid "The panel itself comes from"
+msgstr ""
+
+#. module: erplibre_developer
+#. odoo-javascript
 #: code:addons/erplibre_developer/static/src/drawer/tabs/actions_tab.xml:0
 msgid ""
 "The state is the one recorded at the request: the upgrade itself runs at the"
@@ -1538,4 +1544,16 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_developer/static/src/drawer/tabs/views_tab.xml:0
 msgid "visible to"
+msgstr ""
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/tabs/code_tab.xml:0
+msgid "— listed above."
+msgstr ""
+
+#. module: erplibre_developer
+#. odoo-javascript
+#: code:addons/erplibre_developer/static/src/drawer/tabs/code_tab.xml:0
+msgid "— no module of this page."
 msgstr ""

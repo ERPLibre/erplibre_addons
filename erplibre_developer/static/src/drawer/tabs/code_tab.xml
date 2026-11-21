@@ -311,6 +311,21 @@
                 </t>
                 <t t-else="">No module.</t>
             </div>
+
+            <p
+                t-if="showPanelRepo"
+                class="small text-muted d-flex flex-wrap align-items-center gap-1 mb-0 o_erplibre_dev_panel_repo"
+            >
+                The panel itself comes from
+                <code class="text-break o_erplibre_dev_panel_repo_path" t-esc="panel.clone_rel"/>
+                <span
+                    t-if="panel.repo and panel.repo.state"
+                    t-attf-class="badge rounded-pill bg-{{ stateColor(panel.repo) }}-subtle text-{{ stateColor(panel.repo) }}-emphasis o_erplibre_dev_panel_repo_state"
+                    t-esc="panel.repo.state_label or panel.repo.state"
+                />
+                <span t-if="panelListed">— listed above.</span>
+                <span t-else="">— no module of this page.</span>
+            </p>
         </section>
     </t>
 </templates>
