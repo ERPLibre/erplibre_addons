@@ -391,6 +391,31 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(`${chatter} > .o_erplibre_studio_pick`).toHaveAttribute("aria-pressed", "true");
     });
 
+    test("Enter on a palette item with a group or a page selected adds it inside", async () => {
+        await openEditor();
+        const add = ".o_erplibre_studio_new_field[data-type=char] > .o_erplibre_studio_palette_add";
+        const title = `.o_erplibre_studio_container[data-path="${ADDRESS}"] > .o_erplibre_studio_container_title`;
+        await contains(title).click();
+        expect(`.o_erplibre_studio_container[data-path="${ADDRESS}"]`).toHaveClass("o_erplibre_studio_selected");
+        queryOne(add).focus();
+        await press("Enter");
+        await animationFrame();
+        expect.verifySteps([`apply_operation add_field undefined inside ${ADDRESS}`]);
+        // A tab page selected: at the end of the page.
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        queryOne(add).focus();
+        await press("Enter");
+        await animationFrame();
+        expect.verifySteps([`apply_operation add_field undefined inside ${SALES}`]);
+        // A field selected: right after it, as before.
+        await contains(".o_erplibre_studio_field[data-name=street]").click();
+        await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
+        queryOne(".o_erplibre_studio_existing_field[data-name=phone] > .o_erplibre_studio_palette_add").focus();
+        await press("Enter");
+        await animationFrame();
+        expect.verifySteps([`apply_operation add_existing_field undefined before ${named("city")}`]);
+    });
+
     test("the palette: a search over the types and the fields, the other types, the existing fields", async () => {
         answer = payload({
             field_types: [

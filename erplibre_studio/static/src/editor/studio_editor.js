@@ -953,11 +953,13 @@ export class StudioEditor extends Component {
 
     /**
      * Add the palette ``item`` without a drag (a click, Enter or Space on
-     * it). With a block selected, it goes right after it: the hook before
-     * its next sibling, else the hook at the end of its container; else,
-     * or when that hook does not take the item, on the last hook of the
-     * canvas that takes it. The drop on that hook then runs as a drop of a
-     * drag does.
+     * it). A selected container that takes drops (a group, a tab page)
+     * gets it at its end, on its own « inside » hook. Another selected
+     * block gets it right after it: the hook before its next sibling,
+     * else the hook at the end of its container. With nothing selected,
+     * or when none of those hooks takes the item (a row of groups shows
+     * no hook of its own), it goes on the last hook of the canvas that
+     * takes it. The drop on that hook then runs as a drop of a drag does.
      */
     async addFromPalette(item) {
         if (this.state.busy) {
@@ -976,10 +978,14 @@ export class StudioEditor extends Component {
             .filter((hook) => this.accepts(item, hook.zone));
         const wanted = [];
         const trail = this.state.selected ? blockTrail(this.root, this.state.selected) : [];
+        const selected = trail[trail.length - 1];
+        if (selected && selected.kind === "container" && selected.drop) {
+            wanted.push({target: selected.path, position: "inside"});
+        }
         if (trail.length > 1) {
             const parent = trail[trail.length - 2];
             const siblings = parent.children || [];
-            const next = siblings[siblings.indexOf(trail[trail.length - 1]) + 1];
+            const next = siblings[siblings.indexOf(selected) + 1];
             if (next) {
                 wanted.push({target: next.path, position: "before"});
             }

@@ -2194,7 +2194,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
-msgid "Drag an item onto a drop zone of the canvas, or press Enter on it: it goes after the selected element, else at the end of the view."
+msgid "Drag an item onto a drop zone of the canvas, or press Enter on it: it goes into the selected group or page, after the selected element, else at the end of the view."
 msgstr ""
 
 #. module: erplibre_studio
@@ -4586,6 +4586,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
 msgid "Ribbon"
 msgstr ""

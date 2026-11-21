@@ -363,10 +363,16 @@
         background-color: $o-view-background-color;
     }
 
-    // A palette item is also a button: Enter or Space adds it.
-    .o_erplibre_studio_palette_item:focus-visible {
+    // A palette item holds a button (.o_erplibre_studio_pick) that takes
+    // the focus: the item shows it around its whole box, the button's own
+    // outline then gives way.
+    .o_erplibre_studio_palette_item:has(.o_erplibre_studio_palette_add:focus-visible) {
         outline: 2px solid $primary;
         outline-offset: 1px;
+
+        .o_erplibre_studio_palette_add:focus-visible {
+            outline: 0;
+        }
     }
 
     .o_erplibre_studio_fixed {

@@ -4,7 +4,10 @@
 <templates xml:space="preserve">
     <!-- The palette: a search box, then a section per kind of item; the
          heading of a section carries « data-tab » (new, existing, layout,
-         other). -->
+         other). An item is a draggable div around a button: the button is
+         the tab stop and takes Enter and Space, whose click bubbles to the
+         single click handler of the div; it takes no pointer event, so
+         the mouse reaches the div and a drag starts in every browser. -->
     <t t-name="erplibre_studio.Palette">
         <div class="o_erplibre_studio_palette_body d-flex flex-column gap-3 h-100">
             <div class="input-group input-group-sm">
@@ -29,17 +32,19 @@
                         class="o_erplibre_studio_palette_item o_erplibre_studio_new_field d-flex align-items-center gap-2 border rounded px-2 py-1"
                         t-att-data-type="item.ttype"
                         t-att-title="item.label"
-                        role="button"
-                        tabindex="0"
-                        t-att-aria-label="itemLabel(item.label)"
                         draggable="true"
                         t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'new', ttype: item.ttype})"
                         t-on-dragend="() => this.endDrag()"
                         t-on-click="() => this.add({kind: 'new', ttype: item.ttype})"
-                        t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'new', ttype: item.ttype})"
                     >
-                        <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_container" aria-hidden="true" t-esc="item.glyph" />
-                        <span class="text-truncate" t-esc="item.label" />
+                        <button
+                            type="button"
+                            class="o_erplibre_studio_pick o_erplibre_studio_palette_add flex-nowrap gap-2 w-100"
+                            t-att-aria-label="itemLabel(item.label)"
+                        >
+                            <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_container" aria-hidden="true" t-esc="item.glyph" />
+                            <span class="text-truncate" t-esc="item.label" />
+                        </button>
                     </div>
                 </div>
                 <div t-if="query and !shownTypes.length" class="small text-muted">No field type matches.</div>
@@ -81,24 +86,26 @@
                         class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field d-flex flex-wrap align-items-center gap-1 rounded px-2 py-1 mb-1"
                         t-att-data-name="item.name"
                         t-att-title="item.type"
-                        role="button"
-                        tabindex="0"
-                        t-att-aria-label="itemLabel(item.string + ' (' + item.name + ')')"
                         draggable="true"
                         t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes})"
                         t-on-dragend="() => this.endDrag()"
                         t-on-click="() => this.add({kind: 'existing', name: item.name, axes: item.axes})"
-                        t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'existing', name: item.name, axes: item.axes})"
                     >
-                        <span class="text-truncate flex-grow-1" t-esc="item.string" />
-                        <code class="small text-muted text-truncate" t-esc="item.name" />
-                        <span
-                            t-foreach="item.axes or []"
-                            t-as="axis"
-                            t-key="axis"
-                            class="badge text-bg-light o_erplibre_studio_axis_badge"
-                            t-esc="axisLabel(axis)"
-                        />
+                        <button
+                            type="button"
+                            class="o_erplibre_studio_pick o_erplibre_studio_palette_add gap-1 w-100"
+                            t-att-aria-label="itemLabel(item.string + ' (' + item.name + ')')"
+                        >
+                            <span class="text-truncate flex-grow-1" t-esc="item.string" />
+                            <code class="small text-muted text-truncate" t-esc="item.name" />
+                            <span
+                                t-foreach="item.axes or []"
+                                t-as="axis"
+                                t-key="axis"
+                                class="badge text-bg-light o_erplibre_studio_axis_badge"
+                                t-esc="axisLabel(axis)"
+                            />
+                        </button>
                     </div>
                     <div t-if="query and !existingFields.length" class="small text-muted">No field matches.</div>
                     <div class="small text-muted mt-1">The fields already in the view are left out.</div>
@@ -113,17 +120,19 @@
                     class="o_erplibre_studio_palette_item d-flex align-items-center gap-2 border rounded px-2 py-1 mb-1"
                     t-att-class="item.className"
                     t-att-data-kind="item.kind"
-                    role="button"
-                    tabindex="0"
-                    t-att-aria-label="itemLabel(item.label)"
                     draggable="true"
                     t-on-dragstart="(ev) => this.startDrag(ev, {kind: item.kind})"
                     t-on-dragend="() => this.endDrag()"
                     t-on-click="() => this.add({kind: item.kind})"
-                    t-on-keydown="(ev) => this.onItemKey(ev, {kind: item.kind})"
                 >
-                    <i class="fa text-muted" t-att-class="item.icon" aria-hidden="true" />
-                    <span t-esc="item.label" />
+                    <button
+                        type="button"
+                        class="o_erplibre_studio_pick o_erplibre_studio_palette_add flex-nowrap gap-2 w-100"
+                        t-att-aria-label="itemLabel(item.label)"
+                    >
+                        <i class="fa text-muted" t-att-class="item.icon" aria-hidden="true" />
+                        <span t-esc="item.label" />
+                    </button>
                 </div>
             </section>
             <section t-if="allows('add_widget')" class="o_erplibre_studio_palette_section">
@@ -145,23 +154,26 @@
                 <div
                     class="o_erplibre_studio_palette_item o_erplibre_studio_widget border rounded px-2 py-1 mb-1"
                     data-widget="web_ribbon"
-                    role="button"
-                    tabindex="0"
                     draggable="true"
                     t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'widget', widget: 'web_ribbon'})"
                     t-on-dragend="() => this.endDrag()"
                     t-on-click="() => this.add({kind: 'widget', widget: 'web_ribbon'})"
-                    t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'widget', widget: 'web_ribbon'})"
                 >
-                    <i class="fa fa-bookmark text-muted" aria-hidden="true" />
-                    Ribbon
+                    <button
+                        type="button"
+                        class="o_erplibre_studio_pick o_erplibre_studio_palette_add flex-nowrap gap-2 w-100"
+                        t-att-aria-label="itemLabel(ribbonLabel)"
+                    >
+                        <i class="fa fa-bookmark text-muted" aria-hidden="true" />
+                        <span>Ribbon</span>
+                    </button>
                 </div>
             </section>
             <p t-if="viewType === 'timeline'" class="small text-muted border-top pt-2 mt-auto mb-0">
                 Drag a date field onto Start date or End date, a many2one or a many2many onto Group by.
             </p>
             <p t-else="" class="small text-muted border-top pt-2 mt-auto mb-0">
-                Drag an item onto a drop zone of the canvas, or press Enter on it: it goes after the selected element, else at the end of the view.
+                Drag an item onto a drop zone of the canvas, or press Enter on it: it goes into the selected group or page, after the selected element, else at the end of the view.
             </p>
         </div>
     </t>

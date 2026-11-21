@@ -2298,8 +2298,8 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
-msgid "Drag an item onto a drop zone of the canvas, or press Enter on it: it goes after the selected element, else at the end of the view."
-msgstr "Glissez un élément sur une zone de dépôt du canevas, ou appuyez sur Entrée : il s'ajoute après l'élément sélectionné, sinon à la fin de la vue."
+msgid "Drag an item onto a drop zone of the canvas, or press Enter on it: it goes into the selected group or page, after the selected element, else at the end of the view."
+msgstr "Glissez un élément sur une zone de dépôt du canevas, ou appuyez sur Entrée : il va dans le groupe ou la page sélectionnés, après l'élément sélectionné, sinon à la fin de la vue."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4740,6 +4740,7 @@ msgstr "Revoir le brouillon, puis l'écrire dans la base"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
 msgid "Ribbon"
 msgstr "Ruban"

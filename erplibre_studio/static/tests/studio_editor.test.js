@@ -193,21 +193,46 @@ describe("erplibre_studio editor", () => {
 
     test("Enter on a palette item adds it without a drag", async () => {
         await openEditor();
-        expect(".o_erplibre_studio_new_field[data-type=char]").toHaveAttribute("role", "button");
-        expect(".o_erplibre_studio_new_field[data-type=char]").toHaveAttribute("tabindex", "0");
+        const item = ".o_erplibre_studio_new_field[data-type=char]";
+        const add = `${item} > button.o_erplibre_studio_palette_add`;
+        // The draggable div is no tab stop: the button inside it is.
+        expect(item).toHaveAttribute("draggable", "true");
+        expect(item).not.toHaveAttribute("role");
+        expect(item).not.toHaveAttribute("tabindex");
+        expect(add).toHaveCount(1);
+        expect(add).toHaveAttribute("type", "button");
+        expect(add).toHaveAttribute("aria-label", `Add ${queryOne(item).title}`);
+        // The mouse goes through the button to the draggable div.
+        expect(getComputedStyle(queryOne(add)).pointerEvents).toBe("none");
         // Nothing selected: at the last hook of the canvas.
         const last = queryAll(".o_erplibre_studio_hook").at(-1);
-        queryOne(".o_erplibre_studio_new_field[data-type=char]").focus();
+        queryOne(add).focus();
         await press("Enter");
         await animationFrame();
         expect.verifySteps([`apply_operation add_field ${last.dataset.position} ${last.dataset.target}`]);
         // A selected block: at the first hook after it.
         await contains(".o_erplibre_studio_field[data-name=name]").click();
         await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
-        queryOne(".o_erplibre_studio_existing_field[data-name=ref]").focus();
+        const ref = ".o_erplibre_studio_existing_field[data-name=ref]";
+        expect(ref).not.toHaveAttribute("tabindex");
+        expect(`${ref} > .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add Reference (ref)");
+        queryOne(`${ref} > .o_erplibre_studio_palette_add`).focus();
         await press("Enter");
         await animationFrame();
         expect.verifySteps([`apply_operation add_existing_field ref before ${EMAIL}`]);
+    });
+
+    test("a click on a palette item adds it once", async () => {
+        await openEditor();
+        const item = ".o_erplibre_studio_new_field[data-type=char]";
+        const last = queryAll(".o_erplibre_studio_hook").at(-1);
+        // The click lands on the div: its handler runs once, the button
+        // has none of its own. (Space on the button is the browser's own
+        // click of a button, which hoot does not simulate.)
+        await contains(item).click();
+        await animationFrame();
+        expect.verifySteps([`apply_operation add_field ${last.dataset.position} ${last.dataset.target}`]);
+        expect(".o_erplibre_studio_field[data-name=x_text]").toHaveClass("o_erplibre_studio_selected");
     });
 
     test("a canvas block is a button the keyboard selects", async () => {

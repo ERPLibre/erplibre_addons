@@ -24,13 +24,17 @@ export const LAYOUT_ITEMS = [
  * The palette of the editor, one column of sections: a search box, the new
  * field types, the existing fields (a section that folds), the layout
  * items (a group, a tab, a separator) and the other items (a ribbon) that
- * drag onto the canvas. A drag goes through
- * the editor ``editor``; a click, Enter or Space on an item adds it
- * without a drag (``editor.addFromPalette``). ``palette`` is the state of the palette the
- * editor keeps across its panels: {filter, existing, more, interval,
- * ribbon}; ``existing`` is null until the user folds or unfolds the
- * existing fields, ``more`` shows every type; a drop reads its interval
- * and its ribbon.
+ * drag onto the canvas. Each item is a draggable div that holds a
+ * ``<button class="o_erplibre_studio_pick">``: the button is the tab stop
+ * and the accessible name for the keyboard and assistive technology, and
+ * takes no pointer event, so the mouse reaches the div and a drag starts
+ * there in every browser. A drag goes through the editor ``editor``; a
+ * click on the div, or Enter or Space on its button (whose click bubbles
+ * to the div), adds the item without a drag (``editor.addFromPalette``).
+ * ``palette`` is the state of the palette the editor keeps across its
+ * panels: {filter, existing, more, interval, ribbon}; ``existing`` is
+ * null until the user folds or unfolds the existing fields, ``more``
+ * shows every type; a drop reads its interval and its ribbon.
  */
 export class StudioPalette extends Component {
     static template = "erplibre_studio.Palette";
@@ -60,6 +64,10 @@ export class StudioPalette extends Component {
 
     get ribbonColors() {
         return RIBBON_COLORS;
+    }
+
+    get ribbonLabel() {
+        return _t("Ribbon");
     }
 
     allows(operation) {
@@ -170,14 +178,6 @@ export class StudioPalette extends Component {
     /** Add ``item`` without a drag. */
     add(item) {
         this.editor.addFromPalette(item);
-    }
-
-    /** Enter and Space on an item add it, as a click does. */
-    onItemKey(ev, item) {
-        if (ev.key === "Enter" || ev.key === " ") {
-            ev.preventDefault();
-            this.add(item);
-        }
     }
 
     /** The accessible name of an item: what it is, and that it adds it. */
