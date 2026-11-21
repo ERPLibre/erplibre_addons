@@ -11,6 +11,10 @@ import tempfile
 from unittest.mock import patch
 
 from lxml import etree
+from odoo.addons.erplibre_studio.arch import (
+    COMPANY_ACTION_CONTEXT,
+    COMPANY_RULE_DOMAIN,
+)
 from odoo.addons.erplibre_studio.tests.common import StudioCase
 from odoo.exceptions import UserError
 from odoo.tests import tagged
@@ -129,7 +133,15 @@ class TestGenerateModels(StudioCase):
     @staticmethod
     def class_of(source):
         """(class attributes, {field: keywords}) of the first class of the
-        Python ``source``, literals only."""
+        Python ``source``: a literal as its value, another expression (a
+        lambda) as its source text."""
+
+        def value(node):
+            try:
+                return ast.literal_eval(node)
+            except ValueError:
+                return ast.get_source_segment(source, node)
+
         tree = ast.parse(source)
         node = next(n for n in tree.body if isinstance(n, ast.ClassDef))
         attributes, fields = {}, {}
@@ -138,11 +150,9 @@ class TestGenerateModels(StudioCase):
                 continue
             name = item.targets[0].id
             if isinstance(item.value, ast.Call):
-                fields[name] = {
-                    kw.arg: ast.literal_eval(kw.value) for kw in item.value.keywords
-                }
+                fields[name] = {kw.arg: value(kw.value) for kw in item.value.keywords}
             else:
-                attributes[name] = ast.literal_eval(item.value)
+                attributes[name] = value(item.value)
         return attributes, fields
 
     # ── python ─────────────────────────────────────────────────────────
@@ -534,6 +544,43 @@ class TestGenerateModels(StudioCase):
             f"//record[@id='view_{ITEM}_search']/field[@name='arch']/search"
         )[0]
         self.assertTrue(search.xpath("filter[@name='inactive']"))
+
+    def test_per_company(self):
+        """« Per company » reaches the module: ``x_company_id`` with the
+        current company as default, its multi-company rule, global, and the
+        context of the window action."""
+        self.project._studio_update_model(self.item, {"per_company": True})
+        rule = self.item.company_rule_id
+        self.project.action_apply()
+        self.generate()
+        _attributes, fields = self.class_of(self.read("models", f"{ITEM}.py"))
+        company = fields["x_company_id"]
+        self.assertEqual(company["comodel_name"], "res.company")
+        default = ast.parse(company["default"], mode="eval").body
+        self.assertIsInstance(default, ast.Lambda)
+        self.assertEqual(ast.unparse(default), "lambda self: self.env.company")
+        root = etree.fromstring(self.read("security", f"{MODULE}.xml").encode())
+        record = root.find(f".//record[@id='{rule.xml_name}']")
+        self.assertEqual(
+            record.find("field[@name='domain_force']").text, COMPANY_RULE_DOMAIN
+        )
+        self.assertEqual(
+            record.find("field[@name='groups']").get("eval"), "[(6, 0, [])]"
+        )
+        views = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        action = views.find(f"record[@id='action_{ITEM}']")
+        self.assertEqual(
+            action.find("field[@name='context']").text, COMPANY_ACTION_CONTEXT
+        )
+        self.assertIsNone(
+            views.find(f"record[@id='action_{TAG}']/field[@name='context']")
+        )
+        listing = views.xpath(
+            f"//record[@id='view_{ITEM}_list']/field[@name='arch']/list"
+        )[0]
+        self.assertTrue(listing.xpath("field[@name='x_company_id']"))
 
     # ── checks ─────────────────────────────────────────────────────────
 

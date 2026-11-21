@@ -70,7 +70,8 @@ class PayloadField:
     of FIELD_OPTIONS), the relation of a relational field (the inverse
     of a one2many, the table and columns of a many2many, what a many2one
     does when its record is deleted), and the default of a field of an
-    option of a model (a text, as ir.model.fields holds it). Every other
+    option of a model: a constant (a text, as ir.model.fields holds it) or
+    the source of a lambda, which the class writes as it is. Every other
     attribute is the record's."""
 
     def __init__(self, record, definition):
@@ -93,6 +94,8 @@ class PayloadField:
         ttype = definition.get("ttype")
         if definition.get("default"):
             self._values["default"] = definition["default"]
+        if definition.get("default_lambda"):
+            self._values["default_lambda"] = definition["default_lambda"]
         if ttype in FIELD_OPTIONS["translate"]:
             self._values["translate"] = bool(definition.get("translate"))
         if ttype in FIELD_OPTIONS["index"]:
@@ -111,6 +114,11 @@ class PayloadField:
         if name in self._values:
             return self._values[name]
         return getattr(self._record, name)
+
+    def get_default_lambda(self):
+        if "default_lambda" in self._values:
+            return self._values["default_lambda"]
+        return self._record.get_default_lambda()
 
     def get_selection(self):
         if "selection" in self._values:
@@ -502,6 +510,9 @@ def project_views_file(project):
         _field(record, "res_model", line.model)
         _field(record, "view_mode", "list,form")
         _field(record, "search_view_id", ref=names["search"])
+        context = line._studio_action_context()
+        if context:
+            _field(record, "context", context)
     for app in project.app_ids.filtered(lambda a: a._studio_menu_models()):
         names = app._studio_xml_names()
         etree.SubElement(
