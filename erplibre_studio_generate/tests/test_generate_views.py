@@ -137,6 +137,26 @@ class TestGenerateViews(StudioCase):
             self.assertNotIn("web_timeline", names)
         self.assertNotIn(MODULE, names)
 
+    def test_groups_dependency(self):
+        """A field shown for a group of another installed module: the
+        generated module depends on that module."""
+        form = self.make_view(
+            "form",
+            "<form><sheet><group><field name='name'/></group></sheet></form>",
+            xml_id="base.erplibre_studio_test_form",
+        )
+        group = self.env["res.groups"].create({"name": "Studio test auditor"})
+        self.bind_group(group, "studio_test_other_module", "group_auditor")
+        self.op(
+            self.project,
+            form,
+            type="set_attribute",
+            target="//field[@name='name']",
+            attribute="groups",
+            value=["studio_test_other_module.group_auditor"],
+        )
+        self.assertIn("studio_test_other_module", self.project._dependencies())
+
     def test_generate(self):
         with self.server_actions():
             self.project.action_generate()

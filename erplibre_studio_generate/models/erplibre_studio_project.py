@@ -450,7 +450,8 @@ class ErplibreStudioProject(models.Model):
         (read from the branding of the combined arch), of the models
         extended (by a field or by the inverse of a relational field), of the
         fields added or named by the changes (a filter domain, a group-by,
-        a timeline date) and of the comodels; those of the models and the
+        a timeline date, the domain of a relational field), of the groups a
+        node shows for and of the comodels; those of the models and the
         view types of the views the project adds; mail for a chatter; those of
         the parent menus, of the groups, of the groups the groups of the
         project imply, of the existing models of the access rights and
@@ -493,6 +494,7 @@ class ErplibreStudioProject(models.Model):
                     field = Fields._get(change.model, name)
                     if field:
                         names.add(self._module_of("ir.model.fields", field.id))
+                names |= self._attribute_dependencies(data["payload"])
         for model, _name, definition, _change in self._studio_all_definitions():
             names.add(self._module_of("ir.model", IrModel._get_id(model)))
             relation = definition.get("relation")
@@ -506,6 +508,21 @@ class ErplibreStudioProject(models.Model):
         names.discard(False)
         names.discard(self.module_name)
         return sorted(names)
+
+    def _attribute_dependencies(self, payload):
+        """The modules a « set_attribute » of ``payload`` names: those of the
+        comodel fields the domain of a relational field names, and those of
+        the groups « groups » names by their external id."""
+        Fields = self.env["ir.model.fields"].sudo()
+        names = set()
+        comodel = payload.get("domain_model")
+        for name in payload.get("domain_fields") or []:
+            field = comodel and Fields._get(comodel, name)
+            if field:
+                names.add(self._module_of("ir.model.fields", field.id))
+        for xmlid in payload.get("groups") or []:
+            names.add(xmlid.split(".", 1)[0])
+        return names
 
     def _model_line_dependencies(self):
         """The modules the new models, the groups, the access rights and the
