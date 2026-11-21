@@ -90,8 +90,9 @@ export function reviewWrites(review) {
  * the database, then Apply. ``get_review`` reads the review when the
  * component mounts; the editor mounts it again for each revision and
  * state of the project. Its actions go through the editor: Show reaches
- * the item in its space, Apply sends the digest of the removal report on
- * screen, Discard goes back to the last Apply.
+ * the item in its space, Undo removes a change of a view with what
+ * depends on it, Apply sends the digest of the removal report on screen,
+ * Discard goes back to the last Apply.
  *
  * When something leaves the database, Apply waits for « I understand ».
  * When Apply fails, the review is read again; a removal report that
@@ -202,6 +203,19 @@ export class StudioReview extends Component {
 
     async show(item) {
         await this.editor.showReviewItem(item.target);
+    }
+
+    /**
+     * Undo the change ``item`` with what depends on it
+     * (StudioEditor.removeChange); the review mounts again on the new
+     * revision.
+     */
+    undo(item) {
+        return this.editor.removeChange(item.id);
+    }
+
+    undoLabel(item) {
+        return _t("Undo: %(item)s", {item: item.text});
     }
 
     // ── technical names ─────────────────────────────────────────────────

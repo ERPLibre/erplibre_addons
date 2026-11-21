@@ -274,6 +274,45 @@ beforeEach(() => {
     });
 });
 
+/**
+ * ``get_change_removal`` answers ``removal`` (the change asked about plus
+ * these values); ``remove_change`` drops the changes it removes from the
+ * payload, with the block of « x_sponsor » when « Add Sponsor » goes, and
+ * pushes their ids to ``removed``. Both calls are steps.
+ */
+function mockRemoval(removal, removed) {
+    onRpc("erplibre.studio.editor", "get_change_removal", (args) => {
+        const id = args.args[1];
+        expect.step(`get_change_removal ${id}`);
+        const change = CHANGES.find((c) => c.id === id);
+        return {
+            revision: 0,
+            change: {id, summary: change.summary, view: "res.partner.form", view_type: "form", applied: false},
+            refused: false,
+            ...removal,
+        };
+    });
+    onRpc("erplibre.studio.editor", "remove_change", (args) => {
+        const [, id, expected] = args.args;
+        expect.step(`remove_change ${id} ${JSON.stringify(expected)} ${args.kwargs.revision}`);
+        removed.push(...expected);
+        const drop = (block) => ({
+            ...block,
+            ...(block.children
+                ? {
+                      children: block.children
+                          .filter((child) => !(expected.includes(2) && child.name === "x_sponsor"))
+                          .map(drop),
+                  }
+                : {}),
+        });
+        answer = payload({changes: CHANGES.filter((c) => !expected.includes(c.id))});
+        answer.blocks = drop(answer.blocks);
+        answer.project = {...answer.project, revision: args.kwargs.revision + 1};
+        return {...answer, removed: expected};
+    });
+}
+
 async function openEditor() {
     await mountWithCleanup(WebClient);
     await getService("action").doAction(customizeAction({resModel: "res.partner", viewType: "form", viewId: 9}));
@@ -807,6 +846,126 @@ describe("erplibre_studio editor, inspector", () => {
             value: [],
         });
         expect(".o_erplibre_studio_group_chip").toHaveCount(0);
+    });
+
+    test("a change of the Changes tab is undone on its own", async () => {
+        const removed = [];
+        mockRemoval({items: [], applied: false}, removed);
+        await openEditor();
+        // The new field is selected: its block leaves with the change.
+        await contains(TAB_CHANGES).click();
+        await contains(".o_erplibre_studio_changes li[data-type=add_field] .o_erplibre_studio_change_pick").click();
+        expect(".o_erplibre_studio_field[data-name=x_sponsor]").toHaveClass("o_erplibre_studio_selected");
+        await contains(TAB_CHANGES).click();
+        expect(".o_erplibre_studio_change_remove").toHaveCount(4);
+        // No button inside a button: each one sits beside its change.
+        expect(".o_erplibre_studio_change_item .o_erplibre_studio_change_remove").toHaveCount(0);
+        expect(".o_erplibre_studio_changes li[data-type=add_field] .o_erplibre_studio_change_remove").toHaveAttribute(
+            "aria-label",
+            "Undo this change: Add Sponsor"
+        );
+        await contains(".o_erplibre_studio_changes li[data-type=add_field] .o_erplibre_studio_change_remove").click();
+        // A change that leaves alone and that no Apply wrote goes at once.
+        expect.verifySteps(["get_change_removal 2", "remove_change 2 [2] 0"]);
+        expect(".o_erplibre_studio_change_removal_dialog").toHaveCount(0);
+        expect(removed).toEqual([2]);
+        expect(".o_erplibre_studio_changes li").toHaveCount(3);
+        expect(".o_erplibre_studio_field[data-name=x_sponsor]").toHaveCount(0);
+        // The selection left with its block.
+        await contains(TAB_PROPERTIES).click();
+        expect(".o_erplibre_studio_properties").toHaveCount(0);
+        expect(".o_erplibre_studio_help").toHaveCount(1);
+    });
+
+    test("undoing a change with dependents asks first and lists them", async () => {
+        const removed = [];
+        mockRemoval(
+            {
+                items: [
+                    {id: 2, summary: "Add Sponsor", view: "res.partner.form", view_type: "form", applied: false},
+                    {id: 4, summary: "Remove Fax", view: "res.partner.list", view_type: "list", applied: true},
+                ],
+                applied: true,
+            },
+            removed
+        );
+        await openEditor();
+        await contains(TAB_CHANGES).click();
+        await contains(".o_erplibre_studio_changes li[data-type=relabel] .o_erplibre_studio_change_remove").click();
+        expect.verifySteps(["get_change_removal 1"]);
+        expect(".o_erplibre_studio_change_removal_dialog").toHaveCount(1);
+        expect(".o_erplibre_studio_change_removal_dialog p").toHaveText(
+            "Undoing « Rename City to Town » also removes the changes that depend on it:"
+        );
+        expect(queryAllTexts(".o_erplibre_studio_change_removal_item")).toEqual([
+            "Add Sponsor · res.partner.form",
+            "Remove Fax · res.partner.list · applied",
+        ]);
+        expect(".o_erplibre_studio_change_removal_applied").toHaveCount(1);
+        expect(".o_erplibre_studio_change_removal_confirm").toHaveText("Undo 3 changes");
+        // « Cancel » would read « Annuler » in French, as the action does.
+        expect(".o_erplibre_studio_change_removal_cancel").toHaveText("Change nothing");
+        await contains(".o_erplibre_studio_change_removal_cancel").click();
+        expect(".o_erplibre_studio_change_removal_dialog").toHaveCount(0);
+        expect.verifySteps([]);
+
+        await contains(".o_erplibre_studio_changes li[data-type=relabel] .o_erplibre_studio_change_remove").click();
+        await contains(".o_erplibre_studio_change_removal_confirm").click();
+        // The server checks the list the user saw.
+        expect.verifySteps(["get_change_removal 1", "remove_change 1 [1,2,4] 0"]);
+        expect(".o_erplibre_studio_change_removal_dialog").toHaveCount(0);
+        expect(removed).toEqual([1, 2, 4]);
+    });
+
+    test("an applied change that leaves alone asks first", async () => {
+        mockRemoval({items: [], applied: true}, []);
+        await openEditor();
+        await contains(TAB_CHANGES).click();
+        await contains(".o_erplibre_studio_changes li[data-type=remove] .o_erplibre_studio_change_remove").click();
+        expect.verifySteps(["get_change_removal 4"]);
+        expect(".o_erplibre_studio_change_removal_item").toHaveCount(0);
+        expect(".o_erplibre_studio_change_removal_applied").toHaveText(
+            "This change is applied: Apply then removes it from the database."
+        );
+        expect(".o_erplibre_studio_change_removal_confirm").toHaveText("Undo the change");
+        await contains(".o_erplibre_studio_change_removal_confirm").click();
+        expect.verifySteps(["remove_change 4 [4] 0"]);
+    });
+
+    test("a refused undo notifies and removes nothing", async () => {
+        mockRemoval({items: [], applied: false, refused: "Another one2many takes the inverse of this one."}, []);
+        await openEditor();
+        await contains(TAB_CHANGES).click();
+        await contains(".o_erplibre_studio_changes li[data-type=add_field] .o_erplibre_studio_change_remove").click();
+        expect.verifySteps(["get_change_removal 2"]);
+        expect(".o_notification").toHaveText(/Another one2many takes the inverse of this one\./);
+        expect(".o_erplibre_studio_change_removal_dialog").toHaveCount(0);
+        expect(".o_erplibre_studio_changes li").toHaveCount(4);
+    });
+
+    test("the changed note of a block undoes its single change", async () => {
+        mockRemoval({items: [], applied: false}, []);
+        await openEditor();
+        await contains(".o_erplibre_studio_field[data-name=city]").click();
+        expect(".o_erplibre_studio_inspector_changed .o_erplibre_studio_show_changes").toHaveCount(1);
+        expect(".o_erplibre_studio_undo_block_change").toHaveText("Undo this change");
+        await contains(".o_erplibre_studio_undo_block_change").click();
+        expect.verifySteps(["get_change_removal 1", "remove_change 1 [1] 0"]);
+        expect(".o_erplibre_studio_changes_count").toHaveText("3");
+    });
+
+    test("the changed note of a block with two changes undoes none", async () => {
+        // The note does not guess which change to undo.
+        const twice = (block) => ({
+            ...block,
+            ...(block.name === "city" ? {changes: [1, 2]} : {}),
+            ...(block.children ? {children: block.children.map(twice)} : {}),
+        });
+        answer = {...payload(), blocks: twice(payload().blocks)};
+        await openEditor();
+        await contains(".o_erplibre_studio_field[data-name=city]").click();
+        expect(".o_erplibre_studio_inspector_changed").toHaveCount(1);
+        expect(".o_erplibre_studio_undo_block_change").toHaveCount(0);
     });
 
     test("no change in the view", async () => {

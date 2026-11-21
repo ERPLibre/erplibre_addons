@@ -63,4 +63,42 @@
             </t>
         </Dialog>
     </t>
+
+    <!-- The undo of one change with the changes that depend on it. The
+         cancel button does not read « Cancel »: in French it would read
+         like the action itself. -->
+    <t t-name="erplibre_studio.ChangeRemovalDialog">
+        <Dialog title.translate="Undo a change" size="'md'" contentClass="'o_erplibre_studio_change_removal_dialog'">
+            <p t-esc="intro" />
+            <ul t-if="items.length" class="small o_erplibre_studio_change_removal_items">
+                <li
+                    t-foreach="items"
+                    t-as="item"
+                    t-key="item.id"
+                    class="o_erplibre_studio_change_removal_item"
+                    t-att-data-id="item.id"
+                >
+                    <t t-esc="item.summary" /> · <code class="text-muted o_erplibre_studio_change_removal_view" t-esc="item.view" />
+                    <t t-if="item.applied"> · <span class="badge text-bg-secondary">applied</span></t>
+                </li>
+            </ul>
+            <div
+                t-if="appliedNote"
+                class="alert alert-warning small mb-0 o_erplibre_studio_change_removal_applied"
+                role="alert"
+                t-esc="appliedNote"
+            />
+            <t t-set-slot="footer">
+                <button
+                    class="btn btn-primary o_erplibre_studio_change_removal_confirm"
+                    t-att-disabled="state.running"
+                    t-on-click="confirm"
+                    t-esc="confirmLabel"
+                />
+                <button class="btn btn-secondary o_erplibre_studio_change_removal_cancel" t-on-click="props.close">
+                    Change nothing
+                </button>
+            </t>
+        </Dialog>
+    </t>
 </templates>

@@ -54,7 +54,8 @@ const ADVANCED_VIEW_TYPES = ["form", "list"];
  * under « Advanced »); a many2one of the project, the one2many it may create on its
  * comodel and what it does when its record is deleted; a container shows
  * what it holds. « Changes »: the changes of
- * the draft in this view, each one revealing its block on the canvas. It
+ * the draft in this view, each one revealing its block on the canvas or
+ * undone with what depends on it. It
  * renders from its props; every change is one operation of the editor
  * ``editor``.
  */
@@ -501,6 +502,30 @@ export class StudioInspector extends Component {
 
     pickChange(change) {
         this.editor.revealChange(change);
+    }
+
+    /** Undo ``change`` with what depends on it (StudioEditor.removeChange). */
+    removeChange(change) {
+        return this.editor.removeChange(change.id);
+    }
+
+    undoLabel(change) {
+        return _t("Undo this change: %(change)s", {change: change.summary});
+    }
+
+    /**
+     * The id of the one change of the draft that touches ``block``, or
+     * false when none or several do: the note of the block undoes only a
+     * change it names without doubt.
+     */
+    blockChange(block) {
+        const keys = block.changes || [];
+        return keys.length === 1 && Number.isInteger(keys[0]) ? keys[0] : false;
+    }
+
+    removeBlockChange(block) {
+        const changeId = this.blockChange(block);
+        return changeId ? this.editor.removeChange(changeId) : undefined;
     }
 
     /** Show the review of the whole project. */

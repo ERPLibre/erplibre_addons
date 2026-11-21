@@ -1232,6 +1232,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
+msgid "Change nothing"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Checking…"
@@ -1752,8 +1758,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid ""
-"Click a change to find its element. The review of the whole project is in "
-"the Review space."
+"Click a change to find its element, or undo it with its button. The review "
+"of the whole project is in the Review space."
 msgstr ""
 
 #. module: erplibre_studio
@@ -4821,6 +4827,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid ""
+"Some of these changes are applied: Apply then removes them from the "
+"database."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Stack the items"
 msgstr ""
@@ -6041,6 +6055,12 @@ msgid "This app is not an app of the project."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "This change is applied: Apply then removes it from the database."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_change_removal.py:0
 msgid "This change is not in the draft of the project."
@@ -6231,6 +6251,60 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
 msgid "Under an existing menu"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
+msgid "Undo"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Undo %(count)s changes"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
+msgid "Undo a change"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Undo the change"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Undo this change"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Undo this change: %(change)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
+msgid "Undo: %(item)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Undoing « %(change)s » also removes the changes that depend on it:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "Undoing « %(change)s » removes it from the draft."
 msgstr ""
 
 #. module: erplibre_studio
@@ -6632,6 +6706,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "applied"
 msgstr ""

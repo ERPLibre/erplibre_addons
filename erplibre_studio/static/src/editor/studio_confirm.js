@@ -153,3 +153,65 @@ export class StudioConfirmDialog extends Component {
         this.state.running = false;
     }
 }
+
+/**
+ * The confirmation of the undo of one change that does not leave alone:
+ * ``removal`` (``get_change_removal`` of the server: {change, items,
+ * applied}) lists the changes that depend on it and whether an Apply
+ * wrote one of them. ``confirm()`` removes them all; the dialog closes
+ * once it answered.
+ */
+export class StudioChangeRemovalDialog extends Component {
+    static template = "erplibre_studio.ChangeRemovalDialog";
+    static components = {Dialog};
+    static props = {
+        removal: Object,
+        confirm: Function,
+        close: Function,
+    };
+
+    setup() {
+        this.state = useState({running: false});
+    }
+
+    get items() {
+        return this.props.removal.items || [];
+    }
+
+    get intro() {
+        const change = this.props.removal.change.summary;
+        if (this.items.length) {
+            return _t("Undoing « %(change)s » also removes the changes that depend on it:", {change});
+        }
+        return _t("Undoing « %(change)s » removes it from the draft.", {change});
+    }
+
+    get appliedNote() {
+        if (!this.props.removal.applied) {
+            return "";
+        }
+        if (this.items.length) {
+            return _t("Some of these changes are applied: Apply then removes them from the database.");
+        }
+        return _t("This change is applied: Apply then removes it from the database.");
+    }
+
+    get confirmLabel() {
+        if (this.items.length) {
+            return _t("Undo %(count)s changes", {count: this.items.length + 1});
+        }
+        return _t("Undo the change");
+    }
+
+    async confirm() {
+        if (this.state.running) {
+            return;
+        }
+        this.state.running = true;
+        try {
+            await this.props.confirm();
+        } finally {
+            this.props.close();
+        }
+    }
+}

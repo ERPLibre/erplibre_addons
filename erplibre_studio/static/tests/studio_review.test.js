@@ -169,7 +169,7 @@ function review(values = {}) {
 }
 
 // The calls the tests check as steps; the others are in ``calls``.
-const STEPPED = ["get_editor_data", "get_review", "project_action"];
+const STEPPED = ["get_editor_data", "get_review", "project_action", "get_change_removal", "remove_change"];
 
 let answer;
 let respond;
@@ -188,6 +188,8 @@ beforeEach(() => {
         "get_access_existing",
         "get_group_members",
         "project_action",
+        "get_change_removal",
+        "remove_change",
     ]) {
         onRpc("erplibre.studio.editor", method, (args) => {
             calls.push({method, args: args.args, kwargs: args.kwargs});
@@ -403,6 +405,31 @@ describe("erplibre_studio review", () => {
         );
         expect(".o_erplibre_studio_apply").not.toBeEnabled();
         expect(".o_erplibre_studio_apply").toHaveAttribute("title", "1 technical name(s) block Apply");
+    });
+
+    test("Undo on a change of the review", async () => {
+        respond.get_change_removal = (args) => ({
+            revision: 0,
+            change: {id: args.args[1], summary: "Relabel: city = Town", view: "res.partner.form", applied: false},
+            items: [],
+            refused: false,
+            applied: false,
+        });
+        respond.remove_change = (args) =>
+            payload({project: {...answer.project, revision: args.kwargs.revision + 1}, removed: [2]});
+        await openReview();
+        // Only the changes of a view are undone from here.
+        expect(".o_erplibre_studio_review_undo").toHaveCount(3);
+        expect(".o_erplibre_studio_review_item[data-type=change] .o_erplibre_studio_review_undo").toHaveCount(3);
+        expect(".o_erplibre_studio_review_item[data-key='change:2'] .o_erplibre_studio_review_undo").toHaveAttribute(
+            "aria-label",
+            "Undo: Relabel: city = Town"
+        );
+        await contains(".o_erplibre_studio_review_item[data-key='change:2'] .o_erplibre_studio_review_undo").click();
+        // Nothing depends on it: no question; the review reads the new revision.
+        expect.verifySteps(["get_change_removal [3,2]", 'remove_change [3,2,[2],"res.partner"]', "get_review [3]"]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "review");
+        expect(".modal").toHaveCount(0);
     });
 
     test("what leaves without data needs no « I understand »", async () => {

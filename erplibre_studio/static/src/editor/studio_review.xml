@@ -149,6 +149,16 @@
                                         </t>
                                     </span>
                                     <button
+                                        t-if="item.type === 'change'"
+                                        type="button"
+                                        class="btn btn-sm btn-link o_erplibre_studio_review_undo"
+                                        t-att-aria-label="undoLabel(item)"
+                                        t-att-disabled="props.busy"
+                                        t-on-click="() => this.undo(item)"
+                                    >
+                                        Undo
+                                    </button>
+                                    <button
                                         type="button"
                                         class="btn btn-sm btn-link fw-bold o_erplibre_studio_review_show"
                                         t-att-aria-label="showLabel(item)"

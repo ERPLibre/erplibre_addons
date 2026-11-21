@@ -14,7 +14,7 @@ import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 import {View} from "@web/views/view";
 import {StudioCanvas} from "./studio_canvas";
-import {StudioConfirmDialog} from "./studio_confirm";
+import {StudioChangeRemovalDialog, StudioConfirmDialog} from "./studio_confirm";
 import {parseGroupValue} from "./studio_groups";
 import {PERMS, StudioModelDialog, accessGroup, accessRows} from "./studio_models";
 import {StudioSecuritySpace, pickModel, securityModels} from "./studio_security";
@@ -1481,6 +1481,55 @@ export class StudioEditor extends Component {
             return;
         }
         await remove();
+    }
+
+    /**
+     * Undo the change ``changeId`` of the draft, wherever it sits.
+     * ``get_change_removal`` says what leaves with it: a refusal shows as
+     * a notification; a change that leaves alone and that no Apply wrote
+     * goes at once, as Ctrl+Z does; otherwise a dialog lists what leaves
+     * and removes it once confirmed.
+     */
+    async removeChange(changeId) {
+        if (this.state.busy || !this.project) {
+            return;
+        }
+        this.state.busy = true;
+        let removal;
+        try {
+            removal = await this.orm.call(MODEL, "get_change_removal", [this.project.id, changeId]);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return;
+        } finally {
+            this.state.busy = false;
+        }
+        if (removal.refused) {
+            this.notification.add(removal.refused, {type: "danger"});
+            return;
+        }
+        if (!removal.items.length && !removal.applied) {
+            await this.doRemoveChange(changeId, [changeId]);
+            return;
+        }
+        this.dialog.add(StudioChangeRemovalDialog, {
+            removal,
+            confirm: () => this.doRemoveChange(changeId, [removal.change.id, ...removal.items.map((i) => i.id)]),
+        });
+    }
+
+    /**
+     * Remove the change ``changeId`` with the changes ``expected`` (its
+     * ids and those of what leaves with it, as the user saw them); the
+     * server refuses a list that no longer matches. A selection whose
+     * block left the view goes. Answer the payload, or null.
+     */
+    async doRemoveChange(changeId, expected) {
+        const data = await this.projectCall("remove_change", [changeId, expected]);
+        if (data && this.state.selected && !blockTrail(this.root, this.state.selected).length) {
+            this.state.selected = null;
+        }
+        return data;
     }
 
     /**

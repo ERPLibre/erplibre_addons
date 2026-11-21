@@ -488,6 +488,15 @@
                     >
                         See the changes of this view
                     </button>
+                    <button
+                        t-if="blockChange(block)"
+                        type="button"
+                        class="btn btn-link btn-sm p-0 d-block fw-bold o_erplibre_studio_undo_block_change"
+                        t-att-disabled="props.busy or !props.hasProject"
+                        t-on-click="() => this.removeBlockChange(block)"
+                    >
+                        Undo this change
+                    </button>
                 </span>
             </div>
             <div
@@ -769,12 +778,13 @@
                 t-att-data-type="change.type"
                 t-att-data-kind="change.kind"
                 t-att-data-path="change.path or ''"
+                class="d-flex gap-1 align-items-start"
                 t-att-class="{'o_erplibre_studio_change_failed': change.error}"
             >
                 <button
                     t-if="change.path"
                     type="button"
-                    class="o_erplibre_studio_change_item o_erplibre_studio_change_pick btn w-100 text-start d-flex gap-2 align-items-start border rounded p-2"
+                    class="o_erplibre_studio_change_item o_erplibre_studio_change_pick btn w-100 flex-grow-1 text-start d-flex gap-2 align-items-start border rounded p-2"
                     t-att-class="{'o_erplibre_studio_change_selected': change.path === props.selected}"
                     t-att-disabled="props.busy"
                     t-on-click="() => this.pickChange(change)"
@@ -783,14 +793,24 @@
                 </button>
                 <div
                     t-else=""
-                    class="o_erplibre_studio_change_item d-flex gap-2 align-items-start border rounded p-2"
+                    class="o_erplibre_studio_change_item w-100 flex-grow-1 d-flex gap-2 align-items-start border rounded p-2"
                 >
                     <t t-call="erplibre_studio.Inspector.Change" />
                 </div>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link o_erplibre_studio_change_remove"
+                    t-att-aria-label="undoLabel(change)"
+                    t-att-title="undoLabel(change)"
+                    t-att-disabled="props.busy or !props.hasProject"
+                    t-on-click="() => this.removeChange(change)"
+                >
+                    <i class="fa fa-undo" aria-hidden="true" />
+                </button>
             </li>
         </ol>
         <p class="small text-muted mb-1">
-            Click a change to find its element. The review of the whole project is in the Review space.
+            Click a change to find its element, or undo it with its button. The review of the whole project is in the Review space.
         </p>
         <button
             type="button"
