@@ -250,9 +250,17 @@ class ErplibreStudioChange(models.Model):
                 if attrs.get("type"):
                     text += f" ({attrs['type']})"
             elif change.change_type == "add_node" and not payload.get("node_name"):
-                text = (
-                    f"{labels.get('add_node')}: {payload.get('kind')} → {change.xpath}"
-                )
+                # A group, a tab or a titled separator shows its label; a
+                # notebook, the label of its first tab.
+                node = payload.get("node") or {}
+                first = (node.get("children") or [{}])[0]
+                string = (node.get("attrs") or {}).get("string") or (
+                    first.get("attrs") or {}
+                ).get("string")
+                kind = payload.get("kind")
+                if string:
+                    kind = f"{kind} « {string} »"
+                text = f"{labels.get('add_node')}: {kind} → {change.xpath}"
             elif change.change_type == "set_attribute":
                 text += f" · {payload.get('attribute')}"
                 if value not in (None, ""):

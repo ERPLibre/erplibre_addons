@@ -12,11 +12,19 @@ import {RIBBON_COLORS, fieldTypeLabel, searchText, typeGlyph, valueLabel} from "
 export const COMMON_TYPES = ["char", "integer", "float", "boolean", "date", "selection", "many2one", "many2many"];
 // How many types the palette shows before « Show the other types ».
 export const SHOWN_TYPES = 8;
+// The items of the section « Layout »: the operation each one needs, its
+// class (the separator keeps the one it had in « Other ») and its icon.
+export const LAYOUT_ITEMS = [
+    {kind: "group", operation: "add_group", className: "o_erplibre_studio_layout_group", icon: "fa-square-o"},
+    {kind: "page", operation: "add_page", className: "o_erplibre_studio_layout_page", icon: "fa-folder-o"},
+    {kind: "separator", operation: "add_separator", className: "o_erplibre_studio_separator", icon: "fa-minus"},
+];
 
 /**
  * The palette of the editor, one column of sections: a search box, the new
- * field types, the existing fields (a section that folds), the other items
- * (a ribbon, a separator) that drag onto the canvas. A drag goes through
+ * field types, the existing fields (a section that folds), the layout
+ * items (a group, a tab, a separator) and the other items (a ribbon) that
+ * drag onto the canvas. A drag goes through
  * the editor ``editor``; a click, Enter or Space on an item adds it
  * without a drag (``editor.addFromPalette``). ``palette`` is the state of the palette the
  * editor keeps across its panels: {filter, existing, more, interval,
@@ -56,6 +64,16 @@ export class StudioPalette extends Component {
 
     allows(operation) {
         return (this.data.operations || []).includes(operation);
+    }
+
+    /** The LAYOUT_ITEMS the view allows, with their label. */
+    get layoutItems() {
+        const labels = {group: _t("Group"), page: _t("Tab"), separator: _t("Separator")};
+        return LAYOUT_ITEMS.filter((item) => this.allows(item.operation)).map((item) => ({
+            ...item,
+            label: labels[item.kind],
+            className: `o_erplibre_studio_layout_item ${item.className}`,
+        }));
     }
 
     get query() {

@@ -215,9 +215,16 @@ export class StudioInspector extends Component {
     viewProps(block, field) {
         const isField = block.kind === "field";
         const definition = Boolean(isField && field.project && this.allows("update_field"));
+        // A group, a tab or a separator of a form takes a label too.
+        const layout =
+            this.viewType === "form" &&
+            ((block.kind === "container" && ["group", "page"].includes(block.tag)) || block.kind === "separator");
         const props = {
             definition,
-            relabel: !definition && this.allows("relabel") && ["field", "filter", "group_by"].includes(block.kind),
+            relabel:
+                !definition &&
+                this.allows("relabel") &&
+                (["field", "filter", "group_by"].includes(block.kind) || layout),
             help: !definition && isField && this.allows("help"),
             readonly: !definition && isField && this.allows("readonly"),
             required: isField && this.allows("required"),

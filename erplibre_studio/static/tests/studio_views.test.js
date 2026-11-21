@@ -954,6 +954,101 @@ describe("erplibre_studio editor, timeline", () => {
     });
 });
 
+describe("erplibre_studio editor, form layout", () => {
+    const FORM_OPERATIONS = [
+        "add_field",
+        "add_existing_field",
+        "add_group",
+        "add_page",
+        "add_separator",
+        "move",
+        "remove",
+        "hide",
+        "relabel",
+    ];
+    const SHEET = "/form/sheet";
+    const NOTEBOOK = "/form/sheet/notebook[1]";
+    const NEW_GROUP = named("group", "studio_group_new_group");
+
+    /** A form: a group, then a notebook of one tab; ``extra`` blocks after them. */
+    function formPayload(extra = [], changes = []) {
+        const page = container(named("page", "notes"), "page", [field(named("field", "email"), "email")], {
+            label: "Notes",
+            attrs: {name: "notes", string: "Notes"},
+        });
+        const notebook = container(NOTEBOOK, "notebook", [page], {drop: false, movable: false});
+        const group = container(named("group", "g"), "group", [field(named("field", "name"), "name")]);
+        const sheet = container(SHEET, "sheet", [group, notebook, ...extra], {movable: false});
+        return payload("form", container("/form", "form", [sheet], {drop: false, movable: false}), {
+            operations: FORM_OPERATIONS,
+            changes,
+        });
+    }
+
+    test("the layout items drop onto the sheet and the tabs", async () => {
+        answer = formPayload();
+        await openEditor("form");
+        expect(".o_erplibre_studio_palette [data-tab=layout]").toHaveCount(1);
+        expect(".o_erplibre_studio_layout_item").toHaveCount(3);
+        expect(".o_erplibre_studio_palette [data-tab=other]").toHaveCount(0);
+        // The notebook ends its tabs with the hook of a new tab.
+        expect(`.o_erplibre_studio_page_hook ${hook(NOTEBOOK, "inside", "pages")}`).toHaveCount(1);
+
+        // A group onto the sheet: the new group is selected.
+        const added = container(NEW_GROUP, "group", [], {
+            label: "New group",
+            attrs: {name: "studio_group_new_group", string: "New group"},
+            change_kinds: ["new"],
+            changed: true,
+        });
+        const change = {id: 9, type: "add_node", kind: "new", summary: "group", path: NEW_GROUP, error: false};
+        respond = () => formPayload([added], [change]);
+        await contains(".o_erplibre_studio_layout_group").dragAndDrop(hook(SHEET, "inside"));
+        expect.verifySteps(["apply_operation add_group"]);
+        expect(operations.pop()).toEqual({type: "add_group", target: SHEET, position: "inside"});
+        expect(`.o_erplibre_studio_container[data-path="${NEW_GROUP}"]`).toHaveClass("o_erplibre_studio_selected");
+
+        // A tab onto the hook of the tabs.
+        respond = () => formPayload();
+        await contains(".o_erplibre_studio_layout_page").dragAndDrop(hook(NOTEBOOK, "inside", "pages"));
+        expect.verifySteps(["apply_operation add_page"]);
+        expect(operations.pop()).toEqual({type: "add_page", target: NOTEBOOK, position: "inside"});
+
+        // A field never drops there.
+        await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
+        await contains(".o_erplibre_studio_existing_field[data-name=phone]").dragAndDrop(
+            hook(NOTEBOOK, "inside", "pages")
+        );
+        expect.verifySteps([]);
+
+        // A click on a tab selects its page.
+        await contains(`.o_erplibre_studio_page_tab[data-path="${named("page", "notes")}"]`).click();
+        expect(`.o_erplibre_studio_container[data-path="${named("page", "notes")}"]`).toHaveClass(
+            "o_erplibre_studio_selected"
+        );
+        expect(".o_erplibre_studio_in_view .o_erplibre_studio_prop_label").toHaveCount(1);
+    });
+
+    test("no layout item in a list", async () => {
+        const blocks = container("/list", "list", [field(named("field", "name"), "name")], {movable: false});
+        answer = payload("list", blocks, {
+            operations: ["add_field", "add_existing_field", "move", "remove", "hide", "relabel"],
+        });
+        await openEditor("list");
+        expect(".o_erplibre_studio_palette [data-tab=layout]").toHaveCount(0);
+        expect(".o_erplibre_studio_layout_item").toHaveCount(0);
+    });
+
+    test("the separator of a search view is a layout item", async () => {
+        answer = searchPayload();
+        await openEditor("search");
+        expect(".o_erplibre_studio_palette [data-tab=layout]").toHaveCount(1);
+        expect(".o_erplibre_studio_layout .o_erplibre_studio_separator").toHaveCount(1);
+        expect(".o_erplibre_studio_layout_item").toHaveCount(1);
+        expect(".o_erplibre_studio_palette [data-tab=other]").toHaveCount(0);
+    });
+});
+
 test("helpers of the view types", () => {
     const search = searchPayload({
         filters: [["a", "A", "[]"]],

@@ -97,6 +97,7 @@
             <i t-elif="block.kind === 'field'" class="fa fa-lock text-muted" title="Loaded by the view" />
             <t t-if="block.kind === 'separator'">
                 <span class="o_erplibre_studio_label text-muted">Separator</span>
+                <span t-if="block.attrs.string" class="fw-bold" t-esc="block.attrs.string" />
             </t>
             <t t-elif="block.kind === 'widget'">
                 <i class="fa fa-bookmark text-muted" />
@@ -143,7 +144,7 @@
                         class="nav-link py-1 px-2 o_erplibre_studio_page_tab"
                         t-att-class="{'active': page === activePage}"
                         t-att-data-path="page.path"
-                        t-on-click.prevent.stop="() => this.selectPage(page_index)"
+                        t-on-click.prevent.stop="() => this.selectPage(page_index, page)"
                     >
                         <t t-esc="page.label" />
                         <span
@@ -155,6 +156,14 @@
                             t-att-title="dotTitle('inside')"
                         />
                     </a>
+                </li>
+                <!-- The hook of a new tab, at the end of the tabs. -->
+                <li t-if="editor.data.operations and editor.data.operations.includes('add_page')" class="nav-item o_erplibre_studio_page_hook">
+                    <t t-call="erplibre_studio.Hook">
+                        <t t-set="target" t-value="block.path" />
+                        <t t-set="position" t-value="'inside'" />
+                        <t t-set="zone" t-value="'pages'" />
+                    </t>
                 </li>
             </ul>
             <StudioBlock t-if="activePage" block="activePage" editor="editor" viewType="props.viewType" />

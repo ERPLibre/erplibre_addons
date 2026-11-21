@@ -3,7 +3,8 @@
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <templates xml:space="preserve">
     <!-- The palette: a search box, then a section per kind of item; the
-         heading of a section carries « data-tab » (new, existing, other). -->
+         heading of a section carries « data-tab » (new, existing, layout,
+         other). -->
     <t t-name="erplibre_studio.Palette">
         <div class="o_erplibre_studio_palette_body d-flex flex-column gap-3 h-100">
             <div class="input-group input-group-sm">
@@ -103,51 +104,57 @@
                     <div class="small text-muted mt-1">The fields already in the view are left out.</div>
                 </t>
             </section>
-            <section t-if="allows('add_widget') or allows('add_separator')" class="o_erplibre_studio_palette_section">
-                <h2 class="o_erplibre_studio_section_title mb-2" data-tab="other">Other</h2>
-                <t t-if="allows('add_widget')">
-                    <label class="small text-muted mb-1" for="o_erplibre_studio_ribbon_title">Ribbon on the card</label>
-                    <input
-                        id="o_erplibre_studio_ribbon_title"
-                        class="form-control form-control-sm mb-1 o_erplibre_studio_ribbon_title"
-                        placeholder="Ribbon text"
-                        t-model="palette.ribbon.title"
-                    />
-                    <select
-                        class="form-select form-select-sm mb-1 o_erplibre_studio_ribbon_color"
-                        aria-label="Ribbon color"
-                        t-model="palette.ribbon.bg_color"
-                    >
-                        <option t-foreach="ribbonColors" t-as="color" t-key="color" t-att-value="color" t-esc="color" />
-                    </select>
-                    <div
-                        class="o_erplibre_studio_palette_item o_erplibre_studio_widget border rounded px-2 py-1 mb-1"
-                        data-widget="web_ribbon"
-                        role="button"
-                        tabindex="0"
-                        draggable="true"
-                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'widget', widget: 'web_ribbon'})"
-                        t-on-dragend="() => this.endDrag()"
-                        t-on-click="() => this.add({kind: 'widget', widget: 'web_ribbon'})"
-                        t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'widget', widget: 'web_ribbon'})"
-                    >
-                        <i class="fa fa-bookmark text-muted" aria-hidden="true" />
-                        Ribbon
-                    </div>
-                </t>
+            <section t-if="layoutItems.length" class="o_erplibre_studio_palette_section o_erplibre_studio_layout">
+                <h2 class="o_erplibre_studio_section_title mb-2" data-tab="layout">Layout</h2>
                 <div
-                    t-if="allows('add_separator')"
-                    class="o_erplibre_studio_palette_item o_erplibre_studio_separator border rounded px-2 py-1 mb-1"
+                    t-foreach="layoutItems"
+                    t-as="item"
+                    t-key="item.kind"
+                    class="o_erplibre_studio_palette_item d-flex align-items-center gap-2 border rounded px-2 py-1 mb-1"
+                    t-att-class="item.className"
+                    t-att-data-kind="item.kind"
+                    role="button"
+                    tabindex="0"
+                    t-att-aria-label="itemLabel(item.label)"
+                    draggable="true"
+                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: item.kind})"
+                    t-on-dragend="() => this.endDrag()"
+                    t-on-click="() => this.add({kind: item.kind})"
+                    t-on-keydown="(ev) => this.onItemKey(ev, {kind: item.kind})"
+                >
+                    <i class="fa text-muted" t-att-class="item.icon" aria-hidden="true" />
+                    <span t-esc="item.label" />
+                </div>
+            </section>
+            <section t-if="allows('add_widget')" class="o_erplibre_studio_palette_section">
+                <h2 class="o_erplibre_studio_section_title mb-2" data-tab="other">Other</h2>
+                <label class="small text-muted mb-1" for="o_erplibre_studio_ribbon_title">Ribbon on the card</label>
+                <input
+                    id="o_erplibre_studio_ribbon_title"
+                    class="form-control form-control-sm mb-1 o_erplibre_studio_ribbon_title"
+                    placeholder="Ribbon text"
+                    t-model="palette.ribbon.title"
+                />
+                <select
+                    class="form-select form-select-sm mb-1 o_erplibre_studio_ribbon_color"
+                    aria-label="Ribbon color"
+                    t-model="palette.ribbon.bg_color"
+                >
+                    <option t-foreach="ribbonColors" t-as="color" t-key="color" t-att-value="color" t-esc="color" />
+                </select>
+                <div
+                    class="o_erplibre_studio_palette_item o_erplibre_studio_widget border rounded px-2 py-1 mb-1"
+                    data-widget="web_ribbon"
                     role="button"
                     tabindex="0"
                     draggable="true"
-                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'separator'})"
+                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'widget', widget: 'web_ribbon'})"
                     t-on-dragend="() => this.endDrag()"
-                    t-on-click="() => this.add({kind: 'separator'})"
-                    t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'separator'})"
+                    t-on-click="() => this.add({kind: 'widget', widget: 'web_ribbon'})"
+                    t-on-keydown="(ev) => this.onItemKey(ev, {kind: 'widget', widget: 'web_ribbon'})"
                 >
-                    <i class="fa fa-minus text-muted" aria-hidden="true" />
-                    Separator
+                    <i class="fa fa-bookmark text-muted" aria-hidden="true" />
+                    Ribbon
                 </div>
             </section>
             <p t-if="viewType === 'timeline'" class="small text-muted border-top pt-2 mt-auto mb-0">

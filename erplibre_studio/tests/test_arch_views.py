@@ -55,6 +55,20 @@ TIMELINE = """
 </timeline>
 """
 
+FORM = """
+<form>
+    <sheet>
+        <group name="main">
+            <separator string="Details"/>
+            <field name="name"/>
+        </group>
+        <notebook>
+            <page name="notes" string="Notes"><field name="comment"/></page>
+        </notebook>
+    </sheet>
+</form>
+"""
+
 
 def spec_text(change, view_type):
     return etree.tostring(
@@ -561,4 +575,135 @@ class TestArchViews(BaseCase):
         # The mark never reaches the arch of a view.
         self.assertNotIn(
             studio_arch.ADDED_MARK, studio_arch.view_arch(changes, "search")
+        )
+
+    def test_layout_specs_and_drop_rules(self):
+        form = etree.fromstring(FORM)
+        sheet = form.find("sheet")
+        group = form.xpath("//group[@name='main']")[0]
+        page = form.xpath("//page[@name='notes']")[0]
+        notebook = page.getparent()
+
+        def add(node):
+            return {
+                "type": "add_node",
+                "xpath": "//group[@name='main']",
+                "position": "after",
+                "payload": {"node": node},
+            }
+
+        spec = studio_arch.change_spec(
+            add({"tag": "group", "attrs": {"name": "g2", "string": "Other"}}),
+            "form",
+        )
+        self.assertEqual(spec[0].tag, "group")
+        self.assertEqual(spec[0].get("string"), "Other")
+        spec = studio_arch.change_spec(
+            add(
+                {
+                    "tag": "notebook",
+                    "attrs": {"name": "nb"},
+                    "children": [
+                        {"tag": "page", "attrs": {"name": "p1", "string": "A"}}
+                    ],
+                }
+            ),
+            "form",
+        )
+        self.assertEqual(
+            [(n.tag, n.get("name")) for n in spec.iter() if n.tag != "xpath"],
+            [("notebook", "nb"), ("page", "p1")],
+        )
+        spec = studio_arch.change_spec(
+            add({"tag": "page", "attrs": {"name": "p2"}}), "form"
+        )
+        self.assertEqual(spec[0].tag, "page")
+        # A notebook holds pages only, one level deep.
+        with self.assertRaises(studio_arch.ArchError) as caught:
+            studio_arch.change_spec(
+                add({"tag": "notebook", "children": [{"tag": "field"}]}),
+                "form",
+            )
+        self.assertEqual(caught.exception.code, "unknown_node")
+
+        self.assertIsNone(studio_arch.page_refusal(notebook, "inside"))
+        self.assertIsNone(studio_arch.page_refusal(page, "before"))
+        self.assertIsNone(studio_arch.page_refusal(page, "after"))
+        for node, position in (
+            (group, "inside"),
+            (sheet, "inside"),
+            (page, "inside"),
+        ):
+            self.assertEqual(
+                studio_arch.page_refusal(node, position).code, "page_place"
+            )
+        self.assertIsNone(studio_arch.notebook_refusal(sheet, "inside"))
+        self.assertIsNone(studio_arch.notebook_refusal(group, "after"))
+        self.assertIsNone(studio_arch.notebook_refusal(page, "inside"))
+        self.assertEqual(
+            studio_arch.notebook_refusal(group, "inside").code,
+            "notebook_place",
+        )
+
+        blocks = studio_arch.arch_blocks(form, "form", {})
+        separator = blocks["children"][0]["children"][0]["children"][0]
+        self.assertEqual(
+            (
+                separator["tag"],
+                separator["kind"],
+                separator["attrs"]["string"],
+            ),
+            ("separator", "separator", "Details"),
+        )
+
+    def test_changes_inside_a_tab_of_an_added_notebook(self):
+        root = etree.fromstring(FORM)
+        notebook = {
+            "key": 1,
+            "type": "add_node",
+            "xpath": "//group[@name='main']",
+            "position": "after",
+            "payload": {
+                "node": {
+                    "tag": "notebook",
+                    "attrs": {"name": "nb"},
+                    "children": [
+                        {"tag": "page", "attrs": {"name": "p1"}},
+                        {"tag": "page", "attrs": {"name": "p2"}},
+                    ],
+                }
+            },
+        }
+        in_first = {
+            "key": 2,
+            "type": "add_existing_field",
+            "xpath": "//page[@name='p1']",
+            "position": "inside",
+            "payload": {"field_name": "email"},
+        }
+        in_second = {
+            "key": 3,
+            "type": "add_existing_field",
+            "xpath": "//page[@name='p2']",
+            "position": "inside",
+            "payload": {"field_name": "phone"},
+        }
+        on_email = {
+            "key": 4,
+            "type": "hide",
+            "xpath": "//field[@name='email']",
+            "position": "attributes",
+            "payload": {"value": True},
+        }
+        changes = [notebook, in_first, in_second, on_email]
+        self.assertEqual(
+            studio_arch.changes_on_added(root, changes, "form", 1), [2, 3, 4]
+        )
+        self.assertEqual(
+            studio_arch.changes_on_added(root, changes, "form", 1, child="p1"),
+            [2, 4],
+        )
+        self.assertEqual(
+            studio_arch.changes_on_added(root, changes, "form", 1, child="p2"),
+            [3],
         )

@@ -233,6 +233,9 @@ PENDING_VIEW_OPERATIONS = {
     "form": (
         "add_field",
         "add_existing_field",
+        "add_group",
+        "add_page",
+        "add_separator",
         "move",
         "remove",
         "hide",
@@ -1658,6 +1661,10 @@ class ErplibreStudioProject(models.Model):
             "unknown_view_type": lambda: self.env._(
                 "The studio makes no default %(type)s view.", **params
             ),
+            "page_place": lambda: self.env._("A tab goes in a notebook."),
+            "notebook_place": lambda: self.env._(
+                "A notebook goes in a sheet or in a tab."
+            ),
             "x2many_view": lambda: self.env._("A one2many shows in a form only."),
             "many2many_view": lambda: self.env._(
                 "A many2many shows in a form, a list or a kanban only."
@@ -1719,6 +1726,8 @@ class ErplibreStudioProject(models.Model):
             "add_filter": self._op_add_filter,
             "add_group_by": self._op_add_group_by,
             "add_separator": self._op_add_separator,
+            "add_group": self._op_add_group,
+            "add_page": self._op_add_page,
             "add_widget": self._op_add_widget,
             "move": self._op_move,
             "update_field": lambda view, arch, op: self._update_field(view, op),
@@ -2090,13 +2099,89 @@ class ErplibreStudioProject(models.Model):
         )
 
     def _op_add_separator(self, view, arch, op):
+        """A <separator>; in a form, ``label`` gives it a title."""
         target, position, _node = self._check_drop(arch, op, view.type)
+        attrs = {}
+        label = (op.get("label") or "").strip()
+        if label and view.type == "form":
+            attrs["string"] = label
         return self._add_change(
             view,
             "add_node",
             target,
             position,
-            {"kind": "separator", "node": {"tag": "separator", "attrs": {}}},
+            {
+                "kind": "separator",
+                "node": {"tag": "separator", "attrs": attrs},
+            },
+        )
+
+    def _layout_label(self, op, default):
+        """The label of a new group or tab: ``op["label"]``, else
+        ``default``, in the user's language."""
+        return (op.get("label") or "").strip() or default
+
+    def _op_add_group(self, view, arch, op):
+        """A <group> of a form, named after its label."""
+        target, position, _node = self._check_drop(arch, op, view.type)
+        label = self._layout_label(op, self.env._("New group"))
+        name = studio_arch.node_name_from_label(
+            "studio_group", label, studio_arch.arch_names(arch)
+        )
+        return self._add_change(
+            view,
+            "add_node",
+            target,
+            position,
+            {
+                "kind": "group",
+                "node": {
+                    "tag": "group",
+                    "attrs": {"name": name, "string": label},
+                },
+            },
+        )
+
+    def _op_add_page(self, view, arch, op):
+        """A tab of a form: a <page> inside a <notebook> or next to a
+        <page>; anywhere else, a new <notebook> that holds it, where a
+        notebook may go (``notebook_refusal``)."""
+        target = op.get("target")
+        position = op.get("position") or "after"
+        node = self._locate(arch, target)
+        label = self._layout_label(op, self.env._("New tab"))
+        taken = studio_arch.arch_names(arch)
+        page = {
+            "tag": "page",
+            "attrs": {
+                "name": studio_arch.node_name_from_label("studio_page", label, taken),
+                "string": label,
+            },
+        }
+        if studio_arch.page_refusal(node, position) is None:
+            return self._add_change(
+                view,
+                "add_node",
+                target,
+                position,
+                {"kind": "page", "node": page},
+            )
+        target, position, node = self._check_drop(arch, op, view.type)
+        self._refuse(studio_arch.notebook_refusal(node, position))
+        notebook = studio_arch.node_name_from_label("studio", "notebook", taken)
+        return self._add_change(
+            view,
+            "add_node",
+            target,
+            position,
+            {
+                "kind": "notebook",
+                "node": {
+                    "tag": "notebook",
+                    "attrs": {"name": notebook},
+                    "children": [page],
+                },
+            },
         )
 
     def _op_add_widget(self, view, arch, op):
@@ -2130,6 +2215,10 @@ class ErplibreStudioProject(models.Model):
         source_path = op.get("source")
         source = self._locate(arch, source_path)
         self._refuse(studio_arch.move_refusal(view.type, source))
+        if source.tag == "page":
+            self._refuse(studio_arch.page_refusal(node, position))
+        elif source.tag == "notebook" and view.type == "form":
+            self._refuse(studio_arch.notebook_refusal(node, position))
         if source is node or source in node.iterancestors():
             raise UserError(self.env._("A node cannot move into itself."))
         destination = node if position == "inside" else node.getparent()
@@ -2710,17 +2799,16 @@ class ErplibreStudioProject(models.Model):
         if node.getparent() is None:
             raise UserError(self.env._("The view itself cannot be removed."))
         added = self._added_changes(view, xpath)
+        if node.tag == "page":
+            notebook_xpath = studio_arch.node_xpath(arch, node.getparent())
+            if added:
+                self._remove_added_node(view, added)
+                return self._remove_empty_notebook(view, notebook_xpath, added.browse())
+            touched = self._remove_added_page(view, arch, node)
+            if touched is not None:
+                return self._remove_empty_notebook(view, notebook_xpath, touched)
         if added:
-            changes = self._view_changes(view)
-            keys = studio_arch.changes_on_added(
-                self._base_arch(view),
-                [c._as_dict() for c in changes],
-                view.type,
-                added.id,
-            )
-            removed = added | changes.filtered(lambda c: c.id in keys)
-            self._studio_check_inverse_removal(removed)
-            self._studio_inverse_dependents(removed).unlink()
+            self._remove_added_node(view, added)
             return added.browse()
         if studio_arch.hide_mode(view.type) == "remove":
             payload = {}
@@ -2734,6 +2822,71 @@ class ErplibreStudioProject(models.Model):
         return self._attribute_operation(
             view, arch, {"type": "hide", "target": xpath, "value": True}
         )
+
+    def _remove_added_node(self, view, added):
+        """Remove the change ``added`` of ``view``, which adds a node, with
+        the changes on that node or inside it."""
+        changes = self._view_changes(view)
+        keys = studio_arch.changes_on_added(
+            self._base_arch(view),
+            [c._as_dict() for c in changes],
+            view.type,
+            added.id,
+        )
+        removed = added | changes.filtered(lambda c: c.id in keys)
+        self._studio_check_inverse_removal(removed)
+        self._studio_inverse_dependents(removed).unlink()
+
+    def _remove_added_page(self, view, arch, page):
+        """Take ``page``, a tab the change that added its notebook holds
+        (``NODE_CHILDREN``), out of that change, with the changes on the tab
+        or inside it. Return the change of the notebook, or None when no
+        change of the project added the tab."""
+        notebook_xpath = studio_arch.node_xpath(arch, page.getparent())
+        added = self._added_changes(view, notebook_xpath)
+        if not added or added.change_type != "add_node":
+            return None
+        payload = added._payload()
+        node_def = payload.get("node") or {}
+        name = page.get("name")
+
+        def named(child):
+            return bool(name) and (child.get("attrs") or {}).get("name") == name
+
+        children = node_def.get("children") or []
+        if not any(named(child) for child in children):
+            return None
+        changes = self._view_changes(view)
+        keys = studio_arch.changes_on_added(
+            self._base_arch(view),
+            [c._as_dict() for c in changes],
+            view.type,
+            added.id,
+            child=name,
+        )
+        inner = changes.filtered(lambda c: c.id in keys)
+        self._studio_check_inverse_removal(inner)
+        self._studio_inverse_dependents(inner).unlink()
+        node_def["children"] = [child for child in children if not named(child)]
+        added._set_payload(payload)
+        return added
+
+    def _remove_empty_notebook(self, view, notebook_xpath, touched):
+        """Remove the notebook at ``notebook_xpath`` of the draft of
+        ``view`` when the project added it and it holds no tab any more;
+        return ``touched``, or an empty recordset once the notebook left."""
+        arch, _errors = self._draft_arch(view)
+        try:
+            notebook = studio_arch.locate(arch, notebook_xpath)
+        except studio_arch.ArchError:
+            return touched
+        if any(node.tag == "page" for node in studio_arch.elements(notebook)):
+            return touched
+        added = self._added_changes(view, notebook_xpath)
+        if not added:
+            return touched
+        self._remove_added_node(view, added)
+        return added.browse()
 
     def _studio_dependent_changes(self, changes):
         """``changes`` (of this project) with every change of the project

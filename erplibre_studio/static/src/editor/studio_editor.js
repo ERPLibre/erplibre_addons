@@ -79,6 +79,8 @@ export const LEFT_TABS = ["palette", "plan"];
 // once web_timeline is installed; a type a model not created yet gets
 // once applied.
 export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first"];
+// The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
+export const LAYOUT_KINDS = ["group", "page", "separator"];
 
 /**
  * The studio editor: a client action on one view of a model. The server
@@ -805,12 +807,19 @@ export class StudioEditor extends Component {
 
     /**
      * Whether the dragged ``item`` can land in ``zone``: a column of a
-     * search view, an axis of a pivot, the loaded fields of a timeline, or
-     * the arch tree (no zone). The server checks the rest.
+     * search view, an axis of a pivot, the loaded fields of a timeline,
+     * the tabs of a notebook (« pages », a tab only), or the arch tree (no
+     * zone). The server checks the rest.
      */
     accepts(item, zone) {
         if (!item) {
             return false;
+        }
+        if (zone === "pages" || item.kind === "page") {
+            return this.viewType === "form" && item.kind === "page" && (!zone || zone === "pages");
+        }
+        if (item.kind === "group") {
+            return this.viewType === "form" && !zone;
         }
         const lane = laneOfZone(zone);
         if (lane) {
@@ -824,7 +833,7 @@ export class StudioEditor extends Component {
             return false;
         }
         if (item.kind === "separator") {
-            return viewType === "search" && zone !== "fields";
+            return (viewType === "search" && zone !== "fields") || (viewType === "form" && !zone);
         }
         if (viewType === "search") {
             if (item.kind === "existing" && zone === "group_bys") {
@@ -885,6 +894,12 @@ export class StudioEditor extends Component {
         }
         if (item.kind === "separator") {
             return {type: "add_separator", target, position};
+        }
+        if (item.kind === "group") {
+            return {type: "add_group", target, position};
+        }
+        if (item.kind === "page") {
+            return {type: "add_page", target, position};
         }
         const isDate = DATE_TYPES.includes(this.fieldInfo(item.name).type);
         if (viewType === "search" && zone === "group_bys") {
@@ -984,7 +999,8 @@ export class StudioEditor extends Component {
 
     /**
      * Run ``operation`` and select what it added or moved: a new field, a
-     * new named node, or the dragged one.
+     * new named node, a new layout element (the block of the newest
+     * change; of a new notebook, its tab), or the dragged one.
      */
     async operateAndSelect(operation, item = {}) {
         const before = new Set(Object.keys(this.data.fields || {}));
@@ -994,7 +1010,17 @@ export class StudioEditor extends Component {
             return null;
         }
         let block = null;
-        if (item.kind === "new") {
+        if (LAYOUT_KINDS.includes(item.kind)) {
+            const newest = (data.changes || []).reduce((last, c) => (!last || c.id > last.id ? c : last), null);
+            block = newest && newest.path ? findBlock(data.blocks, (b) => b.path === newest.path) : null;
+            if (block && block.tag === "notebook") {
+                block = (block.children || []).find((b) => b.tag === "page") || block;
+            }
+            if (block) {
+                this.reveal(block.path);
+                return data;
+            }
+        } else if (item.kind === "new") {
             const name = Object.keys(data.fields).find((n) => !before.has(n));
             block = name && this.fieldBlock(data.blocks, name);
         } else if (item.name && ["add_existing_field", "move"].includes(operation.type)) {
@@ -1429,14 +1455,46 @@ export class StudioEditor extends Component {
         return this.nameBlockerCount ? this.nameBlockerText : _t("Review the draft, then write it to the database");
     }
 
+    /**
+     * Remove the selected block. A block the draft adds that holds other
+     * changes (a group, a tab and what was dropped into it) leaves with
+     * them once the user confirms: no undo brings them back.
+     */
     async removeSelected() {
         const block = this.selectedBlock;
         if (!block || this.state.busy) {
             return;
         }
-        if (await this.operate({type: "remove", target: block.path})) {
-            this.state.selected = null;
+        const remove = async () => {
+            if (await this.operate({type: "remove", target: block.path})) {
+                this.state.selected = null;
+            }
+        };
+        if (block.changed_inside && this.addedByDraft(block)) {
+            this.dialog.add(ConfirmationDialog, {
+                title: _t("Remove this element from the draft"),
+                body: _t("The changes made inside it leave the draft with it."),
+                confirmLabel: _t("Remove"),
+                confirm: remove,
+                cancel: () => {},
+            });
+            return;
         }
+        await remove();
+    }
+
+    /**
+     * Whether the draft adds ``block``: a change of kind « new » marks it,
+     * or, for a tab, the notebook that holds it.
+     */
+    addedByDraft(block) {
+        const isNew = (b) => (b.change_kinds || []).includes("new");
+        if (isNew(block)) {
+            return true;
+        }
+        const trail = blockTrail(this.root, block.path);
+        const parent = trail[trail.length - 2];
+        return block.tag === "page" && Boolean(parent) && isNew(parent);
     }
 
     reselect(data, block) {

@@ -484,6 +484,30 @@
         background-color: $primary !important;
     }
 
+    // The hook of a new tab: a small « + » tab at the end of the tabs.
+    .o_erplibre_studio_page_hook {
+        display: flex;
+        align-items: stretch;
+
+        .o_erplibre_studio_hook {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: auto;
+            min-height: 1.75rem;
+            margin: 0 0 0 2px;
+            border: 1px dashed $border-color;
+            border-bottom: 0;
+            border-radius: 0.25rem 0.25rem 0 0;
+            color: $text-muted;
+
+            &::before {
+                content: "+";
+            }
+        }
+    }
+
     .o_erplibre_studio_preview {
         min-height: 300px;
     }

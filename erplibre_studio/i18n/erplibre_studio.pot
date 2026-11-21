@@ -597,6 +597,12 @@ msgid "A node of a template cannot move out of the templates."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A notebook goes in a sheet or in a tab."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid ""
@@ -689,6 +695,12 @@ msgstr ""
 msgid ""
 "A studio project generated these modules: uninstalling them deletes\n"
 "                        what it created, with the records and the values below."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A tab goes in a notebook."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1218,9 +1230,21 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid "Layout"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Lower case letters, digits and _"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "New tab"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1259,6 +1283,12 @@ msgstr ""
 msgid ""
 "Proposed from the label while it is not edited. Frozen at Apply: it becomes "
 "a column of the table."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Remove this element from the draft"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2424,6 +2454,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__group_id
@@ -3286,6 +3317,8 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "New group"
 msgstr ""
@@ -4559,7 +4592,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 msgid "Separator"
 msgstr ""
 
@@ -4738,6 +4771,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 msgid "Tab"
 msgstr ""
 
@@ -4896,6 +4930,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The change « %(change)s » is on no view of the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The changes made inside it leave the draft with it."
 msgstr ""
 
 #. module: erplibre_studio

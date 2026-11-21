@@ -26,6 +26,7 @@ from . import (
     test_ui,
     test_uninstall,
     test_views_kanban,
+    test_views_layout,
     test_views_pivot,
     test_views_search,
     test_views_timeline,

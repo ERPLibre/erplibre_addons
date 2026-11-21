@@ -200,8 +200,12 @@ export class StudioBlock extends Component {
         }
     }
 
-    selectPage(index) {
+    /** Show the tab ``index`` and select its page ``page``. */
+    selectPage(index, page) {
         this.editorState.pages[this.block.path] = index;
+        if (page && this.editorState.selected !== page.path) {
+            this.editor.select(page.path);
+        }
     }
 
     /** The hook the dragged item is over, as ``hookKey`` names it. */

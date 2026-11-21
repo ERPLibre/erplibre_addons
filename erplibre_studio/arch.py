@@ -135,6 +135,9 @@ VIEW_OPERATIONS = {
     "form": (
         "add_field",
         "add_existing_field",
+        "add_group",
+        "add_page",
+        "add_separator",
         "move",
         "remove",
         "hide",
@@ -299,7 +302,12 @@ ITEM_FIELD_TYPES = COLOR_FIELD_TYPES + ("datetime", "many2one")
 ITEM_KINDS = ("many2one", "raw", "text")
 
 # The tags « add_node » inserts; the attributes come from the operation.
-NODE_TAGS = ("filter", "separator", "widget")
+NODE_TAGS = ("filter", "separator", "widget", "group", "notebook", "page")
+# The tags an added node of NODE_TAGS holds, one level deep: a notebook
+# comes with its first page.
+NODE_CHILDREN = {"notebook": ("page",)}
+# The tags a notebook goes in: a tab of a form holds another notebook.
+NOTEBOOK_PARENTS = ("sheet", "page")
 # The tags of the sub-view an added x2many field holds (``node_children``).
 SUBVIEW_TAGS = ("list", "field")
 # The relational field types a project adds; a one2many shows in a form only,
@@ -612,6 +620,25 @@ def drop_refusal(view_type, node, position):
     return None
 
 
+def page_refusal(node, position):
+    """Why a page cannot go at ``position`` of ``node`` (an ArchError), or
+    None when it can: inside a <notebook>, or before or after a <page>."""
+    if (node.tag == "notebook" and position == "inside") or (
+        node.tag == "page" and position in ("before", "after")
+    ):
+        return None
+    return ArchError("A tab goes in a notebook.", "page_place")
+
+
+def notebook_refusal(node, position):
+    """Why a notebook cannot go at ``position`` of ``node`` (an ArchError),
+    or None when it can: its parent is one of NOTEBOOK_PARENTS."""
+    parent = node if position == "inside" else node.getparent()
+    if parent is not None and parent.tag in NOTEBOOK_PARENTS:
+        return None
+    return ArchError("A notebook goes in a sheet or in a tab.", "notebook_place")
+
+
 def move_refusal(view_type, node):
     """Why ``node`` cannot move (an ArchError), or None when it can."""
     parent = node.getparent()
@@ -688,6 +715,25 @@ def _add_child(parent, child):
     return node
 
 
+def _add_node(parent, node_def):
+    """Append the element ``node_def`` {tag, attrs, children} of an
+    « add_node » change to ``parent``: a tag of NODE_TAGS, its children of
+    NODE_CHILDREN, one level deep."""
+    tag = node_def.get("tag")
+    if tag not in NODE_TAGS:
+        raise ArchError(f"A change cannot add <{tag}>.", "unknown_node", tag=tag)
+    node = etree.SubElement(parent, tag)
+    _set_attributes(node, node_def.get("attrs"))
+    for child in node_def.get("children") or []:
+        child_tag = (child or {}).get("tag")
+        if child_tag not in NODE_CHILDREN.get(tag, ()):
+            raise ArchError(
+                f"A change cannot add <{child_tag}>.", "unknown_node", tag=child_tag
+            )
+        _set_attributes(etree.SubElement(node, child_tag), child.get("attrs"))
+    return node
+
+
 def _attributes_spec(xpath, attrs):
     """An ``attributes`` spec: an empty value removes the attribute."""
     spec = etree.Element("xpath", expr=xpath, position="attributes")
@@ -726,13 +772,7 @@ def change_spec(change, view_type):
                 data.append(_attributes_spec(payload["attrs_xpath"], payload["attrs"]))
                 return data
         elif ctype == "add_node":
-            node_def = payload.get("node") or {}
-            tag = node_def.get("tag")
-            if tag not in NODE_TAGS:
-                raise ArchError(
-                    f"A change cannot add <{tag}>.", "unknown_node", tag=tag
-                )
-            _set_attributes(etree.SubElement(spec, tag), node_def.get("attrs"))
+            _add_node(spec, payload.get("node") or {})
         elif payload.get("item"):
             # A field of a timeline item, and the field loaded for it.
             name = payload["field_name"]
@@ -916,16 +956,19 @@ def added_key(arch, changes, view_type, xpath):
     return node.get(ADDED_MARK)
 
 
-def changes_on_added(arch, changes, view_type, key):
+def changes_on_added(arch, changes, view_type, key, child=None):
     """The keys of the changes after the change ``key`` that locate a node
     it added, or a node inside one: by their XPath or the source of a move,
-    in the arch as it stands when each applies."""
+    in the arch as it stands when each applies. ``child``: the name of a
+    node the change adds under its top node (the page of a notebook); only
+    the changes on that node, or on a node inside it, count."""
     current = copy.deepcopy(arch)
+    mark = str(key) if child is None else f"{key}/{child}"
     found, after = [], False
     for change in changes:
         if after:
             paths = (change.get("xpath"), (change.get("payload") or {}).get("source"))
-            if any(path and _added_by(current, path, key) for path in paths):
+            if any(path and _added_by(current, path, mark) for path in paths):
                 found.append(change["key"])
         if change["key"] == key:
             after = True
@@ -933,6 +976,11 @@ def changes_on_added(arch, changes, view_type, key):
             current = _apply_one(current, change, view_type, mark=True)
         except Exception:  # noqa: BLE001,S112 - a change that fails is skipped
             continue
+        if change["key"] == key and child is not None:
+            for top in current.xpath(f"//*[@{ADDED_MARK}=$key]", key=str(key)):
+                for node in top.iterdescendants():
+                    if node.get("name") == child:
+                        node.set(ADDED_MARK, mark)
     return found
 
 
@@ -1161,6 +1209,8 @@ def _node_kind(node, view_type):
         return "field"
     if node.tag == "widget":
         return "widget"
+    if view_type == "form" and node.tag == "separator":
+        return "separator"
     if view_type == "search":
         if node.tag == "filter":
             return "group_by" if group_by_of(node) else "filter"

@@ -648,6 +648,12 @@ msgid "A node of a template cannot move out of the templates."
 msgstr "Un nœud d'un gabarit ne peut pas sortir des gabarits."
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A notebook goes in a sheet or in a tab."
+msgstr "Un bloc d’onglets va dans une feuille ou dans un onglet."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid ""
@@ -754,6 +760,12 @@ msgid ""
 msgstr ""
 "Un projet studio a généré ces modules : les désinstaller supprime\n"
 "                        ce qu'il a créé, avec les enregistrements et les valeurs ci-dessous."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A tab goes in a notebook."
+msgstr "Un onglet va dans un bloc d’onglets."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1303,10 +1315,22 @@ msgid ""
 msgstr "Son nom technique se change dans une vue formulaire, liste ou kanban, jusqu'à l'Apply."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid "Layout"
+msgstr "Mise en page"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Lower case letters, digits and _"
 msgstr "Minuscules, chiffres et _"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "New tab"
+msgstr "Nouvel onglet"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1345,6 +1369,12 @@ msgid ""
 "Proposed from the label while it is not edited. Frozen at Apply: it becomes "
 "a column of the table."
 msgstr "Proposé d'après le libellé tant qu'il n'est pas modifié. Figé à l'Apply : il devient une colonne de la table."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Remove this element from the draft"
+msgstr "Retirer cet élément du brouillon"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2538,6 +2568,7 @@ msgstr "Graphique"
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__group_id
@@ -3409,6 +3440,8 @@ msgstr "Nouveau filtre"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "New group"
 msgstr "Nouveau groupe"
@@ -4709,7 +4742,7 @@ msgstr "Sélection"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 msgid "Separator"
 msgstr "Séparateur"
 
@@ -4890,6 +4923,7 @@ msgstr "Résumé : droits et règles se règlent dans Sécurité."
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 msgid "Tab"
 msgstr "Onglet"
 
@@ -5060,6 +5094,12 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The change « %(change)s » is on no view of the project."
 msgstr "Le changement « %(change)s » ne porte sur aucune vue du projet."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The changes made inside it leave the draft with it."
+msgstr "Les modifications faites à l’intérieur quittent le brouillon avec lui."
 
 #. module: erplibre_studio
 #. odoo-javascript
