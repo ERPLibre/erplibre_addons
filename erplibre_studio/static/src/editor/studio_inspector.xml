@@ -572,6 +572,43 @@
                         />
                         Read-only everywhere
                     </label>
+                    <t t-set="options" t-value="fieldOptions(field)" />
+                    <div t-if="options.translate or options.index or options.size" class="o_erplibre_studio_field_options mb-1">
+                        <label t-if="options.translate" class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2 mb-1">
+                            <input
+                                type="checkbox"
+                                class="form-check-input m-0 o_erplibre_studio_prop_translate"
+                                t-att-checked="field.definition.translate"
+                                t-on-change="(ev) => this.setTranslate(field, ev.target.checked)"
+                                t-att-disabled="props.busy or !field.pending"
+                            />
+                            Translatable
+                        </label>
+                        <label t-if="options.index" class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2 mb-1">
+                            <input
+                                type="checkbox"
+                                class="form-check-input m-0 o_erplibre_studio_prop_index"
+                                t-att-checked="field.definition.index"
+                                t-on-change="(ev) => this.updateField({index: ev.target.checked})"
+                                t-att-disabled="props.busy or !field.pending or field.definition.translate"
+                            />
+                            Indexed (faster search)
+                        </label>
+                        <label t-if="options.size" class="form-label mb-1 w-100">
+                            Maximum size
+                            <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                class="form-control form-control-sm mt-1 o_erplibre_studio_prop_size"
+                                t-att-value="field.definition.size or ''"
+                                placeholder="No limit"
+                                t-on-change="(ev) => this.setSize(ev.target.value)"
+                                t-att-disabled="props.busy or !field.pending"
+                            />
+                        </label>
+                        <span t-if="!field.pending" class="d-block text-muted o_erplibre_studio_options_help">Set before Apply only: the column exists.</span>
+                    </div>
                     <label t-if="field.type === 'selection'" class="form-label mb-1 w-100">
                         Values
                         <textarea

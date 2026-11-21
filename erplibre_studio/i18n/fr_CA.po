@@ -513,6 +513,12 @@ msgstr "Un champ de %(parent)s apparaît aussi sur les modèles qui en héritent
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A field of type %(type)s does not take the option %(option)s."
+msgstr "Un champ de type %(type)s ne prend pas l'option %(option)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A filter needs at least one condition."
 msgstr "Un filtre demande au moins une condition."
 
@@ -790,6 +796,12 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A timeline needs a date field and a many2one on %(model)s."
 msgstr "Une timeline demande un champ date et un many2one sur %(model)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A translatable field cannot be indexed as well."
+msgstr "Un champ traduisible ne peut pas aussi être indexé."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1304,6 +1316,18 @@ msgstr "Figé à l'Apply : son nom est une colonne de la table dans la base de d
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Indexed"
+msgstr "Indexé"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Indexed (faster search)"
+msgstr "Indexé (recherche plus rapide)"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Invalid format: lower case letters, digits and _ only"
 msgstr "Format invalide : minuscules, chiffres et _ seulement"
 
@@ -1327,6 +1351,14 @@ msgid "Lower case letters, digits and _"
 msgstr "Minuscules, chiffres et _"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Maximum size"
+msgstr "Taille maximale"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "New tab"
@@ -1337,6 +1369,12 @@ msgstr "Nouvel onglet"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "No field %(name)s on %(model)s nor in the other projects."
 msgstr "Aucun champ %(name)s sur %(model)s ni dans les autres projets."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "No limit"
+msgstr "Aucune limite"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -4763,6 +4801,12 @@ msgstr "Définir un attribut"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Set before Apply only: the column exists."
+msgstr "Se règle avant l'Apply seulement : la colonne existe."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Settings of the timeline"
 msgstr "Réglages de la frise"
@@ -5280,6 +5324,12 @@ msgstr "Le champ %(name)s existe avec un autre type."
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s exists: whether it is translatable, indexed and its maximum size are set before Apply only."
+msgstr "Le champ %(name)s existe : traduisible, indexé et taille maximale se règlent avant l'Apply seulement."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s is already in the view."
 msgstr "Le champ %(name)s est déjà dans la vue."
 
@@ -5461,6 +5511,12 @@ msgstr "Le libellé du menu, et de la catégorie des groupes de l'application."
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__menu_name
 msgid "The label of the menu; empty: the label."
 msgstr "Le libellé du menu ; vide : le libellé du modèle."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The maximum size is a whole number from 1 to %(max)s."
+msgstr "La taille maximale est un nombre entier de 1 à %(max)s."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6297,6 +6353,14 @@ msgstr "À mettre à jour"
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__help
 msgid "Tooltip"
 msgstr "Infobulle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Translatable"
+msgstr "Traduisible"
 
 #. module: erplibre_studio
 #. odoo-python

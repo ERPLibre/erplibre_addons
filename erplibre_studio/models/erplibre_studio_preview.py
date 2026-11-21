@@ -135,6 +135,7 @@ class ErplibreStudioProject(models.Model):
                 "help": definition.get("help") or "",
                 "relation": definition.get("relation") or False,
                 "selection": definition.get("selection") or [],
+                "translate": bool(definition.get("translate")),
             }
             if ttype == "one2many":
                 extra["relation_field"] = definition.get("relation_field")

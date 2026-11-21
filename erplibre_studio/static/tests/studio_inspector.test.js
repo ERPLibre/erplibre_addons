@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {queryAllTexts} from "@odoo/hoot-dom";
+import {queryAllTexts, queryOne} from "@odoo/hoot-dom";
 import {advanceTime, animationFrame} from "@odoo/hoot-mock";
 import {contains, defineWebModels, getService, mountWithCleanup, onRpc} from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
@@ -561,6 +561,69 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_inverse_toggle").not.toBeEnabled();
         expect(".o_erplibre_studio_inverse_protected").toHaveText("The studio does not add fields to this model.");
         expect(".o_erplibre_studio_prop_on_delete").toHaveCount(1);
+    });
+
+    test("a new field: translatable, indexed, maximum size until Apply", async () => {
+        const OPTIONS = ".o_erplibre_studio_field_props .o_erplibre_studio_field_options";
+        // x_code: a new char of the project in the address group, not created yet.
+        const withCode = (definition = {}) => {
+            const data = payload();
+            data.fields.x_code = {
+                string: "Code",
+                type: "char",
+                project: true,
+                pending: true,
+                name_auto: true,
+                definition: {field_description: "Code", help: "", readonly: false, ...definition},
+            };
+            const address = data.blocks.children[0].children[0];
+            address.children.push(field("street", ["new"], {name: "x_code", path: named("x_code"), label: "Code"}));
+            return data;
+        };
+        answer = withCode();
+        afterOperation = () => withCode({translate: true});
+        await openEditor();
+        await contains(".o_erplibre_studio_field[data-name=x_code]").click();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_translate`).toBeEnabled();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_index`).toBeEnabled();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_size`).toBeEnabled();
+        expect(queryOne(`${OPTIONS} .o_erplibre_studio_prop_size`).value).toBe("");
+        expect(".o_erplibre_studio_options_help").toHaveCount(0);
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_translate`).click();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_code", field: {translate: true}});
+        // A translatable field takes no index.
+        expect(`${OPTIONS} .o_erplibre_studio_prop_translate`).toBeChecked();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_index`).not.toBeEnabled();
+        afterOperation = () => withCode({translate: true, size: 30});
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_size`).edit("30");
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_code", field: {size: 30}});
+        expect(`${OPTIONS} .o_erplibre_studio_prop_size`).toHaveValue(30);
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_size`).clear();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_code", field: {size: 0}});
+
+        // Indexed, then translatable: the index goes.
+        afterOperation = () => withCode({index: true});
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_translate`).click();
+        operations.pop();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_index`).toBeChecked();
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_translate`).click();
+        expect(operations.pop()).toEqual({
+            type: "update_field",
+            field_name: "x_code",
+            field: {translate: true, index: false},
+        });
+
+        // A many2one takes an index only.
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=x_sponsor]").click();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_index`).toBeEnabled();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_translate`).toHaveCount(0);
+        expect(`${OPTIONS} .o_erplibre_studio_prop_size`).toHaveCount(0);
+
+        // A field created by Apply: the column exists, its options are frozen.
+        await contains(".o_erplibre_studio_field[data-name=x_level]").click();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_index`).not.toBeEnabled();
+        expect(".o_erplibre_studio_options_help").toHaveText("Set before Apply only: the column exists.");
     });
 
     test("the names the server counts block Apply", async () => {

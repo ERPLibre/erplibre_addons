@@ -225,6 +225,29 @@ NEW_FIELD_TYPES = (
     "one2many",
     "many2many",
 )
+# The options of a new field set before Apply, and the types that take
+# each one. A text or html column takes no index: a btree row holds about
+# 2700 bytes, a longer value would be refused at write. A translatable
+# column (jsonb) is indexed by Odoo only with a trigram index, so a field
+# is not both translatable and indexed. The editor keeps the same lists
+# (FIELD_OPTIONS of studio_utils.js).
+FIELD_OPTIONS = {
+    "translate": ("char", "text", "html"),
+    "index": (
+        "char",
+        "integer",
+        "float",
+        "boolean",
+        "date",
+        "datetime",
+        "selection",
+        "many2one",
+        "monetary",
+    ),
+    "size": ("char",),
+}
+# The largest maximum size of a char field.
+MAX_FIELD_SIZE = 10000
 # What a many2one does when its record is deleted.
 ON_DELETE = ("set null", "cascade", "restrict")
 
@@ -1188,10 +1211,11 @@ class ErplibreStudioProject(models.Model):
 
     def _clean_field_definition(self, model, field, name=None, existing=None):
         """A checked definition of a new field: {ttype, field_description,
-        readonly, help, selection, relation, on_delete, inverse_o2m,
-        relation_field, inverse_new, relation_table, column1, column2,
-        currency_field}. ``name`` is the field name; None makes one from the
-        label. ``existing``: the definition the field had, whose relation an
+        readonly, help, translate, index, size, selection, relation,
+        on_delete, inverse_o2m, relation_field, inverse_new, relation_table,
+        column1, column2, currency_field}; translate, index and size only
+        when set (``_clean_field_options``). ``name`` is the field name;
+        None makes one from the label. ``existing``: the definition the field had, whose relation an
         x2many keeps, and a many2one while it has an inverse one2many."""
         ttype = field.get("ttype")
         if ttype not in NEW_FIELD_TYPES:
@@ -1209,6 +1233,7 @@ class ErplibreStudioProject(models.Model):
             "readonly": bool(field.get("readonly")),
             "help": help_text,
         }
+        definition.update(self._clean_field_options(ttype, field))
         if ttype == "selection":
             definition["selection"] = self._clean_selection(field)
         elif ttype == "many2one":
@@ -1228,6 +1253,56 @@ class ErplibreStudioProject(models.Model):
         elif ttype == "many2many":
             definition.update(self._clean_many2many(model, name, field))
         return name, definition
+
+    @api.model
+    def _clean_field_options(self, ttype, field):
+        """{translate, index, size} of the field definition ``field`` of type
+        ``ttype``, each key only when set: a definition without the options
+        stays as it was before they existed. A false or empty value is no
+        option. UserError on an option ``ttype`` does not take
+        (FIELD_OPTIONS), on a field both translatable and indexed, and on a
+        size that is not a whole number from 1 to MAX_FIELD_SIZE."""
+        options = {}
+        for key in ("translate", "index"):
+            if field.get(key):
+                options[key] = True
+        size = field.get("size")
+        if size not in (None, False, "", 0):
+            if isinstance(size, bool):
+                size = None
+            else:
+                try:
+                    size = int(size)
+                except (TypeError, ValueError):
+                    size = None
+            if size is None or not 0 < size <= MAX_FIELD_SIZE:
+                raise UserError(
+                    self.env._(
+                        "The maximum size is a whole number from 1 to %(max)s.",
+                        max=MAX_FIELD_SIZE,
+                    )
+                )
+            options["size"] = size
+        labels = {
+            "translate": self.env._("Translatable"),
+            "index": self.env._("Indexed"),
+            "size": self.env._("Maximum size"),
+        }
+        for key in options:
+            if ttype not in FIELD_OPTIONS[key]:
+                raise UserError(
+                    self.env._(
+                        "A field of type %(type)s does not take the option "
+                        "%(option)s.",
+                        type=ttype,
+                        option=labels[key],
+                    )
+                )
+        if options.get("translate") and options.get("index"):
+            raise UserError(
+                self.env._("A translatable field cannot be indexed as well.")
+            )
+        return options
 
     @api.model
     def _check_field_texts(self, label, help_text):
@@ -2712,7 +2787,8 @@ class ErplibreStudioProject(models.Model):
         name stays. A new label of a field not created yet renames it after
         the label while its name is proposed (``name_auto``, missing on a
         field drafted before it, counts as proposed); a rename refused
-        keeps the name."""
+        keeps the name. Its options (FIELD_OPTIONS) change until Apply
+        creates it; UserError after."""
         name = op.get("field_name")
         change = self._field_add_change(view.model, name)
         if not change:
@@ -2723,6 +2799,20 @@ class ErplibreStudioProject(models.Model):
         definition = dict(payload.get("field") or {}, **(op.get("field") or {}))
         if definition.get("ttype") != payload["field"].get("ttype"):
             raise UserError(self.env._("The type of a field cannot change."))
+        if self._studio_options_changed(
+            payload["field"], op.get("field") or {}
+        ) and self._studio_field_applied(view.model, name):
+            # Translatable converts the column to jsonb, and Odoo widens a
+            # varchar but never narrows it: a smaller size would leave the
+            # column and the field apart. The options stay those of the
+            # column as Apply created it.
+            raise UserError(
+                self.env._(
+                    "The field %(name)s exists: whether it is translatable, "
+                    "indexed and its maximum size are set before Apply only.",
+                    name=name,
+                )
+            )
         _name, definition = self._clean_field_definition(
             view.model, definition, name=name, existing=payload["field"]
         )
@@ -2738,6 +2828,26 @@ class ErplibreStudioProject(models.Model):
             except UserError:
                 _logger.debug("%s keeps its name %s", view.model, name)
         return change
+
+    @api.model
+    def _studio_options_changed(self, definition, values):
+        """Whether ``values``, new values of the definition ``definition``,
+        change one of its options (FIELD_OPTIONS): a false or empty value
+        is the same as no option."""
+
+        def value(key, raw):
+            if key != "size":
+                return bool(raw)
+            try:
+                return int(raw or 0)
+            except (TypeError, ValueError):
+                return raw
+
+        return any(
+            value(key, values[key]) != value(key, definition.get(key))
+            for key in FIELD_OPTIONS
+            if key in values
+        )
 
     def _studio_field_applied(self, model, name):
         """Whether the field ``name`` of ``model`` is in the database."""
@@ -3914,12 +4024,22 @@ class ErplibreStudioProject(models.Model):
         return record, bool(todo) and not update
 
     def _field_vals(self, model, name, definition):
+        """The ir.model.fields values of the definition ``definition``. Each
+        option of FIELD_OPTIONS its type takes is written, False or 0 when
+        the definition leaves it out: a field applied without the options
+        shows no difference."""
         vals = {
             "field_description": definition["field_description"],
             "readonly": definition.get("readonly", False),
             "help": definition.get("help") or False,
         }
         ttype = definition["ttype"]
+        if ttype in FIELD_OPTIONS["translate"]:
+            vals["translate"] = bool(definition.get("translate"))
+        if ttype in FIELD_OPTIONS["index"]:
+            vals["index"] = bool(definition.get("index"))
+        if ttype in FIELD_OPTIONS["size"]:
+            vals["size"] = int(definition.get("size") or 0)
         if ttype == "selection":
             vals["selection"] = repr([tuple(item) for item in definition["selection"]])
         elif ttype == "many2one":

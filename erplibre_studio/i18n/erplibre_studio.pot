@@ -466,6 +466,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A field of type %(type)s does not take the option %(option)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A filter needs at least one condition."
 msgstr ""
 
@@ -721,6 +727,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A timeline needs a date field and a many2one on %(model)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A translatable field cannot be indexed as well."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1219,6 +1231,18 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Indexed"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Indexed (faster search)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Invalid format: lower case letters, digits and _ only"
 msgstr ""
 
@@ -1242,6 +1266,14 @@ msgid "Lower case letters, digits and _"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Maximum size"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "New tab"
@@ -1251,6 +1283,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "No field %(name)s on %(model)s nor in the other projects."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "No limit"
 msgstr ""
 
 #. module: erplibre_studio
@@ -4613,6 +4651,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Set before Apply only: the column exists."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Settings of the timeline"
 msgstr ""
@@ -5097,6 +5141,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s exists: whether it is translatable, indexed and its maximum size are set before Apply only."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s is already in the view."
 msgstr ""
 
@@ -5254,6 +5304,12 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__menu_name
 msgid "The label of the menu; empty: the label."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The maximum size is a whole number from 1 to %(max)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -6002,6 +6058,14 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__help
 msgid "Tooltip"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Translatable"
 msgstr ""
 
 #. module: erplibre_studio

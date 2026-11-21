@@ -22,6 +22,19 @@ const TRUE_VALUES = ["1", "True", "true"];
 export const TEMPLATED_TYPES = ["kanban", "timeline"];
 export const DATE_TYPES = ["date", "datetime"];
 export const NUMBER_TYPES = ["integer", "float", "monetary"];
+// The options of a new field set before Apply, and the types that take
+// each one: the FIELD_OPTIONS of the server (erplibre_studio_project.py).
+export const FIELD_OPTIONS = {
+    translate: ["char", "text", "html"],
+    index: ["char", "integer", "float", "boolean", "date", "datetime", "selection", "many2one", "monetary"],
+    size: ["char"],
+};
+
+/** {translate, index, size}: whether a field of ``ttype`` takes each option. */
+export function fieldOptions(ttype) {
+    return Object.fromEntries(Object.entries(FIELD_OPTIONS).map(([key, types]) => [key, types.includes(ttype)]));
+}
+
 // The ribbon colors offered for a new ribbon: bootstrap classes.
 export const RIBBON_COLORS = [
     "text-bg-success",

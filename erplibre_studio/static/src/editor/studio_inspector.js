@@ -20,6 +20,7 @@ import {
     TEMPLATED_TYPES,
     attributeLabel,
     changeKindLabel,
+    fieldOptions,
     fieldTypeLabel,
     fieldWidgets,
     findBlock,
@@ -46,7 +47,8 @@ const ADVANCED_VIEW_TYPES = ["form", "list"];
  * selected block, else the view itself. A field shows its definition
  * (label, technical name, editable for a new field not created yet
  * (StudioFieldName), and for a field of the project its tooltip,
- * read-only, values and comodel) apart from what this view sets
+ * read-only, values, comodel, and the options set before Apply:
+ * translatable, indexed, maximum size) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
  * writes; in a form or a list, the widget, the domain and the groups
  * under « Advanced »); a many2one of the project, the one2many it may create on its
@@ -518,6 +520,28 @@ export class StudioInspector extends Component {
 
     updateField(values) {
         return this.editor.updateField(values);
+    }
+
+    /**
+     * {translate, index, size}: whether the new field ``field`` takes each
+     * option, set before Apply (FIELD_OPTIONS).
+     */
+    fieldOptions(field) {
+        return fieldOptions(field.type);
+    }
+
+    /** Make ``field`` translatable or not; a translatable field takes no index. */
+    setTranslate(field, checked) {
+        const values = {translate: checked};
+        if (checked && field.definition && field.definition.index) {
+            values.index = false;
+        }
+        return this.updateField(values);
+    }
+
+    /** The maximum size of the new field from the text ``value``; empty for no limit. */
+    setSize(value) {
+        return this.updateField({size: value ? Number(value) : 0});
     }
 
     async updateSelection(text) {
