@@ -116,6 +116,21 @@ class TestUnprefixedNames(StudioCase):
         # Nothing to drop: no error.
         drop_manual_name_constraint(self.env.cr)
 
+    def test_loading_drops_the_constraint_again(self):
+        # An update of base sets base up alone and adds the constraint
+        # back; the hook that ends each loading of the modules drops it.
+        sql.add_constraint(
+            self.env.cr,
+            "ir_model_fields",
+            CONSTRAINT,
+            "CHECK (state != 'manual' OR name LIKE 'x\\_%')",
+        )
+        self.env["ir.model.fields"]._register_hook()
+        self.assertFalse(
+            sql.constraint_definition(self.env.cr, "ir_model_fields", CONSTRAINT)
+        )
+        self.assertEqual(self.project._studio_field_name_rule()["mode"], "development")
+
     def test_apply_loads_the_field(self):
         self.project.action_apply()
         field = self.Fields._get(PARTNER, "texte")
@@ -156,6 +171,29 @@ class TestUnprefixedNames(StudioCase):
         self.assertIn("Failed to load field res.partner.write", errors.output[0])
         self.assertNotIn("write", self.env[PARTNER]._fields)
         self.assertTrue(callable(type(self.env[PARTNER]).write))
+
+    def test_method_of_an_inheriting_model_is_not_loaded(self):
+        # res.users copies the fields of res.partner (``_inherits``): a
+        # field « authenticate » would replace its login method.
+        for name in ("authenticate", "check"):
+            with self.subTest(name=name):
+                with (
+                    self.assertLogs(IR_MODEL_LOGGER, "ERROR"),
+                    self.assertLogs(LOADER_LOGGER, "WARNING") as warnings,
+                ):
+                    self.manual_row(name, erplibre_studio_unprefixed=True)
+                # The row of the name before is still there: both log.
+                self.assertIn(
+                    f"res.partner.{name} not loaded: reserved",
+                    "\n".join(warnings.output),
+                )
+                self.assertNotIn(name, self.env[PARTNER]._fields)
+                self.assertNotIn(name, self.env["res.users"]._fields)
+                self.assertTrue(callable(getattr(type(self.env["res.users"]), name)))
+        self.assertEqual(
+            self.project._studio_field_name_problem(PARTNER, "authenticate")["code"],
+            "reserved",
+        )
 
     def test_field_a_module_defines_no_longer_loads(self):
         # A row of a field of base marked as a studio field: the field of
@@ -212,7 +250,12 @@ class TestUnprefixedNames(StudioCase):
             os.path.join(target, "models", "res_partner.py"), encoding="utf-8"
         ) as fh:
             model = fh.read()
-        compile(model, "res_partner.py", "exec")
+        # Run as Odoo imports it, not only compiled: a name of the class
+        # body that hid an import would fail here.
+        exec(  # pylint: disable=exec-used
+            compile(model, "res_partner.py", "exec"),
+            {"__name__": f"odoo.addons.{MODULE}.models.res_partner"},
+        )
         self.assertIn("texte = fields.Char(", model)
         with open(
             os.path.join(target, "views", "erplibre_studio_views.xml"), encoding="utf-8"
@@ -229,3 +272,16 @@ class TestUnprefixedNames(StudioCase):
         payload["field_name"] = "texte"
         self.change._set_payload(payload)
         self.project._check_generation_field_names()
+
+    def test_names_the_generated_file_imports_are_reserved(self):
+        # « fields = fields.Char() » in the class body hides the import
+        # for the fields that follow it.
+        for name in ("fields", "models", "api"):
+            with self.subTest(name=name):
+                problem = self.project._studio_field_name_problem(PARTNER, name)
+                self.assertEqual(problem["code"], "reserved")
+        payload = self.change._payload()
+        payload["field_name"] = "fields"
+        self.change._set_payload(payload)
+        with self.assertRaisesRegex(UserError, "fields"):
+            self.project._check_generation_field_names()

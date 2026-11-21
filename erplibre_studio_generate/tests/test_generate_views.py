@@ -157,6 +157,74 @@ class TestGenerateViews(StudioCase):
         )
         self.assertIn("studio_test_other_module", self.project._dependencies())
 
+    def test_advanced_attributes_written(self):
+        """The widget, the domain and the groups of a field, and a separator,
+        reach the views file; the module of the comodel field the domain
+        names is a dependency."""
+        form = self.make_view(
+            "form",
+            "<form><sheet><group name='g'><field name='name'/>"
+            "<field name='parent_id'/><field name='type'/></group></sheet></form>",
+            xml_id="base.erplibre_studio_test_form",
+        )
+        module = f"{MODULE}_attrs"
+        project = self.make_project(module, destination=self.destination)
+        app = project._studio_save_app({"name": "Studio test attrs"})
+        line = project._studio_save_group(
+            {"name": "Studio test reviewer", "app_id": app.id}
+        )
+        project.action_apply()
+        own = line._studio_full_xmlid()
+        domain = f"[('{self.foreign.name}', '!=', False)]"
+        for name, attribute, value in (
+            ("type", "widget", "radio"),
+            ("parent_id", "domain", domain),
+            ("name", "groups", f"base.group_system,{own}"),
+        ):
+            self.op(
+                project,
+                form,
+                type="set_attribute",
+                target=f"//field[@name='{name}']",
+                attribute=attribute,
+                value=value,
+            )
+        self.op(
+            project,
+            form,
+            type="add_separator",
+            target="//field[@name='type']",
+            position="after",
+            label="Studio separator",
+        )
+        foreign_module = self.Project._module_of("ir.model.fields", self.foreign.id)
+        self.assertNotEqual(foreign_module, "base")
+        self.assertIn(foreign_module, project._dependencies())
+        project.action_apply()
+        with self.server_actions():
+            project.action_generate()
+        with open(
+            os.path.join(
+                self.destination, module, "views", "erplibre_studio_views.xml"
+            ),
+            encoding="utf-8",
+        ) as fh:
+            views = etree.fromstring(fh.read().encode())
+        record = views.find("record[@id='base_erplibre_studio_test_form_studio']")
+        arch = record.find("field[@name='arch']")
+
+        def attribute(name, attribute):
+            return arch.xpath(
+                f".//xpath[@expr=\"//field[@name='{name}']\"]"
+                f"/attribute[@name='{attribute}']"
+            )[0].text
+
+        self.assertEqual(attribute("type", "widget"), "radio")
+        self.assertEqual(attribute("parent_id", "domain"), domain)
+        self.assertEqual(attribute("name", "groups"), f"base.group_system,{own}")
+        separator = arch.xpath(".//separator")
+        self.assertEqual([s.get("string") for s in separator], ["Studio separator"])
+
     def test_generate(self):
         with self.server_actions():
             self.project.action_generate()

@@ -46,6 +46,11 @@ GENERATION_MANAGED_FIELDS = frozenset(
     }
 )
 
+# The names the model files of the generated module import from odoo
+# (code_generator writes « from odoo import _, api, models, fields,
+# SUPERUSER_ID »); « _ » and « SUPERUSER_ID » fail the format already.
+GENERATED_IMPORTS = frozenset({"api", "fields", "models"})
+
 # Characters the code generator copies unescaped into a quoted Python
 # string of the generated module: refused in the texts that reach it.
 _UNSAFE_TEXT = ("'", '"', "\\", "\n", "\r")
@@ -294,11 +299,18 @@ class ErplibreStudioProject(models.Model):
         vals["erplibre_studio_unprefixed"] = not (name or "").startswith("x_")
         return vals
 
+    def _studio_reserved_field_names(self, model):
+        """Those of ERPLibre studio, and the names the module file of the
+        generated module imports (GENERATED_IMPORTS): a field of that name
+        in the body of the class replaces the import for the fields that
+        follow it, and the module no longer loads."""
+        return super()._studio_reserved_field_names(model) | GENERATED_IMPORTS
+
     def _check_generation_field_names(self):
         """Raise UserError on a new field without ``x_`` whose name cannot be
-        a field of the generated module: its format, a Python keyword, or a
-        method or an attribute of the model it would replace in the class
-        (``_studio_reserved_field_names``)."""
+        a field of the generated module: its format, a Python keyword, a
+        method or an attribute of the model it would replace in the class,
+        or a name the file imports (``_studio_reserved_field_names``)."""
         self.ensure_one()
         for model, name, _definition, _change in self._studio_all_definitions():
             if (name or "").startswith("x_"):

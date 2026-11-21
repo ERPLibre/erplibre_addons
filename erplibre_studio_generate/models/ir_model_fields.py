@@ -14,6 +14,9 @@ import logging
 
 from odoo import api, fields, models
 from odoo.addons.erplibre_studio import arch as studio_arch
+from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
+    delegation_classes,
+)
 from odoo.tools import sql
 
 _logger = logging.getLogger(__name__)
@@ -35,7 +38,8 @@ def drop_manual_name_constraint(cr):
     code_generator drops it at its installation, but a module installed
     after it that extends ``ir.model.fields`` adds it back before this
     module is loaded; from then on ``_add_sql_constraints`` leaves it
-    out. Called at the installation and the upgrade of this module."""
+    out. Called at the installation and the upgrade of this module, and
+    at the end of every loading of the modules (``_register_hook``)."""
     if sql.constraint_definition(cr, "ir_model_fields", MANUAL_NAME_CONNAME):
         sql.drop_constraint(cr, "ir_model_fields", MANUAL_NAME_CONNAME)
         _logger.info("Dropped the constraint %s", MANUAL_NAME_CONNAME)
@@ -84,7 +88,9 @@ class IrModelFields(models.Model):
         """The names of the custom fields of ``model`` without ``x_`` that
         carry ``erplibre_studio_unprefixed`` and pass the checks of a new
         field: the format, a name that replaces no method or attribute of
-        the class nor of every model. A marked row that fails a check is
+        every model nor of a class the field lands on: the class of
+        ``model`` and those of the models that inherit it by delegation,
+        which copy it (``delegation_classes``). A marked row that fails a check is
         left out with a warning, then Odoo logs it as not loaded. A row
         whose name a module defines now is no longer loaded: the field of
         the module takes its column over. The mark is read with ``get``:
@@ -96,11 +102,11 @@ class IrModelFields(models.Model):
             if name in model._fields:
                 self._studio_log_taken_over(model, name)
                 continue
+            classes = delegation_classes(model.pool, model._name)
             reserved = (
                 {name}
                 if any(
-                    _attribute_owner(cls, name)
-                    for cls in (type(model), models.BaseModel)
+                    _attribute_owner(cls, name) for cls in (*classes, models.BaseModel)
                 )
                 else ()
             )
@@ -142,6 +148,15 @@ class IrModelFields(models.Model):
             name,
             module,
         )
+
+    def _register_hook(self):
+        """Drop ``name_manual_field`` again once the registry holds this
+        module: Odoo calls the hook at the end of every loading of the
+        modules. An update of base (« -u base », « -u all ») sets base up
+        alone first, without the override of ``_add_sql_constraints``, and
+        adds the constraint back; it would require x_ from then on."""
+        super()._register_hook()
+        drop_manual_name_constraint(self.env.cr)
 
     def _add_sql_constraints(self):
         """Leave out ``name_manual_field`` while the database does not have

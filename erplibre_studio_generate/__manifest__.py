@@ -33,11 +33,15 @@ Writes an applied *ERPLibre studio* project as an installable module, with
 For development databases only: *code_generator* installs only on a
 server started with ``--dev``, and its installation drops the database
 constraint that keeps the names of custom fields starting with ``x_``;
-this module drops it too when a module added it back, and keeps it out.
+this module drops it too at the end of every loading of the modules,
+when a module or an update of base added it back.
 A new field may then go without ``x_``: this module loads it while the
 project is applied, and refuses to be uninstalled until the project is
-reverted or its generated module installed. A module installed later
-that defines a field of the same name takes its column over.
+reverted or its generated module installed. While modules install or
+update, the registries set up before this module is loaded log such a
+field as « Failed to load field » (ERROR) and skip it; its column and
+values stay. A module installed later that defines a field of the same
+name takes its column over.
 The destinations are the directories of the ``addons_path`` of the
 server that it can write into. Writing to the disk needs the
 Settings group, the developer mode and

@@ -50,3 +50,10 @@
     *code_generator*, while such a field exists: **Revert** the project
     or install its generated module first. A module installed later that
     defines a field of the same name takes the column over.
+11. Installing or updating modules (`-i`, `-u`) sets up registries
+    before this module is loaded: each of them logs a field without `x_`
+    as « Failed to load field … » at the level ERROR, with a traceback,
+    and skips it. The column and its values stay; the field loads again
+    once this module is loaded. A server start without `-i` or `-u` logs
+    none of it. An update of base adds the constraint on the names back:
+    this module drops it again at the end of the loading.

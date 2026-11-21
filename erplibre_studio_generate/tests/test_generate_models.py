@@ -545,6 +545,24 @@ class TestGenerateModels(StudioCase):
         )[0]
         self.assertTrue(search.xpath("filter[@name='inactive']"))
 
+    def test_order_of_the_line_over_ir_model(self):
+        """The class takes the order of the model line, not the one of
+        ir.model: the ir.model of a model an installed generated module owns
+        keeps its former order until the upgrade."""
+        self.project._studio_update_model(self.item, {"order": "x_name desc"})
+        self.project.action_apply()
+        for model, order in ((ITEM, "id desc"), (TAG, "x_name")):
+            self.env.cr.execute(
+                'UPDATE ir_model SET "order" = %s WHERE model = %s', [order, model]
+            )
+        self.env["ir.model"].invalidate_model(["order"])
+        self.generate()
+        attributes, _fields = self.class_of(self.read("models", f"{ITEM}.py"))
+        self.assertEqual(attributes["_order"], "x_name desc")
+        # No order on the line: none in the class, Odoo sorts by « id ».
+        attributes, _fields = self.class_of(self.read("models", f"{TAG}.py"))
+        self.assertNotIn("_order", attributes)
+
     def test_per_company(self):
         """« Per company » reaches the module: ``x_company_id`` with the
         current company as default, its multi-company rule, global, and the
