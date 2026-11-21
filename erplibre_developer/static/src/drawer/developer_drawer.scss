@@ -1,0 +1,60 @@
+// © 2026 TechnoLibre (http://www.technolibre.ca)
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+$o-erplibre-dev-width: 460px;
+// The CSS min(): libsass would evaluate a bare min() as its own function
+// and fail on the mixed units.
+$o-erplibre-dev-space: unquote("min(#{$o-erplibre-dev-width}, 100vw)");
+
+.o_erplibre_dev_drawer {
+    position: fixed;
+    // Below the navbar: its systray (debug menu, user menu) stays reachable.
+    top: $o-navbar-height;
+    right: 0;
+    bottom: 0;
+    width: $o-erplibre-dev-space;
+    // Below the overlays: the dialogs (the -u confirmation among them), the
+    // dropdowns and the notifications show above the drawer.
+    z-index: $zindex-modal-backdrop - 10;
+
+    pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 50vh;
+        overflow: auto;
+    }
+
+    // Inline items sit on lines of their own in the template, which drops
+    // the space between them.
+    :is(code, .badge) + :is(code, .badge, span) {
+        margin-left: 0.25rem;
+    }
+
+    .o_erplibre_dev_field_row,
+    .o_erplibre_dev_view_row {
+        cursor: pointer;
+    }
+}
+
+// The page keeps its whole width usable: the drawer takes its own space.
+body.o_erplibre_dev_open .o_action_manager {
+    margin-right: $o-erplibre-dev-space;
+}
+
+.o_erplibre_dev_highlight {
+    outline: 2px solid $primary !important;
+    outline-offset: 1px;
+    background-color: rgba($primary, 0.12) !important;
+}
+
+body.o_erplibre_dev_inspecting {
+    .o_action_manager,
+    .modal {
+        cursor: crosshair;
+    }
+
+    // While inspecting, the drawer stays above a dialog it inspects.
+    .o_erplibre_dev_drawer {
+        z-index: $zindex-modal + 5;
+    }
+}
