@@ -1610,8 +1610,9 @@ export class StudioEditor extends Component {
     }
 
     /**
-     * Write ``values`` (any of name, model, chatter, menu) on the model
-     * line ``line``; the models space follows a new technical name.
+     * Write ``values`` (any of name, model, chatter, menu, order,
+     * archivable, manual_order) on the model line ``line``; the models
+     * space follows a new technical name.
      */
     async updateModel(line, values) {
         const data = await this.projectCall("update_model", [line.id, values]);

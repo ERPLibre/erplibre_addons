@@ -905,15 +905,27 @@ class ErplibreStudioEditor(models.AbstractModel):
     def _model_payload(self, line):
         """A model line as the editor shows it; ``views`` holds the ids of
         its default views once applied; ``pending_views`` says which default
-        views hold changes recorded before Apply."""
+        views hold changes recorded before Apply. ``options_applied``:
+        {option: whether the applied model has its field}, which locks it;
+        ``sort_fields``: [[name, label]] of the fields its default order
+        can name (``_studio_sortable_fields``), by label."""
         views = line._studio_views() if line.applied else {}
         parent = line.menu_parent_id
         changes = line.project_id.change_ids.filtered(lambda c: c.model_line_id == line)
+        sortable = line.project_id._studio_sortable_fields(line)
         return {
             "id": line.id,
             "model": line.model,
             "name": line.name,
             "chatter": line.chatter,
+            "order": line.order or "",
+            "archivable": line.archivable,
+            "manual_order": line.manual_order,
+            "options_applied": line._studio_options_applied(),
+            "sort_fields": sorted(
+                ([name, label] for name, label in sortable.items()),
+                key=lambda item: (item[1].lower(), item[0]),
+            ),
             "menu_mode": line.menu_mode,
             "app_id": line.app_id.id,
             "menu_parent": [parent.id, parent.complete_name] if parent else False,

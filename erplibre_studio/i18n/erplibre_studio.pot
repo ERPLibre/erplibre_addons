@@ -97,6 +97,26 @@ msgid "%(count)s technical name(s) block Apply"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
+msgid ""
+"%(field)s is already a new field of %(name)s: remove it before turning the "
+"option on."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "%(field)s, ascending"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "%(field)s, descending"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "%(groups)s group(s) · %(models)s model(s)"
@@ -126,6 +146,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s already has a %(type)s view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(model)s already has a field %(field)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1180,6 +1206,19 @@ msgid "Apply the model first: %(type)s needs its records."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__archivable
+msgid "Archivable"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Archived"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Available"
@@ -1205,6 +1244,12 @@ msgid "Checks"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "Creation order"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Each new field of the project needs its own name."
@@ -1226,6 +1271,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "Frozen at Apply: its name is a column of the table in the database."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__order
+msgid ""
+"How the lists sort the records, « field asc » or « field desc » terms "
+"separated by commas; empty: the order of creation."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1266,6 +1318,23 @@ msgid "Lower case letters, digits and _"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__manual_order
+msgid "Manual Order"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "Manual order"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "Manual order (Sequence)"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
@@ -1295,6 +1364,18 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Not a reserved word of the ORM"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "Once applied, this option cannot be removed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+msgid "Options · one field each"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1924,7 +2005,9 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__order
 msgid "Default order"
 msgstr ""
 
@@ -3111,6 +3194,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__model
@@ -4657,6 +4741,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+msgid "Set by Odoo for a model created outside code: they do not change."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Settings of the timeline"
 msgstr ""
@@ -5017,6 +5107,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 msgid "The database is busy: try the real preview again."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The default order of %(model)s names %(name)s, which the model will not "
+"have: choose another order."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5466,6 +5564,12 @@ msgid "The operator %(operator)s does not apply to a %(type)s field."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
+msgid "The option %(option)s of %(name)s cannot be removed once applied."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__sequence
 msgid ""
 "The order of the apps in the project: the first one gives the icon of the "
@@ -5545,6 +5649,13 @@ msgid "The record rules of the project on the model"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__manual_order
+msgid ""
+"The records are ordered by hand, with the handle of the list (the field "
+"x_sequence). Once applied, the option cannot be removed."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "The records as cards, in columns by grouping."
@@ -5554,6 +5665,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "The records as rows, one column per field."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__archivable
+msgid ""
+"The records can be archived (the field x_active). Once applied, the option "
+"cannot be removed."
 msgstr ""
 
 #. module: erplibre_studio

@@ -96,8 +96,8 @@ class ErplibreStudioProject(models.Model):
     def _studio_simulated_fields(self, line):
         """{name: fields_get description} of the model of the line ``line``,
         not created yet: the fields Odoo gives a custom model, ``x_name``,
-        and the new fields of the project on it (inverse many2one
-        included)."""
+        the fields of the options of the line, and the new fields of the
+        project on it (inverse many2one included)."""
         self.ensure_one()
         fields_info = {
             "id": _field_info("id", "integer", "ID", readonly=True),
@@ -126,6 +126,10 @@ class ErplibreStudioProject(models.Model):
                 relation="res.users",
             ),
         }
+        for name, definition in line._studio_option_fields().items():
+            fields_info[name] = _field_info(
+                name, definition["ttype"], definition["field_description"]
+            )
         for name, (definition, _change) in self._studio_field_definitions(
             line.model
         ).items():
@@ -145,6 +149,41 @@ class ErplibreStudioProject(models.Model):
                 name, ttype, definition.get("field_description") or name, **extra
             )
         return fields_info
+
+    def _studio_sortable_fields(self, line):
+        """{name: label} of the fields the records of the model line
+        ``line`` can be sorted by once applied: the stored fields of its
+        model (simulated before Apply), the fields of its options and the
+        new fields of the project on it; not a field of the project that
+        the draft no longer has, which Apply removes."""
+        self.ensure_one()
+        if not line.applied:
+            infos = self._studio_simulated_fields(line)
+        else:
+            Model = self.env[line.model]
+            infos = Model.fields_get(attributes=["string", "type", "sortable"])
+            definitions = self._studio_field_definitions(line.model)
+            removed = set(
+                self.field_ids.filtered(lambda f: f.model == line.model).mapped("name")
+            ) - set(definitions)
+            for name in removed:
+                infos.pop(name, None)
+            extra = dict(line._studio_option_fields())
+            extra.update(
+                {name: definition for name, (definition, _c) in definitions.items()}
+            )
+            for name, definition in extra.items():
+                if name not in infos:
+                    infos[name] = _field_info(
+                        name,
+                        definition.get("ttype"),
+                        definition.get("field_description") or name,
+                    )
+        return {
+            name: info.get("string") or name
+            for name, info in infos.items()
+            if info.get("sortable")
+        }
 
     def _studio_preview_arch(self, arch, fields_info=None):
         """``arch`` (an element) with its chatter replaced by a placeholder:
@@ -233,6 +272,9 @@ class ErplibreStudioProject(models.Model):
             }
             for model in pending
         }
+        if line.model in model_defaults:
+            # The defaults Apply gives the fields of the options (ir.default).
+            model_defaults[line.model].update(line._studio_option_defaults())
         return {
             "mode": "simulation",
             "model": line.model,
@@ -266,8 +308,16 @@ class ErplibreStudioProject(models.Model):
         return json.dumps(
             {
                 "models": [
-                    {"model": line.model, "name": line.name, "chatter": line.chatter}
+                    {
+                        "model": line.model,
+                        "name": line.name,
+                        "chatter": line.chatter,
+                        # Named when on only: an approval given before the
+                        # options holds.
+                        **({"options": sorted(options)} if options else {}),
+                    }
                     for line in lines.sorted("model")
+                    for options in [line._studio_option_fields()]
                 ],
                 "changes": changes._snapshot(),
                 "fields": definitions,
@@ -381,9 +431,21 @@ class ErplibreStudioProject(models.Model):
                     )
                 ],
             }
+            for name, definition in line._studio_option_fields().items():
+                vals["field_id"].append(
+                    Command.create(
+                        {
+                            "name": name,
+                            "field_description": definition["field_description"],
+                            "ttype": definition["ttype"],
+                        }
+                    )
+                )
             if line.chatter and mail:
                 vals.update(is_mail_thread=True, is_mail_activity=True)
             IrModel.create(vals)
+            for name, value in line._studio_option_defaults().items():
+                self.env["ir.default"].sudo().set(line.model, name, value)
         pending = set(lines.mapped("model"))
         created = set()
         for model, name, definition, _change in self._studio_all_definitions():

@@ -608,6 +608,130 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_security_model[data-model=x_loan_object]").toHaveAttribute("aria-current", "true");
     });
 
+    test("the models space: the default order and the options of a model", async () => {
+        const partner = {
+            model: "res.partner",
+            name: "Contact",
+            new: false,
+            pending: false,
+            module: "base",
+            chatter: true,
+            views: [{type: "form", label: "Form", view_id: 12}],
+            fields: [],
+            changes: 0,
+            access: 0,
+            rules: 0,
+        };
+        const options = (line = {}) => ({
+            order: "",
+            archivable: false,
+            manual_order: false,
+            options_applied: {archivable: false, manual_order: false},
+            sort_fields: [
+                ["x_name", "Name"],
+                ["id", "ID"],
+            ],
+            ...line,
+        });
+        const project = (line = {}) => ({
+            apps: [LOANS_APP],
+            models: [modelLine(options(line))],
+            access: [],
+            rules: [],
+            item_count: 2,
+            touched_models: [partner],
+        });
+        answer = payload(project());
+        respond.get_editor_data = (args) =>
+            payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
+        await openEditor();
+        await openSpace("models");
+        // A model of the database: no order, no option.
+        expect(".o_erplibre_studio_model[data-model='res.partner']").toHaveCount(1);
+        expect(".o_erplibre_studio_model_order").toHaveCount(0);
+        expect(".o_erplibre_studio_model_archivable").toHaveCount(0);
+
+        // A model of the project, not created yet.
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_order").toHaveValue("");
+        expect(
+            [...document.querySelectorAll(".o_erplibre_studio_model_order option")].map((el) => el.value)
+        ).toEqual(["", "x_name asc", "x_name desc", "id asc", "id desc"]);
+        expect(".o_erplibre_studio_model_order option[value='x_name desc']").toHaveText("Name, descending");
+        expect(".o_erplibre_studio_model_archivable").toBeEnabled();
+        expect(".o_erplibre_studio_model_archivable").not.toBeChecked();
+        expect(".o_erplibre_studio_model_manual_order").toBeEnabled();
+        expect(".o_erplibre_studio_model_options").toHaveText(/Archivable\s*x_active\s*Manual order\s*x_sequence/);
+
+        respond.update_model = () => payload({...project({order: "x_name desc"}), revision: 1});
+        await contains(".o_erplibre_studio_model_order").select("x_name desc");
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {order: "x_name desc"}]);
+        expect(".o_erplibre_studio_model_order").toHaveValue("x_name desc");
+
+        respond.update_model = () =>
+            payload({...project({order: "x_name desc", archivable: true}), revision: 2});
+        await contains(".o_erplibre_studio_model_archivable").click();
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {archivable: true}]);
+        expect(".o_erplibre_studio_model_archivable").toBeChecked();
+
+        // The manual order joins the choices with its option; an order set
+        // otherwise stays shown.
+        respond.update_model = () =>
+            payload({
+                ...project({order: "x_name desc, id asc", archivable: true, manual_order: true}),
+                revision: 3,
+            });
+        await contains(".o_erplibre_studio_model_manual_order").click();
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {manual_order: true}]);
+        expect(".o_erplibre_studio_model_order option[value='x_sequence asc, id asc']").toHaveText(
+            "Manual order (Sequence)"
+        );
+        expect(".o_erplibre_studio_model_order").toHaveValue("x_name desc, id asc");
+
+        // A refusal shows the order of the line again.
+        respond.update_model = () => {
+            throw makeServerError({message: "The records cannot be sorted by id."});
+        };
+        await contains(".o_erplibre_studio_model_order").select("id desc");
+        expect(".o_erplibre_studio_model_order").toHaveValue("x_name desc, id asc");
+    });
+
+    test("the models space: an applied option is locked", async () => {
+        answer = payload({
+            apps: [LOANS_APP],
+            models: [
+                modelLine({
+                    applied: true,
+                    views: APPLIED_VIEWS,
+                    order: "",
+                    archivable: true,
+                    manual_order: false,
+                    options_applied: {archivable: true, manual_order: false},
+                    sort_fields: [["x_name", "Name"]],
+                }),
+            ],
+            item_count: 1,
+            touched_models: [],
+        });
+        respond.get_editor_data = (args) =>
+            payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
+        await openEditor();
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_archivable").toBeChecked();
+        expect(".o_erplibre_studio_model_archivable").not.toBeEnabled();
+        expect(".o_erplibre_studio_model_archivable").toHaveAttribute(
+            "title",
+            "Once applied, this option cannot be removed."
+        );
+        expect(".o_erplibre_studio_model_option_locked").toHaveCount(1);
+        expect(".o_erplibre_studio_model_manual_order").toBeEnabled();
+        await contains(".o_erplibre_studio_model_advanced_toggle").click();
+        expect(".o_erplibre_studio_model_advanced_note").toHaveText(
+            "Set by Odoo for a model created outside code: they do not change."
+        );
+    });
+
     test("the access grid: a toggle and a new row send set_access", async () => {
         const row = {id: 1, model: MODEL, group: [1, "Role / User"], ...ALL_PERMS};
         answer = payload({models: [modelLine({applied: true, views: APPLIED_VIEWS})], access: [row], item_count: 2});

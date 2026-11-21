@@ -16,6 +16,7 @@ from . import (
     test_install,
     test_integrity,
     test_migration,
+    test_model_options,
     test_models,
     test_preview,
     test_preview_models,

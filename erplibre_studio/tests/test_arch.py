@@ -322,6 +322,62 @@ class TestArch(BaseCase):
         with self.assertRaises(studio_arch.ArchError):
             studio_arch.default_model_arch("kanban", "Item")
 
+    def test_default_model_arch_options(self):
+        plain = etree.fromstring(studio_arch.default_model_arch("form", "Item"))
+        form = etree.fromstring(
+            studio_arch.default_model_arch("form", "Item", archivable=True)
+        )
+        ribbon = form.find("sheet")[0]
+        self.assertEqual(
+            (ribbon.tag, ribbon.get("name"), ribbon.get("invisible")),
+            ("widget", "web_ribbon", "x_active"),
+        )
+        self.assertEqual(
+            form.find("sheet")[-1].attrib, {"name": "x_active", "invisible": "1"}
+        )
+        # The nodes of the plain form keep their paths.
+        for xpath in ("/form/sheet/div[1]", "//group[@name='studio_left']"):
+            node = studio_arch.locate(plain, xpath)
+            self.assertEqual(
+                studio_arch.node_xpath(plain, node),
+                studio_arch.node_xpath(form, studio_arch.locate(form, xpath)),
+            )
+        self.assertEqual(
+            studio_arch.node_xpath(form, form.find("sheet/div")),
+            "/form/sheet[1]/div[1]",
+        )
+        # The list: the handle first; the search: the filter last.
+        root = etree.fromstring(
+            studio_arch.default_model_arch("list", "Item", manual_order=True)
+        )
+        self.assertEqual(
+            [(f.get("name"), f.get("widget")) for f in root],
+            [("x_sequence", "handle"), ("x_name", None)],
+        )
+        root = etree.fromstring(
+            studio_arch.default_model_arch("search", "Item", archivable=True)
+        )
+        self.assertEqual([n.tag for n in root], ["field", "filter"])
+        self.assertEqual(root[1].get("domain"), "[('x_active', '=', False)]")
+        # An option leaves the views it does not concern as they are.
+        for view_type, option in (
+            ("form", "manual_order"),
+            ("list", "archivable"),
+            ("search", "manual_order"),
+        ):
+            self.assertEqual(
+                studio_arch.default_model_arch(view_type, "Item", **{option: True}),
+                studio_arch.default_model_arch(view_type, "Item"),
+            )
+
+    def test_order_terms(self):
+        self.assertEqual(
+            studio_arch.order_terms("x_name DESC, id"),
+            [("x_name", "desc"), ("id", "asc")],
+        )
+        with self.assertRaises(studio_arch.ArchError):
+            studio_arch.order_terms("x_name; drop")
+
     def test_chatter_stays_in_place(self):
         root = etree.fromstring(
             studio_arch.default_model_arch("form", "Item", chatter=True)

@@ -352,6 +352,17 @@ MODEL_NAME_SIZE = 50
 # The default views of a model the studio creates.
 MODEL_VIEW_TYPES = ("form", "list", "search")
 
+# The options of a model the studio creates: {option: (field name, type,
+# label)}. Each one adds one field to the model, which Odoo gives a meaning
+# by its name: ``x_active`` archives the records, ``x_sequence`` orders them
+# by hand (the handle of the list).
+MODEL_OPTIONS = {
+    "archivable": ("x_active", "boolean", "Active"),
+    "manual_order": ("x_sequence", "integer", "Sequence"),
+}
+# The order of the records of a model whose option « manual_order » is on.
+MANUAL_ORDER = "x_sequence asc, id asc"
+
 OPTIONAL_VALUES = ("", "show", "hide")
 
 _SAFE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -1136,16 +1147,23 @@ def _color_rule_parts(expression):
 _ORDER_TERM = re.compile(r"^\s*([a-z_][a-z0-9_]*)(\s+(asc|desc))?\s*$", re.I)
 
 
-def order_fields(text):
-    """The field names of an order text (« name asc, id desc »); ArchError
-    when it is not one."""
-    names = []
+def order_terms(text):
+    """[(field name, « asc » or « desc »)] of an order text (« name asc,
+    id desc »), a term without direction ascending; ArchError when it is
+    not one."""
+    terms = []
     for term in (text or "").split(","):
         match = _ORDER_TERM.match(term)
         if not match:
             raise ArchError(f"Invalid order {text}.", "bad_order", order=text)
-        names.append(match.group(1))
-    return names
+        terms.append((match.group(1), (match.group(3) or "asc").lower()))
+    return terms
+
+
+def order_fields(text):
+    """The field names of an order text (« name asc, id desc »); ArchError
+    when it is not one."""
+    return [name for name, _direction in order_terms(text)]
 
 
 def node_name_from_label(prefix, label, taken):
@@ -1355,26 +1373,59 @@ def valid_model_name(name):
     return bool(name and len(name) <= MODEL_NAME_SIZE and _MODEL_NAME.match(name))
 
 
-def default_model_arch(view_type, label, chatter=False):
+def default_model_arch(
+    view_type, label, chatter=False, archivable=False, manual_order=False
+):
     """The arch text of the default ``view_type`` view (``MODEL_VIEW_TYPES``)
     of a model the studio creates, labelled ``label``. The form has a title
     on ``x_name`` and two empty columns to drop fields into, then the
-    chatter when ``chatter``. The arch depends on these values only: the
-    changes of the editor on the view stay in an inherited view, so that
-    writing the arch again never moves the nodes they locate."""
+    chatter when ``chatter``. ``archivable`` (``x_active``) adds the
+    « Archived » ribbon and the field to the form and the « Archived »
+    filter to the search view; ``manual_order`` puts the handle of
+    ``x_sequence`` first in the list. The arch depends on these values
+    only: the changes of the editor on the view stay in an inherited view,
+    so that writing the arch again never moves the nodes they locate. The
+    options add nodes whose tag or name keeps the paths of the other
+    nodes: a ribbon is the only <widget> of the sheet, its fields and its
+    filter are located by name."""
     root = etree.Element(view_type, {"string": label})
     if view_type == "form":
         sheet = etree.SubElement(root, "sheet")
+        if archivable:
+            etree.SubElement(
+                sheet,
+                "widget",
+                {
+                    "name": "web_ribbon",
+                    "title": "Archived",
+                    "bg_color": "text-bg-danger",
+                    "invisible": "x_active",
+                },
+            )
         title = etree.SubElement(sheet, "div", {"class": "oe_title"})
         heading = etree.SubElement(title, "h1")
         etree.SubElement(heading, "field", {"name": "x_name", "placeholder": label})
         main = etree.SubElement(sheet, "group", {"name": "studio_main"})
         etree.SubElement(main, "group", {"name": "studio_left"})
         etree.SubElement(main, "group", {"name": "studio_right"})
+        if archivable:
+            etree.SubElement(sheet, "field", {"name": "x_active", "invisible": "1"})
         if chatter:
             etree.SubElement(root, "chatter")
     elif view_type in ("list", "search"):
+        if view_type == "list" and manual_order:
+            etree.SubElement(root, "field", {"name": "x_sequence", "widget": "handle"})
         etree.SubElement(root, "field", {"name": "x_name"})
+        if view_type == "search" and archivable:
+            etree.SubElement(
+                root,
+                "filter",
+                {
+                    "name": "inactive",
+                    "string": "Archived",
+                    "domain": "[('x_active', '=', False)]",
+                },
+            )
     else:
         raise ArchError(
             f"Unknown view type {view_type}.", "unknown_view_type", type=view_type

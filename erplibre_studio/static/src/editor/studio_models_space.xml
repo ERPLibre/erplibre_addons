@@ -337,6 +337,52 @@
                 <div class="small text-muted o_erplibre_studio_model_kind_text" t-esc="kindText(entry)" />
             </div>
         </div>
+        <t t-if="entry.line">
+            <fieldset class="o_erplibre_studio_fieldset mb-3 o_erplibre_studio_model_settings">
+                <legend class="o_erplibre_studio_section_title">Model</legend>
+                <label class="form-label small mb-1" for="o_erplibre_studio_model_order">Default order</label>
+                <select
+                    id="o_erplibre_studio_model_order"
+                    class="form-select form-select-sm o_erplibre_studio_model_order"
+                    t-att-disabled="props.busy"
+                    t-on-change="(ev) => this.changeOrder(entry, ev)"
+                >
+                    <t t-foreach="orderChoices(entry)" t-as="choice" t-key="choice.value">
+                        <option
+                            t-att-value="choice.value"
+                            t-att-selected="choice.value === (entry.line.order or '')"
+                            t-esc="choice.label"
+                        />
+                    </t>
+                </select>
+            </fieldset>
+            <fieldset class="o_erplibre_studio_fieldset mb-3 o_erplibre_studio_model_options">
+                <legend class="o_erplibre_studio_section_title">Options · one field each</legend>
+                <div t-foreach="modelOptions" t-as="option" t-key="option.key" class="form-check mb-1">
+                    <input
+                        type="checkbox"
+                        t-att-id="'o_erplibre_studio_model_option_' + option.key"
+                        t-attf-class="form-check-input o_erplibre_studio_model_{{option.key}}"
+                        t-att-checked="entry.line[option.key]"
+                        t-att-disabled="optionLocked(entry, option.key) or props.busy"
+                        t-att-title="optionLocked(entry, option.key) ? lockedTitle : ''"
+                        t-on-change="(ev) => this.toggleOption(entry, option.key, ev)"
+                    />
+                    <label
+                        class="form-check-label small d-flex flex-wrap gap-2"
+                        t-att-for="'o_erplibre_studio_model_option_' + option.key"
+                    >
+                        <span t-esc="option.label" />
+                        <code t-esc="option.field" />
+                    </label>
+                    <div
+                        t-if="optionLocked(entry, option.key)"
+                        class="form-text mt-0 o_erplibre_studio_model_option_locked"
+                        t-esc="lockedTitle"
+                    />
+                </div>
+            </fieldset>
+        </t>
         <fieldset class="o_erplibre_studio_fieldset mb-3">
             <legend class="o_erplibre_studio_section_title">In the draft</legend>
             <dl class="row small mb-0 o_erplibre_studio_model_counts">
@@ -366,6 +412,9 @@
             <t t-if="entry.line">
                 <dt class="col-5 fw-normal text-muted">Displayed name</dt>
                 <dd class="col-7 mb-1"><code t-esc="'x_name'" /></dd>
+                <dd class="col-12 mb-1 text-muted o_erplibre_studio_model_advanced_note">
+                    Set by Odoo for a model created outside code: they do not change.
+                </dd>
             </t>
         </dl>
         <button

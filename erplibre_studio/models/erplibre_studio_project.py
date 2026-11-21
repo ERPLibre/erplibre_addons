@@ -1181,14 +1181,17 @@ class ErplibreStudioProject(models.Model):
 
     def _taken_field_names(self, model):
         """The field names a new field of ``model`` cannot take: those of the
-        model (simulated for a model not created yet), those the projects
-        add to it, and the inverse fields their one2many and many2one
-        create on it."""
+        model (simulated for a model not created yet), those of the options
+        of its model line, those the projects add to it, and the inverse
+        fields their one2many and many2one create on it."""
         line = self._studio_pending_line(model)
         if line:
             names = set(self._studio_simulated_fields(line))
         else:
             names = set(self.env[model]._fields)
+        # The fields of the options that are on, before Apply creates them.
+        for option in self.new_model_ids.filtered(lambda m: m.model == model):
+            names |= set(option._studio_option_fields())
         Change = self.env["erplibre.studio.change"]
         names |= set(
             Change.search(
@@ -3415,7 +3418,8 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_create_model(self, values):
         """A new model line from ``values`` {name, model, chatter, menu: see
-        ``_studio_menu_vals``}, with the default access row (the internal
+        ``_studio_menu_vals``, order, archivable, manual_order: see
+        ``_studio_update_model``}, with the default access row (the internal
         users, every right). « app » without an app goes in the first app
         of the project, a new one named after the model when it has none.
         Return the line."""
@@ -3443,6 +3447,13 @@ class ErplibreStudioProject(models.Model):
         if vals["menu_mode"] == "app" and not vals.get("app_id"):
             vals["app_id"] = self.app_ids[:1].id
         line = project.env["erplibre.studio.model"].create(vals)
+        options = {
+            key: values[key]
+            for key in ("order", *studio_arch.MODEL_OPTIONS)
+            if key in values
+        }
+        if options:
+            project._studio_write_options(line, options)
         project.env["erplibre.studio.access"].create(
             {
                 "project_id": self.id,
@@ -3461,8 +3472,9 @@ class ErplibreStudioProject(models.Model):
         return line
 
     def _studio_update_model(self, line, values):
-        """Write ``values`` {name, model, chatter, menu, sequence} on the
-        model line ``line`` (see ``erplibre.studio.model.write``)."""
+        """Write ``values`` {name, model, chatter, menu, sequence, order,
+        archivable, manual_order} on the model line ``line`` (see
+        ``erplibre.studio.model.write`` and ``_studio_write_options``)."""
         self.ensure_one()
         project = self._editing()
         line = line.with_context(**{NO_TOUCH_KEY: True})
@@ -3479,8 +3491,70 @@ class ErplibreStudioProject(models.Model):
             vals["model"] = values["model"].strip()
             self._studio_check_free_model(vals["model"], line)
         line.write(vals)
+        options = {
+            key: values[key]
+            for key in ("order", *studio_arch.MODEL_OPTIONS)
+            if key in values
+        }
+        if options:
+            project._studio_write_options(line, options)
         self._touch()
         return line
+
+    def _studio_write_options(self, line, values):
+        """Write the options of ``values`` {order, archivable, manual_order}
+        on the model line ``line``. An option turned on needs its field
+        free on the applied model. « Manual order » turned on sorts by
+        ``x_sequence`` a model without order; turned off, it clears an
+        order that names ``x_sequence``. The order is checked last, against
+        the fields the options give (``_studio_clean_order``)."""
+        line = line.with_context(**{NO_TOUCH_KEY: True})
+        vals = {}
+        for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items():
+            if key not in values or bool(values[key]) == line[key]:
+                continue
+            vals[key] = bool(values[key])
+            if vals[key] and line.applied and name in self.env[line.model]._fields:
+                raise UserError(
+                    self.env._(
+                        "%(model)s already has a field %(field)s.",
+                        model=line.model,
+                        field=name,
+                    )
+                )
+        manual = studio_arch.MODEL_OPTIONS["manual_order"][0]
+        order = values.get("order", line.order) or ""
+        if vals.get("manual_order") and not order.strip():
+            order = studio_arch.MANUAL_ORDER
+        elif vals.get("manual_order") is False:
+            try:
+                if manual in studio_arch.order_fields(order):
+                    order = ""
+            except studio_arch.ArchError:
+                pass
+        line.write(vals)
+        if "order" in values or order != (line.order or ""):
+            line.write({"order": self._studio_clean_order(line, order) or False})
+
+    def _studio_clean_order(self, line, text):
+        """The order ``text`` of the model line ``line``, normalised:
+        « name asc » or « name desc » terms joined by « , »; empty for
+        none. UserError when it is no order, or names a field the records
+        cannot be sorted by (``_studio_sortable_fields``)."""
+        text = (text or "").strip()
+        if not text:
+            return ""
+        try:
+            terms = studio_arch.order_terms(text)
+        except studio_arch.ArchError as exc:
+            raise UserError(self._arch_message(exc)) from exc
+        sortable = self._studio_sortable_fields(line)
+        for name, _direction in terms:
+            if name not in sortable:
+                raise UserError(
+                    self.env._("The records cannot be sorted by %(name)s.", name=name)
+                )
+        return ", ".join(f"{name} {direction}" for name, direction in terms)
 
     def _studio_remove_model(self, line):
         """Remove the model line ``line`` and what names its model (see
@@ -3714,7 +3788,11 @@ class ErplibreStudioProject(models.Model):
         """The arch of the default ``view_type`` view of the model line
         ``line``: the one Apply writes and a generated module defines."""
         return studio_arch.default_model_arch(
-            view_type, (line.name or "").strip(), line.chatter
+            view_type,
+            (line.name or "").strip(),
+            line.chatter,
+            archivable=line.archivable,
+            manual_order=line.manual_order,
         )
 
     # ── views the project adds ──────────────────────────────────────────
@@ -4200,7 +4278,7 @@ class ErplibreStudioProject(models.Model):
         """Raise UserError when the model line ``line`` does not apply: its
         menu, its chatter without mail (``mail``: whether mail is
         installed), a model of that name already in the database, no access
-        row on it."""
+        row on it, a default order on a field the model will not have."""
         self.ensure_one()
         self._studio_check_menu(line)
         if line.chatter and not mail:
@@ -4218,6 +4296,19 @@ class ErplibreStudioProject(models.Model):
                     name=line.model,
                 )
             )
+        if line.order:
+            sortable = self._studio_sortable_fields(line)
+            for name in studio_arch.order_fields(line.order):
+                if name not in sortable:
+                    raise UserError(
+                        self.env._(
+                            "The default order of %(model)s names %(name)s, "
+                            "which the model will not have: choose another "
+                            "order.",
+                            model=line.model,
+                            name=name,
+                        )
+                    )
 
     def _studio_check_apply_access(self, line):
         """Raise UserError when the access row ``line`` does not apply: its
@@ -4450,6 +4541,61 @@ class ErplibreStudioProject(models.Model):
             kept |= record
         return kept, waiting
 
+    def _apply_model_options(self, log, owned):
+        """Give each custom model of the model lines the fields of its
+        options and its default order, after the new fields: the order may
+        name one of them, and ir.model checks it against the stored fields.
+        A field of an option is created with its default (ir.default, which
+        leaves with the field), on a model the installed module defines as
+        well, as a new field of the project is: the next generation writes
+        it into the module; ``x_active`` created on a
+        model that has records marks them active, as a new column is empty
+        and an empty ``x_active`` reads as archived. The fields of the
+        options are not counted among the fields of the project: they leave
+        with the model, as ``x_name``. The order of a model in ``owned``,
+        defined by the installed module, changes with the module only.
+        Return the names of the models whose order waits for the module."""
+        IrModel = self.env["ir.model"].sudo().with_context(lang=None)
+        Fields = self.env["ir.model.fields"].sudo().with_context(lang=None)
+        Default = self.env["ir.default"].sudo()
+        waiting = []
+        for line in self.new_model_ids:
+            record = IrModel._get(line.model)
+            if not record:
+                continue
+            defaults = line._studio_option_defaults()
+            for name, definition in line._studio_option_fields().items():
+                if Fields._get(line.model, name):
+                    continue
+                Fields.create(
+                    {
+                        "name": name,
+                        "model": line.model,
+                        "model_id": record.id,
+                        "ttype": definition["ttype"],
+                        "field_description": definition["field_description"],
+                        "state": "manual",
+                    }
+                )
+                log.append(f"field {line.model}.{name}: created")
+                Default.set(line.model, name, defaults[name])
+                if definition["ttype"] == "boolean":
+                    Model = self.env[line.model].sudo().with_context(active_test=False)
+                    Model.search([(name, "=", False)]).write({name: True})
+            order = line.order or "id"
+            if record.order == order:
+                continue
+            if line.model in owned:
+                waiting.append(line.model)
+                log.append(
+                    f"model {line.model}: order defined by the module, changes "
+                    "with its next generation and upgrade"
+                )
+            else:
+                record.write({"order": order})
+                log.append(f"model {line.model}: order {order}")
+        return waiting
+
     def _apply_model_views(self, log, owned):
         """Create or update the default form, list and search views of the
         model lines. Those of the models in ``owned``, defined by the
@@ -4477,8 +4623,26 @@ class ErplibreStudioProject(models.Model):
                 )
                 if differs:
                     waiting.append(vals["name"])
+                elif line.archivable and line.model not in owned:
+                    self._studio_translate_archived(view)
                 kept |= view
         return kept, waiting
+
+    def _studio_translate_archived(self, view):
+        """Give the term « Archived » of the option « archivable » (the
+        ribbon of the form, the filter of the search view) of ``view`` its
+        text in each installed language, from the catalogue of the studio:
+        Apply writes the source terms of the arch."""
+        source = "Archived"
+        if source not in (view.with_context(lang=None).arch_db or ""):
+            return
+        translations = {}
+        for code, _name in self.env["res.lang"].get_installed():
+            text = self.with_context(lang=code).env._("Archived")
+            if code != "en_US" and text != source:
+                translations[code] = {source: text}
+        if translations:
+            view.update_field_translations("arch_db", translations)
 
     def _apply_added_views(self, log):
         """Create the views the view lines add, primary, with the arch each
@@ -4836,7 +5000,11 @@ class ErplibreStudioProject(models.Model):
         pointing = Fields.search(
             [("relation", "in", names), ("model", "not in", names)]
         )
-        on_models = Fields.search([("model", "in", names), ("name", "!=", "x_name")])
+        # ``x_name`` and the fields of the options leave with the model.
+        with_model = ["x_name"] + [o[0] for o in studio_arch.MODEL_OPTIONS.values()]
+        on_models = Fields.search(
+            [("model", "in", names), ("name", "not in", with_model)]
+        )
         module_fields = set(
             self.env["ir.model.data"]
             .sudo()
@@ -5243,11 +5411,22 @@ class ErplibreStudioProject(models.Model):
         neither transient nor in CASCADE_SKIPPED (server and scheduled
         actions, actions bound to the models, e-mail templates, automation
         rules, default values...); then the ir.filters of ``models``, which
-        name their model by its name and would stay behind. A read, in
-        sudo."""
+        name their model by its name and would stay behind. The default
+        values for everyone of the fields of the options of ``models``
+        (``_apply_model_options``) are the studio's own: left out. A read,
+        in sudo."""
         Fields = self.env["ir.model.fields"].sudo()
         fields = (fields or Fields) | Fields.search([("model_id", "in", models.ids)])
         targets = {"ir.model": models.ids, "ir.model.fields": fields.ids}
+        options = [option[0] for option in studio_arch.MODEL_OPTIONS.values()]
+
+        def own_default(row):
+            return (
+                row.field_id.model_id in models
+                and row.field_id.name in options
+                and not (row.user_id or row.company_id or row.condition)
+            )
+
         found = []
         for name in sorted(self.env.registry):
             Model = self.env[name]
@@ -5271,6 +5450,8 @@ class ErplibreStudioProject(models.Model):
                     .with_context(active_test=False)
                     .search([(field.name, "in", ids)])
                 )
+                if name == "ir.default":
+                    rows = rows.filtered(lambda row: not own_default(row))
                 if rows:
                     found.append(rows)
         if models:
@@ -5448,6 +5629,7 @@ class ErplibreStudioProject(models.Model):
                 kept["models"].filtered(lambda m: m.state != "manual").mapped("model")
             )
             kept["fields"], waiting_fields = project._apply_fields(log)
+            waiting_models += project._apply_model_options(log, owned)
             kept["primary_views"], waiting_views = project._apply_model_views(
                 log, owned
             )

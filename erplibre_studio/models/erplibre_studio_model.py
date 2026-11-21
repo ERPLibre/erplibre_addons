@@ -1,6 +1,8 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import ast
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -125,6 +127,19 @@ class ErplibreStudioModel(models.Model):
     )
     menu_name = fields.Char(help="The label of the menu; empty: the label.")
     menu_sequence = fields.Integer(default=10)
+    order = fields.Char(
+        string="Default order",
+        help="How the lists sort the records, « field asc » or « field desc » "
+        "terms separated by commas; empty: the order of creation.",
+    )
+    archivable = fields.Boolean(
+        help="The records can be archived (the field x_active). Once "
+        "applied, the option cannot be removed.",
+    )
+    manual_order = fields.Boolean(
+        help="The records are ordered by hand, with the handle of the list "
+        "(the field x_sequence). Once applied, the option cannot be removed.",
+    )
     applied = fields.Boolean(compute="_compute_applied")
     ir_model_id = fields.Many2one(
         "ir.model", compute="_compute_applied", string="Model in the database"
@@ -188,9 +203,49 @@ class ErplibreStudioModel(models.Model):
                 "menu_name": line.menu_name or "",
                 "menu_sequence": line.menu_sequence,
                 "sequence": line.sequence,
+                # Written when set only: the snapshot of a project applied
+                # before the options stays equal to its draft.
+                **({"order": line.order} if line.order else {}),
+                **{key: True for key in studio_arch.MODEL_OPTIONS if line[key]},
             }
             for line in self.sorted(lambda m: (m.sequence, m.model))
         ]
+
+    def _studio_option_fields(self):
+        """{field name: definition} of the fields the options that are on
+        add to the model: {ttype, field_description, default}, the default
+        as ir.model.fields writes it (a text)."""
+        self.ensure_one()
+        defaults = {"boolean": "True", "integer": "10"}
+        return {
+            name: {
+                "ttype": ttype,
+                "field_description": label,
+                "default": defaults[ttype],
+            }
+            for key, (name, ttype, label) in studio_arch.MODEL_OPTIONS.items()
+            if self[key]
+        }
+
+    def _studio_option_defaults(self):
+        """{field name: default value} of the fields of the options that are
+        on, as Python values (ir.default, default_get)."""
+        return {
+            name: ast.literal_eval(definition["default"])
+            for name, definition in self._studio_option_fields().items()
+        }
+
+    def _studio_options_applied(self):
+        """{option: whether the applied model has its field}: an option on
+        the model cannot be removed."""
+        self.ensure_one()
+        names = set()
+        if self.applied:
+            names = set(self.ir_model_id.field_id.mapped("name"))
+        return {
+            key: name in names
+            for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items()
+        }
 
     # ── constraints ─────────────────────────────────────────────────────
 
@@ -242,6 +297,34 @@ class ErplibreStudioModel(models.Model):
                 raise ValidationError(
                     self.env._("A chatter needs the module mail (Discuss).")
                 )
+
+    @api.constrains("archivable", "manual_order")
+    def _check_studio_options(self):
+        """An option whose field the applied model has cannot be turned
+        off, as with the chatter: the field and its values would stay. The
+        field of an option on cannot be a new field of the project."""
+        for line in self:
+            applied = line._studio_options_applied()
+            definitions = line.project_id._studio_field_definitions(line.model)
+            for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items():
+                if not line[key] and applied[key]:
+                    raise ValidationError(
+                        self.env._(
+                            "The option %(option)s of %(name)s cannot be "
+                            "removed once applied.",
+                            option=name,
+                            name=line.model,
+                        )
+                    )
+                if line[key] and name in definitions:
+                    raise ValidationError(
+                        self.env._(
+                            "%(field)s is already a new field of %(name)s: "
+                            "remove it before turning the option on.",
+                            field=name,
+                            name=line.model,
+                        )
+                    )
 
     @api.constrains("menu_mode", "menu_parent_id", "app_id")
     def _check_studio_menu(self):
@@ -340,4 +423,8 @@ class ErplibreStudioModel(models.Model):
         } | {
             "menu_parent_id": item.get("menu_parent_id") or False,
             "app_id": app[:1].id,
+            # A snapshot written before the options, or with an option
+            # off, has no key.
+            "order": item.get("order") or False,
+            **{key: bool(item.get(key)) for key in studio_arch.MODEL_OPTIONS},
         }

@@ -11,6 +11,9 @@ import {fieldTypeLabel, typeGlyph} from "./studio_utils";
 // The default views Apply makes for a model of the project, in their order.
 export const MODEL_VIEW_TYPES = ["form", "list", "search"];
 
+// The order of the records of a model whose option « Manual order » is on.
+export const MANUAL_ORDER = "x_sequence asc, id asc";
+
 /**
  * The models of the models space: [{model, name, kind, line, touched}],
  * the models the project creates first, in their order, then the other
@@ -359,6 +362,62 @@ export class StudioModelsSpace extends Component {
             {key: "access", label: _t("Access rights"), count: count("access", this.access(entry).length)},
             {key: "rules", label: _t("Record rules"), count: count("rules", this.rules(entry).length)},
         ];
+    }
+
+    /**
+     * The choices of the default order of the model line of ``entry``:
+     * [{value, label}]. The order of creation (empty), the manual order
+     * while its option is on, then each sortable field ascending and
+     * descending; an order set otherwise stays shown as it is.
+     */
+    orderChoices(entry) {
+        const line = entry.line;
+        const choices = [{value: "", label: _t("Creation order")}];
+        if (line.manual_order) {
+            choices.push({value: MANUAL_ORDER, label: _t("Manual order (Sequence)")});
+        }
+        for (const [name, field] of line.sort_fields || []) {
+            choices.push({value: `${name} asc`, label: _t("%(field)s, ascending", {field})});
+            choices.push({value: `${name} desc`, label: _t("%(field)s, descending", {field})});
+        }
+        if (line.order && !choices.some((choice) => choice.value === line.order)) {
+            choices.push({value: line.order, label: line.order});
+        }
+        return choices;
+    }
+
+    async changeOrder(entry, ev) {
+        const order = ev.target.value;
+        if (order === (entry.line.order || "")) {
+            return;
+        }
+        if (!(await this.editor.updateModel(entry.line, {order}))) {
+            ev.target.value = entry.line.order || "";
+        }
+    }
+
+    /** The options of a model of the project, one field each: [{key, label, field}]. */
+    get modelOptions() {
+        return [
+            {key: "archivable", label: _t("Archivable"), field: "x_active"},
+            {key: "manual_order", label: _t("Manual order"), field: "x_sequence"},
+        ];
+    }
+
+    /** Whether the option ``key`` of the model line of ``entry`` is applied: its field exists, it stays. */
+    optionLocked(entry, key) {
+        return Boolean(entry.line.options_applied && entry.line.options_applied[key]);
+    }
+
+    get lockedTitle() {
+        return _t("Once applied, this option cannot be removed.");
+    }
+
+    async toggleOption(entry, key, ev) {
+        const checked = ev.target.checked;
+        if (!(await this.editor.updateModel(entry.line, {[key]: checked}))) {
+            ev.target.checked = !checked;
+        }
     }
 
     /** The table of the model in the database. */
