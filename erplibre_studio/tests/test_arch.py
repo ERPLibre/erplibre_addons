@@ -219,6 +219,36 @@ class TestArch(BaseCase):
         for name in ("", "1a", "Studio", "a-b", "a b", "a" * 65):
             self.assertFalse(studio_arch.valid_module_name(name))
 
+    def test_field_name_refusal(self):
+        def code(name, **kwargs):
+            refusal = studio_arch.field_name_refusal(name, **kwargs)
+            return refusal and refusal.code
+
+        self.assertIsNone(code("x_a1"))
+        self.assertEqual(code("a1"), "prefix")
+        self.assertIsNone(code("a1", prefix_required=False))
+        self.assertEqual(code("x_"), "prefix")
+        self.assertEqual(code("X_a"), "format")
+        self.assertEqual(code("x_é"), "format")
+        self.assertEqual(code("1a", prefix_required=False), "format")
+        self.assertEqual(code("x_" + "a" * 62), "format")
+        self.assertIsNone(code("x_" + "a" * 61))
+        self.assertEqual(code("class"), "reserved")
+        self.assertEqual(code("_foo"), "reserved")
+        self.assertEqual(code("in_group_7"), "reserved")
+        self.assertEqual(code("sel_groups_1_2", prefix_required=False), "reserved")
+        self.assertEqual(code("x_write", reserved={"x_write"}), "reserved")
+        self.assertEqual(
+            studio_arch.field_name_checks("Class"),
+            {"format": False, "reserved": True, "prefix": False},
+        )
+        self.assertFalse(studio_arch.valid_field_name("a1"))
+        self.assertTrue(studio_arch.valid_field_name("a1", prefix_required=False))
+        # The relation tables keep their own rule: « x_ » always.
+        self.assertTrue(studio_arch.valid_table_name("x_mod_a_b_rel"))
+        self.assertFalse(studio_arch.valid_table_name("mod_a_b_rel"))
+        self.assertFalse(studio_arch.valid_table_name("x_" + "a" * 62))
+
     def test_errors_carry_a_code(self):
         root = etree.fromstring("<form><field name='a'/></form>")
         with self.assertRaises(studio_arch.ArchError) as caught:

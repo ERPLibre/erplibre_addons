@@ -26,8 +26,8 @@ class ErplibreStudioEditor(models.AbstractModel):
 
     @api.model
     def get_review(self, project_id):
-        """{revision, state, groups, removal, blocked} of the project
-        ``project_id``. ``groups``: [{key, kind, title, ref, items}], each
+        """{revision, state, groups, removal, blocked, name_blockers} of the
+        project ``project_id``. ``groups``: [{key, kind, title, ref, items}], each
         view the project adds, then the changes of each view (« view », a
         view added first), then each model of the project with its access
         rows and rules (« model »), the access rows and rules of the other
@@ -37,7 +37,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         as it is, ``error`` why it does not apply (or False), ``target``
         where the editor shows it ({space, ...}). ``removal``: the answer
         of ``get_apply_report``. ``blocked``: why Apply refuses the draft
-        now, or False. A read."""
+        now, or False. ``name_blockers``: the new fields whose technical
+        name stops Apply (``_studio_field_name_problems``). A read."""
         self._check_studio_access()
         project = self._read_project(project_id)
         review = _Review(self, project)
@@ -57,6 +58,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "groups": review.result(),
             "removal": project._studio_apply_report(),
             "blocked": blocked,
+            "name_blockers": project._studio_field_name_problems(),
         }
 
 

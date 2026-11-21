@@ -8,6 +8,7 @@ from . import (
     test_confirm,
     test_editor_models,
     test_editor_payload,
+    test_field_name,
     test_groups,
     test_guards,
     test_i18n,

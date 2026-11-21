@@ -119,7 +119,8 @@ class TestProject(StudioCase):
         arch = self.draft(project, self.form)
         node = arch.xpath("//field[@name='x_partner_level']")[0]
         self.assertEqual(node.getprevious().get("name"), "vat")
-        # Relabelling a field of the project changes its definition.
+        # Relabelling a field of the project changes its definition, and its
+        # name, proposed after the label, follows it until Apply.
         self.op(
             project,
             self.form,
@@ -129,11 +130,12 @@ class TestProject(StudioCase):
         )
         self.assertEqual(len(project.change_ids), 1)
         self.assertEqual(change._payload()["field"]["field_description"], "Level")
+        self.assertEqual(change.field_name, "x_level")
         self.op(
             project,
             self.form,
             type="hide",
-            target="//field[@name='x_partner_level']",
+            target="//field[@name='x_level']",
             value=True,
         )
         self.assertEqual(len(project.change_ids), 2)
@@ -144,15 +146,15 @@ class TestProject(StudioCase):
             type="add_field",
             target="//field[@name='vat']",
             position="before",
-            field={"ttype": "char", "field_description": "Partner level"},
+            field={"ttype": "char", "field_description": "Level"},
         )
-        self.assertEqual(other.field_name, "x_partner_level_2")
+        self.assertEqual(other.field_name, "x_level_2")
         # Removing a field of the project removes the changes that name it.
         self.op(
             project,
             self.form,
             type="remove",
-            target="//field[@name='x_partner_level']",
+            target="//field[@name='x_level']",
         )
         self.assertEqual(project.change_ids, other)
         # Removing a field of the base view hides it.

@@ -16,6 +16,7 @@ the part of the project and the editor.
 import ast
 import copy
 import hashlib
+import keyword
 import re
 import unicodedata
 
@@ -142,6 +143,7 @@ VIEW_OPERATIONS = {
         "readonly",
         "help",
         "update_field",
+        "rename_field",
     ),
     "list": (
         "add_field",
@@ -155,6 +157,7 @@ VIEW_OPERATIONS = {
         "help",
         "optional",
         "update_field",
+        "rename_field",
     ),
     "kanban": (
         "add_field",
@@ -165,6 +168,7 @@ VIEW_OPERATIONS = {
         "hide",
         "set_attribute",
         "update_field",
+        "rename_field",
     ),
     "search": (
         "add_existing_field",
@@ -307,6 +311,13 @@ X2MANY_VIEW_TYPES = {
 }
 # The longest name of a PostgreSQL table.
 TABLE_NAME_SIZE = 63
+# The longest field name: a column of the table of its model.
+FIELD_NAME_SIZE = 63
+# The prefixes of the names the ORM keeps for itself: the private attributes
+# of a model (« _ »), and the reified group fields of res.users
+# (« in_group_<id> », « sel_groups_<ids> »), which the ORM computes from
+# the groups and never stores.
+RESERVED_FIELD_PREFIXES = ("_", "in_group_", "sel_groups_")
 
 # The leaf elements of a form that stay where the view puts them: the
 # chatter is laid out by the web client beside or under the sheet, from
@@ -324,7 +335,12 @@ OPTIONAL_VALUES = ("", "show", "hide")
 
 _SAFE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _TEMPLATE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.-]*$")
-_FIELD_NAME = re.compile(r"^x_[a-z0-9_]+$")
+# A field name: lower case letters, digits and underscores, a letter first;
+# a leading underscore passes the format and is refused as reserved.
+_FIELD_FORMAT = re.compile(r"^[a-z_][a-z0-9_]*$")
+# A relation table the studio names: « x_ », then lower case letters,
+# digits and underscores, whatever rule the field names follow.
+_TABLE_NAME = re.compile(r"^x_[a-z0-9_]+$")
 _MODEL_NAME = re.compile(r"^x_[a-z][a-z0-9_]*$")
 _MODULE_NAME = re.compile(r"^[a-z][a-z0-9_]*$")
 # A node attribute a change may write: never a QWeb directive (« t- »).
@@ -1403,8 +1419,56 @@ def many2many_names(module_name, model, comodel, field_name, taken):
     )
 
 
-def valid_field_name(name):
-    return bool(name and len(name) <= 63 and _FIELD_NAME.match(name))
+def field_name_checks(name, prefix_required=True, reserved=()):
+    """{format, reserved, prefix}: whether ``name`` passes each check of
+    ``field_name_refusal``, each one run on its own."""
+    text = name if isinstance(name, str) else ""
+    return {
+        "format": bool(
+            text and len(text) <= FIELD_NAME_SIZE and _FIELD_FORMAT.match(text)
+        ),
+        "reserved": not (
+            keyword.iskeyword(text)
+            or text.startswith(RESERVED_FIELD_PREFIXES)
+            or text in reserved
+        ),
+        "prefix": not prefix_required or (text.startswith("x_") and text != "x_"),
+    }
+
+
+def field_name_refusal(name, prefix_required=True, reserved=()):
+    """Why ``name`` cannot be the name of a new field (an ArchError), or
+    None when it can. The codes, in the order they are checked:
+    « format » (lower case letters, digits and underscores, at most
+    FIELD_NAME_SIZE characters), « reserved » (a Python keyword, a prefix of
+    RESERVED_FIELD_PREFIXES, or a name of ``reserved``, the methods and
+    attributes of the model), « prefix » (``prefix_required`` and no
+    « x_ » followed by at least one character)."""
+    checks = field_name_checks(name, prefix_required, reserved)
+    messages = {
+        "format": f"Invalid field name {name}: lower case letters, digits and _.",
+        "reserved": f"Reserved name of the ORM {name}.",
+        "prefix": f"The field name {name} needs the prefix x_.",
+    }
+    for code, message in messages.items():
+        if not checks[code]:
+            return ArchError(message, code, name=name)
+    return None
+
+
+def valid_field_name(name, prefix_required=True):
+    return field_name_refusal(name, prefix_required) is None
+
+
+def valid_table_name(name):
+    """Whether ``name`` can be the relation table of a new many2many:
+    « x_ », lower case letters, digits and underscores, at most
+    TABLE_NAME_SIZE characters."""
+    return bool(
+        isinstance(name, str)
+        and len(name) <= TABLE_NAME_SIZE
+        and _TABLE_NAME.match(name)
+    )
 
 
 def valid_column_name(name):

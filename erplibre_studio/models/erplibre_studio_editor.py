@@ -184,8 +184,9 @@ class ErplibreStudioEditor(models.AbstractModel):
     def _fields_payload(self, model, project):
         """The fields of ``model`` (simulated for a model of the project not
         created yet) with the new fields of the project on it, flagged
-        ``project``, ``pending`` until Apply creates them, and their
-        ``definition``."""
+        ``project``, ``pending`` until Apply creates them, their
+        ``definition``, and ``name_auto``: whether the technical name still
+        follows the label (False for the inverse many2one of a one2many)."""
         line = project._studio_pending_line(model) if project else None
         if line:
             info = project._studio_simulated_fields(line)
@@ -195,7 +196,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             info = Model.fields_get(attributes=FIELD_ATTRIBUTES)
             names = set(Model._fields)
         definitions = project._studio_field_definitions(model) if project else {}
-        for name, (definition, _change) in definitions.items():
+        for name, (definition, change) in definitions.items():
             entry = info.setdefault(
                 name,
                 {
@@ -217,6 +218,11 @@ class ErplibreStudioEditor(models.AbstractModel):
             entry["project"] = True
             entry["pending"] = name not in names
             entry["definition"] = definition
+            entry["name_auto"] = bool(
+                change.model == model
+                and change.field_name == name
+                and change._payload().get("name_auto", True)
+            )
         return info
 
     @api.model
@@ -577,6 +583,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "preview_key": PREVIEW_KEY,
             "sample_res_id": sample or False,
             "mail_available": Project._studio_mail_available(),
+            "field_name_rule": (project or Project)._studio_field_name_rule(),
         }
 
     @api.model
@@ -672,12 +679,14 @@ class ErplibreStudioEditor(models.AbstractModel):
     @api.model
     def _project_counts(self, project):
         """{fields, views, views_added, models, access, rules, groups, apps,
-        total, edited_views} of the draft of ``project``: ``fields`` its
+        total, edited_views, name_blockers} of the draft of ``project``:
+        ``fields`` its
         changes that add a new field, ``views`` its other changes of views,
         ``views_added`` the views it adds,
         ``models``, ``access``, ``rules``, ``groups``, ``apps`` its lines of
         each kind; ``total`` their sum, its ``item_count``; ``edited_views``
-        how many views (pending default views included) its changes edit."""
+        how many views (pending default views included) its changes edit;
+        ``name_blockers`` how many technical names of new fields stop Apply."""
         changes = project.change_ids
         new_fields = project._project_field_changes()
         edited = {
@@ -700,6 +709,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "apps": len(project.app_ids),
             "total": project.item_count,
             "edited_views": len(edited),
+            "name_blockers": len(project._studio_field_name_problems()),
         }
 
     @api.model
@@ -1497,6 +1507,47 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "cascade" if comodel in project._studio_new_models() else "set null"
             ),
             "protected": protected_model(comodel),
+        }
+
+    @api.model
+    def check_field_name(self, project_id, model, name, field_name=False, label=False):
+        """What the technical name ``name`` of a new field of ``model`` gives:
+        {name, proposed, status, message, detail, checks, rule}.
+        ``field_name``: the current name of the field of the project being
+        renamed, which the checks leave aside. ``proposed``: the name its
+        label ``label`` proposes (the label of ``field_name`` when none),
+        or False. ``status``: « available », « taken » or « invalid ».
+        ``rule``: ``_studio_field_name_rule``. An empty ``name`` checks the
+        proposed one. A read."""
+        self._check_studio_access()
+        project = self._read_project(project_id)
+        if not (model in self.env or project._studio_pending_line(model)):
+            raise UserError(self.env._("Unknown model %(model)s.", model=model))
+        own = field_name or None
+        if not label and own:
+            change = project._field_add_change(model, own)
+            label = (change._payload().get("field") or {}).get("field_description")
+        proposed = False
+        if label:
+            proposed = studio_arch.field_name_from_label(
+                label, project._taken_field_names(model) - {own}
+            )
+        name = (name or "").strip() or proposed or ""
+        status = project._studio_field_name_status(model, name, own)
+        if status["code"] is None:
+            state = "available"
+        elif status["code"] == "unique":
+            state = "taken"
+        else:
+            state = "invalid"
+        return {
+            "name": name,
+            "proposed": proposed,
+            "status": state,
+            "message": status["message"],
+            "detail": status["detail"],
+            "checks": status["checks"],
+            "rule": project._studio_field_name_rule(),
         }
 
     # ── confirmations ───────────────────────────────────────────────────

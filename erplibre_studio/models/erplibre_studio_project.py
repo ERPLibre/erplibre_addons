@@ -1,6 +1,7 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import inspect
 import json
 import logging
 import re
@@ -240,6 +241,7 @@ PENDING_VIEW_OPERATIONS = {
         "readonly",
         "help",
         "update_field",
+        "rename_field",
     ),
     "list": (
         "add_field",
@@ -250,9 +252,13 @@ PENDING_VIEW_OPERATIONS = {
         "relabel",
         "optional",
         "update_field",
+        "rename_field",
     ),
     "search": ("add_existing_field", "move", "remove"),
 }
+# The checks of the technical name of a new field, in the order they run
+# and the editor lists them.
+FIELD_NAME_CHECKS = ("format", "reserved", "prefix", "unique")
 
 # The ir.model.fields values that fix the relation of a field: Apply never
 # changes them on a field it created.
@@ -1210,13 +1216,19 @@ class ErplibreStudioProject(models.Model):
         copies them elsewhere narrows the check."""
 
     def _clean_field_name(self, model, label, field, name):
+        """The technical name of a new field of ``model``. ``name``: the
+        name of a field of the draft, checked for its format only; None
+        takes ``field["name"]``, else proposes one made of ``label``, and
+        refuses it on the first problem ``_studio_field_name_problem``
+        finds."""
         if name is None:
-            taken = self._taken_field_names(model)
-            name = field.get("name") or studio_arch.field_name_from_label(label, taken)
-            if name in taken:
-                raise UserError(
-                    self.env._("The field %(name)s already exists.", name=name)
-                )
+            name = field.get("name") or studio_arch.field_name_from_label(
+                label, self._taken_field_names(model)
+            )
+            problem = self._studio_field_name_problem(model, name)
+            if problem:
+                raise UserError(problem["message"])
+            return name
         if not studio_arch.valid_field_name(name):
             raise UserError(
                 self.env._(
@@ -1226,6 +1238,228 @@ class ErplibreStudioProject(models.Model):
                 )
             )
         return name
+
+    # ── technical names of the new fields ───────────────────────────────
+
+    @api.model
+    def _studio_field_name_rule(self):
+        """The rule the technical names of new fields follow on this
+        database: {prefix_required, mode, label, text, detail}. ``label``
+        names the rule; ``text`` and ``detail`` say why a name without the
+        prefix is refused."""
+        return {
+            "prefix_required": True,
+            "mode": "production",
+            "label": self.env._("Production · x_ required"),
+            "text": self.env._("Prefix x_ required on this database"),
+            "detail": self.env._(
+                "Fields created outside the code carry x_ on a production database."
+            ),
+        }
+
+    @api.model
+    def _studio_reserved_field_names(self, model):
+        """The names a field of ``model`` cannot take without hiding a method
+        or an attribute: those of every model and, for a model of the
+        registry, those of its class. Its fields are not reserved, they are
+        taken (``_studio_field_name_owner``)."""
+        classes = [models.BaseModel]
+        Model = self.env.get(model)
+        if Model is not None:
+            classes.append(type(Model))
+        return {
+            name
+            for cls in classes
+            for name in dir(cls)
+            if not isinstance(inspect.getattr_static(cls, name, None), fields.Field)
+        }
+
+    def _studio_project_field_names(self, model):
+        """[(name, change)] of the new fields of the project on ``model``:
+        those its add_field changes add, and the inverse many2one its
+        one2many create on ``model``. A name given by two changes is listed
+        twice."""
+        self.ensure_one()
+        result = []
+        for change in self._project_field_changes():
+            definition = change._payload().get("field") or {}
+            if change.model == model:
+                result.append((change.field_name, change))
+            inverse = self._studio_inverse_definition(change.model, definition)
+            if inverse and definition.get("relation") == model:
+                result.append((inverse[0], change))
+        return result
+
+    def _studio_own_applied_field(self, model, name):
+        """Whether the field ``name`` of ``model`` in the database is one the
+        project created: in its fields, or defined by its module."""
+        field = self.env["ir.model.fields"].sudo()._get(model, name)
+        return bool(
+            field
+            and (
+                field in self.field_ids
+                or self._module_of("ir.model.fields", field.id) == self.module_name
+            )
+        )
+
+    def _studio_field_name_owner(self, model, name, own=None):
+        """Who already holds the field name ``name`` on ``model``, the field
+        of the project named ``own`` aside (the one renamed or checked):
+        None, or {kind, project}. ``kind``: « project » when another new
+        field of this project takes it, « model » when the model has it (a
+        field the project created is its own), « other » when the draft of
+        another project adds it, ``project`` naming that project."""
+        self.ensure_one()
+        mine = [n for n, _change in self._studio_project_field_names(model)]
+        if mine.count(name) - (name == own) > 0:
+            return {"kind": "project", "project": self.name}
+        line = self._studio_pending_line(model)
+        if line:
+            existing = set(self._studio_simulated_fields(line)) - set(mine)
+        else:
+            Model = self.env.get(model)
+            existing = set(Model._fields) if Model is not None else set()
+        if name in existing and (
+            line or not self._studio_own_applied_field(model, name)
+        ):
+            return {"kind": "model", "project": False}
+        Change = self.env["erplibre.studio.change"]
+        others = Change.search(
+            [
+                ("change_type", "=", "add_field"),
+                ("project_id", "!=", self.id),
+                "|",
+                "&",
+                ("model", "=", model),
+                ("field_name", "=", name),
+                ("payload", "ilike", "inverse_new"),
+            ]
+        )
+        for change in others:
+            definition = change._payload().get("field") or {}
+            inverse = change.project_id._studio_inverse_definition(
+                change.model, definition
+            )
+            if (change.model == model and change.field_name == name) or (
+                inverse and definition.get("relation") == model and inverse[0] == name
+            ):
+                return {"kind": "other", "project": change.project_id.name}
+        return None
+
+    def _studio_field_name_status(self, model, name, own=None):
+        """{code, owner, message, detail, checks} of the technical name
+        ``name`` of a new field of ``model``, the field named ``own`` aside
+        (see ``_studio_field_name_owner``). ``code``: None when the name
+        applies, else the first of FIELD_NAME_CHECKS that fails.
+        ``checks``: [{key, ok, text}], the checks of FIELD_NAME_CHECKS each
+        run on its own; the name is looked for in the model and the
+        projects only when its format is valid."""
+        self.ensure_one()
+        rule = self._studio_field_name_rule()
+        passed = studio_arch.field_name_checks(
+            name,
+            rule["prefix_required"],
+            self._studio_reserved_field_names(model),
+        )
+        owner = None
+        if passed["format"]:
+            owner = self._studio_field_name_owner(model, name, own)
+        passed["unique"] = passed["format"] and owner is None
+        label = self._studio_model_label(model)
+        texts = {
+            "format": self.env._("Lower case letters, digits and _"),
+            "reserved": self.env._("Not a reserved word of the ORM"),
+            "prefix": self.env._("Prefix that fits the rule of the database"),
+            "unique": self.env._(
+                "Unique on %(model)s and in the projects", model=label
+            ),
+        }
+        code = next((key for key in FIELD_NAME_CHECKS if not passed[key]), None)
+        if code is None:
+            message = self.env._("Available")
+            detail = self.env._(
+                "No field %(name)s on %(model)s nor in the other projects.",
+                name=name,
+                model=label,
+            )
+        elif code == "format":
+            message = self.env._(
+                "Invalid format: lower case letters, digits and _ only"
+            )
+            detail = self.env._("Starts with a letter, 63 characters at most.")
+        elif code == "reserved":
+            message = self.env._("Reserved name of the ORM (%(name)s)", name=name)
+            detail = self.env._(
+                "This name would hide a method or an attribute of the model. "
+                "The x_ prefix avoids this case."
+            )
+        elif code == "prefix":
+            message, detail = rule["text"], rule["detail"]
+        elif owner["kind"] == "project":
+            message = self.env._(
+                "%(name)s is already created by this project", name=name
+            )
+            detail = self.env._("Each new field of the project needs its own name.")
+        elif owner["kind"] == "other":
+            message = self.env._(
+                "The field %(name)s already exists in another project " "(%(project)s)",
+                name=name,
+                project=owner["project"],
+            )
+            detail = self.env._("Two Apply would create the same column.")
+        else:
+            message = self.env._(
+                "The field %(name)s already exists on %(model)s",
+                name=name,
+                model=label,
+            )
+            detail = self.env._("Add the existing field, or choose another name.")
+        return {
+            "code": code,
+            "owner": owner,
+            "message": message,
+            "detail": detail,
+            "checks": [
+                {"key": key, "ok": passed[key], "text": texts[key]}
+                for key in FIELD_NAME_CHECKS
+            ],
+        }
+
+    def _studio_field_name_problem(self, model, name, own=None):
+        """The ``_studio_field_name_status`` of ``name`` when it does not
+        apply, else None."""
+        status = self._studio_field_name_status(model, name, own)
+        return status if status["code"] else None
+
+    def _studio_change_field_names(self, change):
+        """[(model, name)] of the new fields the add_field ``change`` makes:
+        its field, and the inverse many2one its one2many creates."""
+        definition = change._payload().get("field") or {}
+        result = [(change.model, change.field_name or "")]
+        inverse = self._studio_inverse_definition(change.model, definition)
+        if inverse:
+            result.append((definition["relation"], inverse[0]))
+        return result
+
+    def _studio_field_name_problems(self):
+        """[{change_id, model, name, message}]: the new fields of the project
+        whose technical name does not apply, each checked against the other
+        fields (``_studio_field_name_problem`` with itself aside)."""
+        self.ensure_one()
+        result = []
+        for change in self._project_field_changes():
+            for model, name in self._studio_change_field_names(change):
+                problem = self._studio_field_name_problem(model, name, own=name)
+                if problem:
+                    result.append(
+                        {
+                            "change_id": change.id,
+                            "model": model,
+                            "name": name,
+                            "message": problem["message"],
+                        }
+                    )
+        return result
 
     def _clean_selection(self, field):
         """[[value, label]]: non-empty values, each once."""
@@ -1436,6 +1670,7 @@ class ErplibreStudioProject(models.Model):
             "add_widget": self._op_add_widget,
             "move": self._op_move,
             "update_field": lambda view, arch, op: self._update_field(view, op),
+            "rename_field": lambda view, arch, op: self._studio_rename_field(view, op),
             "remove": self._remove_node,
             "hide": self._op_hide,
             "set_attribute": self._op_set_attribute,
@@ -1611,7 +1846,13 @@ class ErplibreStudioProject(models.Model):
         field = op.get("field") or {}
         self._refuse(studio_arch.x2many_refusal(view.type, field.get("ttype")))
         name, definition = self._clean_field_definition(view.model, field)
-        payload = {"field_name": name, "field": definition, "node_attrs": {}}
+        payload = {
+            "field_name": name,
+            "field": definition,
+            "node_attrs": {},
+            # The name follows the label until it is given or renamed.
+            "name_auto": not field.get("name"),
+        }
         if definition["ttype"] in studio_arch.X2MANY_TYPES:
             attrs, children = studio_arch.x2many_node(
                 view.type,
@@ -2161,6 +2402,11 @@ class ErplibreStudioProject(models.Model):
         return self._add_change(view, "set_attribute", xpath, "attributes", payload)
 
     def _update_field(self, view, op):
+        """A new definition of a new field of the project; its technical
+        name stays. A new label of a field not created yet renames it after
+        the label while its name is proposed (``name_auto``, missing on a
+        field drafted before it, counts as proposed); a rename refused
+        keeps the name."""
         name = op.get("field_name")
         change = self._field_add_change(view.model, name)
         if not change:
@@ -2176,7 +2422,175 @@ class ErplibreStudioProject(models.Model):
         )
         payload["field"] = definition
         change._set_payload(payload)
+        if (
+            "field_description" in (op.get("field") or {})
+            and payload.get("name_auto", True)
+            and not self._studio_field_applied(view.model, name)
+        ):
+            try:
+                self._studio_rename_field(view, {"field_name": name, "auto": True})
+            except UserError:
+                _logger.debug("%s keeps its name %s", view.model, name)
         return change
+
+    def _studio_field_applied(self, model, name):
+        """Whether the field ``name`` of ``model`` is in the database."""
+        Model = self.env.get(model)
+        return bool(
+            (Model is not None and name in Model._fields)
+            or self.env["ir.model.fields"].sudo()._get(model, name)
+        )
+
+    def _studio_rename_field(self, view, op):
+        """Rename the new field ``op["field_name"]`` of the project on the
+        model of ``view``, not created yet: to ``op["new_name"]``, or, with
+        ``op["auto"]``, to the name its label proposes, which it then
+        follows again. The changes of the project that name it follow
+        (``_studio_rewrite_field_name``). UserError when the field is in the
+        database (the name is a column of its table), when the new name does
+        not apply, or while a change, a rule or an added view still names
+        the old one; nothing changes then."""
+        self.ensure_one()
+        model = view.model
+        old = op.get("field_name")
+        change = self._field_add_change(model, old)
+        if not change:
+            raise UserError(
+                self.env._("%(name)s is not a field of this project.", name=old)
+            )
+        if self._studio_field_applied(model, old):
+            raise UserError(
+                self.env._(
+                    "The technical name of %(name)s cannot change once applied: "
+                    "it is a column of the table.",
+                    name=old,
+                )
+            )
+        auto = bool(op.get("auto"))
+        payload = change._payload()
+        if auto:
+            label = (payload.get("field") or {}).get("field_description") or ""
+            new = studio_arch.field_name_from_label(
+                label, self._taken_field_names(model) - {old}
+            )
+        else:
+            new = (op.get("new_name") or "").strip()
+        if new == old:
+            if payload.get("name_auto", True) != auto:
+                payload["name_auto"] = auto
+                change._set_payload(payload)
+            return change
+        problem = self._studio_field_name_problem(model, new, own=old)
+        if problem:
+            raise UserError(problem["message"])
+        with self.env.cr.savepoint():
+            self._studio_rewrite_field_name(change, old, new, auto)
+            self._studio_check_field_renamed(model, old)
+        return change
+
+    @api.model
+    def _studio_rename_token(self, text, old, new):
+        """``text`` (an XPath) with each « [@name='old'] » made
+        « [@name='new'] »; a longer name that starts with ``old`` stays."""
+        if not text:
+            return text
+        pattern = rf"\[@name=(['\"]){re.escape(old)}\1\]"
+        return re.sub(pattern, lambda m: f"[@name={m[1]}{new}{m[1]}]", text)
+
+    def _studio_rewrite_field_name(self, change, old, new, auto):
+        """Give the new field of the add_field ``change`` the name ``new``
+        instead of ``old``: its own payload (``name_auto`` = ``auto``; the
+        relation table and columns of a many2many follow the name), the
+        XPaths, move sources, ``field_name`` and ``fields`` of the changes of
+        the project on its model, and the one2many of the project whose
+        inverse it is."""
+        self.ensure_one()
+        model = change.model
+        for other in self.change_ids.filtered(lambda c: c.model == model) - change:
+            payload = other._payload()
+            vals = {}
+            xpath = self._studio_rename_token(other.xpath, old, new)
+            if xpath != other.xpath:
+                vals["xpath"] = xpath
+            touched = False
+            if payload.get("source"):
+                source = self._studio_rename_token(payload["source"], old, new)
+                touched = source != payload["source"]
+                payload["source"] = source
+            if payload.get("field_name") == old:
+                payload["field_name"] = new
+                touched = True
+            if isinstance(payload.get("fields"), list) and old in payload["fields"]:
+                payload["fields"] = [new if f == old else f for f in payload["fields"]]
+                touched = True
+            if touched:
+                vals["payload"] = json.dumps(payload, sort_keys=True)
+            if vals:
+                other.write(vals)
+        for other in self._project_field_changes() - change:
+            payload = other._payload()
+            definition = payload.get("field") or {}
+            if (
+                definition.get("ttype") == "one2many"
+                and definition.get("relation") == model
+                and definition.get("relation_field") == old
+                and not definition.get("inverse_new")
+            ):
+                definition["relation_field"] = new
+                other._set_payload(payload)
+        payload = change._payload()
+        payload["field_name"] = new
+        payload["name_auto"] = auto
+        definition = payload.get("field") or {}
+        if definition.get("ttype") == "many2many":
+            table, column1, column2 = studio_arch.many2many_names(
+                self.module_name,
+                model,
+                definition["relation"],
+                new,
+                self._studio_relation_table_names()
+                - {definition.get("relation_table")},
+            )
+            definition.update(
+                {"relation_table": table, "column1": column1, "column2": column2}
+            )
+        change._set_payload(payload)
+
+    def _studio_check_field_renamed(self, model, old):
+        """Raise UserError while a change of the project on ``model``, one of
+        its rules or a view it adds on ``model`` still names the field
+        ``old`` once renamed: a name in a domain, a value or an attribute
+        that the rename does not rewrite."""
+        self.ensure_one()
+        names = {old}
+        found = False
+        for change in self.change_ids.filtered(lambda c: c.model == model):
+            if self._studio_change_names(change, names):
+                found = change.summary
+                break
+        word = re.compile(rf"(?<!\w){re.escape(old)}(?!\w)")
+        for rule in self.rule_line_ids:
+            if found:
+                break
+            if (rule.model == model and word.search(rule.domain_force or "")) or (
+                (model, old)
+                in self._studio_domain_fields(rule.model, rule.domain_force)
+            ):
+                found = rule.name
+        for line in self.view_line_ids.filtered(lambda v: v.model == model):
+            if found:
+                break
+            if word.search(line.arch or ""):
+                found = line._studio_view_name()
+        if found:
+            raise UserError(
+                self.env._(
+                    "%(name)s is still named by « %(change)s »: remove that "
+                    "change first, or keep the name.",
+                    name=old,
+                    change=found,
+                )
+            )
 
     def _remove_node(self, view, arch, op):
         """Remove a node: one the project added leaves the project with the
@@ -3251,8 +3665,10 @@ class ErplibreStudioProject(models.Model):
             )
 
     def _studio_check_apply_change(self, change):
-        """Raise UserError when ``change`` is on no view of the project: a
-        change of a model line of another project."""
+        """Raise UserError when ``change`` is on no view of the project (a
+        change of a model line of another project), or when a new field it
+        adds has a technical name that does not apply
+        (``_studio_field_name_problem``, the field itself aside)."""
         self.ensure_one()
         line = change.model_line_id or change.view_line_id
         if not change.view_id and line.project_id != self:
@@ -3262,6 +3678,18 @@ class ErplibreStudioProject(models.Model):
                     change=change.summary,
                 )
             )
+        if change.change_type != "add_field":
+            return
+        for model, name in self._studio_change_field_names(change):
+            problem = self._studio_field_name_problem(model, name, own=name)
+            if problem:
+                raise UserError(
+                    self.env._(
+                        "The technical name %(name)s does not apply: %(message)s",
+                        name=name,
+                        message=problem["message"],
+                    )
+                )
 
     def _studio_check_apply_view(self, line):
         """Raise UserError when the view line ``line`` does not apply: its

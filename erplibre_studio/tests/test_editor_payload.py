@@ -160,7 +160,8 @@ class TestEditorPayload(StudioCase):
             value="hide",
         )
         # A relabel of a field of the project refines the change that adds
-        # it; a second change of another node adds to its marks.
+        # it, whose proposed name follows the label; a second change of
+        # another node adds to its marks.
         self.op(
             project,
             view,
@@ -177,7 +178,7 @@ class TestEditorPayload(StudioCase):
         )
         data = self.data()
         expected = {
-            "x_nickname": ([added.id], ["new"]),
+            "x_alias": ([added.id], ["new"]),
             "phone": ([relabel.id], ["renamed"]),
             "city": ([hide.id], ["hidden"]),
             "email": ([move.id], ["moved"]),

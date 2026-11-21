@@ -392,7 +392,7 @@ class ErplibreStudioProject(models.Model):
                 )
                 if (
                     len(table) > studio_arch.TABLE_NAME_SIZE
-                    or not studio_arch.valid_field_name(table)
+                    or not studio_arch.valid_table_name(table)
                     or not all(studio_arch.valid_column_name(c) for c in columns)
                     or columns[0] == columns[1]
                     # A table of the database, which the field would write

@@ -198,6 +198,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(name)s is already created by this project"
+msgstr "%(name)s est déjà créé par ce projet"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(name)s is not a field of this project."
 msgstr "%(name)s n'est pas un champ de ce projet."
 
@@ -269,6 +275,16 @@ msgid ""
 msgstr ""
 "%(name)s n'est pas un nom technique valide : des minuscules, des chiffres et"
 " des soulignés, en commençant par une lettre."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(name)s is still named by « %(change)s »: remove that change first, or keep"
+" the name."
+msgstr ""
+"%(name)s est encore nommé par « %(change)s » : retirez d'abord ce "
+"changement, ou gardez le nom."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -901,6 +917,12 @@ msgid "Add columns"
 msgstr "Ajouter des colonnes"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Add the existing field, or choose another name."
+msgstr "Ajoutez le champ existant, ou choisissez un autre nom."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Add the filter"
@@ -1128,7 +1150,6 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_revert_wizard__mode__apply
@@ -1190,6 +1211,72 @@ msgstr ""
 msgid "Apply the model first: %(type)s needs its records."
 msgstr ""
 "Appliquez d'abord le modèle : %(type)s a besoin de ses enregistrements."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Available"
+msgstr "Disponible"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Each new field of the project needs its own name."
+msgstr "Chaque nouveau champ du projet doit avoir son propre nom."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Fields created outside the code carry x_ on a production database."
+msgstr "Les champs créés hors du code portent x_ sur une base de production."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid format: lower case letters, digits and _ only"
+msgstr "Format invalide : minuscules, chiffres et _ seulement"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Lower case letters, digits and _"
+msgstr "Minuscules, chiffres et _"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "No field %(name)s on %(model)s nor in the other projects."
+msgstr "Aucun champ %(name)s sur %(model)s ni dans les autres projets."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Not a reserved word of the ORM"
+msgstr "Pas un mot réservé de l'ORM"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Prefix that fits the rule of the database"
+msgstr "Préfixe conforme à la règle de la base"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Prefix x_ required on this database"
+msgstr "Préfixe x_ obligatoire sur cette base"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Production · x_ required"
+msgstr "Production · x_ obligatoire"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Reserved name of the ORM (%(name)s)"
+msgstr "Mot réservé de l'ORM (%(name)s)"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4671,6 +4758,12 @@ msgid "Start date"
 msgstr "Date de début"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Starts with a letter, 63 characters at most."
+msgstr "Commence par une lettre, 63 caractères au plus."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid ""
@@ -5050,6 +5143,17 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s already exists in another project (%(project)s)"
+msgstr "Le champ %(name)s existe déjà dans un autre projet (%(project)s)"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s already exists on %(model)s"
+msgstr "Le champ %(name)s existe déjà sur %(model)s"
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid "The field %(name)s already exists."
 msgstr "Le champ %(name)s existe déjà."
@@ -5775,6 +5879,22 @@ msgstr "Le t-if ou le t-elif d'une chaîne ne peut pas être masqué."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The technical name %(name)s does not apply: %(message)s"
+msgstr "Le nom technique %(name)s ne s'applique pas : %(message)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The technical name of %(name)s cannot change once applied: it is a column of"
+" the table."
+msgstr ""
+"Le nom technique de %(name)s ne peut plus changer une fois appliqué : c'est "
+"une colonne de la table."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 msgid "The technical name of the model %(name)s cannot change once applied."
 msgstr ""
@@ -5963,6 +6083,16 @@ msgid "This model is not a model of the project."
 msgstr "Ce modèle n'est pas un modèle du projet."
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"This name would hide a method or an attribute of the model. The x_ prefix "
+"avoids this case."
+msgstr ""
+"Ce nom masquerait une méthode ou un attribut du modèle. Le préfixe x_ évite "
+"ce cas."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
@@ -6056,6 +6186,12 @@ msgid "Tooltip"
 msgstr "Infobulle"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Two Apply would create the same column."
+msgstr "Deux Apply créeraient la même colonne."
+
+#. module: erplibre_studio
 #: model:ir.model.constraint,message:erplibre_studio.constraint_erplibre_studio_app_xml_name_uniq
 msgid "Two apps of a project have the same external id."
 msgstr "Deux applications d'un projet ont le même identifiant externe."
@@ -6122,6 +6258,12 @@ msgstr ""
 "Désinstaller %(module)s supprime ce que d'autres projets studio ont appliqué"
 " sur ses modèles : %(items)s. Défaites d'abord ces projets, ou retirez-en "
 "ces lignes et appliquez."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unique on %(model)s and in the projects"
+msgstr "Unique sur %(model)s et dans les projets"
 
 #. module: erplibre_studio
 #. odoo-python
