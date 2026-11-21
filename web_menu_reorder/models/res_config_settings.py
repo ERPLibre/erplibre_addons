@@ -2,10 +2,34 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import logging
+import unicodedata
 
 from odoo import fields, models
 
 _logger = logging.getLogger(__name__)
+
+
+def menu_label_key(label):
+    """Comparison key of a menu label: case and accents ignored.
+
+    The label is decomposed (NFKD), its combining marks dropped and the
+    rest case-folded, so that "É", "é" and "e" compare equal and an upper
+    case letter sorts with its lower case one. Surrounding spaces are
+    ignored too.
+    """
+    decomposed = unicodedata.normalize("NFKD", label or "")
+    return (
+        "".join(char for char in decomposed if not unicodedata.combining(char))
+        .casefold()
+        .strip()
+    )
+
+
+def menu_sort_key(menu):
+    """Sort key of a menu: its label key, then its exact label and id so
+    that menus whose labels differ only by case or accents keep a stable
+    order."""
+    return (menu_label_key(menu.display_name), menu.display_name, menu.id)
 
 
 class ResConfigSettings(models.TransientModel):
@@ -68,7 +92,7 @@ class ResConfigSettings(models.TransientModel):
                 menu_id.sequence = (idx + 1) * 10
 
         elif self.menu_reorder_algorithm_lang_to_order == "by_alphabetical":
-            lst_menu = sorted(menu_ids, key=lambda m: m.display_name)
+            lst_menu = sorted(menu_ids, key=menu_sort_key)
             for idx, menu_id in enumerate(lst_menu):
                 menu_id.sequence = (idx + 1) * 10
 
@@ -85,7 +109,12 @@ class ResConfigSettings(models.TransientModel):
             sequence = 10
             for idx_i, label in enumerate(menu_labels):
                 sequence = (idx_i + 1) * 10
-                lst_menu = [m for m in menu_ids if label == m.display_name]
+                label_key = menu_label_key(label)
+                lst_menu = [
+                    m
+                    for m in menu_ids
+                    if label_key == menu_label_key(m.display_name)
+                ]
                 for menu_id in lst_menu:
                     menu_id.sequence = sequence
                     lst_menu_id_reorder.append(menu_id)
@@ -93,7 +122,7 @@ class ResConfigSettings(models.TransientModel):
             last_sequence = sequence + 10
             lst_menu = sorted(
                 [m for m in menu_ids if m not in lst_menu_id_reorder],
-                key=lambda m: m.display_name,
+                key=menu_sort_key,
             )
             for idx, menu_id in enumerate(lst_menu):
                 menu_id.sequence = last_sequence + idx * 10
