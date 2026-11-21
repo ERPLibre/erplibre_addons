@@ -9,7 +9,7 @@ msgstr ""
 "POT-Creation-Date: 2026-10-16 11:54+0000\n"
 "PO-Revision-Date: 2026-10-16 11:54+0000\n"
 "Last-Translator: \n"
-"Language: fr\n"
+"Language: fr_CA\n"
 "Language-Team: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
@@ -29,3 +29,7 @@ msgstr "🏃 Exécutions ERPLibre"
 msgid "🧬 ERPLibre snapshots"
 msgstr "🧬 Instantanés ERPLibre"
 
+#. module: erplibre_info_developer_menu
+#: model:ir.ui.menu,name:erplibre_info_developer_menu.erplibre_dev_menu_erplibre
+msgid "ERPLibre"
+msgstr "ERPLibre"
