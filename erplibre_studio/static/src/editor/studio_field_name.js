@@ -30,9 +30,13 @@ function fieldLabel(field) {
  *
  * Each check is a request numbered in order: an answer that arrives after
  * a newer request, or once the component is gone, is dropped. While the
- * input holds a name that does not apply, the component counts it among
- * the names that block Apply (``editor.setLocalNameBlocker``), until the
- * value applies, goes back to the current name, or the component unmounts.
+ * input holds a name other than the current one, available or not, the
+ * component counts it among the names that block Apply
+ * (``editor.setLocalNameBlocker``): Apply would write the current name.
+ * It stops once the field is renamed to it, the value goes back to the
+ * current name, or the component unmounts. A rename the server refuses
+ * (a stale revision, a name taken meanwhile) puts the current name back
+ * in the input.
  */
 export class StudioFieldName extends Component {
     static template = "erplibre_studio.FieldName";
@@ -151,7 +155,7 @@ export class StudioFieldName extends Component {
             return null;
         }
         Object.assign(this.state, {check, checking: false});
-        this.reportBlocker(value !== props.name && check.status !== "available");
+        this.reportBlocker(value !== props.name);
         return check;
     }
 
@@ -161,13 +165,15 @@ export class StudioFieldName extends Component {
 
     onInput(ev) {
         this.state.value = ev.target.value;
+        this.reportBlocker(this.value !== this.props.name);
         this.scheduleCheck();
     }
 
     /**
      * Rename the field to the value on change: an empty value goes back to
      * the proposed name; another value only once a check of that very
-     * value answered « available ».
+     * value answered « available ». A refused rename shows the current
+     * name again, checked.
      */
     async onChange() {
         if (this.props.busy) {
@@ -187,11 +193,22 @@ export class StudioFieldName extends Component {
             check = await this.check();
         }
         if (check && check.name === value && check.status === "available" && status(this) !== "destroyed") {
-            await this.rename(value);
+            const renamed = await this.rename(value);
+            if (renamed) {
+                // The field has the name: no longer a blocker, in the same
+                // render as the payload that renames it.
+                this.reportBlocker(false);
+            } else if (status(this) !== "destroyed" && this.value === value) {
+                this.state.value = this.props.name;
+                await this.check();
+            }
         }
     }
 
-    /** Rename the field to ``name``: through ``onRename`` when given, else « rename_field ». */
+    /**
+     * Rename the field to ``name``: through ``onRename`` when given, else
+     * « rename_field ». Answer a falsy value when the server refused.
+     */
     rename(name) {
         if (this.props.onRename) {
             return this.props.onRename(name);

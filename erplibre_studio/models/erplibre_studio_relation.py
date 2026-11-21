@@ -393,33 +393,65 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_check_inverse_removal(self, changes):
         """Raise UserError when ``changes`` (add_field changes of the project
-        that leave the draft) hold a one2many whose new inverse another
-        one2many of the project, which stays, takes as its inverse."""
+        that leave the draft) hold a many2one, or a one2many whose new
+        inverse is a many2one, that another one2many of the project, which
+        stays, takes as its inverse: that one2many would name a field that
+        no longer exists."""
         self.ensure_one()
         staying = self._project_field_changes() - changes
         for change in changes.filtered(lambda c: c.change_type == "add_field"):
             definition = change._payload().get("field") or {}
+            # [(model, name, inverse)]: the many2one fields the change
+            # creates; ``inverse`` is set for the one of a one2many. The
+            # one2many of a many2one is the inverse of no other field.
+            created = []
+            if definition.get("ttype") == "many2one" and change.field_name:
+                created.append((change.model, change.field_name, False))
             inverse = self._studio_inverse_definition(change.model, definition)
-            # The one2many of a many2one is the inverse of no other field.
-            if not inverse or inverse[1]["ttype"] != "many2one":
-                continue
-            for other in staying:
-                other_def = other._payload().get("field") or {}
-                if (
-                    other_def.get("ttype") == "one2many"
-                    and other_def.get("relation") == definition["relation"]
-                    and other_def.get("relation_field") == inverse[0]
-                    and not other_def.get("inverse_new")
-                ):
+            if inverse and inverse[1]["ttype"] == "many2one":
+                created.append((definition["relation"], inverse[0], True))
+            for model, name, is_inverse in created:
+                other = next(
+                    (
+                        other
+                        for other in staying
+                        if self._studio_one2many_of(other, model, name)
+                    ),
+                    None,
+                )
+                if other is None:
+                    continue
+                if is_inverse:
                     raise UserError(
                         self.env._(
                             "The field %(field)s creates %(inverse)s, the inverse "
                             "of %(other)s: remove %(other)s first.",
                             field=change.field_name,
-                            inverse=f"{definition['relation']}.{inverse[0]}",
+                            inverse=f"{model}.{name}",
                             other=f"{other.model}.{other.field_name}",
                         )
                     )
+                raise UserError(
+                    self.env._(
+                        "The field %(field)s is the inverse of %(other)s: "
+                        "remove %(other)s first.",
+                        field=f"{model}.{name}",
+                        other=f"{other.model}.{other.field_name}",
+                    )
+                )
+
+    @api.model
+    def _studio_one2many_of(self, change, model, name):
+        """Whether the add_field ``change`` adds a one2many whose inverse is
+        the existing many2one ``name`` of ``model``: not one it creates
+        itself (« inverse_new »)."""
+        definition = change._payload().get("field") or {}
+        return (
+            definition.get("ttype") == "one2many"
+            and definition.get("relation") == model
+            and definition.get("relation_field") == name
+            and not definition.get("inverse_new")
+        )
 
     def _studio_inverse_dependents(self, changes):
         """``changes`` (changes of the project that leave the draft) with the

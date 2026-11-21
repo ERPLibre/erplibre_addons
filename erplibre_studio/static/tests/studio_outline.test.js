@@ -366,7 +366,7 @@ describe("erplibre_studio editor, plan and change marks", () => {
         await openEditor();
         const title = `.o_erplibre_studio_container[data-path="${ADDRESS}"] > .o_erplibre_studio_container_title`;
         const chatter = ".o_erplibre_studio_other[data-tag=chatter]";
-        expect(`${title} > .o_erplibre_studio_pick`).toHaveAttribute("aria-label", "Container group « Address »");
+        expect(`${title} > .o_erplibre_studio_pick`).toHaveAttribute("aria-label", "Container Group « Address »");
         // The dot of the changes inside keeps its tooltip: out of the button.
         expect(`${title} > .o_erplibre_studio_change_dot`).toHaveCount(1);
         expect(`${title} .o_erplibre_studio_pick .o_erplibre_studio_change_dot`).toHaveCount(0);

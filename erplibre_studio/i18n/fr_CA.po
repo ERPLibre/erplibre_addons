@@ -5495,6 +5495,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The field %(field)s is the inverse of %(other)s: remove %(other)s first."
+msgstr ""
+"Le champ %(field)s est l'inverse de %(other)s : retirez d'abord %(other)s."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s already exists in another project (%(project)s)"
 msgstr "Le champ %(name)s existe déjà dans un autre projet (%(project)s)"
@@ -5511,6 +5519,14 @@ msgstr "Le champ %(name)s existe déjà sur %(model)s"
 msgid ""
 "The field %(name)s already exists on %(model)s, which inherits %(parent)s"
 msgstr "Le champ %(name)s existe déjà sur %(model)s, qui hérite de %(parent)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The field %(name)s already exists on %(model)s, which %(child)s inherits"
+msgstr ""
+"Le champ %(name)s existe déjà sur %(model)s, dont %(child)s hérite"
 
 #. module: erplibre_studio
 #. odoo-python

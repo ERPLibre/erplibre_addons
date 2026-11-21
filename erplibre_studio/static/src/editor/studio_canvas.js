@@ -5,6 +5,7 @@
 import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {X2MANY_TYPES} from "./studio_relations";
+import {tagLabel} from "./studio_outline";
 import {
     DEFAULT_TIMELINE_MODE,
     FIELD_LANES,
@@ -89,11 +90,14 @@ export class StudioBlock extends Component {
 
     /**
      * The accessible name of the button that selects the block: its kind,
-     * its label and, for a field or a widget, its technical name.
+     * the translated name of its tag (``tagLabel``), its label and, for a
+     * field or a widget, its technical name.
      */
     get pickLabel() {
         const block = this.block;
         const label = block.label;
+        // The tag in the language of the user (« Group », « Tabs »…).
+        const tag = tagLabel(block.tag);
         const own = label && label !== block.tag;
         switch (block.kind) {
             case "field":
@@ -113,15 +117,13 @@ export class StudioBlock extends Component {
                     : _t("Separator");
             case "container":
                 return own
-                    ? _t("Container %(tag)s « %(label)s »", {tag: block.tag, label})
-                    : _t("Container %(tag)s", {tag: block.tag});
+                    ? _t("Container %(tag)s « %(label)s »", {tag, label})
+                    : _t("Container %(tag)s", {tag});
         }
         if (block.tag === "chatter") {
             return _t("Chatter: messages, followers and activities");
         }
-        return own
-            ? _t("Element %(tag)s « %(label)s »", {tag: block.tag, label})
-            : _t("Element %(tag)s", {tag: block.tag});
+        return own ? _t("Element %(tag)s « %(label)s »", {tag, label}) : _t("Element %(tag)s", {tag});
     }
 
     /** A group of groups lays its groups out side by side, as Odoo does. */

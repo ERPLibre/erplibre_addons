@@ -189,6 +189,32 @@ class TestViewsAdvanced(StudioCase):
         self.project._studio_remove_group(line)
         self.assertFalse(line.exists())
 
+    def test_rename_keeps_the_groups_of_the_project(self):
+        # The external id of a group of the project moves with the module:
+        # the « groups » of a field follow it, a « ! » kept.
+        app = self.project._studio_save_app({"name": "Studio test advanced"})
+        line = self.project._studio_save_group(
+            {"name": "Studio test reviewer", "app_id": app.id}
+        )
+        self.project.action_apply()
+        old = line._studio_full_xmlid()
+        change = self.set_attr("country_id", "groups", f"base.group_system,!{old}")
+        self.project.action_apply()
+        self.project.module_name = "studio_test_advanced_renamed"
+        new = line._studio_full_xmlid()
+        self.assertEqual(new, f"studio_test_advanced_renamed.{line.xml_name}")
+        payload = change._payload()
+        self.assertEqual(payload["value"], f"base.group_system,!{new}")
+        self.assertEqual(payload["groups"], ["base.group_system", new])
+        self.assertEqual(self.project.state, "draft")
+        self.project.action_apply()
+        arch = self.form_view._get_combined_arch()
+        self.assertEqual(
+            arch.xpath(named("country_id"))[0].get("groups"),
+            f"base.group_system,!{new}",
+        )
+        self.assertEqual(self.env.ref(new), line._studio_group_record())
+
     def test_pending_model_view(self):
         model_line = self.make_model(
             self.project, "Studio test advanced item", model=ITEM

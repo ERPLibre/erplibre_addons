@@ -599,7 +599,7 @@
                                 type="checkbox"
                                 class="form-check-input m-0 o_erplibre_studio_prop_translate"
                                 t-att-checked="field.definition.translate"
-                                t-on-change="(ev) => this.setTranslate(field, ev.target.checked)"
+                                t-on-change="(ev) => this.setTranslate(field, ev)"
                                 t-att-disabled="props.busy or !field.pending"
                             />
                             Translatable
@@ -609,7 +609,7 @@
                                 type="checkbox"
                                 class="form-check-input m-0 o_erplibre_studio_prop_index"
                                 t-att-checked="field.definition.index"
-                                t-on-change="(ev) => this.updateField({index: ev.target.checked})"
+                                t-on-change="(ev) => this.setIndex(field, ev)"
                                 t-att-disabled="props.busy or !field.pending or field.definition.translate"
                             />
                             Indexed (faster search)
@@ -619,11 +619,12 @@
                             <input
                                 type="number"
                                 min="1"
+                                t-att-max="maxFieldSize"
                                 step="1"
                                 class="form-control form-control-sm mt-1 o_erplibre_studio_prop_size"
-                                t-att-value="field.definition.size or ''"
+                                t-att-value="sizeText(field)"
                                 placeholder="No limit"
-                                t-on-change="(ev) => this.setSize(ev.target.value)"
+                                t-on-change="(ev) => this.setSize(field, ev)"
                                 t-att-disabled="props.busy or !field.pending"
                             />
                         </label>
@@ -866,7 +867,7 @@
                     class="form-check-input m-0 o_erplibre_studio_inverse_toggle"
                     t-att-checked="!!inverse"
                     t-att-disabled="props.busy or !field.pending or (field.inverse_protected and !inverse)"
-                    t-on-change="(ev) => this.toggleInverse(field, ev.target.checked)"
+                    t-on-change="(ev) => this.toggleInverse(field, ev)"
                 />
                 Create a one2many on the comodel
             </label>
@@ -918,7 +919,7 @@
                     t-att-value="choice.value"
                     t-att-checked="(field.definition.on_delete or 'set null') === choice.value"
                     t-att-disabled="props.busy"
-                    t-on-change="() => this.updateField({on_delete: choice.value})"
+                    t-on-change="(ev) => this.setOnDelete(field, choice.value, ev)"
                 />
                 <span class="d-flex flex-column">
                     <span class="fw-bold" t-esc="choice.label" />

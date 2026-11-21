@@ -407,6 +407,81 @@ class TestUnprefixedRule(StudioCase):
             with self.assertRaises(UserError):
                 self.add("Identifiant", name="login")
 
+    def test_methods_of_the_inheriting_models_are_reserved(self):
+        # res.users inherits res.partner by delegation and copies its
+        # fields: a field « authenticate » of res.partner would replace the
+        # login method of res.users.
+        self.assertFalse(hasattr(type(self.env[PARTNER]), "authenticate"))
+        names = ("authenticate", "check")
+        for name in names:
+            with self.subTest(name=name):
+                problem = self.project._studio_field_name_problem(PARTNER, name)
+                self.assertEqual(problem["code"], "reserved")
+        with self.development():
+            for name in names:
+                with self.subTest(name=name, development=True):
+                    problem = self.project._studio_field_name_problem(PARTNER, name)
+                    self.assertEqual(problem["code"], "reserved")
+            with self.assertRaises(UserError):
+                self.add("Authenticate", name="authenticate")
+
+    def test_reserved_names_of_a_model_not_created_yet(self):
+        # The registry sets « pool » on every class; the chatter brings the
+        # methods of the mail mixins.
+        chatter = self.mail_available()
+        self.make_model(self.project, "Studio test order", model=ORDER, chatter=chatter)
+        self.make_model(self.project, "Studio test line", model=LINE)
+        cases = [(ORDER, "pool", "reserved"), (LINE, "message_post", None)]
+        if chatter:
+            cases += [
+                (ORDER, "message_post", "reserved"),
+                (ORDER, "activity_schedule", "reserved"),
+            ]
+        with self.development():
+            for model, name, code in cases:
+                with self.subTest(model=model, name=name):
+                    status = self.project._studio_field_name_status(model, name)
+                    self.assertEqual(status["code"], code)
+
+    def test_new_fields_of_a_parent_and_its_child_collide(self):
+        # A new field of res.users and one of the same name on res.partner
+        # would land on the same class of res.users.
+        users_form = self.env.ref("base.view_users_form")
+        self.op(
+            self.project,
+            users_form,
+            type="add_field",
+            target="//field[@name='tz']",
+            position="after",
+            field={"ttype": "char", "field_description": "Shared", "name": "x_shared"},
+        )
+        status = self.project._studio_field_name_status(PARTNER, "x_shared")
+        self.assertEqual(status["code"], "unique")
+        self.assertEqual(
+            (status["owner"]["kind"], status["owner"]["model"]),
+            ("child", "res.users"),
+        )
+        with self.assertRaises(UserError):
+            self.add("Shared", name="x_shared")
+        # From another project, the other way round.
+        other = self.make_project(f"{MODULE}_other")
+        self.op(
+            other,
+            self.form,
+            type="add_field",
+            target=VAT,
+            position="after",
+            field={"ttype": "char", "field_description": "Both", "name": "x_both"},
+        )
+        status = self.project._studio_field_name_status("res.users", "x_both")
+        self.assertEqual(
+            (status["owner"]["kind"], status["owner"]["model"]),
+            ("parent", PARTNER),
+        )
+        self.assertEqual(status["owner"]["project"], other.name)
+        self.assertIn("which", status["message"])
+        self.assertEqual(self.project._studio_field_name_problems(), [])
+
     def test_inherited_field_of_the_model_is_no_collision(self):
         # res.users shows the fields of res.partner: they are not its own.
         self.assertIsNone(self.Project._studio_inheriting_owner(PARTNER, "email"))

@@ -17,6 +17,7 @@ import {
 } from "./studio_timeline";
 import {
     DATE_TYPES,
+    MAX_FIELD_SIZE,
     TEMPLATED_TYPES,
     attributeLabel,
     changeKindLabel,
@@ -596,18 +597,62 @@ export class StudioInspector extends Component {
         return fieldOptions(field.type);
     }
 
+    /**
+     * Update the selected field with ``values``, from the input of ``ev``.
+     * A refused update (a value out of range, a stale revision) leaves the
+     * payload as it was, so Owl patches nothing and the input would keep
+     * what the user typed or ticked: ``restore(input)`` shows again what
+     * the draft holds. Answer whether the draft took the values.
+     */
+    async updateFieldFrom(ev, values, restore) {
+        const input = ev.target;
+        const done = await this.updateField(values);
+        if (!done) {
+            restore(input);
+        }
+        return done;
+    }
+
     /** Make ``field`` translatable or not; a translatable field takes no index. */
-    setTranslate(field, checked) {
+    setTranslate(field, ev) {
+        const checked = ev.target.checked;
         const values = {translate: checked};
         if (checked && field.definition && field.definition.index) {
             values.index = false;
         }
-        return this.updateField(values);
+        return this.updateFieldFrom(ev, values, (input) => {
+            input.checked = Boolean(field.definition && field.definition.translate);
+        });
     }
 
-    /** The maximum size of the new field from the text ``value``; empty for no limit. */
-    setSize(value) {
-        return this.updateField({size: value ? Number(value) : 0});
+    /** Index ``field`` or not. */
+    setIndex(field, ev) {
+        return this.updateFieldFrom(ev, {index: ev.target.checked}, (input) => {
+            input.checked = Boolean(field.definition && field.definition.index);
+        });
+    }
+
+    get maxFieldSize() {
+        return MAX_FIELD_SIZE;
+    }
+
+    /** The text the size box of ``field`` shows: empty for no limit (0 or none). */
+    sizeText(field) {
+        const size = field.definition && field.definition.size;
+        return size ? String(size) : "";
+    }
+
+    /** The maximum size of the new field ``field`` from its box; empty or 0 for no limit. */
+    async setSize(field, ev) {
+        const value = ev.target.value;
+        const done = await this.updateFieldFrom(ev, {size: value ? Number(value) : 0}, (input) => {
+            input.value = this.sizeText(field);
+        });
+        if (done && !Number(value)) {
+            // 0 is no limit, shown as an empty box.
+            ev.target.value = "";
+        }
+        return done;
     }
 
     async updateSelection(text) {
@@ -646,15 +691,31 @@ export class StudioInspector extends Component {
      * Add the inverse one2many of ``field`` (the server names it and labels
      * it after the model), or remove it.
      */
-    toggleInverse(field, checked) {
-        return this.updateField({inverse_o2m: checked ? {create: true} : false});
+    toggleInverse(field, ev) {
+        const checked = ev.target.checked;
+        return this.updateFieldFrom(ev, {inverse_o2m: checked ? {create: true} : false}, (input) => {
+            input.checked = Boolean(this.inverseOf(field));
+        });
     }
 
-    /** Give the inverse of ``field`` ``values`` ({name} or {field_description}). */
-    updateInverse(field, values) {
+    /** What the many2one ``field`` does when its record is deleted: the radio ``ev`` chose ``value``. */
+    setOnDelete(field, value, ev) {
+        return this.updateFieldFrom(ev, {on_delete: value}, (input) => {
+            const current = (field.definition && field.definition.on_delete) || "set null";
+            for (const radio of input.closest("fieldset").querySelectorAll("input[type=radio]")) {
+                radio.checked = radio.value === current;
+            }
+        });
+    }
+
+    /**
+     * Give the inverse of ``field`` ``values`` ({name} or {field_description}).
+     * Answer whether the draft took them.
+     */
+    async updateInverse(field, values) {
         const inverse = this.inverseOf(field);
         if (!inverse) {
-            return;
+            return false;
         }
         return this.updateField({
             inverse_o2m: {name: inverse.name, field_description: inverse.field_description, ...values},

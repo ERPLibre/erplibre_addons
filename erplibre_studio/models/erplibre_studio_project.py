@@ -206,6 +206,33 @@ def protected_model(model):
     return (model or "").startswith(PROTECTED_MODEL_PREFIXES)
 
 
+# The mixins a new model of a project inherits when its chatter is on.
+CHATTER_MODELS = ("mail.thread", "mail.activity.mixin")
+
+
+def delegation_classes(registry, model):
+    """The classes of ``registry`` a field of ``model`` lands on: the class
+    of ``model`` and those of the models that inherit it by delegation
+    (``_inherits``, at any depth), which copy its fields as their own
+    (``_add_inherited_fields``). A field there replaces a method or an
+    attribute of that class of the same name. Empty for a model out of
+    the registry. The classes and their children are known once built,
+    before the setup of the models: the registry setup reads them too."""
+    if model not in registry:
+        return []
+    return [registry[name] for name in registry.descendants([model], "_inherits")]
+
+
+def attribute_names(cls):
+    """The names of the methods and the attributes of ``cls``, its fields
+    aside."""
+    return {
+        name
+        for name in dir(cls)
+        if not isinstance(inspect.getattr_static(cls, name, None), fields.Field)
+    }
+
+
 # Inheriting views apply by priority then id: 99 puts the studio view
 # after the views of the modules, as in the draft.
 STUDIO_PRIORITY = 99
@@ -1368,22 +1395,26 @@ class ErplibreStudioProject(models.Model):
             ),
         }
 
-    @api.model
     def _studio_reserved_field_names(self, model):
         """The names a field of ``model`` cannot take without hiding a method
-        or an attribute: those of every model and, for a model of the
-        registry, those of its class. Its fields are not reserved, they are
-        taken (``_studio_field_name_owner``)."""
-        classes = [models.BaseModel]
-        Model = self.env.get(model)
-        if Model is not None:
-            classes.append(type(Model))
-        return {
-            name
-            for cls in classes
-            for name in dir(cls)
-            if not isinstance(inspect.getattr_static(cls, name, None), fields.Field)
-        }
+        or an attribute: those of every model; for a model of the registry,
+        those of the classes the field lands on (``delegation_classes``);
+        for a model the project creates and has not applied yet, « pool »,
+        which the registry sets on every class, and with the chatter those
+        of CHATTER_MODELS. Fields are not reserved, they are taken
+        (``_studio_field_name_owner``)."""
+        registry = self.env.registry
+        names = attribute_names(models.Model)
+        line = self._studio_pending_line(model)
+        if line:
+            names.add("pool")
+            mixins = CHATTER_MODELS if line.chatter else ()
+            classes = [registry[name] for name in mixins if name in registry]
+        else:
+            classes = delegation_classes(registry, model)
+        for cls in classes:
+            names |= attribute_names(cls)
+        return names
 
     def _studio_project_field_names(self, model):
         """[(name, change)] of the new fields of the project on ``model``:
@@ -1432,6 +1463,30 @@ class ErplibreStudioProject(models.Model):
                 return child
         return None
 
+    @api.model
+    def _studio_delegation_models(self, model):
+        """{name: kind} of the models of the registry that share the fields
+        of ``model`` by delegation (``_inherits``, at any depth): « child »
+        for those that inherit it, « parent » for those it inherits. A new
+        field on one of them and a new field of the same name on ``model``
+        end up on the same class, one hiding the other."""
+        registry = self.env.registry
+        if model not in registry:
+            return {}
+        result = {
+            name: "child"
+            for name in registry.descendants([model], "_inherits")
+            if name != model
+        }
+        todo = list(registry[model]._inherits)
+        while todo:
+            parent = todo.pop()
+            if parent == model or parent in result or parent not in registry:
+                continue
+            result[parent] = "parent"
+            todo.extend(registry[parent]._inherits)
+        return result
+
     def _studio_field_name_owner(self, model, name, own=None):
         """Who already holds the field name ``name`` on ``model``, the field
         of the project named ``own`` aside (the one renamed or checked):
@@ -1440,7 +1495,11 @@ class ErplibreStudioProject(models.Model):
         (a field the project created is its own), « child » when a model
         that inherits ``model`` by delegation has it, ``model`` naming that
         model (``_studio_inheriting_owner``), « other » when the draft of
-        another project adds it, ``project`` naming that project."""
+        another project adds it, ``project`` naming that project. A new
+        field of a draft, of this project or another, on a model that
+        shares the fields of ``model`` by delegation
+        (``_studio_delegation_models``) gives « child » or « parent », with
+        ``model`` and ``project``."""
         self.ensure_one()
         mine = [n for n, _change in self._studio_project_field_names(model)]
         if mine.count(name) - (name == own) > 0:
@@ -1458,6 +1517,11 @@ class ErplibreStudioProject(models.Model):
         child = self._studio_inheriting_owner(model, name)
         if child:
             return {"kind": "child", "project": False, "model": child}
+        related = self._studio_delegation_models(model)
+        for other, kind in related.items():
+            if any(n == name for n, _change in self._studio_project_field_names(other)):
+                return {"kind": kind, "project": self.name, "model": other}
+        targets = [model, *related]
         Change = self.env["erplibre.studio.change"]
         others = Change.search(
             [
@@ -1465,7 +1529,7 @@ class ErplibreStudioProject(models.Model):
                 ("project_id", "!=", self.id),
                 "|",
                 "&",
-                ("model", "=", model),
+                ("model", "in", targets),
                 ("field_name", "=", name),
                 "|",
                 ("payload", "ilike", "inverse_new"),
@@ -1473,14 +1537,17 @@ class ErplibreStudioProject(models.Model):
             ]
         )
         for change in others:
-            definition = change._payload().get("field") or {}
-            inverse = change.project_id._studio_inverse_definition(
-                change.model, definition
-            )
-            if (change.model == model and change.field_name == name) or (
-                inverse and definition.get("relation") == model and inverse[0] == name
-            ):
-                return {"kind": "other", "project": change.project_id.name}
+            project = change.project_id
+            for target, field_name in project._studio_change_field_names(change):
+                if field_name != name or target not in targets:
+                    continue
+                if target in related:
+                    return {
+                        "kind": related[target],
+                        "project": project.name,
+                        "model": target,
+                    }
+                return {"kind": "other", "project": project.name}
         return None
 
     def _studio_field_name_status(self, model, name, own=None):
@@ -1555,6 +1622,19 @@ class ErplibreStudioProject(models.Model):
             detail = self.env._(
                 "A field of %(parent)s also shows on the models that inherit it.",
                 parent=label,
+            )
+        elif owner["kind"] == "parent":
+            parent = self._studio_model_label(owner["model"])
+            message = self.env._(
+                "The field %(name)s already exists on %(model)s, which "
+                "%(child)s inherits",
+                name=name,
+                model=parent,
+                child=label,
+            )
+            detail = self.env._(
+                "A field of %(parent)s also shows on the models that inherit it.",
+                parent=parent,
             )
         else:
             message = self.env._(
@@ -4085,9 +4165,17 @@ class ErplibreStudioProject(models.Model):
         ``new_name``. An inherited view on a default view of a new model
         is named after the external id of that view, which starts with the
         module (``_studio_xmlname``): its external id and its name follow,
-        so that the next Apply finds it."""
+        so that the next Apply finds it. The « groups » attributes that name
+        a group of the project follow too (``_studio_rename_group_refs``)."""
         self.ensure_one()
         old_name = self.module_name
+        self._studio_rename_group_refs(
+            {
+                f"{old_name}.{group.xml_name}": f"{new_name}.{group.xml_name}"
+                for group in self.group_line_ids
+                if group.xml_name
+            }
+        )
         Data = self.env["ir.model.data"].sudo()
         records = [self.studio_view_ids, self.field_ids] + [
             self[name] for name in CREATED_FIELDS.values()
@@ -4117,6 +4205,31 @@ class ErplibreStudioProject(models.Model):
                 name = f"{new_name}_{data.name[len(prefix):]}"
                 data.name = name
                 view.name = f"{new_name}.{name}"
+
+    def _studio_rename_group_refs(self, renamed):
+        """Rewrite the « groups » attribute of every set_attribute change of
+        the project that names one of ``renamed`` ({former external id: new
+        external id}), a leading « ! » kept, in its value and in its
+        « groups ». The changed payload puts the project back in draft: the
+        next Apply writes the new external ids into the views, and the
+        generation copies them."""
+        self.ensure_one()
+        if not renamed:
+            return
+        for change in self.change_ids.filtered(
+            lambda c: c.change_type == "set_attribute"
+        ):
+            payload = change._payload()
+            if not set(payload.get("groups") or ()) & set(renamed):
+                continue
+            items = []
+            for item in (payload.get("value") or "").split(","):
+                negated = "!" if item.startswith("!") else ""
+                xmlid = item[len(negated) :]
+                items.append(negated + renamed.get(xmlid, xmlid))
+            payload["value"] = ",".join(items)
+            payload["groups"] = [renamed.get(x, x) for x in payload["groups"]]
+            change.sudo()._set_payload(payload)
 
     # ── records under external ids of the module ────────────────────────
 

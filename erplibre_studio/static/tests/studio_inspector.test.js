@@ -4,7 +4,14 @@
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
 import {queryAllTexts, queryOne} from "@odoo/hoot-dom";
 import {advanceTime, animationFrame} from "@odoo/hoot-mock";
-import {contains, defineWebModels, getService, mountWithCleanup, onRpc} from "@web/../tests/web_test_helpers";
+import {
+    contains,
+    defineWebModels,
+    getService,
+    makeServerError,
+    mountWithCleanup,
+    onRpc,
+} from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
 
@@ -247,6 +254,9 @@ let afterOperation;
 let operations;
 // The names ``check_field_name`` was asked about, in order.
 let nameChecks;
+// ``refuse(operation)``: the message of the error the server answers the
+// operation with, or a falsy value to apply it.
+let refuse;
 
 beforeEach(() => {
     defineWebModels();
@@ -255,10 +265,15 @@ beforeEach(() => {
     afterOperation = null;
     operations = [];
     nameChecks = [];
+    refuse = () => false;
     onRpc("erplibre.studio.editor", "get_editor_data", () => answer);
     onRpc("erplibre.studio.editor", "apply_operation", (args) => {
         const operation = args.args[4];
         operations.push(operation);
+        const refused = refuse(operation);
+        if (refused) {
+            throw makeServerError({message: refused});
+        }
         if (operation.type === "rename_field") {
             answer = renamed(answer, operation.field_name, operation.new_name || "x_sponsor", operation.auto);
         } else {
@@ -518,6 +533,80 @@ describe("erplibre_studio editor, inspector", () => {
         expect(nameChecks.length).toBe(checked);
     });
 
+    test("a typed name blocks Apply until the field is renamed to it", async () => {
+        const NAME = ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name";
+        const STATUS = ".o_erplibre_studio_name_status";
+        const BLOCKED = "1 technical name(s) block Apply";
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=x_sponsor]").click();
+        await animationFrame();
+        // Available, but not the name of the field yet: Apply would write
+        // the current one.
+        await contains(NAME).edit("x_godparent", {confirm: false});
+        await advanceTime(300);
+        await animationFrame();
+        expect(STATUS).toHaveText(/^Available/);
+        expect(".o_erplibre_studio_apply_bar").not.toBeEnabled();
+        expect(".o_erplibre_studio_name_blockers").toHaveText(BLOCKED);
+        // The server refuses the rename: the input shows the current name.
+        refuse = (operation) => operation.type === "rename_field" && "The draft changed meanwhile.";
+        await contains(NAME).edit("x_godparent");
+        await animationFrame();
+        expect(operations.pop()).toEqual({
+            type: "rename_field",
+            field_name: "x_sponsor",
+            new_name: "x_godparent",
+            auto: false,
+        });
+        expect(NAME).toHaveValue("x_sponsor");
+        expect(STATUS).toHaveText(/^Available\s*No field x_sponsor/);
+        expect(".o_erplibre_studio_apply_bar").toBeEnabled();
+        expect(".o_erplibre_studio_name_blockers").toHaveCount(0);
+    });
+
+    test("a refused field option shows the value of the draft again", async () => {
+        const OPTIONS = ".o_erplibre_studio_field_props .o_erplibre_studio_field_options";
+        const withCode = (definition = {}) => {
+            const data = payload();
+            data.fields.x_code = {
+                string: "Code",
+                type: "char",
+                project: true,
+                pending: true,
+                name_auto: true,
+                definition: {field_description: "Code", help: "", readonly: false, ...definition},
+            };
+            const address = data.blocks.children[0].children[0];
+            address.children.push(field("street", ["new"], {name: "x_code", path: named("x_code"), label: "Code"}));
+            return data;
+        };
+        answer = withCode({size: 30});
+        afterOperation = () => withCode({size: 30});
+        await openEditor();
+        await contains(".o_erplibre_studio_field[data-name=x_code]").click();
+        const size = `${OPTIONS} .o_erplibre_studio_prop_size`;
+        expect(size).toHaveAttribute("max", "10000");
+        refuse = () => "The maximum size is a whole number from 1 to 10000.";
+        await contains(size).edit("20000");
+        await animationFrame();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_code", field: {size: 20000}});
+        expect(size).toHaveValue(30);
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_translate`).click();
+        await animationFrame();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_translate`).not.toBeChecked();
+        await contains(`${OPTIONS} .o_erplibre_studio_prop_index`).click();
+        await animationFrame();
+        expect(`${OPTIONS} .o_erplibre_studio_prop_index`).not.toBeChecked();
+        // 0 is no limit: an empty box.
+        refuse = () => false;
+        afterOperation = () => withCode();
+        await contains(size).edit("0");
+        await animationFrame();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_code", field: {size: 0}});
+        expect(queryOne(size).value).toBe("");
+    });
+
     test("a development database: a name without x_ applies", async () => {
         const NAME = ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name";
         const STATUS = ".o_erplibre_studio_name_status";
@@ -588,6 +677,18 @@ describe("erplibre_studio editor, inspector", () => {
             "Block the deletion",
             "Delete as well",
         ]);
+        // Refused by the server: the choice and the toggle of the draft.
+        refuse = () => "The draft changed meanwhile.";
+        await contains(".o_erplibre_studio_on_delete[value=restrict]").click();
+        await animationFrame();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_sponsor", field: {on_delete: "restrict"}});
+        expect(".o_erplibre_studio_on_delete[value='set null']").toBeChecked();
+        expect(".o_erplibre_studio_on_delete[value=restrict]").not.toBeChecked();
+        await contains(".o_erplibre_studio_inverse_toggle").click();
+        await animationFrame();
+        operations.pop();
+        expect(".o_erplibre_studio_inverse_toggle").not.toBeChecked();
+        refuse = () => false;
         await contains(".o_erplibre_studio_on_delete[value=restrict]").click();
         expect(operations.pop()).toEqual({type: "update_field", field_name: "x_sponsor", field: {on_delete: "restrict"}});
 

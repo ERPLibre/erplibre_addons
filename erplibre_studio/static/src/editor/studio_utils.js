@@ -30,6 +30,9 @@ export const FIELD_OPTIONS = {
     size: ["char"],
 };
 
+// The largest maximum size of a new char (MAX_FIELD_SIZE of the server).
+export const MAX_FIELD_SIZE = 10000;
+
 /** {translate, index, size}: whether a field of ``ttype`` takes each option. */
 export function fieldOptions(ttype) {
     return Object.fromEntries(Object.entries(FIELD_OPTIONS).map(([key, types]) => [key, types.includes(ttype)]));

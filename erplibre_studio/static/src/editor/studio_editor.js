@@ -81,6 +81,8 @@ export const LEFT_TABS = ["palette", "plan"];
 export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first"];
 // The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
 export const LAYOUT_KINDS = ["group", "page", "separator"];
+// The tags a new notebook may go in (arch.NOTEBOOK_PARENTS).
+export const NOTEBOOK_PARENTS = ["sheet", "page"];
 
 /**
  * The studio editor: a client action on one view of a model. The server
@@ -809,14 +811,20 @@ export class StudioEditor extends Component {
      * Whether the dragged ``item`` can land in ``zone``: a column of a
      * search view, an axis of a pivot, the loaded fields of a timeline,
      * the tabs of a notebook (« pages », a tab only), or the arch tree (no
-     * zone). The server checks the rest.
+     * zone). A tab lands in the arch tree only where the server accepts
+     * a new notebook for it: on a hook (``target``, ``position``) whose
+     * container is a sheet or a tab (``tabHook``). The server checks the
+     * rest.
      */
-    accepts(item, zone) {
+    accepts(item, zone, target, position) {
         if (!item) {
             return false;
         }
         if (zone === "pages" || item.kind === "page") {
-            return this.viewType === "form" && item.kind === "page" && (!zone || zone === "pages");
+            if (this.viewType !== "form" || item.kind !== "page") {
+                return false;
+            }
+            return zone === "pages" || (!zone && this.tabHook(target, position));
         }
         if (item.kind === "group") {
             return this.viewType === "form" && !zone;
@@ -851,8 +859,20 @@ export class StudioEditor extends Component {
         return true;
     }
 
+    /**
+     * Whether a new notebook can go at the hook (``target``, ``position``)
+     * of the arch tree: its container (``target`` itself for « inside »,
+     * else the parent of ``target``) is one of NOTEBOOK_PARENTS, as the
+     * server's ``notebook_refusal`` requires.
+     */
+    tabHook(target, position) {
+        const trail = blockTrail(this.root, target);
+        const container = position === "inside" ? trail.at(-1) : trail.at(-2);
+        return Boolean(container) && NOTEBOOK_PARENTS.includes(container.tag);
+    }
+
     overHook(ev, target, position, zone) {
-        if (!this.accepts(this.state.dragging, zone)) {
+        if (!this.accepts(this.state.dragging, zone, target, position)) {
             return;
         }
         ev.preventDefault();
@@ -923,7 +943,7 @@ export class StudioEditor extends Component {
         ev.preventDefault();
         const item = this.state.dragging;
         this.endDrag();
-        if (!item || this.state.busy || !this.accepts(item, zone)) {
+        if (!item || this.state.busy || !this.accepts(item, zone, target, position)) {
             return;
         }
         const lane = laneOfZone(zone);
@@ -959,7 +979,10 @@ export class StudioEditor extends Component {
      * else the hook at the end of its container. With nothing selected,
      * or when none of those hooks takes the item (a row of groups shows
      * no hook of its own), it goes on the last hook of the canvas that
-     * takes it. The drop on that hook then runs as a drop of a drag does.
+     * takes it. A tab goes at the end of the tabs of the notebook that
+     * holds the selection, else of the first notebook of the form; only
+     * a form without a notebook gets a new one, on the hooks above. The
+     * drop on that hook then runs as a drop of a drag does.
      */
     async addFromPalette(item) {
         if (this.state.busy) {
@@ -975,10 +998,18 @@ export class StudioEditor extends Component {
                 const {target, position, zone} = el.dataset;
                 return {target, position, zone: zone || undefined};
             })
-            .filter((hook) => this.accepts(item, hook.zone));
+            .filter((hook) => this.accepts(item, hook.zone, hook.target, hook.position));
         const wanted = [];
         const trail = this.state.selected ? blockTrail(this.root, this.state.selected) : [];
         const selected = trail[trail.length - 1];
+        const tabs = item.kind === "page" ? hooks.filter((h) => h.zone === "pages") : [];
+        if (tabs.length) {
+            const notebook = [...trail].reverse().find((b) => b.tag === "notebook");
+            const hook = (notebook && tabs.find((h) => h.target === notebook.path)) || tabs[0];
+            this.state.dragging = item;
+            await this.dropOnHook({preventDefault: () => {}}, hook.target, hook.position, hook.zone);
+            return;
+        }
         if (selected && selected.kind === "container" && selected.drop) {
             wanted.push({target: selected.path, position: "inside"});
         }
@@ -1388,16 +1419,21 @@ export class StudioEditor extends Component {
         this.reselect(data, block);
     }
 
+    /**
+     * Update the selected field with ``values``. Answer whether the draft
+     * took them: false while busy, and when the server refused them.
+     */
     async updateField(values) {
         const block = this.selectedBlock;
         if (!block || this.state.busy) {
-            return;
+            return false;
         }
         const before = new Set(Object.keys(this.data.fields || {}));
         const data = await this.operate({type: "update_field", field_name: block.name, field: values});
         // A new label renames a field whose name follows it.
         const name = data && this.renamedField(before, data, block.name);
         this.reselect(data, name ? {...block, name} : block);
+        return Boolean(data);
     }
 
     /**

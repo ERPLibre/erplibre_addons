@@ -184,6 +184,46 @@ class TestChangeRemoval(StudioCase):
                 )
         self.assertEqual(len(project.change_ids), 2)
 
+    def test_many2one_taken_by_a_one2many_is_refused(self):
+        # A many2one of a model not created yet, the inverse of a one2many
+        # of another model: the one2many would name a field that is gone.
+        project = self.project
+        line = self.make_model(project, "Studio test item", model=ITEM)
+        form = pending_view(line, "form")
+        partner = self.add_field(
+            form,
+            "Partner ref",
+            target=LEFT,
+            position="inside",
+            ttype="many2one",
+            relation="res.partner",
+        )
+        things = self.add_field(
+            self.form,
+            "Things",
+            ttype="one2many",
+            relation=ITEM,
+            relation_field=partner.field_name,
+        )
+        removal = self.removal(partner)
+        self.assertIn(things.field_name, removal["refused"])
+        with self.assertRaisesRegex(UserError, things.field_name):
+            with self.env.cr.savepoint():
+                self.remove(partner, [partner.id], view=form, model=ITEM)
+        with self.assertRaisesRegex(UserError, things.field_name):
+            with self.env.cr.savepoint():
+                self.op(
+                    project,
+                    form,
+                    type="remove",
+                    target=f"//field[@name='{partner.field_name}']",
+                )
+        self.assertEqual(len(project.change_ids), 2)
+        # The one2many first, then the many2one.
+        self.remove(things, [things.id])
+        self.remove(partner, [partner.id], view=form, model=ITEM)
+        self.assertFalse(project.change_ids)
+
     def test_applied_change(self):
         project = self.project
         email = self.op(project, self.list, type="relabel", target=EMAIL, value="Mail")

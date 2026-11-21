@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {queryOne} from "@odoo/hoot-dom";
+import {press, queryOne} from "@odoo/hoot-dom";
 import {animationFrame, mockTimeZone} from "@odoo/hoot-mock";
 import {
     contains,
@@ -1029,6 +1029,54 @@ describe("erplibre_studio editor, form layout", () => {
             "o_erplibre_studio_selected"
         );
         expect(".o_erplibre_studio_in_view .o_erplibre_studio_prop_label").toHaveCount(1);
+    });
+
+    test("a tab from the palette goes with the tabs of the notebook", async () => {
+        answer = formPayload();
+        respond = () => formPayload();
+        await openEditor("form");
+        await contains(".o_erplibre_studio_palette [data-tab=layout]").click();
+        const tab = ".o_erplibre_studio_layout_page";
+        const expected = {type: "add_page", target: NOTEBOOK, position: "inside"};
+        // Nothing selected, a field of a group selected, a tab selected:
+        // each time at the end of the tabs.
+        await contains(tab).click();
+        await animationFrame();
+        expect.verifySteps(["apply_operation add_page"]);
+        expect(operations.pop()).toEqual(expected);
+        await contains(".o_erplibre_studio_field[data-name=name]").click();
+        queryOne(`${tab} > .o_erplibre_studio_palette_add`).focus();
+        await press("Enter");
+        await animationFrame();
+        expect.verifySteps(["apply_operation add_page"]);
+        expect(operations.pop()).toEqual(expected);
+        await contains(`.o_erplibre_studio_page_tab[data-path="${named("page", "notes")}"]`).click();
+        await contains(tab).click();
+        await animationFrame();
+        expect.verifySteps(["apply_operation add_page"]);
+        expect(operations.pop()).toEqual(expected);
+        // A drag of a tab: not into a group, where no notebook goes.
+        await contains(tab).dragAndDrop(hook(named("field", "name"), "before"));
+        expect.verifySteps([]);
+        await contains(tab).dragAndDrop(hook(SHEET, "inside"));
+        expect.verifySteps(["apply_operation add_page"]);
+        expect(operations.pop()).toEqual({type: "add_page", target: SHEET, position: "inside"});
+    });
+
+    test("a tab from the palette starts a notebook in a form without one", async () => {
+        const group = container(named("group", "g"), "group", [field(named("field", "name"), "name")]);
+        const sheet = container(SHEET, "sheet", [group], {movable: false});
+        answer = payload("form", container("/form", "form", [sheet], {drop: false, movable: false}), {
+            operations: FORM_OPERATIONS,
+        });
+        respond = () => answer;
+        await openEditor("form");
+        await contains(".o_erplibre_studio_palette [data-tab=layout]").click();
+        await contains(".o_erplibre_studio_field[data-name=name]").click();
+        await contains(".o_erplibre_studio_layout_page").click();
+        await animationFrame();
+        expect.verifySteps(["apply_operation add_page"]);
+        expect(operations.pop()).toEqual({type: "add_page", target: SHEET, position: "inside"});
     });
 
     test("no layout item in a list", async () => {
