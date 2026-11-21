@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_base_module_uninstall_studio" model="ir.ui.view">
+        <field name="name">base.module.uninstall.erplibre_studio</field>
+        <field name="model">base.module.uninstall</field>
+        <field name="inherit_id" ref="base.view_base_module_uninstall" />
+        <field name="arch" type="xml">
+            <field name="model_ids" position="after">
+                <field name="studio_module_ids" invisible="1" />
+                <div name="erplibre_studio_report" invisible="not studio_module_ids">
+                    <div class="alert alert-warning mt-3" role="alert" invisible="not studio_refused">
+                        <field name="studio_refused" />
+                    </div>
+                    <div class="alert alert-danger mt-3" role="alert">
+                        A studio project generated these modules: uninstalling them deletes
+                        what it created, with the records and the values below.
+                    </div>
+                    <field name="studio_report" nolabel="1" readonly="1" />
+                    <div class="mt-2">
+                        <field name="studio_understood" />
+                        <label for="studio_understood" />
+                    </div>
+                </div>
+            </field>
+            <xpath expr="//footer/button[@name='action_uninstall']" position="attributes">
+                <attribute name="invisible">studio_refused or (studio_module_ids and not studio_understood)</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

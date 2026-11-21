@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The panel « apps » of the editor. -->
+    <t t-name="erplibre_studio.Panel.apps">
+        <StudioAppsPanel
+            editor="editor"
+            project="project"
+            choices="state.choices"
+            busy="state.busy"
+            error="state.panelError"
+        />
+    </t>
+
+    <!-- The apps of the project, each with its groups, and the form of an
+         app or of a group. -->
+    <t t-name="erplibre_studio.AppsPanel">
+        <div class="o_erplibre_studio_apps_panel">
+            <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0">Apps and groups</h5>
+                <span class="text-muted small ms-2">
+                    Each app is a top-level menu and the category of its groups; users get the groups in their form.
+                </span>
+                <button
+                    class="btn btn-sm btn-secondary ms-auto o_erplibre_studio_new_app"
+                    t-att-disabled="props.busy"
+                    t-on-click="newApp"
+                >
+                    <i class="fa fa-plus" />
+                    New app
+                </button>
+            </div>
+            <div
+                t-if="props.error"
+                class="alert alert-danger py-1 px-2 small o_erplibre_studio_apps_error"
+                role="alert"
+                t-esc="props.error"
+            />
+            <t t-if="state.appForm and !state.appForm.id" t-call="erplibre_studio.AppForm" />
+            <div t-if="!apps.length and !state.appForm" class="text-muted small o_erplibre_studio_no_app">
+                No app: a model goes under an existing menu, or in an app made by its dialog.
+            </div>
+            <div
+                t-foreach="apps"
+                t-as="app"
+                t-key="app.id"
+                class="o_erplibre_studio_app_card border rounded p-2 mb-2"
+                t-att-data-app="app.xml_name"
+            >
+                <t t-if="state.appForm and state.appForm.id === app.id" t-call="erplibre_studio.AppForm" />
+                <div t-else="" class="d-flex align-items-center gap-2">
+                    <t t-set="icon" t-value="iconOf(app)" />
+                    <img t-if="icon" t-att-src="icon.url" t-att-alt="icon.label" width="32" height="32" />
+                    <span class="fw-bold o_erplibre_studio_app_name" t-esc="app.name" />
+                    <code class="small text-muted" t-esc="app.xml_name" />
+                    <span
+                        class="badge o_erplibre_studio_app_state"
+                        t-att-class="app.applied ? 'text-bg-success' : 'text-bg-warning'"
+                    >
+                        <t t-if="app.applied">in the database</t>
+                        <t t-else="">created by Apply</t>
+                    </span>
+                    <span class="small text-muted ms-2">
+                        <t t-esc="app.models.length" />
+                        model(s)
+                    </span>
+                    <button
+                        class="btn btn-sm btn-link p-0 ms-auto o_erplibre_studio_edit_app"
+                        title="Edit the app"
+                        t-att-disabled="props.busy"
+                        t-on-click="() => this.editApp(app)"
+                    >
+                        <i class="fa fa-pencil" />
+                    </button>
+                    <button
+                        class="btn btn-sm btn-link text-danger p-0 o_erplibre_studio_remove_app"
+                        title="Remove the app"
+                        t-att-disabled="props.busy"
+                        t-on-click="() => this.removeApp(app)"
+                    >
+                        <i class="fa fa-trash" />
+                    </button>
+                </div>
+                <div class="ms-3 mt-2 o_erplibre_studio_app_groups">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="small fw-bold">Groups</span>
+                        <button
+                            class="btn btn-sm btn-link ms-2 p-0 o_erplibre_studio_new_group"
+                            t-att-disabled="props.busy"
+                            t-on-click="() => this.newGroup(app)"
+                        >
+                            <i class="fa fa-plus" />
+                            Add a group
+                        </button>
+                    </div>
+                    <div
+                        t-if="chainWarning(app)"
+                        class="alert alert-warning py-1 px-2 small o_erplibre_studio_chain_warning"
+                        role="status"
+                    >
+                        These groups show as checkboxes in developer mode only in the user form: make each one imply
+                        the previous one to get a selection.
+                    </div>
+                    <div t-if="!appGroups(app).length" class="text-muted small">No group.</div>
+                    <div
+                        t-foreach="appGroups(app)"
+                        t-as="group"
+                        t-key="group.id"
+                        class="o_erplibre_studio_group border-start ps-2 mb-1"
+                        t-att-data-group="group.xml_name"
+                    >
+                        <t
+                            t-if="state.groupForm and state.groupForm.id === group.id"
+                            t-call="erplibre_studio.GroupForm"
+                        />
+                        <div t-else="" class="d-flex flex-wrap align-items-center gap-1 small">
+                            <span class="fw-bold o_erplibre_studio_group_name" t-esc="group.name" />
+                            <span t-if="group.implied.length or group.implied_groups.length" class="text-muted">
+                                implies
+                            </span>
+                            <span
+                                t-foreach="group.implied"
+                                t-as="implied"
+                                t-key="implied[0]"
+                                class="badge text-bg-primary o_erplibre_studio_group_implied"
+                                t-esc="implied[1]"
+                            />
+                            <span
+                                t-foreach="group.implied_groups"
+                                t-as="implied"
+                                t-key="implied[0]"
+                                class="badge text-bg-light o_erplibre_studio_group_implied_existing"
+                                t-esc="implied[1]"
+                            />
+                            <span
+                                t-foreach="group.missing_implied"
+                                t-as="xmlid"
+                                t-key="xmlid"
+                                class="badge text-bg-danger o_erplibre_studio_missing_group"
+                                role="alert"
+                                t-esc="missingText(xmlid)"
+                            />
+                            <button
+                                class="btn btn-sm btn-link p-0 ms-auto o_erplibre_studio_edit_group"
+                                title="Edit the group"
+                                t-att-disabled="props.busy"
+                                t-on-click="() => this.editGroup(group)"
+                            >
+                                <i class="fa fa-pencil" />
+                            </button>
+                            <button
+                                class="btn btn-sm btn-link text-danger p-0 o_erplibre_studio_remove_group"
+                                title="Remove the group"
+                                t-att-disabled="props.busy"
+                                t-on-click="() => this.removeGroup(group)"
+                            >
+                                <i class="fa fa-trash" />
+                            </button>
+                        </div>
+                    </div>
+                    <t
+                        t-if="state.groupForm and !state.groupForm.id and state.groupForm.app_id === app.id"
+                        t-call="erplibre_studio.GroupForm"
+                    />
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- The form of an app: name, icon, position of its menu. -->
+    <t t-name="erplibre_studio.AppForm">
+        <t t-set="form" t-value="state.appForm" />
+        <div class="o_erplibre_studio_app_form border rounded p-2 mb-2 bg-light">
+            <div class="fw-bold mb-2">
+                <t t-if="form.id">Edit the app</t>
+                <t t-else="">New app</t>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-8">
+                    <label class="form-label mb-0" for="o_erplibre_studio_app_form_name">Name</label>
+                    <input
+                        id="o_erplibre_studio_app_form_name"
+                        class="form-control form-control-sm o_erplibre_studio_app_form_name"
+                        aria-required="true"
+                        t-att-class="{'is-invalid': !form.name.trim()}"
+                        t-att-aria-invalid="form.name.trim() ? 'false' : 'true'"
+                        t-model="form.name"
+                    />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label mb-0" for="o_erplibre_studio_app_form_sequence">
+                        Position of the menu
+                    </label>
+                    <input
+                        id="o_erplibre_studio_app_form_sequence"
+                        type="number"
+                        class="form-control form-control-sm o_erplibre_studio_app_form_sequence"
+                        t-model="form.menu_sequence"
+                    />
+                </div>
+            </div>
+            <div id="o_erplibre_studio_app_form_icons_label" class="form-label mb-1 mt-2">Icon of the app</div>
+            <div
+                class="d-flex flex-wrap gap-1 o_erplibre_studio_icons"
+                role="group"
+                aria-labelledby="o_erplibre_studio_app_form_icons_label"
+            >
+                <button
+                    t-foreach="icons"
+                    t-as="icon"
+                    t-key="icon.value"
+                    type="button"
+                    class="btn btn-light p-1 border o_erplibre_studio_icon"
+                    t-att-class="{'border-primary border-2 o_erplibre_studio_icon_selected': isIcon(icon.value)}"
+                    t-att-data-value="icon.value"
+                    t-att-title="icon.label"
+                    t-att-aria-pressed="isIcon(icon.value) ? 'true' : 'false'"
+                    t-on-click="() => this.setIcon(icon.value)"
+                >
+                    <img t-att-src="icon.url" t-att-alt="icon.label" width="32" height="32" />
+                </button>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+                <button class="btn btn-sm btn-secondary ms-auto" t-on-click="closeForms">Cancel</button>
+                <button
+                    class="btn btn-sm btn-primary o_erplibre_studio_save_app"
+                    t-att-disabled="props.busy or !form.name.trim()"
+                    t-on-click="saveApp"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
+    </t>
+
+    <!-- The form of a group: name, implied groups, comment. -->
+    <t t-name="erplibre_studio.GroupForm">
+        <t t-set="form" t-value="state.groupForm" />
+        <div class="o_erplibre_studio_group_form border rounded p-2 my-1 bg-light small">
+            <div class="fw-bold mb-2">
+                <t t-if="form.id">Edit the group</t>
+                <t t-else="">New group</t>
+            </div>
+            <label class="form-label mb-0" for="o_erplibre_studio_group_form_name">Name</label>
+            <input
+                id="o_erplibre_studio_group_form_name"
+                class="form-control form-control-sm o_erplibre_studio_group_form_name"
+                aria-required="true"
+                t-model="form.name"
+            />
+            <div id="o_erplibre_studio_group_lines_label" class="form-label mb-0 mt-2">
+                Implies these groups of the project
+            </div>
+            <div
+                class="d-flex flex-wrap align-items-center gap-1 o_erplibre_studio_group_form_lines"
+                role="group"
+                aria-labelledby="o_erplibre_studio_group_lines_label"
+            >
+                <span
+                    t-foreach="form.implied_line_ids"
+                    t-as="lineId"
+                    t-key="lineId"
+                    class="badge text-bg-primary o_erplibre_studio_implied_line"
+                    t-att-data-id="lineId"
+                >
+                    <t t-esc="groupLabel(lineId)" />
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white ms-1 align-middle"
+                        t-att-aria-label="removeChipLabel(groupLabel(lineId))"
+                        t-att-title="removeChipLabel(groupLabel(lineId))"
+                        t-on-click="() => this.removeImpliedLine(lineId)"
+                    />
+                </span>
+                <select
+                    class="form-select form-select-sm w-auto o_erplibre_studio_add_implied_line"
+                    aria-label="Add a group of the project"
+                    t-on-change="(ev) => this.addImpliedLine(ev)"
+                >
+                    <option value="">Add a group of the project…</option>
+                    <option
+                        t-foreach="impliableLines"
+                        t-as="group"
+                        t-key="group.id"
+                        t-att-value="group.id"
+                        t-esc="group.name"
+                    />
+                </select>
+            </div>
+            <div id="o_erplibre_studio_group_existing_label" class="form-label mb-0 mt-2">
+                Implies these existing groups
+            </div>
+            <div
+                class="d-flex flex-wrap align-items-center gap-1 o_erplibre_studio_group_form_existing"
+                role="group"
+                aria-labelledby="o_erplibre_studio_group_existing_label"
+            >
+                <span
+                    t-foreach="form.implied_group_ids"
+                    t-as="groupId"
+                    t-key="groupId"
+                    class="badge text-bg-secondary o_erplibre_studio_implied_group"
+                    t-att-data-id="groupId"
+                >
+                    <t t-esc="existingGroupLabel(groupId)" />
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white ms-1 align-middle"
+                        t-att-aria-label="removeChipLabel(existingGroupLabel(groupId))"
+                        t-att-title="removeChipLabel(existingGroupLabel(groupId))"
+                        t-on-click="() => this.removeImpliedGroup(groupId)"
+                    />
+                </span>
+                <select
+                    class="form-select form-select-sm w-auto o_erplibre_studio_add_implied_group"
+                    aria-label="Add an existing group"
+                    t-on-change="(ev) => this.addImpliedGroup(ev)"
+                >
+                    <option value="">Add an existing group…</option>
+                    <option
+                        t-foreach="impliableGroups"
+                        t-as="group"
+                        t-key="group.id"
+                        t-att-value="group.id"
+                        t-esc="group.name"
+                    />
+                </select>
+            </div>
+            <div class="form-text">A user of the group also gets the groups it implies.</div>
+            <label class="form-label mb-0 mt-2" for="o_erplibre_studio_group_form_comment">Comment</label>
+            <textarea
+                id="o_erplibre_studio_group_form_comment"
+                class="form-control form-control-sm o_erplibre_studio_group_form_comment"
+                rows="2"
+                t-model="form.comment"
+            />
+            <div class="d-flex gap-1 mt-2">
+                <button class="btn btn-sm btn-secondary ms-auto" t-on-click="closeForms">Cancel</button>
+                <button
+                    class="btn btn-sm btn-primary o_erplibre_studio_save_group"
+                    t-att-disabled="props.busy or !form.name.trim()"
+                    t-on-click="saveGroup"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="erplibre_studio_project_view_list" model="ir.ui.view">
+        <field name="name">erplibre.studio.project.list</field>
+        <field name="model">erplibre.studio.project</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="module_name" />
+                <field
+                    name="state"
+                    widget="badge"
+                    decoration-info="state == 'draft'"
+                    decoration-success="state != 'draft'"
+                />
+                <field name="change_count" optional="show" />
+                <field name="item_count" optional="hide" />
+                <field name="user_id" optional="show" />
+                <field name="applied_date" optional="show" />
+            </list>
+        </field>
+    </record>
+
+    <record id="erplibre_studio_project_view_form" model="ir.ui.view">
+        <field name="name">erplibre.studio.project.form</field>
+        <field name="model">erplibre.studio.project</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_open_editor"
+                        type="object"
+                        string="Open the editor"
+                        class="btn-secondary"
+                        invisible="not change_count and not created_model_ids"
+                    />
+                    <button
+                        name="action_apply_wizard"
+                        type="object"
+                        string="Apply"
+                        class="btn-primary"
+                        invisible="state != 'draft' or not item_count"
+                    />
+                    <button
+                        name="action_discard"
+                        type="object"
+                        string="Discard the draft"
+                        invisible="state != 'draft' or (not item_count and not applied_snapshot)"
+                        confirm="Back to the changes of the last Apply?"
+                    />
+                    <button
+                        name="action_revert_wizard"
+                        type="object"
+                        string="Revert"
+                        invisible="state == 'draft' and not applied_snapshot"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <!-- erplibre_studio_generate removes it and adds the generation. -->
+                    <div name="generation_hint" class="alert alert-info" role="status" invisible="not item_count">
+                        Generating a module needs ERPLibre studio generate, on a database started with --dev.
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Project name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="module">
+                            <field name="module_name" />
+                            <field name="user_id" />
+                        </group>
+                        <group name="installed_module">
+                            <field name="module_id" invisible="not module_id" />
+                            <field name="module_state" invisible="not module_id" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Changes" name="changes">
+                            <!-- The editor makes the changes: each one locates its node
+                                 in the arch the earlier ones leave. -->
+                            <field name="change_ids" readonly="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="view_id" />
+                                    <field name="model_line_id" optional="hide" />
+                                    <field name="change_type" />
+                                    <field name="summary" />
+                                    <field name="xpath" optional="hide" />
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="change_type" />
+                                        <field name="model" />
+                                        <field name="view_id" />
+                                        <field name="model_line_id" />
+                                        <field name="xpath" />
+                                        <field name="position" />
+                                        <field name="payload" />
+                                        <field name="spec" />
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="New models" name="new_models">
+                            <field name="new_model_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="model" readonly="applied" />
+                                    <field name="chatter" />
+                                    <field name="menu_mode" />
+                                    <field
+                                        name="app_id"
+                                        invisible="menu_mode != 'app'"
+                                        required="menu_mode == 'app'"
+                                        domain="[('project_id', '=', parent.id)]"
+                                    />
+                                    <field
+                                        name="menu_parent_id"
+                                        invisible="menu_mode != 'menu'"
+                                        required="menu_mode == 'menu'"
+                                    />
+                                    <field name="menu_name" optional="show" />
+                                    <field name="menu_sequence" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Apps and groups" name="apps">
+                            <field name="app_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="icon" />
+                                    <field name="menu_sequence" optional="hide" />
+                                    <field name="xml_name" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                            <field name="group_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field
+                                        name="app_id"
+                                        domain="[('project_id', '=', parent.id)]"
+                                    />
+                                    <field name="name" />
+                                    <field
+                                        name="implied_line_ids"
+                                        widget="many2many_tags"
+                                        domain="[('project_id', '=', parent.id)]"
+                                    />
+                                    <field name="implied_group_ids" widget="many2many_tags" />
+                                    <field
+                                        name="missing_implied"
+                                        decoration-danger="missing_implied"
+                                        optional="show"
+                                    />
+                                    <field name="comment" optional="hide" />
+                                    <field name="xml_name" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Access rights" name="access_rights">
+                            <field name="access_line_ids">
+                                <list editable="bottom">
+                                    <field name="model" />
+                                    <field name="group_id" />
+                                    <field
+                                        name="group_line_id"
+                                        domain="[('project_id', '=', parent.id)]"
+                                        optional="show"
+                                    />
+                                    <field name="perm_read" />
+                                    <field name="perm_write" />
+                                    <field name="perm_create" />
+                                    <field name="perm_unlink" />
+                                    <field name="xml_name" optional="hide" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Record rules" name="record_rules">
+                            <field name="rule_line_ids">
+                                <list>
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="model" />
+                                    <field name="global_rule" />
+                                    <field name="group_ids" widget="many2many_tags" />
+                                    <field
+                                        name="group_line_ids"
+                                        widget="many2many_tags"
+                                        optional="show"
+                                    />
+                                    <field
+                                        name="missing_groups"
+                                        decoration-danger="missing_groups"
+                                        optional="show"
+                                    />
+                                    <field name="perm_read" />
+                                    <field name="perm_write" />
+                                    <field name="perm_create" />
+                                    <field name="perm_unlink" />
+                                </list>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="name" />
+                                            <field name="model" />
+                                            <field name="global_rule" />
+                                            <field
+                                                name="group_ids"
+                                                widget="many2many_tags"
+                                                invisible="global_rule"
+                                            />
+                                            <field
+                                                name="group_line_ids"
+                                                widget="many2many_tags"
+                                                invisible="global_rule"
+                                                domain="[('project_id', '=', parent.id)]"
+                                            />
+                                            <field
+                                                name="missing_groups"
+                                                invisible="not missing_groups"
+                                                decoration-danger="1"
+                                            />
+                                            <field name="xml_name" />
+                                        </group>
+                                        <group>
+                                            <field name="perm_read" />
+                                            <field name="perm_write" />
+                                            <field name="perm_create" />
+                                            <field name="perm_unlink" />
+                                        </group>
+                                    </group>
+                                    <field name="domain_force" />
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Database" name="database">
+                            <group>
+                                <field name="applied_date" />
+                                <field name="applied_snapshot" invisible="1" />
+                                <field name="approved" />
+                                <field name="approved_uid" invisible="not approved_uid" />
+                                <field name="approved_date" invisible="not approved_uid" />
+                                <field name="field_ids">
+                                    <list>
+                                        <field name="model" />
+                                        <field name="name" />
+                                        <field name="field_description" />
+                                        <field name="ttype" />
+                                        <field name="state" />
+                                    </list>
+                                </field>
+                                <field name="studio_view_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="inherit_id" />
+                                        <field name="priority" />
+                                    </list>
+                                </field>
+                                <field name="created_model_ids">
+                                    <list>
+                                        <field name="model" />
+                                        <field name="name" />
+                                        <field name="state" />
+                                    </list>
+                                </field>
+                                <field name="created_view_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="type" />
+                                    </list>
+                                </field>
+                                <field name="created_action_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="res_model" />
+                                    </list>
+                                </field>
+                                <field name="created_menu_ids">
+                                    <list>
+                                        <field name="complete_name" />
+                                    </list>
+                                </field>
+                                <field name="created_access_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="model_id" />
+                                        <field name="group_id" />
+                                        <field name="perm_read" />
+                                        <field name="perm_write" />
+                                        <field name="perm_create" />
+                                        <field name="perm_unlink" />
+                                    </list>
+                                </field>
+                                <field name="created_rule_ids">
+                                    <list>
+                                        <field name="name" />
+                                        <field name="model_id" />
+                                        <field name="domain_force" />
+                                    </list>
+                                </field>
+                                <field name="created_group_ids">
+                                    <list>
+                                        <field name="full_name" />
+                                    </list>
+                                </field>
+                                <field name="created_category_ids">
+                                    <list>
+                                        <field name="name" />
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_studio_revert_wizard_view_form" model="ir.ui.view">
+        <field name="name">erplibre.studio.revert.wizard.form</field>
+        <field name="model">erplibre.studio.revert.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="mode" invisible="1" />
+                <div class="alert alert-danger" role="alert" invisible="not refused">
+                    <field name="refused" />
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="refused or mode != 'revert'">
+                    Revert removes from the database what the project created:
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="refused or mode != 'apply'">
+                    Apply removes from the database what the draft no longer has:
+                </div>
+                <field name="report_html" nolabel="1" />
+                <footer>
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Revert"
+                        class="btn-danger"
+                        invisible="refused or mode != 'revert'"
+                        data-hotkey="q"
+                    />
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Apply"
+                        class="btn-danger"
+                        invisible="refused or mode != 'apply'"
+                        data-hotkey="q"
+                    />
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="erplibre_studio_project_view_search" model="ir.ui.view">
+        <field name="name">erplibre.studio.project.search</field>
+        <field name="model">erplibre.studio.project</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="module_name" />
+                <filter name="mine" string="My projects" domain="[('user_id', '=', uid)]" />
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="erplibre_studio_project_action" model="ir.actions.act_window">
+        <field name="name">Studio projects</field>
+        <field name="res_model">erplibre.studio.project</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="erplibre_studio_project_menu"
+        name="Studio projects"
+        parent="erplibre_info.erplibre_info_menu_technical"
+        action="erplibre_studio_project_action"
+        sequence="70"
+    />
+</odoo>

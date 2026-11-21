@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- A new one2many or many2many: comodel, label, then its inverse or
+         its relation table. -->
+    <t t-name="erplibre_studio.RelationDialog">
+        <Dialog title="title" size="'md'" contentClass="'o_erplibre_studio_relation_dialog'">
+            <div class="mb-2 small text-muted">
+                On
+                <span class="fw-bold" t-esc="props.modelLabel" />
+                <code class="ms-1" t-esc="props.model" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="o_erplibre_studio_relation_comodel">Comodel</label>
+                <input
+                    class="form-control form-control-sm mb-1 o_erplibre_studio_relation_filter"
+                    placeholder="Filter the models"
+                    aria-label="Filter the models"
+                    t-model="state.filter"
+                />
+                <select
+                    id="o_erplibre_studio_relation_comodel"
+                    class="form-select form-select-sm o_erplibre_studio_relation_comodel"
+                    aria-required="true"
+                    t-on-change="(ev) => this.setComodel(ev.target.value)"
+                >
+                    <option value="" t-att-selected="!state.comodel">Model…</option>
+                    <option
+                        t-foreach="comodels"
+                        t-as="item"
+                        t-key="item[0]"
+                        t-att-value="item[0]"
+                        t-att-selected="item[0] === state.comodel"
+                        t-esc="item[1] + ' (' + item[0] + ')'"
+                    />
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="o_erplibre_studio_relation_label">Label</label>
+                <input
+                    id="o_erplibre_studio_relation_label"
+                    class="form-control form-control-sm o_erplibre_studio_relation_label"
+                    aria-required="true"
+                    t-att-value="state.label"
+                    t-on-input="(ev) => this.setLabel(ev.target.value)"
+                    t-on-change="labelChanged"
+                />
+            </div>
+            <div
+                t-if="state.error"
+                class="alert alert-danger py-1 px-2 small o_erplibre_studio_relation_error"
+                role="alert"
+                t-esc="state.error"
+            />
+            <div t-if="state.loading" class="text-muted small">
+                <i class="fa fa-spinner fa-spin me-1" />
+                Loading…
+            </div>
+            <fieldset t-if="isOne2many and state.choices" class="mb-2 o_erplibre_studio_relation_inverse">
+                <legend class="fs-6 fw-bold">Inverse field</legend>
+                <div class="form-text mt-0 mb-2">
+                    A one2many lists the records of the comodel whose many2one points to this record.
+                </div>
+                <div class="form-check">
+                    <input
+                        id="o_erplibre_studio_inverse_existing"
+                        type="radio"
+                        class="form-check-input o_erplibre_studio_inverse_mode"
+                        name="o_erplibre_studio_inverse_mode"
+                        value="existing"
+                        t-att-checked="state.inverseMode === 'existing'"
+                        t-att-disabled="!inverses.length"
+                        t-on-change="() => state.inverseMode = 'existing'"
+                    />
+                    <label class="form-check-label" for="o_erplibre_studio_inverse_existing">
+                        An existing many2one of the comodel
+                    </label>
+                </div>
+                <select
+                    t-if="state.inverseMode === 'existing' and inverses.length"
+                    class="form-select form-select-sm ms-4 mb-2 w-auto o_erplibre_studio_relation_inverse_name"
+                    aria-label="Inverse field"
+                    t-model="state.inverseName"
+                >
+                    <option
+                        t-foreach="inverses"
+                        t-as="inverse"
+                        t-key="inverse.name"
+                        t-att-value="inverse.name"
+                        t-esc="inverse.label + ' (' + inverse.name + ')' + (inverse.pending ? ' *' : '')"
+                    />
+                </select>
+                <div t-if="!inverses.length" class="ms-4 small text-muted o_erplibre_studio_no_inverse">
+                    The comodel has no many2one to this model.
+                </div>
+                <div class="form-check mt-1">
+                    <input
+                        id="o_erplibre_studio_inverse_create"
+                        type="radio"
+                        class="form-check-input o_erplibre_studio_inverse_mode"
+                        name="o_erplibre_studio_inverse_mode"
+                        value="create"
+                        t-att-checked="state.inverseMode === 'create'"
+                        t-att-disabled="!canCreateInverse"
+                        t-on-change="() => state.inverseMode = 'create'"
+                    />
+                    <label class="form-check-label" for="o_erplibre_studio_inverse_create" t-esc="createLabel" />
+                </div>
+                <div t-if="state.inverseMode === 'create'" class="ms-4 mt-1 o_erplibre_studio_inverse_form">
+                    <label class="form-label mb-0" for="o_erplibre_studio_inverse_label">Label of the many2one</label>
+                    <input
+                        id="o_erplibre_studio_inverse_label"
+                        class="form-control form-control-sm o_erplibre_studio_inverse_label"
+                        t-model="state.inverseLabel"
+                    />
+                    <div class="form-text">
+                        <t t-if="state.choices.on_delete === 'cascade'">
+                            Deleting a record deletes its lines.
+                        </t>
+                        <t t-else="">Deleting a record empties the many2one of its lines.</t>
+                    </div>
+                </div>
+                <div
+                    t-if="state.choices.protected"
+                    class="ms-4 small text-muted o_erplibre_studio_inverse_protected"
+                >
+                    The studio does not add fields to this model: choose an existing inverse.
+                </div>
+            </fieldset>
+            <div t-if="!isOne2many and state.choices" class="mb-2 o_erplibre_studio_relation_table small">
+                <div class="fw-bold">Relation table</div>
+                <div class="form-text mt-0 mb-1">Named after the module; it cannot change once created.</div>
+                <dl class="row mb-0">
+                    <dt class="col-4 fw-normal text-muted">Table</dt>
+                    <dd class="col-8 mb-0">
+                        <code class="o_erplibre_studio_relation_table_name" t-esc="state.choices.relation_table" />
+                    </dd>
+                    <dt class="col-4 fw-normal text-muted">Columns</dt>
+                    <dd class="col-8 mb-0">
+                        <code
+                            class="o_erplibre_studio_relation_columns"
+                            t-esc="state.choices.column1 + ', ' + state.choices.column2"
+                        />
+                    </dd>
+                </dl>
+            </div>
+            <t t-set-slot="footer">
+                <button
+                    class="btn btn-primary o_erplibre_studio_relation_save"
+                    t-att-disabled="!canSave"
+                    t-on-click="save"
+                >
+                    Create
+                </button>
+                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
