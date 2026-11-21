@@ -129,6 +129,9 @@ export class StudioBlock extends Component {
         if (attrs.widget && this.props.viewType !== "form") {
             flags.push({key: "widget", label: attrs.widget});
         }
+        if (attrs.groups) {
+            flags.push({key: "groups", label: _t("restricted")});
+        }
         if (this.block.interval) {
             flags.push({key: "interval", label: valueLabel("interval", this.block.interval) || this.block.interval});
         }

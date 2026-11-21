@@ -147,6 +147,7 @@ VIEW_OPERATIONS = {
         "help",
         "update_field",
         "rename_field",
+        "set_attribute",
     ),
     "list": (
         "add_field",
@@ -161,6 +162,7 @@ VIEW_OPERATIONS = {
         "optional",
         "update_field",
         "rename_field",
+        "set_attribute",
     ),
     "kanban": (
         "add_field",
@@ -202,7 +204,16 @@ VIEW_OPERATIONS = {
 
 # The attributes « set_attribute » may write: view type -> tag ->
 # attribute -> kind of value. The kind says how the value is checked.
+# A field of a form or a list takes its widget, the domain of its records
+# (a relational field) and the groups it shows for.
+FIELD_ADVANCED_ATTRIBUTES = {
+    "widget": "widget",
+    "domain": "field_domain",
+    "groups": "groups",
+}
 SETTABLE_ATTRIBUTES = {
+    "form": {"field": FIELD_ADVANCED_ATTRIBUTES},
+    "list": {"field": FIELD_ADVANCED_ATTRIBUTES},
     "kanban": {
         "kanban": {
             "default_group_by": "group_field",
@@ -313,6 +324,8 @@ SUBVIEW_TAGS = ("list", "field")
 # The relational field types a project adds; a one2many shows in a form only,
 # a many2many in a form (a sub-list), a list or a kanban (tags).
 X2MANY_TYPES = ("one2many", "many2many")
+# The fields whose records a domain restricts.
+RELATIONAL_TYPES = ("many2one",) + X2MANY_TYPES
 X2MANY_VIEW_TYPES = {
     "one2many": ("form",),
     "many2many": ("form", "list", "kanban"),

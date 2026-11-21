@@ -25,6 +25,7 @@ from . import (
     test_rules,
     test_ui,
     test_uninstall,
+    test_views_advanced,
     test_views_kanban,
     test_views_layout,
     test_views_pivot,

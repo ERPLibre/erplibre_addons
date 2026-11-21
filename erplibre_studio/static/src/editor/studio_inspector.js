@@ -36,6 +36,10 @@ export const INSPECTOR_TABS = ["properties", "changes"];
 // the view.
 const FIELD_CHANGES = ["add_field", "update_field"];
 const RELATION_TYPES = ["many2one", "one2many", "many2many"];
+// The kinds of attribute a field of a form or a list sets under « Advanced ».
+const ADVANCED_KINDS = ["widget", "field_domain", "groups"];
+// The view types whose fields show the attributes of ADVANCED_KINDS apart.
+const ADVANCED_VIEW_TYPES = ["form", "list"];
 
 /**
  * The inspector of the view space, in two tabs. « Properties »: the
@@ -44,7 +48,8 @@ const RELATION_TYPES = ["many2one", "one2many", "many2many"];
  * (StudioFieldName), and for a field of the project its tooltip,
  * read-only, values and comodel) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
- * writes); a many2one of the project, the one2many it may create on its
+ * writes; in a form or a list, the widget, the domain and the groups
+ * under « Advanced »); a many2one of the project, the one2many it may create on its
  * comodel and what it does when its record is deleted; a container shows
  * what it holds. « Changes »: the changes of
  * the draft in this view, each one revealing its block on the canvas. It
@@ -78,8 +83,9 @@ export class StudioInspector extends Component {
     };
 
     setup() {
-        // Whether the attributes the draft gives a timeline show.
-        this.local = useState({generated: false});
+        // Whether the attributes the draft gives a timeline show; whether
+        // « Advanced » is open ({path, open}), null to follow the block.
+        this.local = useState({generated: false, advanced: null, groupText: ""});
     }
 
     get editor() {
@@ -162,6 +168,7 @@ export class StudioInspector extends Component {
         const field = block.kind === "field" ? this.fieldInfo(block.name) : {};
         return Object.entries(attrs)
             .filter(([attribute]) => attribute !== "interval" || DATE_TYPES.includes(field.type))
+            .filter(([, kind]) => kind !== "field_domain" || RELATION_TYPES.includes(field.type))
             .map(([attribute, kind]) => ({
                 attribute,
                 kind,
@@ -169,6 +176,130 @@ export class StudioInspector extends Component {
                 value: (block.attrs || {})[attribute] || "",
                 required: required.includes(attribute),
             }));
+    }
+
+    /** Whether ``block`` shows the attributes of ADVANCED_KINDS apart. */
+    hasAdvanced(block) {
+        return ADVANCED_VIEW_TYPES.includes(this.viewType) && block.kind === "field";
+    }
+
+    /** The entries of settableOf(block) under « Advanced ». */
+    advancedEntries(block) {
+        if (!this.hasAdvanced(block)) {
+            return [];
+        }
+        return this.settableOf(block).filter((entry) => ADVANCED_KINDS.includes(entry.kind));
+    }
+
+    /** The entries of settableOf(block) in « In this view ». */
+    plainEntries(block) {
+        if (!this.hasAdvanced(block)) {
+            return this.settableOf(block);
+        }
+        return this.settableOf(block).filter((entry) => !ADVANCED_KINDS.includes(entry.kind));
+    }
+
+    /**
+     * Whether « Advanced » shows for ``block``: as toggled on this block,
+     * else open when the block has one of its attributes.
+     */
+    advancedOpen(block) {
+        const local = this.local.advanced;
+        if (local && local.path === block.path) {
+            return local.open;
+        }
+        return this.advancedEntries(block).some((entry) => entry.value);
+    }
+
+    toggleAdvanced(block) {
+        const open = !this.advancedOpen(block);
+        this.local.advanced = {path: block.path, open};
+        if (open) {
+            this.ensureChoices();
+        }
+    }
+
+    /** Load the groups the editor offers, once. */
+    ensureChoices() {
+        if (!this.editor.state.choices && !this.choicesLoading) {
+            this.choicesLoading = this.editor.loadChoices().finally(() => {
+                this.choicesLoading = null;
+            });
+        }
+        return this.choicesLoading;
+    }
+
+    /** The groups of get_studio_choices: [{name, xml_id, project, applied}]. */
+    get groupChoices() {
+        return (this.editor.state.choices && this.editor.state.choices.groups) || [];
+    }
+
+    /** The groups a node can show for: existing ones, applied ones of the project. */
+    get groupOptions() {
+        return this.groupChoices.filter((group) => !group.project || group.applied);
+    }
+
+    /** The names of the groups of the project not applied yet. */
+    get pendingGroups() {
+        return this.groupChoices.filter((group) => group.project && !group.applied).map((group) => group.name);
+    }
+
+    /** The external ids of the « groups » of ``entry`` (a comma text). */
+    groupIds(entry) {
+        return (entry.value || "")
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    /** The label of the external id ``xmlid`` (a leading « ! » excludes the group). */
+    groupLabel(xmlid) {
+        const negated = xmlid.startsWith("!");
+        const id = negated ? xmlid.slice(1) : xmlid;
+        const group = this.groupChoices.find((item) => item.xml_id === id);
+        const name = group ? group.name : id;
+        return negated ? _t("Not %(group)s", {group: name}) : name;
+    }
+
+    removeGroupLabel(xmlid) {
+        return _t("Remove the group %(group)s", {group: this.groupLabel(xmlid)});
+    }
+
+    /**
+     * Add the group typed in the input of ``entry`` (its name or its
+     * external id); a group of the project not applied yet is refused.
+     */
+    async addGroup(block, entry, text) {
+        const value = (text || "").trim();
+        if (!value) {
+            return;
+        }
+        await this.ensureChoices();
+        const group = this.groupChoices.find((item) => item.name === value || item.xml_id === value);
+        if (!group) {
+            this.editor.notification.add(_t("No group %(group)s.", {group: value}), {type: "warning"});
+            return;
+        }
+        if (group.project && !group.applied) {
+            this.editor.notification.add(
+                _t("Apply the group %(group)s first: the view names it by its external id.", {group: group.name}),
+                {type: "warning"}
+            );
+            return;
+        }
+        this.local.groupText = "";
+        const ids = this.groupIds(entry);
+        if (!ids.includes(group.xml_id)) {
+            await this.setNodeAttribute(block, entry.attribute, [...ids, group.xml_id]);
+        }
+    }
+
+    removeGroup(block, entry, xmlid) {
+        return this.setNodeAttribute(
+            block,
+            entry.attribute,
+            this.groupIds(entry).filter((item) => item !== xmlid)
+        );
     }
 
     /** [[value, label]] of an attribute of ``kind`` on ``block``. */
@@ -230,7 +361,7 @@ export class StudioInspector extends Component {
             required: isField && this.allows("required"),
             hidden: this.hidesByAttribute && this.canRemove(block),
             optional: this.allows("optional"),
-            settable: this.settableOf(block).length > 0,
+            settable: this.plainEntries(block).length > 0,
         };
         props.any = Boolean(
             (props.relabel && !isField) ||

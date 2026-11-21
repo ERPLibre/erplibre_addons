@@ -635,6 +635,117 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio").toHaveAttribute("data-space", "review");
     });
 
+    test("a field of a form: widget, domain and groups under Advanced", async () => {
+        const advanced = (extra = {}) => {
+            const data = payload({
+                settable: {field: {widget: "widget", domain: "field_domain", groups: "groups"}},
+                operations: [...payload().operations, "set_attribute"],
+                ...extra,
+            });
+            return data;
+        };
+        /** ``data`` with the attributes ``attrs`` on the block of the field ``name``. */
+        const withAttrs = (data, name, attrs) => {
+            const set = (block) => ({
+                ...block,
+                ...(block.name === name ? {attrs: {...block.attrs, ...attrs}} : {}),
+                ...(block.children ? {children: block.children.map(set)} : {}),
+            });
+            return {...data, blocks: set(data.blocks)};
+        };
+        const choiceCalls = [];
+        onRpc("erplibre.studio.editor", "get_studio_choices", (args) => {
+            choiceCalls.push(args.args[0]);
+            return {
+                groups: [
+                    {id: 2, name: "Settings / Administration", xml_id: "base.group_system", category: false},
+                    {
+                        id: false,
+                        line_id: 5,
+                        name: "Desk / Agent",
+                        xml_id: "studio_contacts.group_desk_agent",
+                        project: true,
+                        applied: false,
+                    },
+                ],
+                menus: [],
+                apps: [],
+                models: [],
+                taken_models: [],
+                icons: [],
+            };
+        });
+        answer = advanced();
+        afterOperation = () => advanced();
+        await openEditor();
+
+        // A selection field: the widget goes under « Advanced », closed.
+        await contains(".o_erplibre_studio_field[data-name=x_level]").click();
+        expect(".o_erplibre_studio_field_advanced_toggle").toHaveAttribute("aria-expanded", "false");
+        expect(".o_erplibre_studio_field_advanced").toHaveCount(0);
+        expect(".o_erplibre_studio_in_view .o_erplibre_studio_settable").toHaveCount(0);
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        expect(".o_erplibre_studio_field_advanced_toggle").toHaveAttribute("aria-expanded", "true");
+        expect(choiceCalls).toEqual([3]);
+        const widget = ".o_erplibre_studio_field_advanced .o_erplibre_studio_settable[data-attribute=widget] select";
+        expect(`${widget} option[value=radio]`).toHaveCount(1);
+        expect(`${widget} option[value=many2many_tags]`).toHaveCount(0);
+        // No domain on a field that is not relational.
+        expect(".o_erplibre_studio_prop_domain").toHaveCount(0);
+        await contains(widget).select("radio");
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("x_level"),
+            attribute: "widget",
+            value: "radio",
+        });
+        // Still open on the same field after the operation.
+        expect(".o_erplibre_studio_field_advanced").toHaveCount(1);
+
+        // A many2one: its domain, the groups it shows for.
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=user_id]").click();
+        expect(".o_erplibre_studio_field_advanced").toHaveCount(0);
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        expect(".o_erplibre_studio_prop_domain").toHaveCount(1);
+        expect(".o_erplibre_studio_prop_domain").toHaveAttribute("placeholder", "[('active', '=', True)]");
+        await contains(".o_erplibre_studio_prop_domain").edit("[('share', '=', False)]");
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "domain",
+            value: "[('share', '=', False)]",
+        });
+        expect(".o_erplibre_studio_group_chip").toHaveCount(0);
+        expect("#o_erplibre_studio_group_list option").toHaveCount(1);
+        expect(".o_erplibre_studio_groups_pending").toHaveText(/Desk \/ Agent/);
+        // A group of the project not applied yet is not sent.
+        await contains(".o_erplibre_studio_prop_groups").edit("Desk / Agent");
+        expect(operations).toEqual([]);
+        expect(".o_notification").toHaveCount(1);
+
+        afterOperation = () => withAttrs(advanced(), "user_id", {groups: "base.group_system"});
+        await contains(".o_erplibre_studio_prop_groups").edit("Settings / Administration");
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "groups",
+            value: ["base.group_system"],
+        });
+        expect(".o_erplibre_studio_group_chip").toHaveCount(1);
+        expect(".o_erplibre_studio_group_chip").toHaveText("Settings / Administration");
+        expect(".o_erplibre_studio_field[data-name=user_id] [data-flag=groups]").toHaveCount(1);
+        afterOperation = () => advanced();
+        await contains(".o_erplibre_studio_group_remove").click();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "groups",
+            value: [],
+        });
+        expect(".o_erplibre_studio_group_chip").toHaveCount(0);
+    });
+
     test("no change in the view", async () => {
         answer = payload({changes: []});
         await openEditor();

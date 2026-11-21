@@ -1076,7 +1076,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         offer: the menus a model can go under (with an external id, no
         action, outside the project), the groups (with an external id and
         their ``category`` [id, name]; then the groups of the project,
-        ``project`` true, by ``line_id``), the
+        ``project`` true, by ``line_id``, ``applied`` once created), the
         apps of the project and the icons of an app, the models rights can
         name, and the model names a new model cannot take
         (``taken_models``)."""
@@ -1129,6 +1129,8 @@ class ErplibreStudioEditor(models.AbstractModel):
                     "name": f"{line.app_id.name} / {line.name}",
                     "xml_id": f"{project.module_name}.{line.xml_name}",
                     "project": True,
+                    # A view names the group once Apply has created it.
+                    "applied": line.applied,
                 }
                 for line in project.group_line_ids
             ],

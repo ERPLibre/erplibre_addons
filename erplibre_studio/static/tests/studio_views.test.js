@@ -351,7 +351,9 @@ describe("erplibre_studio editor, kanban", () => {
             field_name: "phone",
         });
         expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "phone");
-        expect(".o_erplibre_studio_settable[data-attribute=widget]").toHaveCount(1);
+        // In a kanban the widget stays in « In this view »: no « Advanced ».
+        expect(".o_erplibre_studio_in_view .o_erplibre_studio_settable[data-attribute=widget]").toHaveCount(1);
+        expect(".o_erplibre_studio_field_advanced_toggle").toHaveCount(0);
 
         // A ribbon from the « Other » tab.
         await contains(".o_erplibre_studio_palette [data-tab=other]").click();

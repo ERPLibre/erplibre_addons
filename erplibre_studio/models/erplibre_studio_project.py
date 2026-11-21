@@ -1,6 +1,7 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import ast
 import inspect
 import json
 import logging
@@ -245,6 +246,7 @@ PENDING_VIEW_OPERATIONS = {
         "help",
         "update_field",
         "rename_field",
+        "set_attribute",
     ),
     "list": (
         "add_field",
@@ -256,6 +258,7 @@ PENDING_VIEW_OPERATIONS = {
         "optional",
         "update_field",
         "rename_field",
+        "set_attribute",
     ),
     "search": ("add_existing_field", "move", "remove"),
 }
@@ -2374,6 +2377,8 @@ class ErplibreStudioProject(models.Model):
             return ("True" if value else "False"), []
         if kind == "colors":
             return self._colors_value(view.model, value)
+        if kind == "groups":
+            return self._groups_value(value), []
         if value in (None, "", False):
             return "", []
         if not isinstance(value, str):
@@ -2388,6 +2393,7 @@ class ErplibreStudioProject(models.Model):
             "interval": self._interval_value,
             "widget": lambda model, node, kind, value: (self._clean_widget(value), []),
             "timeline_mode": self._mode_value,
+            "field_domain": self._field_domain_value,
         }.get(kind)
         if not check:
             raise UserError(self.env._("Invalid value %(value)s.", value=value))
@@ -2450,6 +2456,135 @@ class ErplibreStudioProject(models.Model):
         info = self._field_info(model, node.get("name"))
         return self._check_interval(info, value), []
 
+    def _domain_comodel(self, model, name):
+        """The comodel of the relational field ``name`` of ``model``, the
+        model its domain searches. UserError when the field is not
+        relational, or while its comodel is a model of the project not
+        created yet: a domain is checked by a search. A new field of the
+        project on an existing model is read from its definition."""
+        change = (
+            self._field_add_change(model, name)
+            if not self._studio_pending_line(model)
+            and name not in self.env[model]._fields
+            else None
+        )
+        if change:
+            definition = change._payload().get("field") or {}
+            info = {
+                "type": definition.get("ttype"),
+                "relation": definition.get("relation"),
+                "string": definition.get("field_description"),
+            }
+        else:
+            info = self._field_info(model, name)
+        if info["type"] not in studio_arch.RELATIONAL_TYPES:
+            raise UserError(
+                self.env._(
+                    "Only a relational field takes a domain, not %(name)s.",
+                    name=info.get("string") or name,
+                )
+            )
+        comodel = info.get("relation") or ""
+        if comodel not in self.env:
+            raise UserError(
+                self.env._("Apply the model %(model)s first.", model=comodel)
+            )
+        return comodel
+
+    @api.model
+    def _parse_field_domain(self, value):
+        """The list of terms of the domain text ``value``, a Python literal:
+        a domain that reads the record (« uid », a field of the form) is
+        refused, the generated module writes it as it stands."""
+        try:
+            domain = ast.literal_eval(value)
+            if not isinstance(domain, (list, tuple)):
+                raise ValueError(value)
+            check_domain_shape(domain)
+        except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
+            raise UserError(
+                self.env._(
+                    "%(value)s is not a domain: a list of terms (field, "
+                    "operator, value) with fixed values is needed.",
+                    value=value,
+                )
+            ) from None
+        return [tuple(term) if isinstance(term, list) else term for term in domain]
+
+    def _field_domain_value(self, model, node, kind, value):
+        """The domain of a relational field, written as ``repr`` writes the
+        list of its terms; checked by a search of the comodel."""
+        comodel = self._domain_comodel(model, node.get("name"))
+        domain = self._parse_field_domain(value)
+        try:
+            with self.env.cr.savepoint():
+                self.env[comodel].sudo()._search(domain)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise UserError(
+                self.env._("The domain does not apply: %(error)s", error=exc)
+            ) from exc
+        return repr(list(domain)), []
+
+    @api.model
+    def _groups_list(self, value):
+        """[external ids] of a ``groups`` value: a list, or a text of ids
+        separated by commas; empty entries are dropped."""
+        if value in (None, "", False):
+            return []
+        if isinstance(value, str):
+            value = value.split(",")
+        if not isinstance(value, (list, tuple)) or not all(
+            isinstance(item, str) for item in value
+        ):
+            raise UserError(self.env._("Invalid value %(value)s.", value=value))
+        return [item.strip() for item in value if item.strip()]
+
+    def _groups_value(self, value):
+        """The ``groups`` text of the external ids ``value``. Each one names
+        a group the generated module can name: one under an installed
+        module, or a group of the project Apply created. A leading « ! »
+        (not in the group) stays."""
+        result = []
+        for item in self._groups_list(value):
+            xmlid = item[1:] if item.startswith("!") else item
+            line = self.group_line_ids.filtered(
+                lambda g, x=xmlid: g._studio_full_xmlid() == x
+            )
+            if line:
+                if not line._studio_group_record():
+                    raise UserError(
+                        self.env._(
+                            "Apply the group %(group)s first: the view names "
+                            "it by its external id.",
+                            group=line.name,
+                        )
+                    )
+            else:
+                group = self.env.ref(xmlid, raise_if_not_found=False)
+                module = xmlid.split(".", 1)[0] if "." in xmlid else ""
+                installed = (
+                    self.env["ir.module.module"]
+                    .sudo()
+                    .search_count(
+                        [
+                            ("name", "=", module),
+                            ("state", "in", ("installed", "to upgrade")),
+                        ]
+                    )
+                )
+                if group is None or group._name != "res.groups" or not installed:
+                    raise UserError(
+                        self.env._(
+                            "%(group)s is not the external id of a group of an "
+                            "installed module nor of an applied group of the "
+                            "project.",
+                            group=xmlid,
+                        )
+                    )
+            if item not in result:
+                result.append(item)
+        return ",".join(result)
+
     def _mode_value(self, model, node, kind, value):
         if value not in studio_arch.TIMELINE_MODES:
             raise UserError(self.env._("Invalid value %(value)s.", value=value))
@@ -2493,6 +2628,18 @@ class ErplibreStudioProject(models.Model):
                 return "True"
             if text in ("0", "False", "false"):
                 return "False"
+        if kind == "groups":
+            return ",".join(item.strip() for item in text.split(",") if item.strip())
+        if kind == "field_domain":
+            try:
+                return repr(
+                    [
+                        tuple(t) if isinstance(t, list) else t
+                        for t in ast.literal_eval(text)
+                    ]
+                )
+            except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
+                return text
         return text
 
     def _op_set_attribute(self, view, arch, op):
@@ -2505,6 +2652,11 @@ class ErplibreStudioProject(models.Model):
         settable = studio_arch.SETTABLE_ATTRIBUTES.get(view.type, {})
         kind = settable.get(node.tag, {}).get(attribute)
         if node.tag == view.type and node.getparent() is not None:
+            kind = None
+        if node.tag == "field" and any(
+            parent.tag == "field" for parent in node.iterancestors()
+        ):
+            # A field of the sub-view of an x2many belongs to its comodel.
             kind = None
         if not kind:
             raise UserError(
@@ -2537,6 +2689,19 @@ class ErplibreStudioProject(models.Model):
             replaced.unlink()
             return replaced.browse()
         payload = {"attribute": attribute, "value": value, "fields": named}
+        if kind == "groups":
+            # The external ids the generation depends on and a removal of a
+            # group of the project checks.
+            payload["groups"] = [x.lstrip("!") for x in value.split(",") if x]
+        elif kind == "field_domain" and value:
+            payload["domain_model"] = self._domain_comodel(view.model, node.get("name"))
+            payload["domain_fields"] = sorted(
+                {
+                    term[0].split(".", 1)[0]
+                    for term in ast.literal_eval(value)
+                    if isinstance(term, tuple) and isinstance(term[0], str)
+                }
+            )
         if replaced:
             replaced._set_payload(payload)
             return replaced
@@ -3322,9 +3487,32 @@ class ErplibreStudioProject(models.Model):
         groups of the project that named it lose it."""
         self.ensure_one()
         project = self._editing()
+        project._studio_check_group_in_views(group)
         project.access_line_ids.filtered(lambda a: a.group_line_id == group).unlink()
         group.with_context(**{NO_TOUCH_KEY: True}).unlink()
         self._touch()
+
+    def _studio_check_group_in_views(self, group):
+        """Raise UserError while a change of the project shows a node of a
+        view for the group of the project ``group`` only (« groups »): the
+        view would name an external id that no longer exists."""
+        self.ensure_one()
+        xmlid = group._studio_full_xmlid()
+        items = [
+            f"{change._studio_view_label()} · {change.xpath}"
+            for change in self.change_ids
+            if change.change_type == "set_attribute"
+            and xmlid in (change._payload().get("groups") or [])
+        ]
+        if items:
+            raise UserError(
+                self.env._(
+                    "The group %(group)s cannot be removed: %(items)s show for "
+                    "it. Remove it from these fields first.",
+                    group=group.name,
+                    items=", ".join(sorted(set(items))),
+                )
+            )
 
     def _studio_set_access(self, rows):
         """Replace the access rows of the project by ``rows`` [{model,

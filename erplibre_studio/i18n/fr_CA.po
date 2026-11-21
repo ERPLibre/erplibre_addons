@@ -7334,3 +7334,127 @@ msgstr "Les enregistrements qui y pointent restent, sans le lien."
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "The studio does not add fields to this model."
 msgstr "Le studio n'ajoute pas de champs à ce modèle."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(group)s is not the external id of a group of an installed module nor of an"
+" applied group of the project."
+msgstr ""
+"%(group)s n'est l'identifiant externe ni d'un groupe d'un module installé ni"
+" d'un groupe appliqué du projet."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(value)s is not a domain: a list of terms (field, operator, value) with "
+"fixed values is needed."
+msgstr ""
+"%(value)s n'est pas un domaine : il faut une liste de termes (champ, "
+"opérateur, valeur) aux valeurs fixes."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Advanced"
+msgstr "Avancé"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Advanced: widget, domain, groups"
+msgstr "Avancé — widget, domaine, groupes"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Apply first"
+msgstr "Appliquer d'abord"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Apply first to name the groups of the project:"
+msgstr "Appliquez d'abord pour nommer les groupes du projet :"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Apply the group %(group)s first: the view names it by its external id."
+msgstr ""
+"Appliquez d'abord le groupe %(group)s : la vue le nomme par son identifiant "
+"externe."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Apply the model %(model)s first."
+msgstr "Appliquez d'abord le modèle %(model)s."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Every user who sees the view"
+msgstr "Tous les utilisateurs qui voient la vue"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "No group %(group)s."
+msgstr "Aucun groupe %(group)s."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Not %(group)s"
+msgstr "Sauf %(group)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Only a relational field takes a domain, not %(name)s."
+msgstr "Seul un champ relationnel prend un domaine, pas %(name)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The domain does not apply: %(error)s"
+msgstr "Le domaine ne s'applique pas : %(error)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The group %(group)s cannot be removed: %(items)s show for it. Remove it from"
+" these fields first."
+msgstr ""
+"Le groupe %(group)s ne peut pas être retiré : %(items)s s'affichent pour "
+"lui. Retirez-le d'abord de ces champs."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "The records the field offers. Empty: all of them."
+msgstr "Les enregistrements que le champ propose. Vide : tous."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Visible for groups"
+msgstr "Visible pour les groupes"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "[('active', '=', True)]"
+msgstr "[('active', '=', True)]"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "restricted"
+msgstr "restreint"
