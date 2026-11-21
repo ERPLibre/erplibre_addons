@@ -3,7 +3,7 @@
 
 {
     "name": "ERPLibre studio generate",
-    "version": "18.0.1.2.0",
+    "version": "18.0.1.3.0",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "license": "AGPL-3",
@@ -32,7 +32,12 @@ Writes an applied *ERPLibre studio* project as an installable module, with
 
 For development databases only: *code_generator* installs only on a
 server started with ``--dev``, and its installation drops the database
-constraint that keeps the names of custom fields starting with ``x_``.
+constraint that keeps the names of custom fields starting with ``x_``;
+this module drops it too when a module added it back, and keeps it out.
+A new field may then go without ``x_``: this module loads it while the
+project is applied, and refuses to be uninstalled until the project is
+reverted or its generated module installed. A module installed later
+that defines a field of the same name takes its column over.
 The destinations are the directories of the ``addons_path`` of the
 server that it can write into. Writing to the disk needs the
 Settings group, the developer mode and
@@ -49,6 +54,7 @@ installed.
     "data": [
         "views/erplibre_studio_project_views.xml",
     ],
+    "post_init_hook": "post_init_hook",
     "auto_install": True,
     "installable": True,
 }

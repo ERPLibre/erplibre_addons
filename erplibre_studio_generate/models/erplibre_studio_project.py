@@ -21,11 +21,12 @@ from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
     PERMS as studio_perms,
 )
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import config, file_open
+from odoo.tools import config, file_open, sql
 from odoo.tools.safe_eval import safe_eval
 
 from .. import version as studio_version
 from .code_generator_writer import app_icon_bytes, project_migration_file
+from .ir_model_fields import MANUAL_NAME_CONNAME
 
 _logger = logging.getLogger(__name__)
 
@@ -255,6 +256,66 @@ class ErplibreStudioProject(models.Model):
                         "cannot contain quotes, backslashes or line breaks: "
                         "%(value)s",
                         value=value,
+                    )
+                )
+
+    # ── technical names without x_ ──────────────────────────────────────
+
+    @api.model
+    def _studio_field_name_rule(self):
+        """The development rule, a name without ``x_`` allowed, while the
+        database lacks the core constraint ``name_manual_field``, which
+        code_generator drops; else the rule of ERPLibre studio. Read on
+        each call: a database where the constraint comes back requires the
+        prefix again."""
+        definition = sql.constraint_definition(
+            self.env.cr, "ir_model_fields", MANUAL_NAME_CONNAME
+        )
+        if definition:
+            return super()._studio_field_name_rule()
+        return {
+            "prefix_required": False,
+            "mode": "development",
+            "label": self.env._("Development · code_generator"),
+            "text": self.env._(
+                "Without x_ allowed: development database (code_generator)"
+            ),
+            "detail": self.env._(
+                "A field without x_ loads with ERPLibre studio generate, until "
+                "its generated module defines it."
+            ),
+        }
+
+    def _field_vals(self, model, name, definition):
+        """The row of a field without ``x_`` carries the mark that loads it
+        (``ir.model.fields._studio_loadable_names``): the registry setup of
+        ``create`` reads the row as it is inserted, no context reaches it."""
+        vals = super()._field_vals(model, name, definition)
+        vals["erplibre_studio_unprefixed"] = not (name or "").startswith("x_")
+        return vals
+
+    def _check_generation_field_names(self):
+        """Raise UserError on a new field without ``x_`` whose name cannot be
+        a field of the generated module: its format, a Python keyword, or a
+        method or an attribute of the model it would replace in the class
+        (``_studio_reserved_field_names``)."""
+        self.ensure_one()
+        for model, name, _definition, _change in self._studio_all_definitions():
+            if (name or "").startswith("x_"):
+                continue
+            refusal = studio_arch.field_name_refusal(
+                name,
+                prefix_required=False,
+                reserved=self._studio_reserved_field_names(model),
+            )
+            if refusal is not None:
+                raise UserError(
+                    self.env._(
+                        "The field %(name)s of %(model)s cannot be written in "
+                        "the generated module: revert the project, rename it "
+                        "in the draft, then Apply again.",
+                        name=name,
+                        model=model,
                     )
                 )
 
@@ -736,6 +797,7 @@ class ErplibreStudioProject(models.Model):
         if not self.item_count:
             raise UserError(self.env._("The project has no change to generate."))
         self._check_generation_texts()
+        self._check_generation_field_names()
         if self.state == "draft":
             raise UserError(self.env._("Apply the draft before generating the module."))
         # The groups and the rules go into every database that installs the

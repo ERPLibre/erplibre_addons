@@ -5,4 +5,5 @@ from . import (
     test_generate_models,
     test_generate_views,
     test_project_generate,
+    test_unprefixed_names,
 )

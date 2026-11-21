@@ -42,3 +42,11 @@
    uninstall wizard lists them and asks to confirm (*ERPLibre studio*).
    In the database of its project, the project is back to a draft with
    its lines, and its next generation starts from a new **Apply**.
+10. On a development database, a new field may go without `x_`: the
+    editor shows the rule « Development · code_generator ». Apply marks
+    such a field, and this module loads it into the registry, which Odoo
+    does for `x_` names only; the generated module defines it under the
+    same name. This module refuses to be uninstalled, directly or with
+    *code_generator*, while such a field exists: **Revert** the project
+    or install its generated module first. A module installed later that
+    defines a field of the same name takes the column over.
