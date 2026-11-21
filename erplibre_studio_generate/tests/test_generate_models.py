@@ -479,6 +479,32 @@ class TestGenerateModels(StudioCase):
             [("studio_page_new_tab", "New tab")],
         )
 
+    def test_field_options(self):
+        """The options set before Apply reach the class of the model: an
+        indexed char of 30 characters, a translatable text."""
+        form = self.item._studio_views()["form"]
+        for field in (
+            {"ttype": "char", "field_description": "Code", "index": True, "size": 30},
+            {"ttype": "text", "field_description": "Notes", "translate": True},
+        ):
+            self.op(
+                self.project,
+                form,
+                type="add_field",
+                target="//group[@name='studio_left']",
+                position="inside",
+                field=field,
+            )
+        self.project.action_apply()
+        self.generate()
+        _attributes, fields = self.class_of(self.read("models", f"{ITEM}.py"))
+        self.assertLessEqual(
+            {"index": True, "size": 30}.items(), fields["x_code"].items()
+        )
+        self.assertNotIn("translate", fields["x_code"])
+        self.assertTrue(fields["x_notes"].get("translate"))
+        self.assertNotIn("index", fields["x_notes"])
+
     # ── checks ─────────────────────────────────────────────────────────
 
     def test_rights_alone_generate(self):

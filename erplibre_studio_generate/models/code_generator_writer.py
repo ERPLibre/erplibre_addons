@@ -37,6 +37,7 @@ from odoo import models
 from odoo.addons.code_generator import code_generator_data
 from odoo.addons.erplibre_studio import arch as studio_arch
 from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
+    FIELD_OPTIONS,
     MODEL_VIEW_PRIORITY,
     STUDIO_PRIORITY,
 )
@@ -60,9 +61,11 @@ _WRITER_IMPORT = re.compile(r"^from odoo import .*$", re.M)
 class PayloadField:
     """An ``ir.model.fields`` record read with the definition of the
     project: label, tooltip, read-only flag, selection, comodel, currency
-    field, and the relation of a relational field (the inverse of a
-    one2many, the table and columns of a many2many, what a many2one does
-    when its record is deleted). Every other attribute is the record's."""
+    field, the options its type takes (translatable, indexed, maximum size
+    of FIELD_OPTIONS), and the relation of a relational field (the inverse
+    of a one2many, the table and columns of a many2many, what a many2one
+    does when its record is deleted). Every other attribute is the
+    record's."""
 
     def __init__(self, record, definition):
         self._record = record
@@ -82,6 +85,12 @@ class PayloadField:
         if definition.get("currency_field"):
             self._values["currency_field"] = definition["currency_field"]
         ttype = definition.get("ttype")
+        if ttype in FIELD_OPTIONS["translate"]:
+            self._values["translate"] = bool(definition.get("translate"))
+        if ttype in FIELD_OPTIONS["index"]:
+            self._values["index"] = bool(definition.get("index"))
+        if ttype in FIELD_OPTIONS["size"]:
+            self._values["size"] = int(definition.get("size") or 0)
         if ttype == "many2one":
             self._values["on_delete"] = definition.get("on_delete") or "set null"
         elif ttype == "one2many" and definition.get("relation_field"):
