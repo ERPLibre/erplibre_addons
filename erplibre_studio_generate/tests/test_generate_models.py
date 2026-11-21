@@ -458,6 +458,27 @@ class TestGenerateModels(StudioCase):
             ("base.menu_custom", "Tags", f"action_{TAG}"),
         )
 
+    def test_layout_written(self):
+        form = self.item._studio_views()["form"]
+        main = "//group[@name='studio_main']"
+        self.op(self.project, form, type="add_group", target=main, position="after")
+        self.op(self.project, form, type="add_page", target=main, position="after")
+        self.project.action_apply()
+        self.generate()
+        root = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode(),
+            etree.XMLParser(remove_blank_text=True),
+        )
+        inherited = root.find(f"record[@id='{MODULE}_view_{ITEM}_form_studio']")
+        arch = inherited.find("field[@name='arch']")
+        group = arch.xpath(".//group[@name='studio_group_new_group']")
+        self.assertEqual(group[0].get("string"), "New group")
+        pages = arch.xpath(".//notebook[@name='studio_notebook']/page")
+        self.assertEqual(
+            [(p.get("name"), p.get("string")) for p in pages],
+            [("studio_page_new_tab", "New tab")],
+        )
+
     # ── checks ─────────────────────────────────────────────────────────
 
     def test_rights_alone_generate(self):
