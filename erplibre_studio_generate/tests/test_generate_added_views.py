@@ -1,0 +1,77 @@
+# © 2026 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+import os
+import shutil
+import tempfile
+from unittest.mock import patch
+
+from lxml import etree
+from odoo.addons.erplibre_studio.tests.common import StudioCase
+from odoo.tests import tagged
+
+MODULE = "studio_test_generate_added"
+
+
+@tagged("post_install", "-at_install")
+class TestGenerateAddedViews(StudioCase):
+    """Generation of a project that adds a pivot view to the contacts, which
+    have none, and changes it."""
+
+    def setUp(self):
+        super().setUp()
+        if self.env["ir.ui.view"].default_view("res.partner", "pivot"):
+            self.skipTest("res.partner has a pivot view in this database")
+        self.destination = tempfile.mkdtemp(prefix="erplibre_studio_test_")
+        self.addCleanup(shutil.rmtree, self.destination, True)
+        choices = [(self.destination, self.destination)]
+        patcher = patch.object(
+            type(self.Project), "_destination_choices", lambda self_: choices
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.project = self.make_project(MODULE, destination=self.destination)
+        self.Editor.add_view(self.project.id, "res.partner", "pivot")
+        self.line = self.project.view_line_ids
+        view = self.Editor._resolve_view("res.partner", False, "pivot", self.project)
+        self.op(
+            self.project,
+            view,
+            type="add_existing_field",
+            target="/pivot",
+            position="inside",
+            field_name="create_date",
+            axis="col",
+            interval="month",
+        )
+
+    def read(self, *parts):
+        with open(
+            os.path.join(self.destination, MODULE, *parts), encoding="utf-8"
+        ) as fh:
+            return fh.read()
+
+    def test_generate(self):
+        with self.server_actions():
+            self.project.action_apply()
+            self.project.action_generate()
+        self.assertIn("base", self.project._dependencies())
+        views = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        records = [r.get("id") for r in views.findall("record")]
+        xml_name = "res_partner_view_pivot"
+        studio_name = f"{MODULE}_{xml_name}_studio"
+        # The view comes before the inherited view that refers to it.
+        self.assertEqual(records, [xml_name, studio_name])
+        primary = views.find(f"record[@id='{xml_name}']")
+        self.assertEqual(primary.find("field[@name='model']").text, "res.partner")
+        self.assertEqual(primary.find("field[@name='type']").text, "pivot")
+        self.assertEqual(primary.find("field[@name='priority']").text, "16")
+        self.assertEqual(primary.find("field[@name='arch']/pivot").tag, "pivot")
+        studio = views.find(f"record[@id='{studio_name}']")
+        self.assertEqual(
+            studio.find("field[@name='inherit_id']").get("ref"),
+            f"{MODULE}.{xml_name}",
+        )
+        self.assertIn(xml_name, self.read("readme", "DESCRIPTION.md"))

@@ -16,8 +16,9 @@ actions and every view of the model. Under the context key
   and on the existing models, whether the project adds fields to them or
   not;
 - studio writes the views file itself: the default views of the new
-  models, the inherited views, the window actions, the menu of each app
-  and the menus of the models;
+  models, the views the project adds to existing models, the inherited
+  views, the window actions, the menu of each app and the menus of the
+  models;
 - studio writes the groups file itself: the category of each app that
   has groups, then the groups, each after the groups it implies; and the
   icon of each app, a copy of the icon chosen for it.
@@ -394,8 +395,9 @@ def _field(parent, name, text=None, **attrs):
 def project_views_file(project):
     """The XML data file of the views, actions and menus of ``project``,
     under the external ids the database already uses, in the order their
-    references need: the default views of the new models, one inherited
-    view per edited view, the window actions, then the top-level menu of
+    references need: the default views of the new models, the views the
+    project adds to existing models (primary, with the arch their line
+    recorded), one inherited view per edited view, the window actions, then the top-level menu of
     each app a model goes in, with the icon the generation copies into
     the module, and the menus of the models."""
     root = etree.Element("odoo")
@@ -414,6 +416,16 @@ def project_views_file(project):
             arch.append(
                 etree.fromstring(project._studio_default_arch(line, view_type), parser)
             )
+    for added in project.view_line_ids:
+        record = etree.SubElement(
+            root, "record", id=added._studio_xml_name(), model="ir.ui.view"
+        )
+        _field(record, "name", added._studio_view_name())
+        _field(record, "model", added.model)
+        _field(record, "type", added.view_type)
+        _field(record, "priority", str(MODEL_VIEW_PRIORITY))
+        arch = _field(record, "arch", type="xml")
+        arch.append(etree.fromstring(added.arch, parser))
     for view in project.change_ids.mapped("view_id").sorted("id"):
         changes = [c._as_dict() for c in project._view_changes(view)]
         record = etree.SubElement(
