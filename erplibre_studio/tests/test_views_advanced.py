@@ -207,7 +207,9 @@ class TestViewsAdvanced(StudioCase):
         self.assertEqual(payload["value"], f"base.group_system,!{new}")
         self.assertEqual(payload["groups"], ["base.group_system", new])
         self.assertEqual(self.project.state, "draft")
-        self.project.action_apply()
+        # The check of the view knows the group under its new external id.
+        with self.assertNoLogs("odoo.addons.base.models.ir_ui_view", "WARNING"):
+            self.project.action_apply()
         arch = self.form_view._get_combined_arch()
         self.assertEqual(
             arch.xpath(named("country_id"))[0].get("groups"),

@@ -4189,6 +4189,11 @@ class ErplibreStudioProject(models.Model):
                         ("res_id", "in", record.ids),
                     ]
                 ).write({"module": new_name})
+        if self.created_group_ids:
+            # ir.model.data clears the « groups » cache only on a write of
+            # its « model »: without this, the check of a view and
+            # has_group still know a group under its former external id.
+            self.env.registry.clear_cache("groups")
         prefix = f"{old_name}_"
         for view in self.studio_view_ids.sudo():
             if view.inherit_id not in self.created_view_ids:
