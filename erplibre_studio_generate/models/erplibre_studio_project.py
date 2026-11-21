@@ -262,8 +262,8 @@ class ErplibreStudioProject(models.Model):
         """The checks of ``_check_manifest_text`` and ``_check_field_texts``
         again, on the texts as they are: a project recorded before this
         module was installed went through none of them. The label of a new
-        model becomes its ``_description``; the label of the inverse
-        many2one a one2many creates, a field label; the names of the apps
+        model becomes its ``_description``; the label of the inverse field
+        a one2many or a many2one creates, a field label; the names of the apps
         and of the groups and the comments of the groups go into the data
         files and take the same rule."""
         self.ensure_one()
@@ -341,7 +341,7 @@ class ErplibreStudioProject(models.Model):
     def _generation_models(self):
         """The models of the generated module: the new models and the
         models the new fields extend, the comodels that receive the inverse
-        many2one of a one2many included."""
+        field of a one2many or of a many2one included."""
         return sorted(
             {model for model, *_rest in self._studio_all_definitions()}
             | self._studio_new_models()
@@ -387,7 +387,7 @@ class ErplibreStudioProject(models.Model):
         """The modules the generated module depends on: those of the edited
         views, of their view types and of the nodes the changes locate
         (read from the branding of the combined arch), of the models
-        extended (by a field or by the inverse of a one2many), of the
+        extended (by a field or by the inverse of a relational field), of the
         fields added or named by the changes (a filter domain, a group-by,
         a timeline date) and of the comodels; those of the models and the
         view types of the views the project adds; mail for a chatter; those of

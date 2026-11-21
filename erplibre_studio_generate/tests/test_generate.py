@@ -372,3 +372,32 @@ class TestGenerate(StudioCase):
         self.assertNotIn("x_tier", model)
         self.assertEqual(model.count(" = fields."), 2)
         self.assertIn("x_sponsor", self.read("views", "erplibre_studio_views.xml"))
+
+    def test_many2one_with_its_inverse_one2many(self):
+        """A many2one whose inverse one2many the studio creates: the module
+        extends the comodel with a One2many to the many2one."""
+        self.op(
+            self.project,
+            self.form,
+            type="add_field",
+            target="//field[@name='vat']",
+            position="after",
+            field={
+                "ttype": "many2one",
+                "field_description": "Tag sponsor",
+                "relation": "res.partner.category",
+                "inverse_o2m": {"create": True},
+            },
+        )
+        self.project.action_apply()
+        self.assertIn("res.partner.category", self.project._generation_models())
+        with self.server_actions():
+            self.project.action_generate()
+        model = self.read("models", "res_partner.py")
+        self.assertIn("x_tag_sponsor = fields.Many2one(", model)
+        comodel = self.read("models", "res_partner_category.py")
+        compile(comodel, "res_partner_category.py", "exec")
+        self.assertIn('_inherit = "res.partner.category"', comodel)
+        self.assertIn("x_contact_ids = fields.One2many(", comodel)
+        self.assertIn('inverse_name="x_tag_sponsor"', comodel)
+        self.assertIn('comodel_name="res.partner"', comodel)
