@@ -3211,6 +3211,58 @@ class ErplibreStudioProject(models.Model):
         )
         return self._studio_dependent_changes(naming)
 
+    def _studio_change_removal(self, changes):
+        """``changes`` (of this project) with every change that leaves the
+        draft with them, sorted in the order they apply, until none is
+        added: on each view, the later changes that no longer act on the
+        same node (``arch.dependent_changes``: a node a removed change adds,
+        a positional XPath that would find another node); the changes that
+        name a field a removed « add_field » creates
+        (``_studio_changes_of_fields``, which matches the name in the XPath
+        and the parameters, so a change that only mentions it goes too);
+        the changes that show an inverse a removed one2many creates
+        (``_studio_inverse_dependents``). A read: nothing is removed."""
+        self.ensure_one()
+        result = changes
+        todo = changes
+        while todo:
+            found = self.env["erplibre.studio.change"]
+            for view in {self._change_view(change) for change in todo}:
+                view_changes = self._view_changes(view)
+                keys = studio_arch.dependent_changes(
+                    self._base_arch(view),
+                    [c._as_dict() for c in view_changes],
+                    view.type,
+                    set((result & view_changes).ids),
+                )
+                found |= view_changes.filtered(lambda c, k=keys: c.id in k)
+            names = {}
+            for change in todo.filtered(
+                lambda c: c.change_type == "add_field" and c.field_name
+            ):
+                names.setdefault(change.model, set()).add(change.field_name)
+            if names:
+                found |= self._studio_changes_of_fields(names)
+            found |= self._studio_inverse_dependents(todo)
+            todo = found - result
+            result |= found
+        return result.sorted(lambda c: (c.sequence, c.id))
+
+    def _studio_remove_changes(self, changes):
+        """Remove ``changes`` (of this project) from the draft with the
+        changes of ``_studio_change_removal``; UserError, and nothing
+        removed, when one is a one2many whose inverse another one2many of
+        the project takes (``_studio_check_inverse_removal``). Return the
+        ids of the removed changes."""
+        self.ensure_one()
+        project = self._editing()
+        removed = project._studio_change_removal(changes.with_env(project.env))
+        project._studio_check_inverse_removal(removed)
+        ids = removed.ids
+        removed.unlink()
+        project._touch()
+        return ids
+
     def action_undo(self, view=None):
         """Remove the last change (of ``view`` when given); a one2many goes
         with the changes that show the inverse it creates

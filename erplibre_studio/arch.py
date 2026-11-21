@@ -404,6 +404,9 @@ ADDED_MARK = "erplibre_studio_added"
 # the changes touch: space-separated « key:kind » tokens (see
 # ``change_kind``); never written to a view.
 CHANGE_MARK = "erplibre_studio_changes"
+# The attribute that gives each node, in the archs ``dependent_changes``
+# compares, an identity the changes keep; never written to a view.
+UID_MARK = "data-erplibre-studio-uid"
 # The kinds of ``change_kind``, in the order the editor lists them.
 CHANGE_KINDS = ("new", "renamed", "hidden", "moved", "attribute")
 
@@ -1018,6 +1021,109 @@ def changes_on_added(arch, changes, view_type, key, child=None):
                 for node in top.iterdescendants():
                     if node.get("name") == child:
                         node.set(ADDED_MARK, mark)
+    return found
+
+
+def _with_uids(arch):
+    """A copy of ``arch`` whose elements carry UID_MARK « b<n> », ``n``
+    their index in document order."""
+    marked = copy.deepcopy(arch)
+    nodes = [node for node in marked.iter() if isinstance(node.tag, str)]
+    for index, node in enumerate(nodes):
+        node.set(UID_MARK, f"b{index}")
+    return marked
+
+
+def _apply_uid(arch, change, view_type):
+    """``arch`` with ``change`` applied, a new element; raise when it does
+    not apply. Every element its spec inserts (the items of ``_mark_added``
+    and their descendants) carries UID_MARK « <key>.<n> », ``n`` its index
+    in the spec: the same node gets the same mark in two applications of
+    the change. A moved node keeps its attributes, so its mark."""
+    spec = change_spec(change, view_type)
+    index = 0
+    for item in list(spec) if spec.tag == "data" else [spec]:
+        if item.get("position") not in POSITIONS:
+            continue
+        for child in elements(item):
+            if child.tag == "xpath":
+                continue
+            for node in child.iter():
+                if isinstance(node.tag, str):
+                    node.set(UID_MARK, f"{change['key']}.{index}")
+                    index += 1
+    return apply_inheritance_specs(copy.deepcopy(arch), spec)
+
+
+def _uid_at(arch, xpath):
+    """The UID_MARK of the node ``xpath`` locates in ``arch``, or None."""
+    try:
+        return locate(arch, xpath).get(UID_MARK)
+    except ArchError:
+        return None
+
+
+def _target_uids(arch, change):
+    """The UID_MARK of the nodes ``change`` locates in ``arch`` before it
+    applies: the one of its XPath, then the one of the source of a move."""
+    payload = change.get("payload") or {}
+    return tuple(
+        _uid_at(arch, path) if path else None
+        for path in (change.get("xpath"), payload.get("source"))
+    )
+
+
+def _try_apply_uid(arch, change, view_type):
+    """``_apply_uid``, or None when the change does not apply."""
+    try:
+        return _apply_uid(arch, change, view_type)
+    except Exception:  # noqa: BLE001 - a change that fails is skipped
+        return None
+
+
+def dependent_changes(arch, changes, view_type, removed):
+    """The keys, in order, of the changes of ``changes`` (dicts of
+    ``change_spec``, in the order they apply to ``arch``) outside
+    ``removed`` (a set of keys) that no longer act on the same node once
+    the changes ``removed`` leave: a later change locates its nodes in the
+    arch the earlier ones leave, so a positional XPath can find another
+    node, and a node a removed change adds is no longer there.
+
+    One pass over two archs whose nodes carry an identity (UID_MARK): the
+    « full » arch takes every change, the « kept » arch every change but
+    the removed ones and the dependents found so far. A change depends on
+    the removed ones when the nodes it locates (its XPath, the source of a
+    move, the moved node a move sets attributes on) are not the same
+    nodes in both archs, or when it applies in one and not in the other:
+    a change that fails today and would apply elsewhere counts. Each
+    dependent joins the removed set, so a change on a node a dependent
+    adds is found too. The archs are copies: ``arch`` is left untouched."""
+    gone = set(removed)
+    full = kept = _with_uids(arch)
+    found = []
+    for change in changes:
+        key = change["key"]
+        before_full = _target_uids(full, change)
+        after_full = _try_apply_uid(full, change, view_type)
+        if key not in gone:
+            before_kept = _target_uids(kept, change)
+            after_kept = _try_apply_uid(kept, change, view_type)
+            same = before_full == before_kept and (after_full is None) == (
+                after_kept is None
+            )
+            attrs_xpath = (change.get("payload") or {}).get("attrs_xpath")
+            if same and after_full is not None and attrs_xpath:
+                same = _uid_at(after_full, attrs_xpath) == _uid_at(
+                    after_kept, attrs_xpath
+                )
+            if same:
+                if after_kept is not None:
+                    kept = after_kept
+            else:
+                gone.add(key)
+                found.append(key)
+        if after_full is not None:
+            full = after_full
     return found
 
 

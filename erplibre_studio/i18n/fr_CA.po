@@ -6341,6 +6341,12 @@ msgstr "Cette application n'est pas une application du projet."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_change_removal.py:0
+msgid "This change is not in the draft of the project."
+msgstr "Ce changement n'est pas dans le brouillon du projet."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "This field is loaded by the view for its templates: it cannot move nor be "
@@ -6785,6 +6791,14 @@ msgid ""
 msgstr ""
 "Ce que l'action retire a changé depuis son affichage : vérifiez-le de "
 "nouveau avant de confirmer."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_change_removal.py:0
+msgid "What this undo removes changed since you confirmed it: check it again."
+msgstr ""
+"Ce que cette annulation retire a changé depuis votre confirmation : "
+"vérifiez de nouveau."
 
 #. module: erplibre_studio
 #. odoo-javascript

@@ -5,6 +5,7 @@ from . import (
     test_apps,
     test_arch,
     test_arch_views,
+    test_change_removal,
     test_confirm,
     test_editor_models,
     test_editor_payload,

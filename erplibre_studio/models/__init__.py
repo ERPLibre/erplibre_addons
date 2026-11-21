@@ -7,6 +7,7 @@ from . import (
     erplibre_studio_preview,
     erplibre_studio_report,
     erplibre_studio_review,
+    erplibre_studio_change_removal,
     erplibre_studio_model,
     erplibre_studio_view,
     erplibre_studio_access,

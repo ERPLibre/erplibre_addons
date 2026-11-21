@@ -6042,6 +6042,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_change_removal.py:0
+msgid "This change is not in the draft of the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "This field is loaded by the view for its templates: it cannot move nor be "
@@ -6468,6 +6474,12 @@ msgstr ""
 msgid ""
 "What the action removes changed since it was shown: check it again before "
 "confirming."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_change_removal.py:0
+msgid "What this undo removes changed since you confirmed it: check it again."
 msgstr ""
 
 #. module: erplibre_studio

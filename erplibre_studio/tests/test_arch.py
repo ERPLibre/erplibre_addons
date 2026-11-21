@@ -155,6 +155,80 @@ class TestArch(BaseCase):
         # The arch given is left untouched.
         self.assertEqual(len(self.root.xpath("//field[@name='x_note']")), 0)
 
+    def test_dependent_changes(self):
+        """The changes that no longer act on the same node once others
+        leave: a positional XPath that finds another node, a node a removed
+        change adds, and so on down the chain; a change by name stays."""
+        root = etree.fromstring(
+            '<form><group><field name="a"/></group>'
+            '<group><field name="b"/></group></form>'
+        )
+        dependent = studio_arch.dependent_changes
+        move = {
+            "key": 1,
+            "type": "move",
+            "xpath": "/form/group[1]",
+            "position": "before",
+            "payload": {"source": "/form/group[2]"},
+        }
+        # The first group is the moved one only while the move applies.
+        title = {
+            "key": 2,
+            "type": "set_attribute",
+            "xpath": "/form/group[1]",
+            "payload": {"attribute": "string", "value": "First"},
+        }
+        by_name = {
+            "key": 3,
+            "type": "relabel",
+            "xpath": "//field[@name='a']",
+            "payload": {"value": "A"},
+        }
+        changes = [move, title, by_name]
+        self.assertEqual(dependent(root, changes, "form", {1}), [2])
+        self.assertEqual(dependent(root, changes, "form", {2}), [])
+        self.assertEqual(dependent(root, changes, "form", {3}), [])
+        # The marks of the comparison stay out of the arch given.
+        self.assertFalse(root.xpath(f"//*[@{studio_arch.UID_MARK}]"))
+        add = {
+            "key": 1,
+            "type": "add_field",
+            "xpath": "//field[@name='a']",
+            "position": "after",
+            "payload": {"field_name": "x_new"},
+        }
+        relabel = {
+            "key": 2,
+            "type": "relabel",
+            "xpath": "//field[@name='x_new']",
+            "payload": {"value": "New"},
+        }
+        self.assertEqual(dependent(root, [add, relabel, by_name], "form", {1}), [2])
+        group = {
+            "key": 1,
+            "type": "add_node",
+            "xpath": "/form/group[2]",
+            "position": "after",
+            "payload": {"node": {"tag": "group", "attrs": {"name": "x_outer"}}},
+        }
+        inner = {
+            "key": 2,
+            "type": "add_node",
+            "xpath": "//group[@name='x_outer']",
+            "position": "inside",
+            "payload": {"node": {"tag": "group", "attrs": {"name": "x_inner"}}},
+        }
+        field = {
+            "key": 3,
+            "type": "add_field",
+            "xpath": "//group[@name='x_inner']",
+            "position": "inside",
+            "payload": {"field_name": "x_deep"},
+        }
+        chain = [group, inner, by_name, field]
+        self.assertEqual(dependent(root, chain, "form", {1}), [2, 3])
+        self.assertEqual(dependent(root, chain, "form", {2}), [3])
+
     def test_view_arch(self):
         text = studio_arch.view_arch(
             [
