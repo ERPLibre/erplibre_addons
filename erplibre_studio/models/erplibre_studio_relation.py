@@ -1,7 +1,7 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models
+from odoo import api, models
 from odoo.exceptions import UserError
 from odoo.tools import sql
 
@@ -23,7 +23,8 @@ RELATION_KEYS = (
 class ErplibreStudioProject(models.Model):
     """The relational fields of a project: one2many (to an existing inverse
     many2one, or to one the project creates on the comodel), many2many (to
-    a relation table named after the module), and the many2one."""
+    a relation table named after the module), and the many2one, with the
+    one2many the project may create on its comodel."""
 
     _inherit = "erplibre.studio.project"
 
@@ -31,9 +32,9 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_field_definitions(self, model):
         """{name: (definition, change)} of the new fields of the project on
-        ``model``: those its add_field changes add, and the inverse many2one
-        a one2many of the project creates on ``model`` (with the change of
-        that one2many)."""
+        ``model``: those its add_field changes add, and the inverse fields
+        its one2many and many2one create on ``model`` (with the change of
+        the field that creates them)."""
         self.ensure_one()
         result = {}
         for change in self._project_field_changes():
@@ -47,16 +48,32 @@ class ErplibreStudioProject(models.Model):
         return result
 
     def _studio_inverse_definition(self, model, definition):
-        """(name, definition) of the many2one the one2many ``definition``
-        of ``model`` creates on its comodel, or None. What it does when its
+        """(name, definition) of the inverse field the relational field
+        ``definition`` of ``model`` creates on its comodel, or None: the
+        many2one of a one2many (``inverse_new``), the one2many of a
+        many2one (``inverse_o2m``). What the inverse many2one does when its
         record is deleted comes from the comodel, whatever the payload says:
         « cascade » on a model of the project, « set null » on a model of the
         database, whose records the deletion of a record of the project must
         never take with it."""
-        inverse = definition.get("inverse_new") or {}
-        if definition.get("ttype") != "one2many" or not inverse.get("name"):
-            return None
+        ttype = definition.get("ttype")
         comodel = definition.get("relation")
+        if ttype == "many2one":
+            inverse = definition.get("inverse_o2m") or {}
+            if not inverse.get("name"):
+                return None
+            return inverse["name"], {
+                "ttype": "one2many",
+                "field_description": inverse.get("field_description")
+                or inverse["name"],
+                "readonly": False,
+                "help": "",
+                "relation": model,
+                "relation_field": inverse.get("relation_field"),
+            }
+        inverse = definition.get("inverse_new") or {}
+        if ttype != "one2many" or not inverse.get("name"):
+            return None
         return inverse["name"], {
             "ttype": "many2one",
             "field_description": inverse.get("field_description") or inverse["name"],
@@ -67,6 +84,18 @@ class ErplibreStudioProject(models.Model):
                 "cascade" if comodel in self._studio_new_models() else "set null"
             ),
         }
+
+    def _studio_inverse_owner(self, model, name):
+        """The add_field change of the project whose field creates the
+        inverse field ``name`` on ``model`` (``_studio_inverse_definition``),
+        or an empty recordset."""
+        self.ensure_one()
+        for change in self._project_field_changes():
+            definition = change._payload().get("field") or {}
+            inverse = self._studio_inverse_definition(change.model, definition)
+            if inverse and inverse[0] == name and definition.get("relation") == model:
+                return change
+        return self._project_field_changes().browse()
 
     def _studio_all_definitions(self):
         """[(model, name, definition, change)] of every new field of the
@@ -223,6 +252,89 @@ class ErplibreStudioProject(models.Model):
             },
         }
 
+    @api.model
+    def _studio_inverse_o2m_name(self, label, taken):
+        """The name the inverse one2many of a many2one labelled ``label``
+        proposes: « x_<label>_ids », not in ``taken``."""
+        return studio_arch.field_name_from_label(f"{label} ids", taken)
+
+    def _clean_many2one_inverse(self, model, name, comodel, field, existing=None):
+        """The ``inverse_o2m`` of the new many2one ``name`` of ``model`` to
+        ``comodel``: {name, field_description, relation_field}, the one2many
+        the project creates on the comodel, which lists the records of
+        ``model`` that point to a record; None when ``field["inverse_o2m"]``
+        is empty. Its label defaults to the label of ``model``, its name to
+        one made of that label, free on the comodel. ``existing``: the
+        definition the many2one had; while it has an inverse, its comodel
+        does not change. Once the many2one is in the database, its inverse
+        is neither added, removed nor renamed: only its label changes."""
+        existing = existing or {}
+        previous = existing.get("inverse_o2m") or {}
+        if previous and comodel != existing.get("relation"):
+            raise UserError(
+                self.env._(
+                    "Remove the inverse field %(inverse)s first: the comodel of "
+                    "%(name)s does not change while it exists.",
+                    inverse=previous.get("name"),
+                    name=name,
+                )
+            )
+        inverse = field.get("inverse_o2m") or {}
+        if not isinstance(inverse, dict):
+            inverse = {"create": True}
+        applied = bool(existing) and self._studio_field_applied(model, name)
+        if not inverse:
+            if previous and applied:
+                raise UserError(
+                    self.env._(
+                        "The inverse field of %(name)s changes only before Apply.",
+                        name=name,
+                    )
+                )
+            return None
+        if protected_model(comodel):
+            raise UserError(
+                self.env._(
+                    "The studio does not add fields to %(model)s: choose an "
+                    "existing inverse.",
+                    model=comodel,
+                )
+            )
+        label = (
+            (inverse.get("field_description") or "").strip()
+            or previous.get("field_description")
+            or self._studio_model_label(model)
+        )
+        self._check_field_texts(label, "")
+        inverse_name = (inverse.get("name") or "").strip() or previous.get("name")
+        if not inverse_name:
+            taken = self._taken_field_names(comodel)
+            if comodel == model:
+                taken.add(name)
+            inverse_name = self._studio_inverse_o2m_name(label, taken)
+        if inverse_name != previous.get("name"):
+            if applied:
+                raise UserError(
+                    self.env._(
+                        "The inverse field of %(name)s changes only before Apply.",
+                        name=name,
+                    )
+                )
+            if comodel == model and inverse_name == name:
+                raise UserError(
+                    self.env._("The field %(name)s already exists.", name=name)
+                )
+            problem = self._studio_field_name_problem(
+                comodel, inverse_name, own=previous.get("name") or None
+            )
+            if problem:
+                raise UserError(problem["message"])
+        return {
+            "name": inverse_name,
+            "field_description": label,
+            "relation_field": name,
+        }
+
     def _clean_many2many(self, model, name, field):
         """The relation keys of a new many2many ``name`` of ``model``: its
         comodel, and the relation table and columns the server names
@@ -288,7 +400,8 @@ class ErplibreStudioProject(models.Model):
         for change in changes.filtered(lambda c: c.change_type == "add_field"):
             definition = change._payload().get("field") or {}
             inverse = self._studio_inverse_definition(change.model, definition)
-            if not inverse:
+            # The one2many of a many2one is the inverse of no other field.
+            if not inverse or inverse[1]["ttype"] != "many2one":
                 continue
             for other in staying:
                 other_def = other._payload().get("field") or {}
@@ -310,10 +423,10 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_inverse_dependents(self, changes):
         """``changes`` (changes of the project that leave the draft) with the
-        changes of the project that show a many2one one of their one2many
-        creates on its comodel (``inverse_new``), and the changes that
-        depend on the nodes these add, until none is added: the inverse
-        leaves the draft with its one2many."""
+        changes of the project that show an inverse field one of their
+        fields creates on its comodel (``_studio_inverse_definition``), and
+        the changes that depend on the nodes these add, until none is
+        added: the inverse leaves the draft with its field."""
         self.ensure_one()
         result = changes
         todo = changes
@@ -370,7 +483,9 @@ class ErplibreStudioProject(models.Model):
                             model=model,
                         )
                     )
-            if ttype == "one2many" and definition.get("inverse_new"):
+            if (ttype == "one2many" and definition.get("inverse_new")) or (
+                ttype == "many2one" and definition.get("inverse_o2m")
+            ):
                 if protected_model(relation):
                     raise UserError(
                         self.env._(

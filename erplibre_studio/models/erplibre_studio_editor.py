@@ -185,8 +185,10 @@ class ErplibreStudioEditor(models.AbstractModel):
         """The fields of ``model`` (simulated for a model of the project not
         created yet) with the new fields of the project on it, flagged
         ``project``, ``pending`` until Apply creates them, their
-        ``definition``, and ``name_auto``: whether the technical name still
-        follows the label (False for the inverse many2one of a one2many)."""
+        ``definition``, ``inverse_protected`` for a many2one whose comodel
+        takes no inverse one2many, and ``name_auto``: whether the technical
+        name still follows the label (False for an inverse field, which the
+        field that creates it names)."""
         line = project._studio_pending_line(model) if project else None
         if line:
             info = project._studio_simulated_fields(line)
@@ -223,6 +225,9 @@ class ErplibreStudioEditor(models.AbstractModel):
                 and change.field_name == name
                 and change._payload().get("name_auto", True)
             )
+            if definition.get("ttype") == "many2one":
+                # The studio adds no inverse one2many to such a comodel.
+                entry["inverse_protected"] = protected_model(definition.get("relation"))
         return info
 
     @api.model
@@ -735,7 +740,8 @@ class ErplibreStudioEditor(models.AbstractModel):
             | set(project.rule_line_ids.mapped("model"))
             | set(project.view_line_ids.mapped("model"))
         )
-        # A one2many of the project creates its inverse on the comodel.
+        # A one2many or a many2one of the project creates its inverse on
+        # the comodel.
         for change in project._project_field_changes():
             definition = change._payload().get("field") or {}
             if project._studio_inverse_definition(change.model, definition):
@@ -1524,14 +1530,21 @@ class ErplibreStudioEditor(models.AbstractModel):
         if not (model in self.env or project._studio_pending_line(model)):
             raise UserError(self.env._("Unknown model %(model)s.", model=model))
         own = field_name or None
-        if not label and own:
-            change = project._field_add_change(model, own)
-            label = (change._payload().get("field") or {}).get("field_description")
+        # The field renamed: a field of the project on ``model``, or an
+        # inverse field another field of the project creates on it.
+        definition, owner = project._studio_field_definitions(model).get(
+            own, ({}, None)
+        )
+        label = label or definition.get("field_description")
         proposed = False
         if label:
-            proposed = studio_arch.field_name_from_label(
-                label, project._taken_field_names(model) - {own}
-            )
+            taken = project._taken_field_names(model) - {own}
+            inverse = owner and not (owner.model == model and owner.field_name == own)
+            if inverse and definition.get("ttype") == "one2many":
+                # The inverse one2many of a many2one: « x_<label>_ids ».
+                proposed = project._studio_inverse_o2m_name(label, taken)
+            else:
+                proposed = studio_arch.field_name_from_label(label, taken)
         name = (name or "").strip() or proposed or ""
         status = project._studio_field_name_status(model, name, own)
         if status["code"] is None:

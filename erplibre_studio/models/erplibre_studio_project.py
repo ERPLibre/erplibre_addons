@@ -1150,7 +1150,8 @@ class ErplibreStudioProject(models.Model):
     def _taken_field_names(self, model):
         """The field names a new field of ``model`` cannot take: those of the
         model (simulated for a model not created yet), those the projects
-        add to it, and the inverse many2one their one2many create on it."""
+        add to it, and the inverse fields their one2many and many2one
+        create on it."""
         line = self._studio_pending_line(model)
         if line:
             names = set(self._studio_simulated_fields(line))
@@ -1163,21 +1164,26 @@ class ErplibreStudioProject(models.Model):
             ).mapped("field_name")
         )
         for change in Change.search(
-            [("change_type", "=", "add_field"), ("payload", "ilike", "inverse_new")]
+            [
+                ("change_type", "=", "add_field"),
+                "|",
+                ("payload", "ilike", "inverse_new"),
+                ("payload", "ilike", "inverse_o2m"),
+            ]
         ):
             field = change._payload().get("field") or {}
-            inverse = field.get("inverse_new") or {}
-            if field.get("relation") == model and inverse.get("name"):
-                names.add(inverse["name"])
+            inverse = self._studio_inverse_definition(change.model, field)
+            if inverse and field.get("relation") == model:
+                names.add(inverse[0])
         return names
 
     def _clean_field_definition(self, model, field, name=None, existing=None):
         """A checked definition of a new field: {ttype, field_description,
-        readonly, help, selection, relation, on_delete, relation_field,
-        inverse_new, relation_table, column1, column2, currency_field}.
-        ``name`` is the field name; None makes one from the label.
-        ``existing``: the definition the field had, whose relation an x2many
-        keeps."""
+        readonly, help, selection, relation, on_delete, inverse_o2m,
+        relation_field, inverse_new, relation_table, column1, column2,
+        currency_field}. ``name`` is the field name; None makes one from the
+        label. ``existing``: the definition the field had, whose relation an
+        x2many keeps, and a many2one while it has an inverse one2many."""
         ttype = field.get("ttype")
         if ttype not in NEW_FIELD_TYPES:
             raise UserError(self.env._("Unknown field type %(type)s.", type=ttype))
@@ -1199,6 +1205,11 @@ class ErplibreStudioProject(models.Model):
         elif ttype == "many2one":
             definition["relation"] = self._clean_relation(field)
             definition["on_delete"] = self._clean_on_delete(field)
+            inverse = self._clean_many2one_inverse(
+                model, name, definition["relation"], field, existing
+            )
+            if inverse:
+                definition["inverse_o2m"] = inverse
         elif ttype == "monetary":
             definition["currency_field"] = self._clean_currency(model, field)
         elif ttype in studio_arch.X2MANY_TYPES and existing:
@@ -1276,9 +1287,9 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_project_field_names(self, model):
         """[(name, change)] of the new fields of the project on ``model``:
-        those its add_field changes add, and the inverse many2one its
-        one2many create on ``model``. A name given by two changes is listed
-        twice."""
+        those its add_field changes add, and the inverse fields its one2many
+        and many2one create on ``model``. A name given by two changes is
+        listed twice."""
         self.ensure_one()
         result = []
         for change in self._project_field_changes():
@@ -1332,7 +1343,9 @@ class ErplibreStudioProject(models.Model):
                 "&",
                 ("model", "=", model),
                 ("field_name", "=", name),
+                "|",
                 ("payload", "ilike", "inverse_new"),
+                ("payload", "ilike", "inverse_o2m"),
             ]
         )
         for change in others:
@@ -1433,7 +1446,7 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_change_field_names(self, change):
         """[(model, name)] of the new fields the add_field ``change`` makes:
-        its field, and the inverse many2one its one2many creates."""
+        its field, and the inverse field it creates on its comodel."""
         definition = change._payload().get("field") or {}
         result = [(change.model, change.field_name or "")]
         inverse = self._studio_inverse_definition(change.model, definition)
@@ -2449,12 +2462,17 @@ class ErplibreStudioProject(models.Model):
         (``_studio_rewrite_field_name``). UserError when the field is in the
         database (the name is a column of its table), when the new name does
         not apply, or while a change, a rule or an added view still names
-        the old one; nothing changes then."""
+        the old one; nothing changes then. An inverse field the project
+        creates on the model is renamed in the definition of the field that
+        creates it (``_studio_rename_inverse``)."""
         self.ensure_one()
         model = view.model
         old = op.get("field_name")
         change = self._field_add_change(model, old)
         if not change:
+            owner = self._studio_inverse_owner(model, old)
+            if owner:
+                return self._studio_rename_inverse(owner, model, old, op)
             raise UserError(
                 self.env._("%(name)s is not a field of this project.", name=old)
             )
@@ -2488,6 +2506,49 @@ class ErplibreStudioProject(models.Model):
             self._studio_check_field_renamed(model, old)
         return change
 
+    def _studio_rename_inverse(self, owner, model, old, op):
+        """Rename the inverse field ``old`` of ``model`` that the add_field
+        ``owner`` creates: to ``op["new_name"]``, or, with ``op["auto"]``, to
+        the name its label proposes. The definition of ``owner`` takes the
+        new name (``inverse_new`` and the ``relation_field`` of a one2many,
+        ``inverse_o2m`` of a many2one), the changes of the project that name
+        it follow; same refusals as ``_studio_rename_field``."""
+        if self._studio_field_applied(model, old):
+            raise UserError(
+                self.env._(
+                    "The technical name of %(name)s cannot change once applied: "
+                    "it is a column of the table.",
+                    name=old,
+                )
+            )
+        payload = owner._payload()
+        definition = payload.get("field") or {}
+        key = "inverse_o2m" if definition.get("ttype") == "many2one" else "inverse_new"
+        if op.get("auto"):
+            label = definition[key].get("field_description") or ""
+            taken = self._taken_field_names(model) - {old}
+            if key == "inverse_o2m":
+                new = self._studio_inverse_o2m_name(label, taken)
+            else:
+                new = studio_arch.field_name_from_label(label, taken)
+        else:
+            new = (op.get("new_name") or "").strip()
+        if new == old:
+            return owner
+        problem = self._studio_field_name_problem(model, new, own=old)
+        if problem:
+            raise UserError(problem["message"])
+        if owner.model == model and new == owner.field_name:
+            raise UserError(self.env._("The field %(name)s already exists.", name=new))
+        with self.env.cr.savepoint():
+            self._studio_rewrite_field_refs(model, old, new, owner)
+            definition[key]["name"] = new
+            if key == "inverse_new":
+                definition["relation_field"] = new
+            owner._set_payload(payload)
+            self._studio_check_field_renamed(model, old)
+        return owner
+
     @api.model
     def _studio_rename_token(self, text, old, new):
         """``text`` (an XPath) with each « [@name='old'] » made
@@ -2503,9 +2564,35 @@ class ErplibreStudioProject(models.Model):
         relation table and columns of a many2many follow the name), the
         XPaths, move sources, ``field_name`` and ``fields`` of the changes of
         the project on its model, and the one2many of the project whose
-        inverse it is."""
+        inverse it is (``_studio_rewrite_field_refs``)."""
         self.ensure_one()
         model = change.model
+        self._studio_rewrite_field_refs(model, old, new, change)
+        payload = change._payload()
+        payload["field_name"] = new
+        payload["name_auto"] = auto
+        definition = payload.get("field") or {}
+        if definition.get("inverse_o2m"):
+            definition["inverse_o2m"]["relation_field"] = new
+        if definition.get("ttype") == "many2many":
+            table, column1, column2 = studio_arch.many2many_names(
+                self.module_name,
+                model,
+                definition["relation"],
+                new,
+                self._studio_relation_table_names()
+                - {definition.get("relation_table")},
+            )
+            definition.update(
+                {"relation_table": table, "column1": column1, "column2": column2}
+            )
+        change._set_payload(payload)
+
+    def _studio_rewrite_field_refs(self, model, old, new, change):
+        """Make the field ``old`` of ``model`` ``new`` in the changes of the
+        project other than ``change``: the XPaths, move sources,
+        ``field_name`` and ``fields`` of the changes on ``model``, and the
+        ``relation_field`` of the one2many whose existing inverse it is."""
         for other in self.change_ids.filtered(lambda c: c.model == model) - change:
             payload = other._payload()
             vals = {}
@@ -2538,23 +2625,6 @@ class ErplibreStudioProject(models.Model):
             ):
                 definition["relation_field"] = new
                 other._set_payload(payload)
-        payload = change._payload()
-        payload["field_name"] = new
-        payload["name_auto"] = auto
-        definition = payload.get("field") or {}
-        if definition.get("ttype") == "many2many":
-            table, column1, column2 = studio_arch.many2many_names(
-                self.module_name,
-                model,
-                definition["relation"],
-                new,
-                self._studio_relation_table_names()
-                - {definition.get("relation_table")},
-            )
-            definition.update(
-                {"relation_table": table, "column1": column1, "column2": column2}
-            )
-        change._set_payload(payload)
 
     def _studio_check_field_renamed(self, model, old):
         """Raise UserError while a change of the project on ``model``, one of

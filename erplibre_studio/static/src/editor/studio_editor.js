@@ -1119,6 +1119,7 @@ export class StudioEditor extends Component {
                 this.orm.call(MODEL, "get_relation_choices", [projectId, model, comodel, ttype], {label}),
             save: async (field) =>
                 Boolean(await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"})),
+            checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),
         });
     }
 

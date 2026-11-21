@@ -9,6 +9,7 @@
             <label class="form-label d-flex align-items-center gap-2 mb-1 w-100" t-att-for="inputId">
                 Technical name
                 <span
+                    t-if="!props.onRename"
                     class="badge text-bg-light border ms-auto o_erplibre_studio_name_tag"
                     t-att-data-auto="props.field.name_auto === false ? 'false' : 'true'"
                     t-esc="tag"
@@ -93,14 +94,19 @@
                 </li>
             </ul>
             <button
-                t-if="props.field.name_auto === false and current and current.proposed"
+                t-if="!props.onRename and props.field.name_auto === false and current and current.proposed"
                 type="button"
                 class="btn btn-sm btn-link p-0 mt-1 fw-bold o_erplibre_studio_name_back"
                 t-att-disabled="props.busy"
                 t-on-click="backToProposed"
                 t-esc="backLabel(current.proposed)"
             />
-            <span class="d-block fw-normal text-muted small mt-1 o_erplibre_studio_name_help">
+            <span
+                t-if="props.help"
+                class="d-block fw-normal text-muted small mt-1 o_erplibre_studio_name_help"
+                t-esc="props.help"
+            />
+            <span t-else="" class="d-block fw-normal text-muted small mt-1 o_erplibre_studio_name_help">
                 Proposed from the label while it is not edited. Frozen at Apply: it becomes a column of the table.
             </span>
         </div>

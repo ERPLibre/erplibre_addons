@@ -44,7 +44,9 @@ const RELATION_TYPES = ["many2one", "one2many", "many2many"];
  * (StudioFieldName), and for a field of the project its tooltip,
  * read-only, values and comodel) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
- * writes); a container shows what it holds. « Changes »: the changes of
+ * writes); a many2one of the project, the one2many it may create on its
+ * comodel and what it does when its record is deleted; a container shows
+ * what it holds. « Changes »: the changes of
  * the draft in this view, each one revealing its block on the canvas. It
  * renders from its props; every change is one operation of the editor
  * ``editor``.
@@ -389,6 +391,67 @@ export class StudioInspector extends Component {
 
     loadComodels() {
         return this.editor.loadComodels();
+    }
+
+    // ── a many2one of the project ───────────────────────────────────────
+
+    /** The one2many the new many2one ``field`` creates on its comodel ({name, field_description}), or null. */
+    inverseOf(field) {
+        return (field.definition && field.definition.inverse_o2m) || null;
+    }
+
+    inverseLegend(field) {
+        const comodel = (field.definition && field.definition.relation) || field.relation || "";
+        return _t("Inverse field on %(comodel)s (optional)", {comodel});
+    }
+
+    /** The entry StudioFieldName reads for the inverse ``inverse``: its label proposes its name. */
+    inverseField(inverse) {
+        return {definition: {field_description: inverse.field_description}, name_auto: false};
+    }
+
+    inverseHelp(inverse) {
+        return _t("Creates a one2many « %(label)s »: same prefix rule.", {label: inverse.field_description});
+    }
+
+    /**
+     * Add the inverse one2many of ``field`` (the server names it and labels
+     * it after the model), or remove it.
+     */
+    toggleInverse(field, checked) {
+        return this.updateField({inverse_o2m: checked ? {create: true} : false});
+    }
+
+    /** Give the inverse of ``field`` ``values`` ({name} or {field_description}). */
+    updateInverse(field, values) {
+        const inverse = this.inverseOf(field);
+        if (!inverse) {
+            return;
+        }
+        return this.updateField({
+            inverse_o2m: {name: inverse.name, field_description: inverse.field_description, ...values},
+        });
+    }
+
+    /** [{value, label, help}] of what a many2one does when its record is deleted. */
+    get onDeleteChoices() {
+        return [
+            {
+                value: "set null",
+                label: _t("Empty the field"),
+                help: _t("The records that point to it stay, without the link."),
+            },
+            {
+                value: "restrict",
+                label: _t("Block the deletion"),
+                help: _t("The record cannot be deleted while a record points to it."),
+            },
+            {
+                value: "cascade",
+                label: _t("Delete as well"),
+                help: _t("Every record that points to it is deleted with it."),
+            },
+        ];
     }
 
     removeSelected() {

@@ -1234,6 +1234,7 @@ msgstr "Revenir au nom proposé (%(name)s)"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Checking…"
 msgstr "Vérification…"
 
@@ -5197,6 +5198,7 @@ msgstr "Le champ %(name)s existe déjà sur %(model)s"
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid "The field %(name)s already exists."
 msgstr "Le champ %(name)s existe déjà."
@@ -7170,3 +7172,97 @@ msgstr "Ajouter %(item)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "No place of this view takes this item."
 msgstr "Aucun endroit de cette vue n'accepte cet élément."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Block the deletion"
+msgstr "Bloquer la suppression"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Create a one2many on the comodel"
+msgstr "Créer un one2many sur le comodèle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Creates a one2many « %(label)s »: same prefix rule."
+msgstr "Crée un one2many « %(label)s » : même règle de préfixe."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Delete as well"
+msgstr "Supprimer aussi"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Empty the field"
+msgstr "Vider le champ"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Every record that points to it is deleted with it."
+msgstr "Tout enregistrement qui y pointe est supprimé avec lui."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Inverse field on %(comodel)s (optional)"
+msgstr "Champ inverse sur %(comodel)s (facultatif)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Label of the one2many"
+msgstr "Libellé du one2many"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "On deletion of the linked record"
+msgstr "À la suppression de l'enregistrement lié"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"Remove the inverse field %(inverse)s first: the comodel of %(name)s does not"
+" change while it exists."
+msgstr ""
+"Retirez d'abord le champ inverse %(inverse)s : le comodèle de %(name)s ne "
+"change pas tant qu'il existe."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+msgid "Technical name of the many2one"
+msgstr "Nom technique du many2one"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "The inverse field of %(name)s changes only before Apply."
+msgstr "Le champ inverse de %(name)s ne change qu'avant l'Apply."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The record cannot be deleted while a record points to it."
+msgstr "L'enregistrement ne peut pas être supprimé tant qu'un autre y pointe."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The records that point to it stay, without the link."
+msgstr "Les enregistrements qui y pointent restent, sans le lien."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "The studio does not add fields to this model."
+msgstr "Le studio n'ajoute pas de champs à ce modèle."

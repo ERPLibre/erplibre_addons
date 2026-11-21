@@ -443,3 +443,342 @@ class TestRelations(StudioCase):
             "res.partner", "x_studio_test_order_id"
         )
         self.assertEqual(field.on_delete, "set null")
+
+
+CATEGORY = "res.partner.category"
+VAT = "//field[@name='vat']"
+M_ORDER = "x_studio_test_m2o_order"
+M_LINE = "x_studio_test_m2o_line"
+LINES = "x_studio_test_line_ids"
+
+
+@tagged("post_install", "-at_install")
+class TestMany2oneInverse(StudioCase):
+    """A new many2one may create a one2many on its comodel: the records of
+    its model that point to a record, named and labelled after the model,
+    renamed through the definition of the many2one until Apply."""
+
+    def setUp(self):
+        super().setUp()
+        self.project = self.make_project("studio_test_m2o_inverse")
+        self.category_form = self.env.ref("base.view_partner_category_form")
+
+    def add_sponsor(self, project=None, **field):
+        return self.op(
+            project or self.project,
+            self.form,
+            type="add_field",
+            target=VAT,
+            position="after",
+            field={
+                "ttype": "many2one",
+                "field_description": "Sponsor",
+                "relation": CATEGORY,
+                **field,
+            },
+        )
+
+    def update(self, name, **field):
+        return self.op(
+            self.project, self.form, type="update_field", field_name=name, field=field
+        )
+
+    def pending_models(self):
+        """(order form, line form): the default forms of two models of the
+        project, not created yet."""
+        self.make_model(self.project, "Studio test order", model=M_ORDER)
+        self.make_model(self.project, "Studio test line", model=M_LINE)
+        pending = self.Editor._resolve_view
+        return (
+            pending(M_ORDER, False, "form", self.project),
+            pending(M_LINE, False, "form", self.project),
+        )
+
+    def add_order(self, line_form):
+        """The many2one « x_order » of the line to the order, with its
+        inverse one2many on the order."""
+        return self.op(
+            self.project,
+            line_form,
+            type="add_field",
+            target=LEFT,
+            position="inside",
+            field={
+                "ttype": "many2one",
+                "field_description": "Order",
+                "relation": M_ORDER,
+                "inverse_o2m": {"create": True},
+            },
+        )
+
+    def show_inverse(self, order_form):
+        return self.op(
+            self.project,
+            order_form,
+            type="add_existing_field",
+            target=LEFT,
+            position="inside",
+            field_name=LINES,
+        )
+
+    def test_the_inverse_is_a_field_of_the_comodel(self):
+        change = self.add_sponsor(inverse_o2m={"create": True})
+        self.assertEqual(change.field_name, "x_sponsor")
+        self.assertEqual(
+            change._payload()["field"]["inverse_o2m"],
+            {
+                "name": "x_contact_ids",
+                "field_description": "Contact",
+                "relation_field": "x_sponsor",
+            },
+        )
+        definition, owner = self.project._studio_field_definitions(CATEGORY)[
+            "x_contact_ids"
+        ]
+        self.assertEqual(owner, change)
+        self.assertEqual(
+            (
+                definition["ttype"],
+                definition["relation"],
+                definition["relation_field"],
+            ),
+            ("one2many", "res.partner", "x_sponsor"),
+        )
+        # The comodel shows it, pending, its name not following a label.
+        info = self.Editor._fields_payload(CATEGORY, self.project)["x_contact_ids"]
+        self.assertTrue(info["pending"])
+        self.assertFalse(info["name_auto"])
+        sponsor = self.Editor._fields_payload("res.partner", self.project)["x_sponsor"]
+        self.assertFalse(sponsor["inverse_protected"])
+        self.assertIn(
+            CATEGORY,
+            [m["model"] for m in self.Editor._touched_models(self.project)],
+        )
+        # Its name is taken on the comodel, for this project and the others.
+        self.assertIn("x_contact_ids", self.project._taken_field_names(CATEGORY))
+        other = self.make_project("studio_test_m2o_other")
+        owner = other._studio_field_name_owner(CATEGORY, "x_contact_ids")
+        self.assertEqual(owner["kind"], "other")
+        # The one2many comes after its many2one.
+        order = [
+            (model, name)
+            for model, name, *_rest in self.project._studio_all_definitions()
+        ]
+        self.assertEqual(
+            order, [("res.partner", "x_sponsor"), (CATEGORY, "x_contact_ids")]
+        )
+
+    def test_no_inverse_on_a_protected_model(self):
+        with self.assertRaisesRegex(UserError, "does not add fields to res.users"):
+            with self.env.cr.savepoint():
+                self.add_sponsor(relation="res.users", inverse_o2m={"create": True})
+        self.add_sponsor(relation="res.users")
+        sponsor = self.Editor._fields_payload("res.partner", self.project)["x_sponsor"]
+        self.assertTrue(sponsor["inverse_protected"])
+        with self.assertRaisesRegex(UserError, "does not add fields to res.users"):
+            with self.env.cr.savepoint():
+                self.update("x_sponsor", inverse_o2m={"create": True})
+        self.assertNotIn("inverse_o2m", self.project.change_ids._payload()["field"])
+
+    def test_comodel_changes_once_the_inverse_is_removed(self):
+        change = self.add_sponsor(inverse_o2m={"create": True})
+        with self.assertRaisesRegex(UserError, "Remove the inverse field x_contact"):
+            with self.env.cr.savepoint():
+                self.update("x_sponsor", relation="res.country")
+        self.update("x_sponsor", inverse_o2m=False)
+        self.assertNotIn("inverse_o2m", change._payload()["field"])
+        self.assertNotIn("x_contact_ids", self.project._taken_field_names(CATEGORY))
+        self.update("x_sponsor", relation="res.country")
+        definition = change._payload()["field"]
+        self.assertEqual(definition["relation"], "res.country")
+        # Added again, with a name and a label of its own; on_delete set.
+        self.update(
+            "x_sponsor",
+            inverse_o2m={"name": "x_sponsored_ids", "field_description": "Sponsored"},
+            on_delete="restrict",
+        )
+        definition = change._payload()["field"]
+        self.assertEqual(definition["on_delete"], "restrict")
+        self.assertEqual(
+            definition["inverse_o2m"],
+            {
+                "name": "x_sponsored_ids",
+                "field_description": "Sponsored",
+                "relation_field": "x_sponsor",
+            },
+        )
+        # A new label keeps the name.
+        self.update(
+            "x_sponsor",
+            inverse_o2m={"name": "x_sponsored_ids", "field_description": "Godchildren"},
+        )
+        self.assertEqual(
+            change._payload()["field"]["inverse_o2m"]["name"], "x_sponsored_ids"
+        )
+
+    def test_inverse_name_taken_on_the_comodel(self):
+        for name, message in (
+            ("contacts", "Prefix x_"),
+            ("x_bad name", "Invalid format"),
+            ("x_sponsor", "already exists"),
+        ):
+            with self.subTest(name=name), self.assertRaisesRegex(UserError, message):
+                with self.env.cr.savepoint():
+                    self.add_sponsor(
+                        relation="res.partner" if name == "x_sponsor" else CATEGORY,
+                        inverse_o2m={"name": name},
+                    )
+        other = self.make_project("studio_test_m2o_other")
+        self.op(
+            other,
+            self.category_form,
+            type="add_field",
+            target="//field[@name='name']",
+            position="after",
+            field={"ttype": "char", "field_description": "Contacts list"},
+        )
+        with self.assertRaisesRegex(UserError, "another project"):
+            with self.env.cr.savepoint():
+                self.add_sponsor(inverse_o2m={"name": "x_contacts_list"})
+        self.assertFalse(self.project.change_ids)
+        # The proposed name skips the names taken.
+        self.add_sponsor(inverse_o2m={"field_description": "Contacts list"})
+        self.assertEqual(
+            self.project.change_ids._payload()["field"]["inverse_o2m"]["name"],
+            "x_contacts_list_ids",
+        )
+
+    def test_apply_creates_both_and_revert_removes_both(self):
+        self.add_sponsor(inverse_o2m={"create": True})
+        self.project.action_apply()
+        Fields = self.env["ir.model.fields"]
+        sponsor = Fields._get("res.partner", "x_sponsor")
+        contacts = Fields._get(CATEGORY, "x_contact_ids")
+        self.assertEqual(
+            (contacts.ttype, contacts.relation, contacts.relation_field),
+            ("one2many", "res.partner", "x_sponsor"),
+        )
+        self.assertLess(sponsor.id, contacts.id)
+        self.assertEqual(self.project.field_ids, sponsor | contacts)
+        tag = self.env[CATEGORY].create({"name": "Studio test tag"})
+        partner = self.env["res.partner"].create(
+            {"name": "Studio test partner", "x_sponsor": tag.id}
+        )
+        self.assertEqual(tag.x_contact_ids, partner)
+        # Applied: the inverse is neither removed nor renamed.
+        for inverse in (False, {"name": "x_other_ids"}):
+            with self.assertRaisesRegex(UserError, "only before Apply"):
+                with self.env.cr.savepoint():
+                    self.update("x_sponsor", inverse_o2m=inverse)
+        with self.assertRaisesRegex(UserError, "once applied"):
+            with self.env.cr.savepoint():
+                self.op(
+                    self.project,
+                    self.category_form,
+                    type="rename_field",
+                    field_name="x_contact_ids",
+                    new_name="x_other_ids",
+                )
+        self.project.action_revert()
+        self.assertFalse(sponsor.exists())
+        self.assertFalse(contacts.exists())
+
+    def test_renaming_the_many2one_moves_the_inverse(self):
+        change = self.add_sponsor(inverse_o2m={"create": True})
+        self.op(
+            self.project,
+            self.form,
+            type="rename_field",
+            field_name="x_sponsor",
+            new_name="x_godparent",
+        )
+        inverse = change._payload()["field"]["inverse_o2m"]
+        self.assertEqual(inverse["relation_field"], "x_godparent")
+        definition, _owner = self.project._studio_field_definitions(CATEGORY)[
+            "x_contact_ids"
+        ]
+        self.assertEqual(definition["relation_field"], "x_godparent")
+
+    def test_renaming_the_inverse_rewrites_its_many2one(self):
+        order_form, line_form = self.pending_models()
+        change = self.add_order(line_form)
+        shown = self.show_inverse(order_form)
+        self.op(
+            self.project,
+            order_form,
+            type="rename_field",
+            field_name=LINES,
+            new_name="x_lines",
+        )
+        self.assertEqual(change._payload()["field"]["inverse_o2m"]["name"], "x_lines")
+        self.assertEqual(shown.field_name, "x_lines")
+        arch, errors = self.project._draft_arch(order_form)
+        self.assertFalse(errors)
+        self.assertTrue(arch.xpath(f"{LEFT}/field[@name='x_lines']"))
+        check = self.Editor.check_field_name(
+            self.project.id, M_ORDER, "x_lines", field_name="x_lines"
+        )
+        self.assertEqual((check["status"], check["proposed"]), ("available", LINES))
+        # Back to the name its label proposes.
+        self.op(
+            self.project,
+            order_form,
+            type="rename_field",
+            field_name="x_lines",
+            auto=True,
+        )
+        self.assertEqual(change._payload()["field"]["inverse_o2m"]["name"], LINES)
+        self.assertEqual(shown.field_name, LINES)
+        with self.assertRaisesRegex(UserError, "Prefix x_"):
+            self.op(
+                self.project,
+                order_form,
+                type="rename_field",
+                field_name=LINES,
+                new_name="lines",
+            )
+        # The inverse many2one of a one2many is renamed the same way.
+        others = self.op(
+            self.project,
+            order_form,
+            type="add_field",
+            target=LEFT,
+            position="inside",
+            field={
+                "ttype": "one2many",
+                "field_description": "Other lines",
+                "relation": M_LINE,
+                "inverse": {"create": True},
+            },
+        )
+        old = others._payload()["field"]["relation_field"]
+        self.op(
+            self.project,
+            line_form,
+            type="rename_field",
+            field_name=old,
+            new_name="x_other_order",
+        )
+        definition = others._payload()["field"]
+        self.assertEqual(
+            (definition["relation_field"], definition["inverse_new"]["name"]),
+            ("x_other_order", "x_other_order"),
+        )
+
+    def test_removing_the_many2one_removes_what_shows_the_inverse(self):
+        order_form, line_form = self.pending_models()
+        for leave in ("remove", "undo"):
+            with self.subTest(leave=leave):
+                self.add_order(line_form)
+                self.show_inverse(order_form)
+                self.assertEqual(len(self.project.change_ids), 2)
+                if leave == "undo":
+                    self.project.action_undo(line_form)
+                else:
+                    self.op(
+                        self.project,
+                        line_form,
+                        type="remove",
+                        target=f"{LEFT}/field[@name='x_order']",
+                    )
+                self.assertFalse(self.project.change_ids)

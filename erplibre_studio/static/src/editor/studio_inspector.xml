@@ -544,6 +544,7 @@
                             </option>
                         </datalist>
                     </label>
+                    <t t-if="field.type === 'many2one'" t-call="erplibre_studio.Inspector.Many2one" />
                 </t>
             </fieldset>
 
@@ -702,5 +703,79 @@
                 Not on the canvas: the change removes its element.
             </span>
         </span>
+    </t>
+
+    <!-- A many2one of the project: the inverse one2many it may create on
+         its comodel, and what it does when the linked record is deleted. -->
+    <t t-name="erplibre_studio.Inspector.Many2one">
+        <t t-set="inverse" t-value="inverseOf(field)" />
+        <fieldset class="border rounded p-2 mb-1 o_erplibre_studio_m2o_inverse">
+            <legend class="float-none w-auto fs-6 fw-bold px-1 mb-1" t-esc="inverseLegend(field)" />
+            <label class="o_erplibre_studio_check d-flex align-items-center gap-2 mb-1">
+                <input
+                    type="checkbox"
+                    class="form-check-input m-0 o_erplibre_studio_inverse_toggle"
+                    t-att-checked="!!inverse"
+                    t-att-disabled="props.busy or !field.pending or (field.inverse_protected and !inverse)"
+                    t-on-change="(ev) => this.toggleInverse(field, ev.target.checked)"
+                />
+                Create a one2many on the comodel
+            </label>
+            <div
+                t-if="field.inverse_protected and !inverse"
+                class="small text-muted o_erplibre_studio_inverse_protected"
+            >
+                The studio does not add fields to this model.
+            </div>
+            <t t-if="inverse">
+                <label class="form-label mb-1 w-100">
+                    Label of the one2many
+                    <input
+                        class="form-control form-control-sm mt-1 o_erplibre_studio_inverse_label"
+                        t-att-value="inverse.field_description"
+                        t-att-disabled="props.busy"
+                        t-on-change="(ev) => this.updateInverse(field, {field_description: ev.target.value})"
+                    />
+                </label>
+                <StudioFieldName
+                    t-if="field.pending"
+                    editor="editor"
+                    model="field.definition.relation"
+                    name="inverse.name"
+                    field="inverseField(inverse)"
+                    rule="data.field_name_rule or null"
+                    busy="!!props.busy"
+                    onRename="(name) => this.updateInverse(field, {name})"
+                    help="inverseHelp(inverse)"
+                />
+                <div t-else="" class="small">
+                    <span class="text-muted">Technical name</span>
+                    <code class="ms-1 o_erplibre_studio_inverse_name" t-esc="inverse.name" />
+                </div>
+            </t>
+        </fieldset>
+        <fieldset class="border rounded p-2 mb-1 o_erplibre_studio_prop_on_delete" role="radiogroup">
+            <legend class="float-none w-auto fs-6 fw-bold px-1 mb-1">On deletion of the linked record</legend>
+            <label
+                t-foreach="onDeleteChoices"
+                t-as="choice"
+                t-key="choice.value"
+                class="d-flex align-items-start gap-2 mb-1"
+            >
+                <input
+                    type="radio"
+                    class="form-check-input mt-1 o_erplibre_studio_on_delete"
+                    t-att-name="'o_erplibre_studio_on_delete_' + block.name"
+                    t-att-value="choice.value"
+                    t-att-checked="(field.definition.on_delete or 'set null') === choice.value"
+                    t-att-disabled="props.busy"
+                    t-on-change="() => this.updateField({on_delete: choice.value})"
+                />
+                <span class="d-flex flex-column">
+                    <span class="fw-bold" t-esc="choice.label" />
+                    <span class="small text-muted" t-esc="choice.help" />
+                </span>
+            </label>
+        </fieldset>
     </t>
 </templates>

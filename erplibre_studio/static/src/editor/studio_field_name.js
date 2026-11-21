@@ -24,7 +24,9 @@ function fieldLabel(field) {
  * one renames the field on change (« rename_field »), an empty one gives it
  * back its proposed name; « Use » and « Back
  * to the proposed name » give it back the name its label proposes, which
- * it then follows again.
+ * it then follows again. With ``onRename``, the field is an inverse the
+ * definition of another field names: ``onRename`` renames it, and it
+ * follows no label.
  *
  * Each check is a request numbered in order: an answer that arrives after
  * a newer request, or once the component is gone, is dropped. While the
@@ -45,6 +47,12 @@ export class StudioFieldName extends Component {
         // The rule of the database (``field_name_rule`` of the payload).
         rule: {type: [Object, {value: null}], optional: true},
         busy: {type: Boolean, optional: true},
+        // ``onRename(name)`` renames the field instead of « rename_field »:
+        // the inverse field a relational field of the project creates,
+        // named in the definition of that field. Its name follows no label.
+        onRename: {type: Function, optional: true},
+        // The text under the input, instead of the default one.
+        help: {type: String, optional: true},
     };
 
     setup() {
@@ -179,8 +187,16 @@ export class StudioFieldName extends Component {
             check = await this.check();
         }
         if (check && check.name === value && check.status === "available" && status(this) !== "destroyed") {
-            await this.editor.renameField(this.props.name, value);
+            await this.rename(value);
         }
+    }
+
+    /** Rename the field to ``name``: through ``onRename`` when given, else « rename_field ». */
+    rename(name) {
+        if (this.props.onRename) {
+            return this.props.onRename(name);
+        }
+        return this.editor.renameField(this.props.name, name);
     }
 
     /** Take the name the label proposes, and follow the label again. */
@@ -195,7 +211,17 @@ export class StudioFieldName extends Component {
     async backToProposed() {
         this.scheduleCheck.cancel();
         const old = this.props.name;
-        const name = await this.editor.renameField(old, null, {auto: true});
+        let name = old;
+        if (this.props.onRename) {
+            // No label to follow: the proposed name, once, as a typed one.
+            const proposed = this.state.check && this.state.check.proposed;
+            if (proposed && proposed !== old) {
+                await this.props.onRename(proposed);
+                return;
+            }
+        } else {
+            name = await this.editor.renameField(old, null, {auto: true});
+        }
         if (name === old && status(this) !== "destroyed") {
             // The label proposes the current name: no new props reset the
             // value nor check it, so both happen here.

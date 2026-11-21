@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {animationFrame, runAllTimers} from "@odoo/hoot-mock";
+import {advanceTime, animationFrame, runAllTimers} from "@odoo/hoot-mock";
 import {
     contains,
     defineModels,
@@ -360,6 +360,7 @@ beforeEach(() => {
         "get_studio_choices",
         "get_comodels",
         "get_relation_choices",
+        "check_field_name",
         "get_model_preview",
         "get_revert_report",
         "get_apply_report",
@@ -376,6 +377,19 @@ beforeEach(() => {
         editorRpc(method);
     }
     respond.get_studio_choices = () => JSON.parse(JSON.stringify(CHOICES));
+    // Any technical name applies, but « x_taken ».
+    respond.check_field_name = (args) => {
+        const name = args.args[2];
+        const taken = name === "x_taken";
+        return {
+            name,
+            proposed: false,
+            status: taken ? "taken" : "available",
+            message: taken ? `The field ${name} already exists on J4 line` : "Available",
+            detail: "",
+            checks: [],
+        };
+    };
     respond.get_review = () => review();
     // The security space opens on the access rights, with the rows of the other modules.
     onRpc("erplibre.studio.editor", "get_access_existing", () => []);
@@ -658,6 +672,21 @@ describe("erplibre_studio j4", () => {
         expect("label[for=o_erplibre_studio_inverse_create]").toHaveText("Create the field x_j4_order_id on J4 line");
         await contains(".o_erplibre_studio_relation_label").edit("Lines");
         await contains(".o_erplibre_studio_inverse_label").edit("Order");
+        // The proposed name of the inverse, checked on the comodel, edited.
+        expect(".o_erplibre_studio_inverse_new_name").toHaveValue("x_j4_order_id");
+        expect(lastCall("check_field_name").args.slice(1)).toEqual([LINE, "x_j4_order_id"]);
+        expect(".o_erplibre_studio_inverse_name_status").toHaveAttribute("data-status", "available");
+        await contains(".o_erplibre_studio_inverse_new_name").edit("x_taken", {confirm: false});
+        expect(".o_erplibre_studio_relation_save").not.toBeEnabled();
+        await advanceTime(300);
+        await animationFrame();
+        expect(".o_erplibre_studio_inverse_name_status").toHaveText("The field x_taken already exists on J4 line");
+        expect(".o_erplibre_studio_relation_save").not.toBeEnabled();
+        await contains(".o_erplibre_studio_inverse_new_name").edit("x_order_ref", {confirm: false});
+        await advanceTime(300);
+        await animationFrame();
+        expect(".o_erplibre_studio_inverse_name_status").toHaveAttribute("data-status", "available");
+        expect("label[for=o_erplibre_studio_inverse_create]").toHaveText("Create the field x_order_ref on J4 line");
 
         const field = {string: "Lines", type: "one2many", relation: LINE, project: true, pending: true};
         respond.apply_operation = () =>
@@ -687,7 +716,7 @@ describe("erplibre_studio j4", () => {
                 ttype: "one2many",
                 field_description: "Lines",
                 relation: LINE,
-                inverse: {create: true, name: "x_j4_order_id", field_description: "Order"},
+                inverse: {create: true, name: "x_order_ref", field_description: "Order"},
             },
         });
         expect(".o_erplibre_studio_relation_dialog").toHaveCount(0);

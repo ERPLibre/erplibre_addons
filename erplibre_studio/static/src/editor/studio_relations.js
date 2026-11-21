@@ -2,9 +2,11 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, useState} from "@odoo/owl";
+import {Component, status, useState} from "@odoo/owl";
 import {Dialog} from "@web/core/dialog/dialog";
 import {_t} from "@web/core/l10n/translation";
+import {useDebounced} from "@web/core/utils/timing";
+import {NAME_CHECK_DELAY} from "./studio_field_name";
 
 // The relational field types a drop opens the relation dialog for.
 export const X2MANY_TYPES = ["one2many", "many2many"];
@@ -34,7 +36,8 @@ export function sortComodels(comodels, first = [], text = "") {
  * The field ``apply_operation`` adds for the relation dialog ``state`` of
  * a ``ttype`` field: a many2many names its comodel (the server names its
  * table); a one2many its inverse, an existing many2one or the one the
- * studio creates on the comodel.
+ * studio creates on the comodel, named ``state.inverseNew`` (else the
+ * name the server proposed).
  */
 export function relationField(ttype, state) {
     const field = {ttype, field_description: state.label.trim(), relation: state.comodel};
@@ -42,7 +45,7 @@ export function relationField(ttype, state) {
         if (state.inverseMode === "create") {
             field.inverse = {
                 create: true,
-                name: state.choices.inverse_name,
+                name: (state.inverseNew || "").trim() || state.choices.inverse_name,
                 field_description: state.inverseLabel.trim(),
             };
         } else {
@@ -58,7 +61,10 @@ export function relationField(ttype, state) {
  * the comodel or created by the studio; for a many2many the relation table
  * the server names, shown read-only. ``loadChoices(comodel, label)``
  * answers ``get_relation_choices``; ``save(field)`` answers whether the
- * server took the field.
+ * server took the field; ``checkName(comodel, name, label)`` answers
+ * ``check_field_name`` for the name of the inverse the studio creates,
+ * which Create then needs « available »: each check is numbered, an
+ * older answer that arrives late is dropped.
  */
 export class StudioRelationDialog extends Component {
     static template = "erplibre_studio.RelationDialog";
@@ -71,6 +77,7 @@ export class StudioRelationDialog extends Component {
         projectModels: {type: Array, optional: true},
         loadChoices: Function,
         save: Function,
+        checkName: {type: Function, optional: true},
         close: Function,
     };
 
@@ -86,10 +93,17 @@ export class StudioRelationDialog extends Component {
             inverseMode: "existing",
             inverseName: "",
             inverseLabel: "",
+            // The name of the inverse the studio creates, and the answer
+            // of its last check (``nameCheck.name`` is the name checked).
+            inverseNew: "",
+            nameCheck: null,
+            nameChecking: false,
             saving: false,
         });
         // The answer of the last request: an older one that arrives late is dropped.
         this.request = 0;
+        this.nameRequest = 0;
+        this.scheduleNameCheck = useDebounced(() => this.checkInverseName(), NAME_CHECK_DELAY);
     }
 
     get isOne2many() {
@@ -121,7 +135,7 @@ export class StudioRelationDialog extends Component {
     get createLabel() {
         const choices = this.state.choices || {};
         return _t("Create the field %(name)s on %(comodel)s", {
-            name: choices.inverse_name || "",
+            name: this.state.inverseNew.trim() || choices.inverse_name || "",
             comodel: this.comodelLabel(this.state.comodel),
         });
     }
@@ -148,6 +162,10 @@ export class StudioRelationDialog extends Component {
                 }
                 this.state.inverseMode = names.length || choices.protected ? "existing" : "create";
                 this.state.inverseLabel = choices.inverse_label || "";
+                this.state.inverseNew = choices.inverse_name || "";
+                if (!choices.protected) {
+                    await this.checkInverseName();
+                }
             }
         } catch (error) {
             if (request === this.request) {
@@ -182,6 +200,44 @@ export class StudioRelationDialog extends Component {
         }
     }
 
+    /** Type the name of the inverse: checked once the typing pauses. */
+    setInverseNew(value) {
+        this.state.inverseNew = value;
+        this.state.nameCheck = null;
+        this.scheduleNameCheck();
+    }
+
+    /** Ask the server whether the name of the inverse applies on the comodel. */
+    async checkInverseName() {
+        const name = this.state.inverseNew.trim();
+        const request = ++this.nameRequest;
+        if (!this.props.checkName || !name || !this.state.comodel) {
+            this.state.nameCheck = null;
+            return;
+        }
+        this.state.nameChecking = true;
+        const check = await this.props.checkName(this.state.comodel, name, this.state.inverseLabel.trim());
+        if (request !== this.nameRequest || status(this) === "destroyed") {
+            return;
+        }
+        Object.assign(this.state, {nameCheck: check, nameChecking: false});
+    }
+
+    /** The answer of the last check when it is about the name on screen, else null. */
+    get nameCheck() {
+        const check = this.state.nameCheck;
+        return check && check.name === this.state.inverseNew.trim() ? check : null;
+    }
+
+    /** Whether the name of the inverse may be sent: checked available, or no check to make. */
+    get inverseNameOk() {
+        if (!this.props.checkName) {
+            return Boolean(this.state.inverseNew.trim());
+        }
+        const check = this.nameCheck;
+        return Boolean(!this.state.nameChecking && check && check.status === "available");
+    }
+
     get canSave() {
         const state = this.state;
         if (state.saving || state.loading || !state.choices || !state.comodel || !state.label.trim()) {
@@ -191,7 +247,7 @@ export class StudioRelationDialog extends Component {
             return true;
         }
         if (state.inverseMode === "create") {
-            return this.canCreateInverse && Boolean(state.inverseLabel.trim());
+            return this.canCreateInverse && Boolean(state.inverseLabel.trim()) && this.inverseNameOk;
         }
         return Boolean(state.inverseName);
     }

@@ -230,6 +230,9 @@ function checkName(name) {
 }
 
 let answer;
+// ``afterOperation(operation)``: the payload an operation other than a
+// rename answers, instead of the initial one; null keeps the initial one.
+let afterOperation;
 let operations;
 // The names ``check_field_name`` was asked about, in order.
 let nameChecks;
@@ -237,6 +240,7 @@ let nameChecks;
 beforeEach(() => {
     defineWebModels();
     answer = payload();
+    afterOperation = null;
     operations = [];
     nameChecks = [];
     onRpc("erplibre.studio.editor", "get_editor_data", () => answer);
@@ -246,7 +250,7 @@ beforeEach(() => {
         if (operation.type === "rename_field") {
             answer = renamed(answer, operation.field_name, operation.new_name || "x_sponsor", operation.auto);
         } else {
-            answer = payload();
+            answer = afterOperation ? afterOperation(operation) : payload();
         }
         answer.project = {...answer.project, revision: args.kwargs.revision + 1};
         return answer;
@@ -416,6 +420,97 @@ describe("erplibre_studio editor, inspector", () => {
             expect(STATUS).toHaveCount(0);
         }
         expect(nameChecks.length).toBe(checked);
+    });
+
+    test("a new many2one: its inverse one2many, what a deletion does", async () => {
+        const INVERSE = ".o_erplibre_studio_m2o_inverse";
+        // x_sponsor points to the contacts themselves: its inverse is on res.partner.
+        const sponsor = (inverse, extra = {}) => {
+            const data = payload();
+            const info = data.fields.x_sponsor;
+            const definition = {...info.definition, relation: "res.partner", on_delete: "set null"};
+            if (inverse) {
+                definition.inverse_o2m = {name: inverse, field_description: "Contact", relation_field: "x_sponsor"};
+            }
+            data.fields.x_sponsor = {...info, relation: "res.partner", inverse_protected: false, definition, ...extra};
+            return data;
+        };
+        answer = sponsor(null);
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=x_sponsor]").click();
+        await animationFrame();
+        expect(`${INVERSE} legend`).toHaveText("Inverse field on res.partner (optional)");
+        expect(".o_erplibre_studio_inverse_toggle").not.toBeChecked();
+        expect(".o_erplibre_studio_inverse_toggle").toBeEnabled();
+        expect(".o_erplibre_studio_inverse_label").toHaveCount(0);
+        expect(`${INVERSE} .o_erplibre_studio_prop_name`).toHaveCount(0);
+        // What a deletion of the linked record does, « set null » by default.
+        expect(".o_erplibre_studio_prop_on_delete legend").toHaveText("On deletion of the linked record");
+        expect(".o_erplibre_studio_on_delete").toHaveCount(3);
+        expect(".o_erplibre_studio_on_delete[value='set null']").toBeChecked();
+        expect(queryAllTexts(".o_erplibre_studio_prop_on_delete label .fw-bold")).toEqual([
+            "Empty the field",
+            "Block the deletion",
+            "Delete as well",
+        ]);
+        await contains(".o_erplibre_studio_on_delete[value=restrict]").click();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_sponsor", field: {on_delete: "restrict"}});
+
+        // Checked: the server names and labels the one2many.
+        afterOperation = () => sponsor("x_contact_ids");
+        await contains(".o_erplibre_studio_inverse_toggle").click();
+        await animationFrame();
+        expect(operations.pop()).toEqual({
+            type: "update_field",
+            field_name: "x_sponsor",
+            field: {inverse_o2m: {create: true}},
+        });
+        expect(".o_erplibre_studio_inverse_toggle").toBeChecked();
+        expect(".o_erplibre_studio_inverse_label").toHaveValue("Contact");
+        expect(`${INVERSE} .o_erplibre_studio_prop_name`).toHaveValue("x_contact_ids");
+        expect(`${INVERSE} .o_erplibre_studio_name_tag`).toHaveCount(0);
+        expect(`${INVERSE} .o_erplibre_studio_name_help`).toHaveText("Creates a one2many « Contact »: same prefix rule.");
+        expect(nameChecks.map((item) => item.join(" "))).toInclude("x_contact_ids x_contact_ids");
+
+        // Its label and its name go through the definition of the many2one.
+        await contains(".o_erplibre_studio_inverse_label").edit("Godchildren");
+        expect(operations.pop()).toEqual({
+            type: "update_field",
+            field_name: "x_sponsor",
+            field: {inverse_o2m: {name: "x_contact_ids", field_description: "Godchildren"}},
+        });
+        await contains(`${INVERSE} .o_erplibre_studio_prop_name`).edit("x_godchildren_ids");
+        await animationFrame();
+        expect(nameChecks.pop()).toEqual(["x_godchildren_ids", "x_contact_ids"]);
+        expect(operations.pop()).toEqual({
+            type: "update_field",
+            field_name: "x_sponsor",
+            field: {inverse_o2m: {name: "x_godchildren_ids", field_description: "Contact"}},
+        });
+        // A name that does not apply is not sent.
+        await contains(`${INVERSE} .o_erplibre_studio_prop_name`).edit("godchildren");
+        await animationFrame();
+        expect(`${INVERSE} .o_erplibre_studio_prop_name`).toHaveAttribute("aria-invalid", "true");
+        expect(operations).toEqual([]);
+
+        // Unchecked: the one2many leaves the draft.
+        afterOperation = () => sponsor(null);
+        await contains(".o_erplibre_studio_inverse_toggle").click();
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_sponsor", field: {inverse_o2m: false}});
+        expect(".o_erplibre_studio_inverse_label").toHaveCount(0);
+    });
+
+    test("a many2one to a model the studio adds no field to: no inverse", async () => {
+        answer = payload();
+        answer.fields.x_sponsor.inverse_protected = true;
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=x_sponsor]").click();
+        expect(".o_erplibre_studio_m2o_inverse legend").toHaveText("Inverse field on res.users (optional)");
+        expect(".o_erplibre_studio_inverse_toggle").not.toBeEnabled();
+        expect(".o_erplibre_studio_inverse_protected").toHaveText("The studio does not add fields to this model.");
+        expect(".o_erplibre_studio_prop_on_delete").toHaveCount(1);
     });
 
     test("the names the server counts block Apply", async () => {
