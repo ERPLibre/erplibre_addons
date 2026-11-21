@@ -8,6 +8,7 @@ import {
     contains,
     defineWebModels,
     getService,
+    makeServerError,
     mountWithCleanup,
     onRpc,
     serverState,
@@ -228,7 +229,7 @@ function pivotPayload(axes) {
     return data;
 }
 
-function timelinePayload(attrs, loaded = ["name"]) {
+function timelinePayload(attrs, loaded = ["name"], colors = []) {
     const item = {
         path: "//t[@t-name='timeline-item']",
         tag: "t",
@@ -253,13 +254,15 @@ function timelinePayload(attrs, loaded = ["name"]) {
             root: "/timeline",
             template: item.path,
             loaded_fields: loaded,
-            colors: [],
+            colors,
             color_operators: ["==", "!=", ">", "<"],
             color_types: ["char", "integer", "boolean", "date"],
         },
         settable: {
             timeline: {
                 date_start: "date_field",
+                date_stop: "date_field",
+                date_delay: "number_field",
                 default_group_by: "relation_group_field",
                 mode: "timeline_mode",
                 colors: "colors",
@@ -279,6 +282,8 @@ beforeEach(() => {
     webModels.ResPartner._views = {
         "kanban,12": `<kanban><templates><t t-name="card"><field name="name"/></t></templates></kanban>`,
         "search,44": `<search><field name="name"/></search>`,
+        // The timeline the canvas renders when web_timeline is loaded.
+        "timeline,12": `<timeline date_start="create_date" default_group_by="country_id"/>`,
     };
     defineWebModels();
     operations = [];
@@ -396,6 +401,7 @@ describe("erplibre_studio editor, kanban", () => {
             value: "country_id",
         });
         expect(".o_erplibre_studio_settable[data-attribute=default_group_by] select").toHaveValue("country_id");
+        await contains(".o_erplibre_studio_inspector_tab[data-tab=changes]").click();
         expect(".o_erplibre_studio_changes li[data-type=set_attribute]").toHaveCount(1);
     });
 
@@ -601,6 +607,181 @@ describe("erplibre_studio editor, pivot", () => {
     });
 });
 
+describe("erplibre_studio editor, add a view", () => {
+    /** An entry of ``view_list``: an editable view unless ``values`` say otherwise. */
+    function entry(type, label, values = {}) {
+        return {
+            type,
+            label,
+            view_id: false,
+            xml_id: false,
+            exists: true,
+            pending: false,
+            added: false,
+            editable: true,
+            reason: false,
+            reason_code: false,
+            changes: 0,
+            ...values,
+        };
+    }
+    const missing = (type, label, code, reason) =>
+        entry(type, label, {exists: false, editable: false, reason_code: code, reason});
+
+    test("the menu adds a view to the draft, opens it, and the banner removes it", async () => {
+        const kanbanList = [
+            entry("kanban", "Kanban", {view_id: 12, xml_id: "base.partner_kanban"}),
+            missing("pivot", "Pivot", "no_view", "Contact has no Pivot view to inherit."),
+            missing("timeline", "Timeline", "needs_module", "Install the web_timeline module to edit a timeline view."),
+            missing("calendar", "Calendar", "not_editable", "The studio does not edit Calendar views yet."),
+        ];
+        answer = kanbanPayload([inCard("name")]);
+        answer.view_list = kanbanList;
+        const added = {
+            line_id: 5,
+            applied: false,
+            name: "res.partner.pivot.studio",
+            xml_id: "studio_contacts.res_partner_view_pivot",
+        };
+        onRpc("erplibre.studio.editor", "add_view", (args) => {
+            expect.step(`add_view ${args.args.join(" ")}`);
+            expect(args.kwargs.revision).toBe(0);
+            const data = pivotPayload([]);
+            data.view = {id: false, name: added.name, xml_id: added.xml_id, pending: false, added};
+            data.view_list = [
+                kanbanList[0],
+                entry("pivot", "Pivot", {xml_id: added.xml_id, pending: true, added: true}),
+                ...kanbanList.slice(2),
+            ];
+            data.project = {...data.project, revision: 1, item_count: 1};
+            return data;
+        });
+        onRpc("erplibre.studio.editor", "remove_view", (args) => {
+            expect.step(`remove_view ${args.args.slice(0, 5).join(" ")}`);
+            expect(args.kwargs.revision).toBe(1);
+            expect(args.kwargs.fallback).toEqual(["res.partner", 12, "kanban"]);
+            const data = kanbanPayload([inCard("name")]);
+            data.view_list = kanbanList;
+            data.view_changed = true;
+            return data;
+        });
+        await openEditor("kanban");
+        expect(".o_erplibre_studio_added_banner").toHaveCount(0);
+
+        await contains(".o_erplibre_studio_add_view").click();
+        expect(".o_erplibre_studio_view_menu_open").toHaveCount(1);
+        expect(".o_erplibre_studio_view_menu_open .o_erplibre_studio_view_menu_tag").toHaveAttribute(
+            "data-origin",
+            "model"
+        );
+        expect(".o_erplibre_studio_view_menu_add").toHaveCount(1);
+        expect(".o_erplibre_studio_view_menu_add[data-view-type=pivot]").toHaveText(
+            /Pivot\s*Cross analysis: rows, columns and measures\./
+        );
+        expect(".o_erplibre_studio_view_menu_unavailable[data-reason=needs_module]").toHaveText(
+            /Timeline\s*not installed\s*Install the web_timeline module/
+        );
+        expect(".o_erplibre_studio_view_menu_unavailable[data-reason=not_editable]").toHaveText(
+            /Calendar\s*The studio does not edit Calendar views yet\./
+        );
+        await contains(".o_erplibre_studio_view_menu_add[data-view-type=pivot]").click();
+        expect.verifySteps(["add_view 3 res.partner pivot"]);
+        // The view exists in the draft only: the editor shows its canvas.
+        expect(".o_erplibre_studio").toHaveAttribute("data-view-type", "pivot");
+        expect("[data-axis=row]").toHaveCount(1);
+        expect(".o_erplibre_studio_view_tab[data-view-type=pivot]").toHaveAttribute("aria-selected", "true");
+        expect(".o_erplibre_studio_view_tab[data-view-type=pivot] .o_erplibre_studio_view_tab_new").toHaveCount(1);
+        expect(".o_erplibre_studio_added_banner").toHaveAttribute("data-applied", "false");
+        expect(".o_erplibre_studio_added_banner").toHaveText(/Pivot view added to the project.*Apply creates it/);
+
+        await contains(".o_erplibre_studio_add_view").click();
+        expect(".o_erplibre_studio_view_menu_open[data-view-type=pivot] .o_erplibre_studio_view_menu_tag").toHaveAttribute(
+            "data-origin",
+            "project"
+        );
+        expect(".o_erplibre_studio_view_menu_add").toHaveCount(0);
+        expect(".o_erplibre_studio_view_menu_none").toHaveCount(0);
+        await contains(".o_erplibre_studio_add_view").click();
+
+        // Removing it asks first, then shows the view the editor opened on.
+        await contains(".o_erplibre_studio_remove_view").click();
+        expect.verifySteps([]);
+        await contains(".modal .modal-footer .btn-primary").click();
+        expect.verifySteps(["remove_view 3 5 res.partner false pivot"]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-view-type", "kanban");
+        expect(".o_erplibre_studio_added_banner").toHaveCount(0);
+        expect(".o_erplibre_studio_view_tab[data-view-type=pivot]").toHaveCount(0);
+    });
+});
+
+describe("erplibre_studio editor, a view added to the draft and the project menu", () => {
+    test("another project, or none, shows the view the editor opened on", async () => {
+        answer = kanbanPayload([inCard("name")]);
+        const added = {
+            line_id: 5,
+            applied: false,
+            name: "res.partner.pivot.studio",
+            xml_id: "studio_contacts.res_partner_view_pivot",
+        };
+        answer.view_list = [
+            {
+                type: "kanban",
+                label: "Kanban",
+                view_id: 12,
+                xml_id: "base.partner_kanban",
+                exists: true,
+                pending: false,
+                added: false,
+                editable: true,
+                reason: false,
+                reason_code: false,
+                changes: 0,
+            },
+            {
+                type: "pivot",
+                label: "Pivot",
+                view_id: false,
+                xml_id: false,
+                exists: false,
+                pending: false,
+                added: false,
+                editable: false,
+                reason: "Contact has no Pivot view to inherit.",
+                reason_code: "no_view",
+                changes: 0,
+            },
+        ];
+        onRpc("erplibre.studio.editor", "add_view", () => {
+            const data = pivotPayload([]);
+            data.view = {id: false, name: added.name, xml_id: added.xml_id, pending: false, added};
+            return data;
+        });
+        onRpc("erplibre.studio.editor", "get_editor_data", (args) => {
+            const [, viewId, viewType] = args.args;
+            if (viewId === false && viewType === "pivot") {
+                // The view exists in the draft of project 3 only.
+                throw makeServerError({message: "Contact has no pivot view to inherit."});
+            }
+            if (args.kwargs.pick_project === false) {
+                expect.step(`get_editor_data ${args.args.slice(0, 4).join(" ")}`);
+                return {...answer, project: false};
+            }
+        });
+        await openEditor("kanban");
+        await contains(".o_erplibre_studio_add_view").click();
+        await contains(".o_erplibre_studio_view_menu_add[data-view-type=pivot]").click();
+        expect(".o_erplibre_studio").toHaveAttribute("data-view-type", "pivot");
+
+        await contains(".o_erplibre_studio_project_select").click();
+        await contains(".o_erplibre_studio_project_item[data-project='']").click();
+        await animationFrame();
+        expect.verifySteps(["get_editor_data res.partner 12 kanban false"]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-view-type", "kanban");
+        expect(".o_erplibre_studio_project_select").toHaveAttribute("data-project", "");
+        expect(".o_notification").toHaveCount(0);
+    });
+});
+
 describe("erplibre_studio editor, timeline", () => {
     test("the attributes of the view, the loaded fields and the colors", async () => {
         answer = timelinePayload({date_start: "create_date", default_group_by: "country_id"});
@@ -609,9 +790,15 @@ describe("erplibre_studio editor, timeline", () => {
         expect(".o_erplibre_studio_card .o_erplibre_studio_field[data-name=name]").toHaveCount(1);
         // A required attribute offers no « Default ».
         expect(".o_erplibre_studio_settable[data-attribute=date_start] option[value='']").toHaveCount(0);
-        expect(".o_erplibre_studio_settable[data-attribute=mode] option[value='']").toHaveCount(1);
+        expect(".o_erplibre_studio_settable[data-attribute=date_stop] option[value='']").toHaveCount(1);
+        // The scale is a group of buttons; without « mode », web_timeline opens on « fit ».
+        const scale = ".o_erplibre_studio_settable[data-attribute=mode] .o_erplibre_studio_mode";
+        expect(scale).toHaveCount(4);
+        expect(`${scale}[data-value=fit]`).toHaveAttribute("aria-pressed", "true");
+        await contains(`${scale}[data-value=fit]`).click();
+        expect.verifySteps([]);
 
-        await contains(".o_erplibre_studio_settable[data-attribute=mode] select").select("week");
+        await contains(`${scale}[data-value=week]`).click();
         expect.verifySteps(["apply_operation set_attribute"]);
         expect(operations.pop()).toEqual({
             type: "set_attribute",
@@ -620,7 +807,8 @@ describe("erplibre_studio editor, timeline", () => {
             value: "week",
         });
 
-        await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
+        // A view without new field types shows its existing fields unfolded.
+        expect(".o_erplibre_studio_palette [data-tab=existing]").toHaveAttribute("aria-expanded", "true");
         await contains(".o_erplibre_studio_existing_field[data-name=active]").dragAndDrop(
             hook("/timeline", "inside", "loaded")
         );
@@ -633,6 +821,7 @@ describe("erplibre_studio editor, timeline", () => {
         });
 
         await contains(".o_erplibre_studio_canvas").click();
+        expect(".o_erplibre_studio_edit_colors").toHaveText("Add a rule");
         await contains(".o_erplibre_studio_edit_colors").click();
         await contains(".o_erplibre_studio_color_field").select("active");
         await contains(".o_erplibre_studio_color_value").edit("False");
@@ -644,6 +833,124 @@ describe("erplibre_studio editor, timeline", () => {
             attribute: "colors",
             value: [{color: "#ec7063", field: "active", operator: "==", value: "False"}],
         });
+    });
+
+    test("the lanes take the fields of their kind, the scale and the color rules", async () => {
+        const rules = [
+            {color: "#ec7063", expression: "active == False", field: "active", operator: "==", value: false},
+            {color: "green", expression: "color > 3", field: "color", operator: ">", value: 3},
+        ];
+        answer = timelinePayload({date_start: "create_date", default_group_by: "country_id"}, ["name"], rules);
+        answer.changes = [
+            {
+                id: 5,
+                type: "set_attribute",
+                kind: "attribute",
+                attribute: "date_start",
+                summary: "Set date_start",
+                xpath: "/timeline",
+                path: "/timeline",
+                error: false,
+            },
+        ];
+        await openEditor("timeline");
+        const lane = (key) => `.o_erplibre_studio_timeline_lane[data-lane=${key}]`;
+        expect(".o_erplibre_studio_timeline_lane").toHaveCount(6);
+        expect(`${lane("start")} .o_erplibre_studio_timeline_chip .text-truncate`).toHaveText(
+            "Created on · create_date"
+        );
+        // The draft set the start date: its chip and its lane say so, to
+        // a screen reader too.
+        expect(`${lane("start")} .o_erplibre_studio_timeline_chip`).toHaveClass(
+            "o_erplibre_studio_timeline_chip_changed"
+        );
+        expect(`${lane("start")} .o_erplibre_studio_timeline_chip .visually-hidden`).toHaveText(
+            "(changed in this draft)"
+        );
+        expect(`${lane("group")} .o_erplibre_studio_timeline_chip .visually-hidden`).toHaveCount(0);
+        expect(`${lane("start")} .o_erplibre_studio_change_dot`).toHaveCount(1);
+        expect(`${lane("group")} .o_erplibre_studio_change_dot`).toHaveCount(0);
+        // A required attribute keeps its field; an empty lane says what it takes.
+        expect(`${lane("group")} .o_erplibre_studio_timeline_chip_remove`).toHaveCount(0);
+        expect(lane("stop")).toHaveText(/Drop a field here/);
+        expect(`${lane("template")} .o_erplibre_studio_card .o_erplibre_studio_field[data-name=name]`).toHaveCount(1);
+        expect(".o_erplibre_studio_frise").toHaveCount(1);
+
+        // A field that does not fit a lane is refused, one that fits sets its attribute.
+        await contains(".o_erplibre_studio_existing_field[data-name=active]").dragAndDrop(lane("start"));
+        expect.verifySteps([]);
+        await contains(".o_erplibre_studio_existing_field[data-name=color]").dragAndDrop(lane("stop"));
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/timeline",
+            attribute: "date_delay",
+            value: "color",
+        });
+        // The inspector shows the lane of the drop.
+        expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-lane", "stop");
+        expect(".o_erplibre_studio_lane_props .o_erplibre_studio_settable[data-attribute=date_stop]").toHaveCount(1);
+        expect(".o_erplibre_studio_lane_props .o_erplibre_studio_settable[data-attribute=date_delay]").toHaveCount(1);
+
+        // The scale of the canvas.
+        expect(`${lane("scale")} .o_erplibre_studio_timeline_scale[data-value=fit]`).toHaveAttribute(
+            "aria-pressed",
+            "true"
+        );
+        await contains(`${lane("scale")} .o_erplibre_studio_timeline_scale[data-value=month]`).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({type: "set_attribute", target: "/timeline", attribute: "mode", value: "month"});
+
+        // A color rule leaves; the others are written again as they are.
+        expect(`${lane("colors")} .o_erplibre_studio_timeline_chip`).toHaveCount(2);
+        await contains(`${lane("colors")} .o_erplibre_studio_timeline_chip[data-index='0'] button`).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/timeline",
+            attribute: "colors",
+            value: [{color: "green", field: "color", operator: ">", value: 3}],
+        });
+
+        // « Add a rule » opens the rules of the colors lane with a new one.
+        await contains(`${lane("colors")} .o_erplibre_studio_timeline_add_rule`).click();
+        expect(lane("colors")).toHaveClass("o_erplibre_studio_timeline_lane_selected");
+        expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-lane", "colors");
+        expect(".o_erplibre_studio_color_rule").toHaveCount(3);
+        expect(".o_erplibre_studio_color_rule:eq(1) .o_erplibre_studio_color_value").toHaveValue("3");
+        await contains(".o_erplibre_studio_colors_form .btn-secondary").click();
+
+        // A lane chosen on the canvas: its attribute shows once, in « Lane ».
+        await contains(`${lane("group")} .o_erplibre_studio_timeline_lane_pick`).click();
+        expect(`${lane("group")} .o_erplibre_studio_timeline_lane_pick`).toHaveAttribute("aria-pressed", "true");
+        expect(".o_erplibre_studio_settable[data-attribute=default_group_by]").toHaveCount(1);
+        expect(".o_erplibre_studio_lane_props .o_erplibre_studio_settable[data-attribute=default_group_by]").toHaveCount(
+            1
+        );
+        // The attributes the view gets from the draft.
+        await contains(".o_erplibre_studio_generated_toggle").click();
+        expect(".o_erplibre_studio_generated").toHaveText(/<timeline date_start="create_date"/);
+        expect(".o_erplibre_studio_generated").toHaveText(/default_group_by="country_id">/);
+
+        // A field of the item template: the lane leaves the inspector.
+        await contains(`${lane("template")} .o_erplibre_studio_field[data-name=name]`).click();
+        expect(".o_erplibre_studio_properties[data-name=name]").toHaveCount(1);
+        expect(".o_erplibre_studio_timeline_lane_selected").toHaveCount(0);
+    });
+
+    test("a color rule the editor does not write keeps every rule", async () => {
+        const rules = [
+            {color: "red", expression: "state in ('a', 'b')"},
+            {color: "green", expression: "color > 3", field: "color", operator: ">", value: 3},
+        ];
+        answer = timelinePayload({date_start: "create_date", default_group_by: "country_id"}, ["name"], rules);
+        await openEditor("timeline");
+        expect(".o_erplibre_studio_timeline_chip_remove").toHaveCount(0);
+        expect(".o_erplibre_studio_color_remove").toHaveCount(0);
+        await contains(".o_erplibre_studio_edit_colors").click();
+        // Saving replaces the rules: the form starts with a new one only.
+        expect(".o_erplibre_studio_color_rule").toHaveCount(1);
+        expect(".o_erplibre_studio_colors_form").toHaveText(/Saving replaces the rules above/);
     });
 });
 

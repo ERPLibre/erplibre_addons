@@ -12,7 +12,7 @@ from .erplibre_studio_project import (
     PREVIEW_KEY,
     protected_model,
 )
-from .studio_pending import is_pending_view, pending_view
+from .studio_pending import added_view, is_added_view, is_pending_view, pending_view
 
 FIELD_ATTRIBUTES = [
     "string",
@@ -41,6 +41,23 @@ PROJECT_ACTIONS = (
 DIGEST_ACTIONS = ("action_apply", "action_revert")
 # The modes of the preview of a model not created yet.
 PREVIEW_MODES = ("simulation", "real")
+# The view types the editor lists after VIEW_TYPES, with why it does not
+# edit them.
+UNSUPPORTED_VIEW_TYPES = ("calendar", "graph", "gantt", "activity")
+# The ``reason_code`` of a view type the editor does not open (``_view_list``):
+# a timeline without web_timeline, a type the studio does not edit, a type no
+# installed module provides, a type a model not created yet cannot have
+# before Apply, a type the model has no view of.
+VIEW_REASONS = (
+    "needs_module",
+    "not_editable",
+    "not_installed",
+    "apply_first",
+    "no_view",
+)
+# How many members ``get_group_members`` and ``get_group_losses`` name at
+# most; their ``count`` says how many there are.
+MEMBERS_SHOWN = 20
 
 
 class ErplibreStudioEditor(models.AbstractModel):
@@ -59,7 +76,9 @@ class ErplibreStudioEditor(models.AbstractModel):
     def _resolve_view(self, model, view_id, view_type, project=None):
         """The primary view the editor inherits: ``view_id``, or the default
         view of ``model`` for ``view_type``; for a model of ``project`` not
-        created yet, its pending default view (``StudioPendingView``)."""
+        created yet, its pending default view (``StudioPendingView``); for a
+        type ``model`` has no view of, the view ``project`` adds before
+        Apply creates it (``StudioAddedView``)."""
         Project = self.env["erplibre.studio.project"]
         if view_type not in Project._view_types():
             raise UserError(
@@ -81,6 +100,10 @@ class ErplibreStudioEditor(models.AbstractModel):
         view = View.browse(int(view_id)).exists() if view_id else View
         if not view:
             view = View.browse(View.default_view(model, view_type))
+        if not view and project:
+            added = project._studio_added_view(model, view_type)
+            if added:
+                return added
         if not view:
             raise UserError(
                 self.env._(
@@ -325,6 +348,138 @@ class ErplibreStudioEditor(models.AbstractModel):
         return {"root": root}
 
     @api.model
+    def _view_type_labels(self):
+        """{view type: label} in the language of the user: the types
+        ir.ui.view knows, and those of VIEW_TYPES and UNSUPPORTED_VIEW_TYPES
+        no installed module adds."""
+        labels = {
+            "timeline": self.env._("Timeline"),
+            "calendar": self.env._("Calendar"),
+            "graph": self.env._("Graph"),
+            "gantt": self.env._("Gantt"),
+            "activity": self.env._("Activity"),
+        }
+        field = self.env["ir.ui.view"]._fields["type"]
+        labels.update(dict(field._description_selection(self.env)))
+        return labels
+
+    @api.model
+    def _view_list(self, model, view, project):
+        """[{type, label, view_id, xml_id, exists, pending, added, editable,
+        reason, reason_code, changes}]: for each view type of VIEW_TYPES,
+        then of UNSUPPORTED_VIEW_TYPES, the default view of ``model``
+        (``view``, the view on screen, for its type) and whether the studio
+        edits it, else why not (``reason``, in the language of the user, and
+        ``reason_code``, see VIEW_REASONS). ``changes``: how many changes of
+        ``project`` it holds. A model of the project not created yet has
+        its pending default views (``view_id`` False, ``pending``). A view
+        ``project`` adds is ``added``, and ``pending`` until Apply creates
+        it; an entry « no_view » is a type the project can add."""
+        Project = self.env["erplibre.studio.project"]
+        editable_types = Project._view_types()
+        known = set(self.env["ir.ui.view"]._fields["type"].get_values(self.env))
+        labels = self._view_type_labels()
+        pending = is_pending_view(view)
+        View = self.env["ir.ui.view"].sudo()
+        project_changes = (
+            project.change_ids if project else self.env["erplibre.studio.change"]
+        )
+        result = []
+        for view_type in studio_arch.VIEW_TYPES + UNSUPPORTED_VIEW_TYPES:
+            label = labels.get(view_type, view_type)
+            entry = {
+                "type": view_type,
+                "label": label,
+                "view_id": False,
+                "xml_id": False,
+                "exists": False,
+                "pending": False,
+                "added": False,
+                "editable": False,
+                "reason": False,
+                "reason_code": False,
+                "changes": 0,
+            }
+            if pending:
+                record = view.line
+                if view_type in studio_arch.MODEL_VIEW_TYPES:
+                    entry.update(exists=True, pending=True)
+                    entry["changes"] = len(
+                        project_changes.filtered(
+                            lambda c, t=view_type: c.model_line_id == record
+                            and c.view_type == t
+                        )
+                    )
+            elif view_type in known:
+                line = (
+                    project._studio_view_line(model, view_type)
+                    if project
+                    else self.env["erplibre.studio.view"]
+                )
+                if view_type == view.type:
+                    record = view
+                else:
+                    record = View.browse(View.default_view(model, view_type))
+                    if not record and line and not line.applied:
+                        record = added_view(line)
+                if record:
+                    added = is_added_view(record)
+                    entry.update(
+                        view_id=record.id or False,
+                        xml_id=record.xml_id or False,
+                        exists=True,
+                        pending=added,
+                        added=added or bool(line and record == line.view_id),
+                    )
+                    entry["changes"] = (
+                        len(project._view_changes(record)) if project else 0
+                    )
+            if view_type not in editable_types:
+                if view_type == "timeline":
+                    code = "needs_module"
+                elif view_type in known:
+                    code = "not_editable"
+                else:
+                    code = "not_installed"
+            elif pending and view_type not in studio_arch.MODEL_VIEW_TYPES:
+                code = "apply_first"
+            elif not entry["exists"]:
+                code = "no_view"
+            else:
+                code = False
+            entry["editable"] = not code
+            entry["reason_code"] = code
+            entry["reason"] = self._view_reason(code, label, model)
+            result.append(entry)
+        return result
+
+    @api.model
+    def _view_reason(self, code, label, model):
+        """The text of the ``reason_code`` ``code`` of ``_view_list``, or
+        False for none."""
+        if code == "needs_module":
+            return self.env._(
+                "Install the web_timeline module to edit a timeline view."
+            )
+        if code == "not_editable":
+            return self.env._(
+                "The studio does not edit %(type)s views yet.", type=label
+            )
+        if code == "not_installed":
+            return self.env._(
+                "No installed module provides %(type)s views.", type=label
+            )
+        if code == "apply_first":
+            return self.env._(
+                "Apply the model first: %(type)s needs its records.", type=label
+            )
+        if code == "no_view":
+            return self.env._(
+                "%(model)s has no %(type)s view to inherit.", model=model, type=label
+            )
+        return False
+
+    @api.model
     def get_editor_data(
         self, model, view_id, view_type, project_id=False, pick_project=True
     ):
@@ -337,19 +492,31 @@ class ErplibreStudioEditor(models.AbstractModel):
         project = self._project(project_id, pick_project, model)
         view = self._resolve_view(model, view_id, view_type, project)
         if project:
-            arch, errors = project._draft_arch(view)
+            arch, errors = project._draft_arch(view, track=True)
         else:
             arch, errors = view._get_combined_arch(), {}
         fields_info = self._fields_payload(model, project)
+        blocks = studio_arch.arch_blocks(arch, view.type, fields_info)
+        paths = studio_arch.change_paths(arch)
+        studio_arch.strip_change_marks(arch)
         changes = []
         if project:
             for change in project._view_changes(view):
+                spec = change._as_dict()
                 changes.append(
                     {
                         "id": change.id,
                         "type": change.change_type,
+                        "kind": studio_arch.change_kind(spec),
+                        # The attribute a « set_attribute » writes, else False.
+                        "attribute": (
+                            change.change_type == "set_attribute"
+                            and spec["payload"].get("attribute")
+                        )
+                        or False,
                         "summary": change.summary,
                         "xpath": change.xpath,
+                        "path": paths.get(str(change.id)) or False,
                         "error": errors.get(change.id) or False,
                     }
                 )
@@ -368,14 +535,16 @@ class ErplibreStudioEditor(models.AbstractModel):
             "model_name": model_name,
             "view_type": view.type,
             "view_types": view_types,
+            "view_list": self._view_list(model, view, project),
             "view": {
                 "id": view.id,
                 "name": view.name,
                 "xml_id": view.xml_id or False,
                 "pending": pending,
                 "model_line_id": view.line.id if pending else False,
+                "added": self._added_payload(project, view),
             },
-            "blocks": studio_arch.arch_blocks(arch, view.type, fields_info),
+            "blocks": blocks,
             "layout": self._layout(view.type, arch),
             "operations": [
                 op
@@ -408,6 +577,21 @@ class ErplibreStudioEditor(models.AbstractModel):
             "preview_key": PREVIEW_KEY,
             "sample_res_id": sample or False,
             "mail_available": Project._studio_mail_available(),
+        }
+
+    @api.model
+    def _added_payload(self, project, view):
+        """{line_id, applied, name, xml_id} of the view line of ``project``
+        behind ``view`` (see ``_studio_view_line_of``), or False when
+        ``view`` is not a view the project adds."""
+        line = project._studio_view_line_of(view) if project else False
+        if not line:
+            return False
+        return {
+            "line_id": line.id,
+            "applied": line.applied,
+            "name": line._studio_view_name(),
+            "xml_id": f"{project.module_name}.{line._studio_xml_name()}",
         }
 
     @api.model
@@ -444,6 +628,9 @@ class ErplibreStudioEditor(models.AbstractModel):
             ],
             "access": [self._access_payload(line) for line in project.access_line_ids],
             "rules": [self._rule_payload(rule) for rule in project.rule_line_ids],
+            "added_views": [
+                self._view_line_payload(line) for line in project.view_line_ids
+            ],
             "approved": project.approved,
             "approved_by": [approver.id, approver.name] if approver else False,
             "approved_date": (
@@ -452,7 +639,183 @@ class ErplibreStudioEditor(models.AbstractModel):
                 else False
             ),
             "real_preview_available": bool(project.approved and pending_models),
+            "applied_date": (
+                fields.Datetime.to_string(project.applied_date)
+                if project.applied_date
+                else False
+            ),
+            "counts": self._project_counts(project),
+            "touched_models": self._touched_models(project),
         }
+
+    @api.model
+    def _view_line_payload(self, line):
+        """A view line as the editor shows it: its model and type, whether
+        Apply created it, and how many changes it holds."""
+        project = line.project_id
+        label = self._view_type_labels().get(line.view_type, line.view_type)
+        changes = project.change_ids.filtered(
+            lambda c: c.view_line_id == line
+            or (line.view_id and c.view_id == line.view_id)
+        )
+        return {
+            "id": line.id,
+            "model": line.model,
+            "view_type": line.view_type,
+            "label": label,
+            "applied": line.applied,
+            "view_id": line.view_id.id or False,
+            "xml_id": f"{project.module_name}.{line._studio_xml_name()}",
+            "changes": len(changes),
+        }
+
+    @api.model
+    def _project_counts(self, project):
+        """{fields, views, views_added, models, access, rules, groups, apps,
+        total, edited_views} of the draft of ``project``: ``fields`` its
+        changes that add a new field, ``views`` its other changes of views,
+        ``views_added`` the views it adds,
+        ``models``, ``access``, ``rules``, ``groups``, ``apps`` its lines of
+        each kind; ``total`` their sum, its ``item_count``; ``edited_views``
+        how many views (pending default views included) its changes edit."""
+        changes = project.change_ids
+        new_fields = project._project_field_changes()
+        edited = {
+            (
+                c.view_id.id,
+                c.model_line_id.id,
+                c.view_line_id.id,
+                c.view_type if c.model_line_id else "",
+            )
+            for c in changes
+        }
+        return {
+            "fields": len(new_fields),
+            "views": len(changes - new_fields),
+            "views_added": len(project.view_line_ids),
+            "models": len(project.new_model_ids),
+            "access": len(project.access_line_ids),
+            "rules": len(project.rule_line_ids),
+            "groups": len(project.group_line_ids),
+            "apps": len(project.app_ids),
+            "total": project.item_count,
+            "edited_views": len(edited),
+        }
+
+    @api.model
+    def _touched_models(self, project):
+        """[{model, name, new, pending, module, chatter, views, fields,
+        changes, access, rules}] of the models ``project`` touches, by
+        model: those it creates (``new``; ``pending`` until Apply creates
+        them) and those its changes, access rows or rules name.
+        ``module``: the module that defines a model of the database, False
+        for a model of the project; ``chatter``: whether its records have
+        the chatter (a model not created yet: whether it will);
+        ``views``: [{type, label, view_id}] of its default views the studio
+        edits, for a model of the database. ``fields``: its new fields on
+        the model [{name, label, ttype, relation, applied}], ``applied``
+        once the model has it; ``changes``, ``access``, ``rules``: how many
+        of its changes of views, access rows and rules are on the
+        model."""
+        lines = {line.model: line for line in project.new_model_ids}
+        names = (
+            set(lines)
+            | set(project.change_ids.mapped("model"))
+            | set(project.access_line_ids.mapped("model"))
+            | set(project.rule_line_ids.mapped("model"))
+            | set(project.view_line_ids.mapped("model"))
+        )
+        # A one2many of the project creates its inverse on the comodel.
+        for change in project._project_field_changes():
+            definition = change._payload().get("field") or {}
+            if project._studio_inverse_definition(change.model, definition):
+                names.add(definition.get("relation"))
+        IrModel = self.env["ir.model"].sudo()
+        View = self.env["ir.ui.view"].sudo()
+        editable_types = project._view_types()
+        labels = self._view_type_labels()
+        result = []
+        for model in sorted(name for name in names if name):
+            line = lines.get(model)
+            known = model in self.env
+            record = IrModel._get(model)
+            if line and not known:
+                name = line.name
+            else:
+                name = record.name or (line.name if line else model)
+            existing = set(self.env[model]._fields) if known else set()
+            definitions = project._studio_field_definitions(model)
+            if line:
+                module = False
+                chatter = line.chatter
+            else:
+                # The first xml id of the ir.model names the module that
+                # defines the model; the others only extend it.
+                module = (
+                    self.env["ir.model.data"]
+                    .sudo()
+                    .search(
+                        [("model", "=", "ir.model"), ("res_id", "=", record.id)],
+                        order="id",
+                        limit=1,
+                    )
+                    .module
+                    if record
+                    else False
+                ) or False
+                # ``is_mail_thread`` exists only once mail is installed.
+                chatter = "is_mail_thread" in IrModel._fields and bool(
+                    record.is_mail_thread
+                )
+            views = []
+            if known and not line:
+                for view_type in editable_types:
+                    view_id = View.default_view(model, view_type)
+                    added = project._studio_view_line(model, view_type)
+                    if view_id or added:
+                        views.append(
+                            {
+                                "type": view_type,
+                                "label": labels.get(view_type, view_type),
+                                "view_id": view_id or False,
+                                "added": bool(added),
+                            }
+                        )
+            result.append(
+                {
+                    "model": model,
+                    "name": name,
+                    "new": bool(line),
+                    "pending": bool(line) and not known,
+                    "module": module,
+                    "chatter": chatter,
+                    "views": views,
+                    "fields": [
+                        {
+                            "name": field_name,
+                            "label": definition.get("field_description") or field_name,
+                            "ttype": definition.get("ttype"),
+                            "relation": definition.get("relation") or False,
+                            "applied": field_name in existing,
+                        }
+                        for field_name, (definition, _change) in sorted(
+                            definitions.items()
+                        )
+                    ],
+                    "changes": len(
+                        project.change_ids.filtered(lambda c, m=model: c.model == m)
+                    ),
+                    "access": len(
+                        project.access_line_ids.filtered(
+                            lambda a, m=model: a.model == m
+                        )
+                    ),
+                    "rules": len(
+                        project.rule_line_ids.filtered(lambda r, m=model: r.model == m)
+                    ),
+                }
+            )
+        return result
 
     @api.model
     def _app_payload(self, app):
@@ -487,6 +850,11 @@ class ErplibreStudioEditor(models.AbstractModel):
 
     @api.model
     def _access_payload(self, line):
+        """An access row as the grid shows it; ``applied`` holds the rights
+        of the ir.model.access the last Apply made of it ({perm_*}), False
+        while no Apply made it: the grid marks the rights the draft
+        changes."""
+        record = line.project_id._studio_record("ir.model.access", line.xml_name)
         item = {
             "id": line.id,
             "model": line.model,
@@ -494,6 +862,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                 [line.group_id.id, line.group_id.full_name] if line.group_id else False
             ),
             **{perm: line[perm] for perm in PERMS},
+            "applied": {perm: record[perm] for perm in PERMS} if record else False,
         }
         if line.group_line_id:
             group = line.group_line_id
@@ -608,6 +977,9 @@ class ErplibreStudioEditor(models.AbstractModel):
             raise UserError(self.env._("Unknown action %(action)s.", action=action))
         project = self._edited_project(project_id, revision)
         view = self._resolve_view(model, view_id, view_type, project)
+        # A view the project adds stays on screen through Apply and Revert:
+        # its line resolves to the view Apply creates, or back to the draft.
+        added = project._studio_view_line_of(view)
         if action == "action_undo":
             result = project.action_undo(view)
         elif action in DIGEST_ACTIONS:
@@ -616,6 +988,12 @@ class ErplibreStudioEditor(models.AbstractModel):
             result = getattr(project, action)()
         if is_pending_view(view):
             alive = model in self.env or bool(project._studio_pending_line(model))
+            view_id = False
+        elif added.exists() and model in self.env:
+            alive = True
+            view_id = False
+        elif is_added_view(view):
+            alive = bool(self.env["ir.ui.view"].default_view(model, view_type))
             view_id = False
         else:
             alive = model in self.env and bool(view.exists())
@@ -680,8 +1058,9 @@ class ErplibreStudioEditor(models.AbstractModel):
     def get_studio_choices(self, project_id=False):
         """What the dialogs of the models, the access grid and the rules
         offer: the menus a model can go under (with an external id, no
-        action, outside the project), the groups (with an external id; then
-        the groups of the project, ``project`` true, by ``line_id``), the
+        action, outside the project), the groups (with an external id and
+        their ``category`` [id, name]; then the groups of the project,
+        ``project`` true, by ``line_id``), the
         apps of the project and the icons of an app, the models rights can
         name, and the model names a new model cannot take
         (``taken_models``)."""
@@ -716,6 +1095,11 @@ class ErplibreStudioEditor(models.AbstractModel):
                         "id": group.id,
                         "name": group.full_name,
                         "xml_id": group_xmlids[group.id],
+                        "category": (
+                            [group.category_id.id, group.category_id.name]
+                            if group.category_id
+                            else False
+                        ),
                     }
                     for group in groups - project.created_group_ids
                     if group_xmlids.get(group.id)
@@ -791,6 +1175,51 @@ class ErplibreStudioEditor(models.AbstractModel):
         view = self._resolve_view(model, view_id, view_type, project)
         project._studio_remove_model(project._studio_model_line(line_id))
         return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def add_view(self, project_id, model, view_type, revision=None):
+        """Add the ``view_type`` view of ``model``, which has none, to the
+        draft (see ``_studio_add_view``); the payload of that view, the
+        editor opens it."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        project._studio_add_view(model, view_type)
+        return self.get_editor_data(model, False, view_type, project.id)
+
+    @api.model
+    def remove_view(
+        self,
+        project_id,
+        line_id,
+        model,
+        view_id,
+        view_type,
+        revision=None,
+        fallback=None,
+    ):
+        """Take the view of the view line ``line_id`` out of the draft (see
+        ``_studio_remove_view``). The payload of the view on screen; when it
+        was that view and Apply had not created it, the payload of
+        ``fallback`` ([model, view id, view type]), else of the first view
+        of the model the editor opens, flagged ``view_changed``; without
+        one, {view_gone, project}."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        project._studio_remove_view(project._studio_added_line(line_id))
+        try:
+            return self.get_editor_data(model, view_id, view_type, project.id)
+        except UserError:
+            pass
+        data = self._fallback_data(project, fallback)
+        if not data.get("view_gone") or model not in self.env:
+            return data
+        View = self.env["ir.ui.view"].sudo()
+        for other in project._view_types():
+            if View.default_view(model, other):
+                data = self.get_editor_data(model, False, other, project.id)
+                data["view_changed"] = True
+                return data
+        return data
 
     @api.model
     def update_app(self, project_id, values, model, view_id, view_type, revision=None):
@@ -922,6 +1351,111 @@ class ErplibreStudioEditor(models.AbstractModel):
         view = self._resolve_view(model, view_id, view_type, project)
         project._studio_remove_group(project._studio_group_line(group_id))
         return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def _members_limit(self, limit):
+        """``limit`` as a count of members to name: MEMBERS_SHOWN by
+        default, between 1 and 100."""
+        return max(1, min(int(limit or MEMBERS_SHOWN), 100))
+
+    @api.model
+    def _users_payload(self, users, limit):
+        """{count, users: [{id, name}], more} of the res.users ``users``:
+        the first ``limit`` by name, ``more`` when there are others."""
+        users = users.sorted(lambda u: ((u.name or "").lower(), u.id))
+        return {
+            "count": len(users),
+            "users": [{"id": u.id, "name": u.name} for u in users[:limit]],
+            "more": len(users) > limit,
+        }
+
+    @api.model
+    def _members_payload(self, group, limit):
+        """``_users_payload`` of the members of the res.groups ``group``; a
+        named member is ``direct`` when none of their other groups implies
+        ``group``, else they hold it through an implication."""
+        data = self._users_payload(group.users, limit)
+        users = self.env["res.users"].sudo().browse([u["id"] for u in data["users"]])
+        for item, user in zip(data["users"], users, strict=True):
+            item["direct"] = not any(
+                group in other.trans_implied_ids for other in user.groups_id - group
+            )
+        return data
+
+    @api.model
+    def get_group_members(
+        self, project_id=False, group_ids=None, line_ids=None, limit=MEMBERS_SHOWN
+    ):
+        """The active members of groups, at most ``limit`` named of each
+        (``_members_payload``): {groups: [{id, name, xml_id, category,
+        implied, count, users, more}] for the res.groups ``group_ids``,
+        ``category`` [id, name] or False and ``implied`` [[id, name]] the
+        groups it implies; lines: [{line_id, applied, count, users, more}]
+        for the groups ``line_ids`` of the project ``project_id``}, a group
+        of the project having members once Apply made it. A read."""
+        self._check_studio_access()
+        limit = self._members_limit(limit)
+        Groups = self.env["res.groups"].sudo()
+        result = {"groups": [], "lines": []}
+        for group in Groups.browse([int(i) for i in group_ids or []]).exists():
+            category = group.category_id
+            result["groups"].append(
+                {
+                    "id": group.id,
+                    "name": group.full_name,
+                    "xml_id": group.get_external_id().get(group.id) or False,
+                    "category": [category.id, category.name] if category else False,
+                    "implied": [[g.id, g.full_name] for g in group.implied_ids],
+                    **self._members_payload(group, limit),
+                }
+            )
+        if line_ids:
+            project = self._read_project(project_id)
+            for line_id in line_ids:
+                line = project._studio_group_line(line_id)
+                record = line._studio_group_record()
+                members = (
+                    self._members_payload(record, limit)
+                    if record
+                    else {"count": 0, "users": [], "more": False}
+                )
+                result["lines"].append(
+                    {"line_id": line.id, "applied": bool(record), **members}
+                )
+        return result
+
+    @api.model
+    def get_group_losses(self, project_id, limit=MEMBERS_SHOWN):
+        """What the next Apply takes from members of the groups of the
+        project ``project_id`` (``_studio_group_losses``): [{group,
+        line_id, via, via_line_id, count, users, more}], one entry per
+        group of the project ``via`` that no longer implies the group of the
+        project ``group`` in the draft and whose members lose ``group``;
+        ``group`` and ``via`` are [res.groups id, name], ``line_id`` and
+        ``via_line_id`` their groups of the project; at most ``limit``
+        members named. A read."""
+        self._check_studio_access()
+        limit = self._members_limit(limit)
+        project = self._read_project(project_id)
+        lines = {}
+        for line in project.group_line_ids:
+            record = line._studio_group_record()
+            if record:
+                lines[record.id] = line.id
+        result = []
+        for record, dropped, users in project._studio_group_losses():
+            if not users:
+                continue
+            result.append(
+                {
+                    "group": [dropped.id, dropped.full_name],
+                    "line_id": lines.get(dropped.id, False),
+                    "via": [record.id, record.full_name],
+                    "via_line_id": lines.get(record.id, False),
+                    **self._users_payload(users, limit),
+                }
+            )
+        return result
 
     # ── relations ───────────────────────────────────────────────────────
 

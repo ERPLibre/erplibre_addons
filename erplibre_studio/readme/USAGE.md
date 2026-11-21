@@ -13,6 +13,11 @@
    view, drop a field on the rows, the columns or the measures. A drop
    zone never splits a `t-if` / `t-else` pair of a kanban card. With no
    node selected, the side panel sets the options of the view.
+   **Add a view**, in the top bar, opens the views of the model, and adds
+   to the draft a view of a type the model lacks (kanban, pivot, timeline
+   once *web_timeline* is installed, ...): the editor opens it at once,
+   **Apply** creates it as the default view of its type, the **Review**
+   lists it, and its banner removes it from the draft.
 4. **New model**, in the toolbar of the editor or in the side panel,
    asks a label, a technical name (`x_`, set from the label until
    edited), the chatter (when *Discuss* is installed), and where its menu
@@ -43,7 +48,8 @@
    may only read, and take no record rule: Odoo adds up the rules of the
    groups of a user, so such a rule would widen what they reach.
 6. **Preview** shows the view as it will be, with a placeholder for the
-   new fields not created yet. On a model not created yet, the preview is
+   new fields not created yet. A banner says how it renders, the palette
+   pauses, and the inspector tells the approval and what withdraws it. On a model not created yet, the preview is
    a **simulation**: nothing is written. **Approve for a real preview**
    records who approved what; the **real** preview then creates the
    models in a savepoint, renders them, and rolls back. While it renders
@@ -70,16 +76,21 @@
    form shows it as a sub-list. Many2many, dropped into a form (a
    sub-list), a list or a kanban (tags): the relation table and its
    columns are named by the server, after the module.
-9. **Apply** writes the fields and the views into the database: every user
-   sees them. When it removes records, values or group members, it lists
-   them first and asks to confirm.
+9. **Apply**, in the top bar, opens the **Review** space: every item of
+   the draft by view and by model, filtered by fields, views, models or
+   security, with what stops it from applying; **Show** reaches an item
+   in its space. Beside it, what Apply creates or updates and, when
+   something leaves the database, what leaves it, which Apply waits for
+   « I understand » to remove. The **Apply** button of the review writes
+   the draft into the database: every user sees it.
 10. **Project** opens the project: its changes, and the fields and views
    it put in the database. **Revert**, in the toolbar of the editor or on
    the project form, removes them from the database,
    with the records of its models and their filters, after a list of
    what leaves the database; the changes and the lines stay, as a draft,
    but for the changes of the default views of its models, which go with
-   these views. When what leaves changed since the list was shown, the
+   these views; a view the project adds goes back to the draft with its
+   changes. When what leaves changed since the list was shown, the
    confirmation shows it again before it confirms. Apply and Revert
    refuse to remove a field, a model or a menu that something else still
    uses: a record rule whose domain names the field, a change of another

@@ -13,6 +13,7 @@ the models of the database (field types, the view types installed) is
 the part of the project and the editor.
 """
 
+import ast
 import copy
 import hashlib
 import re
@@ -338,6 +339,12 @@ _ITEM_VALUE = re.compile(
 # The attribute that marks, in a draft arch built to find them, the nodes a
 # change added; never written to a view.
 ADDED_MARK = "erplibre_studio_added"
+# The attribute that marks, in a draft arch built for the editor, the nodes
+# the changes touch: space-separated « key:kind » tokens (see
+# ``change_kind``); never written to a view.
+CHANGE_MARK = "erplibre_studio_changes"
+# The kinds of ``change_kind``, in the order the editor lists them.
+CHANGE_KINDS = ("new", "renamed", "hidden", "moved", "attribute")
 
 
 class ArchError(ValueError):
@@ -769,20 +776,101 @@ def _apply_one(arch, change, view_type, mark=False):
     return apply_inheritance_specs(copy.deepcopy(arch), spec)
 
 
-def apply_changes(arch, changes, view_type, message=str, mark=False):
+def change_kind(change):
+    """What ``change`` (a dict of ``change_spec``) does to its node, one of
+    CHANGE_KINDS: « new » when it adds the node, « moved », « hidden »
+    (hidden, or removed from a view type that hides by removing),
+    « renamed » when it sets the label, else « attribute »."""
+    ctype = change["type"]
+    payload = change.get("payload") or {}
+    if ctype in ADD_CHANGES or ctype == "add_node":
+        return "new"
+    if ctype == "move":
+        return "moved"
+    if ctype == "remove" or (ctype == "hide" and payload.get("value")):
+        return "hidden"
+    if ctype == "relabel" or (
+        ctype == "set_attribute" and payload.get("attribute") == "string"
+    ):
+        return "renamed"
+    return "attribute"
+
+
+def _add_change_mark(node, key, kind):
+    tokens = (node.get(CHANGE_MARK) or "").split()
+    token = f"{key}:{kind}"
+    if token not in tokens:
+        node.set(CHANGE_MARK, " ".join(tokens + [token]))
+
+
+def change_marks(node):
+    """[(key, kind)] of the CHANGE_MARK of ``node``; the keys as text."""
+    return [
+        tuple(token.rsplit(":", 1)) for token in (node.get(CHANGE_MARK) or "").split()
+    ]
+
+
+def strip_change_marks(arch):
+    """Remove the CHANGE_MARK of every node of ``arch``, in place."""
+    for node in arch.xpath(f"//*[@{CHANGE_MARK}]"):
+        del node.attrib[CHANGE_MARK]
+    return arch
+
+
+def _apply_tracked(arch, change, view_type):
+    """``arch`` with ``change`` applied, a new element, the node it touches
+    marked with CHANGE_MARK: the nodes its spec inserts for an added node
+    (not the field a timeline item loads beside), else the node at its
+    XPath (the source of a move) as it stands before the change."""
+    spec = change_spec(change, view_type)
+    candidate = copy.deepcopy(arch)
+    kind = change_kind(change)
+    key = change["key"]
+    if kind == "new":
+        main = spec[0] if spec.tag == "data" else spec
+        for child in elements(main):
+            if child.tag != "xpath":
+                _add_change_mark(child, key, kind)
+    else:
+        payload = change.get("payload") or {}
+        target = payload.get("source") if kind == "moved" else change.get("xpath")
+        try:
+            _add_change_mark(locate(candidate, target), key, kind)
+        except ArchError:
+            # The spec does not apply either, and says why.
+            pass
+    return apply_inheritance_specs(candidate, spec)
+
+
+def apply_changes(arch, changes, view_type, message=str, mark=False, track=False):
     """Apply ``changes`` (dicts with a ``key``) in order to a copy of
     ``arch``. Return (arch, errors): a change that does not apply is
     skipped and ``errors`` maps its key to the reason, the text that
     ``message`` gives for the exception. ``mark``: the nodes a change adds
-    carry ADDED_MARK, its key."""
+    carry ADDED_MARK, its key. ``track``: each node a change adds, moves,
+    hides or sets an attribute of carries CHANGE_MARK (``_apply_tracked``);
+    a node a change removes leaves the arch with its marks."""
     arch = copy.deepcopy(arch)
     errors = {}
     for change in changes:
         try:
-            arch = _apply_one(arch, change, view_type, mark)
+            if track:
+                arch = _apply_tracked(arch, change, view_type)
+            else:
+                arch = _apply_one(arch, change, view_type, mark)
         except Exception as exc:  # noqa: BLE001 - every spec error is reported
             errors[change["key"]] = message(exc)
     return arch, errors
+
+
+def change_paths(arch):
+    """{key: XPath} of the first node of ``arch``, in document order, that
+    carries the CHANGE_MARK of each change; the keys as text."""
+    paths = {}
+    for node in arch.xpath(f"//*[@{CHANGE_MARK}]"):
+        for key, _kind in change_marks(node):
+            paths.setdefault(key, node_xpath(arch, node))
+    return paths
 
 
 def _added_by(root, xpath, key=None):
@@ -934,14 +1022,38 @@ def colors_text(rules):
     return ";".join(parts)
 
 
+# A color rule as ``colors_text`` writes it: « field operator literal ».
+_COLOR_RULE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*(==|!=|>=|<=|>|<)\s*(.+)$", re.S)
+
+
 def colors_rules(text):
-    """[{color, expression}] of a ``colors`` attribute."""
+    """[{color, expression}] of a ``colors`` attribute. A rule that
+    ``colors_text`` could have written also gives its ``field``,
+    ``operator`` and ``value``, so that it can be written again; another
+    expression stays text only."""
     rules = []
     for part in (text or "").split(";"):
         color, sep, expression = part.partition(":")
         if sep and color.strip():
-            rules.append({"color": color.strip(), "expression": expression.strip()})
+            rule = {"color": color.strip(), "expression": expression.strip()}
+            rule.update(_color_rule_parts(rule["expression"]))
+            rules.append(rule)
     return rules
+
+
+def _color_rule_parts(expression):
+    """{field, operator, value} of a color rule « field operator literal »,
+    or {} when ``expression`` is not one."""
+    match = _COLOR_RULE.match(expression)
+    if not match:
+        return {}
+    try:
+        value = ast.literal_eval(match.group(3).strip())
+    except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
+        return {}
+    if not isinstance(value, (str, int, float, bool)):
+        return {}
+    return {"field": match.group(1), "operator": match.group(2), "value": value}
 
 
 _ORDER_TERM = re.compile(r"^\s*([a-z_][a-z0-9_]*)(\s+(asc|desc))?\s*$", re.I)
@@ -1047,20 +1159,41 @@ def arch_blocks(root, view_type, fields):
     editor payload (``get_editor_data``). In a form, any element with children is a container, so
     that a field inside a title shows; in a QWeb view, any element of a
     template is. A field never shows its sub-views: the editor does not
-    descend into an x2many."""
+    descend into an x2many.
+
+    Of a draft arch built with ``apply_changes(track=True)``, a block
+    gives the ``changes`` (keys, an int when the key is one) that touch
+    its node and their ``change_kinds`` (CHANGE_KINDS order), ``changed``
+    when there is one, and ``changed_inside`` when a block under it is
+    ``changed``."""
 
     def walk(node, depth):
+        keys = []
+        kinds = set()
+        for key, kind in change_marks(node):
+            key = int(key) if key.isdigit() else key
+            kinds.add(kind)
+            if key not in keys:
+                keys.append(key)
         block = {
             "path": node_xpath(root, node),
             "tag": node.tag,
             "label": node_label(node, fields, view_type),
             "attrs": _shown_attrs(node, view_type),
             "movable": depth > 0 and move_refusal(view_type, node) is None,
+            "changes": keys,
+            "change_kinds": [kind for kind in CHANGE_KINDS if kind in kinds],
+            "changed": bool(keys),
+            "changed_inside": False,
         }
         if _is_container(node, view_type, depth):
             block["kind"] = "template" if is_template(node) else "container"
             block["drop"] = _drop_container(view_type, node)
             block["children"] = [walk(child, depth + 1) for child in elements(node)]
+            block["changed_inside"] = any(
+                child["changed"] or child["changed_inside"]
+                for child in block["children"]
+            )
         else:
             block["kind"] = _node_kind(node, view_type)
         if block["kind"] == "field":
@@ -1164,6 +1297,47 @@ def default_model_arch(view_type, label, chatter=False):
     elif view_type in ("list", "search"):
         etree.SubElement(root, "field", {"name": "x_name"})
     else:
+        raise ArchError(
+            f"Unknown view type {view_type}.", "unknown_view_type", type=view_type
+        )
+    return etree.tostring(root, encoding="unicode", pretty_print=True)
+
+
+def default_view_arch(view_type, label, name_field, date_field=None, group_field=None):
+    """The arch text of the ``view_type`` view (``VIEW_TYPES``) a project
+    adds to an existing model, labelled ``label``: the record name
+    ``name_field`` in a form, a list, a search view and a kanban card; an
+    empty pivot (it counts the records); a timeline that starts on
+    ``date_field``, one row per value of the many2one ``group_field``, its
+    items showing the record name. The arch depends on these values only:
+    the changes of the editor on the view locate their nodes in it."""
+    root = etree.Element(view_type, {"string": label})
+    if view_type == "form":
+        sheet = etree.SubElement(root, "sheet")
+        main = etree.SubElement(sheet, "group", {"name": "studio_main"})
+        left = etree.SubElement(main, "group", {"name": "studio_left"})
+        etree.SubElement(left, "field", {"name": name_field})
+        etree.SubElement(main, "group", {"name": "studio_right"})
+    elif view_type in ("list", "search"):
+        etree.SubElement(root, "field", {"name": name_field})
+    elif view_type == "kanban":
+        templates = etree.SubElement(root, "templates")
+        card = etree.SubElement(templates, "t", {"t-name": "card"})
+        etree.SubElement(card, "field", {"name": name_field, "class": "fw-bold"})
+    elif view_type == "timeline":
+        if not date_field or not group_field:
+            raise ArchError(
+                "A timeline needs a date field and a many2one to group by.",
+                "timeline_fields",
+            )
+        root.set("date_start", date_field)
+        root.set("default_group_by", group_field)
+        etree.SubElement(root, "field", {"name": name_field})
+        templates = etree.SubElement(root, "templates")
+        item = etree.SubElement(templates, "t", {"t-name": "timeline-item"})
+        body = etree.SubElement(item, "div")
+        etree.SubElement(body, "span", {"t-esc": f"record.{name_field}"})
+    elif view_type != "pivot":
         raise ArchError(
             f"Unknown view type {view_type}.", "unknown_view_type", type=view_type
         )

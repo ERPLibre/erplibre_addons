@@ -6,7 +6,9 @@ list, kanban, search and pivot views, and timeline views once
   of the *Developer panel*, opens the editor on that view;
   **Customize the search view** opens it on the search view of the page.
   In the editor, the view type selector opens the default view of
-  another type of the same model, in the same project.
+  another type of the same model, in the same project; **Add a view**
+  adds to the project a view of a type the model has none of, created by
+  Apply as its default view of that type.
 - The editor shows the view as blocks: groups, notebook pages, columns
   and fields. Fields move by drag and drop; the palette adds existing
   fields of the model and new `x_` fields (text, integer, decimal,
@@ -31,10 +33,13 @@ list, kanban, search and pivot views, and timeline views once
 - **Pivot**: one lane per axis, rows, columns and measures; a field
   dragged from the palette or from another lane lands on that axis, by
   period for a date. A lane refuses a field that cannot go on its axis.
-- **Timeline**: the start and stop dates, the grouping (by a many2one or
-  a many2many field: web_timeline makes one row per record), the colors
-  (from a field, an operator and a value; neither a many2one nor a date
-  and time), the scale, and the fields of the item template. A field
+- **Timeline**: one lane per setting on the canvas: the start and stop
+  dates, the grouping (by a many2one or a many2many field: web_timeline
+  makes one row per record), the colors (rules from a field, an operator
+  and a value; neither a many2one nor a date and time), the scale, and
+  the fields of the item template. A field of the palette dropped on a
+  lane sets it; a lane refuses a field of another kind. Below the lanes,
+  the timeline itself renders the records with the draft. A field
   dropped into the item shows its value (`record.<field>`, the name of a
   many2one) and is loaded by the view: the item template renders without
   the record of a kanban card, where a `<field>` does not compile.
@@ -74,6 +79,9 @@ list, kanban, search and pivot views, and timeline views once
   on any database; once the draft is *approved*, the *real* preview
   creates the model inside a savepoint, renders its views as Odoo
   validates them, and rolls everything back.
+- **Review before Apply**: Apply first shows every item of the draft by
+  view and by model, with what stops it from applying, what Apply writes
+  and what leaves the database.
 - **Confirmations**: Revert, and an Apply that removes records, values or
   group members, first list what leaves the database (models with their
   record counts, fields with their values, views, menus, rights, rules,

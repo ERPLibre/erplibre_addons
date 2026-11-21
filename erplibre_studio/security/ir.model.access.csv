@@ -7,3 +7,4 @@ access_erplibre_studio_rule_system,erplibre.studio.rule system,model_erplibre_st
 access_erplibre_studio_app_system,erplibre.studio.app system,model_erplibre_studio_app,base.group_system,1,1,1,1
 access_erplibre_studio_group_system,erplibre.studio.group system,model_erplibre_studio_group,base.group_system,1,1,1,1
 access_erplibre_studio_revert_wizard_system,erplibre.studio.revert.wizard system,model_erplibre_studio_revert_wizard,base.group_system,1,1,1,1
+access_erplibre_studio_view_system,erplibre.studio.view system,model_erplibre_studio_view,base.group_system,1,1,1,1

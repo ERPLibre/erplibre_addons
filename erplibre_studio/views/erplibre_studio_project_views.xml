@@ -86,6 +86,7 @@
                                 <list create="0" edit="0" delete="0">
                                     <field name="view_id" />
                                     <field name="model_line_id" optional="hide" />
+                                    <field name="view_line_id" optional="hide" />
                                     <field name="change_type" />
                                     <field name="summary" />
                                     <field name="xpath" optional="hide" />
@@ -96,6 +97,7 @@
                                         <field name="model" />
                                         <field name="view_id" />
                                         <field name="model_line_id" />
+                                        <field name="view_line_id" />
                                         <field name="xpath" />
                                         <field name="position" />
                                         <field name="payload" />
@@ -125,6 +127,16 @@
                                     />
                                     <field name="menu_name" optional="show" />
                                     <field name="menu_sequence" optional="hide" />
+                                    <field name="applied" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Views added" name="views_added">
+                            <!-- The editor adds them: « Add a view » of its top bar. -->
+                            <field name="view_line_ids" readonly="1">
+                                <list create="0" edit="0">
+                                    <field name="model" />
+                                    <field name="view_type" />
                                     <field name="applied" />
                                 </list>
                             </field>

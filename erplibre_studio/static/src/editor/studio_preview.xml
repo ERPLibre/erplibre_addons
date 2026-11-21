@@ -23,126 +23,147 @@
         <div t-else="" class="text-muted small">This model is no longer in the project.</div>
     </t>
 
-    <!-- The preview of a model not created yet: the mode the server rendered
-         it in, the approval that the real mode needs, the type of view, then
-         the view. -->
+    <!-- The preview of a model not created yet: a banner with the mode the
+         server rendered it in and the approval the real mode needs, then
+         the type of view and the view. -->
     <t t-name="erplibre_studio.ModelPreview">
         <div
-            class="o_erplibre_studio_model_preview"
+            class="o_erplibre_studio_model_preview d-flex flex-column gap-3"
             t-att-data-mode="renderedMode"
             t-att-data-requested-mode="props.mode"
             t-att-data-view-type="props.viewType"
         >
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                <span
-                    class="badge o_erplibre_studio_preview_mode"
-                    t-att-class="isReal ? 'text-bg-danger' : 'text-bg-info'"
-                    t-att-data-mode="renderedMode"
-                    t-esc="modeLabel"
-                />
-                <span class="fw-bold" t-esc="props.line.name" />
-                <code class="small" t-esc="props.line.model" />
-                <div class="btn-group btn-group-sm" role="group" aria-label="Mode of the preview">
+            <section
+                class="o_erplibre_studio_preview_banner border rounded p-3 d-flex flex-column gap-2"
+                t-att-class="isReal ? 'bg-primary-subtle border-primary-subtle text-primary-emphasis' : 'bg-info-subtle border-info-subtle text-info-emphasis'"
+                data-kind="model"
+                t-att-data-mode="renderedMode"
+                aria-label="Mode of the preview"
+            >
+                <div class="d-flex flex-wrap align-items-start gap-3">
+                    <i class="fa fa-lg mt-1" t-att-class="isReal ? 'fa-database' : 'fa-flask'" aria-hidden="true" />
+                    <div class="flex-grow-1 min-w-0">
+                        <h2 class="h6 mb-1 d-flex flex-wrap align-items-baseline gap-2 o_erplibre_studio_preview_title">
+                            <span class="o_erplibre_studio_preview_mode" t-att-data-mode="renderedMode" t-esc="modeLabel" />
+                            <span class="fw-normal" t-esc="props.line.name" />
+                            <code class="small" t-esc="props.line.model" />
+                        </h2>
+                        <p class="mb-0 small o_erplibre_studio_preview_text" t-esc="bannerText" />
+                    </div>
+                    <div class="btn-group btn-group-sm bg-view rounded" role="group" aria-label="Mode of the preview">
+                        <button
+                            type="button"
+                            class="btn o_erplibre_studio_preview_simulation"
+                            t-att-class="isReal ? 'btn-outline-secondary' : 'btn-secondary'"
+                            t-att-aria-pressed="isReal ? 'false' : 'true'"
+                            t-att-disabled="props.busy"
+                            t-on-click="() => props.onView(props.viewType, 'simulation')"
+                        >
+                            Simulation
+                        </button>
+                        <button
+                            type="button"
+                            class="btn o_erplibre_studio_preview_real"
+                            t-att-class="isReal ? 'btn-secondary' : 'btn-outline-secondary'"
+                            t-att-aria-pressed="isReal ? 'true' : 'false'"
+                            t-att-disabled="props.busy or !props.project.approved"
+                            t-att-aria-describedby="props.project.approved ? false : 'o_erplibre_studio_real_hint'"
+                            title="The server creates the model in a savepoint, renders its views, then rolls everything back"
+                            t-on-click="() => props.onView(props.viewType, 'real')"
+                        >
+                            <i t-if="!props.project.approved" class="fa fa-lock me-1" aria-hidden="true" />
+                            Real
+                        </button>
+                    </div>
                     <button
                         type="button"
-                        class="btn o_erplibre_studio_preview_simulation"
-                        t-att-class="isReal ? 'btn-outline-secondary' : 'btn-secondary'"
-                        t-att-aria-pressed="isReal ? 'false' : 'true'"
-                        t-att-disabled="props.busy"
-                        t-on-click="() => props.onView(props.viewType, 'simulation')"
-                    >
-                        Simulation
-                    </button>
-                    <button
-                        type="button"
-                        class="btn o_erplibre_studio_preview_real"
-                        t-att-class="isReal ? 'btn-secondary' : 'btn-outline-secondary'"
-                        t-att-aria-pressed="isReal ? 'true' : 'false'"
-                        t-att-disabled="props.busy or !props.project.approved"
-                        t-att-aria-describedby="props.project.approved ? false : 'o_erplibre_studio_real_hint'"
-                        title="The server creates the model in a savepoint, renders its views, then rolls everything back"
-                        t-on-click="() => props.onView(props.viewType, 'real')"
-                    >
-                        Real
-                    </button>
+                        class="btn-close o_erplibre_studio_preview_close"
+                        aria-label="Close the preview"
+                        title="Close the preview"
+                        t-on-click="props.onClose"
+                    />
                 </div>
-                <span
-                    t-if="!props.project.approved"
-                    id="o_erplibre_studio_real_hint"
-                    class="small text-muted o_erplibre_studio_real_hint"
-                >
-                    Real: approve the draft first.
-                </span>
-                <button
-                    t-if="!props.project.approved"
-                    type="button"
-                    class="btn btn-sm btn-outline-primary o_erplibre_studio_approve"
-                    title="The real preview creates the models in the database for a moment: approve what it creates"
-                    t-att-disabled="props.busy"
-                    t-on-click="props.onApprove"
-                >
-                    Approve for a real preview
-                </button>
-                <button
-                    t-else=""
-                    type="button"
-                    class="btn btn-sm btn-outline-secondary o_erplibre_studio_unapprove"
-                    t-att-disabled="props.busy"
-                    t-on-click="props.onUnapprove"
-                >
-                    Withdraw the approval
-                </button>
-                <button
-                    type="button"
-                    class="btn-close ms-auto o_erplibre_studio_preview_close"
-                    aria-label="Close the preview"
-                    title="Close the preview"
-                    t-on-click="props.onClose"
-                />
-            </div>
-            <div class="small text-muted mb-2">
-                <span class="o_erplibre_studio_preview_note">Nothing is saved: the model does not exist yet.</span>
-                <span t-if="props.project.approved" class="ms-2 o_erplibre_studio_approved" t-esc="approvedText" />
-                <span
-                    t-elif="props.project.approved_by"
-                    class="ms-2 text-warning o_erplibre_studio_approval_stale"
-                >
-                    The draft changed since its approval: approve it again.
-                </span>
-            </div>
+                <div class="d-flex flex-wrap align-items-center gap-2 small">
+                    <t t-if="!props.project.approved">
+                        <span
+                            t-if="props.project.approved_by"
+                            id="o_erplibre_studio_real_hint"
+                            class="fw-bold o_erplibre_studio_real_hint o_erplibre_studio_approval_stale"
+                        >
+                            The draft changed since its approval: approve it again.
+                        </span>
+                        <span t-else="" id="o_erplibre_studio_real_hint" class="o_erplibre_studio_real_hint">
+                            The real mode creates the draft in the database, then rolls it back: it needs an approval.
+                        </span>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary o_erplibre_studio_approve"
+                            title="The real preview creates the models in the database for a moment: approve what it creates"
+                            t-att-disabled="props.busy"
+                            t-on-click="props.onApprove"
+                        >
+                            <i class="fa fa-check me-1" aria-hidden="true" />
+                            Approve for a real preview
+                        </button>
+                    </t>
+                    <t t-else="">
+                        <span class="o_erplibre_studio_approved">
+                            <i class="fa fa-check-circle me-1" aria-hidden="true" />
+                            <t t-esc="approvedText" />
+                        </span>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary bg-view o_erplibre_studio_unapprove"
+                            t-att-disabled="props.busy"
+                            t-on-click="props.onUnapprove"
+                        >
+                            Withdraw the approval
+                        </button>
+                    </t>
+                    <span class="w-100 o_erplibre_studio_lock_note">
+                        <i class="fa fa-clock-o me-1" aria-hidden="true" />
+                        While it renders, a statement of the real preview waits 2 s at most for a lock; beyond that the preview stops rather than block the other users.
+                    </span>
+                </div>
+            </section>
             <div
                 t-if="modeMismatch"
-                class="alert alert-warning py-1 o_erplibre_studio_preview_mismatch"
+                class="alert alert-warning py-1 mb-0 o_erplibre_studio_preview_mismatch"
                 role="alert"
                 t-esc="modeMismatch"
             />
-            <div class="nav nav-tabs mb-2" role="tablist" aria-label="View of the preview">
-                <button
-                    t-foreach="viewTypes"
-                    t-as="type"
-                    t-key="type"
-                    type="button"
-                    role="tab"
-                    class="nav-link py-1 px-2 o_erplibre_studio_preview_type"
-                    t-att-class="{'active': type === props.viewType}"
-                    t-att-aria-selected="type === props.viewType ? 'true' : 'false'"
-                    t-att-aria-controls="panelId"
-                    t-att-data-view-type="type"
-                    t-on-click="() => props.onView(type, props.mode)"
-                    t-esc="viewTypeLabel(type)"
-                />
-            </div>
-            <div t-att-id="panelId" role="tabpanel" class="o_erplibre_studio_preview_panel">
-                <div
-                    t-if="props.data.error"
-                    class="alert alert-danger o_erplibre_studio_preview_error"
-                    role="alert"
-                    t-esc="props.data.error"
-                />
-                <div t-else="" class="o_erplibre_studio_preview border rounded">
-                    <View t-props="viewProps" />
+            <section aria-label="Render of the preview">
+                <div class="d-flex flex-wrap align-items-end gap-2 mb-2">
+                    <div class="nav nav-tabs flex-grow-1" role="tablist" aria-label="View of the preview">
+                        <button
+                            t-foreach="viewTypes"
+                            t-as="type"
+                            t-key="type"
+                            type="button"
+                            role="tab"
+                            class="nav-link py-1 px-2 o_erplibre_studio_preview_type"
+                            t-att-class="{'active': type === props.viewType}"
+                            t-att-aria-selected="type === props.viewType ? 'true' : 'false'"
+                            t-att-aria-controls="panelId"
+                            t-att-data-view-type="type"
+                            t-on-click="() => props.onView(type, props.mode)"
+                            t-esc="viewTypeLabel(type)"
+                        />
+                    </div>
+                    <span class="small text-muted o_erplibre_studio_preview_note">Nothing is saved: the model does not exist yet.</span>
                 </div>
-            </div>
+                <div t-att-id="panelId" role="tabpanel" class="o_erplibre_studio_preview_panel">
+                    <div
+                        t-if="props.data.error"
+                        class="alert alert-danger o_erplibre_studio_preview_error"
+                        role="alert"
+                        t-esc="props.data.error"
+                    />
+                    <div t-else="" class="o_erplibre_studio_preview border rounded">
+                        <View t-props="viewProps" />
+                    </div>
+                </div>
+            </section>
         </div>
     </t>
 </templates>

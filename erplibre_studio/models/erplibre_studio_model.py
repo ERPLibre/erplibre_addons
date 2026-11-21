@@ -294,12 +294,14 @@ class ErplibreStudioModel(models.Model):
         return res
 
     def unlink(self):
-        """A model leaves the project with what names it: its access and
-        rule lines, the changes of its views, the new fields on it or
-        pointing at it, and the changes of the project that show these
-        fields or depend on the nodes they add."""
+        """A model leaves the project with what names it: the views the
+        project adds to it, its access and rule lines, the changes of its
+        views, the new fields on it or pointing at it, and the changes of
+        the project that show these fields or depend on the nodes they
+        add."""
         for line in self:
             project = line.project_id
+            project.view_line_ids.filtered(lambda v: v.model == line.model).unlink()
             project.access_line_ids.filtered(lambda a: a.model == line.model).unlink()
             project.rule_line_ids.filtered(lambda r: r.model == line.model).unlink()
             pointing = project.change_ids.filtered(

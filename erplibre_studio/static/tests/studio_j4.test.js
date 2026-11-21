@@ -338,6 +338,18 @@ function editorRpc(method) {
 
 const lastCall = (method) => calls.filter((c) => c.method === method).pop();
 
+/** The answer of get_review: nothing leaves the database unless ``removal`` says so. */
+function review(values = {}) {
+    return {
+        revision: 0,
+        state: "draft",
+        groups: [],
+        removal: {report: {}, digest: "n0thing", confirm: false},
+        blocked: false,
+        ...values,
+    };
+}
+
 beforeEach(() => {
     serverState.debug = "1";
     defineWebModels();
@@ -351,6 +363,7 @@ beforeEach(() => {
         "get_model_preview",
         "get_revert_report",
         "get_apply_report",
+        "get_review",
         "apply_operation",
         "project_action",
         "save_rule",
@@ -363,6 +376,9 @@ beforeEach(() => {
         editorRpc(method);
     }
     respond.get_studio_choices = () => JSON.parse(JSON.stringify(CHOICES));
+    respond.get_review = () => review();
+    // The security space opens on the access rights, with the rows of the other modules.
+    onRpc("erplibre.studio.editor", "get_access_existing", () => []);
 });
 
 async function openEditor() {
@@ -374,6 +390,17 @@ async function openEditor() {
     });
     await getService("action").doAction(customizeAction({resModel: ORDER, viewType: "form", viewId: false}));
     await animationFrame();
+}
+
+/** Show the space ``space`` of the rail (view, models, security, review). */
+async function openSpace(space) {
+    await contains(`.o_erplibre_studio_rail_item[data-space=${space}]`).click();
+}
+
+/** Open the menu of Apply in the top bar, then click its item ``selector``. */
+async function applyMenu(selector) {
+    await contains(".o_erplibre_studio_apply_menu").click();
+    await contains(selector).click();
 }
 
 describe.current.tags("desktop");
@@ -499,11 +526,27 @@ describe("erplibre_studio j4", () => {
         };
         await openEditor();
         // The pending model: Form, List and Search open its default views.
+        await openSpace("models");
         expect(".o_erplibre_studio_open_pending").toHaveCount(3);
+        // Preview shows the model in the view space.
         await contains(".o_erplibre_studio_preview_toggle").click();
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "view");
         expect.verifySteps(["get_model_preview 7 form simulation"]);
         expect(".o_erplibre_studio_preview_mode").toHaveText("Simulation");
         expect(".o_erplibre_studio_preview_note").toHaveText("Nothing is saved: the model does not exist yet.");
+        // The banner says the mode; the palette pauses; the inspector shows the approval.
+        expect(".o_erplibre_studio_preview_banner[data-kind=model]").toHaveAttribute("data-mode", "simulation");
+        expect(".o_erplibre_studio_preview_toggle").toHaveAttribute("aria-pressed", "true");
+        expect(".o_erplibre_studio_palette_paused").toHaveCount(1);
+        expect(".o_erplibre_studio_new_field").toHaveCount(0);
+        expect(".o_erplibre_studio_preview_info[data-kind=model]").toHaveAttribute("data-mode", "simulation");
+        expect(".o_erplibre_studio_approval").toHaveAttribute("data-approved", "0");
+        expect(".o_erplibre_studio_approval").toHaveText(/Not approved yet/);
+        expect(".o_erplibre_studio_status_preview").toHaveText("Preview: simulation, nothing is written");
+        // The plan still shows the view.
+        await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
+        expect(".o_erplibre_studio_palette_paused").toHaveCount(0);
+        await contains(".o_erplibre_studio_left_tab[data-panel=palette]").click();
         expect(".o_erplibre_studio_model_preview .o_form_view .o_field_widget[name=x_name] input").toHaveCount(1);
         expect(".o_erplibre_studio_model_preview .o_field_one2many .o_list_renderer").toHaveCount(1);
         // A line of the sub-list: the defaults of the pending comodel.
@@ -531,11 +574,15 @@ describe("erplibre_studio j4", () => {
         // The preview follows the draft: shown again once approved.
         expect.verifySteps(["project_action action_approve", "get_model_preview 7 list simulation"]);
         expect(".o_erplibre_studio_approved").toHaveText(/Approved by Mitchell Admin/);
+        expect(".o_erplibre_studio_approval").toHaveAttribute("data-approved", "1");
+        expect(".o_erplibre_studio_approval dd:eq(0)").toHaveText("Mitchell Admin");
         expect(".o_erplibre_studio_preview_real").toBeEnabled();
         await contains(".o_erplibre_studio_preview_real").click();
         expect.verifySteps(["get_model_preview 7 list real"]);
         expect(".o_erplibre_studio_preview_mode").toHaveAttribute("data-mode", "real");
         expect(".o_erplibre_studio_preview_mode").toHaveText("Real (rolled back)");
+        expect(".o_erplibre_studio_preview_info").toHaveAttribute("data-mode", "real");
+        expect(".o_erplibre_studio_render").toHaveText(/waits 2 s at most/);
 
         // A view that does not render answers its error.
         respond.get_model_preview = () => ({mode: "real", model: ORDER, error: "Field x_nope does not exist"});
@@ -548,6 +595,18 @@ describe("erplibre_studio j4", () => {
         respond.project_action = () => payload({revision: 2, approved: false, approved_by: false});
         await contains(".o_erplibre_studio_unapprove").click();
         expect(".o_erplibre_studio_preview_mode").toHaveAttribute("data-mode", "simulation");
+        // A draft changed since its approval asks for it again.
+        respond.project_action = () =>
+            payload({revision: 3, approved: false, approved_by: [2, "Mitchell Admin"], approved_date: false});
+        await contains(".o_erplibre_studio_approve").click();
+        expect(".o_erplibre_studio_approval_stale").toHaveCount(1);
+        expect(".o_erplibre_studio_approval").toHaveText(/approve it again/);
+        // « Leave the preview » of the inspector, as the close of the banner.
+        await contains(".o_erplibre_studio_preview_leave").click();
+        expect(".o_erplibre_studio_model_preview").toHaveCount(0);
+        expect(".o_erplibre_studio_preview_toggle").toHaveAttribute("aria-pressed", "false");
+        await contains(".o_erplibre_studio_preview_toggle").click();
+        expect(".o_erplibre_studio_model_preview").toHaveCount(1);
         await contains(".o_erplibre_studio_preview_close").click();
         expect(".o_erplibre_studio_model_preview").toHaveCount(0);
         expect(".o_erplibre_studio_field[data-name=x_name]").toHaveCount(1);
@@ -678,6 +737,7 @@ describe("erplibre_studio j4", () => {
     test("apps and groups: an app, a group implying another, the chain warning", async () => {
         answer = payload();
         await openEditor();
+        await openSpace("security");
         await contains(".o_erplibre_studio_apps_toggle").click();
         expect(".o_erplibre_studio_apps_panel").toHaveCount(1);
         expect(".o_erplibre_studio_palette").toHaveCount(0);
@@ -697,9 +757,11 @@ describe("erplibre_studio j4", () => {
         expect(".o_erplibre_studio_implied_group").toHaveText("Role / User");
         // A project group never implies the Settings.
         expect(".o_erplibre_studio_add_implied_group option[value='4']").toHaveCount(0);
-        expect(".o_erplibre_studio_add_implied_line option[value='4']").toHaveCount(0);
-        await contains(".o_erplibre_studio_add_implied_line").select("3");
-        expect(".o_erplibre_studio_implied_line[data-id='3']").toHaveText("J4 user");
+        // The groups of the project are checkboxes, the group itself aside.
+        expect(".o_erplibre_studio_implied_line[data-id='4']").toHaveCount(0);
+        await contains(".o_erplibre_studio_implied_line[data-id='3'] input").check();
+        expect(".o_erplibre_studio_implied_line[data-id='3'] input").toBeChecked();
+        expect(".o_erplibre_studio_implied_line[data-id='3']").toHaveText(/J4 shop \/ J4 user/);
         const chained = [GROUPS[0], {...GROUPS[1], implied: [[3, "J4 user"]], missing_implied: []}];
         respond.save_group = () => ({
             ...payload({revision: 1, apps: [{...SHOP, chain: true}], groups: chained}),
@@ -765,6 +827,7 @@ describe("erplibre_studio j4", () => {
         };
         answer = payload({rules: [rule]});
         await openEditor();
+        await openSpace("security");
         await contains(".o_erplibre_studio_rules_toggle").click();
         expect(".o_erplibre_studio_rule[data-id='5'] .o_erplibre_studio_missing_group").toHaveText(
             "This group no longer exists: studio_j4.group_gone"
@@ -816,9 +879,8 @@ describe("erplibre_studio j4", () => {
 
     test("the access grid offers the groups of the project", async () => {
         answer = payload({access: [{id: 1, model: ORDER, group: [1, "Role / User"], ...ALL_PERMS}]});
-        onRpc("erplibre.studio.editor", "get_access_existing", () => []);
         await openEditor();
-        await contains(".o_erplibre_studio_access_toggle").click();
+        await openSpace("security");
         await contains(".o_erplibre_studio_access_add_model").select(ORDER);
         await contains(".o_erplibre_studio_access_add_group").select("line:3");
         respond.set_access = (args) =>
@@ -862,6 +924,7 @@ describe("erplibre_studio j4", () => {
             return payload({state: "draft", applied: false, revision: 1});
         };
         await openEditor();
+        await contains(".o_erplibre_studio_apply_menu").click();
         expect(".o_erplibre_studio_revert").toBeEnabled();
         await contains(".o_erplibre_studio_revert").click();
         expect(lastCall("get_revert_report").args).toEqual([3]);
@@ -879,10 +942,11 @@ describe("erplibre_studio j4", () => {
         await contains(".o_erplibre_studio_confirm_cancel").click();
         expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
         expect.verifySteps([]);
-        await contains(".o_erplibre_studio_revert").click();
+        await applyMenu(".o_erplibre_studio_revert");
         await contains(".o_erplibre_studio_confirm_button").click();
         expect.verifySteps(["project_action action_revert d1g3st"]);
         expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
+        await contains(".o_erplibre_studio_apply_menu").click();
         expect(".o_erplibre_studio_revert").not.toBeEnabled();
 
         // The generated module owns the models: Revert is refused.
@@ -894,41 +958,80 @@ describe("erplibre_studio j4", () => {
             digest: "d1g3st",
             refused: "Uninstall the module studio_j4 first: it owns its models.",
         });
-        await contains(".o_erplibre_studio_revert").click();
+        await applyMenu(".o_erplibre_studio_revert");
         expect(".o_erplibre_studio_confirm_refused").toHaveText(/Uninstall the module studio_j4 first/);
         expect(".o_erplibre_studio_confirm_button").toHaveCount(0);
     });
 
-    test("Apply that removes data asks first; a first Apply does not", async () => {
+    test("Apply goes through the review; what leaves the database waits for « I understand »", async () => {
         answer = payload();
         respond.project_action = (args) => {
             expect.step(`project_action ${args.args[1]} ${args.kwargs.digest || "-"}`);
             return payload({state: "applied", applied: true, revision: 1});
         };
         await openEditor();
+        await contains(".o_erplibre_studio_apply_bar").click();
+        expect(lastCall("get_review").args).toEqual([3]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "review");
+        // A first Apply removes nothing: no card, no checkbox.
+        expect(".o_erplibre_studio_review_removal").toHaveCount(0);
         await contains(".o_erplibre_studio_apply").click();
-        expect.verifySteps(["project_action action_apply -"]);
+        expect.verifySteps(["project_action action_apply n0thing"]);
         expect(lastCall("get_apply_report")).toBe(undefined);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "view");
 
         // An applied project whose draft removes records.
         answer = payload({applied: true, revision: 2});
         await getService("action").doAction(customizeAction({resModel: ORDER, viewType: "form", viewId: false}));
         await animationFrame();
-        respond.get_apply_report = () => ({report: REPORT, digest: "4pply", confirm: true});
+        respond.get_review = () => review({removal: {report: REPORT, digest: "4pply", confirm: true}});
+        await contains(".o_erplibre_studio_apply_bar").click();
+        expect(".o_erplibre_studio_review_removal .o_erplibre_studio_confirm_section").toHaveCount(8);
+        expect(
+            ".o_erplibre_studio_review_removal [data-section=models] .o_erplibre_studio_confirm_item"
+        ).toHaveText("J4 order (x_j4_order): 2 record(s)");
+        expect(".o_erplibre_studio_confirm_changes").toHaveText(
+            "1 change(s) of the default views go with these views."
+        );
+        expect(".o_erplibre_studio_apply").not.toBeEnabled();
+        await contains(".o_erplibre_studio_review_understood").click();
+        expect(".o_erplibre_studio_apply").toBeEnabled();
         await contains(".o_erplibre_studio_apply").click();
-        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(1);
-        expect.verifySteps([]);
-        await contains(".o_erplibre_studio_confirm_button").click();
         expect.verifySteps(["project_action action_apply 4pply"]);
+    });
 
-        // Nothing with data leaves: Apply runs at once, with the digest.
-        answer = payload({applied: true, revision: 3});
-        await getService("action").doAction(customizeAction({resModel: ORDER, viewType: "form", viewId: false}));
-        await animationFrame();
-        respond.get_apply_report = () => ({report: {...REPORT, models: []}, digest: "s4fe", confirm: false});
+    test("an Apply refused for a changed report shows the new one and asks again", async () => {
+        answer = payload({applied: true});
+        let reads = 0;
+        respond.get_review = () => {
+            reads++;
+            const models = reads === 1 ? REPORT.models : [{model: ORDER, name: "J4 order", count: 3}];
+            return review({removal: {report: {...REPORT, models}, digest: `d${reads}`, confirm: true}});
+        };
+        respond.project_action = (args) => {
+            expect.step(`project_action ${args.kwargs.digest}`);
+            if (args.kwargs.digest === "d1") {
+                throw makeServerError({message: "Apply removes records, values or group members: review it."});
+            }
+            return payload({state: "applied", applied: true, revision: 1});
+        };
+        await openEditor();
+        await contains(".o_erplibre_studio_apply_bar").click();
+        expect(".o_erplibre_studio_review_stale").toHaveCount(0);
+        await contains(".o_erplibre_studio_review_understood").click();
         await contains(".o_erplibre_studio_apply").click();
-        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
-        expect.verifySteps(["project_action action_apply s4fe"]);
+        expect.verifySteps(["project_action d1"]);
+        // The review is read again: the new report, « I understand » again.
+        expect(reads).toBe(2);
+        expect(".o_erplibre_studio_review_stale").toHaveAttribute("role", "alert");
+        expect(
+            ".o_erplibre_studio_review_removal [data-section=models] .o_erplibre_studio_confirm_item"
+        ).toHaveText("J4 order (x_j4_order): 3 record(s)");
+        expect(".o_erplibre_studio_review_understood").not.toBeChecked();
+        expect(".o_erplibre_studio_apply").not.toBeEnabled();
+        await contains(".o_erplibre_studio_review_understood").click();
+        await contains(".o_erplibre_studio_apply").click();
+        expect.verifySteps(["project_action d2"]);
     });
 
     test("the model dialog: an app of the project, or a new one", async () => {
@@ -937,8 +1040,9 @@ describe("erplibre_studio j4", () => {
         respond.create_model = () => payload({revision: 1});
         editorRpc("create_model");
         await openEditor();
+        await openSpace("models");
         await contains(".o_erplibre_studio_new_model").click();
-        expect(".o_erplibre_studio_model_app option").toHaveCount(3);
+        expect(".o_erplibre_studio_model_app option").toHaveCount(2);
         expect(".o_erplibre_studio_model_app").toHaveValue("1");
         await contains(".o_erplibre_studio_model_label").edit("J4 line");
         await contains(".o_erplibre_studio_model_app").select("2");
@@ -952,7 +1056,7 @@ describe("erplibre_studio j4", () => {
         });
         await contains(".o_erplibre_studio_new_model").click();
         await contains(".o_erplibre_studio_model_label").edit("J4 tag");
-        await contains(".o_erplibre_studio_model_app").select("new");
+        await contains("#o_erplibre_studio_menu_new_app").click();
         expect(".o_erplibre_studio_app_name").toHaveValue("J4 tag");
         await contains(".o_erplibre_studio_model_save").click();
         expect(lastCall("create_model").args[1].menu).toEqual({
@@ -1019,10 +1123,12 @@ describe("erplibre_studio j4", () => {
         expect(".o_erplibre_studio_preview_type[data-view-type=list]").toHaveAttribute("aria-selected", "false");
         expect("[role=tabpanel]").toHaveCount(1);
         expect(".o_erplibre_studio_preview_real").toHaveAttribute("aria-describedby", "o_erplibre_studio_real_hint");
-        expect("#o_erplibre_studio_real_hint").toHaveText("Real: approve the draft first.");
+        expect("#o_erplibre_studio_real_hint").toHaveText(
+            "The real mode creates the draft in the database, then rolls it back: it needs an approval."
+        );
     });
 
-    test("the preview follows the draft: Undo shows it again, Apply closes it", async () => {
+    test("the preview follows the draft: Undo shows it again, the review closes it", async () => {
         answer = payload({change_count: 1});
         answer.changes = [{id: 1, type: "add_field", summary: "Add the field Lines"}];
         respond.get_model_preview = () => {
@@ -1046,10 +1152,12 @@ describe("erplibre_studio j4", () => {
                 view: {id: 99, name: `${ORDER}.form`, xml_id: "studio_j4.view_x_j4_order_form", pending: false},
             };
         };
+        await contains(".o_erplibre_studio_apply_bar").click();
+        expect(".o_erplibre_studio_model_preview").toHaveCount(0);
         await contains(".o_erplibre_studio_apply").click();
         expect.verifySteps(["project_action action_apply"]);
         expect(".o_erplibre_studio_model_preview").toHaveCount(0);
-        expect(".o_notification").toHaveText(`The model ${ORDER} exists now: its preview is closed.`);
+        expect(".o_erplibre_studio_title").toHaveText(/studio_j4\.view_x_j4_order_form/);
     });
 
     test("a confirmation refused for a changed report shows the new one and sends its digest", async () => {
@@ -1068,7 +1176,7 @@ describe("erplibre_studio j4", () => {
             return payload({revision: 1});
         };
         await openEditor();
-        await contains(".o_erplibre_studio_revert").click();
+        await applyMenu(".o_erplibre_studio_revert");
         expect(".o_erplibre_studio_confirm_stale").toHaveCount(0);
         await contains(".o_erplibre_studio_confirm_button").click();
         expect.verifySteps(["project_action d1"]);

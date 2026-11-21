@@ -8,7 +8,8 @@ from .erplibre_studio_project import EXCLUDE_KEY, PREVIEW_KEY, ViewExclusion
 
 class Base(models.AbstractModel):
     """The draft preview of a studio project in get_views: for the editor
-    of the project only, when the context names it."""
+    of the project only, when the context names it. A view the project adds
+    shows in place of the default Odoo builds for a type without view."""
 
     _inherit = "base"
 
@@ -30,6 +31,13 @@ class Base(models.AbstractModel):
         project = self.env["erplibre.studio.project"]._preview_project()
         if not project:
             return super()._get_view(view_id, view_type, **options)
+        added = None if view_id else project._studio_added_view(self._name, view_type)
+        if added:
+            # The view the project adds, before Apply creates it, with its
+            # draft: in place of the default Odoo builds for a type without
+            # view, which a type such as « timeline » does not have.
+            arch = project._preview_arch(project._base_arch(added), added, self._name)
+            return arch, self.env["ir.ui.view"]
         excluded = {EXCLUDE_KEY: ViewExclusion(project.studio_view_ids.ids)}
         arch, view = super(Base, self.with_context(**excluded))._get_view(
             view_id, view_type, **options

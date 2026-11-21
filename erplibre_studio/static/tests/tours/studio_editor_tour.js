@@ -21,6 +21,7 @@ registry.category("web_tour.tours").add("erplibre_studio_editor", {
         {trigger: ".o_erplibre_studio_create_project", run: "click"},
         {trigger: ".o_erplibre_studio_state[data-state=draft]"},
         {trigger: ".o_erplibre_studio_field[data-name=email]", run: `drag_and_drop ${NAME_BEFORE}`},
+        {trigger: ".o_erplibre_studio_inspector_tab[data-tab=changes]", run: "click"},
         {trigger: ".o_erplibre_studio_changes li[data-type=move]"},
         {trigger: "[data-tag=list] > .o_erplibre_studio_children > .o_erplibre_studio_field:first[data-name=email]"},
         {trigger: ".o_erplibre_studio_preview_toggle", run: "click"},

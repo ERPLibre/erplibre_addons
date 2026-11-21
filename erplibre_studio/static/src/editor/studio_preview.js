@@ -292,6 +292,20 @@ export class StudioModelPreview extends Component {
         return this.isReal ? _t("Real (rolled back)") : _t("Simulation");
     }
 
+    /** What the mode on screen does, under its title. */
+    get bannerText() {
+        const model = this.props.line.model;
+        return this.isReal
+            ? _t(
+                  "The server creates the model %(model)s, its fields and its views inside a savepoint, renders them, then rolls everything back.",
+                  {model}
+              )
+            : _t(
+                  "The view renders from the draft, without creating the model %(model)s: its access rights and its rules do not run.",
+                  {model}
+              );
+    }
+
     /** Why the preview on screen is not in the mode asked for, or "". */
     get modeMismatch() {
         if (this.renderedMode === this.props.mode) {

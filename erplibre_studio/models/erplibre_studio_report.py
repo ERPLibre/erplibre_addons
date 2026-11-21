@@ -222,7 +222,12 @@ class ErplibreStudioProject(models.Model):
         for kind, label in (("primary_views", "default"), ("views", "inherited")):
             for view in records.get(kind, self.env["ir.ui.view"]).sorted("name"):
                 report["views"].append({"name": view.name, "kind": label})
-        primary = records.get("primary_views", self.env["ir.ui.view"])
+        # The changes of a view a view line of the draft adds go back to
+        # their line instead (``_studio_unbind_added_changes``).
+        primary = (
+            records.get("primary_views", self.env["ir.ui.view"])
+            - self.view_line_ids.view_id.sudo()
+        )
         report["changes_removed"] = len(
             self.change_ids.filtered(lambda c: c.view_id in primary)
         )
@@ -325,6 +330,8 @@ class ErplibreStudioProject(models.Model):
             kept["menus"].add(names["menu"])
             for view_type in studio_arch.MODEL_VIEW_TYPES:
                 kept["primary_views"].add(names[view_type])
+        for line in self.view_line_ids:
+            kept["primary_views"].add(line._studio_xml_name())
         for app in self.app_ids:
             if app._studio_menu_models():
                 kept["menus"].add(app.xml_name)

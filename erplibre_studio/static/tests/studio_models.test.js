@@ -201,6 +201,13 @@ beforeEach(() => {
         expect.step(`get_studio_choices ${args.args[0]}`);
         return choices;
     });
+    onRpc("erplibre.studio.editor", "get_review", () => ({
+        revision: 0,
+        state: "draft",
+        groups: [],
+        removal: {report: {}, digest: "n0thing", confirm: false},
+        blocked: false,
+    }));
     onRpc("erplibre.studio.editor", "get_access_existing", (args) => {
         expect.step(`get_access_existing ${args.args[1]}`);
         return respond.get_access_existing ? respond.get_access_existing(args) : [];
@@ -244,6 +251,23 @@ function accessibleName(el) {
     return label ? label.textContent.trim() : "";
 }
 
+/** Show the space ``space`` of the rail (view, models, security, review). */
+async function openSpace(space) {
+    await contains(`.o_erplibre_studio_rail_item[data-space=${space}]`).click();
+}
+
+/** Apply of the top bar opens the review; Apply there applies the draft. */
+async function applyThroughReview() {
+    await contains(".o_erplibre_studio_apply_bar").click();
+    await contains(".o_erplibre_studio_apply").click();
+}
+
+/** Open the menu of Apply in the top bar, then click its item ``selector``. */
+async function applyMenu(selector) {
+    await contains(".o_erplibre_studio_apply_menu").click();
+    await contains(selector).click();
+}
+
 const lastCall = (method) => calls.filter((c) => c.method === method).pop();
 
 describe.current.tags("desktop");
@@ -277,18 +301,32 @@ describe("erplibre_studio models", () => {
     test("the dialog of a new model creates it in a new app", async () => {
         answer = payload();
         await openEditor();
+        await openSpace("models");
         await contains(".o_erplibre_studio_new_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_dialog").toHaveCount(1);
         expect(".o_erplibre_studio_model_save").not.toBeEnabled();
+        // Without an app in the project, the model goes in a new app.
+        expect("#o_erplibre_studio_menu_app").not.toBeEnabled();
+        expect("#o_erplibre_studio_menu_new_app").toBeChecked();
+        expect(".o_erplibre_studio_menu_preview").toHaveText("New app › New model");
+        expect(".o_erplibre_studio_model_name_pill").toHaveAttribute("data-edited", "0");
 
         await contains(".o_erplibre_studio_model_label").edit("Équipement de prêt");
         expect(".o_erplibre_studio_model_name").toHaveValue("x_equipement_de_pret");
         expect(".o_erplibre_studio_app_name").toHaveValue("Équipement de prêt");
         await contains(".o_erplibre_studio_model_name").edit("x_loan_item");
+        expect(".o_erplibre_studio_model_name_pill").toHaveAttribute("data-edited", "1");
+        // « Follow the label » makes the name from the label again.
+        await contains(".o_erplibre_studio_model_follow").click();
+        expect(".o_erplibre_studio_model_name").toHaveValue("x_equipement_de_pret");
+        expect(".o_erplibre_studio_model_name_pill").toHaveAttribute("data-edited", "0");
+        expect(".o_erplibre_studio_model_follow").toHaveCount(0);
+        await contains(".o_erplibre_studio_model_name").edit("x_loan_item");
         await contains(".o_erplibre_studio_model_label").edit("Loan item");
         expect(".o_erplibre_studio_model_name").toHaveValue("x_loan_item");
         expect(".o_erplibre_studio_app_name").toHaveValue("Loan item");
+        expect(".o_erplibre_studio_menu_preview").toHaveText("Loan item › Loan item");
 
         // The chatter: mail is installed.
         expect(".o_erplibre_studio_model_chatter").toHaveCount(1);
@@ -309,9 +347,10 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_model_save").not.toBeEnabled();
         await contains(".o_erplibre_studio_menu_parent").select("20");
         expect(".o_erplibre_studio_model_save").toBeEnabled();
+        expect(".o_erplibre_studio_menu_preview").toHaveText("Sales › Loan item");
 
         // Back to a new app.
-        await contains("#o_erplibre_studio_menu_app").click();
+        await contains("#o_erplibre_studio_menu_new_app").click();
         expect(".o_erplibre_studio_app_form").toHaveCount(1);
         respond.create_model = () =>
             payload({
@@ -340,26 +379,31 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_apply_open").toHaveCount(1);
         // Its default views are edited before Apply creates them.
         expect(".o_erplibre_studio_open_model.o_erplibre_studio_open_pending").toHaveCount(3);
-        expect(".o_erplibre_studio_model_menu_place").toHaveText("App Loan item");
-        expect(".o_erplibre_studio_apply").toBeEnabled();
+        expect(".o_erplibre_studio_model_menu_place").toHaveText("Loan item › Loan item");
+        expect(".o_erplibre_studio_apply_bar").toBeEnabled();
     });
 
     test("without mail, no chatter; the app of the project; under a menu", async () => {
         answer = payload({apps: [LOANS_APP], models: [modelLine({chatter: false})], item_count: 2});
         choices.mail_available = false;
         await openEditor();
+        await openSpace("models");
         await contains(".o_erplibre_studio_new_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_chatter").toHaveCount(0);
         expect("label[for=o_erplibre_studio_menu_app]").toHaveText("In an app of the project");
-        // The app of the project first, then a new one.
+        // The app of the project by default; a new app is another place.
+        expect("#o_erplibre_studio_menu_app").toBeChecked();
         expect(".o_erplibre_studio_model_app").toHaveValue("1");
-        expect(".o_erplibre_studio_model_app option").toHaveCount(2);
+        expect(".o_erplibre_studio_model_app option").toHaveCount(1);
         expect(".o_erplibre_studio_app_form").toHaveCount(0);
         await contains(".o_erplibre_studio_model_label").edit("Loan tag");
+        expect(".o_erplibre_studio_menu_preview").toHaveText("Loans › Loan tag");
         await contains("#o_erplibre_studio_menu_under").click();
+        expect(".o_erplibre_studio_menu_preview").toHaveText("Choose a parent menu › Loan tag");
         await contains(".o_erplibre_studio_menu_parent").select("21");
         await contains(".o_erplibre_studio_menu_name").edit("Tags");
+        expect(".o_erplibre_studio_menu_preview").toHaveText("Settings › Technical › Tags");
         respond.create_model = () => payload({...answer.project, revision: 1});
         await contains(".o_erplibre_studio_model_save").click();
         expect(lastCall("create_model").args[1]).toEqual({
@@ -378,28 +422,36 @@ describe("erplibre_studio models", () => {
             payload({state: "applied", revision: 1, models: [applied], item_count: 2, menus: APPLIED_MENUS});
         respond.get_editor_data = (args) =>
             payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
+        await openSpace("models");
+        // Apply and open goes through the review: nothing is written yet.
         await contains(".o_erplibre_studio_apply_open").click();
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "review");
+        expect(lastCall("project_action")).toBe(undefined);
+        await contains(".o_erplibre_studio_apply").click();
         expect(lastCall("project_action").args[1]).toBe("action_apply");
         // The view the editor was opened on, where it goes back when the model leaves.
         expect(lastCall("project_action").kwargs.fallback).toEqual(["res.partner", 12, "form"]);
         // The new app and its menu reach the web client.
         expect.verifySteps(["menu reload", `get_editor_data ${MODEL} 51 form 3`]);
-        expect(".o_erplibre_studio_title").toHaveText(/Loan item\s*·\s*studio_loans\.view_x_loan_item_form/);
-        expect(`.o_erplibre_studio_model[data-model=${MODEL}]`).toHaveClass("o_erplibre_studio_model_current");
-        expect(".o_erplibre_studio_model_state").toHaveAttribute("data-applied", "1");
+        expect(".o_erplibre_studio_title").toHaveText(/Loan item\s*Form\s*studio_loans\.view_x_loan_item_form/);
         // The chatter stays where the view puts it.
         expect(".o_erplibre_studio_other[data-tag=chatter]").toHaveAttribute("draggable", "false");
         expect(`.o_erplibre_studio_hook[data-target='/form/chatter']`).toHaveCount(0);
         expect(`.o_erplibre_studio_other[data-tag=chatter] .o_erplibre_studio_hook`).toHaveCount(0);
         expect(`.o_erplibre_studio_hook[data-target="//group[@name='studio_left']"]`).toHaveCount(1);
 
+        await openSpace("models");
+        expect(`.o_erplibre_studio_model[data-model=${MODEL}]`).toHaveClass("o_erplibre_studio_model_current");
+        expect(".o_erplibre_studio_model_state").toHaveAttribute("data-applied", "1");
         await contains(".o_erplibre_studio_open_model[data-view-type=list]").click();
         expect.verifySteps([`get_editor_data ${MODEL} 52 list 3`]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "view");
     });
 
     test("a model of the project is edited and removed", async () => {
         answer = payload({apps: [LOANS_APP], models: [modelLine()], item_count: 2});
         await openEditor();
+        await openSpace("models");
         await contains(".o_erplibre_studio_edit_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_name").toHaveValue(MODEL);
@@ -422,6 +474,140 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_no_model").toHaveCount(1);
     });
 
+    test("the models space: the list, the page of a model, its inspector", async () => {
+        const partner = {
+            model: "res.partner",
+            name: "Contact",
+            new: false,
+            pending: false,
+            module: "base",
+            chatter: true,
+            views: [
+                {type: "form", label: "Form", view_id: 12},
+                {type: "list", label: "List", view_id: 13},
+            ],
+            fields: [{name: "x_sponsor_id", label: "Sponsor", ttype: "many2one", relation: "res.users", applied: false}],
+            changes: 2,
+            access: 0,
+            rules: 0,
+        };
+        const item = (model) => ({
+            model,
+            name: "Loan item",
+            new: true,
+            pending: true,
+            module: false,
+            chatter: true,
+            views: [],
+            fields: [{name: "x_partner_id", label: "Partner", ttype: "many2one", relation: "res.partner", applied: true}],
+            changes: 1,
+            access: 1,
+            rules: 1,
+        });
+        const project = (model = MODEL, line = {}) => ({
+            apps: [LOANS_APP],
+            models: [modelLine({model, pending_views: {form: true, list: false, search: false}, ...line})],
+            access: [{id: 1, model, group: [1, "Role / User"], ...ALL_PERMS, perm_unlink: false}],
+            rules: [{id: 5, name: "Own items", model, domain: "[]", groups: [[1, "Role / User"]], ...ALL_PERMS}],
+            item_count: 4,
+            touched_models: [partner, item(model)],
+        });
+        answer = payload(project());
+        respond.get_editor_data = (args) =>
+            payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
+        await openEditor();
+        await openSpace("models");
+        // The models of the project first, then those it touches.
+        expect(".o_erplibre_studio_no_model").toHaveCount(0);
+        expect(
+            [...document.querySelectorAll(".o_erplibre_studio_models_item")].map((el) => el.dataset.kind)
+        ).toEqual(["pending", "existing"]);
+        expect(".o_erplibre_studio_models_item[data-model='res.partner']").toHaveText(
+            /Contact\s*Changed\s*res\.partner\s*Model of the module base/
+        );
+        // The page opens on the model on screen: a model of the database.
+        expect(".o_erplibre_studio_model[data-model='res.partner']").toHaveClass("o_erplibre_studio_model_current");
+        expect(".o_erplibre_studio_models_item[data-model='res.partner']").toHaveAttribute("aria-current", "true");
+        expect(".o_erplibre_studio_model_detail_label").toHaveAttribute("readonly");
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue("res.partner");
+        expect(".o_erplibre_studio_model_locked").toHaveCount(1);
+        expect(".o_erplibre_studio_model_menu_place").toHaveCount(0);
+        expect(".o_erplibre_studio_model_chatter_switch").toBeChecked();
+        expect(".o_erplibre_studio_model_chatter_switch").not.toBeEnabled();
+        expect(".o_erplibre_studio_model_field").toHaveCount(1);
+        expect(".o_erplibre_studio_model_field[data-name=x_sponsor_id]").toHaveText(
+            /Sponsor\s*x_sponsor_id\s*Many2one → res\.users\s*New/
+        );
+        expect(".o_erplibre_studio_model_access_row").toHaveCount(0);
+        expect(".o_erplibre_studio_model_rules").toHaveText("No rule: the rights hold for every record.");
+        expect(".o_erplibre_studio_remove_model").toHaveCount(0);
+        expect(".o_erplibre_studio_model_counts [data-count=changes]").toHaveText("2");
+        // Its views open in the view space.
+        expect(".o_erplibre_studio_open_model").toHaveCount(2);
+        await contains(".o_erplibre_studio_open_model[data-view-type=list]").click();
+        expect.verifySteps(["get_editor_data res.partner 13 list 3"]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "view");
+
+        // A model of the project, not created yet.
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).toHaveAttribute("aria-current", "true");
+        expect(`.o_erplibre_studio_model[data-model=${MODEL}]`).toHaveAttribute("data-kind", "pending");
+        expect(".o_erplibre_studio_model_state").toHaveAttribute("data-applied", "0");
+        expect(".o_erplibre_studio_model_menu_place").toHaveText("Loans › Loan item");
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue("loan_item");
+        expect(".o_erplibre_studio_model_detail_name").not.toHaveAttribute("readonly");
+        expect(".o_erplibre_studio_model_locked").toHaveCount(0);
+        expect(".o_erplibre_studio_open_pending").toHaveCount(3);
+        expect(".o_erplibre_studio_pending_changes").toHaveCount(1);
+        // Its name field, then the fields of the project on it.
+        expect(
+            [...document.querySelectorAll(".o_erplibre_studio_model_field")].map((el) => el.dataset.name)
+        ).toEqual(["x_name", "x_partner_id"]);
+        expect(".o_erplibre_studio_model_field[data-name=x_partner_id]").toHaveText(
+            /Partner\s*x_partner_id\s*Many2one → Contact\s*Created/
+        );
+        expect(".o_erplibre_studio_model_access_row").toHaveText(/Role \/ User\s*Read · Write · Create/);
+        expect(".o_erplibre_studio_model_rules").toHaveText("1 rule(s): « Own items »");
+        expect(".o_erplibre_studio_model_kind_text").toHaveText("Model of the project · waiting for Apply");
+        // The advanced section folds.
+        expect(".o_erplibre_studio_model_advanced").toHaveCount(0);
+        await contains(".o_erplibre_studio_model_advanced_toggle").click();
+        expect(".o_erplibre_studio_model_advanced_toggle").toHaveAttribute("aria-expanded", "true");
+        expect(".o_erplibre_studio_model_advanced").toHaveText(/Table\s*x_loan_item\s*Displayed name\s*x_name/);
+        expect(".o_erplibre_studio_remove_model").toHaveText("Remove from the draft");
+
+        // The chatter, the label and the technical name: one update_model each.
+        expect(".o_erplibre_studio_model_chatter_switch").toBeEnabled();
+        respond.update_model = () => payload({...project(MODEL, {chatter: false}), revision: 1});
+        await contains(".o_erplibre_studio_model_chatter_switch").click();
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {chatter: false}]);
+        expect(".o_erplibre_studio_model_chatter_switch").not.toBeChecked();
+        respond.update_model = () => payload({...project(MODEL, {name: "Loaned item"}), revision: 2});
+        await contains(".o_erplibre_studio_model_detail_label").edit("Loaned item");
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {name: "Loaned item"}]);
+        expect(lastCall("update_model").kwargs.revision).toBe(1);
+        respond.update_model = () => payload({...project("x_loan_object"), revision: 3});
+        await contains(".o_erplibre_studio_model_detail_name").edit("loan_object");
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {model: "x_loan_object"}]);
+        // The page follows the new name.
+        expect(".o_erplibre_studio_model[data-model=x_loan_object]").toHaveCount(1);
+        // A refusal shows the name of the model again.
+        respond.update_model = () => {
+            throw makeServerError({message: "The model x_loan is taken."});
+        };
+        await contains(".o_erplibre_studio_model_detail_name").edit("loan");
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue("loan_object");
+        expect(".o_notification").toHaveText(/x_loan is taken/);
+
+        // « Open in Security » shows the rights of the model.
+        await contains(".o_erplibre_studio_model_security").click();
+        expect.verifySteps(["get_studio_choices 3", "get_access_existing x_loan_object"]);
+        expect(".o_erplibre_studio").toHaveAttribute("data-space", "security");
+        expect(".o_erplibre_studio_access_toggle").toHaveAttribute("aria-selected", "true");
+        expect(".o_erplibre_studio_security_model[data-model=x_loan_object]").toHaveAttribute("aria-current", "true");
+    });
+
     test("the access grid: a toggle and a new row send set_access", async () => {
         const row = {id: 1, model: MODEL, group: [1, "Role / User"], ...ALL_PERMS};
         answer = payload({models: [modelLine({applied: true, views: APPLIED_VIEWS})], access: [row], item_count: 2});
@@ -430,8 +616,10 @@ describe("erplibre_studio models", () => {
                 ? [{id: 90, name: "res.partner.category", group: [1, "Role / User"], module: "base", perm_read: true}]
                 : [];
         await openEditor();
-        await contains(".o_erplibre_studio_access_toggle").click();
+        // The security space opens on its access rights.
+        await openSpace("security");
         expect.verifySteps(["get_studio_choices 3", `get_access_existing ${MODEL}`]);
+        expect(".o_erplibre_studio_access_toggle").toHaveAttribute("aria-selected", "true");
         expect(".o_erplibre_studio_palette").toHaveCount(0);
         expect(`.o_erplibre_studio_access_model[data-model=${MODEL}] .o_erplibre_studio_access_row`).toHaveCount(1);
 
@@ -484,7 +672,7 @@ describe("erplibre_studio models", () => {
         expect(lastCall("set_access").args[1]).toEqual([{model: MODEL, group_id: 1, ...ALL_PERMS, perm_unlink: false}]);
 
         // Back to the view.
-        await contains(".o_erplibre_studio_access_toggle").click();
+        await openSpace("view");
         expect(".o_erplibre_studio_access_panel").toHaveCount(0);
         expect(".o_erplibre_studio_palette").toHaveCount(1);
     });
@@ -492,8 +680,9 @@ describe("erplibre_studio models", () => {
     test("a rule: Check shows the count or the error, Save sends save_rule", async () => {
         answer = payload({models: [modelLine({applied: true, views: APPLIED_VIEWS})], item_count: 2});
         await openEditor();
+        await openSpace("security");
         await contains(".o_erplibre_studio_rules_toggle").click();
-        expect.verifySteps(["get_studio_choices 3"]);
+        expect.verifySteps(["get_studio_choices 3", `get_access_existing ${MODEL}`, "get_studio_choices 3"]);
         expect(".o_erplibre_studio_no_rule").toHaveCount(1);
         await contains(".o_erplibre_studio_new_rule").click();
         expect(".o_erplibre_studio_rule_model").toHaveValue(MODEL);
@@ -572,8 +761,10 @@ describe("erplibre_studio models", () => {
         respond.get_editor_data = (args) =>
             payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
         await openEditor();
+        await openSpace("models");
         await contains(".o_erplibre_studio_open_model[data-view-type=form]").click();
         expect.verifySteps([`get_editor_data ${MODEL} 51 form 3`]);
+        await openSpace("models");
         respond.remove_model = () =>
             payload(
                 {state: "draft", revision: 1, models: [], item_count: 1, menus: APPLIED_MENUS},
@@ -585,7 +776,7 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_title").toHaveText(/Contact/);
         // Apply then names the view on screen, and the menus follow.
         respond.project_action = () => payload({state: "applied", revision: 2, models: [], item_count: 0});
-        await contains(".o_erplibre_studio_apply").click();
+        await applyThroughReview();
         expect(lastCall("project_action").args.slice(1)).toEqual(["action_apply", "res.partner", 12, "form"]);
         expect.verifySteps(["menu reload"]);
     });
@@ -611,24 +802,25 @@ describe("erplibre_studio models", () => {
             view_changed: true,
             notice: "Back to the last Apply, without what left the database since: the model x_loan_item.",
         });
-        await contains(".o_erplibre_studio_discard").click();
+        await applyMenu(".o_erplibre_studio_discard");
         expect(lastCall("project_action").args.slice(1)).toEqual(["action_discard", MODEL, 51, "form"]);
         expect(lastCall("project_action").kwargs.fallback).toEqual([MODEL, 51, "form"]);
         expect.verifySteps([]);
         expect(".o_erplibre_studio_title").toHaveText(/Contact/);
         expect(".o_notification").toHaveText(/without what left the database/);
-        await contains(".o_erplibre_studio_apply").click();
+        await applyThroughReview();
         expect(lastCall("project_action").args.slice(2)).toEqual(["res.partner", 12, "form"]);
     });
 
     test("the model dialog: an app needs a name, a taken name is skipped", async () => {
         answer = payload({apps: [LOANS_APP], models: [modelLine()], item_count: 2});
         await openEditor();
+        await openSpace("models");
         await contains(".o_erplibre_studio_edit_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         expect(".o_erplibre_studio_model_save").toBeEnabled();
         // A new app for the model: it needs a name.
-        await contains(".o_erplibre_studio_model_app").select("new");
+        await contains("#o_erplibre_studio_menu_new_app").click();
         expect(".o_erplibre_studio_model_save").not.toBeEnabled();
         expect(".o_erplibre_studio_app_name").toHaveClass("is-invalid");
         expect(".o_erplibre_studio_app_name").toHaveAttribute("aria-invalid", "true");
@@ -648,7 +840,7 @@ describe("erplibre_studio models", () => {
         const row = {id: 1, model: MODEL, group: [1, "Role / User"], ...ALL_PERMS};
         answer = payload({models: [modelLine({applied: true, views: APPLIED_VIEWS})], access: [row], item_count: 2});
         await openEditor();
-        await contains(".o_erplibre_studio_access_toggle").click();
+        await openSpace("security");
         expect.verifySteps(["get_studio_choices 3", `get_access_existing ${MODEL}`]);
         const perms = [...document.querySelectorAll(".o_erplibre_studio_access_perm")].map(accessibleName);
         expect(perms).toEqual(["Read – Role / User", "Write – Role / User", "Create – Role / User", "Delete – Role / User"]);
@@ -667,6 +859,7 @@ describe("erplibre_studio models", () => {
         expect(accessibleName(remove)).toBe("Remove the group Role / User");
         await contains(".o_erplibre_studio_rule_group_remove").click();
         expect(".o_erplibre_studio_rule_group").toHaveCount(0);
+        await openSpace("models");
         await contains(".o_erplibre_studio_new_model").click();
         expect.verifySteps(["get_studio_choices 3"]);
         await contains("#o_erplibre_studio_menu_under").click();

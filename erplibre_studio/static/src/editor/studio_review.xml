@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The review space: the items of the draft by view and by model on the
+         left, what Apply writes and removes, then Apply, on the right. -->
+    <t t-name="erplibre_studio.Review">
+        <main
+            class="o_erplibre_studio_space o_erplibre_studio_review flex-grow-1 overflow-auto p-3"
+            t-att-class="{'o_erplibre_studio_busy': props.busy}"
+        >
+            <div class="o_erplibre_studio_review_layout d-flex flex-wrap align-items-start gap-3 mx-auto">
+                <section
+                    class="o_erplibre_studio_review_changes card flex-grow-1 overflow-hidden"
+                    aria-labelledby="o_erplibre_studio_review_title"
+                >
+                    <div class="card-body pb-2">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <h2 id="o_erplibre_studio_review_title" class="h4 mb-0 me-auto">Review before Apply</h2>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-light border o_erplibre_studio_review_back"
+                                t-on-click="() => this.editor.openSpace('view')"
+                            >
+                                <i class="fa fa-angle-left me-1" aria-hidden="true" />
+                                Back to the editor
+                            </button>
+                        </div>
+                        <p t-if="review" class="text-muted mt-2 mb-0 o_erplibre_studio_review_intro" t-esc="intro" />
+                    </div>
+                    <div t-if="state.loading and !review" class="px-3 pb-3 text-muted">
+                        <i class="fa fa-spinner fa-spin me-1" aria-hidden="true" />
+                        Loading…
+                    </div>
+                    <div
+                        t-elif="state.error"
+                        class="alert alert-warning mx-3 o_erplibre_studio_review_error"
+                        role="alert"
+                        t-esc="state.error"
+                    />
+                    <t t-elif="review">
+                        <div
+                            role="group"
+                            class="o_erplibre_studio_review_filters d-flex flex-wrap align-items-center gap-1 px-3 pb-2 border-bottom"
+                            aria-label="Filter the changes"
+                        >
+                            <button
+                                t-foreach="filters"
+                                t-as="filter"
+                                t-key="filter.id"
+                                type="button"
+                                class="btn btn-sm rounded-pill o_erplibre_studio_review_filter"
+                                t-att-class="filter.pressed ? 'btn-primary' : 'btn-outline-secondary'"
+                                t-att-data-filter="filter.id"
+                                t-att-aria-pressed="filter.pressed ? 'true' : 'false'"
+                                t-on-click="() => this.setFilter(filter.id)"
+                            >
+                                <t t-esc="filter.label" />
+                                <span class="ms-1 o_erplibre_studio_review_filter_count" t-esc="filter.count" />
+                            </button>
+                            <button
+                                t-if="appliedCount"
+                                type="button"
+                                class="btn btn-sm btn-link ms-auto o_erplibre_studio_review_show_applied"
+                                t-att-aria-pressed="state.showApplied ? 'true' : 'false'"
+                                t-on-click="toggleApplied"
+                            >
+                                <i
+                                    class="fa me-1"
+                                    t-att-class="state.showApplied ? 'fa-check-square-o' : 'fa-square-o'"
+                                    aria-hidden="true"
+                                />
+                                <t t-esc="appliedText" />
+                            </button>
+                        </div>
+                        <p t-if="!groups.length" class="text-muted p-3 mb-0 o_erplibre_studio_review_empty">
+                            No change to show.
+                        </p>
+                        <section
+                            t-foreach="groups"
+                            t-as="group"
+                            t-key="group.key"
+                            class="o_erplibre_studio_review_group border-bottom"
+                            t-att-data-group="group.key"
+                            t-att-data-kind="group.kind"
+                        >
+                            <h3 class="o_erplibre_studio_section_title d-flex flex-wrap align-items-center gap-2 px-3 pt-3 mb-1">
+                                <span t-esc="group.title" />
+                                <code
+                                    t-if="group.ref"
+                                    class="fw-normal text-muted o_erplibre_studio_review_ref"
+                                    t-esc="group.ref"
+                                />
+                            </h3>
+                            <ul class="list-unstyled px-2 pb-2 mb-0">
+                                <li
+                                    t-foreach="group.items"
+                                    t-as="item"
+                                    t-key="item.key"
+                                    class="o_erplibre_studio_review_item d-flex align-items-start gap-2 rounded px-2 py-1"
+                                    t-att-class="{
+                                        'o_erplibre_studio_review_item_error bg-danger-subtle': item.error,
+                                        'o_erplibre_studio_review_item_applied': item.applied,
+                                    }"
+                                    t-att-data-key="item.key"
+                                    t-att-data-type="item.type"
+                                    t-att-data-category="item.category"
+                                >
+                                    <span
+                                        class="badge o_erplibre_studio_review_kind mt-1"
+                                        t-att-class="item.error ? 'text-bg-danger' : 'text-bg-light border'"
+                                        t-esc="itemKind(item)"
+                                    />
+                                    <span class="flex-grow-1 min-w-0 py-1">
+                                        <span class="o_erplibre_studio_review_text" t-esc="item.text" />
+                                        <span
+                                            t-if="item.applied"
+                                            class="badge text-bg-secondary ms-1 o_erplibre_studio_review_applied"
+                                        >
+                                            applied
+                                        </span>
+                                        <span
+                                            t-if="item.error"
+                                            class="d-block small text-danger-emphasis o_erplibre_studio_review_item_message"
+                                        >
+                                            <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
+                                            <t t-esc="item.error" />
+                                        </span>
+                                    </span>
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-link fw-bold o_erplibre_studio_review_show"
+                                        t-att-aria-label="showLabel(item)"
+                                        t-att-disabled="props.busy"
+                                        t-on-click="() => this.show(item)"
+                                    >
+                                        Show
+                                    </button>
+                                </li>
+                            </ul>
+                        </section>
+                    </t>
+                </section>
+                <aside
+                    class="o_erplibre_studio_review_confirm d-flex flex-column gap-3"
+                    aria-label="Confirmation"
+                >
+                    <div t-if="review" class="card">
+                        <div class="card-body">
+                            <h2 class="h6 fw-bold mb-2">What Apply creates or updates</h2>
+                            <dl class="o_erplibre_studio_review_writes mb-0">
+                                <t t-foreach="writes" t-as="entry" t-key="entry.key">
+                                    <dt class="fw-normal text-muted" t-esc="entry.label" />
+                                    <dd class="fw-bold mb-0" t-att-data-count="entry.key" t-esc="entry.count" />
+                                </t>
+                            </dl>
+                        </div>
+                    </div>
+                    <div
+                        t-if="review and review.blocked"
+                        class="alert alert-danger mb-0 o_erplibre_studio_review_blocked"
+                        role="alert"
+                    >
+                        <div class="fw-bold">Apply refuses the draft until this is fixed:</div>
+                        <t t-esc="review.blocked" />
+                    </div>
+                    <div
+                        t-if="state.stale"
+                        class="alert alert-warning mb-0 o_erplibre_studio_review_stale"
+                        role="alert"
+                    >
+                        What the action removes changed since it was shown: check it again before confirming.
+                    </div>
+                    <div
+                        t-if="review and leaves"
+                        class="card border-danger o_erplibre_studio_review_removal"
+                    >
+                        <div class="card-body">
+                            <h2 class="h6 fw-bold text-danger-emphasis d-flex align-items-center gap-2 mb-2">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true" />
+                                What leaves the database
+                            </h2>
+                            <section
+                                t-foreach="sections"
+                                t-as="section"
+                                t-key="section.key"
+                                class="o_erplibre_studio_confirm_section mb-2"
+                                t-att-data-section="section.key"
+                            >
+                                <h3 class="small fw-bold mb-1">
+                                    <t t-esc="section.title" />
+                                    <span
+                                        class="badge text-bg-light border ms-1 o_erplibre_studio_confirm_count"
+                                        t-esc="section.items.length"
+                                    />
+                                </h3>
+                                <ul class="mb-1 small ps-3">
+                                    <li
+                                        t-foreach="section.items"
+                                        t-as="entry"
+                                        t-key="entry_index"
+                                        class="o_erplibre_studio_confirm_item"
+                                        t-att-class="{'text-danger fw-bold': entry.warn}"
+                                        t-esc="entry.text"
+                                    />
+                                </ul>
+                            </section>
+                            <p
+                                t-if="changesRemoved"
+                                class="small o_erplibre_studio_confirm_changes"
+                                t-esc="changesRemovedText"
+                            />
+                            <div t-if="losesData" class="form-check mb-0">
+                                <input
+                                    id="o_erplibre_studio_review_understood"
+                                    type="checkbox"
+                                    class="form-check-input o_erplibre_studio_review_understood"
+                                    t-att-checked="state.understood"
+                                    t-on-change="toggleUnderstood"
+                                />
+                                <label class="form-check-label" for="o_erplibre_studio_review_understood">
+                                    I understand that these will be deleted.
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-lg btn-primary fw-bold o_erplibre_studio_apply"
+                            t-att-disabled="props.busy or applyBlocker"
+                            t-att-title="applyBlocker or ''"
+                            t-on-click="apply"
+                            t-esc="applyLabel"
+                        />
+                        <button
+                            type="button"
+                            class="btn btn-light border o_erplibre_studio_review_discard"
+                            t-att-disabled="props.busy or props.project.state !== 'draft'"
+                            t-on-click="discard"
+                        >
+                            Discard the draft
+                        </button>
+                        <p class="small text-muted mb-0">
+                            After Apply, every user sees the changes. « Revert » then removes them from the database.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </t>
+</templates>

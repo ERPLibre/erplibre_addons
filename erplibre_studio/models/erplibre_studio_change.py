@@ -68,6 +68,14 @@ class ErplibreStudioChange(models.Model):
         help="The model line whose default view the change is on, before "
         "Apply creates the model: Apply then binds the change to the view.",
     )
+    view_line_id = fields.Many2one(
+        "erplibre.studio.view",
+        string="View not created yet",
+        ondelete="cascade",
+        index=True,
+        help="The view line whose view the change is on, before Apply "
+        "creates the view: Apply then binds the change to the view.",
+    )
     view_type = fields.Selection(VIEW_TYPES, required=True)
     xpath = fields.Char(string="Node path", required=True)
     position = fields.Selection(
@@ -120,14 +128,28 @@ class ErplibreStudioChange(models.Model):
         self._touch_projects(projects)
         return res
 
-    @api.constrains("view_id", "model_line_id")
+    @api.constrains("view_id", "model_line_id", "view_line_id")
     def _check_change_target(self):
         for change in self:
-            if bool(change.view_id) == bool(change.model_line_id):
+            targets = [change.view_id, change.model_line_id, change.view_line_id]
+            if len([target for target in targets if target]) != 1:
                 raise ValidationError(
                     self.env._(
-                        "A change is on a view, or on the default view of a model "
-                        "not created yet: one of them."
+                        "A change is on a view, on the default view of a model "
+                        "not created yet, or on a view the project adds: one "
+                        "of them."
+                    )
+                )
+            added = change.view_line_id
+            if added and (
+                added.project_id != change.project_id
+                or added.view_type != change.view_type
+                or added.model != change.model
+            ):
+                raise ValidationError(
+                    self.env._(
+                        "A change of a view the project adds is on that view, "
+                        "in its project."
                     )
                 )
             line = change.model_line_id
@@ -147,6 +169,8 @@ class ErplibreStudioChange(models.Model):
         self.ensure_one()
         if self.view_id:
             return self.view_id.sudo().name
+        if self.view_line_id:
+            return self.view_line_id._studio_view_name()
         return f"{self.model}.{self.view_type}"
 
     @api.depends("payload")
@@ -192,6 +216,8 @@ class ErplibreStudioChange(models.Model):
             }
             if change.model_line_id:
                 item["model_line"] = change.model_line_id.model
+            if change.view_line_id:
+                item["view_line"] = True
             items.append(item)
         return items
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The timeline of the canvas: the view once shown, else its error. -->
+    <t t-name="erplibre_studio.Frise">
+        <div class="o_erplibre_studio_frise_view">
+            <div
+                t-if="state.error"
+                class="alert alert-warning small mb-0 o_erplibre_studio_frise_error"
+                role="alert"
+                t-esc="state.error"
+            />
+            <View t-elif="state.viewProps" t-props="state.viewProps" t-key="state.key" />
+            <div t-else="" class="small text-muted">
+                <i class="fa fa-spinner fa-spin me-1" aria-hidden="true" />
+                Loading…
+            </div>
+        </div>
+    </t>
+</templates>
