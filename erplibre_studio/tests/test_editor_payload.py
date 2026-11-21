@@ -394,6 +394,14 @@ class TestEditorPayload(StudioCase):
         self.assertTrue(touched["res.partner"]["fields"][0]["applied"])
         self.assertFalse(touched[ITEM]["pending"])
 
+    def test_project_names_the_state_of_its_module(self):
+        """``module_state``: False while no module has the name of the
+        project, the state of that module once one has it."""
+        self.assertFalse(self.data()["project"]["module_state"])
+        self.env["ir.module.module"].create({"name": MODULE, "state": "installed"})
+        self.project.invalidate_recordset(["module_id", "module_state"])
+        self.assertEqual(self.data()["project"]["module_state"], "installed")
+
     def test_access_rows_carry_their_applied_rights(self):
         """An access row names the rights its ir.model.access got at the
         last Apply, False before: the grid marks what the draft changes."""

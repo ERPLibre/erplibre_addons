@@ -1174,6 +1174,22 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid ""
+"Apply created it as a custom field of the database; once the project is "
+"generated and installed, this module holds it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid ""
+"Apply creates it as a custom field of the database; once the project is "
+"generated and installed, this module holds it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Apply creates the group: it has no member yet."
@@ -1316,6 +1332,12 @@ msgid "Frozen at Apply: its name is a column of the table in the database."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Future owner module"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__order
 msgid ""
 "How the lists sort the records, « field asc » or « field desc » terms "
@@ -1424,6 +1446,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Options · one field each"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Owner module"
 msgstr ""
 
 #. module: erplibre_studio
@@ -5603,6 +5631,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "The models not created yet, as the draft has them now"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The module generated from this project holds this field."
 msgstr ""
 
 #. module: erplibre_studio

@@ -561,6 +561,17 @@
                     </span>
                     <span class="d-block fw-normal text-muted mt-1 o_erplibre_studio_name_help" t-esc="nameHelp(field)" />
                 </label>
+                <t t-set="owner" t-value="ownerNote" />
+                <div
+                    t-if="owner"
+                    class="small border rounded p-2 mb-1 o_erplibre_studio_owner_note"
+                    t-att-data-state="owner.state"
+                >
+                    <span class="text-muted" t-if="owner.state === 'future'">Future owner module</span>
+                    <span class="text-muted" t-else="">Owner module</span>
+                    <code class="ms-1 o_erplibre_studio_owner_module" t-esc="owner.module" />
+                    <span class="d-block text-muted" t-esc="owner.text" />
+                </div>
                 <t t-if="view.definition">
                     <label class="form-label mb-1 w-100">
                         Tooltip

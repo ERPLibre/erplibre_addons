@@ -33,6 +33,9 @@ import {
 // The tabs of the inspector: the properties of the selection, the changes
 // of the draft in the view on screen.
 export const INSPECTOR_TABS = ["properties", "changes"];
+// The states of a module that holds the records bound to it; mirrors
+// MODULE_OWNING_STATES of the server (erplibre_studio_project.py).
+export const MODULE_OWNING_STATES = ["installed", "to upgrade", "to remove"];
 // The change types that define a field of the project rather than edit
 // the view.
 const FIELD_CHANGES = ["add_field", "update_field"];
@@ -51,7 +54,8 @@ const ADVANCED_VIEW_TYPES = ["form", "list"];
  * translatable, indexed, maximum size) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
  * writes; in a form or a list, the widget, the domain and the groups
- * under « Advanced »); a many2one of the project, the one2many it may create on its
+ * under « Advanced »; for a new field of a model of the database, the
+ * module that holds it once generated); a many2one of the project, the one2many it may create on its
  * comodel and what it does when its record is deleted; a container shows
  * what it holds. « Changes »: the changes of
  * the draft in this view, each one revealing its block on the canvas or
@@ -477,6 +481,43 @@ export class StudioInspector extends Component {
             return _t("Its technical name changes in a form, list or kanban view, until Apply.");
         }
         return _t("Frozen at Apply: its name is a column of the table in the database.");
+    }
+
+    /**
+     * The module that holds the selected field: {state, module, text},
+     * null unless it is a new field of the project on a model of the
+     * database. ``state``: « owned » once the module of the project is
+     * installed, « future » before. A model the project creates is held
+     * as a whole, its fields carry no note.
+     */
+    get ownerNote() {
+        const block = this.selectedBlock;
+        const field = this.selectedField;
+        const project = this.data.project;
+        if (!block || block.kind !== "field" || !field || !field.project || !project) {
+            return null;
+        }
+        if ((this.data.view || {}).pending || (project.models || []).some((m) => m.model === this.data.model)) {
+            return null;
+        }
+        if (MODULE_OWNING_STATES.includes(project.module_state)) {
+            return {
+                state: "owned",
+                module: project.module_name,
+                text: _t("The module generated from this project holds this field."),
+            };
+        }
+        return {
+            state: "future",
+            module: project.module_name,
+            text: field.pending
+                ? _t(
+                      "Apply creates it as a custom field of the database; once the project is generated and installed, this module holds it."
+                  )
+                : _t(
+                      "Apply created it as a custom field of the database; once the project is generated and installed, this module holds it."
+                  ),
+        };
     }
 
     // ── the changes of the view ─────────────────────────────────────────

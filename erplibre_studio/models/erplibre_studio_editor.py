@@ -610,7 +610,9 @@ class ErplibreStudioEditor(models.AbstractModel):
     def _project_payload(self, project):
         """The project as the editor shows it; ``state_label`` is the label
         of its state in the language of the user. ``app`` is its first app,
-        for an editor of a single app."""
+        for an editor of a single app. ``module_state`` is the state of the
+        module named ``module_name`` in the database, False when none has
+        that name: the inspector names the module that holds a new field."""
         states = dict(project._fields["state"]._description_selection(self.env))
         first = project.app_ids[:1]
         pending_models = project.new_model_ids.filtered(lambda m: not m.applied)
@@ -619,6 +621,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "id": project.id,
             "name": project.name,
             "module_name": project.module_name,
+            "module_state": project.module_state or False,
             "state": project.state,
             "state_label": states.get(project.state, project.state),
             "revision": project.draft_revision,

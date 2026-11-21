@@ -379,6 +379,51 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_name_help").toHaveText(/in the database/);
     });
 
+    test("a new field of an existing model names its future owner module", async () => {
+        const NOTE = ".o_erplibre_studio_owner_note";
+        const project = (extra) => ({...payload().project, module_name: "studio_example", ...extra});
+        const sponsor = {...FIELDS.x_sponsor, string: "Example", name_auto: false};
+        const fields = {...FIELDS, x_studio_example: sponsor};
+        const blocks = formBlocks();
+        const example = {name: "x_studio_example", path: named("x_studio_example"), label: "Example"};
+        // The address group of the sheet holds the new field.
+        blocks.children[0].children[0].children.push(field("street", [], example));
+        answer = payload({fields, blocks, project: project({module_state: false})});
+        await openEditor();
+        // A field of an installed module: no note.
+        await contains(".o_erplibre_studio_field[data-name=street]").click();
+        expect(NOTE).toHaveCount(0);
+        // A new field of the project not created yet: its future module.
+        await contains(".o_erplibre_studio_field[data-name=x_studio_example]").click();
+        expect(NOTE).toHaveAttribute("data-state", "future");
+        expect(`${NOTE} .o_erplibre_studio_owner_module`).toHaveText("studio_example");
+        expect(NOTE).toHaveText(/^Future owner module\s*studio_example\s*Apply creates it/);
+        // An applied field of the project, the module not installed yet.
+        await contains(".o_erplibre_studio_field[data-name=x_level]").click();
+        expect(NOTE).toHaveAttribute("data-state", "future");
+        expect(NOTE).toHaveText(/Apply created it/);
+
+        // The module of the project installed: it holds the field.
+        answer = payload({fields, blocks, project: project({module_state: "installed"})});
+        await getService("action").doAction(customizeAction({resModel: "res.partner", viewType: "form", viewId: 9}));
+        await animationFrame();
+        await contains(".o_erplibre_studio_field[data-name=x_studio_example]").click();
+        expect(NOTE).toHaveAttribute("data-state", "owned");
+        expect(NOTE).toHaveText(/^Owner module\s*studio_example\s*The module generated/);
+
+        // A view of a model the project creates, not created yet: no note.
+        answer = payload({
+            fields,
+            blocks,
+            view: {id: 9, name: "res.partner.form", xml_id: false, pending: true},
+            project: project({module_state: false}),
+        });
+        await getService("action").doAction(customizeAction({resModel: "res.partner", viewType: "form", viewId: 9}));
+        await animationFrame();
+        await contains(".o_erplibre_studio_field[data-name=x_studio_example]").click();
+        expect(NOTE).toHaveCount(0);
+    });
+
     test("a new field: its technical name, checked live", async () => {
         const NAME = ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name";
         const STATUS = ".o_erplibre_studio_name_status";

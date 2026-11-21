@@ -1258,6 +1258,26 @@ msgstr "Appliquer et ouvrir"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid ""
+"Apply created it as a custom field of the database; once the project is "
+"generated and installed, this module holds it."
+msgstr ""
+"L'Apply l'a créé comme champ personnalisé de la base de données ; une "
+"fois le projet généré et installé, ce module le détiendra."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid ""
+"Apply creates it as a custom field of the database; once the project is "
+"generated and installed, this module holds it."
+msgstr ""
+"L'Apply le crée comme champ personnalisé de la base de données ; une "
+"fois le projet généré et installé, ce module le détiendra."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Apply creates the group: it has no member yet."
@@ -1403,6 +1423,12 @@ msgid "Frozen at Apply: its name is a column of the table in the database."
 msgstr "Figé à l'Apply : son nom est une colonne de la table dans la base de données."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Future owner module"
+msgstr "Module propriétaire à venir"
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__order
 msgid ""
 "How the lists sort the records, « field asc » or « field desc » terms "
@@ -1514,6 +1540,12 @@ msgstr "Une fois appliquée, cette option ne peut plus être retirée."
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Options · one field each"
 msgstr "Options · un champ chacune"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Owner module"
+msgstr "Module propriétaire"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -5836,6 +5868,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "The models not created yet, as the draft has them now"
 msgstr "Les modèles pas encore créés, tels que le brouillon les a maintenant"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The module generated from this project holds this field."
+msgstr "Le module généré à partir de ce projet détient ce champ."
 
 #. module: erplibre_studio
 #. odoo-javascript
