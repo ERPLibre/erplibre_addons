@@ -23,6 +23,14 @@ const RULE = {
     text: "Prefix x_ required on this database",
     detail: "Fields created outside the code carry x_ on a production database.",
 };
+// The rule of a database with code_generator: a name without « x_ » applies.
+const DEVELOPMENT_RULE = {
+    prefix_required: false,
+    mode: "development",
+    label: "Development · x_ optional",
+    text: "Without x_ allowed: development database (code_generator)",
+    detail: "The generated module defines its fields in its code.",
+};
 
 const FIELDS = {
     street: {string: "Street", type: "char"},
@@ -189,8 +197,9 @@ const NAME_CHECKS = {
 
 /**
  * The answer of ``check_field_name``: « x_level » is taken by the
- * project, a name without « x_ » breaks the rule, any other name is
- * available; the label proposes « x_sponsor ».
+ * project, a name without « x_ » breaks the rule when ``rule`` requires
+ * the prefix, any other name is available; the label proposes
+ * « x_sponsor ».
  */
 function checkName(name) {
     const proposed = "x_sponsor";
@@ -204,18 +213,18 @@ function checkName(name) {
             message: "x_level is already created by this project",
             detail: "Each new field of the project needs its own name.",
             checks: checks("unique"),
-            rule: RULE,
+            rule,
         };
     }
-    if (!value.startsWith("x_")) {
+    if (rule.prefix_required && !value.startsWith("x_")) {
         return {
             name: value,
             proposed,
             status: "invalid",
-            message: RULE.text,
-            detail: RULE.detail,
+            message: rule.text,
+            detail: rule.detail,
             checks: checks("prefix"),
-            rule: RULE,
+            rule,
         };
     }
     return {
@@ -225,11 +234,13 @@ function checkName(name) {
         message: "Available",
         detail: `No field ${value} on Contact nor in the other projects.`,
         checks: checks(null),
-        rule: RULE,
+        rule,
     };
 }
 
 let answer;
+// The rule ``check_field_name`` answers with.
+let rule;
 // ``afterOperation(operation)``: the payload an operation other than a
 // rename answers, instead of the initial one; null keeps the initial one.
 let afterOperation;
@@ -240,6 +251,7 @@ let nameChecks;
 beforeEach(() => {
     defineWebModels();
     answer = payload();
+    rule = RULE;
     afterOperation = null;
     operations = [];
     nameChecks = [];
@@ -420,6 +432,44 @@ describe("erplibre_studio editor, inspector", () => {
             expect(STATUS).toHaveCount(0);
         }
         expect(nameChecks.length).toBe(checked);
+    });
+
+    test("a development database: a name without x_ applies", async () => {
+        const NAME = ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name";
+        const STATUS = ".o_erplibre_studio_name_status";
+        rule = DEVELOPMENT_RULE;
+        answer = payload({field_name_rule: DEVELOPMENT_RULE});
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=x_sponsor]").click();
+        await animationFrame();
+        expect(".o_erplibre_studio_name_rule").toHaveText(DEVELOPMENT_RULE.text);
+        expect(".o_erplibre_studio_name_rule").toHaveAttribute("data-mode", "development");
+        expect(".o_erplibre_studio_name_rule .fa-code").toHaveCount(1);
+        expect(".o_erplibre_studio_name_rule .fa-lock").toHaveCount(0);
+
+        // A name without « x_ »: available, it renames the field.
+        await contains(NAME).edit("texte");
+        await animationFrame();
+        // Checked as typed, then as the name of the renamed field.
+        expect(nameChecks).toEqual([
+            ["x_sponsor", "x_sponsor"],
+            ["texte", "x_sponsor"],
+            ["texte", "texte"],
+        ]);
+        expect(operations.pop()).toEqual({
+            type: "rename_field",
+            field_name: "x_sponsor",
+            new_name: "texte",
+            auto: false,
+        });
+        expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "texte");
+        expect(NAME).toHaveValue("texte");
+        expect(NAME).toHaveAttribute("aria-invalid", "false");
+        expect(STATUS).toHaveText(/^Available\s*No field texte on Contact/);
+        expect(queryAllTexts(".o_erplibre_studio_name_check_glyph")).toEqual(["✓", "✓", "✓", "✓"]);
+        expect(".o_erplibre_studio_apply_bar").toBeEnabled();
+        expect(".o_erplibre_studio_name_blockers").toHaveCount(0);
     });
 
     test("a new many2one: its inverse one2many, what a deletion does", async () => {

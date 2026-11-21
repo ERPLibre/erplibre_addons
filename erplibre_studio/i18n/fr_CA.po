@@ -254,6 +254,15 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(name)s is not a valid field name: lower case letters, digits and "
+"underscores."
+msgstr ""
+"%(name)s n'est pas un nom de champ valide : des minuscules, des chiffres et "
+"des soulignés."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid ""
 "%(name)s is not a valid field name: x_ then lower case letters, digits and "
@@ -292,6 +301,12 @@ msgid ""
 msgstr ""
 "%(name)s est encore nommé par « %(change)s » : retirez d'abord ce "
 "changement, ou gardez le nom."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(name)s needs the x_ prefix on this database."
+msgstr "%(name)s exige le préfixe x_ sur cette base de données."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -488,6 +503,12 @@ msgid ""
 msgstr ""
 "Champ date ou date et heure du modèle. Obligatoire : sans lui, la frise ne "
 "place rien."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A field of %(parent)s also shows on the models that inherit it."
+msgstr "Un champ de %(parent)s apparaît aussi sur les modèles qui en héritent."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -5195,6 +5216,13 @@ msgstr "Le champ %(name)s existe déjà dans un autre projet (%(project)s)"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s already exists on %(model)s"
 msgstr "Le champ %(name)s existe déjà sur %(model)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The field %(name)s already exists on %(model)s, which inherits %(parent)s"
+msgstr "Le champ %(name)s existe déjà sur %(model)s, qui hérite de %(parent)s"
 
 #. module: erplibre_studio
 #. odoo-python

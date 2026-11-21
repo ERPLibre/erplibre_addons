@@ -1,6 +1,9 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import json
+from unittest.mock import patch
+
 from odoo.exceptions import UserError
 from odoo.tests import tagged
 
@@ -13,6 +16,15 @@ ORDER = "x_studio_test_fname_order"
 LINE = "x_studio_test_fname_line"
 LEFT = "//group[@name='studio_left']"
 VAT = "//field[@name='vat']"
+TEXTE = "//field[@name='texte']"
+# A rule that allows a name without x_, as a development database has.
+DEVELOPMENT_RULE = {
+    "prefix_required": False,
+    "mode": "development",
+    "label": "Development · x_ optional",
+    "text": "Without x_ allowed: development database",
+    "detail": "",
+}
 
 
 @tagged("post_install", "-at_install")
@@ -291,3 +303,173 @@ class TestFieldName(StudioCase):
         self.assertEqual(counts["name_blockers"], 1)
         with self.assertRaises(UserError):
             self.project.action_apply()
+
+
+@tagged("post_install", "-at_install")
+class TestUnprefixedRule(StudioCase):
+    """The technical name of a new field on a database whose rule allows a
+    name without x_: the other checks still refuse what would collide, the
+    texts people read do not name a field, and a database that requires
+    x_ again blocks such a draft before Apply writes it."""
+
+    def setUp(self):
+        super().setUp()
+        self.project = self.make_project(MODULE)
+        self.Change = self.env["erplibre.studio.change"]
+
+    def development(self):
+        return patch.object(
+            type(self.Project),
+            "_studio_field_name_rule",
+            lambda self_: dict(DEVELOPMENT_RULE),
+        )
+
+    def add(self, label, **f):
+        return self.op(
+            self.project,
+            self.form,
+            type="add_field",
+            target=VAT,
+            position="after",
+            field={"ttype": "char", "field_description": label, **f},
+        )
+
+    def rename(self, change, new_name):
+        return self.op(
+            self.project,
+            self.form,
+            type="rename_field",
+            field_name=change.field_name,
+            new_name=new_name,
+        )
+
+    def names(self, change_type, xpath, payload, names=("texte",)):
+        change = self.Change.new(
+            {
+                "change_type": change_type,
+                "xpath": xpath,
+                "payload": json.dumps(payload),
+            }
+        )
+        return self.project._studio_change_names(change, set(names))
+
+    def test_unprefixed_name_in_the_draft(self):
+        with self.development():
+            change = self.add("Texte", name="texte")
+            self.assertEqual(change.field_name, "texte")
+            required = self.op(
+                self.project, self.form, type="required", target=TEXTE, value=True
+            )
+            self.op(
+                self.project,
+                self.form,
+                type="update_field",
+                field_name="texte",
+                field={"field_description": "Texte court"},
+            )
+            self.assertEqual(change.field_name, "texte")
+            self.rename(change, "texte_court")
+            self.assertEqual(change.field_name, "texte_court")
+            self.assertEqual(required.xpath, "//field[@name='texte_court']")
+            self.assertEqual(self.project._studio_field_name_problems(), [])
+            arch = self.draft(self.project, self.form)
+            self.assertEqual(len(arch.xpath("//field[@name='texte_court']")), 1)
+
+    def test_refusals_without_the_prefix(self):
+        cases = {
+            "login": "unique",
+            "name": "unique",
+            "write": "reserved",
+            "class": "reserved",
+            "_x": "reserved",
+            "in_group_3": "reserved",
+            "Texte": "format",
+        }
+        with self.development():
+            for name, code in cases.items():
+                with self.subTest(name=name):
+                    problem = self.project._studio_field_name_problem(PARTNER, name)
+                    self.assertEqual(problem["code"], code)
+            # A field of res.users, which inherits res.partner by delegation.
+            login = self.project._studio_field_name_problem(PARTNER, "login")
+            self.assertEqual(
+                (login["owner"]["kind"], login["owner"]["model"]),
+                ("child", "res.users"),
+            )
+            self.assertIn("which inherits", login["message"])
+            self.assertEqual(
+                self.project._studio_field_name_problem(PARTNER, "name")["owner"][
+                    "kind"
+                ],
+                "model",
+            )
+            self.assertIsNone(self.project._studio_field_name_problem(PARTNER, "texte"))
+            with self.assertRaises(UserError):
+                self.add("Identifiant", name="login")
+
+    def test_inherited_field_of_the_model_is_no_collision(self):
+        # res.users shows the fields of res.partner: they are not its own.
+        self.assertIsNone(self.Project._studio_inheriting_owner(PARTNER, "email"))
+        self.assertEqual(
+            self.Project._studio_inheriting_owner(PARTNER, "login"), "res.users"
+        )
+        self.assertIsNone(self.Project._studio_inheriting_owner("res.users", "login"))
+
+    def test_human_texts_name_no_field(self):
+        self.assertEqual(self.names("relabel", VAT, {"value": "texte"}), set())
+        self.assertEqual(self.names("help", VAT, {"value": "texte"}), set())
+        selection = {
+            "field_name": "x_choix",
+            "field": {
+                "ttype": "selection",
+                "field_description": "texte",
+                "help": "texte",
+                "selection": [["texte", "texte"]],
+            },
+        }
+        self.assertEqual(self.names("add_field", VAT, selection), set())
+        inverse = {
+            "field_name": "x_parent",
+            "field": {
+                "ttype": "many2one",
+                "relation": PARTNER,
+                "inverse_o2m": {"name": "x_enfants", "field_description": "texte"},
+            },
+        }
+        self.assertEqual(self.names("add_field", VAT, inverse), set())
+        ribbon = {"node": {"tag": "widget", "attrs": {"title": "texte"}}}
+        self.assertEqual(self.names("add_node", VAT, ribbon), set())
+        # A path, a domain or an expression still names it.
+        self.assertEqual(self.names("required", TEXTE, {"value": True}), {"texte"})
+        node = {
+            "node": {
+                "tag": "filter",
+                "attrs": {"string": "texte", "domain": "[('texte', '=', 1)]"},
+            }
+        }
+        self.assertEqual(self.names("add_node", VAT, node), {"texte"})
+        expression = {"attribute": "invisible", "value": "texte == False"}
+        self.assertEqual(self.names("set_attribute", VAT, expression), {"texte"})
+        self.assertEqual(
+            self.names("add_field", VAT, {"field_name": "texte"}), {"texte"}
+        )
+
+    def test_production_blocks_an_unprefixed_draft(self):
+        with self.development():
+            change = self.add("Texte", name="texte")
+            self.assertFalse(self.Editor.get_review(self.project.id)["name_blockers"])
+        # The rule is read on each call: the same draft no longer applies.
+        review = self.Editor.get_review(self.project.id)
+        self.assertEqual([b["name"] for b in review["name_blockers"]], ["texte"])
+        with self.assertRaisesRegex(UserError, "texte"):
+            self.project.action_apply()
+        with self.assertRaisesRegex(UserError, "needs the x_ prefix"):
+            self.project._apply_fields([])
+        self.assertFalse(
+            self.env["ir.model.fields"].sudo()._get(PARTNER, "texte"),
+        )
+        # Still pending: renamed, it applies.
+        self.rename(change, "x_texte")
+        self.assertFalse(self.Editor.get_review(self.project.id)["name_blockers"])
+        self.project.action_apply()
+        self.assertTrue(self.env["ir.model.fields"].sudo()._get(PARTNER, "x_texte"))

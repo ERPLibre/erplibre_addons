@@ -235,6 +235,13 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(name)s is not a valid field name: lower case letters, digits and "
+"underscores."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid ""
 "%(name)s is not a valid field name: x_ then lower case letters, digits and "
@@ -263,6 +270,12 @@ msgstr ""
 msgid ""
 "%(name)s is still named by « %(change)s »: remove that change first, or keep"
 " the name."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(name)s needs the x_ prefix on this database."
 msgstr ""
 
 #. module: erplibre_studio
@@ -442,6 +455,12 @@ msgstr ""
 msgid ""
 "A date or date and time field of the model. Required: without it, the "
 "timeline places nothing."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A field of %(parent)s also shows on the models that inherit it."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5013,6 +5032,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s already exists on %(model)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The field %(name)s already exists on %(model)s, which inherits %(parent)s"
 msgstr ""
 
 #. module: erplibre_studio

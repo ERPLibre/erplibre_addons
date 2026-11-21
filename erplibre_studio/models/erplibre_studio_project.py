@@ -260,6 +260,9 @@ PENDING_VIEW_OPERATIONS = {
 # and the editor lists them.
 FIELD_NAME_CHECKS = ("format", "reserved", "prefix", "unique")
 
+# The attributes of a node that hold a text people read, not a field name.
+HUMAN_ATTRIBUTES = ("string", "help", "title", "tooltip", "placeholder")
+
 # The ir.model.fields values that fix the relation of a field: Apply never
 # changes them on a field it created.
 RELATION_VALUES = frozenset(
@@ -1240,11 +1243,11 @@ class ErplibreStudioProject(models.Model):
             if problem:
                 raise UserError(problem["message"])
             return name
-        if not studio_arch.valid_field_name(name):
+        if not studio_arch.valid_field_name(name, prefix_required=False):
             raise UserError(
                 self.env._(
-                    "%(name)s is not a valid field name: x_ then lower case "
-                    "letters, digits and underscores.",
+                    "%(name)s is not a valid field name: lower case letters, "
+                    "digits and underscores.",
                     name=name,
                 )
             )
@@ -1313,12 +1316,33 @@ class ErplibreStudioProject(models.Model):
             )
         )
 
+    @api.model
+    def _studio_inheriting_owner(self, model, name):
+        """The model of the registry that inherits ``model`` by delegation
+        (``_inherits``, at any depth) and already has a field ``name`` of its
+        own or of another parent, or None. A field added to ``model`` shows
+        on these models too, where it would collide; the fields they take
+        from ``model`` itself are no collision. The registry gives the
+        descendants on each call: a module installed in between counts."""
+        registry = self.env.registry
+        if model not in registry:
+            return None
+        for child in registry.descendants([model], "_inherits"):
+            if child == model:
+                continue
+            field = self.env[child]._fields.get(name)
+            if field is not None and field.base_field.model_name != model:
+                return child
+        return None
+
     def _studio_field_name_owner(self, model, name, own=None):
         """Who already holds the field name ``name`` on ``model``, the field
         of the project named ``own`` aside (the one renamed or checked):
-        None, or {kind, project}. ``kind``: « project » when another new
-        field of this project takes it, « model » when the model has it (a
-        field the project created is its own), « other » when the draft of
+        None, or {kind, project, model}. ``kind``: « project » when another
+        new field of this project takes it, « model » when the model has it
+        (a field the project created is its own), « child » when a model
+        that inherits ``model`` by delegation has it, ``model`` naming that
+        model (``_studio_inheriting_owner``), « other » when the draft of
         another project adds it, ``project`` naming that project."""
         self.ensure_one()
         mine = [n for n, _change in self._studio_project_field_names(model)]
@@ -1334,6 +1358,9 @@ class ErplibreStudioProject(models.Model):
             line or not self._studio_own_applied_field(model, name)
         ):
             return {"kind": "model", "project": False}
+        child = self._studio_inheriting_owner(model, name)
+        if child:
+            return {"kind": "child", "project": False, "model": child}
         Change = self.env["erplibre.studio.change"]
         others = Change.search(
             [
@@ -1420,6 +1447,18 @@ class ErplibreStudioProject(models.Model):
                 project=owner["project"],
             )
             detail = self.env._("Two Apply would create the same column.")
+        elif owner["kind"] == "child":
+            message = self.env._(
+                "The field %(name)s already exists on %(model)s, which "
+                "inherits %(parent)s",
+                name=name,
+                model=self._studio_model_label(owner["model"]),
+                parent=label,
+            )
+            detail = self.env._(
+                "A field of %(parent)s also shows on the models that inherit it.",
+                parent=label,
+            )
         else:
             message = self.env._(
                 "The field %(name)s already exists on %(model)s",
@@ -3557,17 +3596,30 @@ class ErplibreStudioProject(models.Model):
         return vals
 
     def _apply_fields(self, log):
-        """Create or update the ``x_`` fields of the project, in the order of
+        """Create or update the new fields of the project, in the order of
         ``_studio_all_definitions``. Return (fields kept, names of the fields
         whose new definition waits for the module): a field the generated
-        module defines, once installed, changes with the module only."""
+        module defines, once installed, changes with the module only.
+        UserError on a field to create without ``x_`` while the rule of the
+        database (``_studio_field_name_rule``, read on each call) requires
+        it."""
         Fields = self.env["ir.model.fields"].sudo()
         kept = Fields
         waiting = []
+        prefix_required = self._studio_field_name_rule()["prefix_required"]
         for model, name, definition, _change in self._studio_all_definitions():
             vals = self._field_vals(model, name, definition)
             field = Fields._get(model, name)
             if not field:
+                if prefix_required and not (name or "").startswith("x_"):
+                    # The SQL constraint of ir.model.fields would refuse it
+                    # with an IntegrityError instead.
+                    raise UserError(
+                        self.env._(
+                            "%(name)s needs the x_ prefix on this database.",
+                            name=name,
+                        )
+                    )
                 vals.update(
                     {
                         "name": name,
@@ -4480,13 +4532,46 @@ class ErplibreStudioProject(models.Model):
         return found
 
     @api.model
+    def _studio_change_name_text(self, change):
+        """The text of ``change`` where a field name can appear: the field
+        it adds or shows, its node path, and its payload without the texts
+        people read (``HUMAN_ATTRIBUTES`` of its nodes, the label, tooltip
+        and selection of a new field and the label of its inverse, the
+        value of a relabel or a tooltip change). A label or a value that
+        spells a field name does not name that field."""
+        payload = change._payload()
+        if change.change_type in ("relabel", "help"):
+            payload.pop("value", None)
+        field = payload.get("field")
+        if isinstance(field, dict):
+            for key in ("field_description", "help", "selection"):
+                field.pop(key, None)
+            for key in ("inverse_new", "inverse_o2m"):
+                if isinstance(field.get(key), dict):
+                    field[key].pop("field_description", None)
+        node = payload.get("node")
+        for attrs in (
+            payload.get("node_attrs"),
+            isinstance(node, dict) and node.get("attrs"),
+        ):
+            if isinstance(attrs, dict):
+                for attr in HUMAN_ATTRIBUTES:
+                    attrs.pop(attr, None)
+        return " ".join(
+            [
+                change.field_name or "",
+                change.xpath or "",
+                json.dumps(payload, sort_keys=True),
+            ]
+        )
+
+    @api.model
     def _studio_change_names(self, change, names):
         """The names of ``names`` (field names of the model of ``change``)
         that ``change`` names: as the field it adds or shows, in its node
-        path, or in its parameters (a domain, an attribute value)."""
-        text = " ".join(
-            [change.field_name or "", change.xpath or "", change.payload or ""]
-        )
+        path, or in its parameters (a domain, an attribute value), its
+        human texts aside (``_studio_change_name_text``)."""
+        text = self._studio_change_name_text(change)
         return {
             name
             for name in names
