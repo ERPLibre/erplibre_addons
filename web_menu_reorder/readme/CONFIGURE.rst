@@ -9,13 +9,16 @@ Go to **Settings → Technical → Menu** section.
     (10, 20, 30 …) without changing the visual order. Safe choice when
     menus are already ordered manually.
   * *Alphabetical order*: sorts all top-level menus alphabetically
-    using the configured language.
+    using the configured language. Case and accents are ignored:
+    "Événements", "evenements" and "Evenements" sort together, with the
+    other labels starting with "e".
   * *By custom label*: lets you specify an ordered list of menu labels
     (one per line). Menus matching the list are placed first in the
     given order; remaining menus are sorted alphabetically and appended
     at the end.
 
 * **Menu Order Labels** (visible only for *By custom label*): enter one
-  menu label per line in the target language.
+  menu label per line in the target language. A label matches a menu
+  whatever its case or accents ("ventes" matches "Ventes").
 
 Click **Reorder Menus** to apply the ordering immediately.

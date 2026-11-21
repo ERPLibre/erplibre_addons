@@ -3,7 +3,7 @@
 
 {
     "name": "Web Menu Reorder",
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Technical",
     "summary": "Reorder top-level menus alphabetically or by custom label list",
     "author": "TechnoLibre",
