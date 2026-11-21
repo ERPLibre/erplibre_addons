@@ -454,6 +454,7 @@
                         class="o_erplibre_studio_canvas flex-grow-1 overflow-auto p-3"
                         t-att-class="{'o_erplibre_studio_busy': state.busy}"
                         t-on-click="onCanvasClick"
+                        t-on-keydown="onCanvasKey"
                     >
                         <t t-if="panel" t-call="erplibre_studio.Panel.{{panel}}" />
                         <t t-elif="state.preview" t-call="erplibre_studio.ViewPreview" />

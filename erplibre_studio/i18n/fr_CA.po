@@ -1338,6 +1338,18 @@ msgstr "Vérifications"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Container %(tag)s"
+msgstr "Conteneur %(tag)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Container %(tag)s « %(label)s »"
+msgstr "Conteneur %(tag)s « %(label)s »"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Creation order"
 msgstr "Ordre de création"
@@ -1349,10 +1361,34 @@ msgid "Each new field of the project needs its own name."
 msgstr "Chaque nouveau champ du projet doit avoir son propre nom."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Element %(tag)s"
+msgstr "Élément %(tag)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Element %(tag)s « %(label)s »"
+msgstr "Élément %(tag)s « %(label)s »"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Field %(label)s (%(name)s)"
+msgstr "Champ %(label)s (%(name)s)"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Fields created outside the code carry x_ on a production database."
 msgstr "Les champs créés hors du code portent x_ sur une base de production."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Filter %(label)s"
+msgstr "Filtre %(label)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1374,6 +1410,12 @@ msgid ""
 msgstr ""
 "Comment les listes trient les enregistrements : des termes « champ asc » ou "
 "« champ desc » séparés par des virgules; vide : l'ordre de création."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Grouping %(label)s"
+msgstr "Regroupement %(label)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1757,6 +1799,7 @@ msgstr "Fil de discussion"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
@@ -4871,12 +4914,19 @@ msgstr "Sélection"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 msgid "Separator"
 msgstr "Séparateur"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Separator %(label)s"
+msgstr "Séparateur %(label)s"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__sequence
@@ -6913,6 +6963,12 @@ msgstr "Pourquoi la désinstallation est refusée"
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Widget"
 msgstr "Widget"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Widget %(label)s (%(name)s)"
+msgstr "Widget %(label)s (%(name)s)"
 
 #. module: erplibre_studio
 #. odoo-javascript

@@ -210,6 +210,58 @@ describe("erplibre_studio editor", () => {
         expect.verifySteps([`apply_operation add_existing_field ref before ${EMAIL}`]);
     });
 
+    test("a canvas block is a button the keyboard selects", async () => {
+        await openEditor();
+        const block = ".o_erplibre_studio_field[data-name=name]";
+        const pick = `${block} .o_erplibre_studio_pick`;
+        expect(pick).toHaveCount(1);
+        expect(queryOne(pick).tagName).toBe("BUTTON");
+        expect(pick).toHaveAttribute("type", "button");
+        expect(pick).toHaveAttribute("aria-label", "Field Name (name)");
+        expect(pick).toHaveAttribute("aria-pressed", "false");
+        // The mouse goes through the button to the draggable div.
+        expect(getComputedStyle(queryOne(pick)).pointerEvents).toBe("none");
+        expect(block).toHaveAttribute("draggable", "true");
+        queryOne(pick).focus();
+        await press("Enter");
+        await animationFrame();
+        expect(block).toHaveClass("o_erplibre_studio_selected");
+        expect(pick).toHaveAttribute("aria-pressed", "true");
+        expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "name");
+        // A second press unselects, as a second click does.
+        await press("Enter");
+        await animationFrame();
+        expect(block).not.toHaveClass("o_erplibre_studio_selected");
+        expect(pick).toHaveAttribute("aria-pressed", "false");
+        // A click on the block still selects it once.
+        await contains(block).click();
+        expect(block).toHaveClass("o_erplibre_studio_selected");
+    });
+
+    test("arrow keys walk the canvas blocks", async () => {
+        answer = payload([column("name", "Name"), column("email", "Email"), column("ref", "Reference")]);
+        await openEditor();
+        const pick = (name) => `.o_erplibre_studio_field[data-name=${name}] .o_erplibre_studio_pick`;
+        queryOne(pick("name")).focus();
+        await press("ArrowDown");
+        expect(pick("email")).toBeFocused();
+        await press("ArrowRight");
+        expect(pick("ref")).toBeFocused();
+        // Down on the last block stays there.
+        await press("ArrowDown");
+        expect(pick("ref")).toBeFocused();
+        await press("Home");
+        expect(pick("name")).toBeFocused();
+        await press("ArrowUp");
+        expect(pick("name")).toBeFocused();
+        await press("End");
+        expect(pick("ref")).toBeFocused();
+        await press("ArrowLeft");
+        expect(pick("email")).toBeFocused();
+        // Walking selects nothing.
+        expect(".o_erplibre_studio_selected").toHaveCount(0);
+    });
+
     test("Ctrl+Z removes the last change of the view; a text field keeps its own undo", async () => {
         answer.changes = [{id: 1, type: "relabel", kind: "renamed", summary: "Rename Email", path: EMAIL, error: false}];
         await openEditor();

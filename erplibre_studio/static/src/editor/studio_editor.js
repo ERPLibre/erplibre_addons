@@ -1158,6 +1158,38 @@ export class StudioEditor extends Component {
     }
 
     /**
+     * Walk the blocks of the canvas from the keyboard: from the button of
+     * a block (``.o_erplibre_studio_pick``), Down or Right focuses the next
+     * one in document order, Up or Left the previous one, Home and End the
+     * first and the last. Each block stays a tab stop of its own; Enter or
+     * Space on its button selects it. A key with a modifier, or on another
+     * element of the canvas, passes through.
+     */
+    onCanvasKey(ev) {
+        if (ev.altKey || ev.ctrlKey || ev.metaKey || !ev.target.classList.contains("o_erplibre_studio_pick")) {
+            return;
+        }
+        const picks = [...ev.currentTarget.querySelectorAll(".o_erplibre_studio_pick")];
+        const index = picks.indexOf(ev.target);
+        const next = {
+            ArrowDown: index + 1,
+            ArrowRight: index + 1,
+            ArrowUp: index - 1,
+            ArrowLeft: index - 1,
+            Home: 0,
+            End: picks.length - 1,
+        }[ev.key];
+        if (next === undefined) {
+            return;
+        }
+        ev.preventDefault();
+        const pick = picks[Math.min(Math.max(next, 0), picks.length - 1)];
+        if (pick) {
+            pick.focus();
+        }
+    }
+
+    /**
      * Select the block at ``path``, or unselect it when it is the
      * selection; the inspector shows the properties of a new selection.
      */

@@ -421,6 +421,33 @@
         background-color: rgba($primary, 0.08);
     }
 
+    // The button that selects a block of the canvas: a tab stop that
+    // looks like the text it holds. It takes no pointer event, nor do its
+    // descendants: the mouse reaches the draggable div around it.
+    .o_erplibre_studio_pick {
+        pointer-events: none;
+        appearance: none;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        color: inherit;
+        font: inherit;
+        text-align: start;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+        flex: 0 1 auto;
+        min-width: 0;
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 2px;
+            border-radius: 0.25rem;
+        }
+    }
+
     .o_erplibre_studio_project_field {
         border-style: dashed !important;
     }
@@ -457,6 +484,11 @@
                 min-width: 120px;
                 flex-direction: column;
                 align-items: flex-start !important;
+
+                > .o_erplibre_studio_pick {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
             }
 
             > .o_erplibre_studio_hook {

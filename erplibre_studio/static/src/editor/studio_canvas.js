@@ -40,6 +40,14 @@ import {
  * the state of the editor, through a ``useState`` of its own: a block
  * renders again when what it reads of that state changes, without the
  * props of the blocks above it changing.
+ *
+ * A field, a container title or another element holds its name in a
+ * ``<button class="o_erplibre_studio_pick">`` inside the draggable div:
+ * the button is a tab stop, and Enter or Space on it fires a click that
+ * bubbles to the ``t-on-click.stop`` of the div, which selects. The
+ * button takes no pointer event (CSS), so the mouse lands on the div: a
+ * mousedown on a ``<button>`` starts no drag in Firefox. What carries a
+ * tooltip (the lock, the change dot) stays outside the button.
  */
 export class StudioBlock extends Component {
     static template = "erplibre_studio.Block";
@@ -77,6 +85,43 @@ export class StudioBlock extends Component {
     /** Whether a click selects the block: any block but a QWeb template. */
     get canSelect() {
         return canSelectBlock(this.block);
+    }
+
+    /**
+     * The accessible name of the button that selects the block: its kind,
+     * its label and, for a field or a widget, its technical name.
+     */
+    get pickLabel() {
+        const block = this.block;
+        const label = block.label;
+        const own = label && label !== block.tag;
+        switch (block.kind) {
+            case "field":
+                return _t("Field %(label)s (%(name)s)", {label, name: block.name});
+            case "widget":
+                return _t("Widget %(label)s (%(name)s)", {
+                    label: (block.attrs && block.attrs.title) || label,
+                    name: block.name,
+                });
+            case "filter":
+                return _t("Filter %(label)s", {label});
+            case "group_by":
+                return _t("Grouping %(label)s", {label});
+            case "separator":
+                return block.attrs && block.attrs.string
+                    ? _t("Separator %(label)s", {label: block.attrs.string})
+                    : _t("Separator");
+            case "container":
+                return own
+                    ? _t("Container %(tag)s « %(label)s »", {tag: block.tag, label})
+                    : _t("Container %(tag)s", {tag: block.tag});
+        }
+        if (block.tag === "chatter") {
+            return _t("Chatter: messages, followers and activities");
+        }
+        return own
+            ? _t("Element %(tag)s « %(label)s »", {tag: block.tag, label})
+            : _t("Element %(tag)s", {tag: block.tag});
     }
 
     /** A group of groups lays its groups out side by side, as Odoo does. */

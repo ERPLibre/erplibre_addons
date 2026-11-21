@@ -350,6 +350,47 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(row(SHEET)).toBeFocused();
     });
 
+    test("a container title and the chatter are buttons too", async () => {
+        answer.blocks.children.push({
+            path: "/form/chatter",
+            tag: "chatter",
+            kind: "other",
+            label: "chatter",
+            attrs: {},
+            movable: false,
+            changes: [],
+            change_kinds: [],
+            changed: false,
+            changed_inside: false,
+        });
+        await openEditor();
+        const title = `.o_erplibre_studio_container[data-path="${ADDRESS}"] > .o_erplibre_studio_container_title`;
+        const chatter = ".o_erplibre_studio_other[data-tag=chatter]";
+        expect(`${title} > .o_erplibre_studio_pick`).toHaveAttribute("aria-label", "Container group « Address »");
+        // The dot of the changes inside keeps its tooltip: out of the button.
+        expect(`${title} > .o_erplibre_studio_change_dot`).toHaveCount(1);
+        expect(`${title} .o_erplibre_studio_pick .o_erplibre_studio_change_dot`).toHaveCount(0);
+        expect(`${chatter} > .o_erplibre_studio_pick`).toHaveAttribute(
+            "aria-label",
+            "Chatter: messages, followers and activities"
+        );
+        expect(chatter).toHaveAttribute("draggable", "false");
+        queryOne(`${title} > .o_erplibre_studio_pick`).focus();
+        await press("Enter");
+        await animationFrame();
+        expect(`.o_erplibre_studio_container[data-path="${ADDRESS}"]`).toHaveClass("o_erplibre_studio_selected");
+        expect(".o_erplibre_studio_properties").toHaveAttribute("data-kind", "container");
+        // The arrows walk into the group, then on to the chatter.
+        await press("ArrowDown");
+        expect(".o_erplibre_studio_field[data-name=street] .o_erplibre_studio_pick").toBeFocused();
+        await press("End");
+        expect(`${chatter} > .o_erplibre_studio_pick`).toBeFocused();
+        await press("Enter");
+        await animationFrame();
+        expect(chatter).toHaveClass("o_erplibre_studio_selected");
+        expect(`${chatter} > .o_erplibre_studio_pick`).toHaveAttribute("aria-pressed", "true");
+    });
+
     test("the palette: a search over the types and the fields, the other types, the existing fields", async () => {
         answer = payload({
             field_types: [

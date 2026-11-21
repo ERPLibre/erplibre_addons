@@ -74,6 +74,22 @@
         />
     </t>
 
+    <!-- The button that selects the block a StudioBlock renders, around
+         the body of the t-call (« 0 »): the tab stop of the block. Enter or
+         Space clicks it, and the click bubbles to the div of the block.
+         The CSS lets no pointer event reach it, so a drag starts on the
+         div. -->
+    <t t-name="erplibre_studio.Block.pick">
+        <button
+            type="button"
+            class="o_erplibre_studio_pick"
+            t-att-aria-pressed="isSelected ? 'true' : 'false'"
+            t-att-aria-label="pickLabel"
+        >
+            <t t-out="0" />
+        </button>
+    </t>
+
     <t t-name="erplibre_studio.Block">
         <div
             t-if="['field', 'widget', 'filter', 'group_by', 'separator'].includes(block.kind)"
@@ -93,23 +109,26 @@
             t-on-dragend="() => editor.endDrag()"
             t-on-click.stop="() => this.select()"
         >
-            <i t-if="canDrag" class="fa fa-arrows text-muted" />
-            <i t-elif="block.kind === 'field'" class="fa fa-lock text-muted" title="Loaded by the view" />
-            <t t-if="block.kind === 'separator'">
-                <span class="o_erplibre_studio_label text-muted">Separator</span>
-                <span t-if="block.attrs.string" class="fw-bold" t-esc="block.attrs.string" />
-            </t>
-            <t t-elif="block.kind === 'widget'">
-                <i class="fa fa-bookmark text-muted" />
-                <span class="o_erplibre_studio_label fw-bold" t-esc="block.attrs.title or block.label" />
-                <code class="small text-muted" t-esc="block.name" />
-            </t>
-            <t t-else="">
-                <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
-                <code t-if="block.kind === 'field'" class="small text-muted" t-esc="block.name" />
-                <code t-if="block.kind === 'filter'" class="small text-muted text-truncate" t-esc="block.domain" />
-                <code t-if="block.kind === 'group_by'" class="small text-muted" t-esc="block.group_by" />
-                <span class="badge text-bg-light" t-if="field.type and block.kind === 'field'" t-esc="field.type" />
+            <!-- The lock keeps its tooltip: it stays out of the button. -->
+            <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock text-muted" title="Loaded by the view" />
+            <t t-call="erplibre_studio.Block.pick">
+                <i t-if="canDrag" class="fa fa-arrows text-muted" aria-hidden="true" />
+                <t t-if="block.kind === 'separator'">
+                    <span class="o_erplibre_studio_label text-muted">Separator</span>
+                    <span t-if="block.attrs.string" class="fw-bold" t-esc="block.attrs.string" />
+                </t>
+                <t t-elif="block.kind === 'widget'">
+                    <i class="fa fa-bookmark text-muted" aria-hidden="true" />
+                    <span class="o_erplibre_studio_label fw-bold" t-esc="block.attrs.title or block.label" />
+                    <code class="small text-muted" t-esc="block.name" />
+                </t>
+                <t t-else="">
+                    <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
+                    <code t-if="block.kind === 'field'" class="small text-muted" t-esc="block.name" />
+                    <code t-if="block.kind === 'filter'" class="small text-muted text-truncate" t-esc="block.domain" />
+                    <code t-if="block.kind === 'group_by'" class="small text-muted" t-esc="block.group_by" />
+                    <span class="badge text-bg-light" t-if="field.type and block.kind === 'field'" t-esc="field.type" />
+                </t>
             </t>
             <t t-call="erplibre_studio.Block.changes" />
             <span
@@ -188,11 +207,13 @@
                 t-on-dragend="() => editor.endDrag()"
                 t-on-click.stop="() => this.select()"
             >
-                <i t-if="canDrag" class="fa fa-arrows" />
-                <t t-esc="block.tag" />
-                <t t-if="block.label !== block.tag">
-                    ·
-                    <t t-esc="block.label" />
+                <t t-call="erplibre_studio.Block.pick">
+                    <i t-if="canDrag" class="fa fa-arrows" aria-hidden="true" />
+                    <t t-esc="block.tag" />
+                    <t t-if="block.label !== block.tag">
+                        ·
+                        <t t-esc="block.label" />
+                    </t>
                 </t>
                 <span
                     t-foreach="flags"
@@ -229,15 +250,17 @@
             t-on-dragend="() => editor.endDrag()"
             t-on-click.stop="() => this.select()"
         >
-            <i t-if="canDrag" class="fa fa-arrows me-1" />
-            <t t-if="block.tag === 'chatter'">
-                <i class="fa fa-comments me-1" />
-                Chatter: messages, followers and activities
-            </t>
-            <t t-else="" t-esc="block.tag" />
-            <t t-if="block.label !== block.tag">
-                ·
-                <t t-esc="block.label" />
+            <t t-call="erplibre_studio.Block.pick">
+                <i t-if="canDrag" class="fa fa-arrows" aria-hidden="true" />
+                <t t-if="block.tag === 'chatter'">
+                    <i class="fa fa-comments" aria-hidden="true" />
+                    Chatter: messages, followers and activities
+                </t>
+                <t t-else="" t-esc="block.tag" />
+                <t t-if="block.label !== block.tag">
+                    ·
+                    <t t-esc="block.label" />
+                </t>
             </t>
             <t t-call="erplibre_studio.Block.changes" />
         </div>
