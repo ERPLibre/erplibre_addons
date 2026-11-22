@@ -158,9 +158,9 @@ class TestGenerateViews(StudioCase):
         self.assertIn("studio_test_other_module", self.project._dependencies())
 
     def test_advanced_attributes_written(self):
-        """The widget, the domain and the groups of a field, and a separator,
-        reach the views file; the module of the comodel field the domain
-        names is a dependency."""
+        """The widget, the options, the domain and the groups of a field,
+        and a separator, reach the views file; the module of the comodel
+        field the domain names, or an option, is a dependency."""
         form = self.make_view(
             "form",
             "<form><sheet><group name='g'><field name='name'/>"
@@ -192,12 +192,31 @@ class TestGenerateViews(StudioCase):
         self.op(
             project,
             form,
+            type="set_attribute",
+            target="//field[@name='parent_id']",
+            attribute="options",
+            value={"no_create": True},
+        )
+        foreign_module = self.Project._module_of("ir.model.fields", self.foreign.id)
+        # An option that names a comodel field: its module is a dependency.
+        self.assertIn(
+            foreign_module,
+            project._attribute_dependencies(
+                {"option_model": "res.partner", "option_fields": [self.foreign.name]}
+            ),
+        )
+        self.assertNotIn(
+            foreign_module,
+            project._attribute_dependencies({"option_model": "res.partner"}),
+        )
+        self.op(
+            project,
+            form,
             type="add_separator",
             target="//field[@name='type']",
             position="after",
             label="Studio separator",
         )
-        foreign_module = self.Project._module_of("ir.model.fields", self.foreign.id)
         self.assertNotEqual(foreign_module, "base")
         self.assertIn(foreign_module, project._dependencies())
         project.action_apply()
@@ -221,6 +240,7 @@ class TestGenerateViews(StudioCase):
 
         self.assertEqual(attribute("type", "widget"), "radio")
         self.assertEqual(attribute("parent_id", "domain"), domain)
+        self.assertEqual(attribute("parent_id", "options"), "{'no_create': True}")
         self.assertEqual(attribute("name", "groups"), f"base.group_system,{own}")
         separator = arch.xpath(".//separator")
         self.assertEqual([s.get("string") for s in separator], ["Studio separator"])

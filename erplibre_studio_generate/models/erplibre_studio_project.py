@@ -629,15 +629,21 @@ class ErplibreStudioProject(models.Model):
 
     def _attribute_dependencies(self, payload):
         """The modules a « set_attribute » of ``payload`` names: those of the
-        comodel fields the domain of a relational field names, and those of
-        the groups « groups » names by their external id."""
+        comodel fields the domain of a relational field names, those of the
+        comodel fields the options of a widget name (``option_model``,
+        ``option_fields``), and those of the groups « groups » names by
+        their external id."""
         Fields = self.env["ir.model.fields"].sudo()
         names = set()
-        comodel = payload.get("domain_model")
-        for name in payload.get("domain_fields") or []:
-            field = comodel and Fields._get(comodel, name)
-            if field:
-                names.add(self._module_of("ir.model.fields", field.id))
+        for model_key, fields_key in (
+            ("domain_model", "domain_fields"),
+            ("option_model", "option_fields"),
+        ):
+            comodel = payload.get(model_key)
+            for name in payload.get(fields_key) or []:
+                field = comodel and Fields._get(comodel, name)
+                if field:
+                    names.add(self._module_of("ir.model.fields", field.id))
         for xmlid in payload.get("groups") or []:
             names.add(xmlid.split(".", 1)[0])
         return names
