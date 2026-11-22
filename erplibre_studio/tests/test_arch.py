@@ -375,6 +375,49 @@ class TestArch(BaseCase):
             )
         )
 
+    def test_model_name_refusal(self):
+        def code(name, **kwargs):
+            refusal = studio_arch.model_name_refusal(name, **kwargs)
+            return refusal and refusal.code
+
+        for prefix_required in (True, False):
+            self.assertIsNone(code("x_studio_demo", prefix_required=prefix_required))
+        self.assertEqual(code("studio_demo.book"), "prefix")
+        self.assertIsNone(code("studio_demo.book", prefix_required=False))
+        self.assertEqual(code("x_studio.book"), "prefix")
+        for name in ("Studio", "studio..book", ".book", "book.", "1book", "a.1b"):
+            with self.subTest(name=name):
+                self.assertEqual(code(name, prefix_required=False), "format")
+        # The table, dots as _, holds MODEL_NAME_SIZE characters at most.
+        self.assertEqual(
+            code("a" * 25 + "." + "b" * 25, prefix_required=False), "format"
+        )
+        self.assertIsNone(code("a" * 24 + "." + "b" * 25, prefix_required=False))
+        self.assertEqual(code("class", prefix_required=False), "reserved")
+        self.assertIsNone(code("studio_class", prefix_required=False))
+        self.assertIsNone(code("studio.class", prefix_required=False))
+        for name in ("ir.studio_demo", "res", "res.studio_demo", "web.x", "report"):
+            with self.subTest(name=name):
+                self.assertEqual(code(name, prefix_required=False), "reserved")
+        self.assertIsNone(code("resource_demo", prefix_required=False))
+        self.assertEqual(
+            code(
+                "studio_demo.shelf",
+                prefix_required=False,
+                reserved={"studio_demo.shelf"},
+            ),
+            "reserved",
+        )
+        self.assertEqual(
+            studio_arch.model_name_checks("Res"),
+            {"format": False, "reserved": True, "prefix": False},
+        )
+        self.assertEqual(
+            studio_arch.model_table("studio_demo.book"), "studio_demo_book"
+        )
+        self.assertTrue(studio_arch.valid_model_name("studio_demo.book", False))
+        self.assertFalse(studio_arch.valid_model_name("studio_demo.book"))
+
     def test_default_model_arch(self):
         form = etree.fromstring(studio_arch.default_model_arch("form", "Item"))
         self.assertEqual(form.get("string"), "Item")

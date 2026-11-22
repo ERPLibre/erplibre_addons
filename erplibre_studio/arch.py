@@ -345,10 +345,14 @@ RESERVED_FIELD_PREFIXES = ("_", "in_group_", "sel_groups_")
 # where it stands in the arch.
 FIXED_TAGS = ("chatter",)
 
-# A model the studio creates: « x_ », then a letter. 50 characters keep
+# The longest table of a model the studio creates (its name, dots as
+# underscores; with x_, « x_ » then a letter). 50 characters keep
 # the names built from it (« <model>_<comodel>_rel », « view_<model>_search »,
 # its table and their indexes) under the 63 characters of PostgreSQL.
 MODEL_NAME_SIZE = 50
+# The namespaces of Odoo a model name without x_ cannot start with: its
+# first part, or the whole name without a dot.
+RESERVED_MODEL_NAMESPACES = ("ir", "res", "base", "web", "bus", "report")
 # The default views of a model the studio creates.
 MODEL_VIEW_TYPES = ("form", "list", "search")
 
@@ -387,6 +391,9 @@ _FIELD_FORMAT = re.compile(r"^[a-z_][a-z0-9_]*$")
 # digits and underscores, whatever rule the field names follow.
 _TABLE_NAME = re.compile(r"^x_[a-z0-9_]+$")
 _MODEL_NAME = re.compile(r"^x_[a-z][a-z0-9_]*$")
+# The format of a model name whatever its prefix: parts of lower case
+# letters, digits and underscores, each a letter first, joined by dots.
+_MODEL_FORMAT = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$")
 _MODULE_NAME = re.compile(r"^[a-z][a-z0-9_]*$")
 # A node attribute a change may write: never a QWeb directive (« t- »).
 _ATTRIBUTE_NAME = re.compile(r"^[a-z_][a-z0-9_]*$")
@@ -1488,8 +1495,55 @@ def model_name_from_label(label, taken):
     return _free_name(base, taken)
 
 
-def valid_model_name(name):
-    return bool(name and len(name) <= MODEL_NAME_SIZE and _MODEL_NAME.match(name))
+def model_table(name):
+    """The table Odoo gives the model ``name``: its dots as underscores.
+    Two names that differ by a dot and an underscore share it."""
+    return (name or "").replace(".", "_")
+
+
+def model_name_checks(name, prefix_required=True, reserved=()):
+    """{format, reserved, prefix}: whether ``name`` passes each check of
+    ``model_name_refusal``, each one run on its own."""
+    text = name if isinstance(name, str) else ""
+    table = model_table(text)
+    return {
+        "format": bool(
+            text and len(table) <= MODEL_NAME_SIZE and _MODEL_FORMAT.match(text)
+        ),
+        "reserved": not (
+            keyword.iskeyword(table)
+            or text.split(".")[0] in RESERVED_MODEL_NAMESPACES
+            or text in reserved
+        ),
+        "prefix": not prefix_required or bool(_MODEL_NAME.match(text)),
+    }
+
+
+def model_name_refusal(name, prefix_required=True, reserved=()):
+    """Why ``name`` cannot be the name of a new model (an ArchError), or
+    None when it can. The codes, in the order they are checked:
+    « format » (parts of lower case letters, digits and underscores, each
+    a letter first, joined by dots; a table of MODEL_NAME_SIZE characters
+    at most), « reserved » (a table that is a Python keyword, which the
+    generated module imports as the file ``models/<table>.py``, a first
+    part in RESERVED_MODEL_NAMESPACES, or a name of ``reserved``),
+    « prefix » (``prefix_required`` and not « x_ », a letter, then lower
+    case letters, digits and underscores, without a dot)."""
+    checks = model_name_checks(name, prefix_required, reserved)
+    messages = {
+        "format": f"Invalid model name {name}: lower case letters, digits, _ "
+        "and dots.",
+        "reserved": f"Reserved model name {name}.",
+        "prefix": f"The model name {name} needs the prefix x_.",
+    }
+    for code, message in messages.items():
+        if not checks[code]:
+            return ArchError(message, code, name=name)
+    return None
+
+
+def valid_model_name(name, prefix_required=True):
+    return model_name_refusal(name, prefix_required) is None
 
 
 def default_model_arch(

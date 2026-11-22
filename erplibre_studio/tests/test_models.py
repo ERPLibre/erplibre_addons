@@ -160,6 +160,63 @@ class TestModels(StudioCase):
                 )["mail_available"]
             )
 
+    def test_model_name_without_prefix_on_production(self):
+        # The rule of the fields pins the models: x_ required.
+        with self.assertRaisesRegex(UserError, "x_"), self.env.cr.savepoint():
+            self.make_model(self.project, "Book", model="studio_demo.book")
+        line = self.item_line()
+        with self.assertRaises(UserError), self.env.cr.savepoint():
+            self.project._studio_update_model(line, {"model": "studio_demo.book"})
+        result = self.Editor.check_model_name(self.project.id, "studio_demo.book")
+        self.assertEqual(result["status"], "invalid")
+        self.assertTrue(result["rule"]["prefix_required"])
+        self.assertEqual(result["rule"]["mode"], "production")
+        self.assertEqual(
+            [c["key"] for c in result["checks"] if not c["ok"]], ["prefix"]
+        )
+        # An empty name checks the one the label proposes.
+        result = self.Editor.check_model_name(
+            self.project.id, "", label="Studio test item"
+        )
+        self.assertEqual(result["proposed"], f"{MODEL}_2")
+        self.assertEqual(
+            (result["name"], result["status"]), (f"{MODEL}_2", "available")
+        )
+        # The line renamed keeps its own name aside.
+        result = self.Editor.check_model_name(self.project.id, MODEL, line_id=line.id)
+        self.assertEqual(result["status"], "available")
+        self.assertEqual(
+            self.Editor.check_model_name(self.project.id, MODEL)["status"], "taken"
+        )
+        # A table of the database without a model takes its name.
+        self.env.cr.execute("CREATE TABLE x_studio_test_table (id serial)")
+        result = self.Editor.check_model_name(self.project.id, "x_studio_test_table")
+        self.assertEqual(result["status"], "taken")
+        self.assertIn("x_studio_test_table", result["message"])
+        data = self.Editor.get_editor_data(
+            "res.partner", self.form.id, "form", self.project.id
+        )
+        self.assertTrue(data["model_name_rule"]["prefix_required"])
+        # A draft line forged without x_ blocks the review and Apply.
+        self.env.cr.execute(
+            "UPDATE erplibre_studio_model SET model = 'studio_demo.book' WHERE id = %s",
+            [line.id],
+        )
+        self.env.cr.execute(
+            "UPDATE erplibre_studio_access SET model = 'studio_demo.book' "
+            "WHERE project_id = %s",
+            [self.project.id],
+        )
+        self.env.invalidate_all()
+        review = self.Editor.get_review(self.project.id)
+        self.assertEqual(
+            [(b["line_id"], b["name"]) for b in review["name_blockers"]],
+            [(line.id, "studio_demo.book")],
+        )
+        self.assertEqual(self.Editor._project_counts(self.project)["name_blockers"], 1)
+        with self.assertRaisesRegex(UserError, "x_"):
+            self.project.action_apply()
+
     def test_draft_leaves_the_registry(self):
         line = self.item_line()
         self.assertNotIn(MODEL, self.env)

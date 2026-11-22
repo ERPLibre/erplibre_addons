@@ -12,6 +12,7 @@ from .erplibre_studio_project import (
     RESTORE_KEY,
     SERVER_VALUES,
     check_studio_write,
+    protected_model,
 )
 
 MENU_MODES = [
@@ -103,8 +104,8 @@ class ErplibreStudioModel(models.Model):
     model = fields.Char(
         string="Technical name",
         required=True,
-        help="x_ then lower case letters, digits and underscores; it "
-        "cannot change once applied.",
+        help="Lower case letters, digits, underscores and dots; x_ first "
+        "unless the database allows otherwise; it cannot change once applied.",
     )
     name = fields.Char(string="Label", required=True)
     chatter = fields.Boolean(
@@ -309,18 +310,14 @@ class ErplibreStudioModel(models.Model):
 
     @api.constrains("model", "name")
     def _check_studio_model(self):
+        """The technical name of a line not applied follows the rule of the
+        database (``_studio_model_name_rule``); an applied line is not
+        checked again: its model exists, under a name a former rule
+        allowed, and Discard restores it as it is."""
         Line = self.env["erplibre.studio.model"].sudo()
         for line in self:
-            if not studio_arch.valid_model_name(line.model):
-                raise ValidationError(
-                    self.env._(
-                        "%(name)s is not a valid model name: x_ then a "
-                        "letter, then lower case letters, digits and "
-                        "underscores, %(size)s characters at most.",
-                        name=line.model,
-                        size=studio_arch.MODEL_NAME_SIZE,
-                    )
-                )
+            if not line.applied:
+                line._check_studio_model_name()
             if line.model in self.env and not line.applied:
                 raise ValidationError(
                     self.env._("The model %(name)s already exists.", name=line.model)
@@ -336,6 +333,54 @@ class ErplibreStudioModel(models.Model):
             if not label:
                 raise ValidationError(self.env._("A model needs a label."))
             line.project_id._check_field_texts(label, "")
+
+    def _check_studio_model_name(self):
+        """Raise ValidationError when the technical name of the line fails
+        a check of ``studio_arch.model_name_refusal`` under the rule of the
+        database, names a model that takes no access row
+        (``protected_model``), or a model a module on the addons path
+        defines (``_studio_reserved_model_names``)."""
+        self.ensure_one()
+        project = self.project_id
+        rule = project._studio_model_name_rule()
+        refusal = studio_arch.model_name_refusal(self.model, rule["prefix_required"])
+        size = studio_arch.MODEL_NAME_SIZE
+        code = refusal.code if refusal is not None else None
+        if code == "prefix" or (code == "format" and rule["prefix_required"]):
+            raise ValidationError(
+                self.env._(
+                    "%(name)s is not a valid model name: x_ then a "
+                    "letter, then lower case letters, digits and "
+                    "underscores, %(size)s characters at most.",
+                    name=self.model,
+                    size=size,
+                )
+            )
+        if code == "format":
+            raise ValidationError(
+                self.env._(
+                    "%(name)s is not a valid model name: lower case letters, "
+                    "digits, underscores and dots, each part starting with a "
+                    "letter, %(size)s characters at most.",
+                    name=self.model,
+                    size=size,
+                )
+            )
+        if refusal is not None or protected_model(self.model):
+            raise ValidationError(
+                self.env._(
+                    "%(name)s is a reserved model name: a Python keyword, a "
+                    "namespace of Odoo or a model that takes no access right.",
+                    name=self.model,
+                )
+            )
+        if self.model in project._studio_reserved_model_names():
+            raise ValidationError(
+                self.env._(
+                    "A module on the addons path defines %(name)s",
+                    name=self.model,
+                )
+            )
 
     @api.constrains("chatter")
     def _check_studio_chatter(self):

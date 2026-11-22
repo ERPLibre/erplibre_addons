@@ -14,6 +14,7 @@ from odoo.addons.base.models.ir_module import STATES
 from odoo.exceptions import UserError, ValidationError
 from odoo.modules.module import get_module_path
 from odoo.osv import expression
+from odoo.tools import sql
 from odoo.tools.misc import file_path
 from odoo.tools.safe_eval import safe_eval
 
@@ -315,6 +316,8 @@ PENDING_VIEW_OPERATIONS = {
 # The checks of the technical name of a new field, in the order they run
 # and the editor lists them.
 FIELD_NAME_CHECKS = ("format", "reserved", "prefix", "unique")
+# The checks of the technical name of a new model, in the order they apply.
+MODEL_NAME_CHECKS = ("format", "reserved", "prefix", "unique")
 
 # The attributes of a node that hold a text people read, not a field name.
 HUMAN_ATTRIBUTES = ("string", "help", "title", "tooltip", "placeholder")
@@ -3535,21 +3538,195 @@ class ErplibreStudioProject(models.Model):
         )
 
     def _studio_check_free_model(self, model, line=None):
-        """Raise UserError when another model line (than ``line``) of any
-        project creates ``model``."""
-        other = (
-            self.env["erplibre.studio.model"]
-            .sudo()
-            .search([("model", "=", model), ("id", "!=", line.id if line else 0)])
-        )
-        if other:
-            raise UserError(
-                self.env._(
-                    "The project %(project)s creates the model %(name)s already.",
-                    project=other.project_id.name,
-                    name=model,
-                )
+        """Raise ValidationError when ``model`` cannot be the technical name
+        of the model line ``line`` (of a new line when None): the message
+        of ``_studio_model_name_status``."""
+        status = self._studio_model_name_status(model, line)
+        if status["code"]:
+            raise ValidationError(status["message"])
+
+    # ── technical names of the new models ───────────────────────────────
+
+    @api.model
+    def _studio_model_name_rule(self):
+        """The rule the technical names of new models follow on this
+        database: {prefix_required, mode, label, text, detail}, the prefix
+        and the mode of ``_studio_field_name_rule``, so that fields and
+        models follow one rule; ``text`` and ``detail`` say why a model
+        name without the prefix is refused or allowed."""
+        rule = self._studio_field_name_rule()
+        if rule["prefix_required"]:
+            text = self.env._("Prefix x_ required on this database")
+            detail = self.env._(
+                "Models created outside the code carry x_ on a production database."
             )
+        else:
+            text = self.env._(
+                "Without x_ allowed: development database (code_generator)"
+            )
+            detail = self.env._(
+                "A model without x_ is written as is in the generated module; "
+                "Odoo keeps it while ERPLibre studio generate is installed."
+            )
+        return {
+            "prefix_required": rule["prefix_required"],
+            "mode": rule["mode"],
+            "label": rule["label"],
+            "text": text,
+            "detail": detail,
+        }
+
+    def _studio_reserved_model_names(self):
+        """The model names a module on the addons path defines, which a new
+        model cannot take: none here; ERPLibre studio generate reads them
+        from the sources."""
+        return set()
+
+    def _studio_model_name_owner(self, name, line=None):
+        """Who already holds the model name ``name``, the model line
+        ``line`` aside (the one renamed or checked; its applied model is
+        its own): None, or {kind, name, project, table, model}. ``kind``:
+        « model » when the registry or ir.model has it, « project » when
+        another model line of any project creates it (``project`` names
+        that project), « table » when its table (``studio_arch.model_table``)
+        is the table of a model of the registry, of another model line, or
+        a table of the database (``table``; ``model`` names the model that
+        holds it, False for a table alone), « module » when a module on the
+        addons path defines it (``_studio_reserved_model_names``)."""
+        own = line.model if line and line.applied else None
+        line_id = line.id if line else 0
+        result = {"name": name, "project": False, "table": False, "model": False}
+        if name != own and (
+            name in self.env.registry or self.env["ir.model"].sudo()._get_id(name)
+        ):
+            return dict(result, kind="model", model=name)
+        Line = self.env["erplibre.studio.model"].sudo()
+        other = Line.search([("model", "=", name), ("id", "!=", line_id)], limit=1)
+        if other:
+            return dict(result, kind="project", project=other.project_id.name)
+        table = studio_arch.model_table(name)
+        if own is None or table != studio_arch.model_table(own):
+            for model_name, Model in self.env.registry.items():
+                if Model._table == table:
+                    return dict(result, kind="table", table=table, model=model_name)
+            for other in Line.search([("id", "!=", line_id)]):
+                if studio_arch.model_table(other.model) == table:
+                    return dict(
+                        result,
+                        kind="table",
+                        table=table,
+                        model=other.model,
+                        project=other.project_id.name,
+                    )
+            if sql.table_exists(self.env.cr, table):
+                return dict(result, kind="table", table=table)
+        if name in self._studio_reserved_model_names():
+            return dict(result, kind="module")
+        return None
+
+    def _studio_model_name_status(self, name, line=None):
+        """{code, owner, message, detail, checks} of the technical name
+        ``name`` of a new model, the model line ``line`` aside (see
+        ``_studio_model_name_owner``). ``code``: None when the name
+        applies, else the first of MODEL_NAME_CHECKS that fails; a model
+        that takes no access row (``protected_model``) is reserved.
+        ``checks``: [{key, ok, text}], the checks of MODEL_NAME_CHECKS each
+        run on its own; the name is looked for only when its format is
+        valid."""
+        rule = self._studio_model_name_rule()
+        passed = studio_arch.model_name_checks(name, rule["prefix_required"])
+        passed["reserved"] = passed["reserved"] and not protected_model(name)
+        owner = None
+        if passed["format"]:
+            owner = self._studio_model_name_owner(name, line)
+        passed["unique"] = passed["format"] and owner is None
+        texts = {
+            "format": self.env._("Lower case letters, digits, _ and dots"),
+            "reserved": self.env._("Not a reserved name"),
+            "prefix": self.env._("Prefix that fits the rule of the database"),
+            "unique": self.env._(
+                "Unique among the models, the tables and the projects"
+            ),
+        }
+        code = next((key for key in MODEL_NAME_CHECKS if not passed[key]), None)
+        if code is None:
+            message = self.env._("Available")
+            detail = self.env._("No model, table nor project uses %(name)s.", name=name)
+        elif code == "format":
+            message = self.env._(
+                "Invalid format: lower case letters, digits, _ and dots only"
+            )
+            detail = self.env._(
+                "Each part starts with a letter; the table, the name with its "
+                "dots as _, has %(size)s characters at most.",
+                size=studio_arch.MODEL_NAME_SIZE,
+            )
+        elif code == "reserved":
+            message = self.env._("Reserved model name (%(name)s)", name=name)
+            detail = self.env._(
+                "A Python keyword, a namespace of Odoo (ir, res, base, web, "
+                "bus, report) or a model that takes no access right. The x_ "
+                "prefix avoids this case."
+            )
+        elif code == "prefix":
+            message, detail = rule["text"], rule["detail"]
+        elif owner["kind"] == "project":
+            message = self.env._(
+                "The project %(project)s creates the model %(name)s already.",
+                project=owner["project"],
+                name=name,
+            )
+            detail = self.env._("Each new model needs its own name.")
+        elif owner["kind"] == "table":
+            message = self.env._(
+                "Another model uses the table %(table)s", table=owner["table"]
+            )
+            detail = self.env._(
+                "The table of a model is its name with its dots as _: two "
+                "such names would share it."
+            )
+        elif owner["kind"] == "module":
+            message = self.env._(
+                "A module on the addons path defines %(name)s", name=name
+            )
+            detail = self.env._(
+                "Installed later, that module would take the model over."
+            )
+        else:
+            message = self.env._("The model %(name)s already exists.", name=name)
+            detail = self.env._("Choose another name.")
+        return {
+            "code": code,
+            "owner": owner,
+            "message": message,
+            "detail": detail,
+            "checks": [
+                {"key": key, "ok": passed[key], "text": texts[key]}
+                for key in MODEL_NAME_CHECKS
+            ],
+        }
+
+    def _studio_model_name_problems(self):
+        """[{line_id, model, name, message}]: the model lines of the project
+        not applied yet whose technical name does not apply, each checked
+        with itself aside. An applied line keeps its name: its model
+        exists."""
+        self.ensure_one()
+        result = []
+        for line in self.new_model_ids:
+            if line.applied:
+                continue
+            status = self._studio_model_name_status(line.model, line)
+            if status["code"]:
+                result.append(
+                    {
+                        "line_id": line.id,
+                        "model": line.model,
+                        "name": line.model,
+                        "message": status["message"],
+                    }
+                )
+        return result
 
     def _studio_menu_vals(self, menu, label=None):
         """The model line values of ``menu`` {mode, app_id | new_app: {name,
@@ -3650,7 +3827,8 @@ class ErplibreStudioProject(models.Model):
             vals["sequence"] = int(values["sequence"] or 0)
         if (values.get("model") or "").strip():
             vals["model"] = values["model"].strip()
-            self._studio_check_free_model(vals["model"], line)
+            if vals["model"] != line.model:
+                self._studio_check_free_model(vals["model"], line)
         line.write(vals)
         options = {
             key: values[key]
@@ -4513,6 +4691,12 @@ class ErplibreStudioProject(models.Model):
             raise UserError(
                 self.env._("The model %(name)s already exists.", name=line.model)
             )
+        if not line.applied:
+            # A draft line recorded under another rule, or whose name a
+            # model, a table or a module took since.
+            status = self._studio_model_name_status(line.model, line)
+            if status["code"]:
+                raise UserError(status["message"])
         if line.model not in self.access_line_ids.mapped("model"):
             # Without one, the model is the superuser's only, and the
             # generated module has no access file.
@@ -4699,15 +4883,42 @@ class ErplibreStudioProject(models.Model):
                 )
             )
 
+    def _model_vals(self, line, label):
+        """The ir.model values of the custom model of the model line
+        ``line`` labelled ``label``: its name, its ``x_name`` and, with the
+        chatter, the mail flags."""
+        vals = {
+            "model": line.model,
+            "name": label,
+            "state": "manual",
+            "field_id": [
+                Command.create(
+                    {
+                        "name": "x_name",
+                        "field_description": "Name",
+                        "ttype": "char",
+                        "required": True,
+                        "copied": True,
+                    }
+                )
+            ],
+        }
+        if line.chatter:
+            vals.update(is_mail_thread=True, is_mail_activity=True)
+        return vals
+
     def _apply_models(self, log):
         """Create or update the custom models of the model lines, with their
         ``x_name``. Return (models kept, names of the models whose new label
         or chatter waits for the module): a model the generated module
-        defines, once installed, changes with the module only."""
+        defines, once installed, changes with the module only. UserError
+        on a model to create without ``x_`` while the rule of the database
+        (``_studio_model_name_rule``, read on each call) requires it."""
         IrModel = self.env["ir.model"].sudo().with_context(lang=None)
         kept = IrModel
         waiting = []
         mail = self._studio_mail_available()
+        prefix_required = self._studio_model_name_rule()["prefix_required"]
         for line in self.new_model_ids:
             name = line._studio_xml_names()["model"]
             label = line.name.strip()
@@ -4719,25 +4930,16 @@ class ErplibreStudioProject(models.Model):
                             "The model %(name)s already exists.", name=line.model
                         )
                     )
-                vals = {
-                    "model": line.model,
-                    "name": label,
-                    "state": "manual",
-                    "field_id": [
-                        Command.create(
-                            {
-                                "name": "x_name",
-                                "field_description": "Name",
-                                "ttype": "char",
-                                "required": True,
-                                "copied": True,
-                            }
+                if prefix_required and not line.model.startswith("x_"):
+                    # ir.model would refuse it with a ValidationError on
+                    # the core rule instead.
+                    raise UserError(
+                        self.env._(
+                            "%(name)s needs the x_ prefix on this database.",
+                            name=line.model,
                         )
-                    ],
-                }
-                if line.chatter:
-                    vals.update(is_mail_thread=True, is_mail_activity=True)
-                record = IrModel.create(vals)
+                    )
+                record = IrModel.create(self._model_vals(line, label))
                 self._studio_bind(record, name)
                 log.append(f"model {line.model}: created")
                 kept |= record

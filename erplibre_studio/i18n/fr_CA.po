@@ -232,6 +232,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
+msgid ""
+"%(name)s is a reserved model name: a Python keyword, a namespace of Odoo or "
+"a model that takes no access right."
+msgstr "%(name)s est un nom de modèle réservé : un mot-clé Python, un espace de noms d'Odoo ou un modèle qui ne prend aucun droit d'accès."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(name)s is already created by this project"
 msgstr "%(name)s est déjà créé par ce projet"
@@ -298,6 +306,14 @@ msgid ""
 msgstr ""
 "%(name)s n'est pas un nom de champ valide : x_ puis des minuscules, des "
 "chiffres et des soulignés."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
+msgid ""
+"%(name)s is not a valid model name: lower case letters, digits, underscores "
+"and dots, each part starting with a letter, %(size)s characters at most."
+msgstr "%(name)s n'est pas un nom de modèle valide : des lettres minuscules, des chiffres, des soulignés et des points, chaque partie commençant par une lettre, %(size)s caractères au plus."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -451,6 +467,14 @@ msgstr "<%(tag)s> ne peut pas être déplacé."
 msgid "<%(tag)s> replaces its content: nothing dropped into it shows."
 msgstr ""
 "<%(tag)s> remplace son contenu : rien de ce qui y est déposé ne s'affiche."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A Python keyword, a namespace of Odoo (ir, res, base, web, bus, report) or a"
+" model that takes no access right. The x_ prefix avoids this case."
+msgstr "Un mot-clé Python, un espace de noms d'Odoo (ir, res, base, web, bus, report) ou un modèle qui ne prend aucun droit d'accès. Le préfixe x_ évite ce cas."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -640,6 +664,14 @@ msgstr "Un modèle que le projet crée, ou un modèle de la base."
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A model without x_ is written as is in the generated module; Odoo keeps it "
+"while ERPLibre studio generate is installed."
+msgstr "Un modèle sans x_ est écrit tel quel dans le module généré ; Odoo le garde tant que ERPLibre studio generate est installé."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A module named %(name)s already exists in %(path)s."
 msgstr "Un module nommé %(name)s existe déjà dans %(path)s."
 
@@ -648,6 +680,13 @@ msgstr "Un module nommé %(name)s existe déjà dans %(path)s."
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A module named %(name)s is already known."
 msgstr "Un module nommé %(name)s est déjà connu."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A module on the addons path defines %(name)s"
+msgstr "Un module de l'addons path définit %(name)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -940,6 +979,7 @@ msgstr "Ajouter un groupe"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Add a group…"
 msgstr "Ajouter un groupe…"
@@ -1142,6 +1182,12 @@ msgstr "Un many2one existant du comodèle"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "And"
 msgstr "Et"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Another model uses the table %(table)s"
+msgstr "Un autre modèle utilise la table %(table)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1357,6 +1403,12 @@ msgid "Checks"
 msgstr "Vérifications"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Choose another name."
+msgstr "Choisissez un autre nom."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Container %(tag)s"
@@ -1379,6 +1431,20 @@ msgstr "Ordre de création"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Each new field of the project needs its own name."
 msgstr "Chaque nouveau champ du projet doit avoir son propre nom."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Each new model needs its own name."
+msgstr "Chaque nouveau modèle doit avoir son propre nom."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"Each part starts with a letter; the table, the name with its dots as _, has "
+"%(size)s characters at most."
+msgstr "Chaque partie commence par une lettre ; la table, le nom avec ses points en _, a %(size)s caractères au plus."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1458,8 +1524,20 @@ msgstr "Indexé (recherche plus rapide)"
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Installed later, that module would take the model over."
+msgstr "Installé plus tard, ce module reprendrait le modèle."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Invalid format: lower case letters, digits and _ only"
 msgstr "Format invalide : minuscules, chiffres et _ seulement"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Invalid format: lower case letters, digits, _ and dots only"
+msgstr "Format invalide : minuscules, chiffres, _ et points seulement"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1479,6 +1557,19 @@ msgstr "Mise en page"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Lower case letters, digits and _"
 msgstr "Minuscules, chiffres et _"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Lower case letters, digits, _ and dots"
+msgstr "Minuscules, chiffres, _ et points"
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__model
+msgid ""
+"Lower case letters, digits, underscores and dots; x_ first unless the "
+"database allows otherwise; it cannot change once applied."
+msgstr "Lettres minuscules, chiffres, soulignés et points ; x_ au début à moins que la base ne permette autrement ; il ne peut plus changer une fois appliqué."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__manual_order
@@ -1508,6 +1599,12 @@ msgstr "Taille maximale"
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Models created outside the code carry x_ on a production database."
+msgstr "Les modèles créés hors du code portent x_ sur une base de production."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "New tab"
 msgstr "Nouvel onglet"
 
@@ -1522,6 +1619,18 @@ msgstr "Aucun champ %(name)s sur %(model)s ni dans les autres projets."
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "No limit"
 msgstr "Aucune limite"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "No model, table nor project uses %(name)s."
+msgstr "Aucun modèle, aucune table ni aucun projet n'utilise %(name)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Not a reserved name"
+msgstr "Pas un nom réservé"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1578,6 +1687,12 @@ msgstr "Proposé d'après le libellé tant qu'il n'est pas modifié. Figé à l'
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Remove this element from the draft"
 msgstr "Retirer cet élément du brouillon"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Reserved model name (%(name)s)"
+msgstr "Nom de modèle réservé (%(name)s)"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2292,6 +2407,7 @@ msgstr "Nom affiché"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__domain_force
 msgid "Domain"
 msgstr "Domaine"
@@ -4585,6 +4701,7 @@ msgstr "Retirer les groupes supprimés"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Remove the group %(group)s"
 msgstr "Retirer le groupe %(group)s"
@@ -6302,6 +6419,14 @@ msgstr "Le t-if ou le t-elif d'une chaîne ne peut pas être masqué."
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The table of a model is its name with its dots as _: two such names would "
+"share it."
+msgstr "La table d'un modèle est son nom avec ses points en _ : deux tels noms la partageraient."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The technical name %(name)s does not apply: %(message)s"
 msgstr "Le nom technique %(name)s ne s'applique pas : %(message)s"
 
@@ -6761,6 +6886,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unique among the models, the tables and the projects"
+msgstr "Unique parmi les modèles, les tables et les projets"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Unique on %(model)s and in the projects"
 msgstr "Unique sur %(model)s et dans les projets"
 
@@ -7058,6 +7189,12 @@ msgid ""
 msgstr ""
 "Sans date de fin, l'élément prend la durée de « Durée » (un nombre "
 "d'heures), ou s'affiche comme un point."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Without x_ allowed: development database (code_generator)"
+msgstr "Sans x_ permis : base de développement (code_generator)"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7585,15 +7722,6 @@ msgstr "vue %(view)s"
 #: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
 msgid "write"
 msgstr "modifier"
-
-#. module: erplibre_studio
-#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__model
-msgid ""
-"x_ then lower case letters, digits and underscores; it cannot change once "
-"applied."
-msgstr ""
-"x_ puis des lettres minuscules, des chiffres et des soulignés ; il ne peut "
-"plus changer une fois appliqué."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__icon

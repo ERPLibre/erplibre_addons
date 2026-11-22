@@ -589,6 +589,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "sample_res_id": sample or False,
             "mail_available": Project._studio_mail_available(),
             "field_name_rule": (project or Project)._studio_field_name_rule(),
+            "model_name_rule": (project or Project)._studio_model_name_rule(),
         }
 
     @api.model
@@ -694,7 +695,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         ``models``, ``access``, ``rules``, ``groups``, ``apps`` its lines of
         each kind; ``total`` their sum, its ``item_count``; ``edited_views``
         how many views (pending default views included) its changes edit;
-        ``name_blockers`` how many technical names of new fields stop Apply."""
+        ``name_blockers`` how many technical names of new fields and models
+        stop Apply."""
         changes = project.change_ids
         new_fields = project._project_field_changes()
         edited = {
@@ -717,7 +719,8 @@ class ErplibreStudioEditor(models.AbstractModel):
             "apps": len(project.app_ids),
             "total": project.item_count,
             "edited_views": len(edited),
-            "name_blockers": len(project._studio_field_name_problems()),
+            "name_blockers": len(project._studio_field_name_problems())
+            + len(project._studio_model_name_problems()),
         }
 
     @api.model
@@ -1586,6 +1589,42 @@ class ErplibreStudioEditor(models.AbstractModel):
             "detail": status["detail"],
             "checks": status["checks"],
             "rule": project._studio_field_name_rule(),
+        }
+
+    @api.model
+    def check_model_name(self, project_id, name, line_id=False, label=False):
+        """What the technical name ``name`` of a new model gives: {name,
+        proposed, status, message, detail, checks, rule}. ``line_id``: the
+        model line of the project being renamed, which the checks leave
+        aside. ``proposed``: the ``x_`` name its label ``label`` proposes
+        (the label of the line when none), or False. ``status``:
+        « available », « taken » or « invalid ». ``rule``:
+        ``_studio_model_name_rule``. An empty ``name`` checks the proposed
+        one. A read."""
+        self._check_studio_access()
+        project = self._read_project(project_id)
+        line = project._studio_model_line(line_id) if line_id else None
+        label = label or (line.name if line else False)
+        proposed = False
+        if label:
+            taken = project._studio_taken_models() - {line.model if line else None}
+            proposed = studio_arch.model_name_from_label(label, taken)
+        name = (name or "").strip() or proposed or ""
+        status = project._studio_model_name_status(name, line)
+        if status["code"] is None:
+            state = "available"
+        elif status["code"] == "unique":
+            state = "taken"
+        else:
+            state = "invalid"
+        return {
+            "name": name,
+            "proposed": proposed,
+            "status": state,
+            "message": status["message"],
+            "detail": status["detail"],
+            "checks": status["checks"],
+            "rule": project._studio_model_name_rule(),
         }
 
     # ── confirmations ───────────────────────────────────────────────────

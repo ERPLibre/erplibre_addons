@@ -37,8 +37,10 @@ class ErplibreStudioEditor(models.AbstractModel):
         as it is, ``error`` why it does not apply (or False), ``target``
         where the editor shows it ({space, ...}). ``removal``: the answer
         of ``get_apply_report``. ``blocked``: why Apply refuses the draft
-        now, or False. ``name_blockers``: the new fields whose technical
-        name stops Apply (``_studio_field_name_problems``). A read."""
+        now, or False. ``name_blockers``: the new fields and the new models
+        whose technical name stops Apply (``_studio_field_name_problems``,
+        then ``_studio_model_name_problems``, whose items carry ``line_id``
+        instead of ``change_id``). A read."""
         self._check_studio_access()
         project = self._read_project(project_id)
         review = _Review(self, project)
@@ -58,7 +60,8 @@ class ErplibreStudioEditor(models.AbstractModel):
             "groups": review.result(),
             "removal": project._studio_apply_report(),
             "blocked": blocked,
-            "name_blockers": project._studio_field_name_problems(),
+            "name_blockers": project._studio_field_name_problems()
+            + project._studio_model_name_problems(),
         }
 
 
