@@ -42,7 +42,7 @@ export const MODULE_OWNING_STATES = ["installed", "to upgrade", "to remove"];
 const FIELD_CHANGES = ["add_field", "update_field"];
 const RELATION_TYPES = ["many2one", "one2many", "many2many"];
 // The kinds of attribute a field of a form or a list sets under « Advanced ».
-const ADVANCED_KINDS = ["widget", "field_domain", "groups"];
+const ADVANCED_KINDS = ["widget", "field_options", "field_domain", "groups"];
 // The view types whose fields show the attributes of ADVANCED_KINDS apart.
 const ADVANCED_VIEW_TYPES = ["form", "list"];
 
@@ -577,8 +577,22 @@ export class StudioInspector extends Component {
 
     // ── changes, made by the editor ─────────────────────────────────────
 
-    setNodeAttribute(block, attribute, value) {
-        return this.editor.setNodeAttribute(block, attribute, value);
+    setNodeAttribute(block, attribute, value, extra = {}, onError = null) {
+        return this.editor.setNodeAttribute(block, attribute, value, extra, onError);
+    }
+
+    /**
+     * Set the options of the widget of ``block`` from the text of the
+     * textarea of ``ev``. A refused text leaves the payload as it was:
+     * the textarea shows again what the draft holds.
+     */
+    async setOptionsText(block, entry, ev) {
+        const input = ev.target;
+        const data = await this.setNodeAttribute(block, entry.attribute, input.value.trim());
+        if (!data) {
+            input.value = entry.value || "";
+        }
+        return data;
     }
 
     setAttribute(type, value) {

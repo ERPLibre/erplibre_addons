@@ -16,7 +16,9 @@ the part of the project and the editor.
 import ast
 import copy
 import hashlib
+import json
 import keyword
+import math
 import re
 import unicodedata
 
@@ -204,10 +206,12 @@ VIEW_OPERATIONS = {
 
 # The attributes « set_attribute » may write: view type -> tag ->
 # attribute -> kind of value. The kind says how the value is checked.
-# A field of a form or a list takes its widget, the domain of its records
-# (a relational field) and the groups it shows for.
+# A field of a form or a list takes its widget, the options of the widget,
+# the domain of its records (a relational field) and the groups it shows
+# for. The key order is the order the inspector lists them in.
 FIELD_ADVANCED_ATTRIBUTES = {
     "widget": "widget",
+    "options": "field_options",
     "domain": "field_domain",
     "groups": "groups",
 }
@@ -1290,6 +1294,98 @@ def order_fields(text):
     """The field names of an order text (« name asc, id desc »); ArchError
     when it is not one."""
     return [name for name, _direction in order_terms(text)]
+
+
+# The ``options`` of a field: at most OPTIONS_SIZE characters of text,
+# nested at most OPTIONS_DEPTH levels; an option name is an identifier
+# that may hold « - » (an html widget names its options in camelCase).
+OPTIONS_SIZE = 2000
+OPTIONS_DEPTH = 4
+OPTION_KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
+
+
+def _refuse_constant(name):
+    raise ValueError(name)
+
+
+def _options_error(value):
+    return ArchError(f"{value} is not a set of options.", "options_value", value=value)
+
+
+def _check_option_value(value, depth):
+    """ArchError unless ``value`` is a fixed value an option may hold:
+    text, boolean, number (finite), None, or a list or a dictionary with
+    text keys of those, nested at most OPTIONS_DEPTH levels."""
+    if isinstance(value, (list, tuple, dict)) and depth > OPTIONS_DEPTH:
+        raise ArchError("The options are nested too deep.", "options_value", value="")
+    if value is None or isinstance(value, (str, bool, int)):
+        return
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ArchError(f"Invalid number {value}.", "options_value", value=value)
+        return
+    if isinstance(value, (list, tuple)):
+        for item in value:
+            _check_option_value(item, depth + 1)
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise ArchError(f"Invalid key {key}.", "options_value", value=key)
+            _check_option_value(item, depth + 1)
+        return
+    raise ArchError(f"Invalid value {value!r}.", "options_value", value=repr(value))
+
+
+def parse_field_options(value):
+    """The dictionary of the ``options`` of a field. ``value`` is a
+    dictionary, or a text: empty (no option), JSON (« true », « null ») or
+    a Python literal (« True », « None »). An expression (« uid », a field
+    of the record) is refused: the options are fixed values. ArchError
+    (code « options_value ») when ``value`` is not one."""
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return {}
+        if len(text) > OPTIONS_SIZE:
+            raise ArchError(
+                "The options are too long.", "options_value", value=text[:40] + "…"
+            )
+        try:
+            options = json.loads(text, parse_constant=_refuse_constant)
+        except ValueError:
+            try:
+                options = ast.literal_eval(text)
+            except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
+                raise _options_error(text) from None
+    else:
+        options = value
+    if not isinstance(options, dict):
+        raise _options_error(value)
+    for key in options:
+        if not isinstance(key, str) or not OPTION_KEY.match(key):
+            raise ArchError(f"Invalid option {key}.", "options_value", value=key)
+    _check_option_value(options, 1)
+    return options
+
+
+def _options_listed(value):
+    """``value`` with its tuples as lists and its dictionaries sorted by
+    key, so that ``repr`` gives one text per set of options."""
+    if isinstance(value, (list, tuple)):
+        return [_options_listed(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _options_listed(value[key]) for key in sorted(value)}
+    return value
+
+
+def options_text(options):
+    """The ``options`` attribute of a field for the dictionary ``options``
+    (see ``parse_field_options``): its Python ``repr``, keys sorted, the
+    form an Odoo arch writes; empty for no option."""
+    if not options:
+        return ""
+    return repr(_options_listed(options))
 
 
 def node_name_from_label(prefix, label, taken):

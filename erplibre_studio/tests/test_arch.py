@@ -495,6 +495,52 @@ class TestArch(BaseCase):
         with self.assertRaises(studio_arch.ArchError):
             studio_arch.order_terms("x_name; drop")
 
+    def test_parse_field_options(self):
+        parse = studio_arch.parse_field_options
+        self.assertEqual(parse({"no_create": True}), {"no_create": True})
+        self.assertEqual(
+            parse('{"no_open": true, "limit": 5, "mode": null}'),
+            {"no_open": True, "limit": 5, "mode": None},
+        )
+        self.assertEqual(
+            parse("{'no_create': True, 'size': [1, 2.5]}"),
+            {"no_create": True, "size": [1, 2.5]},
+        )
+        self.assertEqual(parse(""), {})
+        self.assertEqual(parse("  "), {})
+        self.assertEqual(parse("{'cssEdit': 'a', 'min-height': 1}")["cssEdit"], "a")
+        deep = "{'a': {'b': {'c': {'d': {'e': 1}}}}}"
+        refused = (
+            "[1]",
+            "{'no_create': uid}",
+            '{"a": NaN}',
+            '{"a": Infinity}',
+            '{"a": 1e999}',
+            "{'a b': 1}",
+            "{1: True}",
+            "{'a': {1, 2}}",
+            deep,
+            '{"a": "' + "x" * studio_arch.OPTIONS_SIZE + '"}',
+            42,
+        )
+        for value in refused:
+            with self.assertRaises(studio_arch.ArchError) as caught:
+                parse(value)
+            self.assertEqual(caught.exception.code, "options_value")
+        self.assertEqual(
+            parse("{'a': {'b': {'c': {'d': 1}}}}"), {"a": {"b": {"c": {"d": 1}}}}
+        )
+        text = studio_arch.options_text
+        self.assertEqual(text({}), "")
+        self.assertEqual(
+            text({"no_open": True, "color_field": "color", "sizes": (1, 2)}),
+            "{'color_field': 'color', 'no_open': True, 'sizes': [1, 2]}",
+        )
+        self.assertEqual(
+            text(parse('{"b": {"y": 1, "x": false}}')),
+            text(parse("{'b': {'x': False, 'y': 1}}")),
+        )
+
     def test_chatter_stays_in_place(self):
         root = etree.fromstring(
             studio_arch.default_model_arch("form", "Item", chatter=True)

@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {queryAllTexts, queryOne} from "@odoo/hoot-dom";
+import {queryAll, queryAllTexts, queryOne} from "@odoo/hoot-dom";
 import {advanceTime, animationFrame} from "@odoo/hoot-mock";
 import {
     contains,
@@ -886,7 +886,9 @@ describe("erplibre_studio editor, inspector", () => {
     test("a field of a form: widget, domain and groups under Advanced", async () => {
         const advanced = (extra = {}) => {
             const data = payload({
-                settable: {field: {widget: "widget", domain: "field_domain", groups: "groups"}},
+                settable: {
+                    field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
+                },
                 operations: [...payload().operations, "set_attribute"],
                 ...extra,
             });
@@ -992,6 +994,66 @@ describe("erplibre_studio editor, inspector", () => {
             value: [],
         });
         expect(".o_erplibre_studio_group_chip").toHaveCount(0);
+    });
+
+    test("raw options under Advanced", async () => {
+        const advanced = () =>
+            payload({
+                settable: {
+                    field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
+                },
+                operations: [...payload().operations, "set_attribute"],
+            });
+        /** ``data`` with the options ``text`` on the field user_id. */
+        const withOptions = (data, text) => {
+            const set = (block) => ({
+                ...block,
+                ...(block.name === "user_id" ? {attrs: {...block.attrs, options: text}} : {}),
+                ...(block.children ? {children: block.children.map(set)} : {}),
+            });
+            return {...data, blocks: set(data.blocks)};
+        };
+        onRpc("erplibre.studio.editor", "get_studio_choices", () => ({
+            groups: [],
+            menus: [],
+            apps: [],
+            models: [],
+            taken_models: [],
+            icons: [],
+        }));
+        answer = advanced();
+        afterOperation = () => withOptions(advanced(), "{'no_create': True}");
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=user_id]").click();
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        const OPTIONS = ".o_erplibre_studio_field_advanced .o_erplibre_studio_prop_options";
+        expect(OPTIONS).toHaveCount(1);
+        expect(OPTIONS).toHaveAttribute("placeholder", '{"no_create": true}');
+        // Right under the widget.
+        expect(
+            queryAll(".o_erplibre_studio_field_advanced .o_erplibre_studio_settable").map((el) => el.dataset.attribute)
+        ).toEqual(["widget", "options", "domain", "groups"]);
+        await contains(OPTIONS).edit('{"no_create": true}');
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "options",
+            value: '{"no_create": true}',
+        });
+        // The draft writes the Python form of the options.
+        expect(OPTIONS).toHaveValue("{'no_create': True}");
+        // A refused text: the textarea shows the draft again.
+        refuse = () => "uid is not a set of options: a dictionary of fixed values is needed.";
+        await contains(OPTIONS).edit("{'domain': uid}");
+        await animationFrame();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "options",
+            value: "{'domain': uid}",
+        });
+        expect(OPTIONS).toHaveValue("{'no_create': True}");
     });
 
     test("a change of the Changes tab is undone on its own", async () => {

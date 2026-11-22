@@ -569,8 +569,10 @@ export class StudioEditor extends Component {
      * One operation on the draft. Operations run one at a time: each one
      * locates its nodes in the payload on screen, and names its revision
      * so that the server refuses it on a draft that changed meanwhile.
+     * ``onError(message)``, when given, takes a refusal in place of the
+     * notification (see ``call``).
      */
-    async operate(operation) {
+    async operate(operation, onError = null) {
         if (this.state.busy) {
             return null;
         }
@@ -578,9 +580,12 @@ export class StudioEditor extends Component {
             this.notification.add(_t("Choose or create a studio project first."), {type: "warning"});
             return null;
         }
-        return this.call("apply_operation", [this.project.id, ...this.viewArgs(), operation], {
-            revision: this.project.revision,
-        });
+        return this.call(
+            "apply_operation",
+            [this.project.id, ...this.viewArgs(), operation],
+            {revision: this.project.revision},
+            onError
+        );
     }
 
     /** The view the editor was opened on, as ``project_action`` takes it. */
@@ -1405,11 +1410,20 @@ export class StudioEditor extends Component {
         return Boolean(block && this.root && block.path === this.root.path);
     }
 
-    async setNodeAttribute(block, attribute, value) {
+    /**
+     * Set ``attribute`` of the node of ``block`` to ``value``. ``extra``
+     * adds keys to the operation (``option_fields`` of the options of a
+     * widget); ``onError`` goes to ``operate``. Answer the payload, or
+     * null when the server refuses.
+     */
+    async setNodeAttribute(block, attribute, value, extra = {}, onError = null) {
         if (!block || this.state.busy) {
             return;
         }
-        const data = await this.operate({type: "set_attribute", target: block.path, attribute, value});
+        const data = await this.operate(
+            {type: "set_attribute", target: block.path, attribute, value, ...extra},
+            onError
+        );
         this.reselect(data, block);
         return data;
     }

@@ -31,6 +31,19 @@ LIST = """
     <field name="category_id"/>
 </list>
 """
+# A form whose fields carry options already: a literal written as JSON,
+# an expression.
+FORM_OPTIONS = """
+<form>
+    <sheet>
+        <group name="g">
+            <field name="name"/>
+            <field name="country_id" options='{"no_open": true, "no_create": true}'/>
+            <field name="category_id" options="{'color_field': context.get('a')}"/>
+        </group>
+    </sheet>
+</form>
+"""
 MODULE = "studio_test_advanced"
 ITEM = "x_studio_test_advanced_item"
 
@@ -54,7 +67,7 @@ class TestViewsAdvanced(StudioCase):
         self.list_view = self.make_view("list", LIST)
         self.project = self.make_project(MODULE)
 
-    def set_attr(self, name, attribute, value, view=None):
+    def set_attr(self, name, attribute, value, view=None, **kw):
         view = view or self.form_view
         return self.op(
             self.project,
@@ -63,6 +76,7 @@ class TestViewsAdvanced(StudioCase):
             target=named(name, view.type),
             attribute=attribute,
             value=value,
+            **kw,
         )
 
     def node(self, name, view=None):
@@ -75,9 +89,15 @@ class TestViewsAdvanced(StudioCase):
                 "res.partner", view.id, view.type, self.project.id
             )
             self.assertIn("set_attribute", data["operations"])
+            # The options come right under the widget in the inspector.
             self.assertEqual(
-                data["settable"]["field"],
-                {"widget": "widget", "domain": "field_domain", "groups": "groups"},
+                list(data["settable"]["field"].items()),
+                [
+                    ("widget", "widget"),
+                    ("options", "field_options"),
+                    ("domain", "field_domain"),
+                    ("groups", "groups"),
+                ],
             )
 
     def test_widget_on_form_and_list(self):
@@ -145,6 +165,92 @@ class TestViewsAdvanced(StudioCase):
         name = added._payload()["field_name"]
         change = self.set_attr(name, "domain", "[('code', 'in', ['CA', 'FR'])]")
         self.assertEqual(change._payload()["domain_model"], "res.country")
+
+    def test_options(self):
+        # A dictionary, a JSON text: the arch takes the Python form.
+        change = self.set_attr("country_id", "options", {"no_create": True})
+        self.assertEqual(self.node("country_id").get("options"), "{'no_create': True}")
+        self.assertEqual(change._payload()["fields"], [])
+        self.set_attr("country_id", "options", '{"no_open": true}')
+        self.assertEqual(self.node("country_id").get("options"), "{'no_open': True}")
+        self.assertEqual(len(self.project.change_ids), 1)
+        # Not a dictionary of fixed values.
+        for value in ("[1]", "{'no_create': uid}", '{"a": NaN}', "{'a b': 1}"):
+            with self.assertRaisesRegex(UserError, "not a set of options"):
+                self.set_attr("country_id", "options", value)
+        # An option that names a field of the record: it must exist.
+        change = self.set_attr(
+            "name",
+            "options",
+            {"currency_field": "type"},
+            option_fields={"currency_field": "record"},
+        )
+        self.assertEqual(change._payload()["fields"], ["type"])
+        with self.assertRaisesRegex(UserError, "Unknown field"):
+            self.set_attr(
+                "name",
+                "options",
+                {"currency_field": "x_no_such_field"},
+                option_fields={"currency_field": "record"},
+            )
+        with self.assertRaisesRegex(UserError, "Invalid value"):
+            self.set_attr(
+                "name",
+                "options",
+                {"currency_field": "type"},
+                option_fields={"currency_field": "model"},
+            )
+        # An option that names a field of the comodel.
+        change = self.set_attr(
+            "category_id",
+            "options",
+            {"color_field": "color"},
+            option_fields={"color_field": "comodel"},
+        )
+        payload = change._payload()
+        self.assertEqual(payload["option_model"], "res.partner.category")
+        self.assertEqual(payload["option_fields"], ["color"])
+        with self.assertRaisesRegex(UserError, "Unknown field"):
+            self.set_attr(
+                "category_id",
+                "options",
+                {"color_field": "x_no_such_field"},
+                option_fields={"color_field": "comodel"},
+            )
+        with self.assertRaisesRegex(UserError, "relational field"):
+            self.set_attr(
+                "name",
+                "options",
+                {"color_field": "color"},
+                option_fields={"color_field": "comodel"},
+            )
+        # Empty: no option, the change goes.
+        count = len(self.project.change_ids)
+        self.set_attr("category_id", "options", "")
+        self.assertEqual(len(self.project.change_ids), count - 1)
+        self.assertNotIn("options", self.node("category_id").attrib)
+        # A list view takes them too.
+        self.set_attr(
+            "category_id", "options", "{'no_create': True}", view=self.list_view
+        )
+        self.assertEqual(
+            self.node("category_id", view=self.list_view).get("options"),
+            "{'no_create': True}",
+        )
+
+    def test_options_of_the_arch(self):
+        view = self.make_view("form", FORM_OPTIONS)
+        # The same options as the arch, in another form: no change.
+        self.set_attr(
+            "country_id", "options", "{'no_create': True, 'no_open': True}", view=view
+        )
+        self.assertFalse(self.project.change_ids)
+        # An expression of the arch stays as it is written.
+        text = "{'color_field': context.get('a')}"
+        self.assertEqual(self.Project._normal_attribute("field_options", text), text)
+        self.set_attr("category_id", "options", "", view=view)
+        self.assertEqual(len(self.project.change_ids), 1)
+        self.assertNotIn("options", self.node("category_id", view=view).attrib)
 
     def test_groups(self):
         change = self.set_attr("name", "groups", ["base.group_system"])
@@ -239,6 +345,18 @@ class TestViewsAdvanced(StudioCase):
             .get("widget"),
             "char",
         )
+        # An option names a field created already: none on a model of the
+        # project not applied yet.
+        with self.assertRaisesRegex(UserError, "Apply the model first"):
+            self.op(
+                self.project,
+                list_view,
+                type="set_attribute",
+                target=named(name, "list"),
+                attribute="options",
+                value={"currency_field": name},
+                option_fields={"currency_field": "record"},
+            )
 
     def test_apply_revert(self):
         self.set_attr("type", "widget", "radio")

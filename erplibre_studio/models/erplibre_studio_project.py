@@ -2699,6 +2699,58 @@ class ErplibreStudioProject(models.Model):
             ) from exc
         return repr(list(domain)), []
 
+    def _field_options_value(self, model, node, value, option_fields):
+        """(text, record fields, extra) for the ``options`` of the field
+        ``node`` of ``model``. ``value`` is a dictionary or a text of fixed
+        values (see ``studio_arch.parse_field_options``). ``option_fields``
+        maps an option to the model whose field it names: « record » (the
+        model of the view, as « currency_field ») or « comodel » (the model
+        the field points to, as « color_field » of many2many_tags). Each
+        field named must exist: the record fields go to ``fields``, the
+        comodel fields to ``extra`` (``option_model``, ``option_fields``)
+        for the dependencies of the generated module."""
+        try:
+            options = studio_arch.parse_field_options(
+                value if value not in (None, False) else ""
+            )
+        except studio_arch.ArchError:
+            raise UserError(
+                self.env._(
+                    "%(value)s is not a set of options: a dictionary of fixed "
+                    "values is needed.",
+                    value=value,
+                )
+            ) from None
+        if not isinstance(option_fields, dict) or not all(
+            isinstance(key, str) and scope in ("record", "comodel")
+            for key, scope in option_fields.items()
+        ):
+            raise UserError(self.env._("Invalid value %(value)s.", value=option_fields))
+        record_names, comodel, comodel_names = set(), None, set()
+        for option, scope in option_fields.items():
+            name = options.get(option)
+            if not isinstance(name, str) or not name:
+                continue
+            if scope == "record":
+                if self._studio_pending_line(model):
+                    raise UserError(
+                        self.env._(
+                            "Apply the model first: an option names a field "
+                            "created already."
+                        )
+                    )
+                self._field_info(model, name)
+                record_names.add(name)
+            else:
+                comodel = comodel or self._domain_comodel(model, node.get("name"))
+                if name not in self.env[comodel]._fields:
+                    raise UserError(self.env._("Unknown field %(name)s.", name=name))
+                comodel_names.add(name)
+        extra = {}
+        if comodel_names:
+            extra = {"option_model": comodel, "option_fields": sorted(comodel_names)}
+        return studio_arch.options_text(options), sorted(record_names), extra
+
     @api.model
     def _groups_list(self, value):
         """[external ids] of a ``groups`` value: a list, or a text of ids
@@ -2804,6 +2856,12 @@ class ErplibreStudioProject(models.Model):
                 return "False"
         if kind == "groups":
             return ",".join(item.strip() for item in text.split(",") if item.strip())
+        if kind == "field_options":
+            try:
+                return studio_arch.options_text(studio_arch.parse_field_options(text))
+            except studio_arch.ArchError:
+                # An expression stays as the arch writes it.
+                return text
         if kind == "field_domain":
             try:
                 return repr(
@@ -2840,7 +2898,13 @@ class ErplibreStudioProject(models.Model):
                     tag=node.tag,
                 )
             )
-        value, named = self._attribute_value(view, node, kind, op.get("value"))
+        extra = {}
+        if kind == "field_options":
+            value, named, extra = self._field_options_value(
+                view.model, node, op.get("value"), op.get("option_fields") or {}
+            )
+        else:
+            value, named = self._attribute_value(view, node, kind, op.get("value"))
         required = studio_arch.REQUIRED_ATTRIBUTES.get((view.type, node.tag), ())
         if not value and attribute in required:
             raise UserError(
@@ -2862,7 +2926,7 @@ class ErplibreStudioProject(models.Model):
         if value == self._normal_attribute(kind, original):
             replaced.unlink()
             return replaced.browse()
-        payload = {"attribute": attribute, "value": value, "fields": named}
+        payload = {"attribute": attribute, "value": value, "fields": named, **extra}
         if kind == "groups":
             # The external ids the generation depends on and a removal of a
             # group of the project checks.

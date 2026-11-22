@@ -7683,7 +7683,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Advanced: widget, domain, groups"
+msgid "Advanced: widget, options, domain, groups"
 msgstr ""
 
 #. module: erplibre_studio
@@ -7811,4 +7811,36 @@ msgstr ""
 msgid ""
 "The rule line the option « Per company » created; empty once the rule is "
 "removed from the project."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(value)s is not a set of options: a dictionary of fixed values is "
+"needed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Apply the model first: an option names a field created already."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Options"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Options of the widget: JSON or a Python dictionary. Empty: none."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "{\"no_create\": true}"
 msgstr ""

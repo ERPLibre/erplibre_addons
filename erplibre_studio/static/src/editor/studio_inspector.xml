@@ -165,6 +165,18 @@
                 </div>
                 <span t-if="!entry.value" class="d-block text-muted mt-1">Not set in the view: web_timeline opens on Fit.</span>
             </t>
+            <label t-elif="entry.kind === 'field_options'" class="form-label mb-0 w-100">
+                <t t-esc="entry.label" />
+                <textarea
+                    class="form-control form-control-sm font-monospace mt-1 o_erplibre_studio_prop_options"
+                    rows="3"
+                    placeholder='{"no_create": true}'
+                    t-att-value="entry.value"
+                    t-att-disabled="props.busy"
+                    t-on-change="(ev) => this.setOptionsText(block, entry, ev)"
+                />
+                <span class="d-block text-muted mt-1">Options of the widget: JSON or a Python dictionary. Empty: none.</span>
+            </label>
             <label t-elif="entry.kind === 'field_domain'" class="form-label mb-0 w-100">
                 <t t-esc="entry.label" />
                 <textarea
@@ -755,7 +767,7 @@
                     t-att-aria-expanded="isAdvancedOpen ? 'true' : 'false'"
                     t-on-click="() => this.toggleAdvanced(block)"
                 >
-                    Advanced: widget, domain, groups
+                    Advanced: widget, options, domain, groups
                     <i t-att-class="isAdvancedOpen ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true" />
                 </button>
                 <fieldset t-if="isAdvancedOpen" class="o_erplibre_studio_fieldset o_erplibre_studio_field_advanced pt-1">

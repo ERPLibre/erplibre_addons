@@ -8050,8 +8050,8 @@ msgstr "Avancé"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Advanced: widget, domain, groups"
-msgstr "Avancé — widget, domaine, groupes"
+msgid "Advanced: widget, options, domain, groups"
+msgstr "Avancé — widget, options, domaine, groupes"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8187,3 +8187,37 @@ msgid ""
 msgstr ""
 "La ligne de règle créée par l'option « Par société »; vide une fois la "
 "règle retirée du projet."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"%(value)s is not a set of options: a dictionary of fixed values is "
+"needed."
+msgstr ""
+"%(value)s n'est pas un ensemble d'options : il faut un dictionnaire de "
+"valeurs fixes."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Apply the model first: an option names a field created already."
+msgstr "Appliquez d'abord le modèle : une option nomme un champ déjà créé."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Options"
+msgstr "Options"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Options of the widget: JSON or a Python dictionary. Empty: none."
+msgstr "Options du widget : JSON ou un dictionnaire Python. Vide : aucune."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "{\"no_create\": true}"
+msgstr "{\"no_create\": true}"

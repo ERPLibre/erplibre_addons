@@ -170,6 +170,7 @@ export function attributeLabel(attribute) {
             records_draggable: _t("Drag the records"),
             archivable: _t("Archive the records of a column"),
             widget: _t("Widget"),
+            options: _t("Options"),
             domain: _t("Domain"),
             groups: _t("Visible for groups"),
             disable_linking: _t("No link to the records"),
