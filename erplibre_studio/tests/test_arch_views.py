@@ -78,8 +78,8 @@ def spec_text(change, view_type):
 
 @tagged("post_install", "-at_install")
 class TestArchViews(BaseCase):
-    """The arch helpers of the kanban, search, pivot, graph and timeline
-    views."""
+    """The arch helpers of the kanban, search, pivot, graph, calendar and
+    timeline views."""
 
     def test_template_xpath_by_its_name(self):
         root = etree.fromstring(KANBAN)
@@ -739,3 +739,38 @@ class TestArchViews(BaseCase):
             "no_drop_inside",
         )
         self.assertEqual(studio_arch.CHOICES["graph_type"], studio_arch.GRAPH_TYPES)
+
+    def test_calendar_default_arch_and_blocks(self):
+        root = etree.fromstring(
+            studio_arch.default_view_arch("calendar", "Contact", "name", "date")
+        )
+        self.assertEqual(
+            dict(root.attrib),
+            {"string": "Contact", "date_start": "date", "mode": "month"},
+        )
+        self.assertEqual([dict(field.attrib) for field in root], [{"name": "name"}])
+        # On a date no user writes, events can neither be created nor moved.
+        readonly = etree.fromstring(
+            studio_arch.default_view_arch(
+                "calendar", "Contact", "name", "create_date", readonly_date=True
+            )
+        )
+        self.assertEqual(
+            (readonly.get("create"), readonly.get("edit")), ("False", "False")
+        )
+        with self.assertRaises(studio_arch.ArchError) as caught:
+            studio_arch.default_view_arch("calendar", "Contact", "name")
+        self.assertEqual(caught.exception.code, "calendar_fields")
+        blocks = studio_arch.arch_blocks(root, "calendar", {})
+        self.assertTrue(blocks["drop"])
+        self.assertEqual([b["name"] for b in blocks["children"]], ["name"])
+        self.assertEqual(studio_arch.hide_mode("calendar"), "invisible")
+        self.assertIsNone(studio_arch.drop_refusal("calendar", root, "inside"))
+        self.assertIsNone(studio_arch.drop_refusal("calendar", root[0], "before"))
+        self.assertEqual(
+            studio_arch.drop_refusal("calendar", root[0], "inside").code,
+            "no_drop_inside",
+        )
+        self.assertEqual(
+            studio_arch.CHOICES["calendar_mode"], ("day", "week", "month", "year")
+        )

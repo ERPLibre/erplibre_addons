@@ -32,6 +32,7 @@ VIEW_TYPES = [
     ("search", "Search"),
     ("pivot", "Pivot"),
     ("graph", "Graph"),
+    ("calendar", "Calendar"),
     ("timeline", "Timeline"),
 ]
 

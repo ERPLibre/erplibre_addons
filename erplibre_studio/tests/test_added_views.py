@@ -100,7 +100,8 @@ class TestAddedViews(StudioCase):
         with self.assertRaises(UserError):
             self.Editor.add_view(self.project.id, ITEM, "pivot")
         with self.assertRaises(UserError):
-            self.Editor.add_view(self.project.id, "res.partner", "calendar")
+            # No installed module adds the type.
+            self.Editor.add_view(self.project.id, "res.partner", "gantt")
 
     def test_apply_and_revert(self):
         line, _data = self.add_pivot()
@@ -345,3 +346,52 @@ class TestAddedViews(StudioCase):
         self.project.action_revert()
         self.assertFalse(view.exists())
         self.assertFalse(self.View.default_view("res.partner", "graph"))
+
+    def test_calendar(self):
+        if self.View.default_view("res.partner", "calendar"):
+            self.skipTest("res.partner has a calendar view in this database")
+        date, readonly = self.project._studio_calendar_date("res.partner")
+        data = self.Editor.add_view(self.project.id, "res.partner", "calendar")
+        self.assertEqual(data["view_type"], "calendar")
+        line = self.project.view_line_ids
+        root = etree.fromstring(line.arch)
+        self.assertEqual(
+            (root.tag, root.get("date_start"), root.get("mode")),
+            ("calendar", date, "month"),
+        )
+        self.assertEqual([f.get("name") for f in root], ["name"])
+        if readonly:
+            # On the creation date, the calendar neither creates nor moves
+            # an event.
+            self.assertEqual(date, "create_date")
+            self.assertEqual((root.get("create"), root.get("edit")), ("False", "False"))
+        context = self.preview_key(self.project)
+        arch = etree.fromstring(
+            self.env["res.partner"]
+            .with_context(**context)
+            .get_view(False, "calendar")["arch"]
+        )
+        self.assertEqual(arch.get("date_start"), date)
+        self.assertEqual(arch.xpath("/calendar/field/@name"), ["name"])
+        self.project.action_apply()
+        view = line.view_id
+        self.assertEqual((view.mode, view.type), ("primary", "calendar"))
+        self.assertEqual(self.View.default_view("res.partner", "calendar"), view.id)
+        self.project.action_revert()
+        self.assertFalse(view.exists())
+        self.assertFalse(self.View.default_view("res.partner", "calendar"))
+
+    def test_calendar_date(self):
+        """The date a calendar starts on: a stored date a user writes, else
+        the creation date, readonly."""
+        Project = self.env["erplibre.studio.project"]
+        self.assertEqual(
+            Project._studio_calendar_date("res.currency.rate"), ("name", False)
+        )
+        date, readonly = Project._studio_calendar_date("res.partner")
+        field = self.env["res.partner"]._fields[date]
+        self.assertIn(field.type, ("date", "datetime"))
+        self.assertTrue(field.store)
+        self.assertEqual(readonly, date == "create_date")
+        if not readonly:
+            self.assertFalse(field.readonly)

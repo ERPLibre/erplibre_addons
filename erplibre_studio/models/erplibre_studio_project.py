@@ -2603,6 +2603,8 @@ class ErplibreStudioProject(models.Model):
             return self._colors_value(view.model, value)
         if kind == "groups":
             return self._groups_value(value), []
+        if kind == "calendar_filter":
+            return self._calendar_filter_value(view.model, node, value)
         if value in (None, "", False):
             return "", []
         if not isinstance(value, str):
@@ -2612,6 +2614,8 @@ class ErplibreStudioProject(models.Model):
             "relation_group_field": self._relation_group_field_value,
             "date_field": self._typed_field_value,
             "number_field": self._typed_field_value,
+            "color_field": self._color_field_value,
+            "bool_field": self._bool_field_value,
             "order": self._order_value,
             "axis": self._axis_value,
             "graph_axis": self._axis_value,
@@ -2653,6 +2657,59 @@ class ErplibreStudioProject(models.Model):
                 )
             )
         return value, [value]
+
+    def _color_field_value(self, model, node, kind, value):
+        """The field ``value`` the « color » of a calendar reads: a stored
+        field of a type of ``CALENDAR_COLOR_TYPES``."""
+        info = self._field_info(model, value)
+        types = studio_arch.CALENDAR_COLOR_TYPES
+        if info["type"] not in types or not info.get("store"):
+            raise UserError(
+                self.env._(
+                    "%(name)s does not fit this attribute: a stored %(types)s "
+                    "field is needed.",
+                    name=value,
+                    types=" / ".join(types),
+                )
+            )
+        return value, [value]
+
+    def _bool_field_value(self, model, node, kind, value):
+        """The field ``value`` the « all_day » of a calendar reads: a stored
+        boolean."""
+        info = self._field_info(model, value)
+        if info["type"] != "boolean" or not info.get("store"):
+            raise UserError(
+                self.env._(
+                    "%(name)s does not fit this attribute: a stored %(types)s "
+                    "field is needed.",
+                    name=value,
+                    types="boolean",
+                )
+            )
+        return value, [value]
+
+    def _calendar_filter_value(self, model, node, value):
+        """(text, fields) of the « filters » of a calendar field: « True »
+        for a true ``value``, else an empty text, which removes the
+        attribute; the calendar reads « False » as a filter too. The field
+        is a many2one or a many2many (``CALENDAR_FILTER_TYPES``)."""
+        if isinstance(value, str):
+            value = studio_arch.constant_true(value)
+        if not value:
+            return "", []
+        if node.tag != "field":
+            raise UserError(self.env._("Invalid value %(value)s.", value=value))
+        info = self._field_info(model, node.get("name"))
+        if info["type"] not in studio_arch.CALENDAR_FILTER_TYPES:
+            raise UserError(
+                self.env._(
+                    "The side panel of a calendar filters by a many2one or a "
+                    "many2many field only, not by %(name)s.",
+                    name=info.get("string") or node.get("name"),
+                )
+            )
+        return "True", []
 
     def _order_value(self, model, node, kind, value):
         try:
@@ -2907,6 +2964,9 @@ class ErplibreStudioProject(models.Model):
         write it, to tell whether a value brings the node back."""
         if text is None:
             return ""
+        if kind == "calendar_filter":
+            # The calendar tests « filters » by its presence.
+            return "True"
         if kind == "bool":
             if studio_arch.constant_true(text):
                 return "True"
@@ -4360,6 +4420,32 @@ class ErplibreStudioProject(models.Model):
         )
         return name, date, group
 
+    @api.model
+    def _studio_calendar_date(self, model):
+        """(field, readonly): the date field a calendar added to ``model``
+        starts its events on. The first stored date or datetime field a user
+        writes, the calendar field of the model (``_date_name``),
+        « date_start » and « date » first; else ``create_date``, readonly,
+        which no event can move to; (None, False) without either."""
+        Model = self.env[model]
+        fields = Model._fields
+        preferred = [getattr(Model, "_date_name", "date"), "date_start", "date"]
+        names = preferred + [n for n in fields if n not in preferred]
+        for fname in names:
+            field = fields.get(fname)
+            if (
+                field
+                and field.type in studio_arch.DATE_TYPES
+                and field.store
+                and not field.readonly
+                and fname not in ("create_date", "write_date")
+            ):
+                return fname, False
+        field = fields.get("create_date")
+        if field and field.type in studio_arch.DATE_TYPES:
+            return "create_date", True
+        return None, False
+
     def _studio_add_view(self, model, view_type):
         """Add to the draft the ``view_type`` view of the existing ``model``,
         which has none of that type: a view line with its default arch
@@ -4421,9 +4507,21 @@ class ErplibreStudioProject(models.Model):
                     model=model,
                 )
             )
+        readonly_date = False
+        if view_type == "calendar":
+            date, readonly_date = self._studio_calendar_date(model)
+            if not date:
+                raise UserError(
+                    self.env._(
+                        "A calendar needs a stored date field on %(model)s.",
+                        model=model,
+                    )
+                )
         # The source label of the model: the arch goes as is into a module.
         description = Model._description or model
-        arch = studio_arch.default_view_arch(view_type, description, name, date, group)
+        arch = studio_arch.default_view_arch(
+            view_type, description, name, date, group, readonly_date=readonly_date
+        )
         sequence = max(self.view_line_ids.mapped("sequence") or [0]) + 10
         line = (
             self.env["erplibre.studio.view"]

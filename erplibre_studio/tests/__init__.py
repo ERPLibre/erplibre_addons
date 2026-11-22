@@ -29,6 +29,7 @@ from . import (
     test_ui,
     test_uninstall,
     test_views_advanced,
+    test_views_calendar,
     test_views_graph,
     test_views_kanban,
     test_views_layout,

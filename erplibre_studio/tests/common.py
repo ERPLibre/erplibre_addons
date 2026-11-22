@@ -24,6 +24,13 @@ GRAPH_ARCH = """
 </graph>
 """
 
+CALENDAR_ARCH = """
+<calendar string="Partners" date_start="create_date" color="user_id" mode="week">
+    <field name="name"/>
+    <field name="email"/>
+</calendar>
+"""
+
 TIMELINE_ARCH = """
 <timeline date_start="create_date" date_stop="write_date" default_group_by="user_id">
     <field name="name"/>

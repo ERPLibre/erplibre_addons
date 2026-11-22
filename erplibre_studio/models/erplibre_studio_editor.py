@@ -43,7 +43,7 @@ DIGEST_ACTIONS = ("action_apply", "action_revert")
 PREVIEW_MODES = ("simulation", "real")
 # The view types the editor lists after VIEW_TYPES, with why it does not
 # edit them.
-UNSUPPORTED_VIEW_TYPES = ("calendar", "gantt", "activity")
+UNSUPPORTED_VIEW_TYPES = ("gantt", "activity")
 # The ``reason_code`` of a view type the editor does not open (``_view_list``):
 # a type of OPTIONAL_VIEW_MODULES without its module, a type the studio does
 # not edit, a type no installed module provides, a type a model not created
@@ -250,6 +250,12 @@ class ErplibreStudioEditor(models.AbstractModel):
             }
             if view_type == "search" and not info.get("searchable"):
                 continue
+            if view_type == "calendar" and info.get("type") in (
+                "one2many",
+                "binary",
+            ):
+                # The popover of an event shows neither.
+                continue
             if view_type in studio_arch.AXIS_VIEW_TYPES:
                 axes = [
                     axis
@@ -301,11 +307,14 @@ class ErplibreStudioEditor(models.AbstractModel):
                 and f.get("type") in studio_arch.RELATION_TYPES
             ),
             "date_field": fields_where(stored(studio_arch.DATE_TYPES)),
+            "color_field": fields_where(stored(studio_arch.CALENDAR_COLOR_TYPES)),
+            "bool_field": fields_where(stored(("boolean",))),
             "number_field": fields_where(stored(("integer", "float"))),
             "measure": fields_where(self._measurable),
             "search_field": fields_where(lambda f: f.get("searchable")),
             "sort_field": fields_where(lambda f: f.get("sortable")),
             "bool": [["True", "True"], ["False", "False"]],
+            "calendar_filter": [["True", "True"]],
             "axis": [[axis, axis] for axis in studio_arch.PIVOT_AXES],
             "graph_axis": [[axis, axis] for axis in studio_arch.GRAPH_AXES],
             "interval": [[i, i] for i in studio_arch.INTERVALS],
@@ -357,6 +366,20 @@ class ErplibreStudioEditor(models.AbstractModel):
                     ttype: list(ops)
                     for ttype, ops in studio_arch.SEARCH_OPERATORS.items()
                 },
+            }
+        if view_type == "calendar":
+            # The popover of an event shows the <field> children; the root
+            # attributes load their own fields.
+            return {
+                "root": root,
+                "popover": [
+                    path(c) for c in studio_arch.elements(arch) if c.tag == "field"
+                ],
+                "loaded_by_attributes": [
+                    arch.get(attribute)
+                    for attribute in studio_arch.CALENDAR_FIELD_ATTRIBUTES
+                    if arch.get(attribute)
+                ],
             }
         if view_type in studio_arch.AXIS_VIEW_TYPES:
             axes = {axis: [] for axis in studio_arch.AXIS_VIEW_TYPES[view_type]}

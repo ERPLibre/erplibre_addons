@@ -482,6 +482,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A calendar needs a stored date field on %(model)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A change cannot add <%(tag)s>."
 msgstr ""
 
@@ -1920,6 +1926,8 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__calendar
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__calendar
 msgid "Calendar"
 msgstr ""
 
@@ -6353,6 +6361,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "The server, with the draft of the project"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The side panel of a calendar filters by a many2one or a many2many field "
+"only, not by %(name)s."
 msgstr ""
 
 #. module: erplibre_studio

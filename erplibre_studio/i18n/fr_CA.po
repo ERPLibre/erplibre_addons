@@ -523,6 +523,12 @@ msgstr "Un graphique à barres, à lignes ou en secteurs des enregistrements, re
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A calendar needs a stored date field on %(model)s."
+msgstr "Un calendrier demande un champ date stocké sur %(model)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A change cannot add <%(tag)s>."
 msgstr "Une modification ne peut pas ajouter <%(tag)s>."
 
@@ -2028,6 +2034,8 @@ msgstr "Par"
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__calendar
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__calendar
 msgid "Calendar"
 msgstr "Calendrier"
 
@@ -6659,6 +6667,16 @@ msgstr "Le serveur, en superutilisateur, à partir du modèle créé un instant"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "The server, with the draft of the project"
 msgstr "Le serveur, avec le brouillon du projet"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The side panel of a calendar filters by a many2one or a many2many field "
+"only, not by %(name)s."
+msgstr ""
+"Le panneau latéral d'un calendrier ne filtre que par un champ many2one "
+"ou many2many, pas par %(name)s."
 
 #. module: erplibre_studio
 #. odoo-python

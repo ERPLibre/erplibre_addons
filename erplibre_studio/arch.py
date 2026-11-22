@@ -27,7 +27,16 @@ from odoo.tools.template_inheritance import apply_inheritance_specs
 
 # The editor offers the view types of this tuple that the registry knows:
 # those of OPTIONAL_VIEW_MODULES exist only once their module is installed.
-VIEW_TYPES = ("form", "list", "kanban", "search", "pivot", "graph", "timeline")
+VIEW_TYPES = (
+    "form",
+    "list",
+    "kanban",
+    "search",
+    "pivot",
+    "graph",
+    "calendar",
+    "timeline",
+)
 # {view type: module}: the module that adds the type to ir.ui.view.type, which
 # the editor names when the type is missing from the database.
 OPTIONAL_VIEW_MODULES = {"timeline": "web_timeline"}
@@ -71,6 +80,7 @@ CONTAINERS = {
     "search": ("search", "group"),
     "pivot": ("pivot",),
     "graph": ("graph",),
+    "calendar": ("calendar",),
     "timeline": ("timeline", "templates") + TEMPLATE_DROPS,
 }
 DROP_CONTAINERS = {
@@ -80,6 +90,7 @@ DROP_CONTAINERS = {
     "search": ("search", "group"),
     "pivot": ("pivot",),
     "graph": ("graph",),
+    "calendar": ("calendar",),
     "timeline": ("timeline",) + TEMPLATE_DROPS,
 }
 
@@ -90,6 +101,9 @@ HIDE_MODES = {
     "list": "column_invisible",
     "kanban": "invisible",
     "timeline": "invisible",
+    # An invisible calendar field leaves the popover of the events; with
+    # « filters », it stays in the side panel.
+    "calendar": "invisible",
     "search": "remove",
     "pivot": "remove",
     "graph": "remove",
@@ -209,6 +223,14 @@ VIEW_OPERATIONS = {
         "relabel",
         "set_attribute",
     ),
+    "calendar": (
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "relabel",
+        "set_attribute",
+    ),
     "timeline": (
         "add_existing_field",
         "move",
@@ -262,6 +284,28 @@ SETTABLE_ATTRIBUTES = {
         },
         "field": {"type": "graph_axis", "interval": "interval"},
     },
+    "calendar": {
+        "calendar": {
+            "date_start": "date_field",
+            # The calendar reads date_stop first: date_delay, a number of
+            # hours, counts only without it.
+            "date_stop": "date_field",
+            "date_delay": "number_field",
+            "color": "color_field",
+            "all_day": "bool_field",
+            # Every mode of CALENDAR_MODES is in the default « scales »,
+            # which the editor does not set.
+            "mode": "calendar_mode",
+            "quick_create": "bool",
+            "event_open_popup": "bool",
+            "create": "bool",
+            "edit": "bool",
+            "delete": "bool",
+        },
+        # A field with « filters » is also a filter of the side panel. The
+        # calendar tests the attribute by its presence, whatever its value.
+        "field": {"filters": "calendar_filter"},
+    },
     "timeline": {
         "timeline": {
             "date_start": "date_field",
@@ -280,6 +324,7 @@ SETTABLE_ATTRIBUTES = {
 # The settable attributes a view needs: they can change, not go away.
 REQUIRED_ATTRIBUTES = {
     ("timeline", "timeline"): ("date_start", "default_group_by"),
+    ("calendar", "calendar"): ("date_start",),
 }
 
 PIVOT_AXES = ("row", "col", "measure")
@@ -293,17 +338,33 @@ INTERVALS = ("day", "week", "month", "quarter", "year")
 TIMELINE_MODES = ("day", "week", "month", "fit")
 GRAPH_TYPES = ("bar", "line", "pie")
 GRAPH_ORDERS = ("asc", "desc")
+CALENDAR_MODES = ("day", "week", "month", "year")
 # {kind: values}: the attribute kinds of SETTABLE_ATTRIBUTES whose value is
 # one of a fixed list.
 CHOICES = {
     "timeline_mode": TIMELINE_MODES,
     "graph_type": GRAPH_TYPES,
     "graph_order": GRAPH_ORDERS,
+    "calendar_mode": CALENDAR_MODES,
 }
 DATE_TYPES = ("date", "datetime")
 NUMBER_TYPES = ("integer", "float", "monetary")
 # The fields web_timeline groups its items by, one row per record.
 RELATION_TYPES = ("many2one", "many2many")
+# The fields the « color » of a calendar reads: the color index of the
+# value, the id of a many2one or the value itself.
+CALENDAR_COLOR_TYPES = ("many2one", "selection", "integer", "char")
+# The calendar fields a side panel filter (« filters ») groups by.
+CALENDAR_FILTER_TYPES = ("many2one", "many2many")
+# The root attributes of a calendar that name a field, which the calendar
+# loads without a <field> of its own.
+CALENDAR_FIELD_ATTRIBUTES = (
+    "date_start",
+    "date_stop",
+    "date_delay",
+    "color",
+    "all_day",
+)
 
 # The widgets « add_widget » puts in a kanban card, with the attributes
 # each one takes.
@@ -1814,16 +1875,25 @@ def default_model_arch(
     return etree.tostring(root, encoding="unicode", pretty_print=True)
 
 
-def default_view_arch(view_type, label, name_field, date_field=None, group_field=None):
+def default_view_arch(
+    view_type,
+    label,
+    name_field,
+    date_field=None,
+    group_field=None,
+    readonly_date=False,
+):
     """The arch text of the ``view_type`` view (``VIEW_TYPES``) a project
     adds to an existing model, labelled ``label``: the record name
     ``name_field`` in a form, a list, a search view and a kanban card; an
     empty pivot (it counts the records); a bar graph that counts the
-    records by month of ``date_field``, or in one bar without it; a
-    timeline that starts on ``date_field``, one row per value of the
-    many2one ``group_field``, its items showing the record name. The arch
-    depends on these values only: the changes of the editor on the view
-    locate their nodes in it."""
+    records by month of ``date_field``, or in one bar without it; a month
+    calendar of the records on ``date_field``, their popover showing the
+    record name; a timeline that starts on ``date_field``, one row per
+    value of the many2one ``group_field``, its items showing the record
+    name. A calendar on a ``readonly_date`` neither creates nor moves its
+    events (« create » and « edit » False). The arch depends on these values
+    only: the changes of the editor on the view locate their nodes in it."""
     root = etree.Element(view_type, {"string": label})
     if view_type == "form":
         sheet = etree.SubElement(root, "sheet")
@@ -1850,6 +1920,15 @@ def default_view_arch(view_type, label, name_field, date_field=None, group_field
         item = etree.SubElement(templates, "t", {"t-name": "timeline-item"})
         body = etree.SubElement(item, "div")
         etree.SubElement(body, "span", {"t-esc": f"record.{name_field}"})
+    elif view_type == "calendar":
+        if not date_field:
+            raise ArchError("A calendar needs a date field.", "calendar_fields")
+        root.set("date_start", date_field)
+        root.set("mode", "month")
+        if readonly_date:
+            root.set("create", "False")
+            root.set("edit", "False")
+        etree.SubElement(root, "field", {"name": name_field})
     elif view_type == "graph":
         root.set("type", "bar")
         if date_field:
