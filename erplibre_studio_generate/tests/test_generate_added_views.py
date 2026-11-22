@@ -282,3 +282,78 @@ class TestGenerateAddedHierarchy(StudioCase):
         # The children field, and the field loaded for web_hierarchy.
         self.assertIn('name="child_field">child_ids<', text)
         self.assertIn('<field name="child_ids"/>', text)
+
+
+@tagged("post_install", "-at_install")
+class TestGenerateAddedLeaflet(StudioCase):
+    """Generation of a project that adds a map to the contacts, which have
+    none, and gives it a popup title and a new address field, when
+    web_view_leaflet_map is installed."""
+
+    module = "studio_test_generate_leaflet"
+
+    def setUp(self):
+        super().setUp()
+        if "leaflet_map" not in self.Project._view_types():
+            self.skipTest("web_view_leaflet_map is not installed")
+        if self.env["ir.ui.view"].default_view("res.partner", "leaflet_map"):
+            self.skipTest("res.partner has a leaflet_map view in this database")
+        self.destination = tempfile.mkdtemp(prefix="erplibre_studio_test_")
+        self.addCleanup(shutil.rmtree, self.destination, True)
+        choices = [(self.destination, self.destination)]
+        patcher = patch.object(
+            type(self.Project), "_destination_choices", lambda self_: choices
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.project = self.make_project(self.module, destination=self.destination)
+        self.Editor.add_view(self.project.id, "res.partner", "leaflet_map")
+        view = self.Editor._resolve_view(
+            "res.partner", False, "leaflet_map", self.project
+        )
+        self.op(
+            self.project,
+            view,
+            type="set_attribute",
+            target="/leaflet_map",
+            attribute="field_title",
+            value="email",
+        )
+        self.address = self.op(
+            self.project,
+            view,
+            type="add_field",
+            target="/leaflet_map",
+            position="inside",
+            attribute="field_address",
+            field={"ttype": "char", "field_description": "Map address"},
+        ).field_name
+
+    def read(self, *parts):
+        with open(
+            os.path.join(self.destination, self.module, *parts), encoding="utf-8"
+        ) as fh:
+            return fh.read()
+
+    def test_generate(self):
+        with self.server_actions():
+            self.project.action_apply()
+            self.project.action_generate()
+        self.assertIn("web_view_leaflet_map", self.project._dependencies())
+        self.assertIn("web_view_leaflet_map", self.read("__manifest__.py"))
+        views = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        records = [r.get("id") for r in views.findall("record")]
+        xml_name = "res_partner_view_leaflet_map"
+        studio_name = f"{self.module}_{xml_name}_studio"
+        self.assertEqual(records, [xml_name, studio_name])
+        primary = views.find(f"record[@id='{xml_name}']")
+        self.assertEqual(primary.find("field[@name='type']").text, "leaflet_map")
+        leaflet = primary.find("field[@name='arch']/leaflet_map")
+        self.assertEqual(leaflet.get("field_latitude"), "partner_latitude")
+        self.assertEqual(leaflet.get("field_longitude"), "partner_longitude")
+        text = etree.tostring(views.find(f"record[@id='{studio_name}']")).decode()
+        self.assertIn('name="field_title">email<', text)
+        self.assertIn(f'name="field_address">{self.address}<', text)
+        self.assertIn(self.address, self.read("models", "res_partner.py"))
