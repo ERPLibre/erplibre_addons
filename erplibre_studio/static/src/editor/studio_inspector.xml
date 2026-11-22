@@ -169,6 +169,9 @@
                     </span>
                     <span t-else="" class="d-block text-muted mt-1">Not set in the view: web_timeline opens on Fit.</span>
                 </t>
+                <span t-if="entry.kind === 'calendar_mode'" class="d-block text-muted mt-1">
+                    A browser that opened this calendar before keeps the last scale used on it.
+                </span>
             </t>
             <t t-elif="entry.kind === 'field_options'">
                 <StudioWidgetOptions

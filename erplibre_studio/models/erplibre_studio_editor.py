@@ -322,9 +322,10 @@ class ErplibreStudioEditor(models.AbstractModel):
         }
 
     @api.model
-    def _layout(self, view_type, arch):
+    def _layout(self, view_type, arch, fields_info=None):
         """The part of the payload proper to ``view_type``: where its zones
-        are in the arch (paths of the blocks)."""
+        are in the arch (paths of the blocks). ``fields_info``: the fields
+        of the model ({name: {type}}), which place the fields of a graph."""
         path = lambda node: studio_arch.node_xpath(arch, node)  # noqa: E731
         root = f"/{arch.tag}"
         loaded = [c.get("name") for c in studio_arch.elements(arch) if c.tag == "field"]
@@ -387,13 +388,29 @@ class ErplibreStudioEditor(models.AbstractModel):
             for node in studio_arch.elements(arch):
                 if node.tag != "field":
                     continue
-                axis = node.get("type")
-                if view_type == "graph" and axis == "col":
-                    # The graph reads a « col » field as a group-by.
-                    axis = "row"
+                if view_type == "graph":
+                    axis = self._graph_axis(node, fields_info or {})
+                else:
+                    axis = node.get("type")
                 (axes[axis] if axis in axes else others).append(path(node))
             return {"root": root, "axes": axes, "others": others}
         return {"root": root}
+
+    @api.model
+    def _graph_axis(self, node, fields_info):
+        """The axis a graph reads the <field> ``node`` on, as its arch parser
+        does: none for an invisible field; « measure » for a field of that
+        type; « row », a group-by, for any other field of a type of
+        GRAPH_GROUP_TYPES (``fields_info`` gives the types), whatever its
+        « type »; else none."""
+        if node.get("invisible") in ("1", "True"):
+            return None
+        if node.get("type") == "measure":
+            return "measure"
+        info = fields_info.get(node.get("name")) or {}
+        if info.get("type") in studio_arch.GRAPH_GROUP_TYPES:
+            return "row"
+        return None
 
     @api.model
     def _view_type_labels(self):
@@ -596,7 +613,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "added": self._added_payload(project, view),
             },
             "blocks": blocks,
-            "layout": self._layout(view.type, arch),
+            "layout": self._layout(view.type, arch, fields_info),
             "operations": [
                 op
                 for op in studio_arch.VIEW_OPERATIONS[view.type]

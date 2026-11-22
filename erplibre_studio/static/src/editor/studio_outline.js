@@ -357,22 +357,24 @@ export class StudioOutline extends Component {
     }
 
     /**
-     * Remove the block of ``row`` (of ``rows``); once it left, the row
-     * that takes its place takes the focus (the next one, else the new
-     * last one).
+     * Remove the block of ``row`` (of ``rows``); once it left, directly or
+     * after the dialog of ``removeSelected``, the row that takes its place
+     * takes the focus (the next one, else the new last one).
      */
     async removeRow(row, rows) {
         const index = rows.indexOf(row);
-        if (await this.editor.removeByKeyboard(row.block.path, {focus: false})) {
-            this.editor.afterRender(() => {
-                const tree = this.treeElement;
-                const items = tree ? [...tree.children] : [];
-                const item = items[Math.min(index, items.length - 1)];
-                if (item) {
-                    this.focusRow(tree, item.dataset.path);
-                }
-            });
-        }
+        await this.editor.removeByKeyboard(row.block.path, {
+            focus: false,
+            onRemoved: () =>
+                this.editor.afterRender(() => {
+                    const tree = this.treeElement;
+                    const items = tree ? [...tree.children] : [];
+                    const item = items[Math.min(index, items.length - 1)];
+                    if (item) {
+                        this.focusRow(tree, item.dataset.path);
+                    }
+                }),
+        });
     }
 
     startDrag(ev, block) {

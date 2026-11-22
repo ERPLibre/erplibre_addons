@@ -486,6 +486,13 @@ msgid "A boolean field: true shows the event over the whole day."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"A browser that opened this calendar before keeps the last scale used on it."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A calendar needs a stored date field on %(model)s."
@@ -699,6 +706,12 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A module on the addons path defines %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A module on the addons path uses the table %(table)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1189,6 +1202,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"Another module defines a model of this project now: %(models)s. The project "
+"can no longer apply, revert nor generate it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 msgid "Another real preview is running: try again."
 msgstr ""
@@ -1582,6 +1603,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Indexed (faster search)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Installed later, that module would share the table of this model."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5981,7 +6008,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid ""
 "The installed generated module defines the field of this option: it leaves "
-"the database once the module is generated again and upgraded."
+"the database once the module is generated again and upgraded, with:"
 msgstr ""
 
 #. module: erplibre_studio
@@ -6419,7 +6446,9 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
-msgid "The scale when the calendar opens."
+msgid ""
+"The scale the calendar opens on, unless the browser remembers the last "
+"scale used on this view."
 msgstr ""
 
 #. module: erplibre_studio

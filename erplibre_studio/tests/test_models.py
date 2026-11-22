@@ -229,6 +229,20 @@ class TestModels(StudioCase):
 
     # ── apply ───────────────────────────────────────────────────────────
 
+    def test_action_opens_the_views_the_project_adds(self):
+        """The window action of a model of the project opens the views the
+        project adds to it, in their order, after its list and its form."""
+        self.item_line(menu={"mode": "app"})
+        self.project.action_apply()
+        action = self.ref(f"action_{MODEL}", "ir.actions.act_window")
+        self.assertEqual(action.view_mode, "list,form")
+        self.project._studio_add_view(MODEL, "graph")
+        self.project._studio_add_view(MODEL, "calendar")
+        self.project.action_apply()
+        self.assertEqual(action.view_mode, "list,form,graph,calendar")
+        line = self.project.new_model_ids
+        self.assertEqual(line._studio_view_mode(), "list,form,graph,calendar")
+
     def test_apply_creates_the_model_its_views_action_menu_and_access(self):
         line = self.item_line(menu={"mode": "app"})
         self.project.action_apply()

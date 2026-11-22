@@ -495,7 +495,10 @@ export class StudioCanvas extends Component {
         return (this.layout.popover || []).map(byPath).filter(Boolean);
     }
 
-    /** The scale of the view on opening: its « mode », else the default of its type. */
+    /**
+     * The scale of the view on opening: its « mode », else the default of
+     * its type (DEFAULT_MODES), undefined for a calendar.
+     */
     get currentMode() {
         return (this.root.attrs || {}).mode || DEFAULT_MODES[this.viewType];
     }

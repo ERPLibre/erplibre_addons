@@ -527,6 +527,15 @@ msgid "A boolean field: true shows the event over the whole day."
 msgstr "Un champ booléen : vrai affiche l'événement sur toute la journée."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"A browser that opened this calendar before keeps the last scale used on it."
+msgstr ""
+"Un navigateur qui a déjà ouvert ce calendrier garde la dernière échelle "
+"utilisée."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A calendar needs a stored date field on %(model)s."
@@ -756,6 +765,12 @@ msgstr "Un module nommé %(name)s est déjà connu."
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A module on the addons path defines %(name)s"
 msgstr "Un module de l'addons path définit %(name)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A module on the addons path uses the table %(table)s"
+msgstr "Un module de l'addons path utilise la table %(table)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1277,6 +1292,16 @@ msgstr "Un autre modèle utilise la table %(table)s"
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"Another module defines a model of this project now: %(models)s. The project "
+"can no longer apply, revert nor generate it."
+msgstr ""
+"Un autre module définit maintenant un modèle de ce projet : %(models)s. Le "
+"projet ne peut plus l'appliquer, le défaire ni le générer."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 msgid "Another real preview is running: try again."
 msgstr "Un autre aperçu réel est en cours : réessayez."
@@ -1689,6 +1714,12 @@ msgstr "Indexé"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Indexed (faster search)"
 msgstr "Indexé (recherche plus rapide)"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Installed later, that module would share the table of this model."
+msgstr "Installé plus tard, ce module partagerait la table de ce modèle."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6218,10 +6249,10 @@ msgstr "Les groupes impliqués qui ont quitté la base depuis leur choix."
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid ""
 "The installed generated module defines the field of this option: it leaves "
-"the database once the module is generated again and upgraded."
+"the database once the module is generated again and upgraded, with:"
 msgstr ""
 "Le module généré installé définit le champ de cette option : il quitte la "
-"base une fois le module généré de nouveau et mis à jour."
+"base une fois le module généré de nouveau et mis à jour, avec :"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6718,8 +6749,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
-msgid "The scale when the calendar opens."
-msgstr "L'échelle à l'ouverture du calendrier."
+msgid ""
+"The scale the calendar opens on, unless the browser remembers the last "
+"scale used on this view."
+msgstr ""
+"L'échelle à l'ouverture du calendrier, sauf si le navigateur retient la "
+"dernière échelle utilisée sur cette vue."
 
 #. module: erplibre_studio
 #. odoo-python

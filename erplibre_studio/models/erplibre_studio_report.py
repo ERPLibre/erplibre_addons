@@ -227,7 +227,9 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_removal_report(self, records):
         """What removing ``records`` ({kind: records}, kinds of
-        REMOVAL_ORDER, plus « views » and « fields ») takes out of the
+        REMOVAL_ORDER, plus « views » and « fields », and « module_fields »:
+        fields the installed generated module defines, which its upgrade
+        drops, reported as fields though Apply leaves them) takes out of the
         database: {models: [{model, name, count}], fields: [{model, name,
         label, filled}], effects: [{model, kind, count, field}] (the fields
         of the options of the models of the project among the fields,
@@ -270,10 +272,13 @@ class ErplibreStudioProject(models.Model):
                     "count": self._studio_count(table),
                 }
             )
-        for field in records.get("fields", self.env["ir.model.fields"]).sorted(
-            lambda f: (f.model, f.name)
-        ):
-            if field.state != "manual" or field.model in removed_models:
+        Fields = self.env["ir.model.fields"]
+        module_fields = records.get("module_fields", Fields)
+        reported = records.get("fields", Fields) | module_fields
+        for field in reported.sorted(lambda f: (f.model, f.name)):
+            if field.model in removed_models or (
+                field.state != "manual" and field not in module_fields
+            ):
                 continue
             Model = self.env.get(field.model)
             if field.store and field.ttype not in studio_arch.X2MANY_TYPES:
@@ -297,8 +302,8 @@ class ErplibreStudioProject(models.Model):
         options = {option[0] for option in studio_arch.MODEL_OPTIONS.values()}
         line_models = set(self.new_model_ids.mapped("model")) - removed_models
         report["effects"] = self._studio_option_effects(
-            records.get("fields", self.env["ir.model.fields"]).filtered(
-                lambda f: f.state == "manual"
+            reported.filtered(
+                lambda f: (f.state == "manual" or f in module_fields)
                 and f.name in options
                 and f.model in line_models
             )
@@ -368,13 +373,17 @@ class ErplibreStudioProject(models.Model):
         return records
 
     def _studio_revert_refusal(self, checks=True):
-        """Why Revert is refused now, or False: while the generated module is
-        installed, what the project applied is the module's (its external ids
-        are under the module, its models are defined by it), and only its
-        uninstall removes it; with ``checks``, the refusal of the checks of
-        the removal (``_studio_check_removal``)."""
+        """Why Revert is refused now, or False: a model of the project that
+        another module defines now (``_studio_foreign_model_refusal``); while
+        the generated module is installed, what the project applied is the
+        module's (its external ids are under the module, its models are
+        defined by it), and only its uninstall removes it; with ``checks``,
+        the refusal of the checks of the removal (``_studio_check_removal``)."""
         self.ensure_one()
         self.invalidate_recordset(["module_id", "module_state"])
+        foreign = self._studio_foreign_model_refusal()
+        if foreign:
+            return foreign
         owned = self.created_model_ids.exists().filtered(lambda m: m.state != "manual")
         if owned or self.module_state in MODULE_OWNING_STATES:
             return self.env._(

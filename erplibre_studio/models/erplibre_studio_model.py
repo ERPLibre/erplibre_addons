@@ -297,6 +297,21 @@ class ErplibreStudioModel(models.Model):
         self.ensure_one()
         return studio_arch.COMPANY_ACTION_CONTEXT if self.per_company else False
 
+    def _studio_view_mode(self):
+        """The ``view_mode`` of the window action of the model: « list,form »,
+        then the type of each view the project adds to the model (its view
+        lines, in their order); a search view is no mode of an action."""
+        self.ensure_one()
+        modes = ["list", "form"]
+        for view in self.project_id.view_line_ids:
+            if (
+                view.model == self.model
+                and view.view_type != "search"
+                and view.view_type not in modes
+            ):
+                modes.append(view.view_type)
+        return ",".join(modes)
+
     def _studio_options_applied(self):
         """{option: whether the applied model has its field}: turned off,
         the next Apply removes it when it is the option's own

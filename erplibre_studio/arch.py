@@ -332,6 +332,19 @@ PIVOT_AXES = ("row", "col", "measure")
 # or « col »: the first is the X axis, the next ones split it into series.
 # Its measure is the last field of type « measure ».
 GRAPH_AXES = ("row", "measure")
+# The field types a graph groups by: a visible field not of type « measure »
+# of one of these types is a group-by, with or without a « type »
+# (GROUPABLE_TYPES of web/static/src/search/utils/misc.js).
+GRAPH_GROUP_TYPES = (
+    "boolean",
+    "char",
+    "date",
+    "datetime",
+    "integer",
+    "many2one",
+    "many2many",
+    "selection",
+)
 # {view type: axes}: the views whose fields take an axis in their « type ».
 AXIS_VIEW_TYPES = {"pivot": PIVOT_AXES, "graph": GRAPH_AXES}
 INTERVALS = ("day", "week", "month", "quarter", "year")

@@ -84,6 +84,7 @@ const CHOICES = {
     graph_type: ["bar", "line", "pie"].map((t) => [t, t]),
     graph_order: ["asc", "desc"].map((o) => [o, o]),
     calendar_mode: ["day", "week", "month", "year"].map((m) => [m, m]),
+    calendar_filter: [["True", "True"]],
     color_field: [
         ["color", "Color"],
         ["country_id", "Country"],
@@ -1191,12 +1192,14 @@ describe("erplibre_studio editor, calendar", () => {
         expect(".o_erplibre_studio_lane_props").toHaveText(/The end date wins over the duration/);
         expect(lane("stop")).toHaveClass("o_erplibre_studio_calendar_lane_selected");
 
-        // Without « mode », the calendar opens on the week.
+        // Without « mode », the calendar opens on the scale the browser
+        // remembers: no scale is pressed, the week can be written too.
         const scale = `${lane("scale")} .o_erplibre_studio_calendar_scale`;
         expect(queryAllTexts(scale)).toEqual(["Day", "Week", "Month", "Year"]);
-        expect(`${scale}[data-value=week]`).toHaveAttribute("aria-pressed", "true");
+        expect(`${scale}[aria-pressed=true]`).toHaveCount(0);
         await contains(`${scale}[data-value=week]`).click();
-        expect.verifySteps([]);
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({type: "set_attribute", target: "/calendar", attribute: "mode", value: "week"});
         await contains(`${scale}[data-value=month]`).click();
         expect.verifySteps(["apply_operation set_attribute"]);
         expect(operations.pop()).toEqual({type: "set_attribute", target: "/calendar", attribute: "mode", value: "month"});
@@ -1231,6 +1234,11 @@ describe("erplibre_studio editor, calendar", () => {
         await contains(`${lane("popover")} .o_erplibre_studio_field[data-name=name]`).click();
         expect(".o_erplibre_studio_properties[data-name=name]").toHaveCount(1);
         expect(".o_erplibre_studio_calendar_lane_selected").toHaveCount(0);
+        // Its filter in the side panel reads as a yes, not as the raw value.
+        expect(queryAllTexts(".o_erplibre_studio_settable[data-attribute=filters] option")).toEqual([
+            "Default",
+            "Yes",
+        ]);
     });
 
     test("a color field and an all-day boolean drop on their lanes", async () => {
@@ -1240,6 +1248,9 @@ describe("erplibre_studio editor, calendar", () => {
         expect(".o_erplibre_studio_inspector_title").toHaveText("Calendar");
         expect(".o_erplibre_studio_settable[data-attribute=mode] .o_erplibre_studio_mode").toHaveCount(4);
         expect(".o_erplibre_studio_settable[data-attribute=mode]").toHaveText(/opens on the last scale used, else Week/);
+        expect(".o_erplibre_studio_settable[data-attribute=mode] .o_erplibre_studio_mode[aria-pressed=true]").toHaveCount(
+            0
+        );
         await contains(".o_erplibre_studio_existing_field[data-name=country_id]").dragAndDrop(lane("color"));
         expect.verifySteps(["apply_operation set_attribute"]);
         expect(operations.pop()).toEqual({

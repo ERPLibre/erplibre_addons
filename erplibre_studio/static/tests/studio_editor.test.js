@@ -369,6 +369,26 @@ describe("erplibre_studio editor", () => {
         expect.verifySteps([]);
     });
 
+    test("Delete on a block that asks first announces and moves the focus once confirmed", async () => {
+        // A column the draft adds, with changes inside: its removal asks.
+        const added = {...column("ref", "Reference"), change_kinds: ["new"], changed_inside: true};
+        answer = payload([column("name", "Name"), column("email", "Email"), added]);
+        await openEditor();
+        const pick = (name) => `.o_erplibre_studio_field[data-name=${name}] .o_erplibre_studio_pick`;
+        queryOne(pick("ref")).focus();
+        await press("Delete");
+        await animationFrame();
+        expect.verifySteps([]);
+        expect(".modal").toHaveCount(1);
+        await contains(".modal .btn-primary").click();
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps(["apply_operation remove //field[@name='ref']"]);
+        expect(".o_erplibre_studio_field").toHaveCount(2);
+        expect(".o_erplibre_studio_live").toHaveText(/Reference removed\. Ctrl\+Z undoes it\./);
+        expect(pick("email")).toBeFocused();
+    });
+
     test("consecutive Alt+Arrow moves of one block ask to merge into one change", async () => {
         answer = payload([column("name", "Name"), column("email", "Email"), column("ref", "Reference")]);
         moveChanges = {first: "name,email,ref", items: []};

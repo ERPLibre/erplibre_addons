@@ -412,6 +412,7 @@ class TestModelOptions(StudioCase):
         an option turned off leaves with the next generation and upgrade."""
         self.update(archivable=True)
         self.project.action_apply()
+        self.env[MODEL].create({"x_name": "Archived", "x_active": False})
         cr = self.env.cr
         cr.execute("UPDATE ir_model SET state = 'base' WHERE model = %s", [MODEL])
         cr.execute(
@@ -427,7 +428,15 @@ class TestModelOptions(StudioCase):
         )
         answer = self.removal_report("archivable")
         self.assertTrue(answer["waiting"])
-        self.assertEqual(answer["report"]["fields"], [])
+        # The dialog still lists the column and the archived records the
+        # upgrade of the module makes visible; Apply removes nothing.
+        self.assertEqual(
+            [item["name"] for item in answer["report"]["fields"]], ["x_active"]
+        )
+        self.assertEqual(
+            [(e["kind"], e["count"]) for e in answer["report"]["effects"]],
+            [("archived", 1)],
+        )
         report = self.project._studio_apply_report()["report"]
         self.assertEqual((report["fields"], report["effects"]), ([], []))
         result = self.project.action_apply()

@@ -73,8 +73,9 @@ class TestGraphStudio(StudioCase):
         self.assertNotIn("add_field", data["operations"])
 
     def test_col_field_reads_as_a_group_by(self):
-        """A field of type « col », which the graph reads as a group-by,
-        shows in the group-by lane and keeps its axis in its block."""
+        """A field of type « col », and a field of a groupable type without
+        a « type », which the graph reads as group-bys, show in the
+        group-by lane and keep their axis in their block."""
         graph = self.make_view(
             "graph",
             '<graph><field name="country_id" type="col"/>'
@@ -85,10 +86,49 @@ class TestGraphStudio(StudioCase):
         )
         self.assertEqual(
             data["layout"]["axes"],
-            {"row": ["//field[@name='country_id']"], "measure": []},
+            {
+                "row": ["//field[@name='country_id']", "//field[@name='name']"],
+                "measure": [],
+            },
         )
-        self.assertEqual(data["layout"]["others"], ["//field[@name='name']"])
+        self.assertEqual(data["layout"]["others"], [])
         self.assertEqual(data["blocks"]["children"][0]["axis"], "col")
+
+    def test_fields_filed_as_the_graph_reads_them(self):
+        """The graph groups by an untyped groupable field, in arch order with
+        the typed ones: the first one is its X axis. An invisible field,
+        and an untyped field of a type it cannot group by, are on no
+        axis."""
+        graph = self.make_view(
+            "graph",
+            '<graph><field name="company_id"/>'
+            '<field name="country_id" type="row"/>'
+            '<field name="partner_latitude"/>'
+            '<field name="state_id" type="row" invisible="1"/>'
+            '<field name="color" type="measure" invisible="True"/>'
+            '<field name="partner_longitude" type="measure"/></graph>',
+        )
+        data = self.Editor.get_editor_data(
+            "res.partner", graph.id, "graph", self.project.id
+        )
+        self.assertEqual(
+            data["layout"]["axes"],
+            {
+                "row": [
+                    "//field[@name='company_id']",
+                    "//field[@name='country_id']",
+                ],
+                "measure": ["//field[@name='partner_longitude']"],
+            },
+        )
+        self.assertEqual(
+            data["layout"]["others"],
+            [
+                "//field[@name='partner_latitude']",
+                "//field[@name='state_id']",
+                "//field[@name='color']",
+            ],
+        )
 
     def test_changes(self):
         self.op(

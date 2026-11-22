@@ -1545,13 +1545,14 @@ export class StudioEditor extends Component {
 
     /**
      * Remove the block at ``path`` as « Remove from the view » does
-     * (``removeSelected``, which may ask first). Once it left, with
+     * (``removeSelected``, which may ask first). Once it left, directly or
+     * after the dialog, the live region says Ctrl+Z brings it back; with
      * ``focus``, the button that takes its place in the canvas takes the
-     * focus (the next block, else the new last one), and the live region
-     * says Ctrl+Z brings it back. Answer whether it left: true, false when
-     * it stays, null while a dialog asks.
+     * focus (the next block, else the new last one); ``onRemoved`` runs.
+     * Answer whether it left: true, false when it stays, null while a
+     * dialog asks.
      */
-    async removeByKeyboard(path, {focus = true} = {}) {
+    async removeByKeyboard(path, {focus = true, onRemoved = null} = {}) {
         if (this.state.busy || !this.project || this.state.preview || this.panel) {
             return false;
         }
@@ -1562,21 +1563,22 @@ export class StudioEditor extends Component {
         const index = this.canvasPicks().indexOf(document.activeElement);
         const label = outlineLabel(block);
         this.state.selected = path;
-        const removed = await this.removeSelected();
-        if (!removed) {
-            return removed;
-        }
-        this.announce(_t("%(block)s removed. Ctrl+Z undoes it.", {block: label}));
-        if (focus && index >= 0) {
-            this.afterRender(() => {
-                const picks = this.canvasPicks();
-                const pick = picks[Math.min(index, picks.length - 1)];
-                if (pick) {
-                    pick.focus();
-                }
-            });
-        }
-        return true;
+        const removed = () => {
+            this.announce(_t("%(block)s removed. Ctrl+Z undoes it.", {block: label}));
+            if (focus && index >= 0) {
+                this.afterRender(() => {
+                    const picks = this.canvasPicks();
+                    const pick = picks[Math.min(index, picks.length - 1)];
+                    if (pick) {
+                        pick.focus();
+                    }
+                });
+            }
+            if (onRemoved) {
+                onRemoved();
+            }
+        };
+        return this.removeSelected({onRemoved: removed});
     }
 
     /**
@@ -1940,11 +1942,12 @@ export class StudioEditor extends Component {
     /**
      * Remove the selected block. A block the draft adds that holds other
      * changes (a group, a tab and what was dropped into it) leaves with
-     * them once the user confirms: no undo brings them back. Answer true
+     * them once the user confirms: no undo brings them back. ``onRemoved``
+     * runs once the block left, directly or after the dialog. Answer true
      * when the block left, false when it stays, null while the dialog
      * asks.
      */
-    async removeSelected() {
+    async removeSelected({onRemoved = null} = {}) {
         const block = this.selectedBlock;
         if (!block || this.state.busy) {
             return false;
@@ -1952,6 +1955,9 @@ export class StudioEditor extends Component {
         const remove = async () => {
             if (await this.operate({type: "remove", target: block.path})) {
                 this.state.selected = null;
+                if (onRemoved) {
+                    onRemoved();
+                }
                 return true;
             }
             return false;
@@ -2183,7 +2189,7 @@ export class StudioEditor extends Component {
         }
         const intro = answer.waiting
             ? _t(
-                  "The installed generated module defines the field of this option: it leaves the database once the module is generated again and upgraded."
+                  "The installed generated module defines the field of this option: it leaves the database once the module is generated again and upgraded, with:"
               )
             : _t("Turning this option off removes at the next Apply, after its confirmation:");
         this.dialog.add(StudioConfirmDialog, {

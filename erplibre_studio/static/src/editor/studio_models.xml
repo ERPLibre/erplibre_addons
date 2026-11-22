@@ -84,7 +84,7 @@
                     <t t-else="">
                         <i
                             class="fa mt-1"
-                            t-att-class="nameRefused ? 'fa-exclamation-circle' : 'fa-check-circle'"
+                            t-att-class="nameStatusIcon"
                             aria-hidden="true"
                         />
                         <span class="d-flex flex-column">

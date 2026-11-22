@@ -3764,6 +3764,13 @@ class ErplibreStudioProject(models.Model):
         from the sources."""
         return set()
 
+    def _studio_reserved_model_tables(self):
+        """The tables of the models a module on the addons path defines,
+        which the table of a new model (``studio_arch.model_table``) cannot
+        be: none here; ERPLibre studio generate reads them from the
+        sources."""
+        return set()
+
     def _studio_model_name_owner(self, name, line=None):
         """Who already holds the model name ``name``, the model line
         ``line`` aside (the one renamed or checked; its applied model is
@@ -3774,7 +3781,9 @@ class ErplibreStudioProject(models.Model):
         is the table of a model of the registry, of another model line, or
         a table of the database (``table``; ``model`` names the model that
         holds it, False for a table alone), « module » when a module on the
-        addons path defines it (``_studio_reserved_model_names``)."""
+        addons path defines it (``_studio_reserved_model_names``) or a model
+        of its table (``_studio_reserved_model_tables``; ``table`` names
+        it)."""
         own = line.model if line and line.applied else None
         line_id = line.id if line else 0
         result = {"name": name, "project": False, "table": False, "model": False}
@@ -3804,6 +3813,8 @@ class ErplibreStudioProject(models.Model):
                 return dict(result, kind="table", table=table)
         if name in self._studio_reserved_model_names():
             return dict(result, kind="module")
+        if table in self._studio_reserved_model_tables():
+            return dict(result, kind="module", table=table)
         return None
 
     def _studio_model_name_status(self, name, line=None):
@@ -3867,6 +3878,14 @@ class ErplibreStudioProject(models.Model):
                 "The table of a model is its name with its dots as _: two "
                 "such names would share it."
             )
+        elif owner["kind"] == "module" and owner["table"]:
+            message = self.env._(
+                "A module on the addons path uses the table %(table)s",
+                table=owner["table"],
+            )
+            detail = self.env._(
+                "Installed later, that module would share the table of this model."
+            )
         elif owner["kind"] == "module":
             message = self.env._(
                 "A module on the addons path defines %(name)s", name=name
@@ -3909,6 +3928,37 @@ class ErplibreStudioProject(models.Model):
                     }
                 )
         return result
+
+    def _studio_foreign_models(self):
+        """{model name: module} of the models the project created that a
+        module other than its generated module defines now: the module of
+        the class that defines the model in the registry
+        (``_original_module``). A custom model has none."""
+        self.ensure_one()
+        result = {}
+        for record in self.created_model_ids.exists():
+            if record.state == "manual":
+                continue
+            Model = self.env.registry.get(record.model)
+            module = getattr(Model, "_original_module", None) if Model else None
+            if module and module != self.module_name:
+                result[record.model] = module
+        return result
+
+    def _studio_foreign_model_refusal(self):
+        """Why the project can no longer apply, revert nor generate its
+        models, or False: another module defines one of them now
+        (``_studio_foreign_models``), and owns its table and its fields."""
+        foreign = self._studio_foreign_models()
+        if not foreign:
+            return False
+        return self.env._(
+            "Another module defines a model of this project now: %(models)s. "
+            "The project can no longer apply, revert nor generate it.",
+            models=", ".join(
+                f"{model} ({module})" for model, module in sorted(foreign.items())
+            ),
+        )
 
     def _studio_menu_vals(self, menu, label=None):
         """The model line values of ``menu`` {mode, app_id | new_app: {name,
@@ -4900,6 +4950,9 @@ class ErplibreStudioProject(models.Model):
         line that does not apply; each check of a line is its own method,
         which the review runs line by line."""
         self.ensure_one()
+        refusal = self._studio_foreign_model_refusal()
+        if refusal:
+            raise UserError(refusal)
         mail = self._studio_mail_available()
         for line in self.new_model_ids:
             self._studio_check_apply_model(line, mail)
@@ -5452,8 +5505,9 @@ class ErplibreStudioProject(models.Model):
         (``_studio_removal_report`` of its own field and, for « Per
         company », of the applied rule of its rule line, with the effects
         on the records), why the removal is refused (or False), and
-        whether the removal waits for the installed generated module
-        (then the report holds no field). A read."""
+        whether the removal waits for the installed generated module: the
+        report then lists what its upgrade removes, which Apply leaves to
+        it. A read."""
         self.ensure_one()
         Fields = self.env["ir.model.fields"].sudo()
         Rule = self.env["ir.rule"].sudo()
@@ -5465,7 +5519,13 @@ class ErplibreStudioProject(models.Model):
         if key == "per_company" and line.company_rule_id:
             rule_lines = line.company_rule_id
             rules = self._studio_record("ir.rule", rule_lines.xml_name)
-        report = self._studio_removal_report({"fields": removable, "rules": rules})
+        report = self._studio_removal_report(
+            {
+                "fields": removable,
+                "module_fields": field if waiting else Fields,
+                "rules": rules,
+            }
+        )
         leaving = self._studio_apply_removals().get("rules", Rule) | rules
         return {
             "report": report,
@@ -5547,7 +5607,8 @@ class ErplibreStudioProject(models.Model):
 
     def _apply_actions(self, log):
         """Create or update the window action of each model line, with the
-        context of its options (``_studio_action_context``)."""
+        context of its options (``_studio_action_context``) and the views
+        the project adds to its model (``_studio_view_mode``)."""
         kept = self.env["ir.actions.act_window"].sudo()
         for line in self.new_model_ids:
             names = line._studio_xml_names()
@@ -5558,7 +5619,7 @@ class ErplibreStudioProject(models.Model):
                 {
                     "name": line.name.strip(),
                     "res_model": line.model,
-                    "view_mode": "list,form",
+                    "view_mode": line._studio_view_mode(),
                     "search_view_id": search.id,
                     "context": line._studio_action_context() or "{}",
                 },

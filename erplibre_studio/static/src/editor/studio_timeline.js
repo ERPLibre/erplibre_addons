@@ -39,9 +39,11 @@ export const FIELD_LANES = ["start", "stop", "group"];
 export const FIELD_LANES_BY_TYPE = {timeline: FIELD_LANES, calendar: ["start", "stop", "color", "all_day"]};
 // The scale web_timeline opens on when the view sets no « mode ».
 export const DEFAULT_TIMELINE_MODE = "fit";
-// The scale a view opens on when it sets no « mode », by view type. The
-// calendar opens on the last scale of the browser session, else the week.
-export const DEFAULT_MODES = {timeline: DEFAULT_TIMELINE_MODE, calendar: "week"};
+// The scale a view opens on when it sets no « mode », by view type. A
+// calendar has none: it opens on the last scale of the browser session,
+// else the week, so that no scale stands for « not set » and each one can
+// be written, the week included.
+export const DEFAULT_MODES = {timeline: DEFAULT_TIMELINE_MODE};
 // The drop zone of a lane, as the drag and drop of the editor names zones.
 export const LANE_ZONE_PREFIX = "lane:";
 
@@ -119,7 +121,9 @@ export function laneHelp(key, viewType = "timeline") {
                 ),
                 color: _t("One color per value of this field."),
                 all_day: _t("A boolean field: true shows the event over the whole day."),
-                scale: _t("The scale when the calendar opens."),
+                scale: _t(
+                    "The scale the calendar opens on, unless the browser remembers the last scale used on this view."
+                ),
                 popover: _t("The fields the popover of an event shows, in this order."),
             }[key] || ""
         );

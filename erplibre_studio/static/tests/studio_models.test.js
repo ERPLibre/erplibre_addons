@@ -1384,6 +1384,27 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_model_save").toBeEnabled();
     });
 
+    test("a check that fails shows an exclamation mark, Save stays enabled", async () => {
+        answer = rulePayload(DEVELOPMENT_RULE);
+        respond.check_model_name = () => {
+            throw makeServerError({message: "The check could not run."});
+        };
+        await openEditor();
+        await openSpace("models");
+        await contains(".o_erplibre_studio_new_model").click();
+        expect.verifySteps(["get_studio_choices 3"]);
+        await contains(".o_erplibre_studio_model_label").edit("Book");
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.book");
+        await advanceTime(NAME_CHECK_DELAY);
+        await animationFrame();
+        const status = ".o_erplibre_studio_model_name_status";
+        expect(status).toHaveClass("o_erplibre_studio_name_bad");
+        expect(`${status} .fa-exclamation-circle`).toHaveCount(1);
+        expect(`${status} .fa-check-circle`).toHaveCount(0);
+        expect(".o_erplibre_studio_model_name_message").toHaveText(/The check could not run/);
+        expect(".o_erplibre_studio_model_save").toBeEnabled();
+    });
+
     test("an answer older than the last check is dropped", async () => {
         answer = rulePayload(DEVELOPMENT_RULE);
         const answers = [new Deferred(), new Deferred()];

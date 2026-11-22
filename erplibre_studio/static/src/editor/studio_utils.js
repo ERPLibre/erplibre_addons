@@ -228,6 +228,7 @@ export function valueLabel(kind, value) {
         graph_type: {bar: _t("Bar"), line: _t("Line"), pie: _t("Pie")},
         graph_order: {asc: _t("Ascending"), desc: _t("Descending")},
         calendar_mode: {day: _t("Day"), week: _t("Week"), month: _t("Month"), year: _t("Year")},
+        calendar_filter: {True: _t("Yes")},
     }[kind];
     return (labels && labels[value]) || null;
 }
@@ -342,8 +343,9 @@ export function pivotAxes(info) {
 
 // The axes of a graph: its group-bys, the first one the X axis and the
 // next ones its series, and its measures, of which it draws the last one.
-// A field of type « col » is a group-by too: the layout of the server puts
-// it under « row ».
+// The layout of the server files the fields as the graph reads them: any
+// visible field of a groupable type not of type « measure » is a group-by,
+// under « row ».
 export const GRAPH_AXES = ["row", "measure"];
 
 /** The field blocks of a graph view by axis: {row, measure, others}. */

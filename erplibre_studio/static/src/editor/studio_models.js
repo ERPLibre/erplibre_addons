@@ -252,6 +252,16 @@ export class StudioModelDialog extends Component {
         return Boolean(check && !check.error && check.status !== "available");
     }
 
+    /**
+     * The icon of the status of the name, from the same condition as its
+     * class: a check mark when available, else an exclamation mark (a
+     * refused name, or a check that failed).
+     */
+    get nameStatusIcon() {
+        const check = this.nameCheck;
+        return check && check.status === "available" ? "fa-check-circle" : "fa-exclamation-circle";
+    }
+
     /** The class of the status of the name: available, refused, or none while checking. */
     get nameStatusClass() {
         const check = this.nameCheck;
