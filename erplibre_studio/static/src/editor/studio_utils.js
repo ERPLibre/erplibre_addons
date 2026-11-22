@@ -19,7 +19,7 @@ export const DRAGGING_CLASS = "o_erplibre_studio_dragging";
 
 const TRUE_VALUES = ["1", "True", "true"];
 // The view types whose fields show from a QWeb template.
-export const TEMPLATED_TYPES = ["kanban", "timeline", "hierarchy"];
+export const TEMPLATED_TYPES = ["kanban", "timeline", "hierarchy", "activity"];
 export const DATE_TYPES = ["date", "datetime"];
 export const NUMBER_TYPES = ["integer", "float", "monetary"];
 // The options of a new field set before Apply, and the types that take
@@ -216,6 +216,7 @@ export function attributeLabel(attribute, kind) {
             parent_field: _t("Parent field"),
             child_field: _t("Children field"),
             draggable: _t("Drag the cards to change the parent"),
+            display: _t("Width"),
         }[attribute] || attribute
     );
 }
@@ -232,6 +233,7 @@ export function valueLabel(kind, value) {
         graph_order: {asc: _t("Ascending"), desc: _t("Descending")},
         calendar_mode: {day: _t("Day"), week: _t("Week"), month: _t("Month"), year: _t("Year")},
         calendar_filter: {True: _t("Yes")},
+        activity_display: {full: _t("Whole line"), right: _t("Right-aligned")},
     }[kind];
     return (labels && labels[value]) || null;
 }

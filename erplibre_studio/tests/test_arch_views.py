@@ -55,6 +55,20 @@ TIMELINE = """
 </timeline>
 """
 
+ACTIVITY = """
+<activity string="Contacts">
+    <field name="id"/>
+    <templates>
+        <div t-name="activity-box">
+            <div class="ms-2">
+                <field name="name" display="full"/>
+                <field name="phone" muted="1"/>
+            </div>
+        </div>
+    </templates>
+</activity>
+"""
+
 FORM = """
 <form>
     <sheet>
@@ -78,8 +92,8 @@ def spec_text(change, view_type):
 
 @tagged("post_install", "-at_install")
 class TestArchViews(BaseCase):
-    """The arch helpers of the kanban, search, pivot, graph, calendar and
-    timeline views."""
+    """The arch helpers of the kanban, search, pivot, graph, calendar,
+    timeline, hierarchy and activity views."""
 
     def test_template_xpath_by_its_name(self):
         root = etree.fromstring(KANBAN)
@@ -374,8 +388,7 @@ class TestArchViews(BaseCase):
         )
 
     def test_content_directives_take_no_drop(self):
-        root = etree.fromstring(
-            """
+        root = etree.fromstring("""
             <kanban>
                 <templates>
                     <t t-name="card">
@@ -388,8 +401,7 @@ class TestArchViews(BaseCase):
                     </t>
                 </templates>
             </kanban>
-            """
-        )
+            """)
         card = root.xpath("//t[@t-name='card']")[0]
         span, div_out, t_set, t_call, t_if, div_foreach = studio_arch.elements(card)
         esc = span[0]
@@ -424,8 +436,7 @@ class TestArchViews(BaseCase):
         )
 
     def test_hide_refused_on_the_head_of_a_chain(self):
-        root = etree.fromstring(
-            """
+        root = etree.fromstring("""
             <kanban>
                 <templates>
                     <t t-name="card">
@@ -436,8 +447,7 @@ class TestArchViews(BaseCase):
                     </t>
                 </templates>
             </kanban>
-            """
-        )
+            """)
         head, middle, last, alone = root.xpath("//t[@t-name='card']/span")
         self.assertEqual(studio_arch.hide_refusal("kanban", head).code, "chain_hide")
         self.assertEqual(studio_arch.hide_refusal("kanban", middle).code, "chain_hide")
@@ -487,8 +497,7 @@ class TestArchViews(BaseCase):
             studio_arch.item_value("a or b", "text")
         with self.assertRaises(studio_arch.ArchError):
             studio_arch.item_value("email", "char")
-        shown = etree.fromstring(
-            """
+        shown = etree.fromstring("""
             <div>
                 <span t-esc="record.name"/>
                 <span name="user_id" t-out="record.user_id and record.user_id[1]"/>
@@ -497,8 +506,7 @@ class TestArchViews(BaseCase):
                 <span t-esc="record.name.value"/>
                 <span>Label <t t-esc="record.city"/></span>
             </div>
-            """
-        )
+            """)
         self.assertEqual(
             [studio_arch.item_field_name(node) for node in shown],
             ["name", "user_id", "ref", "email", None, None],
@@ -806,3 +814,80 @@ class TestArchViews(BaseCase):
         self.assertIsNone(studio_arch.drop_refusal("hierarchy", body, "inside"))
         self.assertEqual(studio_arch.move_refusal("hierarchy", card).code, "no_move")
         self.assertEqual(studio_arch.shown_field_names(root, "hierarchy"), {"name"})
+
+    def test_div_template_of_an_activity_view(self):
+        """A <div t-name> directly under <templates> is a template, located
+        by its name; a <div t-name> anywhere else is not."""
+        root = etree.fromstring(ACTIVITY)
+        box = root.xpath("//div[@t-name='activity-box']")[0]
+        self.assertTrue(studio_arch.is_template(box))
+        self.assertEqual(studio_arch.templates_of(root), {"activity-box": box})
+        self.assertEqual(
+            studio_arch.node_xpath(root, box), "//div[@t-name='activity-box']"
+        )
+        inner = box.find("div")
+        self.assertEqual(
+            studio_arch.node_xpath(root, inner), "//div[@t-name='activity-box']/div[1]"
+        )
+        for node in root.iter(etree.Element):
+            self.assertIs(root.xpath(studio_arch.node_xpath(root, node))[0], node)
+        stray = etree.fromstring(
+            "<form><sheet><div t-name='stray'><field name='name'/></div></sheet></form>"
+        )
+        div = stray.find("sheet/div")
+        self.assertFalse(studio_arch.is_template(div))
+        self.assertEqual(studio_arch.templates_of(stray), {})
+        self.assertEqual(studio_arch.node_xpath(stray, div), "/form/sheet[1]/div[1]")
+        # The <t> template of a kanban keeps its path.
+        kanban = etree.fromstring(KANBAN)
+        card = kanban.xpath("//t[@t-name='card']")[0]
+        self.assertEqual(studio_arch.node_xpath(kanban, card), "//t[@t-name='card']")
+
+    def test_activity_rules_and_blocks(self):
+        root = etree.fromstring(ACTIVITY)
+        box = root.xpath("//div[@t-name='activity-box']")[0]
+        inner = box.find("div")
+        name = inner.find("field")
+        declared = root.find("field")
+        refusal = studio_arch.drop_refusal
+        self.assertIsNone(refusal("activity", box, "inside"))
+        self.assertIsNone(refusal("activity", inner, "inside"))
+        self.assertIsNone(refusal("activity", name, "after"))
+        # Nothing new goes outside the box, nor beside it.
+        self.assertEqual(refusal("activity", root, "inside").code, "no_drop_inside")
+        self.assertEqual(refusal("activity", box, "after").code, "no_drop")
+        self.assertEqual(studio_arch.move_refusal("activity", box).code, "no_move")
+        self.assertEqual(studio_arch.hide_refusal("activity", box).code, "no_hide")
+        self.assertIsNone(studio_arch.move_refusal("activity", name))
+        self.assertIsNone(studio_arch.hide_refusal("activity", name))
+        self.assertEqual(
+            studio_arch.move_refusal("activity", declared).code, "outside_template"
+        )
+        self.assertEqual(studio_arch.hide_mode("activity"), "invisible")
+        self.assertEqual(studio_arch.CHOICES["activity_display"], ("full", "right"))
+        blocks = studio_arch.arch_blocks(root, "activity", {})
+        self.assertFalse(blocks["drop"])
+        templates = blocks["children"][1]
+        block = templates["children"][0]
+        self.assertEqual(
+            (block["tag"], block["kind"], block["template"], block["movable"]),
+            ("div", "template", "activity-box", False),
+        )
+        self.assertTrue(block["drop"])
+        field = block["children"][0]["children"][0]
+        self.assertEqual((field["kind"], field["name"]), ("field", "name"))
+        self.assertEqual(field["attrs"].get("display"), "full")
+        self.assertEqual(
+            studio_arch.shown_field_names(root, "activity"), {"name", "phone"}
+        )
+
+    def test_activity_default_arch(self):
+        root = etree.fromstring(
+            studio_arch.default_view_arch("activity", "Contact", "name")
+        )
+        self.assertEqual(dict(root.attrib), {"string": "Contact"})
+        box = root.xpath("/activity/templates/div[@t-name='activity-box']")[0]
+        self.assertEqual(
+            [(f.get("name"), f.get("display")) for f in box], [("name", "full")]
+        )
+        self.assertEqual(studio_arch.templates_of(root), {"activity-box": box})

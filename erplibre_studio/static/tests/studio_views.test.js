@@ -1394,6 +1394,131 @@ describe("erplibre_studio editor, hierarchy", () => {
     });
 });
 
+describe("erplibre_studio editor, activity", () => {
+    const BOX = "//div[@t-name='activity-box']";
+    const ACTIVITY_OPERATIONS = [
+        "add_field",
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "set_attribute",
+        "update_field",
+        "rename_field",
+    ];
+
+    /**
+     * An activity view of the contacts: the id it loads, its
+     * « activity-box » template, a <div>, showing the fields ``names``;
+     * ``attrs`` gives a field its attributes.
+     */
+    function activityPayload(names = ["name"], attrs = {}) {
+        const box = {
+            path: BOX,
+            tag: "div",
+            kind: "template",
+            label: "activity-box",
+            attrs: {"t-name": "activity-box"},
+            movable: false,
+            drop: true,
+            in_template: true,
+            chain: null,
+            template: "activity-box",
+            children: names.map((name) => inCard(name, {attrs: attrs[name] || {}})),
+        };
+        const blocks = container(
+            "/activity",
+            "activity",
+            [container("/activity/templates", "templates", [box], {drop: false, movable: false, in_template: false})],
+            {drop: false, movable: false}
+        );
+        return payload("activity", blocks, {
+            operations: ACTIVITY_OPERATIONS,
+            layout: {root: "/activity", card: BOX, templates: {"activity-box": BOX}, loaded_fields: [], widgets: {}},
+            settable: {field: {widget: "widget", display: "activity_display"}},
+            choices: {...CHOICES, activity_display: ["full", "right"].map((d) => [d, d])},
+        });
+    }
+
+    test("the activity box shows as a card; the palette adds to it; the width of a field", async () => {
+        answer = activityPayload();
+        await openEditor("activity");
+        expect(".o_erplibre_studio_activity_caption").toHaveText("The record cell of each row of the activity view");
+        expect(".o_erplibre_studio_card .o_erplibre_studio_field").toHaveCount(1);
+        expect(".o_erplibre_studio_card .o_erplibre_studio_field:eq(0)").toHaveAttribute("data-name", "name");
+        expect(".o_erplibre_studio_palette [data-tab=other]").toHaveCount(0);
+        expect(hook(BOX, "inside")).toHaveCount(1);
+        // Nothing new goes outside the box.
+        expect(hook("/activity", "inside")).toHaveCount(0);
+
+        respond = () => activityPayload(["name", "phone"]);
+        await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
+        await contains(".o_erplibre_studio_existing_field[data-name=phone]").dragAndDrop(hook(BOX, "inside"));
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: BOX,
+            position: "inside",
+            field_name: "phone",
+        });
+        expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "phone");
+
+        const display = ".o_erplibre_studio_settable[data-attribute=display]";
+        expect(`${display} label`).toHaveText(/Width/);
+        expect(queryAllTexts(`${display} option`)).toEqual(["Default", "Whole line", "Right-aligned"]);
+        respond = () => activityPayload(["name", "phone"], {phone: {display: "right"}});
+        await contains(`${display} select`).select("right");
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("field", "phone"),
+            attribute: "display",
+            value: "right",
+        });
+        expect(`${display} select`).toHaveValue("right");
+    });
+
+    test("a model without activities: the menu lists the activity view, not addable", async () => {
+        answer = kanbanPayload([inCard("name")]);
+        answer.view_list = [
+            {
+                type: "kanban",
+                label: "Kanban",
+                view_id: 12,
+                xml_id: "base.partner_kanban",
+                exists: true,
+                pending: false,
+                added: false,
+                editable: true,
+                reason: false,
+                reason_code: false,
+                changes: 0,
+            },
+            {
+                type: "activity",
+                label: "Activity",
+                view_id: false,
+                xml_id: false,
+                exists: false,
+                pending: false,
+                added: false,
+                editable: false,
+                reason: "res.partner has no activities: an activity view needs the model to inherit mail.activity.mixin (a chatter).",
+                reason_code: "needs_activity",
+                changes: 0,
+            },
+        ];
+        await openEditor("kanban");
+        await contains(".o_erplibre_studio_add_view").click();
+        expect(".o_erplibre_studio_view_menu_add").toHaveCount(0);
+        const unavailable = ".o_erplibre_studio_view_menu_unavailable[data-reason=needs_activity]";
+        expect(unavailable).toHaveAttribute("data-view-type", "activity");
+        expect(unavailable).toHaveAttribute("aria-disabled", "true");
+        expect(unavailable).toHaveText(/Activity\s*res\.partner has no activities: .*mail\.activity\.mixin/);
+        expect(`${unavailable} .badge`).toHaveCount(0);
+    });
+});
+
 describe("erplibre_studio editor, form layout", () => {
     const FORM_OPERATIONS = [
         "add_field",

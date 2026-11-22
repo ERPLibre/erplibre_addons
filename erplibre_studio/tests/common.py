@@ -145,6 +145,9 @@ class StudioMixin(DeveloperMixin):
     def hierarchy_available(self):
         return "hierarchy" in self.Project._view_types()
 
+    def activity_available(self):
+        return "activity" in self.Project._view_types()
+
     def make_users(self):
         """(editor, other): two Settings administrators."""
         groups = "base.group_user,base.group_system"

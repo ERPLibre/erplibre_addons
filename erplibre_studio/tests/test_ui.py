@@ -170,6 +170,36 @@ class TestStudioUi(HttpCase):
         card = arch.xpath("//t[@t-name='hierarchy-box']")[0]
         self.assertIn("email", [f.get("name") for f in card.iter("field")])
 
+    def test_activity_tour(self):
+        """The activity view of the contacts in the editor: the phone added
+        to its « activity-box » with Enter on the palette, the preview
+        renders the activity view with the draft."""
+        if "activity" not in self.env["erplibre.studio.project"]._view_types():
+            self.skipTest("mail is not installed")
+        view = self.env.ref("mail.res_partner_view_activity")
+        if self.env["ir.ui.view"].default_view("res.partner", "activity") != view.id:
+            self.skipTest("res.partner has another activity view in this database")
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?view_type=activity&debug=1",
+            "erplibre_studio_activity_editor",
+            login="admin",
+            timeout=240,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_activity")]
+        )
+        change = project.change_ids
+        self.assertEqual(
+            (change.change_type, change.view_id, change.field_name),
+            ("add_existing_field", view, "phone"),
+        )
+        arch, errors = project._draft_arch(view)
+        self.assertFalse(errors)
+        box = arch.xpath("//div[@t-name='activity-box']")[0]
+        self.assertIn("phone", [f.get("name") for f in box.iter("field")])
+
     def timeline_setup(self):
         """A timeline view of the contacts, a contact of a company to show
         in it, and an action that opens the view: (view, action). Skips the

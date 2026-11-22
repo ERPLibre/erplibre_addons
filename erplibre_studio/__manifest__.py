@@ -18,8 +18,9 @@ project**, applied to the database, and can become a module.
 
 * **Views**: form, list, kanban, search, pivot, graph and calendar
   views, timeline views once *web_timeline* is installed, hierarchy views
-  once *web_hierarchy* is. **Customize this view**, in the debug menu or
-  the *Developer panel*, opens the editor on the view of the page. Fields
+  once *web_hierarchy* is, activity views of the models with activities
+  once *mail* is. **Customize this view**, in the debug menu or the
+  *Developer panel*, opens the editor on the view of the page. Fields
   move by drag and drop; the palette adds existing fields and
   new ``x_`` fields, the side panel edits their properties. **Add a view**
   gives a model a view of a type it lacks.

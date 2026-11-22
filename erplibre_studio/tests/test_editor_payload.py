@@ -67,7 +67,14 @@ class TestEditorPayload(StudioCase):
                 self.assertEqual(entry["editable"], not entry["reason_code"])
                 self.assertEqual(bool(entry["reason"]), bool(entry["reason_code"]))
                 if entry["type"] in editable and not entry["exists"]:
-                    self.assertEqual(entry["reason_code"], "no_view")
+                    # An activity view needs a model with activities.
+                    expected = (
+                        "no_view"
+                        if entry["type"] != "activity"
+                        or self.Project._studio_has_activities("res.partner")
+                        else "needs_activity"
+                    )
+                    self.assertEqual(entry["reason_code"], expected)
                 if entry["type"] in UNSUPPORTED_VIEW_TYPES:
                     self.assertFalse(entry["editable"])
                     self.assertIn(
@@ -86,6 +93,9 @@ class TestEditorPayload(StudioCase):
         if not self.hierarchy_available():
             self.assertEqual(entries["hierarchy"]["reason_code"], "needs_module")
             self.assertIn("web_hierarchy", entries["hierarchy"]["reason"])
+        if not self.activity_available():
+            self.assertEqual(entries["activity"]["reason_code"], "needs_module")
+            self.assertIn("mail", entries["activity"]["reason"])
 
     def test_view_list_names_a_type_without_a_view(self):
         """A studio type the model has no view of is listed, not editable."""
@@ -100,9 +110,11 @@ class TestEditorPayload(StudioCase):
         for view_type in missing:
             with self.subTest(view_type=view_type):
                 entry = entries[view_type]
+                # The tags have no activities: no activity view to add.
+                code = "needs_activity" if view_type == "activity" else "no_view"
                 self.assertEqual(
                     (entry["exists"], entry["editable"], entry["reason_code"]),
-                    (False, False, "no_view"),
+                    (False, False, code),
                 )
 
     def test_view_list_of_a_model_not_created_yet(self):

@@ -43,16 +43,18 @@ DIGEST_ACTIONS = ("action_apply", "action_revert")
 PREVIEW_MODES = ("simulation", "real")
 # The view types the editor lists after VIEW_TYPES, with why it does not
 # edit them.
-UNSUPPORTED_VIEW_TYPES = ("gantt", "activity")
+UNSUPPORTED_VIEW_TYPES = ("gantt",)
 # The ``reason_code`` of a view type the editor does not open (``_view_list``):
 # a type of OPTIONAL_VIEW_MODULES without its module, a type the studio does
 # not edit, a type no installed module provides, a type a model not created
-# yet cannot have before Apply, a type the model has no view of.
+# yet cannot have before Apply, an activity view of a model without
+# activities (mail.activity.mixin), a type the model has no view of.
 VIEW_REASONS = (
     "needs_module",
     "not_editable",
     "not_installed",
     "apply_first",
+    "needs_activity",
     "no_view",
 )
 # How many members ``get_group_members`` and ``get_group_losses`` name at
@@ -340,12 +342,16 @@ class ErplibreStudioEditor(models.AbstractModel):
         path = lambda node: studio_arch.node_xpath(arch, node)  # noqa: E731
         root = f"/{arch.tag}"
         loaded = [c.get("name") for c in studio_arch.elements(arch) if c.tag == "field"]
-        if view_type in ("kanban", "hierarchy"):
+        if view_type in ("kanban", "hierarchy", "activity"):
             # A hierarchy draws each node with its « hierarchy-box » card,
-            # compiled as a kanban card; no widget of WIDGETS goes in it.
+            # an activity view the record cell of each row with its
+            # « activity-box », both compiled as a kanban card is; no widget
+            # of WIDGETS goes in them.
             templates = studio_arch.templates_of(arch)
             if view_type == "hierarchy":
                 card = templates.get("hierarchy-box")
+            elif view_type == "activity":
+                card = templates.get("activity-box")
             else:
                 card = templates.get("card")
                 if card is None:
@@ -529,6 +535,12 @@ class ErplibreStudioEditor(models.AbstractModel):
                     code = "not_installed"
             elif pending and view_type not in studio_arch.MODEL_VIEW_TYPES:
                 code = "apply_first"
+            elif (
+                view_type == "activity"
+                and not entry["exists"]
+                and not Project._studio_has_activities(model)
+            ):
+                code = "needs_activity"
             elif not entry["exists"]:
                 code = "no_view"
             else:
@@ -561,6 +573,12 @@ class ErplibreStudioEditor(models.AbstractModel):
         if code == "apply_first":
             return self.env._(
                 "Apply the model first: %(type)s needs its records.", type=label
+            )
+        if code == "needs_activity":
+            return self.env._(
+                "%(model)s has no activities: an activity view needs the model "
+                "to inherit mail.activity.mixin (a chatter).",
+                model=model,
             )
         if code == "no_view":
             return self.env._(

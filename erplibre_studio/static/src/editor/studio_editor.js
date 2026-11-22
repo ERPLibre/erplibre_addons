@@ -86,8 +86,8 @@ export const LEFT_TABS = ["palette", "plan"];
 // The ``reason_code`` of the view types the menu of views lists « to add »:
 // a type the model has no view of, which the project can add; a timeline
 // once web_timeline is installed; a type a model not created yet gets
-// once applied.
-export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first"];
+// once applied; an activity view once the model has activities.
+export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first", "needs_activity"];
 // The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
 export const LAYOUT_KINDS = ["group", "page", "separator"];
 // The classes of the element a StudioBlock renders, one per kind of block
@@ -504,6 +504,7 @@ export class StudioEditor extends Component {
                 timeline: _t("A chronological band, provided by web_timeline (OCA)."),
                 calendar: _t("The records as events on a day, week, month or year grid."),
                 hierarchy: _t("An organization chart: each record under its parent, provided by web_hierarchy."),
+                activity: _t("The records with their planned activities, one column per activity type (mail)."),
             }[viewType] || ""
         );
     }
@@ -2111,6 +2112,7 @@ export class StudioEditor extends Component {
             timeline: _t("Timeline"),
             calendar: _t("Calendar"),
             hierarchy: _t("Hierarchy"),
+            activity: _t("Activity"),
         };
         return labels[viewType] || viewType;
     }
@@ -2776,10 +2778,12 @@ export class StudioEditor extends Component {
             props.preventEdit = true;
         } else if (this.params.viewType === "search") {
             Object.assign(props, {type: "list", viewId: false, searchViewId: this.params.viewId, display: {}});
-        } else if (this.params.viewType === "timeline") {
+        } else if (["timeline", "activity"].includes(this.params.viewType)) {
             // web_timeline reads the fields of its attributes (start, end,
-            // grouping) from the fields get_views answers; the search view
-            // brings every field of the model.
+            // grouping) from the fields get_views answers, and the activity
+            // view reads write_date for an image of activity_image, a field
+            // its arch does not name; the search view brings every field of
+            // the model.
             props.searchViewId = false;
         }
         return props;

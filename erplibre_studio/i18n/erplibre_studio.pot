@@ -218,6 +218,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "%(model)s has no activities: an activity view needs the model to inherit mail.activity.mixin (a chatter)."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s stores no records: the studio adds no view to it."
 msgstr ""
@@ -962,8 +968,12 @@ msgid "Actions created"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__activity
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__activity
 msgid "Activity"
 msgstr ""
 
@@ -5146,6 +5156,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Right-aligned"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Rights"
 msgstr ""
@@ -6356,6 +6372,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "The record cell of each row of the activity view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "The record rules of the project on the model"
 msgstr ""
@@ -6423,6 +6445,12 @@ msgstr ""
 msgid ""
 "The records the rule lets the groups reach; it may name user, company_id, "
 "company_ids and time."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The records with their planned activities, one column per activity type (mail)."
 msgstr ""
 
 #. module: erplibre_studio
@@ -7363,6 +7391,12 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Whole line"
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_refused
 msgid "Why the uninstall is refused"
 msgstr ""
@@ -7378,6 +7412,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Widget %(label)s (%(name)s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Width"
 msgstr ""
 
 #. module: erplibre_studio

@@ -351,11 +351,11 @@ class ViewExclusion(tuple):
 
 class ErplibreStudioProject(models.Model):
     """A studio project: the changes of views (form, list, kanban, search,
-    pivot, graph, calendar, timeline, hierarchy) that make one module. Its
-    life: draft changes (previewed by its editor only), then applied to
-    the database (``x_`` fields, one inherited view per edited view,
-    under external ids of the module ``module_name``). Writing the project
-    as a module is the part of erplibre_studio_generate."""
+    pivot, graph, calendar, timeline, hierarchy, activity) that make one
+    module. Its life: draft changes (previewed by its editor only), then
+    applied to the database (``x_`` fields, one inherited view per edited
+    view, under external ids of the module ``module_name``). Writing the
+    project as a module is the part of erplibre_studio_generate."""
 
     _name = "erplibre.studio.project"
     _description = "ERPLibre studio project"
@@ -4590,6 +4590,17 @@ class ErplibreStudioProject(models.Model):
         names = preferred + [n for n in fields if n not in preferred]
         return next((fname for fname in names if fits(fname)), None)
 
+    @api.model
+    def _studio_has_activities(self, model):
+        """Whether ``model``, a model of the registry, inherits
+        mail.activity.mixin: an activity view reads its activities. False
+        without mail."""
+        return (
+            "mail.activity.mixin" in self.env
+            and model in self.env
+            and isinstance(self.env[model], self.env.registry["mail.activity.mixin"])
+        )
+
     def _studio_add_view(self, model, view_type):
         """Add to the draft the ``view_type`` view of the existing ``model``,
         which has none of that type: a view line with its default arch
@@ -4661,6 +4672,10 @@ class ErplibreStudioProject(models.Model):
                         model=model,
                     )
                 )
+        if view_type == "activity" and not self._studio_has_activities(model):
+            raise UserError(
+                Editor._view_reason("needs_activity", label, model, view_type)
+            )
         parent = None
         if view_type == "hierarchy":
             parent = self._studio_parent_field(model)

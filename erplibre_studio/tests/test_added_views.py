@@ -429,3 +429,48 @@ class TestAddedViews(StudioCase):
         self.project.action_revert()
         self.assertFalse(view.exists())
         self.assertFalse(self.View.default_view("res.partner", "hierarchy"))
+
+    def test_activity(self):
+        """An activity view added to a model of the project with a chatter,
+        once applied: its « activity-box », a <div>, shows the name. A model
+        without activities gets none."""
+        if not self.activity_available():
+            self.skipTest("mail is not installed")
+        model = "x_studio_test_added_activity"
+        self.make_model(self.project, "Studio test activity", model=model, chatter=True)
+        # Before Apply, the model has no records to plan activities on.
+        with self.assertRaises(UserError):
+            self.Editor.add_view(self.project.id, model, "activity")
+        self.project.action_apply()
+        self.assertTrue(self.Project._studio_has_activities(model))
+        data = self.Editor.get_editor_data(model, False, "form", self.project.id)
+        self.assertEqual(self.entry(data, "activity")["reason_code"], "no_view")
+        data = self.Editor.add_view(self.project.id, model, "activity")
+        self.assertEqual(data["view_type"], "activity")
+        self.assertEqual(data["layout"]["card"], "//div[@t-name='activity-box']")
+        line = self.project.view_line_ids.filtered(lambda v: v.view_type == "activity")
+        root = etree.fromstring(line.arch)
+        self.assertEqual(
+            root.xpath("//div[@t-name='activity-box']/field/@name"), ["x_name"]
+        )
+        self.project.action_apply()
+        view = line.view_id
+        self.assertEqual((view.mode, view.type), ("primary", "activity"))
+        self.assertEqual(self.View.default_view(model, "activity"), view.id)
+        self.env[model].get_views([[view.id, "activity"]])
+
+    def test_activity_needs_activities(self):
+        """The tags of the contacts have no activities: the menu lists the
+        activity view with why, and adding it is refused."""
+        if not self.activity_available():
+            self.skipTest("mail is not installed")
+        model = "res.partner.category"
+        self.assertFalse(self.Project._studio_has_activities(model))
+        data = self.Editor.get_editor_data(model, False, "form", self.project.id)
+        entry = self.entry(data, "activity")
+        self.assertEqual(entry["reason_code"], "needs_activity")
+        self.assertIn("mail.activity.mixin", entry["reason"])
+        self.assertFalse(entry["editable"])
+        with self.assertRaisesRegex(UserError, "mail.activity.mixin"):
+            self.Editor.add_view(self.project.id, model, "activity")
+        self.assertFalse(self.project.view_line_ids)

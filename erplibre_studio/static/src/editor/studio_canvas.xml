@@ -6,7 +6,7 @@
          tree of blocks of a form or a list. -->
     <t t-name="erplibre_studio.Canvas">
         <t
-            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy'].includes(viewType)"
+            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy', 'activity'].includes(viewType)"
             t-call="erplibre_studio.Canvas.{{viewType}}"
         />
         <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
@@ -299,6 +299,13 @@
          draws each node, edited as a kanban card. -->
     <t t-name="erplibre_studio.Canvas.hierarchy">
         <div class="small text-muted mb-1 o_erplibre_studio_hierarchy_caption">The card of each node of the hierarchy</div>
+        <t t-call="erplibre_studio.Canvas.kanban" />
+    </t>
+
+    <!-- The canvas of an activity view: its « activity-box » template, the
+         record cell of each row, edited as a kanban card. -->
+    <t t-name="erplibre_studio.Canvas.activity">
+        <div class="small text-muted mb-1 o_erplibre_studio_activity_caption">The record cell of each row of the activity view</div>
         <t t-call="erplibre_studio.Canvas.kanban" />
     </t>
 

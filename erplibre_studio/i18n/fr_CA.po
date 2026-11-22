@@ -232,6 +232,12 @@ msgstr "%(model)s n'a pas de vue %(type)s à hériter."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "%(model)s has no activities: an activity view needs the model to inherit mail.activity.mixin (a chatter)."
+msgstr "%(model)s n'a pas d'activités : une vue activité exige que le modèle hérite de mail.activity.mixin (un fil de discussion)."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s stores no records: the studio adds no view to it."
 msgstr ""
@@ -1043,8 +1049,12 @@ msgid "Actions created"
 msgstr "Actions créées"
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__activity
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__activity
 msgid "Activity"
 msgstr "Activité"
 
@@ -5323,6 +5333,12 @@ msgstr "Droit"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Right-aligned"
+msgstr "Alignée à droite"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Rights"
 msgstr "Droits"
@@ -6632,6 +6648,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "The record cell of each row of the activity view"
+msgstr "La cellule de l'enregistrement de chaque ligne de la vue activité"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "The record rules of the project on the model"
 msgstr "Les règles d'enregistrement du projet sur le modèle"
@@ -6710,6 +6732,12 @@ msgid ""
 msgstr ""
 "Les enregistrements que la règle laisse atteindre aux groupes ; elle peut "
 "nommer user, company_id, company_ids et time."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The records with their planned activities, one column per activity type (mail)."
+msgstr "Les enregistrements et leurs activités planifiées, une colonne par type d'activité (mail)."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7727,6 +7755,12 @@ msgstr ""
 "utilisateurs."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Whole line"
+msgstr "Ligne entière"
+
+#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_refused
 msgid "Why the uninstall is refused"
 msgstr "Pourquoi la désinstallation est refusée"
@@ -7743,6 +7777,12 @@ msgstr "Widget"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Widget %(label)s (%(name)s)"
 msgstr "Widget %(label)s (%(name)s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Width"
+msgstr "Largeur"
 
 #. module: erplibre_studio
 #. odoo-javascript

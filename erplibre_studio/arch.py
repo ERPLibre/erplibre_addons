@@ -37,14 +37,19 @@ VIEW_TYPES = (
     "calendar",
     "timeline",
     "hierarchy",
+    "activity",
 )
 # {view type: module}: the module that adds the type to ir.ui.view.type, which
 # the editor names when the type is missing from the database.
-OPTIONAL_VIEW_MODULES = {"timeline": "web_timeline", "hierarchy": "web_hierarchy"}
+OPTIONAL_VIEW_MODULES = {
+    "timeline": "web_timeline",
+    "hierarchy": "web_hierarchy",
+    "activity": "mail",
+}
 POSITIONS = ("before", "after", "inside")
 
 # The QWeb views: their fields show from a template under <templates>.
-TEMPLATED_TYPES = ("kanban", "timeline", "hierarchy")
+TEMPLATED_TYPES = ("kanban", "timeline", "hierarchy", "activity")
 # The template elements a node can be dropped into.
 TEMPLATE_DROPS = ("t", "main", "aside", "footer", "header", "div", "section")
 # The QWeb directives that replace or ignore the body of their element: the
@@ -84,6 +89,7 @@ CONTAINERS = {
     "calendar": ("calendar",),
     "timeline": ("timeline", "templates") + TEMPLATE_DROPS,
     "hierarchy": ("hierarchy", "templates") + TEMPLATE_DROPS,
+    "activity": ("activity", "templates") + TEMPLATE_DROPS,
 }
 DROP_CONTAINERS = {
     "form": ("sheet", "group", "page", "div"),
@@ -97,6 +103,9 @@ DROP_CONTAINERS = {
     # A hierarchy takes nothing new outside its card: its fields show from
     # the « hierarchy-box » template.
     "hierarchy": TEMPLATE_DROPS,
+    # An activity view shows its fields from the « activity-box » template
+    # only: a field outside it is only loaded.
+    "activity": TEMPLATE_DROPS,
 }
 
 # How a view type hides a node: an attribute, or the node removed from the
@@ -107,6 +116,7 @@ HIDE_MODES = {
     "kanban": "invisible",
     "timeline": "invisible",
     "hierarchy": "invisible",
+    "activity": "invisible",
     # An invisible calendar field leaves the popover of the events; with
     # « filters », it stays in the side panel.
     "calendar": "invisible",
@@ -256,6 +266,18 @@ VIEW_OPERATIONS = {
         "update_field",
         "rename_field",
     ),
+    # The operations of a hierarchy: an activity view takes no widget of
+    # WIDGETS either.
+    "activity": (
+        "add_field",
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "set_attribute",
+        "update_field",
+        "rename_field",
+    ),
 }
 
 # The attributes « set_attribute » may write: view type -> tag ->
@@ -350,6 +372,11 @@ SETTABLE_ATTRIBUTES = {
         },
         "field": {"widget": "widget"},
     },
+    # The « display » of a field of an activity box: on a line of its own
+    # (« full »), floated to the right (« right »), inline without it.
+    "activity": {
+        "field": {"widget": "widget", "display": "activity_display"},
+    },
 }
 # The settable attributes a view needs: they can change, not go away.
 REQUIRED_ATTRIBUTES = {
@@ -382,6 +409,7 @@ TIMELINE_MODES = ("day", "week", "month", "fit")
 GRAPH_TYPES = ("bar", "line", "pie")
 GRAPH_ORDERS = ("asc", "desc")
 CALENDAR_MODES = ("day", "week", "month", "year")
+ACTIVITY_DISPLAYS = ("full", "right")
 # {kind: values}: the attribute kinds of SETTABLE_ATTRIBUTES whose value is
 # one of a fixed list.
 CHOICES = {
@@ -389,6 +417,7 @@ CHOICES = {
     "graph_type": GRAPH_TYPES,
     "graph_order": GRAPH_ORDERS,
     "calendar_mode": CALENDAR_MODES,
+    "activity_display": ACTIVITY_DISPLAYS,
 }
 DATE_TYPES = ("date", "datetime")
 NUMBER_TYPES = ("integer", "float", "monetary")
@@ -601,10 +630,10 @@ def elements(node):
 
 
 def _named_expr(node):
-    if node.tag == "t":
+    if node.tag == "t" or is_template(node):
         name = node.get("t-name")
         if name and _TEMPLATE_NAME.match(name):
-            return f"//t[@t-name='{name}']"
+            return f"//{node.tag}[@t-name='{name}']"
         return None
     name = node.get("name")
     if name and _SAFE_NAME.match(name):
@@ -653,21 +682,17 @@ def in_template(node):
 
 
 def is_template(node):
-    """Whether ``node`` is a template: a <t t-name> of <templates>."""
+    """Whether ``node`` is a template: an element with a « t-name » directly
+    under <templates>, a <t> or, as in an activity view, a <div>."""
     parent = node.getparent()
-    return (
-        node.tag == "t"
-        and bool(node.get("t-name"))
-        and parent is not None
-        and parent.tag == "templates"
-    )
+    return bool(node.get("t-name")) and parent is not None and parent.tag == "templates"
 
 
 def templates_of(root):
     """{t-name: node} of the templates of ``root``."""
     return {
         node.get("t-name"): node
-        for node in root.xpath("./templates/t[@t-name]")
+        for node in root.xpath("./templates/*[@t-name]")
         if is_template(node)
     }
 
@@ -865,7 +890,7 @@ def hide_refusal(view_type, node):
                 "hidden: the templates read it.",
                 "outside_template",
             )
-        if node.tag == "t" or node.tag == "templates":
+        if is_template(node) or node.tag in ("t", "templates"):
             return ArchError(f"<{node.tag}> cannot be hidden.", "no_hide", tag=node.tag)
         # A hidden node is left out of the compiled template: the t-elif or
         # the t-else after it loses its t-if, and the template no longer
@@ -1959,7 +1984,9 @@ def default_view_arch(
     value of the many2one ``group_field``, its items showing the record
     name; a hierarchy of the records under their many2one ``parent_field``,
     which it loads, its « hierarchy-box » card showing the record name in
-    its header above an empty body. A calendar on a ``readonly_date`` neither creates nor
+    its header above an empty body; an activity view whose
+    « activity-box » template, a <div> as mail writes it, shows the record
+    name on a line of its own. A calendar on a ``readonly_date`` neither creates nor
     moves its events (« create » and « edit » False). The arch depends on these values
     only: the changes of the editor on the view locate their nodes in it."""
     root = etree.Element(view_type, {"string": label})
@@ -2021,6 +2048,19 @@ def default_view_arch(
         etree.SubElement(header, "field", {"name": name_field})
         etree.SubElement(
             card, "div", {"class": "o_hierarchy_node_body d-flex flex-column"}
+        )
+    elif view_type == "activity":
+        templates = etree.SubElement(root, "templates")
+        box = etree.SubElement(templates, "div", {"t-name": "activity-box"})
+        # The classes mail styles the text of a record cell with.
+        etree.SubElement(
+            box,
+            "field",
+            {
+                "name": name_field,
+                "display": "full",
+                "class": "o_text_block o_text_bold",
+            },
         )
     elif view_type == "graph":
         root.set("type", "bar")
