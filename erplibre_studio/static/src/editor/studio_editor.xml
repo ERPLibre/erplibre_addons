@@ -553,6 +553,9 @@
                     />
                 </t>
             </div>
+            <!-- What the keyboard did to a block (announce): rendered always,
+                 so that a screen reader hears its text change. -->
+            <div class="visually-hidden o_erplibre_studio_live" aria-live="polite" aria-atomic="true" t-esc="state.announce" />
             <footer
                 t-if="!state.loading and !state.error"
                 class="o_erplibre_studio_status d-flex flex-wrap align-items-center gap-3 px-3 py-1 border-top small"

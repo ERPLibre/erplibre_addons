@@ -350,6 +350,40 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(row(SHEET)).toBeFocused();
     });
 
+    test("Alt+Arrow moves a block out of its group, from the canvas and from the plan", async () => {
+        await openEditor();
+        // The last field of a group goes down to the hook after the group.
+        const city = ".o_erplibre_studio_field[data-name=city] .o_erplibre_studio_pick";
+        queryOne(city).focus();
+        await press(["Alt", "ArrowDown"]);
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps([`apply_operation move ${named("city")} before ${NOTEBOOK}`]);
+        expect(city).toBeFocused();
+        // The first one goes up to the hook before it.
+        queryOne(".o_erplibre_studio_field[data-name=street] .o_erplibre_studio_pick").focus();
+        await press(["Alt", "ArrowUp"]);
+        await animationFrame();
+        expect.verifySteps([`apply_operation move ${named("street")} before ${ADDRESS}`]);
+
+        await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
+        const pick = `${row(named("city"))} .o_erplibre_studio_outline_pick`;
+        // A div, not a button: a mousedown on a button starts no drag in Firefox.
+        expect(queryOne(pick).tagName).toBe("DIV");
+        expect(pick).toHaveAttribute("tabindex", "-1");
+        expect(pick).toHaveAttribute("draggable", "true");
+        queryOne(row(named("city"))).focus();
+        await press(["Alt", "ArrowDown"]);
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps([`apply_operation move ${named("city")} before ${NOTEBOOK}`]);
+        expect(row(named("city"))).toBeFocused();
+        // Delete removes the block of the row.
+        await press("Delete");
+        await animationFrame();
+        expect.verifySteps([`apply_operation remove undefined undefined ${named("city")}`]);
+    });
+
     test("a container title and the chatter are buttons too", async () => {
         answer.blocks.children.push({
             path: "/form/chatter",

@@ -152,6 +152,18 @@ export function canDragBlock(block, viewType) {
     return TEMPLATED_TYPES.includes(viewType);
 }
 
+/**
+ * Whether ``block`` can leave a view of ``viewType`` whose root block is
+ * ``root``: not the view itself, nor a QWeb template, and in a kanban or a
+ * timeline only a node of its templates (a native node is hidden instead).
+ */
+export function canRemoveBlock(block, root, viewType) {
+    if (!block || (root && block.path === root.path) || block.kind === "template") {
+        return false;
+    }
+    return !TEMPLATED_TYPES.includes(viewType) || block.in_template !== false;
+}
+
 /** Whether ``block`` can be selected: any block but a QWeb template. */
 export function canSelectBlock(block) {
     return block.kind !== "template";
@@ -269,6 +281,24 @@ export function searchColumns(root) {
     };
     visit(root || {});
     return columns;
+}
+
+/**
+ * The title of the column ``key`` of a search view (the keys of
+ * ``searchColumns``) or of the axis ``key`` of a pivot view (row, col,
+ * measure); ``key`` itself for another one.
+ */
+export function columnLabel(key) {
+    return (
+        {
+            fields: _t("Search fields"),
+            filters: _t("Filters"),
+            group_bys: _t("Group by"),
+            row: _t("Rows"),
+            col: _t("Columns"),
+            measure: _t("Measures"),
+        }[key] || key
+    );
 }
 
 /** The field blocks of a pivot view by axis: {row, col, measure, others}. */

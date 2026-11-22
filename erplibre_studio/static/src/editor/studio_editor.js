@@ -2,7 +2,7 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, onWillStart, useState} from "@odoo/owl";
+import {Component, onPatched, onWillStart, useState} from "@odoo/owl";
 import {ConfirmationDialog} from "@web/core/confirmation_dialog/confirmation_dialog";
 import {Dropdown} from "@web/core/dropdown/dropdown";
 import {useDropdownState} from "@web/core/dropdown/dropdown_hooks";
@@ -33,12 +33,17 @@ import {
     RIBBON_COLORS,
     allBlocks,
     blockTrail,
+    canDragBlock,
+    canRemoveBlock,
     canSelectBlock,
+    columnLabel,
     conditionValue,
     fieldTypeLabel,
     findBlock,
     namedKeys,
     pivotAxes,
+    pivotLanes,
+    searchColumns,
     searchEndHook,
 } from "./studio_utils";
 
@@ -81,6 +86,14 @@ export const LEFT_TABS = ["palette", "plan"];
 export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first"];
 // The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
 export const LAYOUT_KINDS = ["group", "page", "separator"];
+// The classes of the element a StudioBlock renders, one per kind of block
+// (erplibre_studio.Block).
+const BLOCK_CLASSES = [
+    "o_erplibre_studio_node",
+    "o_erplibre_studio_notebook",
+    "o_erplibre_studio_container",
+    "o_erplibre_studio_other",
+];
 // The tags a new notebook may go in (arch.NOTEBOOK_PARENTS).
 export const NOTEBOOK_PARENTS = ["sheet", "page"];
 
@@ -210,6 +223,8 @@ export class StudioEditor extends Component {
             // The keys of the technical name inputs whose unsaved value
             // does not apply (StudioFieldName): each one blocks Apply.
             localNameBlockers: new Set(),
+            // What the live region of the editor says (``announce``).
+            announce: "",
         });
         this.previewCount = 0;
         // The menus of the top bar, closed by their items once chosen.
@@ -218,6 +233,15 @@ export class StudioEditor extends Component {
             apply: useDropdownState(),
             views: useDropdownState(),
         };
+        // What runs once the editor renders again (``afterRender``).
+        this.renderCallback = null;
+        onPatched(() => {
+            const callback = this.renderCallback;
+            this.renderCallback = null;
+            if (callback) {
+                callback();
+            }
+        });
         onWillStart(() => this.load());
     }
 
@@ -1208,11 +1232,15 @@ export class StudioEditor extends Component {
      * a block (``.o_erplibre_studio_pick``), Down or Right focuses the next
      * one in document order, Up or Left the previous one, Home and End the
      * first and the last. Each block stays a tab stop of its own; Enter or
-     * Space on its button selects it. A key with a modifier, or on another
+     * Space on its button selects it. The keys of ``onBlockKey`` act on
+     * the block itself. Another key with a modifier, or a key on another
      * element of the canvas, passes through.
      */
     onCanvasKey(ev) {
-        if (ev.altKey || ev.ctrlKey || ev.metaKey || !ev.target.classList.contains("o_erplibre_studio_pick")) {
+        if (!ev.target.classList.contains("o_erplibre_studio_pick") || ev.ctrlKey || ev.metaKey) {
+            return;
+        }
+        if (this.onBlockKey(ev) || ev.altKey) {
             return;
         }
         const picks = [...ev.currentTarget.querySelectorAll(".o_erplibre_studio_pick")];
@@ -1233,6 +1261,281 @@ export class StudioEditor extends Component {
         if (pick) {
             pick.focus();
         }
+    }
+
+    /**
+     * The keys that act on the block whose button is ``ev.target``:
+     * Alt+Up and Alt+Down move it (``moveByKeyboard``; a key held down
+     * moves it once), Delete removes it (``removeByKeyboard``), Escape
+     * unselects what is selected while the focus stays. Answer whether
+     * the key was one of them.
+     */
+    onBlockKey(ev) {
+        const holder = ev.target.closest("[data-path]");
+        const path = holder && holder.dataset.path;
+        if (!path || ev.shiftKey) {
+            return false;
+        }
+        if (ev.altKey) {
+            if (!["ArrowUp", "ArrowDown"].includes(ev.key)) {
+                return false;
+            }
+            ev.preventDefault();
+            if (!ev.repeat) {
+                this.moveByKeyboard(path, ev.key === "ArrowUp" ? -1 : 1);
+            }
+            return true;
+        }
+        if (ev.key === "Delete") {
+            ev.preventDefault();
+            this.removeByKeyboard(path);
+            return true;
+        }
+        if (ev.key === "Escape" && this.state.selected) {
+            ev.preventDefault();
+            this.state.selected = null;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Say ``text`` through the live region of the editor
+     * (``.o_erplibre_studio_live``): the region empties, then takes the
+     * text on the next frame, so that a screen reader says a message that
+     * repeats the last one again.
+     */
+    announce(text) {
+        this.state.announce = "";
+        browser.requestAnimationFrame(() => {
+            this.state.announce = text;
+        });
+    }
+
+    /**
+     * The element of the canvas that renders the block at ``path``, or
+     * null. The tab of a notebook page and the crumbs of the selection
+     * carry a path too: only the element of a StudioBlock counts.
+     */
+    blockElement(path) {
+        const canvas = document.querySelector(".o_erplibre_studio_canvas");
+        const blocks = BLOCK_CLASSES.map((name) => `.${name}`).join(", ");
+        const selector = `:is(${blocks})[data-path="${CSS.escape(path)}"]`;
+        return (canvas && canvas.querySelector(selector)) || null;
+    }
+
+    /** The buttons of the blocks of the canvas, in document order. */
+    canvasPicks() {
+        const canvas = document.querySelector(".o_erplibre_studio_canvas");
+        return [...((canvas && canvas.querySelectorAll(".o_erplibre_studio_pick")) || [])];
+    }
+
+    /**
+     * The hooks of the canvas the keyboard moves ``block`` to: {up, down},
+     * each one {target, position, zone} or null. ``up`` is the nearest
+     * hook before the element of the block in document order, ``down``
+     * the nearest one after it, among those that take the block
+     * (``accepts``) and change its place: the hooks inside the block, the
+     * tab hooks of a notebook, and the hooks of its own column that leave
+     * it where it is (right before or after it, at the end of its
+     * container when it is the last child) are left out. A search view
+     * keeps a block in its column: a filter in the column of the fields
+     * stays a filter. Only the hooks on screen count: a tab page not
+     * shown holds none, so a block enters it only once it shows.
+     */
+    keyboardHooks(block) {
+        const canvas = document.querySelector(".o_erplibre_studio_canvas");
+        const el = this.blockElement(block.path);
+        if (!canvas || !el) {
+            return {up: null, down: null};
+        }
+        const item = {kind: "node", path: block.path, name: block.name};
+        const trail = blockTrail(this.root, block.path);
+        const parent = trail[trail.length - 2];
+        const siblings = (parent && parent.children) || [];
+        const index = siblings.indexOf(block);
+        const still = new Set([`before:${block.path}`, `after:${block.path}`]);
+        if (index >= 0 && index + 1 < siblings.length) {
+            still.add(`before:${siblings[index + 1].path}`);
+        }
+        if (index > 0) {
+            still.add(`after:${siblings[index - 1].path}`);
+        }
+        if (parent && index === siblings.length - 1) {
+            still.add(`inside:${parent.path}`);
+        }
+        const lane = el.closest("[data-zone]");
+        const zone = (lane && lane.dataset.zone) || "";
+        let up = null;
+        let down = null;
+        for (const hookEl of canvas.querySelectorAll(".o_erplibre_studio_hook")) {
+            const {target, position} = hookEl.dataset;
+            const hookZone = hookEl.dataset.zone || "";
+            if (el.contains(hookEl) || hookZone === "pages" || target === block.path) {
+                continue;
+            }
+            if (hookZone === zone ? still.has(`${position}:${target}`) : this.viewType === "search") {
+                continue;
+            }
+            if (!this.accepts(item, hookZone || undefined, target, position)) {
+                continue;
+            }
+            const hook = {target, position, zone: hookZone || undefined};
+            if (el.compareDocumentPosition(hookEl) & Node.DOCUMENT_POSITION_PRECEDING) {
+                up = hook;
+            } else if (!down) {
+                down = hook;
+            }
+        }
+        return {up, down};
+    }
+
+    /**
+     * Where the block at ``path`` of the payload ``data`` stands, for the
+     * live region: {index, count, container}, its place from 1 among the
+     * blocks of its column (``zone``, a search view or a pivot view) or of
+     * its container, and the label of that column or container. Null when
+     * no block has that path.
+     */
+    blockPlace(data, path, zone) {
+        const trail = blockTrail(data.blocks, path);
+        const block = trail[trail.length - 1];
+        if (!block) {
+            return null;
+        }
+        let blocks;
+        let container;
+        if (zone && this.viewType === "search") {
+            blocks = searchColumns(data.blocks)[zone] || [];
+            container = columnLabel(zone);
+        } else if (zone && this.viewType === "pivot") {
+            blocks = pivotLanes(data)[zone] || [];
+            container = columnLabel(zone);
+        } else {
+            const parent = trail[trail.length - 2];
+            blocks = (parent && parent.children) || [block];
+            container = parent ? outlineLabel(parent) : "";
+        }
+        return {index: blocks.indexOf(block) + 1, count: blocks.length, container};
+    }
+
+    /**
+     * Move the block at ``path`` one place up (``direction`` -1) or down
+     * (+1): onto the hook ``keyboardHooks`` gives, through the operation a
+     * drop of the block there makes, one change of the draft per move. A
+     * block of a tab page not shown shows first. The block stays selected;
+     * with ``focus``, its button takes the focus back once the canvas
+     * renders again (the move gives it a new element). The live region
+     * says where it went, or that it cannot go further. Answer the path of
+     * the block once moved, or null: an unnamed block gets a new path, the
+     * one the newest move change of the payload carries.
+     */
+    async moveByKeyboard(path, direction, {focus = true} = {}) {
+        if (this.state.busy || !this.project || this.state.preview || this.panel) {
+            return null;
+        }
+        const block = findBlock(this.root, (b) => b.path === path);
+        if (!block || !canDragBlock(block, this.viewType)) {
+            return null;
+        }
+        if (!this.blockElement(path)) {
+            this.reveal(path);
+            for (let frame = 0; frame < 3 && !this.blockElement(path); frame++) {
+                await new Promise((resolve) => browser.requestAnimationFrame(resolve));
+            }
+        }
+        const hooks = this.keyboardHooks(block);
+        const hook = direction < 0 ? hooks.up : hooks.down;
+        const label = outlineLabel(block);
+        if (!hook) {
+            this.announce(_t("%(block)s cannot move further.", {block: label}));
+            return null;
+        }
+        const item = {kind: "node", path, name: block.name};
+        const data = await this.operate(this.dropOperation(item, hook.target, hook.position, hook.zone));
+        if (!data) {
+            return null;
+        }
+        const newest = (data.changes || [])
+            .filter((c) => c.type === "move")
+            .reduce((last, c) => (!last || c.id > last.id ? c : last), null);
+        const named = !(newest && newest.path) && block.name && this.fieldBlock(data.blocks, block.name);
+        const newPath = (newest && newest.path) || (named && named.path) || null;
+        this.state.selected = newPath;
+        const place = newPath && this.blockPlace(data, newPath, hook.zone);
+        if (place) {
+            this.announce(
+                _t("%(block)s moved: position %(index)s of %(count)s in %(container)s.", {block: label, ...place})
+            );
+        }
+        if (focus && newPath) {
+            this.focusBlock(newPath);
+        }
+        return newPath;
+    }
+
+    /**
+     * Run ``callback`` once the editor renders again: the DOM then shows
+     * the payload of the last answer. A block that changes its place in
+     * a list leaves the DOM for a moment, which takes its focus away, so
+     * the focus goes back only after that render. To call right after a
+     * state change that renders, before the next frame; one callback at a
+     * time, the last one wins.
+     */
+    afterRender(callback) {
+        this.renderCallback = callback;
+    }
+
+    /**
+     * Focus the button of the block at ``path`` once the canvas renders
+     * again: the block's own, or the one of the title of a container.
+     */
+    focusBlock(path) {
+        this.afterRender(() => {
+            const el = this.blockElement(path);
+            const own = ":scope > .o_erplibre_studio_pick";
+            const title = ":scope > .o_erplibre_studio_container_title > .o_erplibre_studio_pick";
+            const pick = el && el.querySelector(`${own}, ${title}`);
+            if (pick) {
+                pick.focus();
+            }
+        });
+    }
+
+    /**
+     * Remove the block at ``path`` as « Remove from the view » does
+     * (``removeSelected``, which may ask first). Once it left, with
+     * ``focus``, the button that takes its place in the canvas takes the
+     * focus (the next block, else the new last one), and the live region
+     * says Ctrl+Z brings it back. Answer whether it left: true, false when
+     * it stays, null while a dialog asks.
+     */
+    async removeByKeyboard(path, {focus = true} = {}) {
+        if (this.state.busy || !this.project || this.state.preview || this.panel) {
+            return false;
+        }
+        const block = findBlock(this.root, (b) => b.path === path);
+        if (!canRemoveBlock(block, this.root, this.viewType)) {
+            return false;
+        }
+        const index = this.canvasPicks().indexOf(document.activeElement);
+        const label = outlineLabel(block);
+        this.state.selected = path;
+        const removed = await this.removeSelected();
+        if (!removed) {
+            return removed;
+        }
+        this.announce(_t("%(block)s removed. Ctrl+Z undoes it.", {block: label}));
+        if (focus && index >= 0) {
+            this.afterRender(() => {
+                const picks = this.canvasPicks();
+                const pick = picks[Math.min(index, picks.length - 1)];
+                if (pick) {
+                    pick.focus();
+                }
+            });
+        }
+        return true;
     }
 
     /**
@@ -1593,29 +1896,36 @@ export class StudioEditor extends Component {
     /**
      * Remove the selected block. A block the draft adds that holds other
      * changes (a group, a tab and what was dropped into it) leaves with
-     * them once the user confirms: no undo brings them back.
+     * them once the user confirms: no undo brings them back. Answer true
+     * when the block left, false when it stays, null while the dialog
+     * asks.
      */
     async removeSelected() {
         const block = this.selectedBlock;
         if (!block || this.state.busy) {
-            return;
+            return false;
         }
         const remove = async () => {
             if (await this.operate({type: "remove", target: block.path})) {
                 this.state.selected = null;
+                return true;
             }
+            return false;
         };
         if (block.changed_inside && this.addedByDraft(block)) {
             this.dialog.add(ConfirmationDialog, {
                 title: _t("Remove this element from the draft"),
                 body: _t("The changes made inside it leave the draft with it."),
                 confirmLabel: _t("Remove"),
-                confirm: remove,
+                // A false answer would keep the dialog open.
+                confirm: async () => {
+                    await remove();
+                },
                 cancel: () => {},
             });
-            return;
+            return null;
         }
-        await remove();
+        return remove();
     }
 
     /**

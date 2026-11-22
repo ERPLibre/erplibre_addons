@@ -23,8 +23,10 @@ import {
     TEMPLATED_TYPES,
     attributeLabel,
     canDragBlock,
+    canRemoveBlock,
     canSelectBlock,
     changeKindLabel,
+    columnLabel,
     endHook,
     findBlock,
     isTrue,
@@ -48,7 +50,9 @@ import {
  * bubbles to the ``t-on-click.stop`` of the div, which selects. The
  * button takes no pointer event (CSS), so the mouse lands on the div: a
  * mousedown on a ``<button>`` starts no drag in Firefox. What carries a
- * tooltip (the lock, the change dot) stays outside the button.
+ * tooltip (the lock, the change dot) stays outside the button. The editor
+ * reads the other keys of the button (``onCanvasKey``): Alt+Up and
+ * Alt+Down move the block, Delete removes it, Escape unselects.
  */
 export class StudioBlock extends Component {
     static template = "erplibre_studio.Block";
@@ -81,6 +85,20 @@ export class StudioBlock extends Component {
     /** Whether the block can be dragged (``canDragBlock``). */
     get canDrag() {
         return canDragBlock(this.block, this.props.viewType);
+    }
+
+    /**
+     * The keys the editor reads on the button of the block, as
+     * ``aria-keyshortcuts`` names them: Alt+Up and Alt+Down for a block
+     * that moves, Delete for one that can leave the view, Escape always.
+     */
+    get pickShortcuts() {
+        const keys = this.canDrag ? ["Alt+ArrowUp", "Alt+ArrowDown"] : [];
+        if (canRemoveBlock(this.block, this.editor.root, this.props.viewType)) {
+            keys.push("Delete");
+        }
+        keys.push("Escape");
+        return keys.join(" ");
     }
 
     /** Whether a click selects the block: any block but a QWeb template. */
@@ -492,19 +510,11 @@ export class StudioCanvas extends Component {
     }
 
     get searchColumnList() {
-        return [
-            {key: "fields", label: _t("Search fields")},
-            {key: "filters", label: _t("Filters")},
-            {key: "group_bys", label: _t("Group by")},
-        ];
+        return ["fields", "filters", "group_bys"].map((key) => ({key, label: columnLabel(key)}));
     }
 
     get pivotLaneList() {
-        return [
-            {key: "row", label: _t("Rows")},
-            {key: "col", label: _t("Columns")},
-            {key: "measure", label: _t("Measures")},
-        ];
+        return ["row", "col", "measure"].map((key) => ({key, label: columnLabel(key)}));
     }
 
     // ── the filter form of a search view ────────────────────────────────

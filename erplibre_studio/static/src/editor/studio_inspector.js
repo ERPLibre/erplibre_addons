@@ -20,8 +20,8 @@ import {
 import {
     DATE_TYPES,
     MAX_FIELD_SIZE,
-    TEMPLATED_TYPES,
     attributeLabel,
+    canRemoveBlock,
     changeKindLabel,
     fieldOptions,
     fieldTypeLabel,
@@ -160,10 +160,7 @@ export class StudioInspector extends Component {
 
     /** Whether ``block`` can leave the view (a native node is hidden). */
     canRemove(block) {
-        if (!block || this.isRoot(block) || block.kind === "template") {
-            return false;
-        }
-        return !TEMPLATED_TYPES.includes(this.viewType) || block.in_template !== false;
+        return canRemoveBlock(block, this.root, this.viewType);
     }
 
     /**

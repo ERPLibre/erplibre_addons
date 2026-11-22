@@ -17,6 +17,24 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(block)s cannot move further."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(block)s moved: position %(index)s of %(count)s in %(container)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(block)s removed. Ctrl+Z undoes it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
@@ -506,8 +524,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
 msgid ""
-"A click selects the element on the canvas. Drag a row to move it; a filled dot marks a change of the\n"
-"                draft."
+"A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it; a\n"
+"                filled dot marks a change of the draft."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2097,8 +2115,8 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Columns"
 msgstr ""
 
@@ -2796,7 +2814,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Filters"
 msgstr ""
 
@@ -2898,10 +2916,10 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Group by"
 msgstr ""
 
@@ -3401,7 +3419,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Measures"
 msgstr ""
 
@@ -4917,7 +4935,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Rows"
 msgstr ""
 
@@ -4993,7 +5011,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Search fields"
 msgstr ""
 

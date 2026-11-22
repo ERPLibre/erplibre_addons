@@ -18,6 +18,24 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(block)s cannot move further."
+msgstr "%(block)s ne peut pas aller plus loin."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(block)s moved: position %(index)s of %(count)s in %(container)s."
+msgstr "Déplacement de %(block)s : position %(index)s sur %(count)s dans %(container)s."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(block)s removed. Ctrl+Z undoes it."
+msgstr "Retrait de %(block)s. Ctrl+Z l'annule."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
@@ -553,11 +571,12 @@ msgstr "Frise chronologique, fournie par web_timeline (OCA)."
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
 msgid ""
-"A click selects the element on the canvas. Drag a row to move it; a filled dot marks a change of the\n"
-"                draft."
+"A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it; a\n"
+"                filled dot marks a change of the draft."
 msgstr ""
-"Un clic sélectionne l'élément dans le canevas. Glissez une ligne pour la "
-"déplacer ; un point plein marque un changement du brouillon."
+"Un clic sélectionne l'élément dans le canevas. Glissez une ligne, ou "
+"appuyez sur Alt+Haut ou Alt+Bas, pour la déplacer ; un point plein marque un "
+"changement du brouillon."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2213,8 +2232,8 @@ msgstr "Colonne"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Columns"
 msgstr "Colonnes"
 
@@ -2926,7 +2945,7 @@ msgstr "Filtrer : libellé ou nom technique"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Filters"
 msgstr "Filtres"
 
@@ -3032,10 +3051,10 @@ msgstr "Références des groupes"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Group by"
 msgstr "Regrouper par"
 
@@ -3542,7 +3561,7 @@ msgstr "Mesure"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Measures"
 msgstr "Mesures"
 
@@ -5089,7 +5108,7 @@ msgstr "Ligne"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Rows"
 msgstr "Lignes"
 
@@ -5165,7 +5184,7 @@ msgstr "Rechercher un champ ou un type"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Search fields"
 msgstr "Champs de recherche"
 

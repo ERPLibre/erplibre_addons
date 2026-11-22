@@ -135,7 +135,9 @@ export function outlineRows(root, {filter = "", changedOnly = false, collapsed =
  * The tree is one tab stop (a roving tabindex on its rows): Up and Down
  * move between the rows shown, Home and End to the first and the last,
  * Right unfolds a container then enters it, Left folds it or goes up to
- * its container, Enter and Space select the row's block.
+ * its container, Enter and Space select the row's block. Alt+Up and
+ * Alt+Down move the row's block as they do on the canvas, Delete removes
+ * it (``moveByKeyboard``, ``removeByKeyboard`` of the editor).
  */
 export class StudioOutline extends Component {
     static template = "erplibre_studio.Outline";
@@ -264,7 +266,22 @@ export class StudioOutline extends Component {
 
     /** The keys of the tree on the row ``row`` of ``rows`` (see the class). */
     onTreeKey(ev, row, rows) {
-        if (ev.target !== ev.currentTarget || ev.altKey || ev.ctrlKey || ev.metaKey) {
+        if (ev.target !== ev.currentTarget || ev.ctrlKey || ev.metaKey) {
+            return;
+        }
+        if (!ev.shiftKey && ev.altKey && ["ArrowUp", "ArrowDown"].includes(ev.key)) {
+            ev.preventDefault();
+            if (!ev.repeat) {
+                this.moveRow(row, ev.key === "ArrowUp" ? -1 : 1);
+            }
+            return;
+        }
+        if (!ev.shiftKey && !ev.altKey && ev.key === "Delete") {
+            ev.preventDefault();
+            this.removeRow(row, rows);
+            return;
+        }
+        if (ev.altKey) {
             return;
         }
         const index = rows.indexOf(row);
@@ -319,6 +336,42 @@ export class StudioOutline extends Component {
         const item = [...tree.children].find((el) => el.dataset.path === path);
         if (item) {
             item.focus();
+        }
+    }
+
+    /** The tree of the plan on screen, or null. */
+    get treeElement() {
+        return document.querySelector(".o_erplibre_studio_outline_tree");
+    }
+
+    /**
+     * Move the block of ``row`` one place up (``direction`` -1) or down
+     * (+1); its row keeps the focus, at the path the move gives it.
+     */
+    async moveRow(row, direction) {
+        const path = await this.editor.moveByKeyboard(row.block.path, direction, {focus: false});
+        if (path) {
+            this.state.focus = path;
+            this.editor.afterRender(() => this.treeElement && this.focusRow(this.treeElement, path));
+        }
+    }
+
+    /**
+     * Remove the block of ``row`` (of ``rows``); once it left, the row
+     * that takes its place takes the focus (the next one, else the new
+     * last one).
+     */
+    async removeRow(row, rows) {
+        const index = rows.indexOf(row);
+        if (await this.editor.removeByKeyboard(row.block.path, {focus: false})) {
+            this.editor.afterRender(() => {
+                const tree = this.treeElement;
+                const items = tree ? [...tree.children] : [];
+                const item = items[Math.min(index, items.length - 1)];
+                if (item) {
+                    this.focusRow(tree, item.dataset.path);
+                }
+            });
         }
     }
 

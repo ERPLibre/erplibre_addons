@@ -131,7 +131,16 @@ beforeEach(() => {
                 definition: {ttype: "char", field_description: "Text", help: "", readonly: false},
             };
         } else if (operation.type === "move") {
-            answer = payload([column("email", "Email"), column("name", "Name")]);
+            // The columns in their new order: the source before the target,
+            // or at the end for « inside ».
+            const columns = answer.blocks.children;
+            const moved = columns.find((c) => c.path === operation.source);
+            const rest = columns.filter((c) => c !== moved);
+            const index = rest.findIndex((c) => c.path === operation.target);
+            rest.splice(operation.position === "before" && index >= 0 ? index : rest.length, 0, moved);
+            answer = payload(rest);
+        } else if (operation.type === "remove") {
+            answer = payload(answer.blocks.children.filter((c) => c.path !== operation.target));
         } else if (operation.type === "relabel") {
             answer = payload([column("name", "Name"), column("email", operation.value, {string: operation.value})]);
         }
@@ -285,6 +294,64 @@ describe("erplibre_studio editor", () => {
         expect(pick("email")).toBeFocused();
         // Walking selects nothing.
         expect(".o_erplibre_studio_selected").toHaveCount(0);
+    });
+
+    test("Alt+Arrow moves a canvas block, Delete removes it, Escape unselects", async () => {
+        answer = payload([column("name", "Name"), column("email", "Email"), column("ref", "Reference")]);
+        await openEditor();
+        const pick = (name) => `.o_erplibre_studio_field[data-name=${name}] .o_erplibre_studio_pick`;
+        const REF = "//field[@name='ref']";
+        expect(pick("email")).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown Delete Escape");
+        expect(".o_erplibre_studio_live").toHaveAttribute("aria-live", "polite");
+        queryOne(pick("email")).focus();
+        await press(["Alt", "ArrowUp"]);
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps([`apply_operation move ${EMAIL} before ${NAME}`]);
+        expect(".o_erplibre_studio_field:eq(0)").toHaveAttribute("data-name", "email");
+        expect(pick("email")).toBeFocused();
+        expect(".o_erplibre_studio_field[data-name=email]").toHaveClass("o_erplibre_studio_selected");
+        expect(".o_erplibre_studio_live").toHaveText(/Email moved: position 1 of 3/);
+        // The first block goes no higher; the last one no lower.
+        await press(["Alt", "ArrowUp"]);
+        await animationFrame();
+        expect.verifySteps([]);
+        expect(".o_erplibre_studio_live").toHaveText(/Email cannot move further/);
+        queryOne(pick("ref")).focus();
+        await press(["Alt", "ArrowDown"]);
+        await animationFrame();
+        expect.verifySteps([]);
+        expect(".o_erplibre_studio_live").toHaveText(/Reference cannot move further/);
+        // Down from the first block: past the hook right after it, to the
+        // place after the next one.
+        queryOne(pick("email")).focus();
+        await press(["Alt", "ArrowDown"]);
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps([`apply_operation move ${EMAIL} before ${REF}`]);
+        expect(queryAll(".o_erplibre_studio_field").map((e) => e.dataset.name)).toEqual(["name", "email", "ref"]);
+        // The selection shows its crumbs, which carry its path too.
+        expect(`.o_erplibre_studio_crumb[data-path="${EMAIL}"]`).toHaveCount(1);
+        expect(pick("email")).toBeFocused();
+        // Escape unselects; the focus stays.
+        expect(".o_erplibre_studio_selected").toHaveCount(1);
+        await press("Escape");
+        await animationFrame();
+        expect(".o_erplibre_studio_selected").toHaveCount(0);
+        expect(pick("email")).toBeFocused();
+        // Delete removes the block; the focus goes to the block in its place.
+        queryOne(pick("ref")).focus();
+        await press("Delete");
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps([`apply_operation remove ${REF}`]);
+        expect(".o_erplibre_studio_field").toHaveCount(2);
+        expect(pick("email")).toBeFocused();
+        expect(".o_erplibre_studio_live").toHaveText(/Reference removed\. Ctrl\+Z undoes it\./);
+        // The plain arrows still walk.
+        await press("ArrowUp");
+        expect(pick("name")).toBeFocused();
+        expect.verifySteps([]);
     });
 
     test("Ctrl+Z removes the last change of the view; a text field keeps its own undo", async () => {

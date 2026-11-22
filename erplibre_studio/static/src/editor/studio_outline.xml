@@ -86,7 +86,9 @@
                         <i class="fa fa-fw" t-att-class="row.open ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
                     </button>
                     <span t-else="" class="o_erplibre_studio_outline_spacer" aria-hidden="true" />
-                    <button
+                    <!-- A div, not a button: a mousedown on a button starts no
+                         drag in Firefox. The keys are those of the row. -->
+                    <div
                         class="btn btn-sm d-flex align-items-center gap-1 flex-grow-1 min-w-0 text-start px-1 o_erplibre_studio_outline_pick"
                         tabindex="-1"
                         t-att-class="{'fw-bold': isContainer(row.block) and !row.context}"
@@ -125,13 +127,13 @@
                             t-att-aria-label="holdsLabel()"
                             t-att-title="holdsLabel()"
                         />
-                    </button>
+                    </div>
                 </li>
             </ul>
             <p t-if="!shown.rows.length" class="small text-muted mb-0 o_erplibre_studio_outline_empty" t-esc="emptyLabel" />
             <p class="small text-muted border-top pt-2 mt-auto mb-0">
-                A click selects the element on the canvas. Drag a row to move it; a filled dot marks a change of the
-                draft.
+                A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it; a
+                filled dot marks a change of the draft.
             </p>
         </div>
     </t>

@@ -78,13 +78,15 @@
          the body of the t-call (« 0 »): the tab stop of the block. Enter or
          Space clicks it, and the click bubbles to the div of the block.
          The CSS lets no pointer event reach it, so a drag starts on the
-         div. -->
+         div. « aria-keyshortcuts » names the keys the editor reads on it;
+         nothing shows them on screen. -->
     <t t-name="erplibre_studio.Block.pick">
         <button
             type="button"
             class="o_erplibre_studio_pick"
             t-att-aria-pressed="isSelected ? 'true' : 'false'"
             t-att-aria-label="pickLabel"
+            t-att-aria-keyshortcuts="pickShortcuts"
         >
             <t t-out="0" />
         </button>
