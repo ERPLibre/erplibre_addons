@@ -6,10 +6,10 @@ import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {user} from "@web/core/user";
 
-// The view types the editor opens on. A page shows a timeline, a hierarchy
-// or an activity view only when web_timeline, web_hierarchy or mail is
-// installed, and the server refuses the type otherwise: the list needs no
-// detection of its own.
+// The view types the editor opens on. A page shows a timeline, a hierarchy,
+// an activity view or a map only when web_timeline, web_hierarchy, mail or
+// web_view_leaflet_map is installed, and the server refuses the type
+// otherwise: the list needs no detection of its own.
 export const STUDIO_VIEW_TYPES = [
     "form",
     "list",
@@ -20,6 +20,7 @@ export const STUDIO_VIEW_TYPES = [
     "timeline",
     "hierarchy",
     "activity",
+    "leaflet_map",
 ];
 
 /** The client action of the studio editor on a view. */

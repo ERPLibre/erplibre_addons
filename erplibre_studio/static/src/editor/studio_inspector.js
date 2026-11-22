@@ -48,6 +48,9 @@ const RELATION_TYPES = ["many2one", "one2many", "many2many"];
 const ADVANCED_KINDS = ["widget", "field_options", "field_domain", "groups"];
 // The view types whose fields show the attributes of ADVANCED_KINDS apart.
 const ADVANCED_VIEW_TYPES = ["form", "list"];
+// The kinds of the root attributes of a view with lanes that fold under
+// « Advanced » (foldedEntries): the numbers of the markers of a map.
+const FOLDED_KINDS = ["pixels", "offset"];
 
 /**
  * The inspector of the view space, in two tabs. « Properties »: the
@@ -98,7 +101,7 @@ export class StudioInspector extends Component {
     setup() {
         // Whether the attributes the draft gives a timeline show; whether
         // « Advanced » is open ({path, open}), null to follow the block.
-        this.local = useState({generated: false, advanced: null, groupText: ""});
+        this.local = useState({generated: false, advanced: null, groupText: "", viewAdvanced: false});
     }
 
     get editor() {
@@ -806,17 +809,17 @@ export class StudioInspector extends Component {
 
     /** Whether the view on screen shows its settings as lanes (VIEW_LANES). */
     get hasLanes() {
-        return ["timeline", "calendar"].includes(this.viewType);
+        return ["timeline", "calendar", "leaflet_map"].includes(this.viewType);
     }
 
     /** The title of the properties of the view when no lane is shown. */
     get laneViewLabel() {
-        return this.viewType === "calendar" ? _t("Calendar") : _t("Timeline");
+        return {calendar: _t("Calendar"), leaflet_map: _t("Map")}[this.viewType] || _t("Timeline");
     }
 
     /** The glyph of the view when no lane is shown. */
     get laneViewGlyph() {
-        return this.viewType === "calendar" ? "Ca" : "TL";
+        return {calendar: "Ca", leaflet_map: "Ma"}[this.viewType] || "TL";
     }
 
     get viewPropertiesLabel() {
@@ -846,7 +849,9 @@ export class StudioInspector extends Component {
         }
         const attributes = lane.attributes.join(", ");
         let kind;
-        if (viewType === "calendar") {
+        if (viewType === "leaflet_map") {
+            kind = _t("Lane of the map · %(attributes)s", {attributes});
+        } else if (viewType === "calendar") {
             kind = attributes
                 ? _t("Lane of the calendar · %(attributes)s", {attributes})
                 : _t("Lane of the calendar");
@@ -866,10 +871,48 @@ export class StudioInspector extends Component {
         };
     }
 
+    /**
+     * The attributes of the view that fold under « Advanced », apart from
+     * the lanes: the marker size and the popup anchor of a map.
+     */
+    get foldedEntries() {
+        return this.hasLanes ? this.settableOf(this.root).filter((entry) => FOLDED_KINDS.includes(entry.kind)) : [];
+    }
+
+    /** Whether the folded attributes show (foldedEntries). */
+    get foldedOpen() {
+        return Boolean(this.local.viewAdvanced);
+    }
+
+    toggleFolded() {
+        this.local.viewAdvanced = !this.local.viewAdvanced;
+    }
+
+    /**
+     * The value web_view_leaflet_map takes for the number ``attribute``
+     * when the view does not set it, as text; "" for none.
+     */
+    numberDefault(attribute) {
+        const defaults = {
+            marker_icon_size_x: 64,
+            marker_icon_size_y: 64,
+            marker_popup_anchor_x: 0,
+            marker_popup_anchor_y: -32,
+        };
+        return attribute in defaults ? String(defaults[attribute]) : "";
+    }
+
+    /** The bounds [min, max] of a number attribute of ``kind``. */
+    numberBounds(kind) {
+        return kind === "pixels" ? [1, 512] : [-512, 512];
+    }
+
     /** The attributes of the view outside the lane ``lane`` (laneInfo). */
     otherEntries(lane) {
         const own = lane ? lane.entries.map((entry) => entry.attribute) : [];
-        return this.settableOf(this.root).filter((entry) => !own.includes(entry.attribute));
+        return this.settableOf(this.root).filter(
+            (entry) => !own.includes(entry.attribute) && !FOLDED_KINDS.includes(entry.kind)
+        );
     }
 
     /** The scales of ``entry`` (« mode »): [{value, label, pressed}]. */

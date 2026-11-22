@@ -147,6 +147,11 @@
                                         </span>
                                     </span>
                                     <span class="text-muted" t-esc="entry.reason" />
+                                    <span
+                                        t-if="viewTypeDescription(entry.type)"
+                                        class="text-muted o_erplibre_studio_view_menu_description"
+                                        t-esc="viewTypeDescription(entry.type)"
+                                    />
                                 </div>
                             </t>
                             <p
@@ -518,7 +523,7 @@
                             comodels="state.comodels"
                             tab="state.inspectorTab"
                             hasProject="!!project"
-                            lane="['timeline', 'calendar'].includes(viewType) ? state.timelineLane : null"
+                            lane="['timeline', 'calendar', 'leaflet_map'].includes(viewType) ? state.timelineLane : null"
                             preview="previewInfo"
                         />
                     </aside>

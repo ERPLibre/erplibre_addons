@@ -57,6 +57,7 @@ const OPERATIONS = {
     graph: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
     timeline: ["add_existing_field", "move", "remove", "hide", "set_attribute"],
     calendar: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
+    leaflet_map: ["add_field", "add_existing_field", "remove", "set_attribute"],
 };
 
 const CHOICES = {
@@ -91,6 +92,14 @@ const CHOICES = {
         ["name", "Name"],
     ],
     bool_field: [["active", "Active"]],
+    coordinate_field: [["partner_latitude", "Latitude"]],
+    text_field: [
+        ["email", "Email"],
+        ["name", "Name"],
+        ["phone", "Phone"],
+        ["vat", "Tax ID"],
+    ],
+    image_field: [],
 };
 
 function field(path, name, extra = {}) {
@@ -349,6 +358,47 @@ function calendarPayload(attrs, popover = ["name"]) {
             field: {filters: "calendar_filter"},
         },
         required_attributes: {calendar: ["date_start"]},
+    });
+}
+
+/**
+ * A map of the contacts (web_view_leaflet_map): the root attributes
+ * ``attrs``, no children.
+ */
+function leafletPayload(attrs) {
+    const settable = {
+        field_latitude: "coordinate_field",
+        field_longitude: "coordinate_field",
+        field_title: "text_field",
+        field_address: "text_field",
+        field_marker_icon_image: "image_field",
+        marker_icon_size_x: "pixels",
+        marker_icon_size_y: "pixels",
+        marker_popup_anchor_x: "offset",
+        marker_popup_anchor_y: "offset",
+    };
+    const lanes = Object.fromEntries(
+        Object.keys(settable)
+            .filter((attribute) => attribute.startsWith("field_"))
+            .map((attribute) => [attribute, attrs[attribute] || false])
+    );
+    return payload("leaflet_map", container("/leaflet_map", "leaflet_map", [], {movable: false, attrs}), {
+        layout: {
+            root: "/leaflet_map",
+            lanes,
+            loaded_fields: [],
+            new_field_types: {
+                field_latitude: ["float"],
+                field_longitude: ["float"],
+                field_title: ["char"],
+                field_address: ["char"],
+                field_marker_icon_image: [],
+            },
+        },
+        hide_mode: "remove",
+        settable: {leaflet_map: settable},
+        required_attributes: {leaflet_map: ["field_latitude", "field_longitude"]},
+        field_types: ["char", "integer", "float"],
     });
 }
 
@@ -1516,6 +1566,124 @@ describe("erplibre_studio editor, activity", () => {
         expect(unavailable).toHaveAttribute("aria-disabled", "true");
         expect(unavailable).toHaveText(/Activity\s*res\.partner has no activities: .*mail\.activity\.mixin/);
         expect(`${unavailable} .badge`).toHaveCount(0);
+    });
+});
+
+describe("erplibre_studio editor, leaflet map", () => {
+    const lane = (key) => `.o_erplibre_studio_timeline_lane[data-lane=${key}]`;
+
+    test("five lanes; a field of its kind or a new field drops on a lane", async () => {
+        answer = leafletPayload({field_longitude: "partner_latitude", field_title: "name"});
+        await openEditor("leaflet_map");
+        expect(".o_erplibre_studio_leaflet_lanes .o_erplibre_studio_timeline_lane").toHaveCount(5);
+        for (const key of ["latitude", "longitude", "title", "address", "marker"]) {
+            expect(lane(key)).toHaveCount(1);
+        }
+        expect(".o_erplibre_studio_palette").toHaveText(/onto Latitude or Longitude/);
+        // A coordinate is required: its chip stays; the title can leave.
+        expect(`${lane("longitude")} .o_erplibre_studio_timeline_chip`).toHaveText(
+            "Latitude · partner_latitude"
+        );
+        expect(`${lane("longitude")} .o_erplibre_studio_timeline_chip_remove`).toHaveCount(0);
+        expect(`${lane("title")} .o_erplibre_studio_timeline_chip_remove`).toHaveCount(1);
+        // The palette offers the new types a lane creates only.
+        expect(".o_erplibre_studio_new_field").toHaveCount(2);
+        expect(".o_erplibre_studio_new_field[data-type=integer]").toHaveCount(0);
+
+        // A text does not fit a coordinate: refused, no call.
+        const dragging = await contains(".o_erplibre_studio_existing_field[data-name=email]").drag();
+        expect(lane("latitude")).toHaveClass("o_erplibre_studio_timeline_lane_refused");
+        expect(lane("title")).not.toHaveClass("o_erplibre_studio_timeline_lane_refused");
+        await dragging.drop(lane("latitude"));
+        expect.verifySteps([]);
+
+        await contains(".o_erplibre_studio_existing_field[data-name=partner_latitude]").dragAndDrop(
+            lane("latitude")
+        );
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/leaflet_map",
+            attribute: "field_latitude",
+            value: "partner_latitude",
+        });
+        expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-lane", "latitude");
+        expect(".o_erplibre_studio_inspector_kind").toHaveText(/Lane of the map/);
+        expect(".o_erplibre_studio_lane_props").toHaveText(/A stored decimal field/);
+
+        // A new Decimal field dropped on Longitude is created for it.
+        await contains(".o_erplibre_studio_new_field[data-type=float]").dragAndDrop(lane("longitude"));
+        expect.verifySteps(["apply_operation add_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_field",
+            target: "/leaflet_map",
+            position: "inside",
+            attribute: "field_longitude",
+            field: {ttype: "float", field_description: "Longitude"},
+        });
+        // A new Text field fits no coordinate.
+        const text = await contains(".o_erplibre_studio_new_field[data-type=char]").drag();
+        expect(lane("latitude")).toHaveClass("o_erplibre_studio_timeline_lane_refused");
+        expect(lane("address")).not.toHaveClass("o_erplibre_studio_timeline_lane_refused");
+        expect(lane("marker")).toHaveClass("o_erplibre_studio_timeline_lane_refused");
+        await text.drop(lane("latitude"));
+        expect.verifySteps([]);
+    });
+
+    test("the marker numbers fold under Advanced; no zoom setting", async () => {
+        answer = leafletPayload({field_latitude: "partner_latitude", field_longitude: "partner_latitude"});
+        await openEditor("leaflet_map");
+        expect(".o_erplibre_studio_inspector_title").toHaveText("Map");
+        expect(".o_erplibre_studio_settable[data-attribute=default_zoom]").toHaveCount(0);
+        expect(".o_erplibre_studio_settable[data-attribute=marker_icon_size_x]").toHaveCount(0);
+        await contains(".o_erplibre_studio_lane_advanced_toggle").click();
+        const width = ".o_erplibre_studio_settable[data-attribute=marker_icon_size_x] input[type=number]";
+        expect(width).toHaveCount(1);
+        expect(width).toHaveAttribute("placeholder", "64");
+        expect(".o_erplibre_studio_settable[data-attribute=marker_popup_anchor_y] input").toHaveAttribute(
+            "placeholder",
+            "-32"
+        );
+        await contains(width).edit("48");
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/leaflet_map",
+            attribute: "marker_icon_size_x",
+            value: "48",
+        });
+    });
+
+    test("the menu of views describes the map, and why it is missing", async () => {
+        answer = kanbanPayload([inCard("name")]);
+        const base = {view_id: false, xml_id: false, exists: false, pending: false, added: false, changes: 0};
+        answer.view_list = [
+            {
+                ...base,
+                type: "kanban",
+                label: "Kanban",
+                view_id: 12,
+                exists: true,
+                editable: true,
+                reason: false,
+                reason_code: false,
+            },
+            {
+                ...base,
+                type: "leaflet_map",
+                label: "Map (Leaflet)",
+                editable: false,
+                reason: "Install the web_view_leaflet_map module to edit a map (leaflet) view.",
+                reason_code: "needs_module",
+            },
+        ];
+        await openEditor("kanban");
+        await contains(".o_erplibre_studio_add_view").click();
+        const entry = ".o_erplibre_studio_view_menu_unavailable[data-view-type=leaflet_map]";
+        expect(entry).toHaveAttribute("data-reason", "needs_module");
+        expect(entry).toHaveText(
+            /Map \(Leaflet\)\s*not installed\s*Install the web_view_leaflet_map module.*view\.\s*Markers on a map, provided by web_view_leaflet_map/
+        );
     });
 });
 

@@ -8364,3 +8364,216 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "{\"no_create\": true}"
 msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A map shows a new field through one of its lanes only: drop it on a lane."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "This lane of the map takes no new %(type)s field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(name)s does not fit this attribute: a %(types)s field is needed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(value)s is not a whole number from %(low)s to %(high)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The map %(view)s needs a latitude and a longitude field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid ""
+"The map of web_view_leaflet_map reads a date_localization field, which "
+"%(model)s does not have: it would show no marker."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Map (Leaflet)"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__leaflet_map
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__leaflet_map
+msgid "Leaflet Map"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Latitude"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Longitude"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup title"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup address"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Marker image"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "decimal"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "text"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "image"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid ""
+"A stored decimal field. Required: a record without a latitude and a "
+"longitude shows no marker."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid ""
+"The bold line of the popup of a marker, and the text shown when the pointer "
+"rests on it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "The line under the title in the popup of a marker."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid ""
+"An image field drawn as the marker, at the size set under Advanced. Without "
+"it, the map draws its default pin."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Markers on a map, provided by web_view_leaflet_map (OCA)."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Map"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Lane of the map · %(attributes)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Marker width"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Marker height"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup anchor, horizontal"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup anchor, vertical"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Settings of the map"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Fields of the map"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Advanced: marker size and popup anchor"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"In pixels. The size applies to a marker image; the anchor places the popup "
+"from the marker."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid ""
+"Drag a decimal field onto Latitude or Longitude, a text onto the popup, an "
+"image onto Marker image; a new Decimal or Text field dropped on a lane is "
+"created for it."
+msgstr ""

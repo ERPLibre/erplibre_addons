@@ -38,6 +38,7 @@ VIEW_TYPES = (
     "timeline",
     "hierarchy",
     "activity",
+    "leaflet_map",
 )
 # {view type: module}: the module that adds the type to ir.ui.view.type, which
 # the editor names when the type is missing from the database.
@@ -45,6 +46,7 @@ OPTIONAL_VIEW_MODULES = {
     "timeline": "web_timeline",
     "hierarchy": "web_hierarchy",
     "activity": "mail",
+    "leaflet_map": "web_view_leaflet_map",
 }
 POSITIONS = ("before", "after", "inside")
 
@@ -90,6 +92,7 @@ CONTAINERS = {
     "timeline": ("timeline", "templates") + TEMPLATE_DROPS,
     "hierarchy": ("hierarchy", "templates") + TEMPLATE_DROPS,
     "activity": ("activity", "templates") + TEMPLATE_DROPS,
+    "leaflet_map": ("leaflet_map",),
 }
 DROP_CONTAINERS = {
     "form": ("sheet", "group", "page", "div"),
@@ -106,6 +109,9 @@ DROP_CONTAINERS = {
     # An activity view shows its fields from the « activity-box » template
     # only: a field outside it is only loaded.
     "activity": TEMPLATE_DROPS,
+    # A map reads its fields from its root attributes only: a <field> child
+    # is what a new field of a lane adds, which the map ignores.
+    "leaflet_map": ("leaflet_map",),
 }
 
 # How a view type hides a node: an attribute, or the node removed from the
@@ -123,6 +129,7 @@ HIDE_MODES = {
     "search": "remove",
     "pivot": "remove",
     "graph": "remove",
+    "leaflet_map": "remove",
 }
 
 # The node attributes the editor shows; ``settable`` ones are added.
@@ -278,6 +285,14 @@ VIEW_OPERATIONS = {
         "update_field",
         "rename_field",
     ),
+    # A map is set by its root attributes; « add_field » creates the field
+    # of a lane and points the lane at it (``change_spec``).
+    "leaflet_map": (
+        "add_field",
+        "add_existing_field",
+        "remove",
+        "set_attribute",
+    ),
 }
 
 # The attributes « set_attribute » may write: view type -> tag ->
@@ -377,11 +392,28 @@ SETTABLE_ATTRIBUTES = {
     "activity": {
         "field": {"widget": "widget", "display": "activity_display"},
     },
+    # The attributes web_view_leaflet_map reads with their value. It reads
+    # default_zoom, max_zoom and zoom_snap without it, so that they never
+    # take effect: the editor does not offer them.
+    "leaflet_map": {
+        "leaflet_map": {
+            "field_latitude": "coordinate_field",
+            "field_longitude": "coordinate_field",
+            "field_title": "text_field",
+            "field_address": "text_field",
+            "field_marker_icon_image": "image_field",
+            "marker_icon_size_x": "pixels",
+            "marker_icon_size_y": "pixels",
+            "marker_popup_anchor_x": "offset",
+            "marker_popup_anchor_y": "offset",
+        },
+    },
 }
 # The settable attributes a view needs: they can change, not go away.
 REQUIRED_ATTRIBUTES = {
     ("timeline", "timeline"): ("date_start", "default_group_by"),
     ("calendar", "calendar"): ("date_start",),
+    ("leaflet_map", "leaflet_map"): ("field_latitude", "field_longitude"),
 }
 
 PIVOT_AXES = ("row", "col", "measure")
@@ -437,6 +469,32 @@ CALENDAR_FIELD_ATTRIBUTES = (
     "color",
     "all_day",
 )
+
+# The root attributes of a map that name a field: the map reads them with
+# searchRead, which needs no <field> of the view.
+LEAFLET_FIELD_ATTRIBUTES = (
+    "field_latitude",
+    "field_longitude",
+    "field_title",
+    "field_address",
+    "field_marker_icon_image",
+)
+# {attribute kind: field types}: the new field a lane of a map creates, by
+# the kind of its attribute (SETTABLE_ATTRIBUTES). A marker image is
+# chosen among the existing binary fields only.
+LEAFLET_NEW_FIELD_TYPES = {
+    "coordinate_field": ("float",),
+    "text_field": ("char",),
+}
+# The field types a popup title or address shows: searchRead gives a
+# many2one as [id, name], which the popup would print as is.
+LEAFLET_TEXT_TYPES = ("char", "text", "selection")
+# The bounds of a marker size, in pixels, and of a popup anchor offset.
+LEAFLET_PIXELS = (1, 512)
+LEAFLET_OFFSET = (-512, 512)
+# The field web_view_leaflet_map always reads: a model without it shows no
+# marker, the read failing as a whole.
+LEAFLET_DATE_FIELD = "date_localization"
 
 # The widgets « add_widget » puts in a kanban card, with the attributes
 # each one takes.
@@ -1037,6 +1095,19 @@ def change_spec(change, view_type):
             _set_attributes(node, payload.get("node_attrs"))
             for child in payload.get("node_children") or []:
                 _add_child(node, child)
+            if ctype == "add_field" and payload.get("root_attribute"):
+                # The new field of a lane of a map, and the root attribute
+                # that names it: one change does both, and the value
+                # follows a rename of the field (``field_name``).
+                data = etree.Element("data")
+                data.append(spec)
+                data.append(
+                    _attributes_spec(
+                        f"/{view_type}",
+                        {payload["root_attribute"]: payload["field_name"]},
+                    )
+                )
+                return data
         return spec
     if ctype == "remove":
         return etree.Element("xpath", expr=change["xpath"], position="replace")
@@ -1973,6 +2044,7 @@ def default_view_arch(
     group_field=None,
     readonly_date=False,
     parent_field=None,
+    leaflet=None,
 ):
     """The arch text of the ``view_type`` view (``VIEW_TYPES``) a project
     adds to an existing model, labelled ``label``: the record name
@@ -1986,10 +2058,14 @@ def default_view_arch(
     which it loads, its « hierarchy-box » card showing the record name in
     its header above an empty body; an activity view whose
     « activity-box » template, a <div> as mail writes it, shows the record
-    name on a line of its own. A calendar on a ``readonly_date`` neither creates nor
+    name on a line of its own; a map whose root attributes are those of
+    ``leaflet`` ({attribute of LEAFLET_FIELD_ATTRIBUTES: field}), without
+    children. A calendar on a ``readonly_date`` neither creates nor
     moves its events (« create » and « edit » False). The arch depends on these values
     only: the changes of the editor on the view locate their nodes in it."""
     root = etree.Element(view_type, {"string": label})
+    # A map is its root attributes; any other type takes none of them.
+    _set_attributes(root, _leaflet_attributes(view_type, leaflet))
     if view_type == "form":
         sheet = etree.SubElement(root, "sheet")
         main = etree.SubElement(sheet, "group", {"name": "studio_main"})
@@ -2070,11 +2146,24 @@ def default_view_arch(
                 "field",
                 {"name": date_field, "interval": "month", "type": "row"},
             )
-    elif view_type != "pivot":
+    elif view_type not in ("pivot", "leaflet_map"):
         raise ArchError(
             f"Unknown view type {view_type}.", "unknown_view_type", type=view_type
         )
     return etree.tostring(root, encoding="unicode", pretty_print=True)
+
+
+def _leaflet_attributes(view_type, leaflet):
+    """{attribute: field} of ``leaflet`` (see ``default_view_arch``) for a
+    map, its attributes of LEAFLET_FIELD_ATTRIBUTES that name a field;
+    empty for another ``view_type``."""
+    if view_type != "leaflet_map":
+        return {}
+    return {
+        attribute: leaflet[attribute]
+        for attribute in LEAFLET_FIELD_ATTRIBUTES
+        if (leaflet or {}).get(attribute)
+    }
 
 
 def x2many_refusal(view_type, ttype):

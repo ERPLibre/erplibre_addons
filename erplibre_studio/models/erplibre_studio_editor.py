@@ -48,13 +48,16 @@ UNSUPPORTED_VIEW_TYPES = ("gantt",)
 # a type of OPTIONAL_VIEW_MODULES without its module, a type the studio does
 # not edit, a type no installed module provides, a type a model not created
 # yet cannot have before Apply, an activity view of a model without
-# activities (mail.activity.mixin), a type the model has no view of.
+# activities (mail.activity.mixin), a map of a model without the field
+# web_view_leaflet_map always reads (LEAFLET_DATE_FIELD), a type the model
+# has no view of.
 VIEW_REASONS = (
     "needs_module",
     "not_editable",
     "not_installed",
     "apply_first",
     "needs_activity",
+    "needs_field",
     "no_view",
 )
 # How many members ``get_group_members`` and ``get_group_losses`` name at
@@ -258,6 +261,9 @@ class ErplibreStudioEditor(models.AbstractModel):
             ):
                 # The popover of an event shows neither.
                 continue
+            if view_type == "leaflet_map" and not self._leaflet_fits(info):
+                # A map shows a field through a lane only.
+                continue
             if view_type in studio_arch.AXIS_VIEW_TYPES:
                 axes = [
                     axis
@@ -271,6 +277,18 @@ class ErplibreStudioEditor(models.AbstractModel):
                 item["axes"] = axes
             palette.append(item)
         return sorted(palette, key=lambda f: (f["string"] or "").lower())
+
+    @api.model
+    def _leaflet_fits(self, info):
+        """Whether the field ``info`` fits a lane of a map: a stored float
+        (a coordinate), a text of LEAFLET_TEXT_TYPES (the popup) or a
+        binary (the marker image)."""
+        ttype = info.get("type")
+        return (
+            (ttype == "float" and info.get("store"))
+            or ttype in studio_arch.LEAFLET_TEXT_TYPES
+            or ttype == "binary"
+        )
 
     @api.model
     def _measurable(self, info):
@@ -328,6 +346,11 @@ class ErplibreStudioEditor(models.AbstractModel):
                 lambda f: to_model("many2one")(f) and f.get("store")
             ),
             "child_field": fields_where(to_model("one2many")),
+            "coordinate_field": fields_where(stored(("float",))),
+            "text_field": fields_where(
+                lambda f: f.get("type") in studio_arch.LEAFLET_TEXT_TYPES
+            ),
+            "image_field": fields_where(lambda f: f.get("type") == "binary"),
             "axis": [[axis, axis] for axis in studio_arch.PIVOT_AXES],
             "graph_axis": [[axis, axis] for axis in studio_arch.GRAPH_AXES],
             "interval": [[i, i] for i in studio_arch.INTERVALS],
@@ -408,6 +431,24 @@ class ErplibreStudioEditor(models.AbstractModel):
                     if arch.get(attribute)
                 ],
             }
+        if view_type == "leaflet_map":
+            # The lanes of a map are its field attributes; a lane takes a
+            # new field of the types of ``new_field_types``.
+            settable = studio_arch.SETTABLE_ATTRIBUTES["leaflet_map"]["leaflet_map"]
+            return {
+                "root": root,
+                "lanes": {
+                    attribute: arch.get(attribute) or False
+                    for attribute in studio_arch.LEAFLET_FIELD_ATTRIBUTES
+                },
+                "loaded_fields": loaded,
+                "new_field_types": {
+                    attribute: list(
+                        studio_arch.LEAFLET_NEW_FIELD_TYPES.get(settable[attribute], ())
+                    )
+                    for attribute in studio_arch.LEAFLET_FIELD_ATTRIBUTES
+                },
+            }
         if view_type in studio_arch.AXIS_VIEW_TYPES:
             axes = {axis: [] for axis in studio_arch.AXIS_VIEW_TYPES[view_type]}
             others = []
@@ -450,6 +491,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "graph": self.env._("Graph"),
             "gantt": self.env._("Gantt"),
             "activity": self.env._("Activity"),
+            "leaflet_map": self.env._("Map (Leaflet)"),
         }
         field = self.env["ir.ui.view"]._fields["type"]
         labels.update(dict(field._description_selection(self.env)))
@@ -541,6 +583,13 @@ class ErplibreStudioEditor(models.AbstractModel):
                 and not Project._studio_has_activities(model)
             ):
                 code = "needs_activity"
+            elif (
+                view_type == "leaflet_map"
+                and not entry["exists"]
+                and model in self.env
+                and studio_arch.LEAFLET_DATE_FIELD not in self.env[model]._fields
+            ):
+                code = "needs_field"
             elif not entry["exists"]:
                 code = "no_view"
             else:
@@ -578,6 +627,12 @@ class ErplibreStudioEditor(models.AbstractModel):
             return self.env._(
                 "%(model)s has no activities: an activity view needs the model "
                 "to inherit mail.activity.mixin (a chatter).",
+                model=model,
+            )
+        if code == "needs_field":
+            return self.env._(
+                "The map of web_view_leaflet_map reads a date_localization "
+                "field, which %(model)s does not have: it would show no marker.",
                 model=model,
             )
         if code == "no_view":

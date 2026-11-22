@@ -13,8 +13,15 @@ export const X2MANY_TYPES = ["one2many", "many2many"];
 // The view types each one shows in (X2MANY_VIEW_TYPES of the server).
 export const X2MANY_VIEW_TYPES = {one2many: ["form"], many2many: ["form", "list", "kanban"]};
 
+// The new field types a map creates from its lanes (LEAFLET_NEW_FIELD_TYPES
+// of the server): a coordinate, a popup text.
+export const LEAFLET_NEW_TYPES = ["float", "char"];
+
 /** Whether a new field of ``ttype`` can be dropped into a ``viewType`` view. */
 export function fieldTypeFits(ttype, viewType) {
+    if (viewType === "leaflet_map") {
+        return LEAFLET_NEW_TYPES.includes(ttype);
+    }
     return !X2MANY_TYPES.includes(ttype) || X2MANY_VIEW_TYPES[ttype].includes(viewType);
 }
 

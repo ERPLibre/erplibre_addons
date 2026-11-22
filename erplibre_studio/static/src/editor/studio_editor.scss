@@ -573,6 +573,12 @@
         gap: 0.75rem;
     }
 
+    // A map has five short lanes: one column.
+    .o_erplibre_studio_timeline_lanes.o_erplibre_studio_leaflet_lanes {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 36rem;
+    }
+
     .o_erplibre_studio_timeline_lane,
     .o_erplibre_studio_calendar_lane {
         min-height: 5rem;

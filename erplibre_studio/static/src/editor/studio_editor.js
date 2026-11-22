@@ -24,7 +24,7 @@ import {StudioPalette} from "./studio_palette";
 import {StudioModelsSpace} from "./studio_models_space";
 import {StudioModelPreview} from "./studio_preview";
 import {StudioReview} from "./studio_review";
-import {laneOf, laneOfZone, writableColorRules} from "./studio_timeline";
+import {LANE_ZONE_PREFIX, VIEW_LANES, laneLabel, laneOf, laneOfZone, writableColorRules} from "./studio_timeline";
 import {StudioRelationDialog, X2MANY_TYPES, fieldTypeFits} from "./studio_relations";
 import {
     DATE_TYPES,
@@ -86,8 +86,9 @@ export const LEFT_TABS = ["palette", "plan"];
 // The ``reason_code`` of the view types the menu of views lists « to add »:
 // a type the model has no view of, which the project can add; a timeline
 // once web_timeline is installed; a type a model not created yet gets
-// once applied; an activity view once the model has activities.
-export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first", "needs_activity"];
+// once applied; an activity view once the model has activities; a map
+// once the model has the field web_view_leaflet_map reads.
+export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first", "needs_activity", "needs_field"];
 // The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
 export const LAYOUT_KINDS = ["group", "page", "separator"];
 // The classes of the element a StudioBlock renders, one per kind of block
@@ -505,6 +506,7 @@ export class StudioEditor extends Component {
                 calendar: _t("The records as events on a day, week, month or year grid."),
                 hierarchy: _t("An organization chart: each record under its parent, provided by web_hierarchy."),
                 activity: _t("The records with their planned activities, one column per activity type (mail)."),
+                leaflet_map: _t("Markers on a map, provided by web_view_leaflet_map (OCA)."),
             }[viewType] || ""
         );
     }
@@ -876,6 +878,9 @@ export class StudioEditor extends Component {
         }
         const lane = laneOfZone(zone);
         if (lane) {
+            if (item.kind === "new") {
+                return Boolean(this.laneNewAttribute(lane, item.ttype));
+            }
             return item.kind === "existing" && Boolean(this.laneAttribute(lane, item.name));
         }
         const viewType = this.viewType;
@@ -993,10 +998,20 @@ export class StudioEditor extends Component {
         }
         const lane = laneOfZone(zone);
         if (lane) {
-            // A field dropped on a lane of a timeline or of a calendar
-            // becomes its attribute.
-            const attribute = this.laneAttribute(lane, item.name);
-            if (await this.operate({type: "set_attribute", target, attribute, value: item.name})) {
+            // A field dropped on a lane of a timeline, of a calendar or of
+            // a map becomes its attribute; a new field of a lane of a map
+            // is created and becomes its attribute in one change.
+            const operation =
+                item.kind === "new"
+                    ? {
+                          type: "add_field",
+                          target,
+                          position: "inside",
+                          attribute: this.laneNewAttribute(lane, item.ttype),
+                          field: {ttype: item.ttype, field_description: laneLabel(lane, this.viewType)},
+                      }
+                    : {type: "set_attribute", target, attribute: this.laneAttribute(lane, item.name), value: item.name};
+            if (await this.operate(operation)) {
                 Object.assign(this.state, {timelineLane: lane, selected: null, inspectorTab: "properties"});
             }
             return;
@@ -1036,6 +1051,21 @@ export class StudioEditor extends Component {
         }
         if (!this.project) {
             this.notification.add(_t("Choose or create a studio project first."), {type: "warning"});
+            return;
+        }
+        if (this.viewType === "leaflet_map") {
+            // A map has lanes only: the selected lane when it takes the
+            // item, else the first one that does.
+            const keys = (VIEW_LANES.leaflet_map || []).map((lane) => lane.key);
+            const selected = this.state.timelineLane;
+            const order = keys.includes(selected) ? [selected, ...keys.filter((k) => k !== selected)] : keys;
+            const zone = order.map((key) => `${LANE_ZONE_PREFIX}${key}`).find((z) => this.accepts(item, z));
+            if (!zone) {
+                this.notification.add(_t("No place of this view takes this item."), {type: "warning"});
+                return;
+            }
+            this.state.dragging = item;
+            await this.dropOnHook({preventDefault: () => {}}, this.root.path, "lane", zone);
             return;
         }
         const canvas = document.querySelector(".o_erplibre_studio_canvas");
@@ -1711,6 +1741,17 @@ export class StudioEditor extends Component {
         return ((lane && lane.attributes) || []).find(fits) || null;
     }
 
+    /**
+     * The attribute of the lane ``key`` a new field of ``ttype`` becomes:
+     * on a map, the attribute of a lane whose ``new_field_types`` (layout)
+     * hold the type; null for none.
+     */
+    laneNewAttribute(key, ttype) {
+        const lane = laneOf(this.viewType, key);
+        const types = this.layout.new_field_types || {};
+        return ((lane && lane.attributes) || []).find((attribute) => (types[attribute] || []).includes(ttype)) || null;
+    }
+
     newColorRule() {
         return {color: "#ec7063", field: "", operator: (this.layout.color_operators || ["=="])[0], value: ""};
     }
@@ -2113,6 +2154,7 @@ export class StudioEditor extends Component {
             calendar: _t("Calendar"),
             hierarchy: _t("Hierarchy"),
             activity: _t("Activity"),
+            leaflet_map: _t("Map (Leaflet)"),
         };
         return labels[viewType] || viewType;
     }
@@ -2778,12 +2820,12 @@ export class StudioEditor extends Component {
             props.preventEdit = true;
         } else if (this.params.viewType === "search") {
             Object.assign(props, {type: "list", viewId: false, searchViewId: this.params.viewId, display: {}});
-        } else if (["timeline", "activity"].includes(this.params.viewType)) {
+        } else if (["timeline", "activity", "leaflet_map"].includes(this.params.viewType)) {
             // web_timeline reads the fields of its attributes (start, end,
             // grouping) from the fields get_views answers, and the activity
             // view reads write_date for an image of activity_image, a field
             // its arch does not name; the search view brings every field of
-            // the model.
+            // the model. A map reads its records with searchRead.
             props.searchViewId = false;
         }
         return props;

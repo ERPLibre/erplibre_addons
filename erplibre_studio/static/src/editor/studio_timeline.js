@@ -7,6 +7,13 @@ import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {View} from "@web/views/view";
 import {allBlocks} from "./studio_utils";
+import {
+    LEAFLET_FIELD_LANES,
+    LEAFLET_LANES,
+    leafletLaneAccepts,
+    leafletLaneHelp,
+    leafletLaneLabel,
+} from "./studio_leaflet";
 
 // The lanes of the canvas of a timeline, in their order: each one holds
 // the attributes of <timeline> it sets. « template » holds the item
@@ -31,12 +38,16 @@ export const CALENDAR_LANES = [
     {key: "popover", attributes: [], glyph: "Aa"},
 ];
 // {view type: lanes}: the views whose canvas shows attribute lanes.
-export const VIEW_LANES = {timeline: TIMELINE_LANES, calendar: CALENDAR_LANES};
+export const VIEW_LANES = {timeline: TIMELINE_LANES, calendar: CALENDAR_LANES, leaflet_map: LEAFLET_LANES};
 // The lanes a field of the palette is dropped on: their attributes name a
 // field.
 export const FIELD_LANES = ["start", "stop", "group"];
 // FIELD_LANES by view type.
-export const FIELD_LANES_BY_TYPE = {timeline: FIELD_LANES, calendar: ["start", "stop", "color", "all_day"]};
+export const FIELD_LANES_BY_TYPE = {
+    timeline: FIELD_LANES,
+    calendar: ["start", "stop", "color", "all_day"],
+    leaflet_map: LEAFLET_FIELD_LANES,
+};
 // The scale web_timeline opens on when the view sets no « mode ».
 export const DEFAULT_TIMELINE_MODE = "fit";
 // The scale a view opens on when it sets no « mode », by view type. A
@@ -64,6 +75,9 @@ export function laneOfZone(zone) {
 
 /** The label of the lane ``key`` of a ``viewType`` view, a timeline by default. */
 export function laneLabel(key, viewType = "timeline") {
+    if (viewType === "leaflet_map") {
+        return leafletLaneLabel(key) || key;
+    }
     if (viewType === "calendar") {
         const label = {
             color: _t("Color"),
@@ -88,6 +102,9 @@ export function laneLabel(key, viewType = "timeline") {
 
 /** What the lane ``key`` of a ``viewType`` view takes, under its label. */
 export function laneAccepts(key, viewType = "timeline") {
+    if (viewType === "leaflet_map") {
+        return leafletLaneAccepts(key) || "";
+    }
     if (viewType === "calendar") {
         const accepts = {
             color: _t("many2one, selection, integer or char"),
@@ -112,6 +129,9 @@ export function laneAccepts(key, viewType = "timeline") {
 
 /** What the lane ``key`` of a ``viewType`` view does, for the inspector. */
 export function laneHelp(key, viewType = "timeline") {
+    if (viewType === "leaflet_map") {
+        return leafletLaneHelp(key) || "";
+    }
     if (viewType === "calendar") {
         return (
             {

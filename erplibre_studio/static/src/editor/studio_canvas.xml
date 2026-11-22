@@ -6,7 +6,7 @@
          tree of blocks of a form or a list. -->
     <t t-name="erplibre_studio.Canvas">
         <t
-            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy', 'activity'].includes(viewType)"
+            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy', 'activity', 'leaflet_map'].includes(viewType)"
             t-call="erplibre_studio.Canvas.{{viewType}}"
         />
         <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
@@ -708,6 +708,24 @@
                 <t t-call="erplibre_studio.Canvas.lanes">
                     <t t-set="lanes" t-value="calendarLanes" />
                     <t t-set="prefix" t-value="'o_erplibre_studio_calendar'" />
+                </t>
+            </section>
+        </div>
+    </t>
+
+    <!-- The canvas of a map (web_view_leaflet_map): a lane per field
+         attribute of <leaflet_map> (LEAFLET_LANES), with the classes of the
+         timeline lanes. The Preview of the toolbar shows the map itself:
+         it loads its tiles from the network. -->
+    <t t-name="erplibre_studio.Canvas.leaflet_map">
+        <div class="o_erplibre_studio_leaflet">
+            <section
+                class="o_erplibre_studio_timeline_lanes o_erplibre_studio_leaflet_lanes"
+                aria-label="Settings of the map"
+            >
+                <t t-call="erplibre_studio.Canvas.lanes">
+                    <t t-set="lanes" t-value="leafletLanes" />
+                    <t t-set="prefix" t-value="'o_erplibre_studio_timeline'" />
                 </t>
             </section>
         </div>

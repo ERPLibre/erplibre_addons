@@ -6,6 +6,7 @@ import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {X2MANY_TYPES} from "./studio_relations";
 import {tagLabel} from "./studio_outline";
+import {LEAFLET_LANES} from "./studio_leaflet";
 import {
     CALENDAR_LANES,
     DEFAULT_MODES,
@@ -289,7 +290,8 @@ StudioBlock.components = {StudioBlock};
 /**
  * The canvas of the editor: the arch tree of a form or a list, the template
  * of a kanban card or of a timeline item, the columns of a search view, the
- * axes of a pivot or of a graph, the lanes of a timeline or of a calendar.
+ * axes of a pivot or of a graph, the lanes of a timeline, of a calendar or
+ * of a map.
  * It renders from its props: a component renders again
  * when its props change, not when the editor reads its own state, so what
  * the canvas shows of that state reaches it as a prop. A drop, a selection
@@ -404,10 +406,10 @@ export class StudioCanvas extends Component {
      * attribute (removable unless the view needs it), a color rule
      * (removable when the editor can write the others again). A field of
      * the palette drops on the lanes of ``fieldLanes``. ``classes`` names
-     * the lane and its flags after the view type
+     * the lane and its flags after ``prefix``, the view type by default
      * (« o_erplibre_studio_calendar_lane_selected »).
      */
-    attributeLanes(defs, fieldLanes) {
+    attributeLanes(defs, fieldLanes, prefix = `o_erplibre_studio_${this.viewType}`) {
         const attrs = (this.root && this.root.attrs) || {};
         const changed = this.changedAttributes;
         const required = (this.data.required_attributes || {})[this.root.tag] || [];
@@ -415,7 +417,6 @@ export class StudioCanvas extends Component {
         const rules = this.layout.colors || [];
         const writable = writableColorRules(rules);
         const viewType = this.viewType;
-        const prefix = `o_erplibre_studio_${viewType}`;
         return defs.map((lane) => {
             const zone = `${LANE_ZONE_PREFIX}${lane.key}`;
             const drop = fieldLanes.includes(lane.key) && Boolean(this.project);
@@ -487,6 +488,12 @@ export class StudioCanvas extends Component {
     /** The lanes of the canvas of a calendar (attributeLanes). */
     get calendarLanes() {
         return this.attributeLanes(CALENDAR_LANES, FIELD_LANES_BY_TYPE.calendar);
+    }
+
+    /** The lanes of the canvas of a map (attributeLanes). */
+    get leafletLanes() {
+        // The classes of the lanes of a timeline, which the map shares.
+        return this.attributeLanes(LEAFLET_LANES, FIELD_LANES_BY_TYPE.leaflet_map, "o_erplibre_studio_timeline");
     }
 
     /** The field blocks of the popover of a calendar, in their order. */

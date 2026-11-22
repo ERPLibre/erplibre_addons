@@ -35,6 +35,7 @@ from . import (
     test_views_hierarchy,
     test_views_kanban,
     test_views_layout,
+    test_views_leaflet,
     test_views_pivot,
     test_views_search,
     test_views_timeline,

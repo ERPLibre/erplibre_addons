@@ -8752,3 +8752,233 @@ msgstr "Options du widget : JSON ou un dictionnaire Python. Vide : aucune."
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "{\"no_create\": true}"
 msgstr "{\"no_create\": true}"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A map shows a new field through one of its lanes only: drop it on a lane."
+msgstr ""
+"Une carte montre un nouveau champ par l'un de ses couloirs seulement : "
+"déposez-le sur un couloir."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "This lane of the map takes no new %(type)s field."
+msgstr "Ce couloir de la carte ne prend aucun nouveau champ %(type)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(name)s does not fit this attribute: a %(types)s field is needed."
+msgstr "%(name)s ne convient pas à cet attribut : il faut un champ %(types)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "%(value)s is not a whole number from %(low)s to %(high)s."
+msgstr "%(value)s n'est pas un nombre entier de %(low)s à %(high)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The map %(view)s needs a latitude and a longitude field."
+msgstr ""
+"La carte %(view)s a besoin d'un champ de latitude et d'un champ de "
+"longitude."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid ""
+"The map of web_view_leaflet_map reads a date_localization field, which "
+"%(model)s does not have: it would show no marker."
+msgstr ""
+"La carte de web_view_leaflet_map lit un champ date_localization, que "
+"%(model)s n'a pas : elle n'afficherait aucun marqueur."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Map (Leaflet)"
+msgstr "Carte (Leaflet)"
+
+#. module: erplibre_studio
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__leaflet_map
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__leaflet_map
+msgid "Leaflet Map"
+msgstr "Carte Leaflet"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Latitude"
+msgstr "Latitude"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Longitude"
+msgstr "Longitude"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup title"
+msgstr "Titre de la fenêtre contextuelle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup address"
+msgstr "Adresse de la fenêtre contextuelle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Marker image"
+msgstr "Image du marqueur"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "decimal"
+msgstr "décimal"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "text"
+msgstr "texte"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "image"
+msgstr "image"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid ""
+"A stored decimal field. Required: a record without a latitude and a "
+"longitude shows no marker."
+msgstr ""
+"Un champ décimal stocké. Requis : un enregistrement sans latitude ni "
+"longitude n'affiche aucun marqueur."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid ""
+"The bold line of the popup of a marker, and the text shown when the pointer "
+"rests on it."
+msgstr ""
+"La ligne en gras de la fenêtre contextuelle d'un marqueur, et le texte "
+"affiché quand le pointeur s'y arrête."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid "The line under the title in the popup of a marker."
+msgstr "La ligne sous le titre dans la fenêtre contextuelle d'un marqueur."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_leaflet.js:0
+msgid ""
+"An image field drawn as the marker, at the size set under Advanced. Without "
+"it, the map draws its default pin."
+msgstr ""
+"Un champ image dessiné comme marqueur, à la taille réglée sous Avancé. Sans "
+"lui, la carte dessine son épingle par défaut."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Markers on a map, provided by web_view_leaflet_map (OCA)."
+msgstr "Des marqueurs sur une carte, fournis par web_view_leaflet_map (OCA)."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Map"
+msgstr "Carte"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Lane of the map · %(attributes)s"
+msgstr "Couloir de la carte · %(attributes)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Marker width"
+msgstr "Largeur du marqueur"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Marker height"
+msgstr "Hauteur du marqueur"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup anchor, horizontal"
+msgstr "Ancrage de la fenêtre contextuelle, horizontal"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Popup anchor, vertical"
+msgstr "Ancrage de la fenêtre contextuelle, vertical"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Settings of the map"
+msgstr "Réglages de la carte"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Fields of the map"
+msgstr "Champs de la carte"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Advanced: marker size and popup anchor"
+msgstr "Avancé : taille du marqueur et ancrage de la fenêtre contextuelle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"In pixels. The size applies to a marker image; the anchor places the popup "
+"from the marker."
+msgstr ""
+"En pixels. La taille s'applique à une image de marqueur; l'ancrage place la "
+"fenêtre contextuelle par rapport au marqueur."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid ""
+"Drag a decimal field onto Latitude or Longitude, a text onto the popup, an "
+"image onto Marker image; a new Decimal or Text field dropped on a lane is "
+"created for it."
+msgstr ""
+"Glissez un champ décimal sur Latitude ou Longitude, un texte sur la fenêtre "
+"contextuelle, une image sur Image du marqueur; un nouveau champ Décimal ou "
+"Texte déposé sur un couloir est créé pour lui."

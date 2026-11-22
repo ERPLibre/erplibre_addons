@@ -36,6 +36,7 @@ VIEW_TYPES = [
     ("timeline", "Timeline"),
     ("hierarchy", "Hierarchy"),
     ("activity", "Activity"),
+    ("leaflet_map", "Leaflet Map"),
 ]
 
 

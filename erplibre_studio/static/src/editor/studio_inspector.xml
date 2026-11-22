@@ -259,6 +259,20 @@
                     Apply first to name the groups of the project: <t t-esc="pendingGroups.join(', ')" />
                 </span>
             </t>
+            <label t-elif="['pixels', 'offset'].includes(entry.kind)" class="form-label mb-0 w-100">
+                <t t-esc="entry.label" />
+                <input
+                    type="number"
+                    step="1"
+                    class="form-control form-control-sm o_erplibre_studio_attribute o_erplibre_studio_attribute_number"
+                    t-att-min="numberBounds(entry.kind)[0]"
+                    t-att-max="numberBounds(entry.kind)[1]"
+                    t-att-placeholder="numberDefault(entry.attribute)"
+                    t-att-value="entry.value"
+                    t-att-disabled="props.busy"
+                    t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value.trim())"
+                />
+            </label>
             <label t-elif="entry.kind === 'order'" class="form-label mb-0 w-100">
                 <t t-esc="entry.label" />
                 <input
@@ -332,11 +346,31 @@
             </fieldset>
             <fieldset t-if="otherEntries(lane).length" class="o_erplibre_studio_fieldset">
                 <legend t-if="viewType === 'calendar'" class="o_erplibre_studio_section_title">Options of the calendar</legend>
+                <legend t-elif="viewType === 'leaflet_map'" class="o_erplibre_studio_section_title">Fields of the map</legend>
                 <legend t-else="" class="o_erplibre_studio_section_title">Options of the timeline</legend>
                 <t t-foreach="otherEntries(lane)" t-as="entry" t-key="entry.attribute">
                     <t t-call="erplibre_studio.Inspector.SettableEntry" />
                 </t>
             </fieldset>
+            <div t-if="foldedEntries.length" class="o_erplibre_studio_lane_advanced">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link px-0 d-flex align-items-center gap-1 o_erplibre_studio_lane_advanced_toggle"
+                    t-att-aria-expanded="foldedOpen ? 'true' : 'false'"
+                    t-on-click="toggleFolded"
+                >
+                    Advanced: marker size and popup anchor
+                    <i class="fa" t-att-class="foldedOpen ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
+                </button>
+                <fieldset t-if="foldedOpen" class="o_erplibre_studio_fieldset">
+                    <t t-foreach="foldedEntries" t-as="entry" t-key="entry.attribute">
+                        <t t-call="erplibre_studio.Inspector.SettableEntry" />
+                    </t>
+                    <p class="text-muted mb-0">
+                        In pixels. The size applies to a marker image; the anchor places the popup from the marker.
+                    </p>
+                </fieldset>
+            </div>
             <div>
                 <button
                     type="button"

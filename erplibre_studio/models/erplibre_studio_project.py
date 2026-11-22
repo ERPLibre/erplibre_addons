@@ -1183,7 +1183,8 @@ class ErplibreStudioProject(models.Model):
         """``arch`` (the combined arch of ``view``, without the project
         views) with the draft applied. A new field not yet in the database
         shows as a placeholder in a form and is left out of the other view
-        types."""
+        types, root attributes of a map that name it included: the map
+        would read a field the model does not have."""
         self.ensure_one()
         changes = [c._as_dict() for c in self._view_changes(view)]
         if not changes:
@@ -1211,6 +1212,11 @@ class ErplibreStudioProject(models.Model):
             )
             placeholder.tail = node.tail
             parent.replace(node, placeholder)
+        if view.type == "leaflet_map":
+            for attribute in studio_arch.LEAFLET_FIELD_ATTRIBUTES:
+                name = arch.get(attribute)
+                if name in pending and name not in Model._fields:
+                    del arch.attrib[attribute]
         return arch
 
     # ── operations of the editor ────────────────────────────────────────
@@ -2083,10 +2089,15 @@ class ErplibreStudioProject(models.Model):
 
     def _op_add_field(self, view, arch, op):
         """A new field dropped into the view; an x2many shows as an inline
-        sub-list in a form, a many2many as tags in a list or a kanban."""
+        sub-list in a form, a many2many as tags in a list or a kanban. On a
+        map, the field of a lane: ``attribute`` names the root attribute it
+        becomes (``_leaflet_new_field``)."""
         target, position, _node = self._check_drop(arch, op, view.type)
         field = op.get("field") or {}
         self._refuse(studio_arch.x2many_refusal(view.type, field.get("ttype")))
+        root_attribute = None
+        if view.type == "leaflet_map":
+            root_attribute = self._leaflet_new_field(op, target, position)
         name, definition = self._clean_field_definition(view.model, field)
         payload = {
             "field_name": name,
@@ -2095,6 +2106,8 @@ class ErplibreStudioProject(models.Model):
             # The name follows the label until it is given or renamed.
             "name_auto": not field.get("name"),
         }
+        if root_attribute:
+            payload["root_attribute"] = root_attribute
         if definition["ttype"] in studio_arch.X2MANY_TYPES:
             attrs, children = studio_arch.x2many_node(
                 view.type,
@@ -2105,6 +2118,35 @@ class ErplibreStudioProject(models.Model):
             if children:
                 payload["node_children"] = children
         return self._add_change(view, "add_field", target, position, payload)
+
+    def _leaflet_new_field(self, op, target, position):
+        """The root attribute of a map the new field of ``op`` becomes: its
+        ``attribute``, a field attribute of the map whose kind takes a new
+        field of the type of ``op`` (LEAFLET_NEW_FIELD_TYPES), dropped at
+        the end of the root. UserError otherwise: a map ignores a field
+        that no attribute names."""
+        attribute = op.get("attribute")
+        settable = studio_arch.SETTABLE_ATTRIBUTES["leaflet_map"]["leaflet_map"]
+        types = studio_arch.LEAFLET_NEW_FIELD_TYPES.get(settable.get(attribute), ())
+        if (
+            target != "/leaflet_map"
+            or position != "inside"
+            or attribute not in studio_arch.LEAFLET_FIELD_ATTRIBUTES
+        ):
+            raise UserError(
+                self.env._(
+                    "A map shows a new field through one of its lanes only: "
+                    "drop it on a lane."
+                )
+            )
+        ttype = (op.get("field") or {}).get("ttype")
+        if ttype not in types:
+            raise UserError(
+                self.env._(
+                    "This lane of the map takes no new %(type)s field.", type=ttype
+                )
+            )
+        return attribute
 
     def _field_scope(self, arch, node, view_type):
         """The names of the fields a new field must not repeat: those of the
@@ -2623,6 +2665,11 @@ class ErplibreStudioProject(models.Model):
             "bool_field": self._bool_field_value,
             "parent_field": self._parent_field_value,
             "child_field": self._child_field_value,
+            "coordinate_field": self._leaflet_field_value,
+            "text_field": self._leaflet_field_value,
+            "image_field": self._leaflet_field_value,
+            "pixels": self._leaflet_number_value,
+            "offset": self._leaflet_number_value,
             "order": self._order_value,
             "axis": self._axis_value,
             "graph_axis": self._axis_value,
@@ -2695,6 +2742,64 @@ class ErplibreStudioProject(models.Model):
                 )
             )
         return value, [value]
+
+    def _leaflet_field_value(self, model, node, kind, value):
+        """The field ``value`` a root attribute of a map of ``kind`` names:
+        a stored float for a coordinate (the map compares it), a char, a
+        text or a selection for a popup title or address (searchRead reads
+        a computed field too; a many2one would print as [id, name]), a
+        binary for a marker image, which /web/image serves."""
+        info = self._field_info(model, value)
+        types = {
+            "coordinate_field": ("float",),
+            "text_field": studio_arch.LEAFLET_TEXT_TYPES,
+            "image_field": ("binary",),
+        }[kind]
+        if kind == "coordinate_field" and (
+            info["type"] not in types or not info.get("store")
+        ):
+            raise UserError(
+                self.env._(
+                    "%(name)s does not fit this attribute: a stored %(types)s "
+                    "field is needed.",
+                    name=value,
+                    types=" / ".join(types),
+                )
+            )
+        if info["type"] not in types:
+            raise UserError(
+                self.env._(
+                    "%(name)s does not fit this attribute: a %(types)s field "
+                    "is needed.",
+                    name=value,
+                    types=" / ".join(types),
+                )
+            )
+        return value, [value]
+
+    def _leaflet_number_value(self, model, node, kind, value):
+        """The integer text of ``value`` for a marker size (``pixels``,
+        LEAFLET_PIXELS) or a popup anchor offset (``offset``,
+        LEAFLET_OFFSET) of a map."""
+        low, high = (
+            studio_arch.LEAFLET_PIXELS
+            if kind == "pixels"
+            else studio_arch.LEAFLET_OFFSET
+        )
+        try:
+            number = int(value)
+        except ValueError:
+            number = None
+        if number is None or not low <= number <= high:
+            raise UserError(
+                self.env._(
+                    "%(value)s is not a whole number from %(low)s to %(high)s.",
+                    value=value,
+                    low=low,
+                    high=high,
+                )
+            )
+        return str(number), []
 
     def _parent_field_value(self, model, node, kind, value):
         """The « parent_field » ``value`` of a hierarchy: a stored many2one
@@ -4591,6 +4696,35 @@ class ErplibreStudioProject(models.Model):
         return next((fname for fname in names if fits(fname)), None)
 
     @api.model
+    def _studio_leaflet_fields(self, model):
+        """{attribute: field} of the map added to ``model``: the first
+        stored float whose name ends with « latitude », and with
+        « longitude », the record name as popup title when a popup shows
+        it (LEAFLET_TEXT_TYPES); no address, which the user chooses. An
+        attribute without a field is left out: its lane creates one."""
+        Model = self.env[model]
+        fields = Model._fields
+        result = {}
+        for attribute, suffix in (
+            ("field_latitude", "latitude"),
+            ("field_longitude", "longitude"),
+        ):
+            name = next(
+                (
+                    fname
+                    for fname, field in fields.items()
+                    if field.type == "float" and field.store and fname.endswith(suffix)
+                ),
+                None,
+            )
+            if name:
+                result[attribute] = name
+        title = Model._rec_name_fallback()
+        if title in fields and fields[title].type in studio_arch.LEAFLET_TEXT_TYPES:
+            result["field_title"] = title
+        return result
+
+    @api.model
     def _studio_has_activities(self, model):
         """Whether ``model``, a model of the registry, inherits
         mail.activity.mixin: an activity view reads its activities. False
@@ -4676,6 +4810,14 @@ class ErplibreStudioProject(models.Model):
             raise UserError(
                 Editor._view_reason("needs_activity", label, model, view_type)
             )
+        if (
+            view_type == "leaflet_map"
+            and studio_arch.LEAFLET_DATE_FIELD not in Model._fields
+        ):
+            raise UserError(Editor._view_reason("needs_field", label, model, view_type))
+        leaflet = None
+        if view_type == "leaflet_map":
+            leaflet = self._studio_leaflet_fields(model)
         parent = None
         if view_type == "hierarchy":
             parent = self._studio_parent_field(model)
@@ -4696,6 +4838,7 @@ class ErplibreStudioProject(models.Model):
             group,
             readonly_date=readonly_date,
             parent_field=parent,
+            leaflet=leaflet,
         )
         sequence = max(self.view_line_ids.mapped("sequence") or [0]) + 10
         line = (
@@ -5234,6 +5377,27 @@ class ErplibreStudioProject(models.Model):
                     model=line.model,
                     type=label,
                     view=default.xml_id or default.name,
+                )
+            )
+        if line.view_type == "leaflet_map":
+            self._studio_check_leaflet_coordinates(line)
+
+    def _studio_check_leaflet_coordinates(self, line):
+        """Raise UserError when the map of the view line ``line``, with the
+        changes of the draft, has no latitude or no longitude field: the
+        map places no marker without both."""
+        view = line.view_id if line.applied and line.view_id else added_view(line)
+        arch, _errors = self._draft_arch(view)
+        if not all(
+            arch.get(attribute)
+            for attribute in studio_arch.REQUIRED_ATTRIBUTES[
+                ("leaflet_map", "leaflet_map")
+            ]
+        ):
+            raise UserError(
+                self.env._(
+                    "The map %(view)s needs a latitude and a longitude field.",
+                    view=line._studio_view_name(),
                 )
             )
 

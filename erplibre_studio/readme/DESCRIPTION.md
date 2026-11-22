@@ -43,6 +43,13 @@ list, kanban, search and pivot views, and timeline views once
   dropped into the item shows its value (`record.<field>`, the name of a
   many2one) and is loaded by the view: the item template renders without
   the record of a kanban card, where a `<field>` does not compile.
+- **Map** (once *web_view_leaflet_map* is installed): one lane per field
+  the map reads, latitude, longitude, popup title, popup address and
+  marker image; a field of the palette dropped on a lane sets it, and a
+  new decimal or text field dropped on a lane is created for it in the
+  same change. The marker size and the popup anchor are under Advanced.
+  The map reads a `date_localization` field on every record: **Add a
+  view** offers a map only to a model that has one, such as the contacts.
 - Each change is recorded in a **studio project**, as a draft. **Preview**
   shows the real view with the draft applied, to the editor of the
   project only.

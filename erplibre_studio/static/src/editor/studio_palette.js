@@ -141,14 +141,18 @@ export class StudioPalette extends Component {
 
     /**
      * Whether the existing fields show: while searching, else as the user
-     * left them, else when the view offers no new field type.
+     * left them, else when the view offers no new field type or is a map,
+     * whose lanes mostly take existing fields.
      */
     get existingOpen() {
         if (this.query) {
             return true;
         }
         const existing = this.palette.existing;
-        return existing === null || existing === undefined ? !this.allows("add_field") : existing;
+        if (existing === null || existing === undefined) {
+            return !this.allows("add_field") || this.viewType === "leaflet_map";
+        }
+        return existing;
     }
 
     toggleExisting() {

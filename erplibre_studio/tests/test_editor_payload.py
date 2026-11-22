@@ -110,8 +110,12 @@ class TestEditorPayload(StudioCase):
         for view_type in missing:
             with self.subTest(view_type=view_type):
                 entry = entries[view_type]
-                # The tags have no activities: no activity view to add.
-                code = "needs_activity" if view_type == "activity" else "no_view"
+                # The tags have no activities and no date_localization: no
+                # activity view and no map to add.
+                code = {
+                    "activity": "needs_activity",
+                    "leaflet_map": "needs_field",
+                }.get(view_type, "no_view")
                 self.assertEqual(
                     (entry["exists"], entry["editable"], entry["reason_code"]),
                     (False, False, code),
