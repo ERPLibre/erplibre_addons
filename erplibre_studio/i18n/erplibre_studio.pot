@@ -16,6 +16,12 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "%(count)s archived record(s) of %(model)s become visible"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
@@ -69,6 +75,13 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "%(count)s member(s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid ""
+"%(count)s record(s) of %(model)s are no longer limited to their company"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1355,6 +1368,15 @@ msgstr ""
 msgid ""
 "Each part starts with a letter; the table, the name with its dots as _, has "
 "%(size)s characters at most."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__per_company
+msgid ""
+"Each record belongs to a company (the field x_company_id), and a global "
+"record rule shows a user the records of their companies and those of no "
+"company. Turned off after Apply, the next Apply removes the field and its "
+"values, after a confirmation."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5428,6 +5450,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(field)s cannot be removed, it is still used: %(items)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid ""
 "The field %(field)s creates %(inverse)s, the inverse of %(other)s: remove "
@@ -5650,6 +5678,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "The list of %(model)s loses its drag handle"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The maximum size is a whole number from 1 to %(max)s."
 msgstr ""
@@ -5814,12 +5848,6 @@ msgid "The operator %(operator)s does not apply to a %(type)s field."
 msgstr ""
 
 #. module: erplibre_studio
-#. odoo-python
-#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
-msgid "The option %(option)s of %(name)s cannot be removed once applied."
-msgstr ""
-
-#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__sequence
 msgid ""
 "The order of the apps in the project: the first one gives the icon of the "
@@ -5902,7 +5930,8 @@ msgstr ""
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__manual_order
 msgid ""
 "The records are ordered by hand, with the handle of the list (the field "
-"x_sequence). Once applied, the option cannot be removed."
+"x_sequence). Turned off after Apply, the next Apply removes the field and "
+"its values, after a confirmation."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5920,8 +5949,8 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__archivable
 msgid ""
-"The records can be archived (the field x_active). Once applied, the option "
-"cannot be removed."
+"The records can be archived (the field x_active). Turned off after Apply, "
+"the next Apply removes the field and its values, after a confirmation."
 msgstr ""
 
 #. module: erplibre_studio
@@ -6631,6 +6660,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Unknown model option %(key)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Unknown operation %(type)s."
 msgstr ""
@@ -6783,6 +6818,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 msgid "What Revert removes changed since it was shown: review it again."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "What changes for the records"
 msgstr ""
 
 #. module: erplibre_studio
@@ -7348,6 +7389,12 @@ msgid "the app"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the field %(name)s depends on it"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "the first true rule wins"
@@ -7374,7 +7421,25 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the rule %(name)s of the project"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "the view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the view %(name)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the view %(name)s of the project"
 msgstr ""
 
 #. module: erplibre_studio
@@ -7662,14 +7727,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s: multi-company"
-msgstr ""
-
-#. module: erplibre_studio
-#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__per_company
-msgid ""
-"Each record belongs to a company (the field x_company_id), and a global "
-"record rule shows a user the records of their companies and those of no "
-"company. Once applied, the option cannot be removed."
 msgstr ""
 
 #. module: erplibre_studio

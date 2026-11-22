@@ -3843,19 +3843,28 @@ class ErplibreStudioProject(models.Model):
     def _studio_write_options(self, line, values):
         """Write the options of ``values`` {order, archivable, manual_order,
         per_company} on the model line ``line``. An option turned on needs
-        its field free on the applied model. « Manual order » turned on
-        sorts by ``x_sequence`` a model without order; turned off, it clears
-        an order that names ``x_sequence``. « Per company » turned on adds
-        its rule line (``_studio_company_rule``); turned off, it removes
-        that line when the project still has it. The order is checked last,
-        against the fields the options give (``_studio_clean_order``)."""
+        its field free on the applied model, or the option's own
+        (``_studio_option_own_field``): an option turned off after Apply and
+        on again before the next one removes nothing. « Manual order »
+        turned on sorts by ``x_sequence`` a model without order; turned off,
+        it clears an order that names ``x_sequence``. « Per company »
+        turned on adds its rule line (``_studio_company_rule``), under the
+        external id of the applied rule when the option had one; turned
+        off, it removes that line when the project still has it. The order
+        is checked last, against the fields the options give
+        (``_studio_clean_order``)."""
         line = line.with_context(**{NO_TOUCH_KEY: True})
         vals = {}
         for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items():
             if key not in values or bool(values[key]) == line[key]:
                 continue
             vals[key] = bool(values[key])
-            if vals[key] and line.applied and name in self.env[line.model]._fields:
+            if (
+                vals[key]
+                and line.applied
+                and name in self.env[line.model]._fields
+                and not self._studio_option_own_field(line, key)
+            ):
                 raise UserError(
                     self.env._(
                         "%(model)s already has a field %(field)s.",
@@ -3876,18 +3885,22 @@ class ErplibreStudioProject(models.Model):
         company_rule = line.company_rule_id
         line.write(vals)
         if vals.get("per_company"):
-            self._studio_company_rule(line)
+            item = self._studio_applied_model_item(line.model)
+            self._studio_company_rule(line, item.get("company_rule"))
         elif vals.get("per_company") is False:
             company_rule.unlink()
         if "order" in values or order != (line.order or ""):
             line.write({"order": self._studio_clean_order(line, order) or False})
 
-    def _studio_company_rule(self, line):
+    def _studio_company_rule(self, line, xml_name=None):
         """Create the rule line of the option « Per company » of the model
         line ``line`` and keep it on the line: global, every operation,
         the records of the companies of the user and those of no company
-        (``COMPANY_RULE_DOMAIN``). The line is an ordinary rule of the
-        project from then on: the Security space edits or removes it."""
+        (``COMPANY_RULE_DOMAIN``). ``xml_name``: the external id name the
+        line takes when no rule line of the project has it (the one of the
+        applied rule, which Apply then updates instead of replacing it).
+        The line is an ordinary rule of the project from then on: the
+        Security space edits or removes it."""
         label = (line.name or "").strip() or line.model
         rule = self._studio_save_rule(
             {
@@ -3898,6 +3911,8 @@ class ErplibreStudioProject(models.Model):
                 **{perm: True for perm in PERMS},
             }
         )
+        if xml_name and xml_name not in (self.rule_line_ids - rule).mapped("xml_name"):
+            rule._server_writing().write({"xml_name": xml_name})
         line._server_writing().write({"company_rule_id": rule.id})
         return rule
 
@@ -4682,7 +4697,9 @@ class ErplibreStudioProject(models.Model):
         """Raise UserError when the model line ``line`` does not apply: its
         menu, its chatter without mail (``mail``: whether mail is
         installed), a model of that name already in the database, no access
-        row on it, a default order on a field the model will not have."""
+        row on it, a field of an option turned off that cannot leave
+        (``_studio_option_removal_refusal``), a default order on a field the
+        model will not have."""
         self.ensure_one()
         self._studio_check_menu(line)
         if line.chatter and not mail:
@@ -4706,6 +4723,10 @@ class ErplibreStudioProject(models.Model):
                     name=line.model,
                 )
             )
+        fields_, _waiting = self._studio_option_removals(line)
+        refusal = self._studio_option_removal_refusal(fields_)
+        if refusal:
+            raise UserError(refusal)
         if line.order:
             sortable = self._studio_sortable_fields(line)
             for name in studio_arch.order_fields(line.order):
@@ -5023,6 +5044,212 @@ class ErplibreStudioProject(models.Model):
                 record.write({"order": order})
                 log.append(f"model {line.model}: order {order}")
         return waiting
+
+    # ── options removed after Apply ─────────────────────────────────────
+
+    def _studio_applied_model_item(self, model):
+        """The entry of the model line of ``model`` in the snapshot of the
+        last Apply ({} when none)."""
+        self.ensure_one()
+        snapshot = self._studio_load_snapshot(self.applied_snapshot)
+        for item in snapshot["models"]:
+            if item.get("model") == model:
+                return item
+        return {}
+
+    def _studio_option_own_field(self, line, key, item=None):
+        """The field (ir.model.fields, sudo) of the option ``key`` of the
+        model line ``line`` on its applied model when it is the option's
+        own: the last Apply had the option on (``item``, its entry in the
+        snapshot, read when None), or the generated module defines the
+        field. Empty for a field of the same name made otherwise, which
+        no option removes."""
+        self.ensure_one()
+        Fields = self.env["ir.model.fields"].sudo()
+        if not line.applied:
+            return Fields
+        name = studio_arch.MODEL_OPTIONS[key][0]
+        field = Fields._get(line.model, name)
+        if not field:
+            return Fields
+        if item is None:
+            item = self._studio_applied_model_item(line.model)
+        if item.get(key):
+            return field
+        if field.state != "manual" and (
+            self._module_of("ir.model.fields", field.id) == self.module_name
+        ):
+            return field
+        return Fields
+
+    def _studio_option_leaving(self, line):
+        """{option: field} of the options of the applied model line ``line``
+        that are off while their own field (``_studio_option_own_field``)
+        is still on the model: the next Apply removes these fields, or,
+        on a model the installed generated module defines, leaves them to
+        its next generation and upgrade."""
+        self.ensure_one()
+        if not line.applied:
+            return {}
+        item = self._studio_applied_model_item(line.model)
+        definitions = self._studio_field_definitions(line.model)
+        leaving = {}
+        for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items():
+            if line[key] or name in definitions:
+                continue
+            field = self._studio_option_own_field(line, key, item)
+            if field:
+                leaving[key] = field
+        return leaving
+
+    @api.model
+    def _studio_option_waits(self, line, field):
+        """Whether the removal of the field of an option ``field`` of the
+        model line ``line`` waits for the generated module: the module
+        defines the model or the field, and only its upgrade drops them."""
+        return field.state != "manual" or line.ir_model_id.sudo().state != "manual"
+
+    def _studio_option_removals(self, lines=None):
+        """(fields, waiting) of the options turned off after Apply on the
+        model lines ``lines`` (default: all of them): the ir.model.fields
+        (sudo) the next Apply removes, after it rewrote the default views,
+        the window action, the order and the rules without them; and the
+        « model.field » names whose removal waits for the installed
+        generated module (``_studio_option_waits``)."""
+        self.ensure_one()
+        fields_ = self.env["ir.model.fields"].sudo()
+        waiting = []
+        for line in self.new_model_ids if lines is None else lines:
+            for field in self._studio_option_leaving(line).values():
+                if self._studio_option_waits(line, field):
+                    waiting.append(f"{line.model}.{field.name}")
+                else:
+                    fields_ |= field
+        return fields_, waiting
+
+    def _studio_option_removal_refusal(self, fields_, rules=None, rule_lines=None):
+        """Why ``fields_`` (fields of options) cannot leave the database
+        now, or False. ``rules``: the ir.rule that leave with them
+        (default: those the next Apply removes); ``rule_lines``: the rule
+        lines of the project that leave with them. What the project
+        rewrites at Apply is judged by its draft: its rules by their rule
+        lines, its inherited views by its changes, the default views of
+        its models and the views its view lines add by their new arch.
+        Refused while a record rule or a change names a field
+        (``_studio_check_field_removal``), a custom field depends on it,
+        or a view of its model, or a rule line of the project, names it:
+        ir.model.fields would refuse the removal in the middle of Apply."""
+        self.ensure_one()
+        if not fields_:
+            return False
+        _ = self.env._
+        Rule = self.env["ir.rule"].sudo()
+        if rules is None:
+            rules = self._studio_apply_removals().get("rules", Rule)
+        rule_lines = self.rule_line_ids - (
+            rule_lines or self.env["erplibre.studio.rule"]
+        )
+        own_rules = Rule
+        for rule_line in self.rule_line_ids:
+            own_rules |= self._studio_record("ir.rule", rule_line.xml_name)
+        messages = []
+        try:
+            self._studio_check_field_removal(
+                fields_, rules | own_rules, self.change_ids
+            )
+        except UserError as exc:
+            messages.append(exc.args[0])
+        rewritten = self.studio_view_ids | self.view_line_ids.view_id
+        for line in self.new_model_ids:
+            for view in line._studio_views().values():
+                rewritten |= view
+        for field in fields_.sorted(lambda f: (f.model, f.name)):
+            items = self._studio_option_field_uses(field, rule_lines, rewritten)
+            if items:
+                messages.append(
+                    _(
+                        "The field %(field)s cannot be removed, it is still "
+                        "used: %(items)s.",
+                        field=f"{field.model}.{field.name}",
+                        items=", ".join(sorted(set(items))),
+                    )
+                )
+        return " ".join(messages) or False
+
+    def _studio_option_field_uses(self, field, rule_lines, rewritten):
+        """The descriptions of what still names ``field`` (an ir.model.fields
+        of an option) once Apply rewrote what the project owns: the custom
+        fields that depend on it or are its one2many inverse, the rule
+        lines ``rule_lines`` whose domain names it, the views of its model
+        but ``rewritten`` whose arch names it, and the view lines of the
+        project whose arch names it."""
+        _ = self.env._
+        items = []
+        pattern = re.compile(rf"(?<!\w){re.escape(field.name)}(?!\w)")
+        Model = self.env.get(field.model)
+        odoo_field = Model._fields.get(field.name) if Model is not None else None
+        if odoo_field is not None:
+            dependents = [
+                dep for dep in self.pool.get_dependent_fields(odoo_field) if dep.manual
+            ] + [
+                inverse
+                for inverse in self.pool.field_inverses[odoo_field]
+                if inverse.manual and inverse.type == "one2many"
+            ]
+            items += [
+                _("the field %(name)s depends on it", name=str(dep))
+                for dep in dependents
+            ]
+        for rule_line in rule_lines.filtered(lambda r: r.model == field.model):
+            named = self._studio_domain_fields(rule_line.model, rule_line.domain_force)
+            if (field.model, field.name) in named:
+                items.append(_("the rule %(name)s of the project", name=rule_line.name))
+        View = self.env["ir.ui.view"].sudo().with_context(active_test=False)
+        views = (
+            View.search([("model", "=", field.model), ("arch_db", "ilike", field.name)])
+            - rewritten
+        )
+        for view in views:
+            if pattern.search(view.with_context(lang=None).arch_db or ""):
+                items.append(_("the view %(name)s", name=view.name))
+        for view_line in self.view_line_ids.filtered(lambda v: v.model == field.model):
+            if pattern.search(view_line.arch or ""):
+                items.append(
+                    _(
+                        "the view %(name)s of the project",
+                        name=view_line._studio_view_name(),
+                    )
+                )
+        return items
+
+    def _studio_option_removal_report(self, line, key):
+        """{report, refused, waiting} of turning the option ``key`` of the
+        model line ``line`` off now: what the next Apply removes with it
+        (``_studio_removal_report`` of its own field and, for « Per
+        company », of the applied rule of its rule line, with the effects
+        on the records), why the removal is refused (or False), and
+        whether the removal waits for the installed generated module
+        (then the report holds no field). A read."""
+        self.ensure_one()
+        Fields = self.env["ir.model.fields"].sudo()
+        Rule = self.env["ir.rule"].sudo()
+        field = self._studio_option_own_field(line, key)
+        waiting = bool(field) and self._studio_option_waits(line, field)
+        removable = Fields if waiting else field
+        rules = Rule
+        rule_lines = self.env["erplibre.studio.rule"]
+        if key == "per_company" and line.company_rule_id:
+            rule_lines = line.company_rule_id
+            rules = self._studio_record("ir.rule", rule_lines.xml_name)
+        report = self._studio_removal_report({"fields": removable, "rules": rules})
+        leaving = self._studio_apply_removals().get("rules", Rule) | rules
+        return {
+            "report": report,
+            "refused": self._studio_option_removal_refusal(
+                removable, leaving, rule_lines
+            ),
+            "waiting": waiting,
+        }
 
     def _apply_model_views(self, log, owned):
         """Create or update the default form, list and search views of the
@@ -5842,18 +6069,28 @@ class ErplibreStudioProject(models.Model):
         actions, actions bound to the models, e-mail templates, automation
         rules, default values...); then the ir.filters of ``models``, which
         name their model by its name and would stay behind. The default
-        values for everyone of the fields of the options of ``models``
-        (``_apply_model_options``) are the studio's own: left out. A read,
-        in sudo."""
+        values for everyone of the fields of the options of the models the
+        studio creates (``_apply_model_options``), removed with ``models``
+        or among ``fields``, are the studio's own: left out. A read, in
+        sudo."""
         Fields = self.env["ir.model.fields"].sudo()
         fields = (fields or Fields) | Fields.search([("model_id", "in", models.ids)])
         targets = {"ir.model": models.ids, "ir.model.fields": fields.ids}
         options = [option[0] for option in studio_arch.MODEL_OPTIONS.values()]
+        studio_models = set(
+            self.env["erplibre.studio.model"]
+            .sudo()
+            .search([("model", "in", fields.mapped("model"))])
+            .mapped("model")
+        )
 
         def own_default(row):
             return (
-                row.field_id.model_id in models
-                and row.field_id.name in options
+                row.field_id.name in options
+                and (
+                    row.field_id.model_id in models
+                    or row.field_id.model in studio_models
+                )
                 and not (row.user_id or row.company_id or row.condition)
             )
 
@@ -6051,6 +6288,10 @@ class ErplibreStudioProject(models.Model):
             before = {kind: project[name] for kind, name in CREATED_FIELDS.items()}
             before["views"] = project.studio_view_ids
             before["fields"] = project.field_ids
+            # The fields of the options turned off are not fields of the
+            # project: they leave on their own, after everything that names
+            # them was rewritten without them.
+            option_fields, waiting_options = project._studio_option_removals()
             kept = {}
             kept["categories"] = project._apply_categories(log)
             kept["groups"] = project._apply_groups(log)
@@ -6072,8 +6313,11 @@ class ErplibreStudioProject(models.Model):
             kept["access"] = project._apply_access(log)
             kept["rules"] = project._apply_rules(log)
             waiting += waiting_models + waiting_fields + waiting_views + waiting_icons
+            waiting += waiting_options
+            removed = {kind: before[kind] - kept[kind] for kind in before}
+            removed["fields"] |= option_fields
             project._studio_remove_created(
-                {kind: before[kind] - kept[kind] for kind in before},
+                removed,
                 log,
                 kept,
                 own_changes=project.change_ids,

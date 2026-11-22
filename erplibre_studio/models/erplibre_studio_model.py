@@ -134,18 +134,21 @@ class ErplibreStudioModel(models.Model):
         "terms separated by commas; empty: the order of creation.",
     )
     archivable = fields.Boolean(
-        help="The records can be archived (the field x_active). Once "
-        "applied, the option cannot be removed.",
+        help="The records can be archived (the field x_active). Turned off "
+        "after Apply, the next Apply removes the field and its values, after "
+        "a confirmation.",
     )
     manual_order = fields.Boolean(
         help="The records are ordered by hand, with the handle of the list "
-        "(the field x_sequence). Once applied, the option cannot be removed.",
+        "(the field x_sequence). Turned off after Apply, the next Apply "
+        "removes the field and its values, after a confirmation.",
     )
     per_company = fields.Boolean(
         string="Per company",
         help="Each record belongs to a company (the field x_company_id), and a "
         "global record rule shows a user the records of their companies and "
-        "those of no company. Once applied, the option cannot be removed.",
+        "those of no company. Turned off after Apply, the next Apply removes "
+        "the field and its values, after a confirmation.",
     )
     company_rule_id = fields.Many2one(
         "erplibre.studio.rule",
@@ -295,8 +298,9 @@ class ErplibreStudioModel(models.Model):
         return studio_arch.COMPANY_ACTION_CONTEXT if self.per_company else False
 
     def _studio_options_applied(self):
-        """{option: whether the applied model has its field}: an option on
-        the model cannot be removed."""
+        """{option: whether the applied model has its field}: turned off,
+        the next Apply removes it when it is the option's own
+        (``_studio_option_own_field`` of the project)."""
         self.ensure_one()
         names = set()
         if self.applied:
@@ -403,22 +407,12 @@ class ErplibreStudioModel(models.Model):
 
     @api.constrains(*studio_arch.MODEL_OPTIONS)
     def _check_studio_options(self):
-        """An option whose field the applied model has cannot be turned
-        off, as with the chatter: the field and its values would stay. The
-        field of an option on cannot be a new field of the project."""
+        """The field of an option on cannot be a new field of the project.
+        An option turned off after Apply is accepted: the next Apply removes
+        its field (``_studio_option_removals`` of the project)."""
         for line in self:
-            applied = line._studio_options_applied()
             definitions = line.project_id._studio_field_definitions(line.model)
             for key, (name, _ttype, _label) in studio_arch.MODEL_OPTIONS.items():
-                if not line[key] and applied[key]:
-                    raise ValidationError(
-                        self.env._(
-                            "The option %(option)s of %(name)s cannot be "
-                            "removed once applied.",
-                            option=name,
-                            name=line.model,
-                        )
-                    )
                 if line[key] and name in definitions:
                     raise ValidationError(
                         self.env._(

@@ -5,7 +5,7 @@ from lxml import etree
 from odoo.exceptions import UserError
 from odoo.tests import new_test_user, tagged
 
-from ..arch import COMPANY_ACTION_CONTEXT, COMPANY_RULE_DOMAIN
+from ..arch import COMPANY_ACTION_CONTEXT, COMPANY_RULE_DOMAIN, MANUAL_ORDER
 from ..models.erplibre_studio_project import PERMS
 from .common import StudioCase
 
@@ -175,25 +175,277 @@ class TestModelOptions(StudioCase):
         self.assertEqual(Model.search([]), Model.browse(records.ids))
         self.assertEqual(Model.browse(records.ids).mapped("x_active"), [True, True])
 
-    def test_options_frozen_after_apply(self):
+    # ── options removed after Apply ─────────────────────────────────────
+
+    def as_admin(self):
+        """The project as a Settings administrator edits it: not the
+        superuser, who is not asked to confirm."""
+        return self.project.with_user(self.env.ref("base.user_admin"))
+
+    def removal_report(self, key):
+        return self.Editor.get_option_removal_report(self.project.id, self.line.id, key)
+
+    def test_archivable_removed_after_apply(self):
         self.update(archivable=True)
         self.project.action_apply()
-        with self.assertRaises(UserError):
+        Model = self.env[MODEL]
+        records = Model.create([{"x_name": "One"}, {"x_name": "Two"}])
+        records[1].x_active = False
+        answer = self.removal_report("archivable")
+        self.assertEqual(
+            (answer["refused"], answer["waiting"]),
+            (False, False),
+            answer["refused"],
+        )
+        self.assertEqual(
+            answer["report"]["effects"],
+            [
+                {
+                    "model": MODEL,
+                    "kind": "archived",
+                    "count": 1,
+                    "field": "x_active",
+                }
+            ],
+        )
+        self.update(archivable=False)
+        payload = self.Editor._model_payload(self.line)
+        self.assertTrue(payload["options_applied"]["archivable"])
+        self.assertEqual(
+            payload["option_removals"],
+            {"archivable": True, "manual_order": False, "per_company": False},
+        )
+        answer = self.project._studio_apply_report()
+        report = answer["report"]
+        self.assertEqual(
+            [(f["name"], f["filled"]) for f in report["fields"]],
+            [("x_active", 2)],
+        )
+        self.assertEqual(
+            report["effects"],
+            [
+                {
+                    "model": MODEL,
+                    "kind": "archived",
+                    "count": 1,
+                    "field": "x_active",
+                }
+            ],
+        )
+        self.assertTrue(answer["confirm"])
+        project = self.as_admin()
+        with self.assertRaisesRegex(UserError, "confirm"):
             with self.env.cr.savepoint():
-                self.update(archivable=False)
-        self.assertTrue(self.line.archivable)
-        self.line.invalidate_recordset()
-        # The other option and the order still change.
+                project.action_apply()
+        self.assertIs(project.action_apply(digest=answer["digest"]), True)
+        self.assertFalse(self.env["ir.model.fields"]._get(MODEL, "x_active"))
+        Model = self.env[MODEL]
+        self.assertNotIn("x_active", Model._fields)
+        self.assertFalse(Model._active_name)
+        # The archived record is visible again.
+        self.assertEqual(Model.search([]), Model.browse(records.ids))
+        self.assertFalse(
+            self.env["ir.default"].search([("field_id.model", "=", MODEL)])
+        )
+        views = self.line._studio_views()
+        for view_type in ("form", "search"):
+            self.assertNotIn("x_active", views[view_type].arch)
+        payload = self.Editor._model_payload(self.line)
+        self.assertFalse(payload["options_applied"]["archivable"])
+        self.assertFalse(payload["option_removals"]["archivable"])
+        self.assertEqual(self.project.state, "applied")
+
+    def test_manual_order_removed(self):
         self.update(manual_order=True)
-        self.assertEqual(self.line.order, "x_sequence asc, id asc")
         self.project.action_apply()
-        self.assertEqual(self.env[MODEL]._order, "x_sequence asc, id asc")
-        with self.assertRaises(UserError):
+        self.assertEqual(self.line.order, MANUAL_ORDER)
+        self.update(manual_order=False)
+        self.assertFalse(self.line.order)
+        # Apply removes x_sequence: no order can name it any longer.
+        names = [n for n, _l in self.Editor._model_payload(self.line)["sort_fields"]]
+        self.assertNotIn("x_sequence", names)
+        with self.assertRaises(UserError), self.env.cr.savepoint():
+            self.update(order="x_sequence asc")
+        answer = self.project._studio_apply_report()
+        self.assertEqual(
+            answer["report"]["effects"],
+            [
+                {
+                    "model": MODEL,
+                    "kind": "handle",
+                    "count": 0,
+                    "field": "x_sequence",
+                }
+            ],
+        )
+        # No record: nothing to confirm.
+        self.assertFalse(answer["confirm"])
+        self.project.action_apply()
+        self.assertEqual(self.env["ir.model"]._get(MODEL).order, "id")
+        listing = etree.fromstring(self.line._studio_views()["list"].arch)
+        self.assertFalse(listing.xpath("//field[@widget='handle']"))
+        self.assertNotIn("x_sequence", self.env[MODEL]._fields)
+        self.assertFalse(self.env["ir.model.fields"]._get(MODEL, "x_sequence"))
+
+    def test_per_company_removed(self):
+        self.update(per_company=True)
+        self.project.action_apply()
+        rule_line = self.line.company_rule_id
+        ir_rule = self.env.ref(f"{MODULE}.{rule_line.xml_name}")
+        action = self.env.ref(f"{MODULE}.{self.line._studio_xml_names()['action']}")
+        self.env[MODEL].create(
+            [
+                {
+                    "x_name": "Of the company",
+                    "x_company_id": self.env.company.id,
+                },
+                {"x_name": "Shared", "x_company_id": False},
+            ]
+        )
+        answer = self.removal_report("per_company")
+        self.assertFalse(answer["refused"])
+        self.assertEqual(
+            answer["report"]["rules"], [{"name": ir_rule.name, "model": MODEL}]
+        )
+        self.update(per_company=False)
+        self.assertFalse(rule_line.exists())
+        answer = self.project._studio_apply_report()
+        report = answer["report"]
+        self.assertEqual(
+            report["effects"],
+            [
+                {
+                    "model": MODEL,
+                    "kind": "company",
+                    "count": 1,
+                    "field": "x_company_id",
+                }
+            ],
+        )
+        self.assertEqual(report["rules"], [{"name": ir_rule.name, "model": MODEL}])
+        self.assertTrue(answer["confirm"])
+        self.project.action_apply()
+        self.assertFalse(ir_rule.exists())
+        self.assertNotIn("x_company_id", self.env[MODEL]._fields)
+        self.assertNotIn("x_company_id", action.context or "")
+        self.assertEqual(self.env[MODEL].search_count([]), 2)
+
+    def test_option_off_then_on_removes_nothing(self):
+        self.update(archivable=True, per_company=True)
+        self.project.action_apply()
+        xml_name = self.line.company_rule_id.xml_name
+        ir_rule = self.env.ref(f"{MODULE}.{xml_name}")
+        record = self.env[MODEL].create(
+            {"x_name": "One", "x_company_id": self.env.company.id}
+        )
+        self.update(archivable=False, per_company=False)
+        self.update(archivable=True, per_company=True)
+        self.assertEqual(self.line.company_rule_id.xml_name, xml_name)
+        answer = self.project._studio_apply_report()
+        for section in ("fields", "effects", "rules"):
+            self.assertEqual(answer["report"][section], [], section)
+        self.assertFalse(answer["confirm"])
+        self.project.action_apply()
+        self.assertTrue(ir_rule.exists())
+        record = self.env[MODEL].browse(record.id)
+        self.assertEqual(
+            (record.x_active, record.x_company_id), (True, self.env.company)
+        )
+
+    def test_option_removal_refused_while_used(self):
+        self.update(per_company=True)
+        self.project.action_apply()
+        self.project._studio_save_rule(
+            {
+                "name": "Studio test with a company",
+                "model": MODEL,
+                "domain": "[('x_company_id', '!=', False)]",
+                "group_ids": self.env.ref("base.group_user").ids,
+                **{perm: True for perm in PERMS},
+            }
+        )
+        refused = self.removal_report("per_company")["refused"]
+        self.assertIn("Studio test with a company", refused)
+        self.update(per_company=False)
+        self.assertIn(
+            "Studio test with a company",
+            self.Editor.get_review(self.project.id)["blocked"],
+        )
+        with self.assertRaisesRegex(UserError, "x_company_id"):
             with self.env.cr.savepoint():
-                self.update(manual_order=False)
-        self.update(order="x_name desc")
+                self.project.action_apply()
+        self.assertIn("x_company_id", self.env[MODEL]._fields)
+        # A change of a default view that shows the field.
+        self.update(per_company=True, archivable=True)
         self.project.action_apply()
-        self.assertEqual(self.env[MODEL]._order, "x_name desc")
+        self.op(
+            self.project,
+            self.line._studio_views()["list"],
+            type="add_existing_field",
+            target="//field[@name='x_name']",
+            position="after",
+            field_name="x_active",
+        )
+        refused = self.removal_report("archivable")["refused"]
+        self.assertIn(f"{MODEL}.x_active", refused)
+        self.update(archivable=False)
+        with self.assertRaisesRegex(UserError, "x_active"):
+            with self.env.cr.savepoint():
+                self.project.action_apply()
+        self.assertIn("x_active", self.env[MODEL]._fields)
+
+    def test_discard_after_turning_off(self):
+        self.update(archivable=True)
+        self.project.action_apply()
+        record = self.env[MODEL].create({"x_name": "One"})
+        self.update(archivable=False)
+        self.assertEqual(self.project.state, "draft")
+        self.project.action_discard()
+        line = self.project.new_model_ids
+        self.assertTrue(line.archivable)
+        self.assertEqual(self.project._studio_apply_report()["report"]["fields"], [])
+        self.project.action_apply()
+        self.assertTrue(self.env[MODEL].browse(record.id).x_active)
+
+    def test_owned_model_waits(self):
+        """On a model the installed generated module defines, the field of
+        an option turned off leaves with the next generation and upgrade."""
+        self.update(archivable=True)
+        self.project.action_apply()
+        cr = self.env.cr
+        cr.execute("UPDATE ir_model SET state = 'base' WHERE model = %s", [MODEL])
+        cr.execute(
+            "UPDATE ir_model_fields SET state = 'base' "
+            "WHERE model = %s AND name = 'x_active'",
+            [MODEL],
+        )
+        self.env["ir.model"].invalidate_model(["state"])
+        self.env["ir.model.fields"].invalidate_model(["state"])
+        self.update(archivable=False)
+        self.assertTrue(
+            self.Editor._model_payload(self.line)["option_removals"]["archivable"]
+        )
+        answer = self.removal_report("archivable")
+        self.assertTrue(answer["waiting"])
+        self.assertEqual(answer["report"]["fields"], [])
+        report = self.project._studio_apply_report()["report"]
+        self.assertEqual((report["fields"], report["effects"]), ([], []))
+        result = self.project.action_apply()
+        self.assertEqual(result["params"]["type"], "warning")
+        self.assertIn(f"{MODEL}.x_active", result["params"]["message"])
+        self.assertTrue(self.env["ir.model.fields"]._get(MODEL, "x_active"))
+        cr.execute("UPDATE ir_model SET state = 'manual' WHERE model = %s", [MODEL])
+        cr.execute(
+            "UPDATE ir_model_fields SET state = 'manual' "
+            "WHERE model = %s AND name = 'x_active'",
+            [MODEL],
+        )
+        self.env["ir.model"].invalidate_model(["state"])
+        self.env["ir.model.fields"].invalidate_model(["state"])
+
+    def test_unknown_option_refused(self):
+        with self.assertRaises(UserError):
+            self.removal_report("x_unknown")
 
     def test_archived_term_translated(self):
         """The views keep the source term « Archived »; each installed
@@ -370,17 +622,3 @@ class TestModelOptions(StudioCase):
             self.project.id, MODEL, COMPANY_RULE_DOMAIN
         )
         self.assertEqual(check, {"ok": True, "count": 1})
-
-    def test_per_company_frozen_after_apply(self):
-        self.update(per_company=True)
-        self.project.action_apply()
-        rule = self.line.company_rule_id
-        with self.assertRaises(UserError):
-            with self.env.cr.savepoint():
-                self.update(per_company=False)
-        self.line.invalidate_recordset()
-        self.assertTrue(self.line.per_company)
-        self.assertTrue(rule.exists())
-        self.assertTrue(
-            self.Editor._model_payload(self.line)["options_applied"]["per_company"]
-        )

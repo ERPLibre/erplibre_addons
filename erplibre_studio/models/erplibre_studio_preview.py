@@ -158,7 +158,8 @@ class ErplibreStudioProject(models.Model):
         ``line`` can be sorted by once applied: the stored fields of its
         model (simulated before Apply), the fields of its options and the
         new fields of the project on it; not a field of the project that
-        the draft no longer has, which Apply removes."""
+        the draft no longer has, nor the field of an option turned off,
+        which Apply removes."""
         self.ensure_one()
         if not line.applied:
             infos = self._studio_simulated_fields(line)
@@ -169,6 +170,9 @@ class ErplibreStudioProject(models.Model):
             removed = set(
                 self.field_ids.filtered(lambda f: f.model == line.model).mapped("name")
             ) - set(definitions)
+            removed |= {
+                field.name for field in self._studio_option_leaving(line).values()
+            }
             for name in removed:
                 infos.pop(name, None)
             extra = dict(line._studio_option_fields())

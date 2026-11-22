@@ -190,6 +190,38 @@ class TestConfirm(StudioCase):
         self.assertEqual(data["project"]["state"], "applied")
         self.assertNotIn(ORDER, self.env)
 
+    def test_apply_wizard_shows_option_effects(self):
+        """An option turned off after Apply: the confirmation of Apply names
+        the field and what changes for the records."""
+        self.project._studio_update_model(
+            self.order, {"archivable": True, "per_company": True}
+        )
+        self.project.action_apply()
+        records = self.env[ORDER].create(
+            [
+                {"x_name": "One", "x_company_id": self.env.company.id},
+                {"x_name": "Two"},
+            ]
+        )
+        records[1].x_active = False
+        self.project._studio_update_model(
+            self.order, {"archivable": False, "per_company": False}
+        )
+        action = self.as_admin().action_apply_wizard()
+        wizard = self.env[action["res_model"]].browse(action["res_id"])
+        html = str(wizard.report_html)
+        for text in (
+            "What changes for the records",
+            f"1 archived record(s) of {ORDER} become visible",
+            f"1 record(s) of {ORDER} are no longer limited to their company",
+            f"{ORDER}.x_active",
+        ):
+            self.assertIn(text, html)
+        wizard.with_user(self.admin).action_confirm()
+        self.assertNotIn("x_active", self.env[ORDER]._fields)
+        self.assertNotIn("x_company_id", self.env[ORDER]._fields)
+        self.assertEqual(self.env[ORDER].search_count([]), 2)
+
     def test_revert_refused_while_the_module_is_installed(self):
         """Installed, the generated module owns what the project applied,
         models or not (groups, categories, access rights): only its

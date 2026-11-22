@@ -17,6 +17,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "%(count)s archived record(s) of %(model)s become visible"
+msgstr ""
+"%(count)s enregistrement(s) archivé(s) de %(model)s redeviennent visibles"
+
+#. module: erplibre_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
@@ -75,6 +82,15 @@ msgstr "%(count)s élément(s) inchangé(s) depuis le dernier Apply"
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "%(count)s member(s)"
 msgstr "%(count)s membre(s)"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid ""
+"%(count)s record(s) of %(model)s are no longer limited to their company"
+msgstr ""
+"%(count)s enregistrement(s) de %(model)s ne sont plus limités à leur "
+"société"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1447,6 +1463,20 @@ msgid ""
 "Each part starts with a letter; the table, the name with its dots as _, has "
 "%(size)s characters at most."
 msgstr "Chaque partie commence par une lettre ; la table, le nom avec ses points en _, a %(size)s caractères au plus."
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__per_company
+msgid ""
+"Each record belongs to a company (the field x_company_id), and a global "
+"record rule shows a user the records of their companies and those of no "
+"company. Turned off after Apply, the next Apply removes the field and its "
+"values, after a confirmation."
+msgstr ""
+"Chaque enregistrement appartient à une société (le champ x_company_id), et "
+"une règle d'enregistrement globale montre à un utilisateur les "
+"enregistrements de ses sociétés et ceux sans société. Désactivée après "
+"l'Apply, le prochain Apply retire son champ et ses valeurs, après une "
+"confirmation."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5628,6 +5658,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(field)s cannot be removed, it is still used: %(items)s."
+msgstr ""
+"Le champ %(field)s ne peut pas être retiré, il est encore utilisé : "
+"%(items)s."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid ""
 "The field %(field)s creates %(inverse)s, the inverse of %(other)s: remove "
@@ -5877,6 +5915,12 @@ msgstr "Le libellé du menu ; vide : le libellé du modèle."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "The list of %(model)s loses its drag handle"
+msgstr "La liste de %(model)s perd sa poignée de glisser-déposer"
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The maximum size is a whole number from 1 to %(max)s."
 msgstr "La taille maximale est un nombre entier de 1 à %(max)s."
@@ -6059,14 +6103,6 @@ msgid "The operator %(operator)s does not apply to a %(type)s field."
 msgstr "L'opérateur %(operator)s ne s'applique pas à un champ %(type)s."
 
 #. module: erplibre_studio
-#. odoo-python
-#: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
-msgid "The option %(option)s of %(name)s cannot be removed once applied."
-msgstr ""
-"L'option %(option)s de %(name)s ne peut plus être retirée une fois "
-"appliquée."
-
-#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_app__sequence
 msgid ""
 "The order of the apps in the project: the first one gives the icon of the "
@@ -6159,11 +6195,12 @@ msgstr "Les règles d'enregistrement du projet sur le modèle"
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__manual_order
 msgid ""
 "The records are ordered by hand, with the handle of the list (the field "
-"x_sequence). Once applied, the option cannot be removed."
+"x_sequence). Turned off after Apply, the next Apply removes the field and "
+"its values, after a confirmation."
 msgstr ""
 "Les enregistrements sont ordonnés à la main, avec la poignée de la liste "
-"(le champ x_sequence). Une fois appliquée, l'option ne peut plus être "
-"retirée."
+"(le champ x_sequence). Désactivée après l'Apply, le prochain Apply retire "
+"son champ et ses valeurs, après une confirmation."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6180,11 +6217,12 @@ msgstr "Les enregistrements en lignes, une colonne par champ."
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__archivable
 msgid ""
-"The records can be archived (the field x_active). Once applied, the option "
-"cannot be removed."
+"The records can be archived (the field x_active). Turned off after Apply, "
+"the next Apply removes the field and its values, after a confirmation."
 msgstr ""
-"Les enregistrements peuvent être archivés (le champ x_active). Une fois "
-"appliquée, l'option ne peut plus être retirée."
+"Les enregistrements peuvent être archivés (le champ x_active). Désactivée "
+"après l'Apply, le prochain Apply retire son champ et ses valeurs, après "
+"une confirmation."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6961,6 +6999,12 @@ msgstr "Modèle inconnu %(model)s."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Unknown model option %(key)s."
+msgstr "Option de modèle inconnue : %(key)s."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Unknown operation %(type)s."
 msgstr "Opération inconnue %(type)s."
@@ -7115,6 +7159,12 @@ msgstr "Ce que l'Apply crée ou met à jour"
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 msgid "What Revert removes changed since it was shown: review it again."
 msgstr "Ce que Défaire retire a changé depuis son affichage : relisez-le."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+msgid "What changes for the records"
+msgstr "Ce qui change pour les enregistrements"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7690,6 +7740,12 @@ msgid "the app"
 msgstr "l'application"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the field %(name)s depends on it"
+msgstr "le champ %(name)s en dépend"
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "the first true rule wins"
@@ -7716,8 +7772,26 @@ msgstr "la règle"
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the rule %(name)s of the project"
+msgstr "la règle %(name)s du projet"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "the view"
 msgstr "la vue"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the view %(name)s"
+msgstr "la vue %(name)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "the view %(name)s of the project"
+msgstr "la vue %(name)s du projet"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8019,18 +8093,6 @@ msgstr "restreint"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s: multi-company"
 msgstr "%(model)s : multisociété"
-
-#. module: erplibre_studio
-#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__per_company
-msgid ""
-"Each record belongs to a company (the field x_company_id), and a global "
-"record rule shows a user the records of their companies and those of no "
-"company. Once applied, the option cannot be removed."
-msgstr ""
-"Chaque enregistrement appartient à une société (le champ x_company_id), et "
-"une règle d'enregistrement globale montre à un utilisateur les "
-"enregistrements de ses sociétés et ceux sans société. Une fois appliquée, "
-"l'option ne peut plus être retirée."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__company_rule_id

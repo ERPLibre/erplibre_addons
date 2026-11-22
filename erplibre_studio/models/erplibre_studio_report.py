@@ -7,15 +7,25 @@ import json
 from markupsafe import Markup, escape
 from odoo import models
 from odoo.exceptions import UserError
-from odoo.tools import sql
+from odoo.tools import SQL, sql
 
 from .. import arch as studio_arch
 from .erplibre_studio_project import CREATED_FIELDS, MODULE_OWNING_STATES
+
+# {option: kind of effect} of the removal of the field of an option
+# (``_studio_option_effects``): archived records that become visible,
+# records no longer limited to their company, a list without its handle.
+OPTION_EFFECTS = {
+    "archivable": "archived",
+    "per_company": "company",
+    "manual_order": "handle",
+}
 
 # The sections of a removal report, in the order they show.
 REPORT_SECTIONS = (
     "models",
     "fields",
+    "effects",
     "tables",
     "groups",
     "categories",
@@ -37,6 +47,25 @@ def report_digest(report):
     ).hexdigest()
 
 
+def effect_text(env, item):
+    """The text of ``item``, an effect of the removal of the field of an
+    option (``_studio_option_effects``)."""
+    if item["kind"] == "archived":
+        return env._(
+            "%(count)s archived record(s) of %(model)s become visible",
+            count=item["count"],
+            model=item["model"],
+        )
+    if item["kind"] == "company":
+        return env._(
+            "%(count)s record(s) of %(model)s are no longer limited to their "
+            "company",
+            count=item["count"],
+            model=item["model"],
+        )
+    return env._("The list of %(model)s loses its drag handle", model=item["model"])
+
+
 def report_html(env, report):
     """The HTML of ``report`` (``_studio_removal_report``), every value
     escaped."""
@@ -44,6 +73,7 @@ def report_html(env, report):
     titles = {
         "models": _("Models and their records"),
         "fields": _("Fields and their values"),
+        "effects": _("What changes for the records"),
         "tables": _("Relation tables"),
         "groups": _("Groups and their members"),
         "categories": _("Categories of groups"),
@@ -72,6 +102,8 @@ def report_html(env, report):
                 name=item["name"],
                 filled=item["filled"],
             )
+        if section == "effects":
+            return effect_text(env, item)
         if section == "groups":
             return _(
                 "%(name)s: %(users)s member(s)",
@@ -139,6 +171,46 @@ class ErplibreStudioProject(models.Model):
         self.env.cr.execute(query)
         return self.env.cr.fetchone()[0]
 
+    def _studio_option_effects(self, fields_):
+        """[{model, kind, count, field}] of the removal of ``fields_``, the
+        fields of options (OPTION_EFFECTS): « archived », the records whose
+        ``x_active`` is not set, visible once it leaves; « company », the
+        records with a company, which every company then sees; « handle »,
+        count 0: the list loses its handle and the records sort by the
+        default order of the model line. A read, in sudo."""
+        kinds = {
+            studio_arch.MODEL_OPTIONS[key][0]: kind
+            for key, kind in OPTION_EFFECTS.items()
+        }
+        conditions = {"archived": "IS NOT TRUE", "company": "IS NOT NULL"}
+        effects = []
+        for field in fields_.sorted(lambda f: (f.model, f.name)):
+            kind = kinds.get(field.name)
+            Model = self.env.get(field.model)
+            if not kind or Model is None:
+                continue
+            count = 0
+            table = Model._table
+            if kind in conditions and sql.column_exists(self.env.cr, table, field.name):
+                self.env.cr.execute(
+                    SQL(
+                        "SELECT count(*) FROM %s WHERE %s %s",
+                        SQL.identifier(table),
+                        SQL.identifier(field.name),
+                        SQL(conditions[kind]),
+                    )
+                )
+                count = self.env.cr.fetchone()[0]
+            effects.append(
+                {
+                    "model": field.model,
+                    "kind": kind,
+                    "count": count,
+                    "field": field.name,
+                }
+            )
+        return effects
+
     def _studio_leaving_fields(self, records):
         """The ir.model.fields that leave with ``records``: the custom fields
         among them, the fields of their models and those pointing at
@@ -157,9 +229,11 @@ class ErplibreStudioProject(models.Model):
         """What removing ``records`` ({kind: records}, kinds of
         REMOVAL_ORDER, plus « views » and « fields ») takes out of the
         database: {models: [{model, name, count}], fields: [{model, name,
-        label, filled}], views: [{name, kind}], changes_removed, menus,
-        actions, access: [{name, group}], rules: [{name, model}], groups:
-        [{name, users}], categories, tables}. A read, in sudo."""
+        label, filled}], effects: [{model, kind, count, field}] (the fields
+        of the options of the models of the project among the fields,
+        ``_studio_option_effects``), views: [{name, kind}], changes_removed,
+        menus, actions, access: [{name, group}], rules: [{name, model}],
+        groups: [{name, users}], categories, tables}. A read, in sudo."""
         self.ensure_one()
         self.env.flush_all()
         records = {
@@ -173,6 +247,7 @@ class ErplibreStudioProject(models.Model):
         report = {
             "models": [],
             "fields": [],
+            "effects": [],
             "views": [],
             "changes_removed": 0,
             "menus": [],
@@ -219,6 +294,15 @@ class ErplibreStudioProject(models.Model):
                     "filled": filled,
                 }
             )
+        options = {option[0] for option in studio_arch.MODEL_OPTIONS.values()}
+        line_models = set(self.new_model_ids.mapped("model")) - removed_models
+        report["effects"] = self._studio_option_effects(
+            records.get("fields", self.env["ir.model.fields"]).filtered(
+                lambda f: f.state == "manual"
+                and f.name in options
+                and f.model in line_models
+            )
+        )
         for kind, label in (("primary_views", "default"), ("views", "inherited")):
             for view in records.get(kind, self.env["ir.ui.view"]).sorted("name"):
                 report["views"].append({"name": view.name, "kind": label})
@@ -349,7 +433,8 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_apply_removals(self):
         """{kind: records} of what the next Apply removes: what the project
-        created that the draft no longer has."""
+        created that the draft no longer has, and the fields of the options
+        turned off (``_studio_option_removals``)."""
         self.ensure_one()
         created = self._studio_created_records()
         kept = self._studio_kept_names()
@@ -377,12 +462,14 @@ class ErplibreStudioProject(models.Model):
             removals[kind] = records.filtered(
                 lambda r, k=kind: names.get(r.id) not in kept[k]
             )
+        removals["fields"] |= self._studio_option_removals()[0]
         return removals
 
     def _studio_apply_report(self):
         """{report, digest, confirm}: what the next Apply removes from the
-        database; ``confirm`` when it holds records, values or group
-        members, which Apply then asks to confirm by the digest."""
+        database; ``confirm`` when it holds records, values, group members
+        or records an option removed changes, which Apply then asks to
+        confirm by the digest."""
         self.ensure_one()
         report = self._studio_removal_report(self._studio_apply_removals())
         report["members"] = [
@@ -399,6 +486,7 @@ class ErplibreStudioProject(models.Model):
             or any(item["filled"] for item in report["fields"])
             or any(item["users"] for item in report["groups"])
             or any(item["users"] for item in report["members"])
+            or any(item["count"] for item in report["effects"])
         )
         return {"report": report, "digest": report_digest(report), "confirm": confirm}
 

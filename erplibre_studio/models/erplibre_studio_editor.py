@@ -912,14 +912,17 @@ class ErplibreStudioEditor(models.AbstractModel):
         """A model line as the editor shows it; ``views`` holds the ids of
         its default views once applied; ``pending_views`` says which default
         views hold changes recorded before Apply. ``options_applied``:
-        {option: whether the applied model has its field}, which locks it;
-        ``sort_fields``: [[name, label]] of the fields its default order
+        {option: whether the applied model has its field};
+        ``option_removals``: {option: whether the option is off while its
+        own field is still on the model, which the next Apply removes
+        (``_studio_option_leaving``)}; ``sort_fields``: [[name, label]] of the fields its default order
         can name (``_studio_sortable_fields``), by label; ``company_rule``:
         [id, name] of the rule line of « Per company », or False."""
         views = line._studio_views() if line.applied else {}
         parent = line.menu_parent_id
         changes = line.project_id.change_ids.filtered(lambda c: c.model_line_id == line)
         sortable = line.project_id._studio_sortable_fields(line)
+        leaving = line.project_id._studio_option_leaving(line)
         return {
             "id": line.id,
             "model": line.model,
@@ -935,6 +938,9 @@ class ErplibreStudioEditor(models.AbstractModel):
                 else False
             ),
             "options_applied": line._studio_options_applied(),
+            "option_removals": {
+                key: key in leaving for key in studio_arch.MODEL_OPTIONS
+            },
             "sort_fields": sorted(
                 ([name, label] for name, label in sortable.items()),
                 key=lambda item: (item[1].lower(), item[0]),
@@ -1643,6 +1649,20 @@ class ErplibreStudioEditor(models.AbstractModel):
         digest. A read."""
         self._check_studio_access()
         return self._read_project(project_id)._studio_apply_report()
+
+    @api.model
+    def get_option_removal_report(self, project_id, line_id, key):
+        """{report, refused, waiting}: what turning the option ``key`` of the
+        model line ``line_id`` off removes at the next Apply, with its
+        effects on the records, why that removal is refused (or False),
+        and whether it waits for the installed generated module
+        (``_studio_option_removal_report``). A read."""
+        self._check_studio_access()
+        if key not in studio_arch.MODEL_OPTIONS:
+            raise UserError(self.env._("Unknown model option %(key)s.", key=key))
+        project = self._read_project(project_id)
+        line = project._studio_model_line(line_id)
+        return project._studio_option_removal_report(line, key)
 
     # ── preview of a model not created yet ──────────────────────────────
 
