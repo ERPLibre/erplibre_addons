@@ -14,6 +14,7 @@ import {
 } from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
+import {choiceValue, parseOptions, widgetOptionSpecs} from "@erplibre_studio/editor/studio_widget_options";
 
 const SHEET = "/form/sheet";
 const ADDRESS = "//group[@name='address']";
@@ -1028,6 +1029,11 @@ describe("erplibre_studio editor, inspector", () => {
         await contains(".o_erplibre_studio_field[data-name=user_id]").click();
         await contains(".o_erplibre_studio_field_advanced_toggle").click();
         const OPTIONS = ".o_erplibre_studio_field_advanced .o_erplibre_studio_prop_options";
+        // The form of the options first, the text on demand.
+        expect(OPTIONS).toHaveCount(0);
+        expect(".o_erplibre_studio_options_raw_toggle").toHaveAttribute("aria-pressed", "false");
+        await contains(".o_erplibre_studio_options_raw_toggle").click();
+        expect(".o_erplibre_studio_options_raw_toggle").toHaveAttribute("aria-pressed", "true");
         expect(OPTIONS).toHaveCount(1);
         expect(OPTIONS).toHaveAttribute("placeholder", '{"no_create": true}');
         // Right under the widget.
@@ -1054,6 +1060,211 @@ describe("erplibre_studio editor, inspector", () => {
             value: "{'domain': uid}",
         });
         expect(OPTIONS).toHaveValue("{'no_create': True}");
+    });
+
+    test("widget options: the metadata of the registry", () => {
+        const tags = widgetOptionSpecs("many2many_tags", "many2many", "form");
+        expect(tags.find((spec) => spec.name === "color_field").scope).toBe("comodel");
+        expect(tags.find((spec) => spec.name === "no_create").scope).toBe(null);
+        const money = widgetOptionSpecs(false, "monetary", "list");
+        expect(money.find((spec) => spec.name === "currency_field").scope).toBe("record");
+        // A field option of the comodel without relatedFields.
+        const status = widgetOptionSpecs("statusbar", "many2one", "form");
+        expect(status.find((spec) => spec.name === "fold_field").scope).toBe("comodel");
+        // An unknown widget falls back to the widget of the type.
+        expect(widgetOptionSpecs("x_unknown_widget", "many2one", "form").map((spec) => spec.name)).toInclude(
+            "no_open"
+        );
+        expect(choiceValue("[0,90]")).toEqual([0, 90]);
+        expect(choiceValue("md")).toBe("md");
+        expect(parseOptions("")).toEqual({ok: true, options: {}});
+        expect(parseOptions('{"no_create": true}')).toEqual({ok: true, options: {no_create: true}});
+        expect(parseOptions("{'size': [0, 90], 'zoom_delay': -5}")).toEqual({
+            ok: true,
+            options: {size: [0, 90], zoom_delay: -5},
+        });
+        expect(parseOptions("{'no_create': context.get('x')}").ok).toBe(false);
+        expect(parseOptions("{'domain': uid}").ok).toBe(false);
+        expect(parseOptions("[1, 2]").ok).toBe(false);
+    });
+
+    test("widget options: a form from the widget metadata", async () => {
+        const SETTABLE = {
+            field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
+        };
+        const AMOUNT = {...field("street"), name: "x_amount", path: named("x_amount"), label: "Amount"};
+        /**
+         * The payload with a monetary field « x_amount » in the address
+         * group, and ``attrs``: field name -> attributes of its block.
+         */
+        const advanced = (attrs = {}) => {
+            const set = (block) => {
+                let next = attrs[block.name] ? {...block, attrs: {...block.attrs, ...attrs[block.name]}} : block;
+                if (next.children) {
+                    const children = next.path === ADDRESS ? [...next.children, AMOUNT] : next.children;
+                    next = {...next, children: children.map(set)};
+                }
+                return next;
+            };
+            const data = payload({settable: SETTABLE, operations: [...payload().operations, "set_attribute"]});
+            data.fields.x_amount = {string: "Amount", type: "monetary"};
+            data.fields.currency_id = {string: "Currency", type: "many2one", relation: "res.currency"};
+            return {...data, blocks: set(data.blocks)};
+        };
+        onRpc("erplibre.studio.editor", "get_studio_choices", () => ({
+            groups: [],
+            menus: [],
+            apps: [],
+            models: [],
+            taken_models: [],
+            icons: [],
+        }));
+        const OPTION = (name) => `.o_erplibre_studio_field_advanced .o_erplibre_studio_option[data-option=${name}]`;
+        let attrs = {x_level: {widget: "radio"}, city: {options: "{'no_create': context.get('x')}"}};
+        answer = advanced(attrs);
+        afterOperation = () => advanced(attrs);
+        await openEditor();
+
+        // A selection shown as radio buttons: the options of radio.
+        await contains(".o_erplibre_studio_field[data-name=x_level]").click();
+        expect(".o_erplibre_studio_field_advanced").toHaveCount(1);
+        expect(`${OPTION("horizontal")} input[type=checkbox]`).toHaveCount(1);
+        expect(`${OPTION("horizontal")} input`).not.toBeChecked();
+        expect(".o_erplibre_studio_prop_options").toHaveCount(0);
+        await contains(`${OPTION("horizontal")} input`).check();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("x_level"),
+            attribute: "options",
+            value: {horizontal: true},
+            option_fields: {},
+        });
+
+        // A many2one without a widget: the options of many2one.
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=user_id]").click();
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        expect(OPTION("no_open")).toHaveCount(1);
+        attrs = {...attrs, user_id: {options: "{'no_open': True, 'x_custom': 1}"}};
+        await contains(`${OPTION("no_open")} input`).check();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "options",
+            value: {no_open: true},
+            option_fields: {},
+        });
+        expect(`${OPTION("no_open")} input`).toBeChecked();
+        // A key the widget does not list shows apart; its button removes it.
+        expect(".o_erplibre_studio_option_unknown").toHaveCount(1);
+        expect(".o_erplibre_studio_option_unknown").toHaveText("x_custom");
+        attrs = {...attrs, user_id: {options: "{'no_open': True}"}};
+        await contains(".o_erplibre_studio_option_unknown_remove").click();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "options",
+            value: {no_open: true},
+            option_fields: {},
+        });
+        expect(".o_erplibre_studio_option_unknown").toHaveCount(0);
+        // Unchecked: the last option leaves, the attribute goes.
+        attrs = {...attrs, user_id: {}};
+        await contains(`${OPTION("no_open")} input`).uncheck();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "options",
+            value: "",
+            option_fields: {},
+        });
+
+        // A monetary: its currency field, a many2one of the record.
+        await contains(".o_erplibre_studio_field[data-name=x_amount]").click();
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        const currency = `${OPTION("currency_field")} select`;
+        expect(`${currency} option[value=currency_id]`).toHaveCount(1);
+        expect(`${currency} option[value=user_id]`).toHaveCount(1);
+        // Neither a field not created yet nor a field of another type.
+        expect(`${currency} option[value=x_sponsor]`).toHaveCount(0);
+        expect(`${currency} option[value=city]`).toHaveCount(0);
+        attrs = {...attrs, x_amount: {options: "{'currency_field': 'currency_id'}"}};
+        await contains(currency).select("currency_id");
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("x_amount"),
+            attribute: "options",
+            value: {currency_field: "currency_id"},
+            option_fields: {currency_field: "record"},
+        });
+        expect(currency).toHaveValue("currency_id");
+        // The currency is not in the view: the record would not load it.
+        expect(`${OPTION("currency_field")} .o_erplibre_studio_option_missing`).toHaveCount(1);
+
+        // Options that hold an expression: the text only.
+        await contains(".o_erplibre_studio_field[data-name=city]").click();
+        expect(".o_erplibre_studio_field_advanced").toHaveCount(1);
+        expect(".o_erplibre_studio_prop_options").toHaveValue("{'no_create': context.get('x')}");
+        expect(".o_erplibre_studio_options_raw_toggle").toHaveCount(0);
+        expect(".o_erplibre_studio_options_note").toHaveText("These options hold expressions: edit them as text.");
+        expect(".o_erplibre_studio_option").toHaveCount(0);
+    });
+
+    test("widget options: switch, number, text and list choices of an image", async () => {
+        const PHOTO = {...field("street"), name: "x_photo", path: named("x_photo"), label: "Photo"};
+        let options = "";
+        /** The payload with an image field « x_photo » holding ``options``. */
+        const withPhoto = () => {
+            const attrs = {widget: "image", ...(options ? {options} : {})};
+            const set = (block) => {
+                if (block.path === ADDRESS) {
+                    return {...block, children: [...block.children, {...PHOTO, attrs}]};
+                }
+                return block.children ? {...block, children: block.children.map(set)} : block;
+            };
+            const data = payload({
+                settable: {field: {widget: "widget", options: "field_options"}},
+                operations: [...payload().operations, "set_attribute"],
+            });
+            data.fields.x_photo = {string: "Photo", type: "binary"};
+            return {...data, blocks: set(data.blocks)};
+        };
+        answer = withPhoto();
+        afterOperation = () => withPhoto();
+        await openEditor();
+        await contains(".o_erplibre_studio_field[data-name=x_photo]").click();
+        const OPTION = (name) => `.o_erplibre_studio_field_advanced .o_erplibre_studio_option[data-option=${name}]`;
+        const sent = () => operations.pop().value;
+        // A switch whose default is on shows on while the key is absent.
+        expect(`${OPTION("reload")} input`).toBeChecked();
+        options = "{'reload': False}";
+        await contains(`${OPTION("reload")} input`).uncheck();
+        expect(sent()).toEqual({reload: false});
+        expect(`${OPTION("reload")} input`).not.toBeChecked();
+        // Back to its default: the key leaves.
+        options = "";
+        await contains(`${OPTION("reload")} input`).check();
+        expect(sent()).toBe("");
+        // A number.
+        options = "{'zoom_delay': 300}";
+        await contains(`${OPTION("zoom_delay")} input[type=number]`).edit("300");
+        expect(sent()).toEqual({zoom_delay: 300});
+        expect(`${OPTION("zoom_delay")} input`).toHaveValue(300);
+        // A text, kept next to the number.
+        options = "{'accepted_file_extensions': '.png', 'zoom_delay': 300}";
+        await contains(`${OPTION("accepted_file_extensions")} input`).edit(".png");
+        expect(sent()).toEqual({zoom_delay: 300, accepted_file_extensions: ".png"});
+        // A choice written as a list is sent as a list, and shows chosen.
+        options = "{'accepted_file_extensions': '.png', 'size': [0, 90], 'zoom_delay': 300}";
+        await contains(`${OPTION("size")} select`).select("[0,90]");
+        expect(sent()).toEqual({zoom_delay: 300, accepted_file_extensions: ".png", size: [0, 90]});
+        expect(`${OPTION("size")} select`).toHaveValue("[0,90]");
+        // « Default » removes the key.
+        options = "{'accepted_file_extensions': '.png', 'zoom_delay': 300}";
+        await contains(`${OPTION("size")} select`).select("");
+        expect(sent()).toEqual({zoom_delay: 300, accepted_file_extensions: ".png"});
+        // The help of an option is its title, not a line of text.
+        expect(OPTION("zoom_delay")).toHaveAttribute("title", /milliseconds/);
     });
 
     test("a change of the Changes tab is undone on its own", async () => {

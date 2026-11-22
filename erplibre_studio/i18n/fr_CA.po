@@ -1057,6 +1057,16 @@ msgid "Add columns"
 msgstr "Ajouter des colonnes"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
+msgid ""
+"Add it to the view, hidden if need be: the record loads only the fields of "
+"the view."
+msgstr ""
+"Ajoutez-le à la vue, masqué au besoin : l'enregistrement ne charge que les "
+"champs de la vue."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Add the existing field, or choose another name."
@@ -1434,6 +1444,12 @@ msgstr "Choisissez un autre nom."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "Code view (debug mode)"
+msgstr "Vue du code (mode débogage)"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Container %(tag)s"
 msgstr "Conteneur %(tag)s"
@@ -1486,6 +1502,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
+msgid "Edit as text"
+msgstr "Modifier en texte"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Element %(tag)s"
 msgstr "Élément %(tag)s"
@@ -1535,6 +1557,12 @@ msgstr "Figé à l'Apply : son nom est une colonne de la table dans la base de d
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Future owner module"
 msgstr "Module propriétaire à venir"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "Height (px)"
+msgstr "Hauteur (px)"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__order
@@ -1658,6 +1686,18 @@ msgstr "Aucun champ %(name)s sur %(model)s ni dans les autres projets."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "No file"
+msgstr "Sans fichier"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "No image"
+msgstr "Sans image"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "No limit"
 msgstr "Aucune limite"
@@ -1667,6 +1707,12 @@ msgstr "Aucune limite"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "No model, table nor project uses %(name)s."
 msgstr "Aucun modèle, aucune table ni aucun projet n'utilise %(name)s."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "No video"
+msgstr "Sans vidéo"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1679,6 +1725,12 @@ msgstr "Pas un nom réservé"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Not a reserved word of the ORM"
 msgstr "Pas un mot réservé de l'ORM"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
+msgid "Not listed by this widget:"
+msgstr "Non listées par ce widget :"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2320,6 +2372,7 @@ msgstr "Décimal"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Default"
 msgstr "Par défaut"
 
@@ -4710,6 +4763,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
 msgid "Remove %(name)s"
 msgstr "Retirer %(name)s"
 
@@ -6662,6 +6716,12 @@ msgstr ""
 "précédent pour obtenir une sélection."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "These options hold expressions: edit them as text."
+msgstr "Ces options contiennent des expressions : modifiez-les en texte."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
@@ -6786,6 +6846,12 @@ msgstr "Cette vue n'a pas de gabarit."
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "This view is not in the project."
 msgstr "Cette vue n'est pas dans le projet."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
+msgid "This widget lists no options: edit them as text."
+msgstr "Ce widget ne liste aucune option : modifiez les options en texte."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8212,7 +8278,7 @@ msgstr "Options"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Options of the widget: JSON or a Python dictionary. Empty: none."
 msgstr "Options du widget : JSON ou un dictionnaire Python. Vide : aucune."
 

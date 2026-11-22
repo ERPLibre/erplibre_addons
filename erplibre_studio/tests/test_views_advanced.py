@@ -174,6 +174,12 @@ class TestViewsAdvanced(StudioCase):
         self.set_attr("country_id", "options", '{"no_open": true}')
         self.assertEqual(self.node("country_id").get("options"), "{'no_open': True}")
         self.assertEqual(len(self.project.change_ids), 1)
+        # A list value, as the typed form sends the size of an image.
+        self.set_attr("country_id", "options", {"size": [0, 90], "zoom": True})
+        self.assertEqual(
+            self.node("country_id").get("options"), "{'size': [0, 90], 'zoom': True}"
+        )
+        self.assertEqual(len(self.project.change_ids), 1)
         # Not a dictionary of fixed values.
         for value in ("[1]", "{'no_create': uid}", '{"a": NaN}', "{'a b': 1}"):
             with self.assertRaisesRegex(UserError, "not a set of options"):

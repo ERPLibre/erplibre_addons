@@ -5,6 +5,7 @@
 import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {StudioFieldName} from "./studio_field_name";
+import {StudioWidgetOptions} from "./studio_widget_options";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
 import {
     DEFAULT_TIMELINE_MODE,
@@ -54,8 +55,8 @@ const ADVANCED_VIEW_TYPES = ["form", "list"];
  * read-only, values, comodel, and the options set before Apply:
  * translatable, indexed, maximum size) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
- * writes; in a form or a list, the widget, the domain and the groups
- * under « Advanced »; for a new field of a model of the database, the
+ * writes; in a form or a list, the widget, its options
+ * (StudioWidgetOptions), the domain and the groups under « Advanced »; for a new field of a model of the database, the
  * module that holds it once generated); a many2one of the project, the one2many it may create on its
  * comodel and what it does when its record is deleted; a container shows
  * what it holds. « Changes »: the changes of
@@ -66,7 +67,7 @@ const ADVANCED_VIEW_TYPES = ["form", "list"];
  */
 export class StudioInspector extends Component {
     static template = "erplibre_studio.Inspector";
-    static components = {StudioFieldName};
+    static components = {StudioFieldName, StudioWidgetOptions};
     static props = {
         editor: Object,
         // The payload of the editor (get_editor_data).
@@ -579,20 +580,6 @@ export class StudioInspector extends Component {
 
     setNodeAttribute(block, attribute, value, extra = {}, onError = null) {
         return this.editor.setNodeAttribute(block, attribute, value, extra, onError);
-    }
-
-    /**
-     * Set the options of the widget of ``block`` from the text of the
-     * textarea of ``ev``. A refused text leaves the payload as it was:
-     * the textarea shows again what the draft holds.
-     */
-    async setOptionsText(block, entry, ev) {
-        const input = ev.target;
-        const data = await this.setNodeAttribute(block, entry.attribute, input.value.trim());
-        if (!data) {
-            input.value = entry.value || "";
-        }
-        return data;
     }
 
     setAttribute(type, value) {

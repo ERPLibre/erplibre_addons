@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The options of the widget of a field: one line per option the
+         widget lists, the keys it does not list, or the text of the
+         attribute. -->
+    <t t-name="erplibre_studio.WidgetOptions">
+        <div class="o_erplibre_studio_widget_options">
+            <div class="d-flex align-items-baseline gap-2 mb-1">
+                <span class="form-label mb-0" t-esc="props.entry.label" />
+                <button
+                    t-if="canToggle"
+                    type="button"
+                    class="btn btn-link btn-sm p-0 ms-auto o_erplibre_studio_options_raw_toggle"
+                    t-att-aria-pressed="state.raw ? 'true' : 'false'"
+                    t-on-click="toggleRaw"
+                >
+                    Edit as text
+                </button>
+            </div>
+            <t t-if="showRaw">
+                <textarea
+                    class="form-control form-control-sm font-monospace o_erplibre_studio_prop_options"
+                    rows="3"
+                    placeholder='{"no_create": true}'
+                    t-att-aria-label="props.entry.label"
+                    t-att-value="props.entry.value"
+                    t-att-disabled="props.busy"
+                    t-on-change="setText"
+                />
+                <span t-if="rawNote" class="d-block text-muted small mt-1 o_erplibre_studio_options_note" t-esc="rawNote" />
+                <span t-else="" class="d-block text-muted small mt-1">Options of the widget: JSON or a Python dictionary. Empty: none.</span>
+            </t>
+            <t t-else="">
+                <div
+                    t-foreach="rows"
+                    t-as="row"
+                    t-key="row.spec.name"
+                    class="o_erplibre_studio_option"
+                    t-att-data-option="row.spec.name"
+                    t-att-title="row.spec.help or null"
+                >
+                    <div t-if="row.spec.type === 'boolean'" class="form-check form-switch mb-0 o_erplibre_studio_option_wide">
+                        <input
+                            type="checkbox"
+                            role="switch"
+                            class="form-check-input"
+                            t-att-id="row.id"
+                            t-att-checked="row.checked"
+                            t-att-disabled="props.busy"
+                            t-on-change="(ev) => this.setOption(row.spec, ev.target.checked)"
+                        />
+                        <label class="form-check-label" t-att-for="row.id" t-esc="row.spec.label" />
+                    </div>
+                    <t t-else="">
+                        <label class="text-truncate mb-0" t-att-for="row.id" t-esc="row.spec.label" />
+                        <input
+                            t-if="row.spec.type === 'number'"
+                            type="number"
+                            class="form-control form-control-sm"
+                            t-att-id="row.id"
+                            t-att-value="row.present ? row.value : ''"
+                            t-att-placeholder="row.spec.default !== undefined ? row.spec.default : null"
+                            t-att-disabled="props.busy"
+                            t-on-change="(ev) => this.onNumber(row.spec, ev)"
+                        />
+                        <select
+                            t-elif="row.spec.type === 'selection'"
+                            class="form-select form-select-sm"
+                            t-att-id="row.id"
+                            t-att-disabled="props.busy"
+                            t-on-change="(ev) => this.onSelect(row.spec, ev)"
+                        >
+                            <option value="" t-att-selected="!row.present">Default</option>
+                            <option
+                                t-foreach="row.spec.choices or []"
+                                t-as="choice"
+                                t-key="choice.value"
+                                t-att-value="choice.value"
+                                t-att-selected="isChosen(row, choice)"
+                                t-esc="choice.label"
+                            />
+                        </select>
+                        <select
+                            t-elif="row.spec.type === 'field'"
+                            class="form-select form-select-sm"
+                            t-att-id="row.id"
+                            t-att-disabled="props.busy"
+                            t-on-change="(ev) => this.onSelect(row.spec, ev)"
+                        >
+                            <option value="" t-att-selected="!row.present">Default</option>
+                            <option
+                                t-foreach="fieldChoices(row.spec, row.present ? row.value : '')"
+                                t-as="choice"
+                                t-key="choice[0]"
+                                t-att-value="choice[0]"
+                                t-att-selected="row.present and row.value === choice[0]"
+                                t-esc="choice[1]"
+                            />
+                        </select>
+                        <input
+                            t-else=""
+                            type="text"
+                            class="form-control form-control-sm"
+                            t-att-id="row.id"
+                            t-att-value="row.present ? row.value : ''"
+                            t-att-disabled="props.busy"
+                            t-on-change="(ev) => this.onText(row.spec, ev)"
+                        />
+                    </t>
+                    <span t-if="row.missing" class="text-muted small o_erplibre_studio_option_wide o_erplibre_studio_option_missing">
+                        Add it to the view, hidden if need be: the record loads only the fields of the view.
+                    </span>
+                </div>
+                <div t-if="unknownKeys.length" class="d-flex flex-wrap align-items-baseline gap-1 small text-muted mt-1 o_erplibre_studio_options_unknown">
+                    Not listed by this widget:
+                    <span
+                        t-foreach="unknownKeys"
+                        t-as="key"
+                        t-key="key"
+                        class="d-inline-flex align-items-center gap-1 o_erplibre_studio_option_unknown"
+                        t-att-data-option="key"
+                    >
+                        <code t-esc="key" />
+                        <button
+                            type="button"
+                            class="btn btn-link btn-sm p-0 text-body o_erplibre_studio_option_unknown_remove"
+                            t-att-aria-label="removeLabel(key)"
+                            t-att-title="removeLabel(key)"
+                            t-att-disabled="props.busy"
+                            t-on-click="() => this.removeKey(key)"
+                        >
+                            <i class="fa fa-times" aria-hidden="true" />
+                        </button>
+                    </span>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

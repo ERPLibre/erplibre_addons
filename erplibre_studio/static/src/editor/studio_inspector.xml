@@ -165,18 +165,19 @@
                 </div>
                 <span t-if="!entry.value" class="d-block text-muted mt-1">Not set in the view: web_timeline opens on Fit.</span>
             </t>
-            <label t-elif="entry.kind === 'field_options'" class="form-label mb-0 w-100">
-                <t t-esc="entry.label" />
-                <textarea
-                    class="form-control form-control-sm font-monospace mt-1 o_erplibre_studio_prop_options"
-                    rows="3"
-                    placeholder='{"no_create": true}'
-                    t-att-value="entry.value"
-                    t-att-disabled="props.busy"
-                    t-on-change="(ev) => this.setOptionsText(block, entry, ev)"
+            <t t-elif="entry.kind === 'field_options'">
+                <StudioWidgetOptions
+                    t-key="block.path"
+                    editor="editor"
+                    block="block"
+                    entry="entry"
+                    field="fieldInfo(block.name)"
+                    fields="data.fields or {}"
+                    blocks="data.blocks or null"
+                    viewType="viewType"
+                    busy="!!props.busy"
                 />
-                <span class="d-block text-muted mt-1">Options of the widget: JSON or a Python dictionary. Empty: none.</span>
-            </label>
+            </t>
             <label t-elif="entry.kind === 'field_domain'" class="form-label mb-0 w-100">
                 <t t-esc="entry.label" />
                 <textarea

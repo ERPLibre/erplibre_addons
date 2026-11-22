@@ -161,6 +161,20 @@
         }
     }
 
+    // One line per option of a widget: the label, then its control; a
+    // switch and the line under it take the whole width.
+    .o_erplibre_studio_option {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 9rem);
+        align-items: center;
+        column-gap: 0.5rem;
+        margin-bottom: 0.25rem;
+
+        .o_erplibre_studio_option_wide {
+            grid-column: 1 / -1;
+        }
+    }
+
     .o_erplibre_studio_checks {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
