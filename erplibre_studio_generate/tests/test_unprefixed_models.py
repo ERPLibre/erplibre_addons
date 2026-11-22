@@ -8,6 +8,9 @@ import tempfile
 from unittest.mock import patch
 
 from odoo.addons.base.models.ir_model import IrModel as BaseIrModel
+from odoo.addons.erplibre_studio_generate.models import (
+    erplibre_studio_project as project_module,
+)
 from odoo.addons.erplibre_studio.tests.common import StudioCase
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
@@ -112,6 +115,71 @@ class TestUnprefixedModels(StudioCase):
             f"{PROJECT_MODULE}.module_model_names", lambda: {shelf: frozenset({MODULE})}
         ):
             self.assertIsNone(self.status(shelf)["code"])
+
+    def test_module_table_reserved(self):
+        """The table of a model a module on the addons path defines, installed
+        or not, is reserved too: the name without dots of a model of a
+        module, or a model of its explicit ``_table``. The project's own
+        generated module aside."""
+        tables = {"studio_demo_shelf": frozenset({"studio_demo_library"})}
+        with patch(f"{PROJECT_MODULE}.module_model_tables", lambda: tables):
+            status = self.status("studio_demo_shelf")
+            self.assertEqual(status["code"], "unique")
+            self.assertEqual(
+                (status["owner"]["kind"], status["owner"]["table"]),
+                ("module", "studio_demo_shelf"),
+            )
+            self.assertIn("studio_demo_shelf", status["message"])
+            with self.assertRaisesRegex(UserError, "studio_demo_shelf"):
+                self.make_model(self.project, "Shelf", model="studio_demo.shelf")
+        tables = {"studio_demo_shelf": frozenset({MODULE})}
+        with patch(f"{PROJECT_MODULE}.module_model_tables", lambda: tables):
+            self.assertIsNone(self.status("studio_demo_shelf")["code"])
+        # The sources of the addons path: a core model, installed or not,
+        # in its form without dots.
+        self.assertIn("sale_order", project_module.module_model_tables())
+        self.assertEqual(self.status("sale_order")["code"], "unique")
+
+    def test_scan_reads_names_and_tables(self):
+        """The scan of the sources gives each model its explicit ``_table``,
+        else its name with its dots as ``_``, class by class."""
+        root = tempfile.mkdtemp(prefix="erplibre_studio_scan_")
+        self.addCleanup(shutil.rmtree, root, True)
+        module = os.path.join(root, "studio_demo_vault", "models")
+        os.makedirs(module)
+        with open(
+            os.path.join(root, "studio_demo_vault", "__manifest__.py"), "w"
+        ) as fh:
+            fh.write("{'name': 'Vault'}\n")
+        with open(os.path.join(module, "vault.py"), "w") as fh:
+            fh.write(
+                "class Vault(models.Model):\n"
+                "    _name = 'studio_demo.vault'\n"
+                "    _table = 'studio_demo_safe'\n"
+                "\n"
+                "class Key(models.Model):\n"
+                "    _name = 'studio_demo.key'\n"
+            )
+        names, tables = project_module._module_models(((root, 0),))
+        modules = frozenset({"studio_demo_vault"})
+        self.assertEqual(
+            names, {"studio_demo.vault": modules, "studio_demo.key": modules}
+        )
+        self.assertEqual(
+            tables, {"studio_demo_safe": modules, "studio_demo_key": modules}
+        )
+
+    def test_apply_reads_the_sources_again(self):
+        """Apply and the generation read the sources of the addons path
+        again: a model added inside an existing module changes no directory
+        of the addons path."""
+        self.book_line()
+        with patch(f"{PROJECT_MODULE}.refresh_module_models") as refresh:
+            self.project.action_apply()
+            self.assertTrue(refresh.called)
+            refresh.reset_mock()
+            self.project._check_generation_model_names()
+            self.assertTrue(refresh.called)
 
     def test_apply_creates_the_marked_model(self):
         line = self.book_line()
@@ -265,5 +333,56 @@ class TestUnprefixedModels(StudioCase):
             "UPDATE erplibre_studio_model SET model = 'class' WHERE id = %s", [line.id]
         )
         line.invalidate_recordset(["model"])
-        with self.assertRaisesRegex(UserError, "class"):
-            self.project._check_generation_model_names()
+        with self.server_actions(), self.assertRaisesRegex(UserError, "class"):
+            self.project.action_generate()
+
+    def test_generation_refuses_a_module_name(self):
+        """An applied model whose name a module on the addons path defines
+        since is not written: the two classes would be one model."""
+        self.book_line()
+        self.project.action_apply()
+        names = {BOOK: frozenset({"studio_demo_library"})}
+        with (
+            patch(f"{PROJECT_MODULE}.module_model_names", lambda: names),
+            self.server_actions(),
+            self.assertRaisesRegex(UserError, "A module on the addons path"),
+        ):
+            self.project.action_generate()
+
+    def test_foreign_module_owns_the_model(self):
+        """A model of the project that another module defines now: Apply,
+        Revert and the generation are refused and name that module."""
+        self.book_line()
+        self.project.action_apply()
+        ModuleBook = type(
+            "ModuleBook",
+            (self.registry[BOOK],),
+            {
+                "_register": False,
+                "_custom": False,
+                "_original_module": "studio_demo_library",
+            },
+        )
+        self.env.cr.execute(
+            "UPDATE ir_model SET state = 'base' WHERE model = %s", [BOOK]
+        )
+        self.env["ir.model"].invalidate_model(["state"])
+        with patch.dict(self.registry.models, {BOOK: ModuleBook}):
+            self.assertEqual(
+                self.project._studio_foreign_models(), {BOOK: "studio_demo_library"}
+            )
+            refusal = self.project._studio_revert_refusal()
+            self.assertIn(f"{BOOK} (studio_demo_library)", refusal)
+            with self.assertRaisesRegex(UserError, "studio_demo_library"):
+                self.project.action_revert()
+            with self.assertRaisesRegex(UserError, "studio_demo_library"):
+                self.project.action_apply()
+            with (
+                self.server_actions(),
+                self.assertRaisesRegex(UserError, "studio_demo_library"),
+            ):
+                self.project.action_generate()
+        # Its own generated module defines it: not another module.
+        ModuleBook._original_module = MODULE
+        with patch.dict(self.registry.models, {BOOK: ModuleBook}):
+            self.assertEqual(self.project._studio_foreign_models(), {})

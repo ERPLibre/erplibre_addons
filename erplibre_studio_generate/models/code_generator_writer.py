@@ -508,7 +508,7 @@ def project_views_file(project):
         )
         _field(record, "name", line.name.strip())
         _field(record, "res_model", line.model)
-        _field(record, "view_mode", "list,form")
+        _field(record, "view_mode", line._studio_view_mode())
         _field(record, "search_view_id", ref=names["search"])
         context = line._studio_action_context()
         if context:

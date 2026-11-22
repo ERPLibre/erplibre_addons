@@ -468,6 +468,25 @@ class TestGenerateModels(StudioCase):
             ("base.menu_custom", "Tags", f"action_{TAG}"),
         )
 
+    def test_action_opens_the_added_views(self):
+        """The action of a model of the project names, after its list and
+        its form, each view the project adds to the model."""
+        self.project._studio_add_view(ITEM, "graph")
+        self.project.action_apply()
+        self.generate()
+        root = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode(),
+            etree.XMLParser(remove_blank_text=True),
+        )
+        modes = {
+            node.get("id"): node.find("field[@name='view_mode']").text
+            for node in root.iter("record")
+            if node.get("model") == "ir.actions.act_window"
+        }
+        self.assertEqual(
+            modes, {f"action_{ITEM}": "list,form,graph", f"action_{TAG}": "list,form"}
+        )
+
     def test_layout_written(self):
         form = self.item._studio_views()["form"]
         main = "//group[@name='studio_main']"

@@ -58,8 +58,11 @@ GENERATED_IMPORTS = frozenset({"api", "fields", "models"})
 _UNSAFE_TEXT = ("'", '"', "\\", "\n", "\r")
 
 # The ``_name`` of a model class in a Python source, indented in the body
-# of its class.
+# of its class, and its explicit ``_table``.
 _SOURCE_MODEL_NAME = re.compile(r"^\s+_name\s*=\s*['\"]([a-z0-9_.]+)['\"]", re.M)
+_SOURCE_MODEL_TABLE = re.compile(r"^\s+_table\s*=\s*['\"]([a-z0-9_]+)['\"]", re.M)
+# The start of a class statement: the source splits there into class bodies.
+_SOURCE_CLASS = re.compile(r"^\s*class\s", re.M)
 # The directories of a module that hold no model class.
 _SKIPPED_DIRS = frozenset({"static", "node_modules", "__pycache__"})
 
@@ -92,13 +95,16 @@ def _addons_signature():
 
 
 @functools.lru_cache(maxsize=4)
-def _module_model_names(signature):
-    """{model name: frozenset of modules} of the model classes the Python
-    sources of the modules of ``signature`` declare, installed or not; a
-    module found twice counts in its first directory, as Odoo loads it. A
-    ``_name`` computed at run time or written outside a ``.py`` file is
+def _module_models(signature):
+    """({model name: frozenset of modules}, {table: frozenset of modules})
+    of the model classes the Python sources of the modules of ``signature``
+    declare, installed or not; a module found twice counts in its first
+    directory, as Odoo loads it. The table of a class is its explicit
+    ``_table``, else its ``_name`` with its dots as ``_``. A ``_name`` or a
+    ``_table`` computed at run time or written outside a ``.py`` file is
     not seen."""
-    found = {}
+    names = {}
+    tables = {}
     seen = set()
     for path, _mtime in signature:
         try:
@@ -126,16 +132,41 @@ def _module_model_names(signature):
                             text = fh.read()
                     except OSError:
                         continue
-                    for model in _SOURCE_MODEL_NAME.findall(text):
-                        found.setdefault(model, set()).add(module)
-    return {model: frozenset(modules) for model, modules in found.items()}
+                    for body in _SOURCE_CLASS.split(text):
+                        models_ = _SOURCE_MODEL_NAME.findall(body)
+                        if not models_:
+                            continue
+                        for model in models_:
+                            names.setdefault(model, set()).add(module)
+                        explicit = _SOURCE_MODEL_TABLE.findall(body)
+                        for table in explicit or map(studio_arch.model_table, models_):
+                            tables.setdefault(table, set()).add(module)
+    return (
+        {model: frozenset(modules) for model, modules in names.items()},
+        {table: frozenset(modules) for table, modules in tables.items()},
+    )
 
 
 def module_model_names():
     """{model name: frozenset of modules} of the models the modules on the
-    addons path define, read from their sources (``_module_model_names``).
-    Cached per process until a directory of the addons path changes."""
-    return _module_model_names(_addons_signature())
+    addons path define, read from their sources (``_module_models``).
+    Cached per process until a directory of the addons path changes, or
+    until ``refresh_module_models``."""
+    return _module_models(_addons_signature())[0]
+
+
+def module_model_tables():
+    """{table: frozenset of modules} of the tables of the models the modules
+    on the addons path define (``_module_models``), cached as
+    ``module_model_names``."""
+    return _module_models(_addons_signature())[1]
+
+
+def refresh_module_models():
+    """Drop the cache of ``_module_models`` of this process: a model added
+    inside an existing module changes no directory of the addons path, so
+    the checks that decide (Apply, the generation) read the sources again."""
+    _module_models.cache_clear()
 
 
 def addons_path_dirs():
@@ -393,15 +424,51 @@ class ErplibreStudioProject(models.Model):
                 names.add(model)
         return names
 
+    def _studio_reserved_model_tables(self):
+        """Those of ERPLibre studio, and the tables of the models a module on
+        the addons path defines (``module_model_tables``), installed or not,
+        the generated module of the project aside: « sale_order » would
+        share the table of « sale.order » once its module is installed."""
+        tables = super()._studio_reserved_model_tables()
+        own = self.module_name if len(self) == 1 else None
+        for table, modules in module_model_tables().items():
+            if modules - {own}:
+                tables.add(table)
+        return tables
+
+    def _studio_check_apply(self):
+        """The checks of ERPLibre studio on the sources of the addons path as
+        they are now (``refresh_module_models``)."""
+        refresh_module_models()
+        return super()._studio_check_apply()
+
     def _check_generation_model_names(self):
-        """Raise UserError on a new model without ``x_`` whose name cannot be
-        a model of the generated module: its format, a table that is a
-        Python keyword (the file ``models/<table>.py`` is imported by
-        name), a namespace of Odoo (``studio_arch.model_name_refusal``)."""
+        """Raise UserError on a model of the project another module defines
+        now (``_studio_foreign_model_refusal``), and on a new model without
+        ``x_`` whose name cannot be a model of the generated module: its
+        format, a table that is a Python keyword (the file
+        ``models/<table>.py`` is imported by name), a namespace of Odoo
+        (``studio_arch.model_name_refusal``), a name or a table a module on
+        the addons path defines, read again from the sources."""
         self.ensure_one()
+        refusal = self._studio_foreign_model_refusal()
+        if refusal:
+            raise UserError(refusal)
+        refresh_module_models()
+        names = self._studio_reserved_model_names()
+        tables = self._studio_reserved_model_tables()
         for line in self.new_model_ids:
             if line.model.startswith("x_"):
                 continue
+            if line.model in names or studio_arch.model_table(line.model) in tables:
+                raise UserError(
+                    self.env._(
+                        "A module on the addons path defines the model "
+                        "%(name)s or its table: revert the project, rename it "
+                        "in the draft, then Apply again.",
+                        name=line.model,
+                    )
+                )
             if studio_arch.model_name_refusal(line.model, prefix_required=False):
                 raise UserError(
                     self.env._(

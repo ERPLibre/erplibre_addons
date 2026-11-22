@@ -67,6 +67,17 @@ msgid ""
 msgstr "Un modèle d'un projet ERPLibre studio dont le nom n'a pas de x_ : ERPLibre studio generate le protège d'un module du même nom installé plus tard."
 
 #. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid ""
+"A module on the addons path defines the model %(name)s or its table: revert "
+"the project, rename it in the draft, then Apply again."
+msgstr ""
+"Un module de l'addons path définit le modèle %(name)s ou sa table : "
+"défaites le projet, renommez-le dans le brouillon, puis appliquez de "
+"nouveau."
+
+#. module: erplibre_studio_generate
 #: model:ir.model.fields.selection,name:erplibre_studio_generate.selection__erplibre_studio_project__license__agpl-3
 msgid "AGPL-3"
 msgstr "AGPL-3"
